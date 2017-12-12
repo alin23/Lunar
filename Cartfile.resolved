@@ -1,0 +1,7 @@
+github "Alamofire/Alamofire" "4.6.0"
+github "SwiftyBeaver/SwiftyBeaver" "1.4.3"
+github "SwiftyJSON/SwiftyJSON" "4.0.0"
+github "alin23/Solar" "2.2.0"
+github "alin23/WAYWindow" "1.0.0"
+github "malcommac/SwiftDate" "4.5.0"
+github "maxmouchet/LightKit" "0.0.2"

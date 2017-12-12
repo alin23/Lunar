@@ -1,8 +1,8 @@
 //
 //  ViewController.swift
-//  Adaptivo
+//  AdaptiveService
 //
-//  Created by Alin on 30/11/2017.
+//  Created by Alin on 03/12/2017.
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
