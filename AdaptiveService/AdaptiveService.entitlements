@@ -15,8 +15,8 @@
 	<key>com.apple.security.temporary-exception.sbpl</key>
 	<array>
 		<string>(allow iokit-open)</string>
-		<string>(allow iokit-set-properties (iokit-property &quot;ConsoleUID&quot;))</string>
-		<string>(allow mach-lookup (global-name &quot;com.apple.AssetCacheLocatorService&quot;))</string>
+		<string>(allow iokit-set-properties (iokit-property "ConsoleUID"))</string>
+		<string>(allow mach-lookup (global-name "com.apple.AssetCacheLocatorService"))</string>
 	</array>
 </dict>
 </plist>
