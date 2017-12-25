@@ -1,0 +1,704 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
+		C735DD751FD5B35E00FBD16F /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; };
+		C735DD761FD5B35E00FBD16F /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
+		C76545211FD88F5800DBACE9 /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C765451F1FD88F5600DBACE9 /* Solar.framework */; };
+		C76545221FD88F5800DBACE9 /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C765451F1FD88F5600DBACE9 /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C76545291FD8A56B00DBACE9 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C76545261FD8A11000DBACE9 /* DDC.c */; };
+		C77200031FF072CB0078E155 /* ScrollableValueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableValueController.swift */; };
+		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
+		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
+		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
+		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
+		C794E16E1FEFD03100549462 /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C794E16C1FEFD03100549462 /* NSPageControl.framework */; };
+		C794E1711FEFD04600549462 /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C794E16F1FEFD04500549462 /* NSPageControl.framework */; };
+		C794E1721FEFD04600549462 /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C794E16F1FEFD04500549462 /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
+		C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C794E1751FF01EF500549462 /* Model.xcdatamodeld */; };
+		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
+		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
+		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
+		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
+		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
+		C7C1F7031FD5FD390039507C /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7021FD5FD390039507C /* Display.swift */; };
+		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
+		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
+		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
+		C7CFEA031FD3605F000AC4A6 /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; };
+		C7CFEA041FD3605F000AC4A6 /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7CFEA051FD3605F000AC4A6 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA011FD3605E000AC4A6 /* SwiftyJSON.framework */; };
+		C7CFEA061FD3605F000AC4A6 /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA011FD3605E000AC4A6 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7CFEA071FD3605F000AC4A6 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA021FD3605F000AC4A6 /* Alamofire.framework */; };
+		C7CFEA081FD3605F000AC4A6 /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA021FD3605F000AC4A6 /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7CFEA0C1FD36923000AC4A6 /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA0A1FD36923000AC4A6 /* SwiftDate.framework */; };
+		C7CFEA0D1FD36923000AC4A6 /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA0A1FD36923000AC4A6 /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
+		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
+		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
+		C7CFEA231FD37853000AC4A6 /* LunarService.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CFEA121FD376E6000AC4A6 /* LunarService.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7CFEA261FD378BD000AC4A6 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */; };
+		C7CFEA271FD37AF3000AC4A6 /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; };
+		C7CFEA281FD37AF3000AC4A6 /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C7CFEA091FD3605F000AC4A6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C7CFEA061FD3605F000AC4A6 /* SwiftyJSON.framework in Embed Frameworks */,
+				C7CFEA081FD3605F000AC4A6 /* Alamofire.framework in Embed Frameworks */,
+				C735DD761FD5B35E00FBD16F /* WAYWindow.framework in Embed Frameworks */,
+				C7CFEA0D1FD36923000AC4A6 /* SwiftDate.framework in Embed Frameworks */,
+				C794E1721FEFD04600549462 /* NSPageControl.framework in Embed Frameworks */,
+				C76545221FD88F5800DBACE9 /* Solar.framework in Embed Frameworks */,
+				C7CFEA041FD3605F000AC4A6 /* SwiftyBeaver.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA221FD37836000AC4A6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				C7CFEA231FD37853000AC4A6 /* LunarService.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA291FD37AF3000AC4A6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C7CFEA281FD37AF3000AC4A6 /* SwiftyBeaver.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
+		C716B2051FD32B4900F22F90 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
+		C735DD731FD5B35D00FBD16F /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = WAYWindow.framework.dSYM; path = Carthage/Build/Mac/WAYWindow.framework.dSYM; sourceTree = "<group>"; };
+		C735DD741FD5B35E00FBD16F /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
+		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		C73853F91FEDBFA300C6B797 /* PocketSVG.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PocketSVG.framework; path = Carthage/Build/Mac/PocketSVG.framework; sourceTree = "<group>"; };
+		C73853FA1FEDBFA300C6B797 /* PocketSVG.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = PocketSVG.framework.dSYM; path = Carthage/Build/Mac/PocketSVG.framework.dSYM; sourceTree = "<group>"; };
+		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
+		C765451F1FD88F5600DBACE9 /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
+		C76545201FD88F5700DBACE9 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Solar.framework.dSYM; path = Carthage/Build/Mac/Solar.framework.dSYM; sourceTree = "<group>"; };
+		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
+		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
+		C77200021FF072CB0078E155 /* ScrollableValueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableValueController.swift; sourceTree = "<group>"; };
+		C77CC7541FED5501009AA718 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
+		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
+		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
+		C794E16B1FEFD03000549462 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = NSPageControl.framework.dSYM; path = Carthage/Build/Mac/NSPageControl.framework.dSYM; sourceTree = "<group>"; };
+		C794E16C1FEFD03100549462 /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
+		C794E16F1FEFD04500549462 /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
+		C794E1701FEFD04500549462 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = NSPageControl.framework.dSYM; path = Carthage/Build/Mac/NSPageControl.framework.dSYM; sourceTree = "<group>"; };
+		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
+		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
+		C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C7AEC7FF1FD0B4350039B562 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7AEC8021FD0B4350039B562 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
+		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
+		C7C1F7021FD5FD390039507C /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
+		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
+		C7C1F7061FD6354C0039507C /* Geolocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geolocation.swift; sourceTree = "<group>"; };
+		C7C1F7081FD639970039507C /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		C7CFE9FD1FD3605E000AC4A6 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Alamofire.framework.dSYM; path = Carthage/Build/Mac/Alamofire.framework.dSYM; sourceTree = "<group>"; };
+		C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
+		C7CFE9FF1FD3605E000AC4A6 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyBeaver.framework.dSYM; path = Carthage/Build/Mac/SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
+		C7CFEA001FD3605E000AC4A6 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Carthage/Build/Mac/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
+		C7CFEA011FD3605E000AC4A6 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
+		C7CFEA021FD3605F000AC4A6 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
+		C7CFEA0A1FD36923000AC4A6 /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
+		C7CFEA0B1FD36923000AC4A6 /* SwiftDate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftDate.framework.dSYM; path = Carthage/Build/Mac/SwiftDate.framework.dSYM; sourceTree = "<group>"; };
+		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C7CFEA1B1FD376E6000AC4A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7CFEA1E1FD376E6000AC4A6 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
+		C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C7AEC7F21FD0B4350039B562 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C794E16E1FEFD03100549462 /* NSPageControl.framework in Frameworks */,
+				C7CFEA261FD378BD000AC4A6 /* ServiceManagement.framework in Frameworks */,
+				C7CFEA051FD3605F000AC4A6 /* SwiftyJSON.framework in Frameworks */,
+				C735DD751FD5B35E00FBD16F /* WAYWindow.framework in Frameworks */,
+				C76545211FD88F5800DBACE9 /* Solar.framework in Frameworks */,
+				C7CFEA071FD3605F000AC4A6 /* Alamofire.framework in Frameworks */,
+				C794E1711FEFD04600549462 /* NSPageControl.framework in Frameworks */,
+				C7CFEA0C1FD36923000AC4A6 /* SwiftDate.framework in Frameworks */,
+				C7CFEA031FD3605F000AC4A6 /* SwiftyBeaver.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA0F1FD376E6000AC4A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7CFEA271FD37AF3000AC4A6 /* SwiftyBeaver.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C76545231FD8A0E000DBACE9 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				C7C1F7081FD639970039507C /* DataStore.swift */,
+				C7C1F7041FD635360039507C /* Moment.swift */,
+				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
+				C7C1F7021FD5FD390039507C /* Display.swift */,
+				C794E1751FF01EF500549462 /* Model.xcdatamodeld */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		C76545241FD8A10200DBACE9 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C7AEC7FA1FD0B4350039B562 /* PageController.swift */,
+				C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */,
+				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
+				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
+				C77200021FF072CB0078E155 /* ScrollableValueController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		C76545251FD8A11000DBACE9 /* DDC */ = {
+			isa = PBXGroup;
+			children = (
+				C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */,
+				C716B2051FD32B4900F22F90 /* DDC.swift */,
+			);
+			path = DDC;
+			sourceTree = "<group>";
+		};
+		C77CC75A1FEDB367009AA718 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
+				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
+				C794E1731FEFE31A00549462 /* ScrollableTextField.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C7AEC7EC1FD0B4350039B562 = {
+			isa = PBXGroup;
+			children = (
+				C794E16F1FEFD04500549462 /* NSPageControl.framework */,
+				C794E1701FEFD04500549462 /* NSPageControl.framework.dSYM */,
+				C765451F1FD88F5600DBACE9 /* Solar.framework */,
+				C76545201FD88F5700DBACE9 /* Solar.framework.dSYM */,
+				C735DD741FD5B35E00FBD16F /* WAYWindow.framework */,
+				C735DD731FD5B35D00FBD16F /* WAYWindow.framework.dSYM */,
+				C7CFEA0A1FD36923000AC4A6 /* SwiftDate.framework */,
+				C7CFEA0B1FD36923000AC4A6 /* SwiftDate.framework.dSYM */,
+				C7CFEA021FD3605F000AC4A6 /* Alamofire.framework */,
+				C7CFE9FD1FD3605E000AC4A6 /* Alamofire.framework.dSYM */,
+				C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */,
+				C7CFE9FF1FD3605E000AC4A6 /* SwiftyBeaver.framework.dSYM */,
+				C7CFEA011FD3605E000AC4A6 /* SwiftyJSON.framework */,
+				C7CFEA001FD3605E000AC4A6 /* SwiftyJSON.framework.dSYM */,
+				C7AEC7F71FD0B4350039B562 /* Lunar */,
+				C7CFEA131FD376E6000AC4A6 /* LunarService */,
+				C7AEC7F61FD0B4350039B562 /* Products */,
+				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		C7AEC7F61FD0B4350039B562 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C7AEC7F51FD0B4350039B562 /* Lunar.app */,
+				C7CFEA121FD376E6000AC4A6 /* LunarService.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
+			isa = PBXGroup;
+			children = (
+				C77CC75A1FEDB367009AA718 /* Views */,
+				C76545241FD8A10200DBACE9 /* Controllers */,
+				C76545231FD8A0E000DBACE9 /* Data */,
+				C76545251FD8A11000DBACE9 /* DDC */,
+				C76545261FD8A11000DBACE9 /* DDC.c */,
+				C76545271FD8A11000DBACE9 /* DDC.h */,
+				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
+				C7AEC8021FD0B4350039B562 /* Lunar.entitlements */,
+				C7AEC8011FD0B4350039B562 /* Info.plist */,
+				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
+				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
+				C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */,
+			);
+			path = Lunar;
+			sourceTree = "<group>";
+		};
+		C7CFEA131FD376E6000AC4A6 /* LunarService */ = {
+			isa = PBXGroup;
+			children = (
+				C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */,
+				C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */,
+				C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */,
+				C7CFEA1D1FD376E6000AC4A6 /* Info.plist */,
+				C7CFEA1E1FD376E6000AC4A6 /* LunarService.entitlements */,
+			);
+			path = LunarService;
+			sourceTree = "<group>";
+		};
+		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C794E16C1FEFD03100549462 /* NSPageControl.framework */,
+				C794E16B1FEFD03000549462 /* NSPageControl.framework.dSYM */,
+				C73853F91FEDBFA300C6B797 /* PocketSVG.framework */,
+				C73853FA1FEDBFA300C6B797 /* PocketSVG.framework.dSYM */,
+				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
+				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C7AEC7F41FD0B4350039B562 /* Lunar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7AEC81B1FD0B4350039B562 /* Build configuration list for PBXNativeTarget "Lunar" */;
+			buildPhases = (
+				C7AEC7F11FD0B4350039B562 /* Sources */,
+				C7AEC7F21FD0B4350039B562 /* Frameworks */,
+				C7AEC7F31FD0B4350039B562 /* Resources */,
+				C7CFEA091FD3605F000AC4A6 /* Embed Frameworks */,
+				C7CFEA221FD37836000AC4A6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Lunar;
+			productName = Lunar;
+			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C7CFEA111FD376E6000AC4A6 /* LunarService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7CFEA211FD376E6000AC4A6 /* Build configuration list for PBXNativeTarget "LunarService" */;
+			buildPhases = (
+				C7CFEA0E1FD376E6000AC4A6 /* Sources */,
+				C7CFEA0F1FD376E6000AC4A6 /* Frameworks */,
+				C7CFEA101FD376E6000AC4A6 /* Resources */,
+				C7CFEA291FD37AF3000AC4A6 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LunarService;
+			productName = LunarService;
+			productReference = C7CFEA121FD376E6000AC4A6 /* LunarService.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C7AEC7ED1FD0B4350039B562 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0910;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Alin;
+				TargetAttributes = {
+					C7AEC7F41FD0B4350039B562 = {
+						CreatedOnToolsVersion = 9.1;
+						LastSwiftMigration = 0910;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
+					C7CFEA111FD376E6000AC4A6 = {
+						CreatedOnToolsVersion = 9.1;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = C7AEC7F01FD0B4350039B562 /* Build configuration list for PBXProject "Lunar" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C7AEC7EC1FD0B4350039B562;
+			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C7AEC7F41FD0B4350039B562 /* Lunar */,
+				C7CFEA111FD376E6000AC4A6 /* LunarService */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C7AEC7F31FD0B4350039B562 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
+				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA101FD376E6000AC4A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */,
+				C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C7AEC7F11FD0B4350039B562 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */,
+				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
+				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
+				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
+				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
+				C76545291FD8A56B00DBACE9 /* DDC.c in Sources */,
+				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
+				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
+				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
+				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
+				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
+				C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */,
+				C77200031FF072CB0078E155 /* ScrollableValueController.swift in Sources */,
+				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
+				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
+				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
+				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA0E1FD376E6000AC4A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		C7AEC7FE1FD0B4350039B562 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C7AEC7FF1FD0B4350039B562 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C7CFEA1B1FD376E6000AC4A6 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C7AEC8191FD0B4350039B562 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C7AEC81A1FD0B4350039B562 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		C7AEC81C1FD0B4350039B562 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RDDXV84A73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = Lunar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.Lunar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		C7AEC81D1FD0B4350039B562 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RDDXV84A73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = Lunar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.Lunar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		C7CFEA1F1FD376E6000AC4A6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RDDXV84A73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = LunarService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		C7CFEA201FD376E6000AC4A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RDDXV84A73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = LunarService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C7AEC7F01FD0B4350039B562 /* Build configuration list for PBXProject "Lunar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7AEC8191FD0B4350039B562 /* Debug */,
+				C7AEC81A1FD0B4350039B562 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7AEC81B1FD0B4350039B562 /* Build configuration list for PBXNativeTarget "Lunar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7AEC81C1FD0B4350039B562 /* Debug */,
+				C7AEC81D1FD0B4350039B562 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7CFEA211FD376E6000AC4A6 /* Build configuration list for PBXNativeTarget "LunarService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7CFEA1F1FD376E6000AC4A6 /* Debug */,
+				C7CFEA201FD376E6000AC4A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C794E1751FF01EF500549462 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C794E1761FF01EF500549462 /* Model.xcdatamodel */,
+			);
+			currentVersion = C794E1761FF01EF500549462 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = C7AEC7ED1FD0B4350039B562 /* Project object */;
+}

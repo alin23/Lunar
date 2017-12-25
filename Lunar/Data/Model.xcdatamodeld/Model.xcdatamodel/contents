@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D25b" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Display" representedClassName=".Display" syncable="YES">
+        <attribute name="adaptive" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="maxBrightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="100" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="maxContrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="100" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="minBrightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="minContrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Display" positionX="-63" positionY="-18" width="128" height="150"/>
+    </elements>
+</model>
