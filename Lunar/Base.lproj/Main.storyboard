@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
+    </dependencies>
+    <scenes>
+        <!--Application-->
+        <scene sceneID="JPo-4y-FX3">
+            <objects>
+                <application id="hnw-xV-0zn" sceneMemberID="viewController">
+                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
+                        <items>
+                            <menuItem title="Lunar" id="1Xt-HY-uBw">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
+                                    <items>
+                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                            <connections>
+                                                <segue destination="B8D-0N-5wS" kind="show" id="PSl-fJ-HrZ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Toggle" keyEquivalent="l" id="cb4-qT-5Fw">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="toggleBrightnessAdapterWithSender:" target="Voe-Tx-rLC" id="WZa-gt-6uZ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
+                                        <menuItem title="Quit Lunar" keyEquivalent="q" id="4sb-4s-VLi">
+                                            <connections>
+                                                <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                    <connections>
+                                        <outlet property="delegate" destination="Voe-Tx-rLC" id="Qnj-0T-tfY"/>
+                                    </connections>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Window" id="iIR-Wz-GYk">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Window" systemMenu="apple" id="3qC-XO-MrT">
+                                    <items>
+                                        <menuItem title="Close Window" keyEquivalent="w" id="p42-Pp-Fha">
+                                            <connections>
+                                                <action selector="performClose:" target="Ady-hI-5gd" id="y1g-fw-SQt"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Hide Window" keyEquivalent="h" id="njI-iY-8HK">
+                                            <connections>
+                                                <action selector="hide:" target="Ady-hI-5gd" id="FAw-Io-dj6"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Hide Others" keyEquivalent="h" id="F5t-ga-Ofd">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="hideOtherApplications:" target="Ady-hI-5gd" id="vG8-gU-Bl9"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Minimize" keyEquivalent="m" id="D8j-Gy-uQh">
+                                            <connections>
+                                                <action selector="performMiniaturize:" target="Ady-hI-5gd" id="xYK-aJ-QSH"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                    <connections>
+                                        <outlet property="delegate" destination="Voe-Tx-rLC" id="fr7-Am-tDe"/>
+                                    </connections>
+                                </menu>
+                            </menuItem>
+                        </items>
+                    </menu>
+                    <connections>
+                        <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
+                    </connections>
+                </application>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
+                    <connections>
+                        <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
+                        <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
+                    </connections>
+                </customObject>
+                <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
+                <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="0.0"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="R2V-B0-nI4">
+            <objects>
+                <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <windowController id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="WAYWindow">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
+                        <rect key="contentRect" x="561" y="239" width="750" height="500"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <value key="minSize" type="size" width="750" height="500"/>
+                        <value key="maxSize" type="size" width="750" height="500"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticallyCenterTitle" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="centerTrafficLightButtons" value="YES"/>
+                            <userDefinedRuntimeAttribute type="number" keyPath="titleBarHeight">
+                                <real key="value" value="40"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="trafficLightButtonsLeftMargin">
+                                <real key="value" value="14"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="hideTitleBarInFullScreen" value="NO"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="hidesTitle" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticalTrafficLightButtons" value="NO"/>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <outlet property="window" destination="IQv-IB-iLA" id="kBQ-Ew-vMy"/>
+                        <segue destination="cu7-9X-1cE" kind="relationship" relationship="window.shadowedContentViewController" id="qtt-sk-mJb"/>
+                    </connections>
+                </windowController>
+            </objects>
+            <point key="canvasLocation" x="75" y="415"/>
+        </scene>
+        <!--Split View Controller-->
+        <scene sceneID="cHE-73-x2e">
+            <objects>
+                <viewController id="cu7-9X-1cE" customClass="SplitViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" focusRingType="none" id="5aw-bz-KGE">
+                        <rect key="frame" x="0.0" y="0.0" width="750" height="500"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mMS-bl-7KZ">
+                                <rect key="frame" x="0.0" y="0.0" width="750" height="430"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <segue destination="lKy-an-qh6" kind="embed" id="hC9-84-OaC"/>
+                                </connections>
+                            </containerView>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="651" y="454" width="74" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Start      ⚫︎" alternateTitle="Pause    ⚫︎" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <string key="keyEquivalent">b</string>
+                                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="zyO-27-aZX"/>
+                                </connections>
+                            </button>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
+                                <rect key="frame" x="323" y="440" width="103" height="42"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
+                                    <font key="font" size="25" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.89411764705882346" green="0.72941176470588232" blue="0.26666666666666666" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="activeStateButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
+                    </connections>
+                </viewController>
+                <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="1047"/>
+        </scene>
+        <!--Page Controller-->
+        <scene sceneID="fpi-QH-es0">
+            <objects>
+                <pagecontroller showSeguePresentationStyle="single" transitionStyle="horizontalStrip" id="lKy-an-qh6" customClass="PageController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" focusRingType="none" id="vLl-tq-UBI">
+                        <rect key="frame" x="0.0" y="0.0" width="750" height="430"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    </view>
+                    <connections>
+                        <outlet property="userDefaultsController" destination="9Fa-lg-FqD" id="b5J-py-ooT"/>
+                    </connections>
+                </pagecontroller>
+                <customObject id="H0s-9S-08j" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="9Fa-lg-FqD"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="1638"/>
+        </scene>
+        <!--Display View Controller-->
+        <scene sceneID="XpM-oo-Jy5">
+            <objects>
+                <viewController storyboardIdentifier="displayViewController" id="1Bn-Ca-ETm" customClass="DisplayViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" focusRingType="none" id="PXe-go-kYm">
+                        <rect key="frame" x="0.0" y="0.0" width="750" height="430"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q">
+                                <rect key="frame" x="250" y="119" width="250" height="200"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" focusRingType="none" alignment="left" imageScaling="proportionallyDown" image="Display" id="GDk-iZ-Y9k"/>
+                            </imageView>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy">
+                                <rect key="frame" x="265" y="167" width="220" height="96"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf">
+                                    <font key="font" size="28" name="Menlo-Regular"/>
+                                    <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlx-Xy-HmE" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="241" width="258" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="10" usesSingleLineMode="YES" id="cAX-he-daa">
+                                    <font key="font" metaFont="systemBlack" size="50"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jPJ-JT-IAi" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="158" width="258" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="lmk-r8-4mb">
+                                    <font key="font" metaFont="systemBlack" size="50"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n8Y-U1-onQ">
+                                <rect key="frame" x="0.0" y="315" width="258" height="27"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Brightness" id="rRz-1T-Jmz">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H6o-mg-lXU" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="492" y="241" width="258" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="30" usesSingleLineMode="YES" id="a5b-hV-F2n">
+                                    <font key="font" metaFont="systemBlack" size="50"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eMi-BT-cI1" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="492" y="158" width="258" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="90" usesSingleLineMode="YES" id="1Gv-l9-z5P">
+                                    <font key="font" metaFont="systemBlack" size="50"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8fm-GT-uKN">
+                                <rect key="frame" x="492" y="315" width="258" height="27"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Contrast" id="cfA-qT-js9">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bVt-pa-Zbe">
+                                <rect key="frame" x="0.0" y="228" width="258" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="qTt-MW-1bT">
+                                    <font key="font" metaFont="systemBold" size="10"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VEg-Tl-rq5">
+                                <rect key="frame" x="0.0" y="145" width="258" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="oFE-0j-WG9">
+                                    <font key="font" metaFont="systemBold" size="10"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lgf-el-0pV">
+                                <rect key="frame" x="492" y="228" width="258" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="wED-mh-KGb">
+                                    <font key="font" metaFont="systemBold" size="10"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mCm-HY-NsK">
+                                <rect key="frame" x="492" y="145" width="258" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="oDd-DG-BXp">
+                                    <font key="font" metaFont="systemBold" size="10"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q49-TR-BYd">
+                                <rect key="frame" x="333" y="85" width="83" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Manual" alternateTitle="Adaptive" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tss-e1-acf">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <string key="keyEquivalent">a</string>
+                                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleAdaptive:" target="1Bn-Ca-ETm" id="lN7-m5-AxW"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="adaptiveButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
+                        <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
+                        <outlet property="maxBrightness" destination="jPJ-JT-IAi" id="vNy-56-mXQ"/>
+                        <outlet property="maxContrast" destination="eMi-BT-cI1" id="qQu-E1-X1v"/>
+                        <outlet property="minBrightness" destination="hlx-Xy-HmE" id="don-D7-WvH"/>
+                        <outlet property="minContrast" destination="H6o-mg-lXU" id="A2l-kc-NmJ"/>
+                    </connections>
+                </viewController>
+                <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="1082"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Display" width="236" height="200"/>
+    </resources>
+</document>
