@@ -21,9 +21,17 @@ class BrightnessAdapter  {
             fetchMoments()
         }
     }
+    var _moment: Moment!
     var moment: Moment! {
-        didSet {
-            moment.store()
+        get {
+            if !_moment.solarNoon.isToday {
+                fetchMoments()
+            }
+            return _moment
+        }
+        set {
+            _moment = newValue
+            _moment.store()
             if running {
                 adaptBrightness()
             }
@@ -57,23 +65,24 @@ class BrightnessAdapter  {
         let displayIDs = Set(DDC.findExternalDisplays())
         
         do {
-            let displayList = try datastore.context.fetch(NSFetchRequest<Display>(entityName: "Display"))
+            let displayList = try datastore.context.fetch(datastore.container.managedObjectModel.fetchRequestTemplate(forName: "AllDisplays")!) as! [Display]
             displays = Dictionary(uniqueKeysWithValues: displayList.map {
                 (d) -> (CGDirectDisplayID, Display) in (d.id, d)
             })
             let loadedDisplayIDs = Set(displays.keys)
             for id in loadedDisplayIDs.intersection(displayIDs) {
                 displays[id]?.active = true
+                displays[id]?.addObservers()
             }
             for id in displayIDs.subtracting(loadedDisplayIDs) {
                 displays[id] = Display(id: id)
             }
+            datastore.save()
             return displays
         } catch {
             log.error("Error on fetching displays: \(error)")
             displays = Dictionary(uniqueKeysWithValues: displayIDs.map { (id) in (id, Display(id: id, active: true)) })
         }
-
         datastore.save()
         return displays
     }

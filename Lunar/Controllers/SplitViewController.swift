@@ -9,7 +9,7 @@
 import Cocoa
 
 class SplitViewController: NSViewController {
-    let bgColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+    let bgColor = NSColor.init(deviceWhite: 1.0, alpha: 1.0)
     let buttonLabelColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.2513754401)
     let buttonColor = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
     @IBOutlet weak var activeStateButton: NSButton?
@@ -25,10 +25,10 @@ class SplitViewController: NSViewController {
             
             let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
             activeTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: buttonLabelColor, range: NSMakeRange(0, activeTitle.length - 2))
-            activeTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: #colorLiteral(red: 0.3295102879, green: 0.8284319043, blue: 0.5044205216, alpha: 1), range: NSMakeRange(activeTitle.length - 2, 2))
+            activeTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: #colorLiteral(red: 0.9481818676, green: 0.2008136532, blue: 0.262285579, alpha: 1), range: NSMakeRange(activeTitle.length - 2, 2))
             let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
             inactiveTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: buttonLabelColor, range: NSMakeRange(0, inactiveTitle.length - 2))
-            inactiveTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: #colorLiteral(red: 0.9481818676, green: 0.2008136532, blue: 0.262285579, alpha: 1), range: NSMakeRange(inactiveTitle.length - 2, 2))
+            inactiveTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: #colorLiteral(red: 0.3295102879, green: 0.8284319043, blue: 0.5044205216, alpha: 1), range: NSMakeRange(inactiveTitle.length - 2, 2))
             
             button.attributedTitle = inactiveTitle
             button.attributedAlternateTitle = activeTitle
