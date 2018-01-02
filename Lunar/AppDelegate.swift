@@ -81,6 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     func applicationWillTerminate(_ aNotification: Notification) {
         log.info("Going down")
+        datastore.save()
         activity.invalidate()
     }
     

@@ -35,12 +35,28 @@ class PageController: NSPageController, NSPageControllerDelegate {
         view.addSubview(pageControl)
     }
     
+    @IBAction func deleteDisplay(sender: NSButton) {
+//        let viewControllerToDelete = selectedViewController
+        if selectedIndex == 0 {
+            if selectedIndex < arrangedObjects.count {
+                navigateForward(nil)
+            }
+        } else {
+            navigateBack(nil)
+        }
+        let displayToDelete = arrangedObjects[selectedIndex] as! Display
+        arrangedObjects.remove(at: selectedIndex)
+        datastore.context.delete(displayToDelete)
+        datastore.save()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         delegate = self
         setupPageControl(selectedIndex)
-        if !brightnessAdapter.displays.isEmpty {
+        if !brightnessAdapter.displays.isEmpty
+        {
             arrangedObjects = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
             })
