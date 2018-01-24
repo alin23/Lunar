@@ -59,6 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
         activity.repeats = true
         activity.interval = interval
+        activity.qualityOfService = .userInitiated
     }
     
     func initMenubarIcon() {
