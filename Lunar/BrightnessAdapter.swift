@@ -31,9 +31,8 @@ class BrightnessAdapter  {
         }
         set {
             _moment = newValue
-            _moment.store()
-            if running {
-                adaptBrightness()
+            if _moment != nil {
+                _moment.store()
             }
         }
     }
