@@ -19,8 +19,8 @@ class ToggleButton: NSButton {
     }
     
     override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
         state = getButtonState()
+        super.draw(dirtyRect)
     }
     
 }

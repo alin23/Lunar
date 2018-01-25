@@ -9,10 +9,11 @@
 import Cocoa
 import WAYWindow
 
-class ModernWindowController: NSWindowController {
+class ModernWindowController: NSWindowController, NSWindowDelegate {
     
-    override func windowDidLoad() {
+    func setupWindow() {
         if let w = window as? WAYWindow {
+            w.delegate = self
             w.titleBarHeight = 50
             w.verticallyCenterTitle = true
             w.centerTrafficLightButtons = true
@@ -22,8 +23,17 @@ class ModernWindowController: NSWindowController {
             w.hideTitleBarInFullScreen = false
             w.isOpaque = false
             w.backgroundColor = NSColor.clear
+            w.makeKeyAndOrderFront(nil)
         }
+    }
+    
+    override func windowDidLoad() {
         super.windowDidLoad()
+        setupWindow()
+    }
+    
+    func windowWillClose(_ notification: Notification) {
+        log.info("Window closing")
     }
     
 }

@@ -49,6 +49,9 @@
 		C7CFEA261FD378BD000AC4A6 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */; };
 		C7CFEA271FD37AF3000AC4A6 /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; };
 		C7CFEA281FD37AF3000AC4A6 /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFE9FE1FD3605E000AC4A6 /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7DE938E2019E1230017F965 /* HotKey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DE938C2019E1220017F965 /* HotKey.framework */; };
+		C7DE938F2019E1230017F965 /* HotKey.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7DE938C2019E1220017F965 /* HotKey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,6 +61,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C7DE938F2019E1230017F965 /* HotKey.framework in Embed Frameworks */,
 				C7CFEA061FD3605F000AC4A6 /* SwiftyJSON.framework in Embed Frameworks */,
 				C7CFEA081FD3605F000AC4A6 /* Alamofire.framework in Embed Frameworks */,
 				C735DD761FD5B35E00FBD16F /* WAYWindow.framework in Embed Frameworks */,
@@ -144,6 +148,11 @@
 		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7CFEA1E1FD376E6000AC4A6 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		C7DE93882019E1160017F965 /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
+		C7DE93892019E1160017F965 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = HotKey.framework.dSYM; path = Carthage/Build/Mac/HotKey.framework.dSYM; sourceTree = "<group>"; };
+		C7DE938C2019E1220017F965 /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
+		C7DE938D2019E1230017F965 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = HotKey.framework.dSYM; path = Carthage/Build/Mac/HotKey.framework.dSYM; sourceTree = "<group>"; };
+		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +162,7 @@
 			files = (
 				C794E16E1FEFD03100549462 /* NSPageControl.framework in Frameworks */,
 				C7CFEA261FD378BD000AC4A6 /* ServiceManagement.framework in Frameworks */,
+				C7DE938E2019E1230017F965 /* HotKey.framework in Frameworks */,
 				C7CFEA051FD3605F000AC4A6 /* SwiftyJSON.framework in Frameworks */,
 				C735DD751FD5B35E00FBD16F /* WAYWindow.framework in Frameworks */,
 				C76545211FD88F5800DBACE9 /* Solar.framework in Frameworks */,
@@ -214,6 +224,7 @@
 				C794E1731FEFE31A00549462 /* ScrollableTextField.swift */,
 				C77200021FF072CB0078E155 /* ScrollableBrightness.swift */,
 				C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */,
+				C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -221,6 +232,8 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C7DE938C2019E1220017F965 /* HotKey.framework */,
+				C7DE938D2019E1230017F965 /* HotKey.framework.dSYM */,
 				C794E16F1FEFD04500549462 /* NSPageControl.framework */,
 				C794E1701FEFD04500549462 /* NSPageControl.framework.dSYM */,
 				C765451F1FD88F5600DBACE9 /* Solar.framework */,
@@ -285,6 +298,8 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7DE93882019E1160017F965 /* HotKey.framework */,
+				C7DE93892019E1160017F965 /* HotKey.framework.dSYM */,
 				C794E16C1FEFD03100549462 /* NSPageControl.framework */,
 				C794E16B1FEFD03000549462 /* NSPageControl.framework.dSYM */,
 				C73853F91FEDBFA300C6B797 /* PocketSVG.framework */,
@@ -420,6 +435,7 @@
 				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
