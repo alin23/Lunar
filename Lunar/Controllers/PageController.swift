@@ -71,7 +71,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
     }
     
     func pageController(_ pageController: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
-        let vc = NSStoryboard(name: NSStoryboard.Name(rawValue: "Main"), bundle:nil).instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as! DisplayViewController
+        let vc = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as! DisplayViewController
         let displayId = CGDirectDisplayID(identifier.rawValue)!
         if displayId != GENERIC_DISPLAY.id {
             vc.display = brightnessAdapter.displays[displayId]

@@ -13,7 +13,11 @@ class ScrollableBrightness: NSView {
     @IBOutlet weak var minValue: ScrollableTextField!
     @IBOutlet weak var maxValue: ScrollableTextField!
     @IBOutlet weak var currentValue: ScrollableTextField!
-
+    
+    @IBOutlet weak var minValueCaption: ScrollableTextFieldCaption!
+    @IBOutlet weak var maxValueCaption: ScrollableTextFieldCaption!
+    @IBOutlet weak var currentValueCaption: ScrollableTextFieldCaption!
+    
     var display: Display! {
         didSet {
             update(from: display)
@@ -59,22 +63,34 @@ class ScrollableBrightness: NSView {
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        minValue?.onValueChanged = { (value: Int) in
-            self.maxValue?.lowerLimit = value
-            if self.display != nil {
-                self.displayMinValue = value
+        if let min = minValue,
+            let max = maxValue,
+            min.onValueChanged == nil,
+            max.onValueChanged == nil
+        {
+            min.onValueChanged = { (value: Int) in
+                self.maxValue?.lowerLimit = value
+                if self.display != nil {
+                    self.displayMinValue = value
+                }
+            }
+            max.onValueChanged = { (value: Int) in
+                self.minValue?.upperLimit = value
+                if self.display != nil {
+                    self.displayMaxValue = value
+                }
             }
         }
-        maxValue?.onValueChanged = { (value: Int) in
-            self.minValue?.upperLimit = value
-            if self.display != nil {
-                self.displayMaxValue = value
-            }
-        }
-        currentValue?.onValueChanged = { (value: Int) in
-            if self.display != nil {
-                self.displayValue = value
-            }
+        
+        if let minCaption = minValueCaption,
+            let maxCaption = maxValueCaption,
+            let min = minValue,
+            let max = maxValue,
+            min.caption == nil,
+            max.caption == nil
+        {
+            min.caption = minCaption
+            max.caption = maxCaption
         }
     }
     

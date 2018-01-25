@@ -17,14 +17,14 @@
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
                                         <menuItem title="Preferences…" keyEquivalent="L" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
-                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <segue destination="B8D-0N-5wS" kind="show" id="PSl-fJ-HrZ"/>
+                                                <action selector="showWindowWithSender:" target="Voe-Tx-rLC" id="qbP-Ur-gqG"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Toggle" keyEquivalent="d" id="cb4-qT-5Fw">
+                                        <menuItem title="Toggle" keyEquivalent="l" id="cb4-qT-5Fw">
                                             <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
                                                 <action selector="toggleBrightnessAdapterWithSender:" target="Voe-Tx-rLC" id="WZa-gt-6uZ"/>
                                             </connections>
@@ -93,8 +93,8 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <windowController id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="WAYWindow">
+                <windowController storyboardIdentifier="windowController" id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="WAYWindow">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
                         <rect key="contentRect" x="561" y="239" width="750" height="500"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
@@ -114,7 +114,7 @@
                             <userDefinedRuntimeAttribute type="boolean" keyPath="verticalTrafficLightButtons" value="NO"/>
                         </userDefinedRuntimeAttributes>
                         <connections>
-                            <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
+                            <outlet property="delegate" destination="B8D-0N-5wS" id="J7h-ef-IWy"/>
                         </connections>
                     </window>
                     <connections>
@@ -237,39 +237,39 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sHO-oG-RCf" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="20" width="250" height="60"/>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sHO-oG-RCf" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="65" y="20" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="h6T-2W-xq9">
                                             <font key="font" metaFont="systemHeavy" size="48"/>
-                                            <color key="textColor" white="0.0" alpha="0.60092979753521125" colorSpace="deviceWhite"/>
+                                            <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AFf-yC-bHu">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AFf-yC-bHu" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="5" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="yxN-eN-fTW">
                                             <font key="font" metaFont="systemBold" size="10"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWj-lO-viB">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWj-lO-viB" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="90" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="kl2-hg-amy">
                                             <font key="font" metaFont="systemBold" size="10"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OzI-5V-Ofu" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="105" width="250" height="60"/>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OzI-5V-Ofu" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="65" y="105" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="10" usesSingleLineMode="YES" id="GW0-Io-Qsz">
                                             <font key="font" metaFont="systemHeavy" size="48"/>
-                                            <color key="textColor" white="0.0" alpha="0.60092979753521125" colorSpace="deviceWhite"/>
+                                            <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -277,7 +277,9 @@
                                 <connections>
                                     <outlet property="label" destination="umA-QT-AAO" id="h1E-9Y-e3c"/>
                                     <outlet property="maxValue" destination="sHO-oG-RCf" id="2ii-Is-jhN"/>
+                                    <outlet property="maxValueCaption" destination="AFf-yC-bHu" id="w4l-6S-M0T"/>
                                     <outlet property="minValue" destination="OzI-5V-Ofu" id="1YB-Us-jJa"/>
+                                    <outlet property="minValueCaption" destination="bWj-lO-viB" id="GlG-FP-cHP"/>
                                 </connections>
                             </customView>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XVS-nO-2Mf" customClass="ScrollableContrast" customModule="Lunar" customModuleProvider="target">
@@ -293,39 +295,39 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EOc-dV-pve" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="20" width="250" height="60"/>
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EOc-dV-pve" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="65" y="20" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="b0T-Nr-uCc">
                                             <font key="font" metaFont="systemHeavy" size="48"/>
-                                            <color key="textColor" white="0.0" alpha="0.60092979749999997" colorSpace="deviceWhite"/>
+                                            <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hND-EE-xno">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hND-EE-xno" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="5" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="j1k-jz-zl9">
                                             <font key="font" metaFont="systemBold" size="10"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1u6-gf-UFK">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1u6-gf-UFK" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="90" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="Dyb-7m-YDq">
                                             <font key="font" metaFont="systemBold" size="10"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QAV-hB-Z6e" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="105" width="250" height="60"/>
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QAV-hB-Z6e" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="65" y="105" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="bOn-60-FuP">
                                             <font key="font" metaFont="systemHeavy" size="48"/>
-                                            <color key="textColor" white="0.0" alpha="0.60092979749999997" colorSpace="deviceWhite"/>
+                                            <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -333,17 +335,11 @@
                                 <connections>
                                     <outlet property="label" destination="7BM-c4-qeq" id="sel-wj-PFB"/>
                                     <outlet property="maxValue" destination="EOc-dV-pve" id="JdS-sC-elv"/>
+                                    <outlet property="maxValueCaption" destination="hND-EE-xno" id="PO4-w4-jG9"/>
                                     <outlet property="minValue" destination="QAV-hB-Z6e" id="l4g-Ob-ZZ1"/>
+                                    <outlet property="minValueCaption" destination="1u6-gf-UFK" id="moA-76-mwR"/>
                                 </connections>
                             </customView>
-                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dIr-RL-ive">
-                                <rect key="frame" x="682" y="20" width="48" height="48"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Trash" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="q69-NR-IDM">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -360,6 +356,5 @@
     </scenes>
     <resources>
         <image name="Display" width="250" height="211"/>
-        <image name="Trash" width="39" height="48"/>
     </resources>
 </document>

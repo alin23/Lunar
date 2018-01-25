@@ -25,9 +25,13 @@ class DisplayViewController: NSViewController {
         }
     }
     let adaptiveButtonBgOn = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
-    let adaptiveButtonLabelOn = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.796875)
+    let adaptiveButtonBgOnHover = #colorLiteral(red: 1, green: 0.7921187659, blue: 0.4011040637, alpha: 1)
+    let adaptiveButtonLabelOn = #colorLiteral(red: 0.0808076635, green: 0.0326673463, blue: 0.2609090805, alpha: 1)
     let adaptiveButtonBgOff = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
+    let adaptiveButtonBgOffHover = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
     let adaptiveButtonLabelOff = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.2513754401)
+    
+    var adaptiveButtonTrackingArea: NSTrackingArea!
     
     func update(from display: Display) {
         displayName?.stringValue = display.name
@@ -71,9 +75,34 @@ class DisplayViewController: NSViewController {
             } else {
                 button.layer!.backgroundColor = adaptiveButtonBgOff.cgColor
             }
+            adaptiveButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+            button.addTrackingArea(adaptiveButtonTrackingArea)
         }
     }
     
+    override func mouseEntered(with event: NSEvent) {
+        if let button = adaptiveButton {
+            button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
+
+            if button.state == .on {
+                button.layer!.backgroundColor = adaptiveButtonBgOnHover.cgColor
+            } else {
+                button.layer!.backgroundColor = adaptiveButtonBgOffHover.cgColor
+            }
+        }
+    }
+    
+    override func mouseExited(with event: NSEvent) {
+        if let button = adaptiveButton {
+            button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+
+            if button.state == .on {
+                button.layer!.backgroundColor = adaptiveButtonBgOn.cgColor
+            } else {
+                button.layer!.backgroundColor = adaptiveButtonBgOff.cgColor
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

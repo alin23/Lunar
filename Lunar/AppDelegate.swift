@@ -11,6 +11,7 @@ import CoreLocation
 import SwiftyBeaver
 import ServiceManagement
 import WAYWindow
+import HotKey
 
 let log = SwiftyBeaver.self
 let brightnessAdapter = BrightnessAdapter()
@@ -21,9 +22,20 @@ extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
 }
 
+let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
+let lunarHotKey = HotKey(key: .l, modifiers: [.command, .control, .shift])
+
+func fadeTransition(duration: TimeInterval) -> CATransition {
+    let transition = CATransition()
+    transition.duration = duration
+    transition.type = kCATransitionFade
+    return transition
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
+    var windowController: ModernWindowController?
     @IBOutlet weak var menu: NSMenu!
     @IBOutlet weak var toggleMenuItem: NSMenuItem!
     
@@ -39,6 +51,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         
         log.addDestination(console)
         log.addDestination(file)
+    }
+    
+    func initHotkeys() {
+        toggleHotKey.keyDownHandler = {
+            self.toggleBrightnessAdapter(sender: nil)
+            log.debug("Toggle Hotkey pressed")
+        }
+        lunarHotKey.keyDownHandler = {
+            self.showWindow()
+            log.debug("Show Window Hotkey pressed")
+        }
+    }
+    
+    func showWindow() {
+        if self.windowController == nil {
+            self.windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "windowController")) as? ModernWindowController
+        }
+        if let windowController = self.windowController,
+            let window = windowController.window,
+            !window.isVisible {
+            windowController.showWindow(nil)
+        }
     }
     
     func handleDaemon() {
@@ -78,6 +112,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initBrightnessAdapterActivity(interval: 60)
         brightnessAdapter.running = true
         initMenubarIcon()
+        initHotkeys()
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -137,6 +172,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func toggleBrightnessAdapter(sender: Any?) {
         _ = brightnessAdapter.toggle()
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
+        let splitView = self.windowController?.window?.contentViewController as? SplitViewController
+        splitView?.activeStateButton?.setNeedsDisplay()
+    }
+    
+    @IBAction func showWindow(sender: Any?) {
+        self.showWindow()
     }
 }
 

@@ -21,6 +21,7 @@ class DataStore: NSObject {
         }
     }
     
+    
     override init() {
         container.loadPersistentStores(completionHandler: { (description, error) in
             if let error = error {
@@ -28,6 +29,12 @@ class DataStore: NSObject {
             }
         })
         context = container.newBackgroundContext()
+        if defaults.object(forKey: "interpolationFactor") == nil {
+            defaults.set(0.5, forKey: "interpolationFactor")
+        }
+        if defaults.object(forKey: "didScrollTextField") == nil {
+            defaults.set(false, forKey: "didScrollTextField")
+        }
     }
     
 }
