@@ -20,12 +20,6 @@ class ScrollableTextField: NSTextField {
     
     var normalSize: CGSize?
     var activeSize: CGSize?
-    var normalFont: NSFont?
-    var activeFont: NSFont?
-    
-    let color = #colorLiteral(red: 0.95, green: 0.748125, blue: 0.1425, alpha: 0.7989381602)
-    let colorHover = #colorLiteral(red: 1, green: 0.7875, blue: 0.15, alpha: 0.7989381602)
-    let colorLight = #colorLiteral(red: 1, green: 0.7733493961, blue: 0.347030403, alpha: 1)
     
     var trackingArea: NSTrackingArea?
     var captionTrackingArea: NSTrackingArea?
@@ -35,68 +29,66 @@ class ScrollableTextField: NSTextField {
                 return
             }
             if let area = captionTrackingArea {
-                self.removeTrackingArea(area)
+                removeTrackingArea(area)
             }
-            captionTrackingArea = NSTrackingArea(rect: self.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: caption, userInfo: nil)
-            self.addTrackingArea(captionTrackingArea!)
+            captionTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: caption, userInfo: nil)
+            addTrackingArea(captionTrackingArea!)
         }
     }
     
-    override func draw(_ dirtyRect: NSRect) {
+    func setup() {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         centerAlign = paragraphStyle
         
-        self.usesSingleLineMode = false
-        self.allowsEditingTextAttributes = true
-        super.draw(dirtyRect)
+        usesSingleLineMode = false
+        allowsEditingTextAttributes = true
+        textColor = scrollableTextFieldColor
         
-        if normalFont == nil {
-            normalFont = NSFont(name: (self.font?.fontName)!, size: self.font!.pointSize)
-            activeFont = NSFont(name: (self.font?.fontName)!, size: self.font!.pointSize + growPointSize)
-        }
-        if normalSize == nil {
-            normalSize = self.frame.size
-            activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
-        }
-        if trackingArea == nil {
-            trackingArea = NSTrackingArea(rect: dirtyRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-            self.addTrackingArea(trackingArea!)
-        }
+        normalSize = frame.size
+        activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
+        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        addTrackingArea(trackingArea!)
+    }
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+    
+    override func draw(_ dirtyRect: NSRect) {
+       super.draw(dirtyRect)
     }
     
     override func mouseEntered(with event: NSEvent) {
-        self.lightenUp(grow: false, color: colorHover)
+        self.lightenUp(color: scrollableTextFieldColorHover)
     }
     
     override func mouseExited(with event: NSEvent) {
-        self.darken(color: self.color)
+        self.darken(color: scrollableTextFieldColor)
     }
     
     
-    func lightenUp(grow: Bool, color: NSColor) {
-        self.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
-        self.textColor = color
-//        if let font = activeFont {
-//            if grow {
-//                self.font = font
-//            }
-//        }
+    func lightenUp(color: NSColor) {
+        layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+        textColor = color
     }
     
     func darken(color: NSColor) {
-        self.layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
-        self.textColor = color
-//        if let font = normalFont {
-//            self.font = font
-//        }
+        layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
+        textColor = color
     }
     
     func disableScrollHint() {
         if !didScrollTextField {
             didScrollTextField = true
             datastore.defaults.set(true, forKey: "didScrollTextField")
-            self.removeTrackingArea(captionTrackingArea!)
+            removeTrackingArea(captionTrackingArea!)
             caption.resetText()
         }
     }
@@ -107,7 +99,7 @@ class ScrollableTextField: NSTextField {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    self.lightenUp(grow: true, color: colorLight)
+                    lightenUp(color: scrollableTextFieldColorLight)
                 }
                 if intValue < upperLimit {
                     if scrolledOnce {
@@ -121,7 +113,7 @@ class ScrollableTextField: NSTextField {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    self.lightenUp(grow: true, color: colorLight)
+                    lightenUp(color: scrollableTextFieldColorLight)
                 }
                 if intValue > lowerLimit {
                     if scrolledOnce {
@@ -138,7 +130,7 @@ class ScrollableTextField: NSTextField {
                     if let updater = onValueChanged {
                         updater(integerValue)
                     }
-                    self.darken(color: self.colorHover)
+                    darken(color: scrollableTextFieldColorHover)
                 }
             }
         } else {

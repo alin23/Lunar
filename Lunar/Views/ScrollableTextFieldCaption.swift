@@ -15,28 +15,38 @@ class ScrollableTextFieldCaption: NSTextField {
     var initialText: String!
     var initialAlphaValue: CGFloat!
     
+    func setup() {
+        usesSingleLineMode = false
+        allowsEditingTextAttributes = true
+        textColor = scrollableTextFieldCaptionColor
+        initialText = stringValue
+        initialAlphaValue = alphaValue
+    }
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+    
     override func draw(_ dirtyRect: NSRect) {
-        self.usesSingleLineMode = false
-        self.allowsEditingTextAttributes = true
         super.draw(dirtyRect)
-        if initialText == nil {
-            initialText = self.stringValue
-        }
-        if initialAlphaValue == nil {
-            initialAlphaValue = self.alphaValue
-        }
     }
     
     func resetText() {
-        self.layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
-        self.stringValue = initialText
-        self.alphaValue = initialAlphaValue
+        layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
+        stringValue = initialText
+        alphaValue = initialAlphaValue
     }
     
     override func mouseEntered(with event: NSEvent) {
-        self.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
-        self.stringValue = "Scroll to change value"
-        self.alphaValue = 0.5
+        layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+        stringValue = "Scroll to change value"
+        alphaValue = 0.5
     }
     
     override func mouseExited(with event: NSEvent) {

@@ -23,6 +23,8 @@ extension Notification.Name {
 }
 
 let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
+let pauseHotKey = HotKey(key: .k, modifiers: [.command, .control])
+let startHotKey = HotKey(key: .k, modifiers: [.command, .control, .shift])
 let lunarHotKey = HotKey(key: .l, modifiers: [.command, .control, .shift])
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
@@ -57,6 +59,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         toggleHotKey.keyDownHandler = {
             self.toggleBrightnessAdapter(sender: nil)
             log.debug("Toggle Hotkey pressed")
+        }
+        pauseHotKey.keyDownHandler = {
+            brightnessAdapter.running = false
+            self.resetElements()
+            log.debug("Pause Hotkey pressed")
+        }
+        startHotKey.keyDownHandler = {
+            brightnessAdapter.running = true
+            self.resetElements()
+            log.debug("Start Hotkey pressed")
         }
         lunarHotKey.keyDownHandler = {
             self.showWindow()
@@ -105,6 +117,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
     }
     
+    func listenForScreenConfigurationChanged() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.adaptToScreenConfiguration(notification:)),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil)
+        
+    }
+    
+    @objc func adaptToScreenConfiguration(notification: Notification) {
+        brightnessAdapter.resetDisplayList()
+        let pageController = (self.windowController?.window?.contentViewController as? SplitViewController)?.childViewControllers[0] as? PageController
+        pageController?.setup()
+    }
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         initLogger()
         handleDaemon()
@@ -113,6 +140,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.running = true
         initMenubarIcon()
         initHotkeys()
+        listenForScreenConfigurationChanged()
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -169,11 +197,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
     
-    @IBAction func toggleBrightnessAdapter(sender: Any?) {
-        _ = brightnessAdapter.toggle()
+    func resetElements() {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
         let splitView = self.windowController?.window?.contentViewController as? SplitViewController
         splitView?.activeStateButton?.setNeedsDisplay()
+    }
+    
+    @IBAction func toggleBrightnessAdapter(sender: Any?) {
+        _ = brightnessAdapter.toggle()
+        resetElements()
     }
     
     @IBAction func showWindow(sender: Any?) {

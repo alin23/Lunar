@@ -10,12 +10,14 @@ import Cocoa
 
 class DisplayViewController: NSViewController {
     
+    @IBOutlet weak var displayView: DisplayView!
     @IBOutlet weak var displayName: NSTextField!
     @IBOutlet weak var adaptiveButton: NSButton!
     
     @IBOutlet weak var scrollableBrightness: ScrollableBrightness!
     @IBOutlet weak var scrollableContrast: ScrollableContrast!
     
+    @IBOutlet weak var deleteButton: DeleteButton!
     
     var display: Display! {
         didSet {
@@ -24,14 +26,9 @@ class DisplayViewController: NSViewController {
             }
         }
     }
-    let adaptiveButtonBgOn = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
-    let adaptiveButtonBgOnHover = #colorLiteral(red: 1, green: 0.7921187659, blue: 0.4011040637, alpha: 1)
-    let adaptiveButtonLabelOn = #colorLiteral(red: 0.0808076635, green: 0.0326673463, blue: 0.2609090805, alpha: 1)
-    let adaptiveButtonBgOff = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
-    let adaptiveButtonBgOffHover = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
-    let adaptiveButtonLabelOff = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.2513754401)
     
     var adaptiveButtonTrackingArea: NSTrackingArea!
+    var deleteButtonTrackingArea: NSTrackingArea!
     
     func update(from display: Display) {
         displayName?.stringValue = display.name
@@ -53,6 +50,10 @@ class DisplayViewController: NSViewController {
         default:
             return
         }
+    }
+    
+    @IBAction func delete(_ sender: NSButton) {
+        (self.view.superview!.nextResponder as! PageController).deleteDisplay()
     }
     
     func initAdaptiveButton() {
@@ -80,10 +81,11 @@ class DisplayViewController: NSViewController {
         }
     }
     
+    
     override func mouseEntered(with event: NSEvent) {
         if let button = adaptiveButton {
             button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
-
+            
             if button.state == .on {
                 button.layer!.backgroundColor = adaptiveButtonBgOnHover.cgColor
             } else {
@@ -95,7 +97,7 @@ class DisplayViewController: NSViewController {
     override func mouseExited(with event: NSEvent) {
         if let button = adaptiveButton {
             button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
-
+            
             if button.state == .on {
                 button.layer!.backgroundColor = adaptiveButtonBgOn.cgColor
             } else {
@@ -104,16 +106,24 @@ class DisplayViewController: NSViewController {
         }
     }
     
+    func setIsHidden(_ value: Bool) {
+        adaptiveButton.isHidden = value
+        scrollableBrightness.isHidden = value
+        scrollableContrast.isHidden = value
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let display = display {
+        if let display = display, display != GENERIC_DISPLAY {
             update(from: display)
             scrollableBrightness.display = display
             scrollableContrast.display = display
-            if display.adaptive {
-            }
+            initAdaptiveButton()
+            scrollableBrightness.label.textColor = scollableViewLabelColor
+            scrollableContrast.label.textColor = scollableViewLabelColor
+        } else {
+            setIsHidden(true)
         }
-        initAdaptiveButton()
     }
 }

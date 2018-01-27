@@ -71,6 +71,10 @@ class Display: NSManagedObject {
         }
     }
     
+    func resetName() {
+        self.name = DDC.getDisplayName(for: id).trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
     func addObservers() {
         addObserver(self, forKeyPath: "minBrightness", options: [.new, .old], context: nil)
         addObserver(self, forKeyPath: "maxBrightness", options: [.new, .old], context: nil)
@@ -80,13 +84,22 @@ class Display: NSManagedObject {
         addObserver(self, forKeyPath: "contrast", options: [.new, .old], context: nil)
     }
     
+    func removeObservers() {
+        removeObserver(self, forKeyPath: "minBrightness")
+        removeObserver(self, forKeyPath: "maxBrightness")
+        removeObserver(self, forKeyPath: "minContrast")
+        removeObserver(self, forKeyPath: "maxContrast")
+        removeObserver(self, forKeyPath: "brightness")
+        removeObserver(self, forKeyPath: "contrast")
+    }
+    
     func interpolate(value: Double, span: Double, min: UInt8, max: UInt8, factor: Double) -> NSNumber {
         let maxValue = Double(max)
         let minValue = Double(min)
         let valueSpan = maxValue - minValue
         var interpolated = ((value * valueSpan) / span)
         let normalized = interpolated / valueSpan
-        interpolated = pow(normalized, factor) * maxValue
+        interpolated = minValue + pow(normalized, factor) * valueSpan
         return NSNumber(value: UInt8(interpolated))
     }
     
@@ -107,8 +120,8 @@ class Display: NSManagedObject {
             let minutesSinceSunrise = ((now - moment.civilSunrise) / seconds)
             newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
             newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
-        case moment.solarNoon...moment.civilSunset:
-            let secondHalfDayMinutes = ((moment.civilSunset - moment.solarNoon) / seconds)
+        case moment.solarNoon...moment.astronomicalSunset:
+            let secondHalfDayMinutes = ((moment.astronomicalSunset - moment.solarNoon) / seconds)
             let minutesSinceNoon = ((now - moment.solarNoon) / seconds)
             let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
             let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)

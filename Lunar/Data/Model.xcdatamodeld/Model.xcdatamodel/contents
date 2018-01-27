@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D25b" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17E139j" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Display" representedClassName=".Display" syncable="YES">
         <attribute name="adaptive" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="brightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="50" usesScalarValueType="YES" syncable="YES"/>
@@ -19,9 +19,15 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="Exception" representedClassName="Exception" syncable="YES" codeGenerationType="class">
+        <attribute name="brightness" attributeType="Integer 16" defaultValueString="75" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="contrast" attributeType="Integer 16" defaultValueString="75" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
+    </entity>
     <fetchRequest name="AllDisplayDicts" entity="Display" resultType="2"/>
     <fetchRequest name="AllDisplays" entity="Display"/>
     <elements>
         <element name="Display" positionX="-63" positionY="-18" width="128" height="180"/>
+        <element name="Exception" positionX="-63" positionY="54" width="128" height="90"/>
     </elements>
 </model>
