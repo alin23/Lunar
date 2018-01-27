@@ -61,37 +61,51 @@ class ScrollableBrightness: NSView {
         currentValue?.intValue = Int32(displayValue)
     }
     
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-        if let min = minValue,
-            let max = maxValue,
-            min.onValueChanged == nil,
-            max.onValueChanged == nil
-        {
-            min.onValueChanged = { (value: Int) in
-                self.maxValue?.lowerLimit = value
-                if self.display != nil {
-                    self.displayMinValue = value
-                }
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+    
+    func setup() {
+        minValue?.onValueChanged = { (value: Int) in
+            self.maxValue?.lowerLimit = value
+            if self.display != nil {
+                self.displayMinValue = value
             }
-            max.onValueChanged = { (value: Int) in
-                self.minValue?.upperLimit = value
-                if self.display != nil {
-                    self.displayMaxValue = value
-                }
+        }
+        maxValue?.onValueChanged = { (value: Int) in
+            self.minValue?.upperLimit = value
+            if self.display != nil {
+                self.displayMaxValue = value
             }
         }
         
-        if let minCaption = minValueCaption,
-            let maxCaption = maxValueCaption,
-            let min = minValue,
-            let max = maxValue,
-            min.caption == nil,
-            max.caption == nil
-        {
-            min.caption = minCaption
-            max.caption = maxCaption
+        minValue?.caption = minValueCaption
+        maxValue?.caption = maxValueCaption
+    }
+    
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
+            self.maxValue?.lowerLimit = value
+            if self.display != nil {
+                self.displayMinValue = value
+            }
         }
+        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
+            self.minValue?.upperLimit = value
+            if self.display != nil {
+                self.displayMaxValue = value
+            }
+        }
+        
+        minValue?.caption = minValue?.caption ?? minValueCaption
+        maxValue?.caption = maxValue?.caption ?? maxValueCaption
     }
     
 }

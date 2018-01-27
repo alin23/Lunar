@@ -166,6 +166,7 @@
                     </view>
                     <connections>
                         <outlet property="activeStateButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
+                        <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
                     </connections>
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -189,21 +190,72 @@
             </objects>
             <point key="canvasLocation" x="75" y="1638"/>
         </scene>
+        <!--Split View Controller-->
+        <scene sceneID="QQh-JI-QxL">
+            <objects>
+                <splitViewController id="VFu-z9-UHh" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem id="HGr-6r-aru"/>
+                        <splitViewItem id="lNg-GU-3aO"/>
+                    </splitViewItems>
+                    <splitView key="splitView" dividerStyle="thin" vertical="YES" id="Mt0-eG-aqK">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <outlet property="delegate" destination="VFu-z9-UHh" id="uKR-R5-ai8"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="splitView" destination="Mt0-eG-aqK" id="Nz5-hC-Wk1"/>
+                        <segue destination="8dO-ff-2g9" kind="relationship" relationship="splitItems" id="3nN-Yx-wWC"/>
+                        <segue destination="v5h-uZ-R2O" kind="relationship" relationship="splitItems" id="LB3-dh-Vn7"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="DaR-tN-O0u" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-600" y="2257"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="MwP-RD-6xX">
+            <objects>
+                <viewController id="8dO-ff-2g9" sceneMemberID="viewController">
+                    <view key="view" id="OP4-YT-Mrk">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="70" y="2071"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="Hpx-1r-TPC">
+            <objects>
+                <viewController id="v5h-uZ-R2O" sceneMemberID="viewController">
+                    <view key="view" id="X56-lr-Iy5">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="bLt-h3-CCz" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="70" y="2443"/>
+        </scene>
         <!--Display View Controller-->
         <scene sceneID="XpM-oo-Jy5">
             <objects>
                 <viewController storyboardIdentifier="displayViewController" id="1Bn-Ca-ETm" customClass="DisplayViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" focusRingType="none" id="PXe-go-kYm">
+                    <view key="view" wantsLayer="YES" focusRingType="none" id="PXe-go-kYm">
                         <rect key="frame" x="0.0" y="0.0" width="750" height="430"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q">
-                                <rect key="frame" x="250" y="141" width="250" height="212"/>
+                            <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="250" y="141" width="250" height="251"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <imageCell key="cell" refusesFirstResponder="YES" focusRingType="none" alignment="left" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy">
-                                <rect key="frame" x="265" y="204" width="220" height="96"/>
+                                <rect key="frame" x="265" y="203" width="220" height="96"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf">
                                     <font key="font" size="28" name="Menlo-Regular"/>
@@ -345,6 +397,7 @@
                     <connections>
                         <outlet property="adaptiveButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
+                        <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                     </connections>

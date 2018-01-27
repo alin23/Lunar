@@ -59,19 +59,31 @@ class BrightnessAdapter  {
         return running
     }
     
+    func resetDisplayList() {
+        for display in displays.values {
+            display.removeObservers()
+        }
+        displays = BrightnessAdapter.getDisplays()
+    }
+    
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
         
         do {
-            let displayList = try datastore.context.fetch(datastore.container.managedObjectModel.fetchRequestTemplate(forName: "AllDisplays")!) as! [Display]
+            let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
+            fetchRequest.predicate = NSPredicate(format: "id IN %@", displayIDs)
+            let displayList = try datastore.context.fetch(fetchRequest)
             displays = Dictionary(uniqueKeysWithValues: displayList.map {
                 (d) -> (CGDirectDisplayID, Display) in (d.id, d)
             })
             let loadedDisplayIDs = Set(displays.keys)
             for id in loadedDisplayIDs.intersection(displayIDs) {
-                displays[id]?.active = true
-                displays[id]?.addObservers()
+                if let display = displays[id] {
+                    display.active = true
+                    display.resetName()
+                    display.addObservers()
+                }
             }
             for id in displayIDs.subtracting(loadedDisplayIDs) {
                 displays[id] = Display(id: id)

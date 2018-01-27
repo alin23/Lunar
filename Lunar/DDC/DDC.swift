@@ -57,7 +57,7 @@ class DDC {
         )
     }
     
-    static func test (displayID: CGDirectDisplayID) -> (Bool, EDID) {
+    static func test (displayID: CGDirectDisplayID) throws -> (Bool, EDID) {
         var edid = EDID()
         let result = EDIDTest(displayID, &edid)
         print("EDID Test for Display \(String(displayID)) - \(String(result))")
@@ -65,7 +65,9 @@ class DDC {
     }
     
     static func getDisplayName(for displayID: CGDirectDisplayID) -> String {
-        let (result, edid) = test(displayID: displayID)
+        guard let (result, edid) = try? test(displayID: displayID) else {
+            return ""
+        }
         print("Test EDID... \(String(result))")
         
         var tmp = edid.descriptors
@@ -81,7 +83,7 @@ class DDC {
                 return name
             }
         }
-        return "Monitor"
+        return ""
     }
     
     static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt8) -> Bool {

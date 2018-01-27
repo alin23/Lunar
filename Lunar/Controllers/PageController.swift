@@ -24,19 +24,19 @@ class PageController: NSPageController, NSPageControllerDelegate {
             pageControl.currentPage = selectedIndex
         }
     }
+    var viewControllers: [NSPageController.ObjectIdentifier: DisplayViewController] = [:]
     
     private func setupPageControl(_ selectedIndex: Int) {
         let width: CGFloat = 200
         let x: CGFloat = (view.frame.width - width) / 2
         pageControl.frame = CGRect(x: x, y: 20, width: 200, height: 20)
-        pageControl.currentPageIndicatorTintColor = #colorLiteral(red: 1, green: 0.8625625372, blue: 0.594591558, alpha: 1)
-        pageControl.pageIndicatorTintColor = #colorLiteral(red: 0.262745098, green: 0.2901960784, blue: 0.368627451, alpha: 0.1979258363)
+        pageControl.currentPageIndicatorTintColor = currentPageIndicatorTintColor
+        pageControl.pageIndicatorTintColor = pageIndicatorTintColor
         pageControl.hidesForSinglePage = true
         view.addSubview(pageControl)
     }
     
-    @IBAction func deleteDisplay(sender: NSButton) {
-//        let viewControllerToDelete = selectedViewController
+    func deleteDisplay() {
         if selectedIndex == 0 {
             if selectedIndex < arrangedObjects.count {
                 navigateForward(nil)
@@ -45,15 +45,16 @@ class PageController: NSPageController, NSPageControllerDelegate {
             navigateBack(nil)
         }
         let displayToDelete = arrangedObjects[selectedIndex] as! Display
+        let identifier = NSPageController.ObjectIdentifier(String(describing: displayToDelete.id))
+        viewControllers.removeValue(forKey: identifier)
         arrangedObjects.remove(at: selectedIndex)
         datastore.context.delete(displayToDelete)
         datastore.save()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+    func setup() {
         delegate = self
+        viewControllers.removeAll(keepingCapacity: false)
         setupPageControl(selectedIndex)
         if !brightnessAdapter.displays.isEmpty
         {
@@ -64,21 +65,28 @@ class PageController: NSPageController, NSPageControllerDelegate {
             arrangedObjects = [GENERIC_DISPLAY]
         }
         selectedIndex = 0
-        
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setup()
+    }
+    
     func pageController(_ pageController: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
     
     func pageController(_ pageController: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
-        let vc = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as! DisplayViewController
+        if viewControllers[identifier] == nil {
+            viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as? DisplayViewController
+        }
         let displayId = CGDirectDisplayID(identifier.rawValue)!
         if displayId != GENERIC_DISPLAY.id {
-            vc.display = brightnessAdapter.displays[displayId]
+            viewControllers[identifier]!.display = brightnessAdapter.displays[displayId]
         } else {
-            vc.display = GENERIC_DISPLAY
+            viewControllers[identifier]!.display = GENERIC_DISPLAY
         }
-        return vc
+        return viewControllers[identifier]!
     }
     
     override func scrollWheel(with event: NSEvent) {
