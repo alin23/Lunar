@@ -17,6 +17,7 @@ let white = NSColor.init(deviceWhite: 1.0, alpha: 1.0)
 
 let bgColor = white
 let logoColor = lunarYellow
+let settingsDividerColor = white.withAlphaComponent(0.3)
 
 let scrollableTextFieldCaptionColor = mauve
 let adaptiveButtonLabelColor = mauve
@@ -36,10 +37,21 @@ let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
 
-let stateButtonLabelColor = mauve.withAlphaComponent(0.25)
-let stateButtonLabelColorHover = mauve
-let stateButtonColor = gray
-let stateButtonColorHover = lunarYellow
+let stateButtonLabelColorDisplay = mauve.withAlphaComponent(0.25)
+let stateButtonLabelColorHoverDisplay = mauve
+let stateButtonColorDisplay = gray
+let stateButtonColorHoverDisplay = lunarYellow
+
+let stateButtonLabelColorSettings = white
+let stateButtonLabelColorHoverSettings = lunarYellow
+let stateButtonColorSettings = white.withAlphaComponent(0.3)
+let stateButtonColorHoverSettings = mauve.withAlphaComponent(0.5)
+
+var stateButtonLabelColor = stateButtonLabelColorDisplay
+var stateButtonLabelColorHover = stateButtonLabelColorHoverDisplay
+var stateButtonColor = stateButtonColorDisplay
+var stateButtonColorHover = stateButtonColorHoverDisplay
+
 let onButtonColor = green
 let offButtonColor = red
 

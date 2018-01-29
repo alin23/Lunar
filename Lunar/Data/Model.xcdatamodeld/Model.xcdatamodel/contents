@@ -9,13 +9,14 @@
         <attribute name="maxContrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="100" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="minBrightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="minContrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" maxValueString="13" syncable="YES"/>
+        <attribute name="serial" attributeType="String" syncable="YES"/>
         <fetchIndex name="idIndex">
             <fetchIndexElement property="id" type="Binary" order="ascending"/>
         </fetchIndex>
         <uniquenessConstraints>
             <uniquenessConstraint>
-                <constraint value="id"/>
+                <constraint value="serial"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
@@ -27,7 +28,7 @@
     <fetchRequest name="AllDisplayDicts" entity="Display" resultType="2"/>
     <fetchRequest name="AllDisplays" entity="Display"/>
     <elements>
-        <element name="Display" positionX="-63" positionY="-18" width="128" height="180"/>
+        <element name="Display" positionX="-63" positionY="-18" width="128" height="195"/>
         <element name="Exception" positionX="-63" positionY="54" width="128" height="90"/>
     </elements>
 </model>

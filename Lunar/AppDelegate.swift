@@ -132,6 +132,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         pageController?.setup()
     }
     
+    func addObservers() {
+        addObserver(self, forKeyPath: "daylightExtensionHours", options: [], context: nil)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if let key = keyPath {
+            switch key {
+            case "daylightExtensionMinutes", "noonDurationMinutes":
+                brightnessAdapter.adaptBrightness()
+            default:
+                return
+            }
+        }
+    }
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         initLogger()
         handleDaemon()
@@ -141,6 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initMenubarIcon()
         initHotkeys()
         listenForScreenConfigurationChanged()
+        addObservers()
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {

@@ -91,5 +91,20 @@ class ScrollableContrast: NSView {
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+        minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
+            self.maxValue?.lowerLimit = value
+            if self.display != nil {
+                self.displayMinValue = value
+            }
+        }
+        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
+            self.minValue?.upperLimit = value
+            if self.display != nil {
+                self.displayMaxValue = value
+            }
+        }
+        
+        minValue?.caption = minValue?.caption ?? minValueCaption
+        maxValue?.caption = maxValue?.caption ?? maxValueCaption
     }
 }
