@@ -14,11 +14,12 @@ let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
 let MAX_CONTRAST: UInt8 = 100
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
-let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, name: "No display", context: datastore.container.newBackgroundContext())
+let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No display", context: datastore.container.newBackgroundContext())
 
 
 class Display: NSManagedObject {
     @NSManaged var id: CGDirectDisplayID
+    @NSManaged var serial: String
     @NSManaged var name: String
     @NSManaged var adaptive: Bool
     
@@ -54,13 +55,14 @@ class Display: NSManagedObject {
         }
     }
     
-    convenience init(id: CGDirectDisplayID, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
+    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
         self.init(entity: entity, insertInto: context)
         
         self.id = id
-        self.name = (name ?? DDC.getDisplayName(for: id)).trimmingCharacters(in: .whitespacesAndNewlines)
+        self.name = name ?? DDC.getDisplayName(for: id)
+        self.serial = serial ?? DDC.getDisplaySerial(for: id)
         self.active = active
         if id != GENERIC_DISPLAY_ID {
             self.minBrightness = NSNumber(value: minBrightness)
@@ -72,7 +74,7 @@ class Display: NSManagedObject {
     }
     
     func resetName() {
-        self.name = DDC.getDisplayName(for: id).trimmingCharacters(in: .whitespacesAndNewlines)
+        self.name = DDC.getDisplayName(for: id)
     }
     
     func addObservers() {
@@ -113,25 +115,41 @@ class Display: NSManagedObject {
         var newBrightness = self.minBrightness
         var newContrast = self.minContrast
         let interpolationFactor = datastore.defaults.double(forKey: "interpolationFactor")
+        let daylightExtension = datastore.defaults.integer(forKey: "daylightExtensionMinutes")
+        let noonDuration = datastore.defaults.integer(forKey: "noonDurationMinutes")
+        
+        let daylightStart = moment.civilSunrise - daylightExtension.minutes
+        let daylightEnd = moment.civilSunset + daylightExtension.minutes
+        
+        let noonStart = moment.solarNoon - (noonDuration / 2).minutes
+        let noonEnd = moment.solarNoon + (noonDuration / 2).minutes
         
         switch now {
-        case moment.civilSunrise...moment.solarNoon:
-            let firstHalfDayMinutes = ((moment.solarNoon - moment.civilSunrise) / seconds)
-            let minutesSinceSunrise = ((now - moment.civilSunrise) / seconds)
+        case daylightStart...noonStart:
+            let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
+            let minutesSinceSunrise = ((now - daylightStart) / seconds)
             newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
             newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
-        case moment.solarNoon...moment.astronomicalSunset:
-            let secondHalfDayMinutes = ((moment.astronomicalSunset - moment.solarNoon) / seconds)
-            let minutesSinceNoon = ((now - moment.solarNoon) / seconds)
+            self.setValue(newBrightness, forKey: "brightness")
+            self.setValue(newContrast, forKey: "contrast")
+        case noonEnd...daylightEnd:
+            let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
+            let minutesSinceNoon = ((now - noonEnd) / seconds)
             let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
             let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
             newBrightness = NSNumber(value: maxBrightness + minBrightness - interpolatedBrightness.uint8Value)
             newContrast = NSNumber(value: maxContrast + minContrast - interpolatedContrast.uint8Value)
+            self.setValue(newBrightness, forKey: "brightness")
+            self.setValue(newContrast, forKey: "contrast")
+        case noonStart...noonEnd:
+            log.debug("Setting brightness/contrast to maximum values.")
+            self.setValue(self.maxBrightness, forKey: "brightness")
+            self.setValue(self.maxContrast, forKey: "contrast")
         default:
             log.debug("Setting brightness/contrast to minimum values.")
+            self.setValue(self.minBrightness, forKey: "brightness")
+            self.setValue(self.minContrast, forKey: "contrast")
         }
-        self.setValue(newBrightness, forKey: "brightness")
-        self.setValue(newContrast, forKey: "contrast")
         log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         datastore.save()
     }

@@ -64,12 +64,24 @@ class DDC {
         return (result, edid)
     }
     
-    static func getDisplayName(for displayID: CGDirectDisplayID) -> String {
-        guard let (result, edid) = try? test(displayID: displayID) else {
-            return ""
+    static func printTextDescriptors(displayID: CGDirectDisplayID) {
+        guard let (_, edid) = try? test(displayID: displayID) else {
+            return
         }
-        print("Test EDID... \(String(result))")
+        var tmp = edid.descriptors
+        let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
         
+        for descriptor in descriptors {
+            let type = descriptor.text.type
+            var tmp = descriptor.text.data
+            let chars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
+            if let data = NSString(bytes: chars, length: 13, encoding: String.Encoding.utf8.rawValue) as String? {
+                print("\(type) : \(data)")
+            }
+        }
+    }
+    
+    static func extractName(from edid: EDID) -> String {
         var tmp = edid.descriptors
         let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
         
@@ -80,10 +92,54 @@ class DDC {
             let nameChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
             if let name = NSString(bytes: nameChars, length: 13, encoding: String.Encoding.utf8.rawValue) as String? {
                 print("Descriptor: \(name)")
-                return name
+                return name.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
         return ""
+    }
+    
+    static func extractSerialNumber(from edid: EDID) -> String {
+        var tmp = edid.descriptors
+        let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
+        
+        if let serialDescriptor = descriptors.first(where: { (des) in
+            des.text.type == 0xFF
+        }) {
+            var tmp = serialDescriptor.text.data
+            let serialChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
+            if let serial = NSString(bytes: serialChars, length: 13, encoding: String.Encoding.utf8.rawValue) as String? {
+                print("Descriptor: \(serial)")
+                return serial.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        return ""
+    }
+    
+    static func getDisplayName(for displayID: CGDirectDisplayID) -> String {
+        guard let (_, edid) = try? test(displayID: displayID) else {
+            return ""
+        }
+        return extractName(from: edid)
+    }
+    
+    static func getDisplaySerial(for displayID: CGDirectDisplayID) -> String {
+        guard let (_, edid) = try? test(displayID: displayID) else {
+            return ""
+        }
+        
+        let serialNumber = extractSerialNumber(from: edid)
+        let name = extractName(from: edid)
+        return "\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)"
+    }
+    
+    static func getDisplaySerialAndName(for displayID: CGDirectDisplayID) -> (String, String) {
+        guard let (_, edid) = try? test(displayID: displayID) else {
+            return ("", "")
+        }
+        
+        let serialNumber = extractSerialNumber(from: edid)
+        let name = extractName(from: edid)
+        return ("\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)", name)
     }
     
     static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt8) -> Bool {

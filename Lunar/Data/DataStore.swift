@@ -21,6 +21,11 @@ class DataStore: NSObject {
         }
     }
     
+    func fetchDisplays(by serials: [String]) throws -> [Display] {
+        let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
+        fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
+        return try context.fetch(fetchRequest)
+    }
     
     override init() {
         container.loadPersistentStores(completionHandler: { (description, error) in
@@ -34,6 +39,12 @@ class DataStore: NSObject {
         }
         if defaults.object(forKey: "didScrollTextField") == nil {
             defaults.set(false, forKey: "didScrollTextField")
+        }
+        if defaults.object(forKey: "daylightExtensionMinutes") == nil {
+            defaults.set(0, forKey: "daylightExtensionMinutes")
+        }
+        if defaults.object(forKey: "noonDurationMinutes") == nil {
+            defaults.set(60, forKey: "noonDurationMinutes")
         }
     }
     

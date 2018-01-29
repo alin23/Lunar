@@ -8,32 +8,30 @@
 
 import Cocoa
 import Foundation
-import NSPageControl
 
 class PageController: NSPageController, NSPageControllerDelegate {
-    @IBOutlet var userDefaultsController: NSUserDefaultsController!
-    var pageControl = NSPageControl()
+    var pageControl: PageControl!
+    var lastSelectedIndex = 0
+    
     override var arrangedObjects: [Any] {
         didSet {
-            pageControl.numberOfPages = arrangedObjects.count
+            pageControl?.numberOfPages = arrangedObjects.count
         }
     }
     
-    override var selectedIndex: Int {
-        didSet {
-            pageControl.currentPage = selectedIndex
-        }
-    }
-    var viewControllers: [NSPageController.ObjectIdentifier: DisplayViewController] = [:]
+    let settingsViewControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
+    var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
     
-    private func setupPageControl(_ selectedIndex: Int) {
-        let width: CGFloat = 200
+    private func setupPageControl(size: Int) {
+        let width: CGFloat = 300
         let x: CGFloat = (view.frame.width - width) / 2
-        pageControl.frame = CGRect(x: x, y: 20, width: 200, height: 20)
-        pageControl.currentPageIndicatorTintColor = currentPageIndicatorTintColor
-        pageControl.pageIndicatorTintColor = pageIndicatorTintColor
-        pageControl.hidesForSinglePage = true
-        view.addSubview(pageControl)
+        
+        let frame = NSRect(x: x, y: 20, width: width, height: 20)
+        pageControl = PageControl(frame: frame, numberOfPages: size, hidesForSinglePage: true, tintColor: pageIndicatorTintColor, currentTintColor: currentPageIndicatorTintColor)
+        if !view.subviews.contains(pageControl) {
+            view.addSubview(pageControl)
+        }
+        pageControl.setNeedsDisplay(pageControl.frame)
     }
     
     func deleteDisplay() {
@@ -55,16 +53,18 @@ class PageController: NSPageController, NSPageControllerDelegate {
     func setup() {
         delegate = self
         viewControllers.removeAll(keepingCapacity: false)
-        setupPageControl(selectedIndex)
+        arrangedObjects = [datastore]
         if !brightnessAdapter.displays.isEmpty
         {
-            arrangedObjects = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
+            let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
             })
+            arrangedObjects.append(contentsOf: displays)
         } else {
-            arrangedObjects = [GENERIC_DISPLAY]
+            arrangedObjects.append(GENERIC_DISPLAY)
         }
-        selectedIndex = 0
+        setupPageControl(size: arrangedObjects.count)
+        selectedIndex = 1
     }
     
     override func viewDidLoad() {
@@ -72,19 +72,39 @@ class PageController: NSPageController, NSPageControllerDelegate {
         setup()
     }
     
+    func pageControllerDidEndLiveTransition(_ pageController: NSPageController) {
+        if let splitViewController = parent as? SplitViewController {
+            if selectedIndex == 0 {
+                splitViewController.yellowBackground()
+            } else if !splitViewController.hasWhiteBackground() {
+                splitViewController.whiteBackground()
+            }
+        }
+        pageControl?.currentPage = selectedIndex
+    }
+    
     func pageController(_ pageController: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
+        if (object as? DataStore) == datastore {
+            return settingsViewControllerIdentifier
+        }
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
     
     func pageController(_ pageController: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         if viewControllers[identifier] == nil {
-            viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as? DisplayViewController
+            if identifier == settingsViewControllerIdentifier {
+                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "settingsViewController")) as! SettingsViewController
+            } else {
+                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as! DisplayViewController
+            }
         }
-        let displayId = CGDirectDisplayID(identifier.rawValue)!
-        if displayId != GENERIC_DISPLAY.id {
-            viewControllers[identifier]!.display = brightnessAdapter.displays[displayId]
-        } else {
-            viewControllers[identifier]!.display = GENERIC_DISPLAY
+        if let controller = viewControllers[identifier] as? DisplayViewController {
+            let displayId = CGDirectDisplayID(identifier.rawValue)!
+            if displayId != GENERIC_DISPLAY.id {
+                controller.display = brightnessAdapter.displays[displayId]
+            } else {
+                controller.display = GENERIC_DISPLAY
+            }
         }
         return viewControllers[identifier]!
     }

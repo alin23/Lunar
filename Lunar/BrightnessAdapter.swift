@@ -69,25 +69,34 @@ class BrightnessAdapter  {
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
+        let serialsAndNames = displayIDs.map({id in DDC.getDisplaySerialAndName(for: id)})
+        let serials = serialsAndNames.map({(d) in d.0})
+        let displaySerialIDMapping = Dictionary(uniqueKeysWithValues: zip(serials, displayIDs))
+        let displaySerialNameMapping = Dictionary(uniqueKeysWithValues: serialsAndNames)
+        let displayIDSerialNameMapping = Dictionary(uniqueKeysWithValues: zip(displayIDs, serialsAndNames))
         
         do {
-            let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
-            fetchRequest.predicate = NSPredicate(format: "id IN %@", displayIDs)
-            let displayList = try datastore.context.fetch(fetchRequest)
+            let displayList = try datastore.fetchDisplays(by: serials)
+            for display in displayList {
+                display.id = displaySerialIDMapping[display.serial]!
+                display.name = displaySerialNameMapping[display.serial]!
+                display.active = true
+                display.addObservers()
+            }
+            
             displays = Dictionary(uniqueKeysWithValues: displayList.map {
                 (d) -> (CGDirectDisplayID, Display) in (d.id, d)
             })
+            
             let loadedDisplayIDs = Set(displays.keys)
-            for id in loadedDisplayIDs.intersection(displayIDs) {
-                if let display = displays[id] {
-                    display.active = true
-                    display.resetName()
-                    display.addObservers()
+            for id in displayIDs.subtracting(loadedDisplayIDs) {
+                if let (serial, name) = displayIDSerialNameMapping[id] {
+                    displays[id] = Display(id: id, serial: serial, name: name)
+                } else {
+                    displays[id] = Display(id: id)
                 }
             }
-            for id in displayIDs.subtracting(loadedDisplayIDs) {
-                displays[id] = Display(id: id)
-            }
+            
             datastore.save()
             return displays
         } catch {
