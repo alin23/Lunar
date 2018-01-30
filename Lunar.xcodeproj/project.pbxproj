@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
+		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
+		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
+		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C735DD751FD5B35E00FBD16F /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; };
 		C735DD761FD5B35E00FBD16F /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
@@ -101,6 +104,9 @@
 		C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
 		C716B2051FD32B4900F22F90 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
 		C72776E6201F02140055934F /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PageControl.swift; path = Lunar/Views/PageControl.swift; sourceTree = SOURCE_ROOT; };
+		C72776E8201F1BED0055934F /* ExceptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsView.swift; sourceTree = "<group>"; };
+		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
+		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
 		C735DD731FD5B35D00FBD16F /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = WAYWindow.framework.dSYM; path = Carthage/Build/Mac/WAYWindow.framework.dSYM; sourceTree = "<group>"; };
 		C735DD741FD5B35E00FBD16F /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -195,6 +201,7 @@
 				C7C1F7021FD5FD390039507C /* Display.swift */,
 				C794E1751FF01EF500549462 /* Model.xcdatamodeld */,
 				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
+				C72776EC201F26CB0055934F /* AppException.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -207,6 +214,7 @@
 				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
 				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
 				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
+				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -232,6 +240,7 @@
 				C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */,
 				C7C68F08201B75C700F49A2B /* DeleteButton.swift */,
 				C7C68F0C201D3D9800F49A2B /* SettingsView.swift */,
+				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -439,9 +448,11 @@
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
 				C76545291FD8A56B00DBACE9 /* DDC.c in Sources */,
+				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
 				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
@@ -453,6 +464,7 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
+				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 			);

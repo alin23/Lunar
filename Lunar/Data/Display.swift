@@ -50,6 +50,7 @@ class Display: NSManagedObject {
                 let _ = DDC.setContrast(for: self.id, contrast: newContrast)
                 log.debug("\(name): Set contrast to \(newContrast)")
             default:
+                log.debug(key)
                 return
             }
         }
@@ -132,6 +133,7 @@ class Display: NSManagedObject {
             newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
             self.setValue(newBrightness, forKey: "brightness")
             self.setValue(newContrast, forKey: "contrast")
+            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         case noonEnd...daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
             let minutesSinceNoon = ((now - noonEnd) / seconds)
@@ -141,16 +143,18 @@ class Display: NSManagedObject {
             newContrast = NSNumber(value: maxContrast + minContrast - interpolatedContrast.uint8Value)
             self.setValue(newBrightness, forKey: "brightness")
             self.setValue(newContrast, forKey: "contrast")
+            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         case noonStart...noonEnd:
             log.debug("Setting brightness/contrast to maximum values.")
             self.setValue(self.maxBrightness, forKey: "brightness")
             self.setValue(self.maxContrast, forKey: "contrast")
+            log.info("\n\(name):\n\tBrightness: \(maxBrightness)\n\tContrast: \(maxContrast)")
         default:
             log.debug("Setting brightness/contrast to minimum values.")
             self.setValue(self.minBrightness, forKey: "brightness")
             self.setValue(self.minContrast, forKey: "contrast")
+            log.info("\n\(name):\n\tBrightness: \(minBrightness)\n\tContrast: \(minContrast)")
         }
-        log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         datastore.save()
     }
 }
