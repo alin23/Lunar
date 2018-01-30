@@ -7,11 +7,33 @@
 //
 
 import Cocoa
+import HotKey
 
 class ScrollableTextField: NSTextField {
     @IBInspectable var lowerLimit: Int = 0
     @IBInspectable var upperLimit: Int = 100
+    
+    @IBInspectable var textFieldColor: NSColor = scrollableTextFieldColor {
+        didSet {
+            if !hover {
+                textColor = textFieldColor
+            }
+        }
+    }
+    @IBInspectable var textFieldColorHover: NSColor = scrollableTextFieldColorHover {
+        didSet {
+            if hover {
+                textColor = textFieldColorHover
+            }
+        }
+    }
+    @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
+    
+    var upHotkey: HotKey?
+    var downHotkey: HotKey?
+    
     let growPointSize: CGFloat = 2
+    var hover: Bool = false
     var scrolling: Bool = false
     var onValueChanged: ((Int) -> Void)?
     var centerAlign: NSParagraphStyle?
@@ -43,12 +65,13 @@ class ScrollableTextField: NSTextField {
         
         usesSingleLineMode = false
         allowsEditingTextAttributes = true
-        textColor = scrollableTextFieldColor
+        textColor = textFieldColor
         
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
+        setNeedsDisplay()
     }
     
     override init(frame frameRect: NSRect) {
@@ -62,15 +85,39 @@ class ScrollableTextField: NSTextField {
     }
     
     override func draw(_ dirtyRect: NSRect) {
-       super.draw(dirtyRect)
+        super.draw(dirtyRect)
     }
     
     override func mouseEntered(with event: NSEvent) {
-        self.lightenUp(color: scrollableTextFieldColorHover)
+        hover = true
+        self.lightenUp(color: textFieldColorHover)
+        upHotkey = HotKey(
+            key: .upArrow, modifiers: [],
+            keyDownHandler: {
+                if self.intValue < self.upperLimit {
+                    self.intValue += 1
+                }
+        },
+            keyUpHandler: {
+                self.onValueChanged?(self.integerValue)
+        })
+        downHotkey = HotKey(
+            key: .downArrow, modifiers: [],
+            keyDownHandler: {
+                if self.intValue > self.lowerLimit {
+                    self.intValue -= 1
+                }
+        },
+            keyUpHandler: {
+                self.onValueChanged?(self.integerValue)
+        })
     }
     
     override func mouseExited(with event: NSEvent) {
-        self.darken(color: scrollableTextFieldColor)
+        hover = false
+        self.darken(color: textFieldColor)
+        upHotkey = nil
+        downHotkey = nil
     }
     
     
@@ -99,7 +146,7 @@ class ScrollableTextField: NSTextField {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    lightenUp(color: scrollableTextFieldColorLight)
+                    lightenUp(color: textFieldColorLight)
                 }
                 if intValue < upperLimit {
                     if scrolledOnce {
@@ -113,7 +160,7 @@ class ScrollableTextField: NSTextField {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    lightenUp(color: scrollableTextFieldColorLight)
+                    lightenUp(color: textFieldColorLight)
                 }
                 if intValue > lowerLimit {
                     if scrolledOnce {
@@ -127,10 +174,8 @@ class ScrollableTextField: NSTextField {
                 if scrolling {
                     scrolling = false
                     scrolledOnce = false
-                    if let updater = onValueChanged {
-                        updater(integerValue)
-                    }
-                    darken(color: scrollableTextFieldColorHover)
+                    onValueChanged?(integerValue)
+                    darken(color: textFieldColorHover)
                 }
             }
         } else {

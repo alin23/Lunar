@@ -8,6 +8,15 @@
 
 import Cocoa
 
+extension UserDefaults {
+    @objc dynamic var noonDurationMinutes: Int {
+        return integer(forKey: "noonDurationMinutes")
+    }
+    @objc dynamic var daylightExtensionMinutes: Int {
+        return integer(forKey: "daylightExtensionMinutes")
+    }
+}
+
 class DataStore: NSObject {
     let defaults: UserDefaults = UserDefaults()
     let container = NSPersistentContainer(name: "Model")
@@ -27,6 +36,18 @@ class DataStore: NSObject {
         return try context.fetch(fetchRequest)
     }
     
+    func fetchAppExceptions(by names: [String]) throws -> [AppException] {
+        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
+        fetchRequest.predicate = NSPredicate(format: "name IN %@", Set(names))
+        return try context.fetch(fetchRequest)
+    }
+    
+    static func firstRun(context: NSManagedObjectContext) {
+        for app in DEFAULT_APP_EXCEPTIONS {
+            let _ = AppException(name: app, context: context)
+        }
+    }
+    
     override init() {
         container.loadPersistentStores(completionHandler: { (description, error) in
             if let error = error {
@@ -34,6 +55,10 @@ class DataStore: NSObject {
             }
         })
         context = container.newBackgroundContext()
+        if defaults.object(forKey: "firstRun") == nil {
+            DataStore.firstRun(context: context)
+            defaults.set(true, forKey: "firstRun")
+        }
         if defaults.object(forKey: "interpolationFactor") == nil {
             defaults.set(0.5, forKey: "interpolationFactor")
         }

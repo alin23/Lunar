@@ -38,6 +38,9 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
+    var appObserver: NSKeyValueObservation?
+    var daylightObserver: NSKeyValueObservation?
+    var noonObserver: NSKeyValueObservation?
     @IBOutlet weak var menu: NSMenu!
     @IBOutlet weak var toggleMenuItem: NSMenuItem!
     
@@ -126,6 +129,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         
     }
     
+    func listenForRunningApps() {
+        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: {(workspace, change) in
+            let oldAppNames = change.oldValue?.map({app in app.localizedName ?? ""})
+            let newAppNames = change.newValue?.map({app in app.localizedName ?? ""})
+            log.debug("oldAppNames: \(oldAppNames ?? [""])")
+            log.debug("newAppNames: \(newAppNames ?? [""])")
+            do {
+                if let names = newAppNames {
+                    let exceptions = try datastore.fetchAppExceptions(by: names)
+                    if !exceptions.isEmpty {
+                        brightnessAdapter.running = false
+                        self.resetElements()
+                    }
+                }
+                if let names = oldAppNames {
+                    let exceptions = try datastore.fetchAppExceptions(by: names)
+                    if !exceptions.isEmpty {
+                        brightnessAdapter.running = true
+                        self.resetElements()
+                    }
+                }
+            } catch {
+                log.error("Error on fetching app exceptions for app names: \(newAppNames ?? [""])")
+            }
+        })
+    }
+    
     @objc func adaptToScreenConfiguration(notification: Notification) {
         brightnessAdapter.resetDisplayList()
         let pageController = (self.windowController?.window?.contentViewController as? SplitViewController)?.childViewControllers[0] as? PageController
@@ -133,18 +163,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
     
     func addObservers() {
-        addObserver(self, forKeyPath: "daylightExtensionHours", options: [], context: nil)
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if let key = keyPath {
-            switch key {
-            case "daylightExtensionMinutes", "noonDurationMinutes":
-                brightnessAdapter.adaptBrightness()
-            default:
-                return
-            }
-        }
+        daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: {(defaults, change) in
+            brightnessAdapter.adaptBrightness()
+        })
+        noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: {(defaults, change) in
+            brightnessAdapter.adaptBrightness()
+        })
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -156,6 +180,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initMenubarIcon()
         initHotkeys()
         listenForScreenConfigurationChanged()
+        listenForRunningApps()
         addObservers()
     }
     
