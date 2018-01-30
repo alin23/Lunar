@@ -224,7 +224,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="CONFIGURATION" id="Al9-EG-ODL">
                                     <font key="font" size="24" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -233,7 +233,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Settings for changing adaptive mode behavior" usesSingleLineMode="YES" id="QmS-xo-dWA">
                                     <font key="font" metaFont="systemMedium" size="13"/>
-                                    <color key="textColor" white="1" alpha="0.74813490319999998" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.74813490319999998" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -354,8 +354,8 @@
                                                                     <rect key="frame" x="0.0" y="0.0" width="70" height="13"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="9bg-Bk-YCG">
-                                                                        <font key="font" size="10" name="Menlo-Bold"/>
-                                                                        <color key="textColor" white="1" alpha="0.70214018485915508" colorSpace="calibratedWhite"/>
+                                                                        <font key="font" size="10" name="Menlo-Regular"/>
+                                                                        <color key="textColor" red="0.40906229576534564" green="0.37205992800080562" blue="0.55178571428571432" alpha="1" colorSpace="calibratedRGB"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
@@ -414,8 +414,8 @@
                                                                     <rect key="frame" x="0.0" y="0.0" width="70" height="13"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="hOm-J9-pO3">
-                                                                        <font key="font" size="10" name="Menlo-Bold"/>
-                                                                        <color key="textColor" white="1" alpha="0.70214018485915508" colorSpace="calibratedWhite"/>
+                                                                        <font key="font" size="10" name="Menlo-Regular"/>
+                                                                        <color key="textColor" red="0.40906229576534564" green="0.37205992800080562" blue="0.55178571428571432" alpha="1" colorSpace="calibratedRGB"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
@@ -452,7 +452,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="EXCEPTIONS" id="BNH-yp-CJC">
                                     <font key="font" size="24" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -461,7 +461,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Disable adaptive mode in the following apps" usesSingleLineMode="YES" id="J8r-d9-DNr">
                                     <font key="font" metaFont="systemMedium" size="13"/>
-                                    <color key="textColor" white="1" alpha="0.7481349031690141" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.7481349031690141" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>

@@ -163,5 +163,19 @@ class BrightnessAdapter  {
             self.displays.values.forEach({(display) in display.adapt(moment: moment)})
         }
     }
+    func setBrightness(brightness: NSNumber, for displays: [Display]? = nil) {
+        if let displays = displays {
+            displays.forEach({ (display) in display.brightness = brightness })
+        } else {
+            self.displays.values.forEach({(display) in display.brightness = brightness})
+        }
+    }
+    func setContrast(contrast: NSNumber, for displays: [Display]? = nil) {
+        if let displays = displays {
+            displays.forEach({ (display) in display.contrast = contrast })
+        } else {
+            self.displays.values.forEach({(display) in display.contrast = contrast})
+        }
+    }
 }
 

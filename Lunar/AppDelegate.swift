@@ -41,6 +41,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
+    var runningAppExceptions: [AppException]!
     @IBOutlet weak var menu: NSMenu!
     @IBOutlet weak var toggleMenuItem: NSMenuItem!
     
@@ -64,13 +65,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.debug("Toggle Hotkey pressed")
         }
         pauseHotKey.keyDownHandler = {
-            brightnessAdapter.running = false
-            self.resetElements()
+            self.disableBrightnessAdapter()
             log.debug("Pause Hotkey pressed")
         }
         startHotKey.keyDownHandler = {
-            brightnessAdapter.running = true
-            self.resetElements()
+            self.enableBrightnessAdapter()
             log.debug("Start Hotkey pressed")
         }
         lunarHotKey.keyDownHandler = {
@@ -130,26 +129,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
     
     func listenForRunningApps() {
+        let appNames = NSWorkspace.shared.runningApplications.map({app in app.localizedName ?? ""})
+        runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
+        
+        adapt()
+        
         appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: {(workspace, change) in
             let oldAppNames = change.oldValue?.map({app in app.localizedName ?? ""})
             let newAppNames = change.newValue?.map({app in app.localizedName ?? ""})
-            log.debug("oldAppNames: \(oldAppNames ?? [""])")
-            log.debug("newAppNames: \(newAppNames ?? [""])")
             do {
                 if let names = newAppNames {
-                    let exceptions = try datastore.fetchAppExceptions(by: names)
-                    if !exceptions.isEmpty {
-                        brightnessAdapter.running = false
-                        self.resetElements()
-                    }
+                    self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
                 }
                 if let names = oldAppNames {
                     let exceptions = try datastore.fetchAppExceptions(by: names)
-                    if !exceptions.isEmpty {
-                        brightnessAdapter.running = true
-                        self.resetElements()
+                    for exception in exceptions {
+                        if let idx = self.runningAppExceptions.index(where: { app in app.name == exception.name }) {
+                            self.runningAppExceptions.remove(at: idx)
+                        }
                     }
                 }
+                self.adapt()
             } catch {
                 log.error("Error on fetching app exceptions for app names: \(newAppNames ?? [""])")
             }
@@ -242,6 +242,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
         let splitView = self.windowController?.window?.contentViewController as? SplitViewController
         splitView?.activeStateButton?.setNeedsDisplay()
+    }
+    
+    func adapt() {
+        if !runningAppExceptions.isEmpty {
+            disableBrightnessAdapter()
+            let lastApp = runningAppExceptions.last!
+            brightnessAdapter.setBrightness(brightness: lastApp.brightness)
+            brightnessAdapter.setContrast(contrast: lastApp.contrast)
+        } else {
+            enableBrightnessAdapter()
+            brightnessAdapter.adaptBrightness()
+        }
+    }
+    
+    func disableBrightnessAdapter() {
+        brightnessAdapter.running = false
+        resetElements()
+    }
+    
+    func enableBrightnessAdapter() {
+        brightnessAdapter.running = true
+        resetElements()
     }
     
     @IBAction func toggleBrightnessAdapter(sender: Any?) {
