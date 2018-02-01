@@ -17,7 +17,7 @@ extension Notification.Name {
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
+     
     @objc func terminate() {
         NSApp.terminate(nil)
     }
@@ -29,9 +29,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         log.addDestination(console)
         log.addDestination(file)
         
-        let mainAppIdentifier = "com.alinp.LunarService"
+        let mainAppIdentifier = "com.alinp.Lunar"
         let runningApps = NSWorkspace.shared.runningApplications
-        let isRunning = (runningApps.first(where: { app in app.bundleIdentifier == mainAppIdentifier }) != nil)
+        let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == mainAppIdentifier })
         
         if !isRunning {
             DistributedNotificationCenter.default().addObserver(
@@ -49,6 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             components.append("Lunar")
             
             let newPath = NSString.path(withComponents: components)
+            log.debug("Launching \(newPath)")
             
             NSWorkspace.shared.launchApplication(newPath)
         }

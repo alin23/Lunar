@@ -14,14 +14,54 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet weak var brightnessColumn: NSTableColumn!
     @IBOutlet weak var contrastColumn: NSTableColumn!
+    @IBOutlet weak var addAppButton: NSButton!
+    var addAppButtonTrackingArea: NSTrackingArea!
+    var addAppButtonShadow: NSShadow!
     
     func setup() {
+        
+    }
+    
+    func initAddAppButton() {
+        if let button = addAppButton {
+            let buttonSize = button.frame
+            button.wantsLayer = true
+            
+            button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
+            button.layer!.cornerRadius = button.frame.width / 2
+            button.layer!.backgroundColor = white.cgColor
+            button.alphaValue = 0.8
+            
+            addAppButtonShadow = button.shadow
+            button.shadow = nil
+            
+            addAppButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+            button.addTrackingArea(addAppButtonTrackingArea)
+        }
+    }
+    
+    
+    override func mouseEntered(with event: NSEvent) {
+        if let button = addAppButton {
+            button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
+            button.alphaValue = 1.0
+            button.shadow = addAppButtonShadow
+        }
+    }
+    
+    override func mouseExited(with event: NSEvent) {
+        if let button = addAppButton {
+            button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+            button.alphaValue = 0.8
+            button.shadow = nil
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         arrayController.managedObjectContext = datastore.context
         tableView.headerView = nil
+        initAddAppButton()
     }
     
 }

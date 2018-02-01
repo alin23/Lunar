@@ -33,28 +33,7 @@ class Display: NSManagedObject {
     @NSManaged var contrast: NSNumber
     
     var active: Bool = false
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if let key = keyPath {
-            switch key {
-            case "minBrightness", "maxBrightness", "minContrast", "maxContrast":
-                if adaptive && change![.newKey] as! NSNumber != change![.oldKey] as! NSNumber {
-                    adapt(moment: brightnessAdapter.moment)
-                }
-            case "brightness":
-                let newBrightness = min(max(brightness.uint8Value, minBrightness.uint8Value), maxBrightness.uint8Value)
-                let _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
-                log.debug("\(name): Set brightness to \(newBrightness)")
-            case "contrast":
-                let newContrast = min(max(contrast.uint8Value, minContrast.uint8Value), maxContrast.uint8Value)
-                let _ = DDC.setContrast(for: self.id, contrast: newContrast)
-                log.debug("\(name): Set contrast to \(newContrast)")
-            default:
-                log.debug(key)
-                return
-            }
-        }
-    }
+    var observers: [NSKeyValueObservation] = []
     
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
@@ -70,7 +49,6 @@ class Display: NSManagedObject {
             self.maxBrightness = NSNumber(value: maxBrightness)
             self.minContrast = NSNumber(value: minContrast)
             self.maxContrast = NSNumber(value: maxContrast)
-            addObservers()
         }
     }
     
@@ -78,22 +56,33 @@ class Display: NSManagedObject {
         self.name = DDC.getDisplayName(for: id)
     }
     
+    func readapt<T>(display: Display, change: NSKeyValueObservedChange<T>) {
+        if display.adaptive && change.newValue as! NSNumber != change.oldValue as! NSNumber {
+            display.adapt(moment: brightnessAdapter.moment)
+        }
+    }
+    
     func addObservers() {
-        addObserver(self, forKeyPath: "minBrightness", options: [.new, .old], context: nil)
-        addObserver(self, forKeyPath: "maxBrightness", options: [.new, .old], context: nil)
-        addObserver(self, forKeyPath: "minContrast", options: [.new, .old], context: nil)
-        addObserver(self, forKeyPath: "maxContrast", options: [.new, .old], context: nil)
-        addObserver(self, forKeyPath: "brightness", options: [.new, .old], context: nil)
-        addObserver(self, forKeyPath: "contrast", options: [.new, .old], context: nil)
+        observers = [
+            observe(\.minBrightness, options: [.new, .old], changeHandler: readapt),
+            observe(\.maxBrightness, options: [.new, .old], changeHandler: readapt),
+            observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
+            observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
+            observe(\.brightness, options: [.new], changeHandler: {display, change in
+                let newBrightness = min(max(change.newValue!.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
+                let _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
+                log.debug("\(self.name): Set brightness to \(newBrightness)")
+            }),
+            observe(\.contrast, options: [.new], changeHandler: {display, change in
+                let newContrast = min(max(change.newValue!.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
+                let _ = DDC.setContrast(for: self.id, contrast: newContrast)
+                log.debug("\(self.name): Set contrast to \(newContrast)")
+            })
+        ]
     }
     
     func removeObservers() {
-        removeObserver(self, forKeyPath: "minBrightness")
-        removeObserver(self, forKeyPath: "maxBrightness")
-        removeObserver(self, forKeyPath: "minContrast")
-        removeObserver(self, forKeyPath: "maxContrast")
-        removeObserver(self, forKeyPath: "brightness")
-        removeObserver(self, forKeyPath: "contrast")
+        observers.removeAll(keepingCapacity: true)
     }
     
     func interpolate(value: Double, span: Double, min: UInt8, max: UInt8, factor: Double) -> NSNumber {
@@ -115,9 +104,9 @@ class Display: NSManagedObject {
         let maxContrast = self.maxContrast.uint8Value
         var newBrightness = self.minBrightness
         var newContrast = self.minContrast
-        let interpolationFactor = datastore.defaults.double(forKey: "interpolationFactor")
-        let daylightExtension = datastore.defaults.integer(forKey: "daylightExtensionMinutes")
-        let noonDuration = datastore.defaults.integer(forKey: "noonDurationMinutes")
+        let interpolationFactor = datastore.defaults.interpolationFactor
+        let daylightExtension = datastore.defaults.daylightExtensionMinutes
+        let noonDuration = datastore.defaults.noonDurationMinutes
         
         let daylightStart = moment.civilSunrise - daylightExtension.minutes
         let daylightEnd = moment.civilSunset + daylightExtension.minutes
@@ -155,6 +144,6 @@ class Display: NSManagedObject {
             self.setValue(self.minContrast, forKey: "contrast")
             log.info("\n\(name):\n\tBrightness: \(minBrightness)\n\tContrast: \(minContrast)")
         }
-        datastore.save()
+        datastore.save(context: managedObjectContext!)
     }
 }

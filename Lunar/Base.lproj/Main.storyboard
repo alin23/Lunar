@@ -224,7 +224,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="CONFIGURATION" id="Al9-EG-ODL">
                                     <font key="font" size="24" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -233,7 +233,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Settings for changing adaptive mode behavior" usesSingleLineMode="YES" id="QmS-xo-dWA">
                                     <font key="font" metaFont="systemMedium" size="13"/>
-                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.74813490319999998" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -248,7 +248,7 @@
         <scene sceneID="Hpx-1r-TPC">
             <objects>
                 <viewController id="v5h-uZ-R2O" customClass="ExceptionsViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="X56-lr-Iy5">
+                    <view key="view" wantsLayer="YES" id="X56-lr-Iy5">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -328,7 +328,7 @@
                                                                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="rHW-2k-1pe">
                                                                         <font key="font" metaFont="systemHeavy" size="32"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="textColor" white="1" alpha="0.70059419014084512" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <userDefinedRuntimeAttributes>
@@ -355,7 +355,7 @@
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="9bg-Bk-YCG">
                                                                         <font key="font" size="10" name="Menlo-Regular"/>
-                                                                        <color key="textColor" red="0.40906229576534564" green="0.37205992800080562" blue="0.55178571428571432" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
@@ -388,7 +388,7 @@
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="JvL-0T-le7">
                                                                         <font key="font" metaFont="systemHeavy" size="32"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="textColor" white="1" alpha="0.70059419014084512" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <userDefinedRuntimeAttributes>
@@ -415,7 +415,7 @@
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="hOm-J9-pO3">
                                                                         <font key="font" size="10" name="Menlo-Regular"/>
-                                                                        <color key="textColor" red="0.40906229576534564" green="0.37205992800080562" blue="0.55178571428571432" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
@@ -452,7 +452,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="EXCEPTIONS" id="BNH-yp-CJC">
                                     <font key="font" size="24" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -461,13 +461,27 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Disable adaptive mode in the following apps" usesSingleLineMode="YES" id="J8r-d9-DNr">
                                     <font key="font" metaFont="systemMedium" size="13"/>
-                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.7481349031690141" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="eal-ql-8ai">
+                                <rect key="frame" x="172" y="20" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" white="0.0" alpha="0.29888314260563381" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="voI-qk-GvB">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent">a</string>
+                                </buttonCell>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="addAppButton" destination="eal-ql-8ai" id="7CS-19-TxT"/>
                         <outlet property="arrayController" destination="qou-Pu-5OD" id="v4G-5V-Grt"/>
                         <outlet property="brightnessColumn" destination="DLe-P9-tVg" id="WhI-CJ-07I"/>
                         <outlet property="contrastColumn" destination="ZQc-qo-r6X" id="R3l-xs-jU6"/>
@@ -647,5 +661,6 @@
     </scenes>
     <resources>
         <image name="Display" width="250" height="211"/>
+        <image name="NSAddTemplate" width="11" height="11"/>
     </resources>
 </document>

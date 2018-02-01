@@ -38,7 +38,7 @@ class ScrollableTextField: NSTextField {
     var onValueChanged: ((Int) -> Void)?
     var centerAlign: NSParagraphStyle?
     var scrolledOnce: Bool = false
-    var didScrollTextField: Bool = datastore.defaults.bool(forKey: "didScrollTextField")
+    var didScrollTextField: Bool = datastore.defaults.didScrollTextField
     
     var normalSize: CGSize?
     var activeSize: CGSize?

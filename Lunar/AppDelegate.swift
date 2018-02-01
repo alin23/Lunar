@@ -13,10 +13,10 @@ import ServiceManagement
 import WAYWindow
 import HotKey
 
+let launcherAppId = "com.alinp.LunarService"
 let log = SwiftyBeaver.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
-var activity: NSBackgroundActivityScheduler!
 
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
@@ -38,9 +38,14 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
+    var activity: NSBackgroundActivityScheduler!
+    
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
+    var loginItemObserver: NSKeyValueObservation?
+    var adaptiveEnabledObserver: NSKeyValueObservation?
+    
     var runningAppExceptions: [AppException]!
     @IBOutlet weak var menu: NSMenu!
     @IBOutlet weak var toggleMenuItem: NSMenuItem!
@@ -61,21 +66,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     func initHotkeys() {
         toggleHotKey.keyDownHandler = {
-            self.toggleBrightnessAdapter(sender: nil)
+            brightnessAdapter.toggle()
             log.debug("Toggle Hotkey pressed")
         }
         pauseHotKey.keyDownHandler = {
-            self.disableBrightnessAdapter()
+            brightnessAdapter.disable()
             log.debug("Pause Hotkey pressed")
         }
         startHotKey.keyDownHandler = {
-            self.enableBrightnessAdapter()
+            brightnessAdapter.enable()
             log.debug("Start Hotkey pressed")
         }
         lunarHotKey.keyDownHandler = {
             self.showWindow()
             log.debug("Show Window Hotkey pressed")
         }
+    }
+    
+    func listenForAdaptiveEnabled() {
+        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessEnabled, options: [.old, .new], changeHandler: {defaults, change in
+            guard let running = change.newValue, let oldRunning = change.oldValue, running != oldRunning else {
+                return
+            }
+            brightnessAdapter.running = running
+            self.resetElements()
+            self.manageBrightnessAdapterActivity(start: running)
+        })
     }
     
     func showWindow() {
@@ -86,15 +102,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let window = windowController.window,
             !window.isVisible {
             windowController.showWindow(nil)
+            NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
     }
     
     func handleDaemon() {
-        let launcherAppId = "com.alinp.LunarService"
         let runningApps = NSWorkspace.shared.runningApplications
-        let isRunning = (runningApps.first(where: { app in app.bundleIdentifier == launcherAppId }) != nil)
+        let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == launcherAppId })
         
-        SMLoginItemSetEnabled(launcherAppId as CFString, true)
+        SMLoginItemSetEnabled(launcherAppId as CFString, datastore.defaults.startAtLogin)
+        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: {defaults, change in
+            SMLoginItemSetEnabled(launcherAppId as CFString, change.newValue ?? false)
+        })
         
         if isRunning {
             DistributedNotificationCenter.default().post(
@@ -103,11 +122,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
     
+    func manageBrightnessAdapterActivity(start: Bool) {
+        if start {
+            log.debug("Started BrightnessAdapter")
+            brightnessAdapter.adaptBrightness()
+            self.activity.schedule { (completion) in
+//                let context = datastore.container.newBackgroundContext()
+                let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
+                do {
+                    let displays = try displayIDs.map({id in (try datastore.context.existingObject(with: id) as! Display)})
+                    brightnessAdapter.adaptBrightness(for: displays)
+                } catch {
+                    log.error("Error on fetching Displays by IDs")
+                }
+                completion(NSBackgroundActivityScheduler.Result.finished)
+            }
+        } else {
+            log.debug("Paused BrightnessAdapter")
+            self.activity.invalidate()
+        }
+    }
+    
     func initBrightnessAdapterActivity(interval: TimeInterval) {
         activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
         activity.repeats = true
         activity.interval = interval
         activity.qualityOfService = .userInitiated
+        manageBrightnessAdapterActivity(start: brightnessAdapter.running)
     }
     
     func initMenubarIcon() {
@@ -175,12 +216,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()
+        
         initBrightnessAdapterActivity(interval: 60)
-        brightnessAdapter.running = true
         initMenubarIcon()
         initHotkeys()
+        
+        listenForAdaptiveEnabled()
         listenForScreenConfigurationChanged()
         listenForRunningApps()
+        
         addObservers()
     }
     
@@ -246,29 +290,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     func adapt() {
         if !runningAppExceptions.isEmpty {
-            disableBrightnessAdapter()
+            brightnessAdapter.disable()
             let lastApp = runningAppExceptions.last!
             brightnessAdapter.setBrightness(brightness: lastApp.brightness)
             brightnessAdapter.setContrast(contrast: lastApp.contrast)
         } else {
-            enableBrightnessAdapter()
+            brightnessAdapter.enable()
             brightnessAdapter.adaptBrightness()
         }
     }
     
-    func disableBrightnessAdapter() {
-        brightnessAdapter.running = false
-        resetElements()
-    }
-    
-    func enableBrightnessAdapter() {
-        brightnessAdapter.running = true
-        resetElements()
-    }
-    
     @IBAction func toggleBrightnessAdapter(sender: Any?) {
-        _ = brightnessAdapter.toggle()
-        resetElements()
+        brightnessAdapter.toggle()
     }
     
     @IBAction func showWindow(sender: Any?) {
