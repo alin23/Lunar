@@ -37,28 +37,20 @@ class BrightnessAdapter  {
         }
     }
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
-    var running: Bool = datastore.defaults.bool(forKey: "adaptiveBrightnessEnabled") {
-        didSet {
-            datastore.defaults.set(running, forKey: "adaptiveBrightnessEnabled")
-            if running {
-                log.debug("Started BrightnessAdapter")
-                brightnessAdapter.adaptBrightness()
-                activity.schedule { (completion) in
-                    brightnessAdapter.adaptBrightness()
-                    completion(NSBackgroundActivityScheduler.Result.finished)
-                }
-            } else {
-                log.debug("Paused BrightnessAdapter")
-                activity.invalidate()
-            }
-        }
+    var running: Bool = datastore.defaults.adaptiveBrightnessEnabled
+    
+    func toggle() {
+        datastore.defaults.set(!running, forKey: "adaptiveBrightnessEnabled")
     }
     
-    func toggle() -> Bool {
-        running = !running
-        return running
+    func disable() {
+        datastore.defaults.set(false, forKey: "adaptiveBrightnessEnabled")
     }
     
+    func enable() {
+        datastore.defaults.set(true, forKey: "adaptiveBrightnessEnabled")
+    }
+
     func resetDisplayList() {
         for display in displays.values {
             display.removeObservers()
@@ -95,6 +87,7 @@ class BrightnessAdapter  {
                 } else {
                     displays[id] = Display(id: id)
                 }
+                displays[id]?.addObservers()
             }
             
             datastore.save()
@@ -102,6 +95,7 @@ class BrightnessAdapter  {
         } catch {
             log.error("Error on fetching displays: \(error)")
             displays = Dictionary(uniqueKeysWithValues: displayIDs.map { (id) in (id, Display(id: id, active: true)) })
+            displays.values.forEach({$0.addObservers()})
         }
         datastore.save()
         return displays

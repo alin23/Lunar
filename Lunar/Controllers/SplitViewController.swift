@@ -28,7 +28,7 @@ class SplitViewController: NSSplitViewController {
     @IBOutlet weak var activeStateButton: NSButton?
     
     @IBAction func toggleBrightnessAdapter(sender: Any?) {
-        _ = brightnessAdapter.toggle()
+        brightnessAdapter.toggle()
     }
     
     func initActiveStateButton() {

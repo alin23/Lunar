@@ -15,6 +15,18 @@ extension UserDefaults {
     @objc dynamic var daylightExtensionMinutes: Int {
         return integer(forKey: "daylightExtensionMinutes")
     }
+    @objc dynamic var interpolationFactor: Double {
+        return double(forKey: "interpolationFactor")
+    }
+    @objc dynamic var startAtLogin: Bool {
+        return bool(forKey: "startAtLogin")
+    }
+    @objc dynamic var didScrollTextField: Bool {
+        return bool(forKey: "didScrollTextField")
+    }
+    @objc dynamic var adaptiveBrightnessEnabled: Bool {
+        return bool(forKey: "adaptiveBrightnessEnabled")
+    }
 }
 
 class DataStore: NSObject {
@@ -30,16 +42,16 @@ class DataStore: NSObject {
         }
     }
     
-    func fetchDisplays(by serials: [String]) throws -> [Display] {
+    func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
         let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
         fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
-        return try context.fetch(fetchRequest)
+        return try (context ?? self.context).fetch(fetchRequest)
     }
     
-    func fetchAppExceptions(by names: [String]) throws -> [AppException] {
+    func fetchAppExceptions(by names: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "name IN %@", Set(names))
-        return try context.fetch(fetchRequest)
+        return try (context ?? self.context).fetch(fetchRequest)
     }
     
     static func firstRun(context: NSManagedObjectContext) {
@@ -64,6 +76,9 @@ class DataStore: NSObject {
         }
         if defaults.object(forKey: "didScrollTextField") == nil {
             defaults.set(false, forKey: "didScrollTextField")
+        }
+        if defaults.object(forKey: "startAtLogin") == nil {
+            defaults.set(true, forKey: "startAtLogin")
         }
         if defaults.object(forKey: "daylightExtensionMinutes") == nil {
             defaults.set(0, forKey: "daylightExtensionMinutes")
