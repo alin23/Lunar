@@ -30,7 +30,8 @@ extension UserDefaults {
 }
 
 class DataStore: NSObject {
-    let defaults: UserDefaults = UserDefaults()
+    static let defaults: UserDefaults = UserDefaults()
+    let defaults: UserDefaults = DataStore.defaults
     let container = NSPersistentContainer(name: "Model")
     var context: NSManagedObjectContext
     
@@ -55,6 +56,7 @@ class DataStore: NSObject {
     }
     
     static func firstRun(context: NSManagedObjectContext) {
+        log.debug("First run")
         for app in DEFAULT_APP_EXCEPTIONS {
             let _ = AppException(name: app, context: context)
         }
@@ -67,24 +69,25 @@ class DataStore: NSObject {
             }
         })
         context = container.newBackgroundContext()
-        if defaults.object(forKey: "firstRun") == nil {
+//        DataStore.defaults.removeObject(forKey: "firstRun")
+        if DataStore.defaults.object(forKey: "firstRun") == nil {
             DataStore.firstRun(context: context)
-            defaults.set(true, forKey: "firstRun")
+            DataStore.defaults.set(true, forKey: "firstRun")
         }
-        if defaults.object(forKey: "interpolationFactor") == nil {
-            defaults.set(0.5, forKey: "interpolationFactor")
+        if DataStore.defaults.object(forKey: "interpolationFactor") == nil {
+            DataStore.defaults.set(0.5, forKey: "interpolationFactor")
         }
-        if defaults.object(forKey: "didScrollTextField") == nil {
-            defaults.set(false, forKey: "didScrollTextField")
+        if DataStore.defaults.object(forKey: "didScrollTextField") == nil {
+            DataStore.defaults.set(false, forKey: "didScrollTextField")
         }
-        if defaults.object(forKey: "startAtLogin") == nil {
-            defaults.set(true, forKey: "startAtLogin")
+        if DataStore.defaults.object(forKey: "startAtLogin") == nil {
+            DataStore.defaults.set(true, forKey: "startAtLogin")
         }
-        if defaults.object(forKey: "daylightExtensionMinutes") == nil {
-            defaults.set(0, forKey: "daylightExtensionMinutes")
+        if DataStore.defaults.object(forKey: "daylightExtensionMinutes") == nil {
+            DataStore.defaults.set(180, forKey: "daylightExtensionMinutes")
         }
-        if defaults.object(forKey: "noonDurationMinutes") == nil {
-            defaults.set(60, forKey: "noonDurationMinutes")
+        if DataStore.defaults.object(forKey: "noonDurationMinutes") == nil {
+            DataStore.defaults.set(240, forKey: "noonDurationMinutes")
         }
     }
     

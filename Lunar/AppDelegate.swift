@@ -292,8 +292,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if !runningAppExceptions.isEmpty {
             brightnessAdapter.disable()
             let lastApp = runningAppExceptions.last!
-            brightnessAdapter.setBrightness(brightness: lastApp.brightness)
-            brightnessAdapter.setContrast(contrast: lastApp.contrast)
+            brightnessAdapter.adaptBrightness(app: lastApp)
         } else {
             brightnessAdapter.enable()
             brightnessAdapter.adaptBrightness()
