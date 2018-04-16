@@ -24,7 +24,7 @@ class BrightnessAdapter  {
     var _moment: Moment!
     var moment: Moment! {
         get {
-            if !_moment.solarNoon.isToday {
+            if let m = _moment, !m.solarNoon.isToday {
                 fetchMoments()
             }
             return _moment
@@ -146,15 +146,15 @@ class BrightnessAdapter  {
         }
     }
     
-    func adaptBrightness(for displays: [Display]? = nil) {
+    func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil) {
         if moment == nil {
             log.warning("Day moments aren't fetched yet")
             return
         }
         if let displays = displays {
-            displays.forEach({ (display) in display.adapt(moment: moment) })
+            displays.forEach({ (display) in display.adapt(moment: moment, app: app) })
         } else {
-            self.displays.values.forEach({(display) in display.adapt(moment: moment)})
+            self.displays.values.forEach({(display) in display.adapt(moment: moment, app: app)})
         }
     }
     func setBrightness(brightness: NSNumber, for displays: [Display]? = nil) {

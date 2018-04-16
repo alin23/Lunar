@@ -95,7 +95,7 @@ class Display: NSManagedObject {
         return NSNumber(value: UInt8(interpolated))
     }
     
-    func adapt(moment: Moment) {
+    func getBrightnessContrast(moment: Moment) -> (NSNumber, NSNumber) {
         let now = DateInRegion()
         let seconds = 60.0
         let minBrightness = self.minBrightness.uint8Value
@@ -120,9 +120,6 @@ class Display: NSManagedObject {
             let minutesSinceSunrise = ((now - daylightStart) / seconds)
             newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
             newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
-            self.setValue(newBrightness, forKey: "brightness")
-            self.setValue(newContrast, forKey: "contrast")
-            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         case noonEnd...daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
             let minutesSinceNoon = ((now - noonEnd) / seconds)
@@ -130,20 +127,25 @@ class Display: NSManagedObject {
             let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
             newBrightness = NSNumber(value: maxBrightness + minBrightness - interpolatedBrightness.uint8Value)
             newContrast = NSNumber(value: maxContrast + minContrast - interpolatedContrast.uint8Value)
-            self.setValue(newBrightness, forKey: "brightness")
-            self.setValue(newContrast, forKey: "contrast")
-            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         case noonStart...noonEnd:
-            log.debug("Setting brightness/contrast to maximum values.")
-            self.setValue(self.maxBrightness, forKey: "brightness")
-            self.setValue(self.maxContrast, forKey: "contrast")
-            log.info("\n\(name):\n\tBrightness: \(maxBrightness)\n\tContrast: \(maxContrast)")
+            newBrightness = self.maxBrightness
+            newContrast = self.maxContrast
         default:
-            log.debug("Setting brightness/contrast to minimum values.")
-            self.setValue(self.minBrightness, forKey: "brightness")
-            self.setValue(self.minContrast, forKey: "contrast")
-            log.info("\n\(name):\n\tBrightness: \(minBrightness)\n\tContrast: \(minContrast)")
+            newBrightness = self.minBrightness
+            newContrast = self.minContrast
         }
+        return (newBrightness, newContrast)
+    }
+    
+    func adapt(moment: Moment, app: AppException? = nil) {
+        var (newBrightness, newContrast) = self.getBrightnessContrast(moment: moment)
+        if let app = app {
+            newBrightness = NSNumber(value: min(newBrightness.uint8Value + app.brightness.uint8Value, MAX_BRIGHTNESS))
+            newContrast = NSNumber(value: min(newContrast.uint8Value + app.contrast.uint8Value, MAX_CONTRAST))
+        }
+        self.setValue(newBrightness, forKey: "brightness")
+        self.setValue(newContrast, forKey: "contrast")
+        log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
         datastore.save(context: managedObjectContext!)
     }
 }

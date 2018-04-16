@@ -31,6 +31,8 @@
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
+		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
+		C7C163232085136E00C7EA8F /* ScrollableTextCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C163222085136E00C7EA8F /* ScrollableTextCellView.swift */; };
 		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
 		C7C1F7031FD5FD390039507C /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7021FD5FD390039507C /* Display.swift */; };
 		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
@@ -133,8 +135,9 @@
 		C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7AEC7FF1FD0B4350039B562 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C7AEC8021FD0B4350039B562 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
+		C7C163222085136E00C7EA8F /* ScrollableTextCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextCellView.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
 		C7C1F7021FD5FD390039507C /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
 		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
@@ -156,7 +159,6 @@
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7CFEA1B1FD376E6000AC4A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C7CFEA1E1FD376E6000AC4A6 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		C7DE93882019E1160017F965 /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
 		C7DE93892019E1160017F965 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = HotKey.framework.dSYM; path = Carthage/Build/Mac/HotKey.framework.dSYM; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
 				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
 				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
+				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				C7C68F08201B75C700F49A2B /* DeleteButton.swift */,
 				C7C68F0C201D3D9800F49A2B /* SettingsView.swift */,
 				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
+				C7C163222085136E00C7EA8F /* ScrollableTextCellView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -288,7 +292,6 @@
 				C76545261FD8A11000DBACE9 /* DDC.c */,
 				C76545271FD8A11000DBACE9 /* DDC.h */,
 				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
-				C7AEC8021FD0B4350039B562 /* Lunar.entitlements */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
@@ -304,7 +307,6 @@
 				C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */,
 				C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */,
 				C7CFEA1D1FD376E6000AC4A6 /* Info.plist */,
-				C7CFEA1E1FD376E6000AC4A6 /* LunarService.entitlements */,
 			);
 			path = LunarService;
 			sourceTree = "<group>";
@@ -371,7 +373,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -380,7 +382,7 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -389,7 +391,7 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -452,6 +454,7 @@
 				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C7C163232085136E00C7EA8F /* ScrollableTextCellView.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
@@ -465,6 +468,7 @@
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
+				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 			);
@@ -514,6 +518,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -521,6 +526,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -571,6 +577,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -578,6 +585,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -660,6 +668,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -671,6 +680,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 			};
@@ -681,6 +691,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -692,6 +703,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 			};

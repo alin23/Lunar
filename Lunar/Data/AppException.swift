@@ -8,9 +8,9 @@
 
 import Cocoa
 
-let APP_MAX_BRIGHTNESS: UInt8 = 100
-let APP_MAX_CONTRAST: UInt8 = 75
-let DEFAULT_APP_EXCEPTIONS = ["VLC", "OpenPHT", "QuickTime Player", "Plex Media Player"]
+let APP_MAX_BRIGHTNESS: UInt8 = 50
+let APP_MAX_CONTRAST: UInt8 = 30
+let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player"]
 
 class AppException: NSManagedObject {
     @NSManaged var name: String

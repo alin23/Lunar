@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
@@ -211,10 +211,10 @@
             </objects>
             <point key="canvasLocation" x="-608" y="2418"/>
         </scene>
-        <!--View Controller-->
+        <!--Configuration View Controller-->
         <scene sceneID="MwP-RD-6xX">
             <objects>
-                <viewController id="8dO-ff-2g9" sceneMemberID="viewController">
+                <viewController id="8dO-ff-2g9" customClass="ConfigurationViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="OP4-YT-Mrk">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -237,12 +237,106 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jCD-nB-vFN">
+                                <rect key="frame" x="20" y="260" width="200" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Noon duration" id="Bab-eR-qtG">
+                                    <font key="font" size="18" name="Menlo-Bold"/>
+                                    <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gR8-S6-VJx" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="261" width="100" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="arM-D9-iPc">
+                                    <font key="font" metaFont="systemHeavy" size="32"/>
+                                    <color key="textColor" white="1" alpha="0.70059419010000001" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" white="1" alpha="0.69921875" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" white="1" alpha="0.89981294020000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="600"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xSp-32-U36" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="249" width="100" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MINUTES" id="oL8-hX-2by">
+                                    <font key="font" size="10" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gmb-rW-1Qy">
+                                <rect key="frame" x="20" y="200" width="200" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Daylight extension" id="1KO-ff-EYF">
+                                    <font key="font" size="18" name="Menlo-Bold"/>
+                                    <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H5y-th-bQ1" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="201" width="100" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="qrl-79-qzh">
+                                    <font key="font" metaFont="systemHeavy" size="32"/>
+                                    <color key="textColor" white="1" alpha="0.70059419010000001" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" white="1" alpha="0.69921875" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" white="1" alpha="0.89981294020000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="600"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7xo-Ez-g9m" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="189" width="100" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MINUTES" id="Q5X-IC-Qmg">
+                                    <font key="font" size="10" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
+                    <connections>
+                        <outlet property="daylightExtensionCaption" destination="7xo-Ez-g9m" id="tcA-SF-lgJ"/>
+                        <outlet property="daylightExtensionField" destination="H5y-th-bQ1" id="nXd-ff-ul0"/>
+                        <outlet property="noonDurationCaption" destination="xSp-32-U36" id="ai7-im-YU1"/>
+                        <outlet property="noonDurationField" destination="gR8-S6-VJx" id="uhd-gR-fkf"/>
+                    </connections>
                 </viewController>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="28" y="2418"/>
+            <point key="canvasLocation" x="27.5" y="2418"/>
         </scene>
         <!--Exceptions View Controller-->
         <scene sceneID="Hpx-1r-TPC">
@@ -319,7 +413,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="WvX-GE-Jy3">
+                                                        <tableCellView id="WvX-GE-Jy3" customClass="ScrollableTextCellView" customModule="Lunar" customModuleProvider="target">
                                                             <rect key="frame" x="200" y="10" width="70" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -350,7 +444,7 @@
                                                                         </binding>
                                                                     </connections>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C68-N6-aA6">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C68-N6-aA6" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="0.0" width="70" height="13"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="9bg-Bk-YCG">
@@ -361,6 +455,8 @@
                                                                 </textField>
                                                             </subviews>
                                                             <connections>
+                                                                <outlet property="scrollableCaption" destination="C68-N6-aA6" id="qwb-rX-nEY"/>
+                                                                <outlet property="scrollableField" destination="pbm-hq-sAY" id="Odv-u2-fz8"/>
                                                                 <outlet property="textField" destination="pbm-hq-sAY" id="8rJ-wq-UFK"/>
                                                             </connections>
                                                         </tableCellView>
@@ -379,7 +475,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="AbE-RR-q5I">
+                                                        <tableCellView id="AbE-RR-q5I" customClass="ScrollableTextCellView" customModule="Lunar" customModuleProvider="target">
                                                             <rect key="frame" x="270" y="10" width="70" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -410,7 +506,7 @@
                                                                         </binding>
                                                                     </connections>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mt6-ZS-1wJ">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mt6-ZS-1wJ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="0.0" width="70" height="13"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="hOm-J9-pO3">
@@ -421,6 +517,8 @@
                                                                 </textField>
                                                             </subviews>
                                                             <connections>
+                                                                <outlet property="scrollableCaption" destination="mt6-ZS-1wJ" id="pGs-XM-njs"/>
+                                                                <outlet property="scrollableField" destination="DuS-ce-rej" id="ks2-bH-nHV"/>
                                                                 <outlet property="textField" destination="DuS-ce-rej" id="wAO-Hg-afR"/>
                                                             </connections>
                                                         </tableCellView>
