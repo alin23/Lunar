@@ -104,8 +104,18 @@ public class PageControl: NSView {
         let fillColorAnimation: CABasicAnimation = CABasicAnimation(keyPath: "fillColor")
         fillColorAnimation.toValue    = color.cgColor
         fillColorAnimation.duration   = animationDuration
-        fillColorAnimation.fillMode = kCAFillModeForwards
+        fillColorAnimation.fillMode = convertToCAMediaTimingFillMode(convertFromCAMediaTimingFillMode(CAMediaTimingFillMode.forwards))
         fillColorAnimation.isRemovedOnCompletion = false
         return fillColorAnimation
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCAMediaTimingFillMode(_ input: String) -> CAMediaTimingFillMode {
+	return CAMediaTimingFillMode(rawValue: input)
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromCAMediaTimingFillMode(_ input: CAMediaTimingFillMode) -> String {
+	return input.rawValue
 }

@@ -17,6 +17,9 @@ class ScrollableBrightness: NSView {
     @IBOutlet weak var minValueCaption: ScrollableTextFieldCaption!
     @IBOutlet weak var maxValueCaption: ScrollableTextFieldCaption!
     @IBOutlet weak var currentValueCaption: ScrollableTextFieldCaption!
+    var onMinValueChanged: ((UInt8) -> Void)?
+    var onMaxValueChanged: ((UInt8) -> Void)?
+    
     
     var display: Display! {
         didSet {
@@ -72,12 +75,14 @@ class ScrollableBrightness: NSView {
     }
     
     func setup() {
+        minValue?.onValueChangedInstant = onMinValueChanged
         minValue?.onValueChanged = { (value: Int) in
             self.maxValue?.lowerLimit = value
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
+        maxValue?.onValueChangedInstant = onMaxValueChanged
         maxValue?.onValueChanged = { (value: Int) in
             self.minValue?.upperLimit = value
             if self.display != nil {
@@ -91,12 +96,14 @@ class ScrollableBrightness: NSView {
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+        minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
         minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
             self.maxValue?.lowerLimit = value
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
+        maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
         maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
             self.minValue?.upperLimit = value
             if self.display != nil {

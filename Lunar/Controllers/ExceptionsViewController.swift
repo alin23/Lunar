@@ -18,7 +18,37 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
     
-    func setup() {
+    @IBAction func addAppException(_ sender: NSButton) {
+        let dialog = NSOpenPanel();
+        
+        dialog.title = "Choose an application";
+        dialog.showsResizeIndicator = true
+        dialog.showsHiddenFiles = false
+        dialog.canChooseDirectories = false
+        dialog.canCreateDirectories = false
+        dialog.allowsMultipleSelection = false
+        dialog.allowedFileTypes = ["app"]
+        dialog.treatsFilePackagesAsDirectories = false
+        dialog.directoryURL = URL(string: "file:///Applications")
+        
+        if dialog.runModal() == NSApplication.ModalResponse.OK {
+            let result = dialog.url
+            
+            if let res = result {
+                let bundle = Bundle(url: res)
+                guard let name = bundle?.infoDictionary?["CFBundleName"] as? String,
+                    let id = bundle?.bundleIdentifier else {
+                        log.warning("Bundle for \(res.path) does not contain required fields")
+                        return
+                }
+                if try! datastore.fetchAppException(by: id) == nil {
+                    let app = AppException(identifier: id, name: name)
+                    arrayController.addObject(app)
+                }
+            }
+        } else {
+            return
+        }
         
     }
     
