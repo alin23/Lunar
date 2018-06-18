@@ -7,23 +7,14 @@
 //
 
 import Cocoa
-import WAYWindow
 
 class ModernWindowController: NSWindowController, NSWindowDelegate {
+    var observer: NSKeyValueObservation?
     
     func setupWindow() {
-        if let w = window as? WAYWindow {
+        if let w = window as? ModernWindow {
             w.delegate = self
-            w.titleBarHeight = 50
-            w.verticallyCenterTitle = true
-            w.centerTrafficLightButtons = true
-            w.hidesTitle = true
-            w.trafficLightButtonsLeftMargin = 20
-            w.trafficLightButtonsTopMargin = 0
-            w.hideTitleBarInFullScreen = false
-            w.isOpaque = false
-            w.backgroundColor = NSColor.clear
-            w.makeKeyAndOrderFront(nil)
+            w.setup()
         }
     }
     
@@ -34,6 +25,8 @@ class ModernWindowController: NSWindowController, NSWindowDelegate {
     
     func windowWillClose(_ notification: Notification) {
         log.info("Window closing")
+        upHotkey = nil
+        downHotkey = nil
     }
     
 }

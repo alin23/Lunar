@@ -25,7 +25,12 @@ let adaptiveButtonLabelColor = mauve
 let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05)!
 let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1)!
 let scrollableTextFieldColorLight = lunarYellow.highlight(withLevel: 0.3)!
-let scollableViewLabelColor = mauve.withAlphaComponent(0.35)
+
+let scrollableTextFieldColorWhite = white.withAlphaComponent(0.7)
+let scrollableTextFieldColorHoverWhite = white.withAlphaComponent(0.9)
+let scrollableTextFieldColorLightWhite = white
+
+let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
 let adaptiveButtonBgOn = lunarYellow
 let adaptiveButtonBgOnHover = lunarYellow.highlight(withLevel: 0.2)!
@@ -56,4 +61,7 @@ let onButtonColor = green
 let offButtonColor = red
 
 let xColor = red
+let removeButtonColor = red.highlight(withLevel: 0.3)!
 
+let brightnessGraphColor = lunarYellow.highlight(withLevel: 0.5)!
+let contrastGraphColor = red.withAlphaComponent(0.3)

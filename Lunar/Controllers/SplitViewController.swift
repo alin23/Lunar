@@ -37,36 +37,36 @@ class SplitViewController: NSSplitViewController {
             button.wantsLayer = true
             
             activeTitleDisplay = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-            activeTitleDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorDisplay, range: NSMakeRange(0, activeTitleDisplay!.length - 2))
-            activeTitleDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleDisplay!.length - 2, 2))
+            activeTitleDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorDisplay, range: NSMakeRange(0, activeTitleDisplay!.length - 2))
+            activeTitleDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleDisplay!.length - 2, 2))
             
             inactiveTitleDisplay = NSMutableAttributedString(attributedString: button.attributedTitle)
-            inactiveTitleDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorDisplay, range: NSMakeRange(0, inactiveTitleDisplay!.length - 2))
-            inactiveTitleDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleDisplay!.length - 2, 2))
+            inactiveTitleDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorDisplay, range: NSMakeRange(0, inactiveTitleDisplay!.length - 2))
+            inactiveTitleDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleDisplay!.length - 2, 2))
             
             activeTitleHoverDisplay = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-            activeTitleHoverDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorHoverDisplay, range: NSMakeRange(0, activeTitleHoverDisplay!.length - 2))
-            activeTitleHoverDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleHoverDisplay!.length - 2, 2))
+            activeTitleHoverDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorHoverDisplay, range: NSMakeRange(0, activeTitleHoverDisplay!.length - 2))
+            activeTitleHoverDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleHoverDisplay!.length - 2, 2))
             
             inactiveTitleHoverDisplay = NSMutableAttributedString(attributedString: button.attributedTitle)
-            inactiveTitleHoverDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorHoverDisplay, range: NSMakeRange(0, inactiveTitleHoverDisplay!.length - 2))
-            inactiveTitleHoverDisplay?.addAttribute(NSAttributedStringKey.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleHoverDisplay!.length - 2, 2))
+            inactiveTitleHoverDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorHoverDisplay, range: NSMakeRange(0, inactiveTitleHoverDisplay!.length - 2))
+            inactiveTitleHoverDisplay?.addAttribute(NSAttributedString.Key.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleHoverDisplay!.length - 2, 2))
             
             activeTitleSettings = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-            activeTitleSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorSettings, range: NSMakeRange(0, activeTitleSettings!.length - 2))
-            activeTitleSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleSettings!.length - 2, 2))
+            activeTitleSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorSettings, range: NSMakeRange(0, activeTitleSettings!.length - 2))
+            activeTitleSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleSettings!.length - 2, 2))
             
             inactiveTitleSettings = NSMutableAttributedString(attributedString: button.attributedTitle)
-            inactiveTitleSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorSettings, range: NSMakeRange(0, inactiveTitleSettings!.length - 2))
-            inactiveTitleSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleSettings!.length - 2, 2))
+            inactiveTitleSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorSettings, range: NSMakeRange(0, inactiveTitleSettings!.length - 2))
+            inactiveTitleSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleSettings!.length - 2, 2))
             
             activeTitleHoverSettings = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-            activeTitleHoverSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorHoverSettings, range: NSMakeRange(0, activeTitleHoverSettings!.length - 2))
-            activeTitleHoverSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleHoverSettings!.length - 2, 2))
+            activeTitleHoverSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorHoverSettings, range: NSMakeRange(0, activeTitleHoverSettings!.length - 2))
+            activeTitleHoverSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: offButtonColor, range: NSMakeRange(activeTitleHoverSettings!.length - 2, 2))
             
             inactiveTitleHoverSettings = NSMutableAttributedString(attributedString: button.attributedTitle)
-            inactiveTitleHoverSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: stateButtonLabelColorHoverSettings, range: NSMakeRange(0, inactiveTitleHoverSettings!.length - 2))
-            inactiveTitleHoverSettings?.addAttribute(NSAttributedStringKey.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleHoverSettings!.length - 2, 2))
+            inactiveTitleHoverSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColorHoverSettings, range: NSMakeRange(0, inactiveTitleHoverSettings!.length - 2))
+            inactiveTitleHoverSettings?.addAttribute(NSAttributedString.Key.foregroundColor, value: onButtonColor, range: NSMakeRange(inactiveTitleHoverSettings!.length - 2, 2))
             
             
             button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 10))

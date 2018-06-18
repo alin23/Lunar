@@ -93,13 +93,13 @@ class PageController: NSPageController, NSPageControllerDelegate {
     func pageController(_ pageController: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         if viewControllers[identifier] == nil {
             if identifier == settingsViewControllerIdentifier {
-                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "settingsViewController")) as! SettingsViewController
+                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsViewController")) as! SettingsViewController
             } else {
-                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "displayViewController")) as! DisplayViewController
+                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
         }
         if let controller = viewControllers[identifier] as? DisplayViewController {
-            let displayId = CGDirectDisplayID(identifier.rawValue)!
+            let displayId = CGDirectDisplayID(identifier)!
             if displayId != GENERIC_DISPLAY.id {
                 controller.display = brightnessAdapter.displays[displayId]
             } else {

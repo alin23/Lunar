@@ -22,15 +22,20 @@ extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
 }
 
-let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
-let pauseHotKey = HotKey(key: .k, modifiers: [.command, .control])
-let startHotKey = HotKey(key: .k, modifiers: [.command, .control, .shift])
-let lunarHotKey = HotKey(key: .l, modifiers: [.command, .control, .shift])
+let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control, .option])
+let startHotKey = HotKey(key: .l, modifiers: [.command, .control])
+let pauseHotKey = HotKey(key: .l, modifiers: [.command, .control, .shift])
+let lunarHotKey = HotKey(key: .l, modifiers: [.command, .option])
+let percent0HotKey = HotKey(key: .zero, modifiers: [.command, .control])
+let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
+let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
+let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
+let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
     transition.duration = duration
-    transition.type = kCATransitionFade
+    transition.type = convertToCATransitionType(convertFromCATransitionType(CATransitionType.fade))
     return transition
 }
 
@@ -81,6 +86,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.showWindow()
             log.debug("Show Window Hotkey pressed")
         }
+        percent0HotKey.keyDownHandler = {
+            self.setLightPercent(percent: 0)
+        }
+        percent25HotKey.keyDownHandler = {
+            self.setLightPercent(percent: 25)
+        }
+        percent50HotKey.keyDownHandler = {
+            self.setLightPercent(percent: 50)
+        }
+        percent75HotKey.keyDownHandler = {
+            self.setLightPercent(percent: 75)
+        }
+        percent100HotKey.keyDownHandler = {
+            self.setLightPercent(percent: 100)
+        }
     }
     
     func listenForAdaptiveEnabled() {
@@ -96,12 +116,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     func showWindow() {
         if self.windowController == nil {
-            self.windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "windowController")) as? ModernWindowController
+            self.windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
         if let windowController = self.windowController,
-            let window = windowController.window,
-            !window.isVisible {
+            let window = windowController.window {
             windowController.showWindow(nil)
+            window.orderFrontRegardless()
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
     }
@@ -122,12 +142,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
     
+    func applicationDidResignActive(_ notification: Notification) {
+        upHotkey = nil
+        downHotkey = nil
+    }
+    
     func manageBrightnessAdapterActivity(start: Bool) {
         if start {
             log.debug("Started BrightnessAdapter")
             brightnessAdapter.adaptBrightness()
             self.activity.schedule { (completion) in
-//                let context = datastore.container.newBackgroundContext()
+                //                let context = datastore.container.newBackgroundContext()
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
                 do {
                     let displays = try displayIDs.map({id in (try datastore.context.existingObject(with: id) as! Display)})
@@ -170,14 +195,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
     
     func listenForRunningApps() {
-        let appNames = NSWorkspace.shared.runningApplications.map({app in app.localizedName ?? ""})
+        let appNames = NSWorkspace.shared.runningApplications.map({app in app.bundleIdentifier ?? ""})
         runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
+        for app in runningAppExceptions {
+            app.addObservers()
+        }
         
         adapt()
         
         appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: {(workspace, change) in
-            let oldAppNames = change.oldValue?.map({app in app.localizedName ?? ""})
-            let newAppNames = change.newValue?.map({app in app.localizedName ?? ""})
+            let oldAppNames = change.oldValue?.map({app in app.bundleIdentifier ?? ""})
+            let newAppNames = change.newValue?.map({app in app.bundleIdentifier ?? ""})
             do {
                 if let names = newAppNames {
                     self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
@@ -199,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     @objc func adaptToScreenConfiguration(notification: Notification) {
         brightnessAdapter.resetDisplayList()
-        let pageController = (self.windowController?.window?.contentViewController as? SplitViewController)?.childViewControllers[0] as? PageController
+        let pageController = (self.windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController
         pageController?.setup()
     }
     
@@ -299,6 +327,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
     
+    func setLightPercent(percent: Int8) {
+        brightnessAdapter.disable()
+        brightnessAdapter.setBrightnessPercent(value: percent)
+        brightnessAdapter.setContrastPercent(value: percent)
+        log.debug("Setting brightness and contrast to \(percent)%")
+    }
+    
+    @IBAction func setLight0Percent(sender: Any?) {
+        setLightPercent(percent: 0)
+    }
+    @IBAction func setLight25Percent(sender: Any?) {
+        setLightPercent(percent: 25)
+    }
+    @IBAction func setLight50Percent(sender: Any?) {
+        setLightPercent(percent: 50)
+    }
+    @IBAction func setLight75Percent(sender: Any?) {
+        setLightPercent(percent: 75)
+    }
+    @IBAction func setLight100Percent(sender: Any?) {
+        setLightPercent(percent: 100)
+    }
+    
     @IBAction func toggleBrightnessAdapter(sender: Any?) {
         brightnessAdapter.toggle()
     }
@@ -308,3 +359,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCATransitionType(_ input: String) -> CATransitionType {
+    return CATransitionType(rawValue: input)
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromCATransitionType(_ input: CATransitionType) -> String {
+    return input.rawValue
+}

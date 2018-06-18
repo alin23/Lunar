@@ -34,6 +34,7 @@ class Display: NSManagedObject {
     
     var active: Bool = false
     var observers: [NSKeyValueObservation] = []
+    var onReadapt: (() -> Void)?
     
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
@@ -57,6 +58,9 @@ class Display: NSManagedObject {
     }
     
     func readapt<T>(display: Display, change: NSKeyValueObservedChange<T>) {
+        if let readaptListener = onReadapt {
+            readaptListener()
+        }
         if display.adaptive && change.newValue as! NSNumber != change.oldValue as! NSNumber {
             display.adapt(moment: brightnessAdapter.moment)
         }
@@ -95,13 +99,24 @@ class Display: NSManagedObject {
         return NSNumber(value: UInt8(interpolated))
     }
     
-    func getBrightnessContrast(moment: Moment) -> (NSNumber, NSNumber) {
-        let now = DateInRegion()
+    func getBrightnessContrast(
+        moment: Moment,
+        hour: Int? = nil,
+        minute: Int = 0,
+        minBrightness: UInt8? = nil,
+        maxBrightness: UInt8? = nil,
+        minContrast: UInt8? = nil,
+        maxContrast: UInt8? = nil
+        ) -> (NSNumber, NSNumber) {
+        var now = DateInRegion()
+        if let hour = hour {
+            now = now.atTime(hour: hour, minute: minute, second: 0)!
+        }
         let seconds = 60.0
-        let minBrightness = self.minBrightness.uint8Value
-        let maxBrightness = self.maxBrightness.uint8Value
-        let minContrast = self.minContrast.uint8Value
-        let maxContrast = self.maxContrast.uint8Value
+        let minBrightness = minBrightness ?? self.minBrightness.uint8Value
+        let maxBrightness = maxBrightness ?? self.maxBrightness.uint8Value
+        let minContrast = minContrast ?? self.minContrast.uint8Value
+        let maxContrast = maxContrast ?? self.maxContrast.uint8Value
         var newBrightness = self.minBrightness
         var newContrast = self.minContrast
         let interpolationFactor = datastore.defaults.interpolationFactor
@@ -118,8 +133,8 @@ class Display: NSManagedObject {
         case daylightStart...noonStart:
             let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
             let minutesSinceSunrise = ((now - daylightStart) / seconds)
-            newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
-            newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
+            newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: 1/interpolationFactor)
+            newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: 1/interpolationFactor)
         case noonEnd...daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
             let minutesSinceNoon = ((now - noonEnd) / seconds)

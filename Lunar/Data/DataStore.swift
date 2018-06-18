@@ -49,16 +49,31 @@ class DataStore: NSObject {
         return try (context ?? self.context).fetch(fetchRequest)
     }
     
-    func fetchAppExceptions(by names: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
+    func fetchAppExceptions(by identifiers: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
-        fetchRequest.predicate = NSPredicate(format: "name IN %@", Set(names))
+        fetchRequest.predicate = NSPredicate(format: "identifier IN %@", Set(identifiers))
         return try (context ?? self.context).fetch(fetchRequest)
     }
     
+    func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
+        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
+        fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
+        return try (context ?? self.context).fetch(fetchRequest).first
+    }
+    
+
     static func firstRun(context: NSManagedObjectContext) {
         log.debug("First run")
         for app in DEFAULT_APP_EXCEPTIONS {
-            let _ = AppException(name: app, context: context)
+            let appPath = "/Applications/\(app).app"
+            if FileManager.default.fileExists(atPath: appPath) {
+                let bundle = Bundle(path: appPath)
+                guard let id = bundle?.bundleIdentifier,
+                let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
+                    continue
+                }
+                let _ = AppException(identifier: id, name: name, context: context)
+            }
         }
     }
     
@@ -69,13 +84,12 @@ class DataStore: NSObject {
             }
         })
         context = container.newBackgroundContext()
-//        DataStore.defaults.removeObject(forKey: "firstRun")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
             DataStore.firstRun(context: context)
             DataStore.defaults.set(true, forKey: "firstRun")
         }
         if DataStore.defaults.object(forKey: "interpolationFactor") == nil {
-            DataStore.defaults.set(0.5, forKey: "interpolationFactor")
+            DataStore.defaults.set(2.0, forKey: "interpolationFactor")
         }
         if DataStore.defaults.object(forKey: "didScrollTextField") == nil {
             DataStore.defaults.set(false, forKey: "didScrollTextField")

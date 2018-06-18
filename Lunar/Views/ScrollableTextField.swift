@@ -9,6 +9,9 @@
 import Cocoa
 import HotKey
 
+var upHotkey: HotKey?
+var downHotkey: HotKey?
+
 class ScrollableTextField: NSTextField {
     @IBInspectable var lowerLimit: Int = 0
     @IBInspectable var upperLimit: Int = 100
@@ -29,13 +32,11 @@ class ScrollableTextField: NSTextField {
     }
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
     
-    var upHotkey: HotKey?
-    var downHotkey: HotKey?
-    
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
     var onValueChanged: ((Int) -> Void)?
+    var onValueChangedInstant: ((UInt8) -> Void)?
     var centerAlign: NSParagraphStyle?
     var scrolledOnce: Bool = false
     var didScrollTextField: Bool = datastore.defaults.didScrollTextField
@@ -151,6 +152,7 @@ class ScrollableTextField: NSTextField {
                 if intValue < upperLimit {
                     if scrolledOnce {
                         intValue += 1
+                        onValueChangedInstant?(UInt8(integerValue))
                         scrolledOnce = false
                     } else {
                         scrolledOnce = true
@@ -165,6 +167,7 @@ class ScrollableTextField: NSTextField {
                 if intValue > lowerLimit {
                     if scrolledOnce {
                         intValue -= 1
+                        onValueChangedInstant?(UInt8(integerValue))
                         scrolledOnce = false
                     } else {
                         scrolledOnce = true
