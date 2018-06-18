@@ -8,10 +8,10 @@
 
 import Cocoa
 import CoreLocation
-import SwiftyBeaver
-import ServiceManagement
-import WAYWindow
 import HotKey
+import ServiceManagement
+import SwiftyBeaver
+import WAYWindow
 
 let launcherAppId = "com.alinp.LunarService"
 let log = SwiftyBeaver.self
@@ -44,31 +44,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
     var activity: NSBackgroundActivityScheduler!
-    
+
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
     var adaptiveEnabledObserver: NSKeyValueObservation?
-    
+
     var runningAppExceptions: [AppException]!
-    @IBOutlet weak var menu: NSMenu!
-    @IBOutlet weak var toggleMenuItem: NSMenuItem!
-    
-    let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
-    
-    func menuWillOpen(_ menu: NSMenu) {
+    @IBOutlet var menu: NSMenu!
+    @IBOutlet var toggleMenuItem: NSMenuItem!
+
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+
+    func menuWillOpen(_: NSMenu) {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
     }
-    
+
     func initLogger() {
         let console = ConsoleDestination()
         let file = FileDestination()
-        
+
         log.addDestination(console)
         log.addDestination(file)
     }
-    
+
     func initHotkeys() {
         toggleHotKey.keyDownHandler = {
             brightnessAdapter.toggle()
@@ -102,9 +102,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.setLightPercent(percent: 100)
         }
     }
-    
+
     func listenForAdaptiveEnabled() {
-        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessEnabled, options: [.old, .new], changeHandler: {defaults, change in
+        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessEnabled, options: [.old, .new], changeHandler: { _, change in
             guard let running = change.newValue, let oldRunning = change.oldValue, running != oldRunning else {
                 return
             }
@@ -113,10 +113,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.manageBrightnessAdapterActivity(start: running)
         })
     }
-    
+
     func showWindow() {
-        if self.windowController == nil {
-            self.windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
+        if windowController == nil {
+            windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
         if let windowController = self.windowController,
             let window = windowController.window {
@@ -125,37 +125,37 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
     }
-    
+
     func handleDaemon() {
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == launcherAppId })
-        
+
         SMLoginItemSetEnabled(launcherAppId as CFString, datastore.defaults.startAtLogin)
-        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: {defaults, change in
+        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, change in
             SMLoginItemSetEnabled(launcherAppId as CFString, change.newValue ?? false)
         })
-        
+
         if isRunning {
             DistributedNotificationCenter.default().post(
                 name: .killLauncher,
                 object: Bundle.main.bundleIdentifier!)
         }
     }
-    
-    func applicationDidResignActive(_ notification: Notification) {
+
+    func applicationDidResignActive(_: Notification) {
         upHotkey = nil
         downHotkey = nil
     }
-    
+
     func manageBrightnessAdapterActivity(start: Bool) {
         if start {
             log.debug("Started BrightnessAdapter")
             brightnessAdapter.adaptBrightness()
-            self.activity.schedule { (completion) in
+            activity.schedule { completion in
                 //                let context = datastore.container.newBackgroundContext()
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
                 do {
-                    let displays = try displayIDs.map({id in (try datastore.context.existingObject(with: id) as! Display)})
+                    let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
                     brightnessAdapter.adaptBrightness(for: displays)
                 } catch {
                     log.error("Error on fetching Displays by IDs")
@@ -164,10 +164,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         } else {
             log.debug("Paused BrightnessAdapter")
-            self.activity.invalidate()
+            activity.invalidate()
         }
     }
-    
+
     func initBrightnessAdapterActivity(interval: TimeInterval) {
         activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
         activity.repeats = true
@@ -175,7 +175,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         activity.qualityOfService = .userInitiated
         manageBrightnessAdapterActivity(start: brightnessAdapter.running)
     }
-    
+
     func initMenubarIcon() {
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("MenubarIcon"))
@@ -184,28 +184,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         statusItem.menu = menu
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
     }
-    
+
     func listenForScreenConfigurationChanged() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(self.adaptToScreenConfiguration(notification:)),
+            selector: #selector(adaptToScreenConfiguration(notification:)),
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil)
-        
     }
-    
+
     func listenForRunningApps() {
-        let appNames = NSWorkspace.shared.runningApplications.map({app in app.bundleIdentifier ?? ""})
+        let appNames = NSWorkspace.shared.runningApplications.map({ app in app.bundleIdentifier ?? "" })
         runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
         for app in runningAppExceptions {
             app.addObservers()
         }
-        
+
         adapt()
-        
-        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: {(workspace, change) in
-            let oldAppNames = change.oldValue?.map({app in app.bundleIdentifier ?? ""})
-            let newAppNames = change.newValue?.map({app in app.bundleIdentifier ?? ""})
+
+        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
+            let oldAppNames = change.oldValue?.map({ app in app.bundleIdentifier ?? "" })
+            let newAppNames = change.newValue?.map({ app in app.bundleIdentifier ?? "" })
             do {
                 if let names = newAppNames {
                     self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
@@ -224,51 +223,51 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         })
     }
-    
-    @objc func adaptToScreenConfiguration(notification: Notification) {
+
+    @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
-        let pageController = (self.windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController
+        let pageController = (windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController
         pageController?.setup()
     }
-    
+
     func addObservers() {
-        daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: {(defaults, change) in
+        daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: { _, _ in
             brightnessAdapter.adaptBrightness()
         })
-        noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: {(defaults, change) in
+        noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: { _, _ in
             brightnessAdapter.adaptBrightness()
         })
     }
-    
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+
+    func applicationDidFinishLaunching(_: Notification) {
         initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()
-        
+
         initBrightnessAdapterActivity(interval: 60)
         initMenubarIcon()
         initHotkeys()
-        
+
         listenForAdaptiveEnabled()
         listenForScreenConfigurationChanged()
         listenForRunningApps()
-        
+
         addObservers()
     }
-    
-    func applicationWillTerminate(_ aNotification: Notification) {
+
+    func applicationWillTerminate(_: Notification) {
         log.info("Going down")
         datastore.save()
         activity.invalidate()
     }
-    
+
     func geolocationFallback() {
         if brightnessAdapter.geolocation == nil {
             brightnessAdapter.fetchGeolocation()
         }
     }
-    
-    internal func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
+
+    internal func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             brightnessAdapter.geolocation = Geolocation(location: location)
             locationManager.stopMonitoringSignificantLocationChanges()
@@ -278,12 +277,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             geolocationFallback()
         }
     }
-    
-    internal func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+
+    internal func locationManager(_: CLLocationManager, didFailWithError error: Error) {
         log.error("Location manager failed with error: \(error)")
         geolocationFallback()
     }
-    
+
     func startReceivingSignificantLocationChanges() {
         locationManager = CLLocationManager()
         locationManager.delegate = self
@@ -294,14 +293,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             geolocationFallback()
             return
         }
-        
+
         guard CLLocationManager.significantLocationChangeMonitoringAvailable() else {
             log.warning("Location services are not available")
             geolocationFallback()
             return
         }
     }
-    
+
     static func getToggleMenuItemTitle() -> String {
         if brightnessAdapter.running {
             return "Pause Lunar"
@@ -309,13 +308,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return "Start Lunar"
         }
     }
-    
+
     func resetElements() {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
-        let splitView = self.windowController?.window?.contentViewController as? SplitViewController
+        let splitView = windowController?.window?.contentViewController as? SplitViewController
         splitView?.activeStateButton?.setNeedsDisplay()
     }
-    
+
     func adapt() {
         if !runningAppExceptions.isEmpty {
             brightnessAdapter.disable()
@@ -326,39 +325,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             brightnessAdapter.adaptBrightness()
         }
     }
-    
+
     func setLightPercent(percent: Int8) {
         brightnessAdapter.disable()
         brightnessAdapter.setBrightnessPercent(value: percent)
         brightnessAdapter.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
     }
-    
-    @IBAction func setLight0Percent(sender: Any?) {
+
+    @IBAction func setLight0Percent(sender _: Any?) {
         setLightPercent(percent: 0)
     }
-    @IBAction func setLight25Percent(sender: Any?) {
+
+    @IBAction func setLight25Percent(sender _: Any?) {
         setLightPercent(percent: 25)
     }
-    @IBAction func setLight50Percent(sender: Any?) {
+
+    @IBAction func setLight50Percent(sender _: Any?) {
         setLightPercent(percent: 50)
     }
-    @IBAction func setLight75Percent(sender: Any?) {
+
+    @IBAction func setLight75Percent(sender _: Any?) {
         setLightPercent(percent: 75)
     }
-    @IBAction func setLight100Percent(sender: Any?) {
+
+    @IBAction func setLight100Percent(sender _: Any?) {
         setLightPercent(percent: 100)
     }
-    
-    @IBAction func toggleBrightnessAdapter(sender: Any?) {
+
+    @IBAction func toggleBrightnessAdapter(sender _: Any?) {
         brightnessAdapter.toggle()
     }
-    
-    @IBAction func showWindow(sender: Any?) {
-        self.showWindow()
+
+    @IBAction func showWindow(sender _: Any?) {
+        showWindow()
     }
 }
-
 
 // Helper function inserted by Swift 4.2 migrator.
 fileprivate func convertToCATransitionType(_ input: String) -> CATransitionType {

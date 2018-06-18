@@ -9,7 +9,6 @@
 import Cocoa
 
 class ToggleButton: NSButton {
-    
     func getButtonState() -> NSControl.StateValue {
         if brightnessAdapter.running {
             return .on
@@ -17,10 +16,9 @@ class ToggleButton: NSButton {
             return .off
         }
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         state = getButtonState()
         super.draw(dirtyRect)
     }
-    
 }

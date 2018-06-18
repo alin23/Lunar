@@ -9,28 +9,29 @@
 import Cocoa
 
 class ScrollableBrightness: NSView {
-    @IBOutlet weak var label: NSTextField!
-    @IBOutlet weak var minValue: ScrollableTextField!
-    @IBOutlet weak var maxValue: ScrollableTextField!
-    @IBOutlet weak var currentValue: ScrollableTextField!
-    
-    @IBOutlet weak var minValueCaption: ScrollableTextFieldCaption!
-    @IBOutlet weak var maxValueCaption: ScrollableTextFieldCaption!
-    @IBOutlet weak var currentValueCaption: ScrollableTextFieldCaption!
+    @IBOutlet var label: NSTextField!
+    @IBOutlet var minValue: ScrollableTextField!
+    @IBOutlet var maxValue: ScrollableTextField!
+    @IBOutlet var currentValue: ScrollableTextField!
+
+    @IBOutlet var minValueCaption: ScrollableTextFieldCaption!
+    @IBOutlet var maxValueCaption: ScrollableTextFieldCaption!
+    @IBOutlet var currentValueCaption: ScrollableTextFieldCaption!
     var onMinValueChanged: ((UInt8) -> Void)?
     var onMaxValueChanged: ((UInt8) -> Void)?
-    
-    
+
     var display: Display! {
         didSet {
             update(from: display)
         }
     }
+
     var name: String! {
         didSet {
             label?.stringValue = name
         }
     }
+
     var displayMinValue: Int {
         get {
             return (display.value(forKey: "minBrightness") as! NSNumber).intValue
@@ -39,6 +40,7 @@ class ScrollableBrightness: NSView {
             display.setValue(newValue, forKey: "minBrightness")
         }
     }
+
     var displayMaxValue: Int {
         get {
             return (display.value(forKey: "maxBrightness") as! NSNumber).intValue
@@ -47,6 +49,7 @@ class ScrollableBrightness: NSView {
             display.setValue(newValue, forKey: "maxBrightness")
         }
     }
+
     var displayValue: Int {
         get {
             return (display.value(forKey: "brightness") as! NSNumber).intValue
@@ -55,25 +58,25 @@ class ScrollableBrightness: NSView {
             display.setValue(newValue, forKey: "brightness")
         }
     }
-    
-    func update(from display: Display) {
+
+    func update(from _: Display) {
         minValue?.intValue = Int32(displayMinValue)
         minValue?.upperLimit = displayMaxValue
         maxValue?.intValue = Int32(displayMaxValue)
         maxValue?.lowerLimit = displayMinValue
         currentValue?.intValue = Int32(displayValue)
     }
-    
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
     }
-    
+
     func setup() {
         minValue?.onValueChangedInstant = onMinValueChanged
         minValue?.onValueChanged = { (value: Int) in
@@ -89,11 +92,11 @@ class ScrollableBrightness: NSView {
                 self.displayMaxValue = value
             }
         }
-        
+
         minValue?.caption = minValueCaption
         maxValue?.caption = maxValueCaption
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
@@ -110,9 +113,8 @@ class ScrollableBrightness: NSView {
                 self.displayMaxValue = value
             }
         }
-        
+
         minValue?.caption = minValue?.caption ?? minValueCaption
         maxValue?.caption = maxValue?.caption ?? maxValueCaption
     }
-    
 }

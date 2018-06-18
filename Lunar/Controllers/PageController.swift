@@ -12,20 +12,20 @@ import Foundation
 class PageController: NSPageController, NSPageControllerDelegate {
     var pageControl: PageControl!
     var lastSelectedIndex = 0
-    
+
     override var arrangedObjects: [Any] {
         didSet {
             pageControl?.numberOfPages = arrangedObjects.count
         }
     }
-    
+
     let settingsViewControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
-    
+
     private func setupPageControl(size: Int) {
         let width: CGFloat = 300
         let x: CGFloat = (view.frame.width - width) / 2
-        
+
         let frame = NSRect(x: x, y: 20, width: width, height: 20)
         pageControl = PageControl(frame: frame, numberOfPages: size, hidesForSinglePage: true, tintColor: pageIndicatorTintColor, currentTintColor: currentPageIndicatorTintColor)
         if !view.subviews.contains(pageControl) {
@@ -33,7 +33,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
         pageControl.setNeedsDisplay(pageControl.frame)
     }
-    
+
     func deleteDisplay() {
         if selectedIndex == 0 {
             if selectedIndex < arrangedObjects.count {
@@ -49,13 +49,12 @@ class PageController: NSPageController, NSPageControllerDelegate {
         datastore.context.delete(displayToDelete)
         datastore.save()
     }
-    
+
     func setup() {
         delegate = self
         viewControllers.removeAll(keepingCapacity: false)
         arrangedObjects = [datastore]
-        if !brightnessAdapter.displays.isEmpty
-        {
+        if !brightnessAdapter.displays.isEmpty {
             let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
             })
@@ -66,13 +65,13 @@ class PageController: NSPageController, NSPageControllerDelegate {
         setupPageControl(size: arrangedObjects.count)
         selectedIndex = 1
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
     }
-    
-    func pageControllerDidEndLiveTransition(_ pageController: NSPageController) {
+
+    func pageControllerDidEndLiveTransition(_: NSPageController) {
         if let splitViewController = parent as? SplitViewController {
             if selectedIndex == 0 {
                 splitViewController.yellowBackground()
@@ -82,15 +81,15 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
         pageControl?.currentPage = selectedIndex
     }
-    
-    func pageController(_ pageController: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
+
+    func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
         if (object as? DataStore) == datastore {
             return settingsViewControllerIdentifier
         }
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
-    
-    func pageController(_ pageController: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
+
+    func pageController(_: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         if viewControllers[identifier] == nil {
             if identifier == settingsViewControllerIdentifier {
                 viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsViewController")) as! SettingsViewController
@@ -108,18 +107,17 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
         return viewControllers[identifier]!
     }
-    
+
     override func scrollWheel(with event: NSEvent) {
         let lastIndex = arrangedObjects.count - 1
         if arrangedObjects.count > 1 && ((selectedIndex < lastIndex && event.scrollingDeltaX < 0) || (selectedIndex == lastIndex && event.scrollingDeltaX > 0)) {
             super.scrollWheel(with: event)
         }
     }
-    
+
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
         }
     }
 }
-

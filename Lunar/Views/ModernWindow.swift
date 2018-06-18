@@ -10,11 +10,10 @@ import Cocoa
 import WAYWindow
 
 class ModernWindow: WAYWindow {
-    
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
     }
-    
+
     func setup() {
         titleBarHeight = 50
         verticallyCenterTitle = true
@@ -30,5 +29,4 @@ class ModernWindow: WAYWindow {
         makeKeyAndOrderFront(nil)
         orderFrontRegardless()
     }
-    
 }

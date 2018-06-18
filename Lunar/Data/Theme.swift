@@ -13,7 +13,7 @@ let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244,
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
 let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
-let white = NSColor.init(deviceWhite: 1.0, alpha: 1.0)
+let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 
 let bgColor = white
 let logoColor = lunarYellow

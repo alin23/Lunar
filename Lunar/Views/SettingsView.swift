@@ -10,11 +10,9 @@ import Cocoa
 
 class SettingsView: NSSplitView {
     override var dividerThickness: CGFloat {
-        get {
-            return 1.0
-        }
+        return 1.0
     }
-    
+
     override func drawDivider(in rect: NSRect) {
         let rect = NSRect(x: frame.width / 2 - 1.0, y: 200.0, width: 2.0, height: 200)
         settingsDividerColor.set()
@@ -24,5 +22,4 @@ class SettingsView: NSSplitView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
-    
 }

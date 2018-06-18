@@ -15,7 +15,7 @@ var downHotkey: HotKey?
 class ScrollableTextField: NSTextField {
     @IBInspectable var lowerLimit: Int = 0
     @IBInspectable var upperLimit: Int = 100
-    
+
     @IBInspectable var textFieldColor: NSColor = scrollableTextFieldColor {
         didSet {
             if !hover {
@@ -23,6 +23,7 @@ class ScrollableTextField: NSTextField {
             }
         }
     }
+
     @IBInspectable var textFieldColorHover: NSColor = scrollableTextFieldColorHover {
         didSet {
             if hover {
@@ -30,8 +31,9 @@ class ScrollableTextField: NSTextField {
             }
         }
     }
+
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
-    
+
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
@@ -40,10 +42,10 @@ class ScrollableTextField: NSTextField {
     var centerAlign: NSParagraphStyle?
     var scrolledOnce: Bool = false
     var didScrollTextField: Bool = datastore.defaults.didScrollTextField
-    
+
     var normalSize: CGSize?
     var activeSize: CGSize?
-    
+
     var trackingArea: NSTrackingArea?
     var captionTrackingArea: NSTrackingArea?
     var caption: ScrollableTextFieldCaption! {
@@ -58,47 +60,47 @@ class ScrollableTextField: NSTextField {
             addTrackingArea(captionTrackingArea!)
         }
     }
-    
+
     func setup() {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         centerAlign = paragraphStyle
-        
+
         usesSingleLineMode = false
         allowsEditingTextAttributes = true
         textColor = textFieldColor
-        
+
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
         setNeedsDisplay()
     }
-    
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
-    
-    override func mouseEntered(with event: NSEvent) {
+
+    override func mouseEntered(with _: NSEvent) {
         hover = true
-        self.lightenUp(color: textFieldColorHover)
+        lightenUp(color: textFieldColorHover)
         upHotkey = HotKey(
             key: .upArrow, modifiers: [],
             keyDownHandler: {
                 if self.intValue < self.upperLimit {
                     self.intValue += 1
                 }
-        },
+            },
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
         })
@@ -108,30 +110,29 @@ class ScrollableTextField: NSTextField {
                 if self.intValue > self.lowerLimit {
                     self.intValue -= 1
                 }
-        },
+            },
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
         })
     }
-    
-    override func mouseExited(with event: NSEvent) {
+
+    override func mouseExited(with _: NSEvent) {
         hover = false
-        self.darken(color: textFieldColor)
+        darken(color: textFieldColor)
         upHotkey = nil
         downHotkey = nil
     }
-    
-    
+
     func lightenUp(color: NSColor) {
         layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
         textColor = color
     }
-    
+
     func darken(color: NSColor) {
         layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
         textColor = color
     }
-    
+
     func disableScrollHint() {
         if !didScrollTextField {
             didScrollTextField = true
@@ -140,7 +141,7 @@ class ScrollableTextField: NSTextField {
             caption.resetText()
         }
     }
-    
+
     override func scrollWheel(with event: NSEvent) {
         if abs(event.scrollingDeltaX) <= 1.0 {
             if event.scrollingDeltaY < 0.0 {
