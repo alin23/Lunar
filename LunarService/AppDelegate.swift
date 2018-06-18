@@ -17,29 +17,28 @@ extension Notification.Name {
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-     
     @objc func terminate() {
         NSApp.terminate(nil)
     }
-    
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+
+    func applicationDidFinishLaunching(_: Notification) {
         let console = ConsoleDestination()
         let file = FileDestination()
-        
+
         log.addDestination(console)
         log.addDestination(file)
-        
+
         let mainAppIdentifier = "com.alinp.Lunar"
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == mainAppIdentifier })
-        
+
         if !isRunning {
             DistributedNotificationCenter.default().addObserver(
                 self,
-                selector: #selector(self.terminate),
+                selector: #selector(terminate),
                 name: .killLauncher,
                 object: mainAppIdentifier)
-            
+
             let path = Bundle.main.bundlePath as NSString
             var components = path.pathComponents
             components.removeLast()
@@ -47,21 +46,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             components.removeLast()
             components.append("MacOS")
             components.append("Lunar")
-            
+
             let newPath = NSString.path(withComponents: components)
             log.debug("Launching \(newPath)")
-            
+
             NSWorkspace.shared.launchApplication(newPath)
-        }
-        else {
-            self.terminate()
+        } else {
+            terminate()
         }
     }
-    
-    func applicationWillTerminate(_ aNotification: Notification) {
+
+    func applicationWillTerminate(_: Notification) {
         // Insert code here to tear down your application
     }
-    
-    
 }
-

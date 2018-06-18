@@ -18,34 +18,34 @@ class AppException: NSManagedObject {
     @NSManaged var brightness: NSNumber
     @NSManaged var contrast: NSNumber
     var observers: [NSKeyValueObservation] = []
-    
+
     convenience init(identifier: String, name: String, brightness: UInt8 = APP_MAX_BRIGHTNESS, contrast: UInt8 = APP_MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "AppException", in: context)!
         self.init(entity: entity, insertInto: context)
-        
+
         self.identifier = identifier
         self.name = name
         self.brightness = NSNumber(value: brightness)
         self.contrast = NSNumber(value: contrast)
     }
-    
-    @objc func remove()  {
+
+    @objc func remove() {
         datastore.context.delete(self)
         try? datastore.context.save()
     }
-    
+
     func addObservers() {
         observers = [
-            observe(\.brightness, options: [.new], changeHandler: {display, change in
+            observe(\.brightness, options: [.new], changeHandler: { _, change in
                 log.debug("\(self.name): Set brightness to \(change.newValue!.uint8Value)")
             }),
-            observe(\.contrast, options: [.new], changeHandler: {display, change in
+            observe(\.contrast, options: [.new], changeHandler: { _, change in
                 log.debug("\(self.name): Set contrast to \(change.newValue!.uint8Value)")
-            })
+            }),
         ]
     }
-    
+
     func removeObservers() {
         observers.removeAll(keepingCapacity: true)
     }

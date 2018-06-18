@@ -9,19 +9,18 @@
 import Cocoa
 
 class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
-    
-    @IBOutlet weak var tableView: NSTableView!
+    @IBOutlet var tableView: NSTableView!
     @IBOutlet var arrayController: NSArrayController!
-    @IBOutlet weak var brightnessColumn: NSTableColumn!
-    @IBOutlet weak var contrastColumn: NSTableColumn!
-    @IBOutlet weak var addAppButton: NSButton!
+    @IBOutlet var brightnessColumn: NSTableColumn!
+    @IBOutlet var contrastColumn: NSTableColumn!
+    @IBOutlet var addAppButton: NSButton!
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
-    
-    @IBAction func addAppException(_ sender: NSButton) {
-        let dialog = NSOpenPanel();
-        
-        dialog.title = "Choose an application";
+
+    @IBAction func addAppException(_: NSButton) {
+        let dialog = NSOpenPanel()
+
+        dialog.title = "Choose an application"
         dialog.showsResizeIndicator = true
         dialog.showsHiddenFiles = false
         dialog.canChooseDirectories = false
@@ -30,16 +29,16 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         dialog.allowedFileTypes = ["app"]
         dialog.treatsFilePackagesAsDirectories = false
         dialog.directoryURL = URL(string: "file:///Applications")
-        
+
         if dialog.runModal() == NSApplication.ModalResponse.OK {
             let result = dialog.url
-            
+
             if let res = result {
                 let bundle = Bundle(url: res)
                 guard let name = bundle?.infoDictionary?["CFBundleName"] as? String,
                     let id = bundle?.bundleIdentifier else {
-                        log.warning("Bundle for \(res.path) does not contain required fields")
-                        return
+                    log.warning("Bundle for \(res.path) does not contain required fields")
+                    return
                 }
                 if try! datastore.fetchAppException(by: id) == nil {
                     let app = AppException(identifier: id, name: name)
@@ -49,49 +48,46 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         } else {
             return
         }
-        
     }
-    
+
     func initAddAppButton() {
         if let button = addAppButton {
             let buttonSize = button.frame
             button.wantsLayer = true
-            
+
             button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
             button.layer!.cornerRadius = button.frame.width / 2
             button.layer!.backgroundColor = white.cgColor
             button.alphaValue = 0.8
-            
+
             addAppButtonShadow = button.shadow
             button.shadow = nil
-            
+
             addAppButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
             button.addTrackingArea(addAppButtonTrackingArea)
         }
     }
-    
-    
-    override func mouseEntered(with event: NSEvent) {
+
+    override func mouseEntered(with _: NSEvent) {
         if let button = addAppButton {
             button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
             button.alphaValue = 1.0
             button.shadow = addAppButtonShadow
         }
     }
-    
-    override func mouseExited(with event: NSEvent) {
+
+    override func mouseExited(with _: NSEvent) {
         if let button = addAppButton {
             button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
             button.alphaValue = 0.8
             button.shadow = nil
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         arrayController.managedObjectContext = datastore.context
         tableView.headerView = nil
         initAddAppButton()
     }
-    
 }

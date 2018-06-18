@@ -9,31 +9,29 @@
 import Cocoa
 
 class ConfigurationViewController: NSViewController {
+    @IBOutlet var noonDurationField: ScrollableTextField!
+    @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
 
-    @IBOutlet weak var noonDurationField: ScrollableTextField!
-    @IBOutlet weak var noonDurationCaption: ScrollableTextFieldCaption!
-    
-    @IBOutlet weak var daylightExtensionField: ScrollableTextField!
-    @IBOutlet weak var daylightExtensionCaption: ScrollableTextFieldCaption!
-    
+    @IBOutlet var daylightExtensionField: ScrollableTextField!
+    @IBOutlet var daylightExtensionCaption: ScrollableTextFieldCaption!
+
     func setup() {
         noonDurationField.integerValue = datastore.defaults.noonDurationMinutes
         daylightExtensionField.integerValue = datastore.defaults.daylightExtensionMinutes
-        
+
         noonDurationField?.onValueChanged = { (value: Int) in
             datastore.defaults.set(value, forKey: "noonDurationMinutes")
         }
         daylightExtensionField?.onValueChanged = { (value: Int) in
             datastore.defaults.set(value, forKey: "daylightExtensionMinutes")
         }
-        
+
         noonDurationField?.caption = noonDurationCaption
         daylightExtensionField?.caption = daylightExtensionCaption
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
     }
-    
 }

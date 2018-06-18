@@ -12,18 +12,23 @@ extension UserDefaults {
     @objc dynamic var noonDurationMinutes: Int {
         return integer(forKey: "noonDurationMinutes")
     }
+
     @objc dynamic var daylightExtensionMinutes: Int {
         return integer(forKey: "daylightExtensionMinutes")
     }
+
     @objc dynamic var interpolationFactor: Double {
         return double(forKey: "interpolationFactor")
     }
+
     @objc dynamic var startAtLogin: Bool {
         return bool(forKey: "startAtLogin")
     }
+
     @objc dynamic var didScrollTextField: Bool {
         return bool(forKey: "didScrollTextField")
     }
+
     @objc dynamic var adaptiveBrightnessEnabled: Bool {
         return bool(forKey: "adaptiveBrightnessEnabled")
     }
@@ -34,7 +39,7 @@ class DataStore: NSObject {
     let defaults: UserDefaults = DataStore.defaults
     let container = NSPersistentContainer(name: "Model")
     var context: NSManagedObjectContext
-    
+
     func save(context: NSManagedObjectContext? = nil) {
         do {
             try (context ?? self.context).save()
@@ -42,25 +47,24 @@ class DataStore: NSObject {
             log.error("Error on saving context: \(error)")
         }
     }
-    
+
     func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
         let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
         fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
         return try (context ?? self.context).fetch(fetchRequest)
     }
-    
+
     func fetchAppExceptions(by identifiers: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "identifier IN %@", Set(identifiers))
         return try (context ?? self.context).fetch(fetchRequest)
     }
-    
+
     func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
         return try (context ?? self.context).fetch(fetchRequest).first
     }
-    
 
     static func firstRun(context: NSManagedObjectContext) {
         log.debug("First run")
@@ -69,16 +73,16 @@ class DataStore: NSObject {
             if FileManager.default.fileExists(atPath: appPath) {
                 let bundle = Bundle(path: appPath)
                 guard let id = bundle?.bundleIdentifier,
-                let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
+                    let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                let _ = AppException(identifier: id, name: name, context: context)
+                _ = AppException(identifier: id, name: name, context: context)
             }
         }
     }
-    
+
     override init() {
-        container.loadPersistentStores(completionHandler: { (description, error) in
+        container.loadPersistentStores(completionHandler: { _, error in
             if let error = error {
                 fatalError("Unable to load persistent stores: \(error)")
             }
@@ -104,5 +108,4 @@ class DataStore: NSObject {
             DataStore.defaults.set(240, forKey: "noonDurationMinutes")
         }
     }
-    
 }
