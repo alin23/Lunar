@@ -18,7 +18,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableContrast: ScrollableContrast!
 
     @IBOutlet var deleteButton: DeleteButton!
-    @IBOutlet var brightnessContrastChart: LineChartView!
+    @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
 
     var display: Display! {
         didSet {
@@ -30,9 +30,6 @@ class DisplayViewController: NSViewController {
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var deleteButtonTrackingArea: NSTrackingArea!
-    let brightnessGraph = LineChartDataSet(values: [ChartDataEntry](), label: "Brightness")
-    let contrastGraph = LineChartDataSet(values: [ChartDataEntry](), label: "Contrast")
-    let graphData = LineChartData()
 
     func update(from display: Display) {
         displayName?.stringValue = display.name
@@ -44,8 +41,8 @@ class DisplayViewController: NSViewController {
     }
 
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil) {
-        var brightnessChartEntry = brightnessGraph.values
-        var contrastChartEntry = contrastGraph.values
+        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
+        var contrastChartEntry = brightnessContrastChart.contrastGraph.values
 
         for hour in 0 ..< 24 {
             let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
@@ -57,74 +54,10 @@ class DisplayViewController: NSViewController {
             brightnessChartEntry[hour].y = brightness.doubleValue
             contrastChartEntry[hour].y = contrast.doubleValue
         }
+        brightnessChartEntry[24] = brightnessChartEntry[0]
+        contrastChartEntry[24] = contrastChartEntry[0]
 
         brightnessContrastChart.notifyDataSetChanged()
-    }
-
-    func updateGraph() {
-        var brightnessChartEntry = brightnessGraph.values
-        var contrastChartEntry = contrastGraph.values
-
-        brightnessChartEntry.reserveCapacity(24)
-        contrastChartEntry.reserveCapacity(24)
-        brightnessChartEntry.removeAll(keepingCapacity: true)
-        contrastChartEntry.removeAll(keepingCapacity: true)
-
-        for hour in 0 ..< 24 {
-            let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(for: display, hour: hour)
-            brightnessChartEntry.append(ChartDataEntry(x: Double(hour), y: brightness.doubleValue))
-            contrastChartEntry.append(ChartDataEntry(x: Double(hour), y: contrast.doubleValue))
-        }
-
-        brightnessGraph.values = brightnessChartEntry
-        contrastGraph.values = contrastChartEntry
-
-        graphData.addDataSet(contrastGraph)
-        graphData.addDataSet(brightnessGraph)
-
-        brightnessGraph.colors = [NSColor.clear]
-        brightnessGraph.fillColor = brightnessGraphColor
-        brightnessGraph.drawCirclesEnabled = false
-        brightnessGraph.drawFilledEnabled = true
-        brightnessGraph.drawValuesEnabled = false
-        brightnessGraph.mode = LineChartDataSet.Mode.cubicBezier
-
-        contrastGraph.colors = [NSColor.clear]
-        contrastGraph.fillColor = contrastGraphColor
-        contrastGraph.drawCirclesEnabled = false
-        contrastGraph.drawFilledEnabled = true
-        contrastGraph.drawValuesEnabled = false
-        contrastGraph.mode = LineChartDataSet.Mode.cubicBezier
-
-        brightnessContrastChart.data = graphData
-        brightnessContrastChart.gridBackgroundColor = NSColor.clear
-        brightnessContrastChart.drawGridBackgroundEnabled = false
-        brightnessContrastChart.drawBordersEnabled = false
-        brightnessContrastChart.autoScaleMinMaxEnabled = false
-
-        let leftAxis = brightnessContrastChart.leftAxis
-        let rightAxis = brightnessContrastChart.rightAxis
-        let xAxis = brightnessContrastChart.xAxis
-
-        leftAxis.axisMaximum = 130
-        leftAxis.axisMinimum = 0
-        leftAxis.drawGridLinesEnabled = false
-        leftAxis.drawLabelsEnabled = false
-        leftAxis.drawAxisLineEnabled = false
-
-        rightAxis.axisMaximum = 130
-        rightAxis.axisMinimum = 0
-        rightAxis.drawGridLinesEnabled = false
-        rightAxis.drawLabelsEnabled = false
-        rightAxis.drawAxisLineEnabled = false
-
-        xAxis.drawGridLinesEnabled = false
-        xAxis.drawLabelsEnabled = false
-        xAxis.drawAxisLineEnabled = false
-
-        brightnessContrastChart.chartDescription = nil
-        brightnessContrastChart.legend.enabled = false
-        brightnessContrastChart.animate(yAxisDuration: 1.5, easingOption: ChartEasingOption.easeOutExpo)
     }
 
     @IBAction func toggleAdaptive(_ sender: NSButton) {
@@ -199,6 +132,14 @@ class DisplayViewController: NSViewController {
         scrollableContrast.isHidden = value
     }
 
+    func initGraph() {
+        brightnessContrastChart.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+    }
+
+    func zeroGraph() {
+        brightnessContrastChart.initGraph(display: nil, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -209,11 +150,11 @@ class DisplayViewController: NSViewController {
             initAdaptiveButton()
             scrollableBrightness.label.textColor = scrollableViewLabelColor
             scrollableContrast.label.textColor = scrollableViewLabelColor
-            scrollableBrightness.onMinValueChanged = { value in self.updateDataset(minBrightness: value) }
-            scrollableBrightness.onMaxValueChanged = { value in self.updateDataset(maxBrightness: value) }
-            scrollableContrast.onMinValueChanged = { value in self.updateDataset(minContrast: value) }
-            scrollableContrast.onMaxValueChanged = { value in self.updateDataset(maxContrast: value) }
-            updateGraph()
+            scrollableBrightness.onMinValueChanged = { (value: Int) in self.updateDataset(minBrightness: UInt8(value)) }
+            scrollableBrightness.onMaxValueChanged = { (value: Int) in self.updateDataset(maxBrightness: UInt8(value)) }
+            scrollableContrast.onMinValueChanged = { (value: Int) in self.updateDataset(minContrast: UInt8(value)) }
+            scrollableContrast.onMaxValueChanged = { (value: Int) in self.updateDataset(maxContrast: UInt8(value)) }
+            initGraph()
         } else {
             setIsHidden(true)
         }

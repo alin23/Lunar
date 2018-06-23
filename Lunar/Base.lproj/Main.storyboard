@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14269.12" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14269.14" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.14"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -202,6 +202,7 @@
                     </view>
                     <connections>
                         <outlet property="activeStateButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
+                        <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
                     </connections>
                 </viewController>
@@ -221,6 +222,35 @@
                 <customObject id="H0s-9S-08j" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="1680"/>
+        </scene>
+        <!--Settings Page Controller-->
+        <scene sceneID="hgz-Zl-vw0">
+            <objects>
+                <viewController storyboardIdentifier="settingsPageController" id="Whm-7P-QYV" customClass="SettingsPageController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="ZMk-n3-S0b">
+                        <rect key="frame" x="0.0" y="0.0" width="750" height="500"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zJT-GX-NnT" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-40" y="-10" width="800" height="190"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </customView>
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fR4-tr-Hez">
+                                <rect key="frame" x="0.0" y="0.0" width="750" height="500"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <connections>
+                                    <segue destination="VFu-z9-UHh" kind="embed" id="ikv-IJ-MZ2"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="brightnessContrastChart" destination="zJT-GX-NnT" id="bAP-fG-mvF"/>
+                    </connections>
+                </viewController>
+                <customObject id="teY-QZ-vXN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-712" y="1776"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="QQh-JI-QxL">
@@ -396,7 +426,7 @@
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
                                             <color key="gridColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
                                             <tableColumns>
-                                                <tableColumn width="14" minWidth="14" maxWidth="14" id="CdZ-ki-J4O" userLabel="Delete">
+                                                <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -410,7 +440,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="02C-la-JmE">
-                                                            <rect key="frame" x="0.0" y="10" width="14" height="50"/>
+                                                            <rect key="frame" x="0.0" y="10" width="18" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="GDa-lA-NYA" customClass="RemoveAppButton" customModule="Lunar" customModuleProvider="target">
@@ -446,7 +476,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="RB2-V9-vwF">
-                                                            <rect key="frame" x="14" y="10" width="176" height="50"/>
+                                                            <rect key="frame" x="18" y="10" width="176" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bPk-JH-iHh">
@@ -486,7 +516,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="WvX-GE-Jy3">
-                                                            <rect key="frame" x="190" y="10" width="70" height="50"/>
+                                                            <rect key="frame" x="194" y="10" width="70" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbm-hq-sAY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -549,7 +579,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="AbE-RR-q5I">
-                                                            <rect key="frame" x="260" y="10" width="70" height="50"/>
+                                                            <rect key="frame" x="264" y="10" width="70" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuS-ce-rej" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -677,8 +707,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="750" height="500"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zJT-GX-NnT" customClass="LineChartView" customModule="Charts">
-                                <rect key="frame" x="-16" y="-10" width="782" height="190"/>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-40" y="-10" width="800" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
@@ -730,7 +760,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWj-lO-viB" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="bWj-lO-viB" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="90" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="kl2-hg-amy">
@@ -788,7 +818,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1u6-gf-UFK" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="1u6-gf-UFK" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="90" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="Dyb-7m-YDq">
@@ -828,7 +858,7 @@
                     </view>
                     <connections>
                         <outlet property="adaptiveButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
-                        <outlet property="brightnessContrastChart" destination="zJT-GX-NnT" id="tv7-RN-yYi"/>
+                        <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>

@@ -27,5 +27,7 @@ class ModernWindowController: NSWindowController, NSWindowDelegate {
         log.info("Window closing")
         upHotkey = nil
         downHotkey = nil
+        leftHotkey = nil
+        rightHotkey = nil
     }
 }

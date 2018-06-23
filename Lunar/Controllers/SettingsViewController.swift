@@ -16,7 +16,5 @@ class SettingsViewController: NSSplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         splitView.delegate = self
-        splitView.wantsLayer = true
-        splitView.layer!.backgroundColor = logoColor.cgColor
     }
 }

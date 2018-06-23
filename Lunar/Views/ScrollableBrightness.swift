@@ -17,8 +17,8 @@ class ScrollableBrightness: NSView {
     @IBOutlet var minValueCaption: ScrollableTextFieldCaption!
     @IBOutlet var maxValueCaption: ScrollableTextFieldCaption!
     @IBOutlet var currentValueCaption: ScrollableTextFieldCaption!
-    var onMinValueChanged: ((UInt8) -> Void)?
-    var onMaxValueChanged: ((UInt8) -> Void)?
+    var onMinValueChanged: ((Int) -> Void)?
+    var onMaxValueChanged: ((Int) -> Void)?
 
     var display: Display! {
         didSet {
@@ -61,9 +61,9 @@ class ScrollableBrightness: NSView {
 
     func update(from _: Display) {
         minValue?.intValue = Int32(displayMinValue)
-        minValue?.upperLimit = displayMaxValue
+        minValue?.upperLimit = displayMaxValue - 1
         maxValue?.intValue = Int32(displayMaxValue)
-        maxValue?.lowerLimit = displayMinValue
+        maxValue?.lowerLimit = displayMinValue + 1
         currentValue?.intValue = Int32(displayValue)
     }
 
@@ -80,14 +80,14 @@ class ScrollableBrightness: NSView {
     func setup() {
         minValue?.onValueChangedInstant = onMinValueChanged
         minValue?.onValueChanged = { (value: Int) in
-            self.maxValue?.lowerLimit = value
+            self.maxValue?.lowerLimit = value + 1
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = onMaxValueChanged
         maxValue?.onValueChanged = { (value: Int) in
-            self.minValue?.upperLimit = value
+            self.minValue?.upperLimit = value - 1
             if self.display != nil {
                 self.displayMaxValue = value
             }
@@ -101,14 +101,14 @@ class ScrollableBrightness: NSView {
         super.draw(dirtyRect)
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
         minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
-            self.maxValue?.lowerLimit = value
+            self.maxValue?.lowerLimit = value + 1
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
         maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
-            self.minValue?.upperLimit = value
+            self.minValue?.upperLimit = value - 1
             if self.display != nil {
                 self.displayMaxValue = value
             }
