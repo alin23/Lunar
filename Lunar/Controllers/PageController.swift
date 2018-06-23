@@ -8,6 +8,7 @@
 
 import Cocoa
 import Foundation
+import HotKey
 
 class PageController: NSPageController, NSPageControllerDelegate {
     var pageControl: PageControl!
@@ -19,7 +20,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
     }
 
-    let settingsViewControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
+    let settingsPageControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
     private func setupPageControl(size: Int) {
@@ -66,17 +67,49 @@ class PageController: NSPageController, NSPageControllerDelegate {
         selectedIndex = 1
     }
 
+    func setupHotkeys() {
+        leftHotkey = HotKey(
+            key: .leftArrow, modifiers: [],
+            keyDownHandler: {
+                self.navigateBack(nil)
+            }
+        )
+        rightHotkey = HotKey(
+            key: .rightArrow, modifiers: [],
+            keyDownHandler: {
+                self.navigateForward(nil)
+            }
+        )
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setupHotkeys()
     }
 
     func pageControllerDidEndLiveTransition(_: NSPageController) {
         if let splitViewController = parent as? SplitViewController {
+            let identifier = pageController(self, identifierFor: arrangedObjects[selectedIndex])
             if selectedIndex == 0 {
                 splitViewController.yellowBackground()
-            } else if !splitViewController.hasWhiteBackground() {
-                splitViewController.whiteBackground()
+                if let settingsController = viewControllers[identifier] as? SettingsPageController {
+                    settingsController.initGraph(display: brightnessAdapter.firstDisplay)
+                }
+            } else {
+                if !splitViewController.hasWhiteBackground() {
+                    splitViewController.whiteBackground()
+                }
+                if let displayController = viewControllers[identifier] as? DisplayViewController {
+                    displayController.initGraph()
+                }
+            }
+            for (id, controller) in viewControllers.filter({ key, _ in key != identifier }) {
+                if id == settingsPageControllerIdentifier {
+                    (controller as! SettingsPageController).zeroGraph()
+                } else {
+                    (controller as! DisplayViewController).zeroGraph()
+                }
             }
         }
         pageControl?.currentPage = selectedIndex
@@ -84,15 +117,15 @@ class PageController: NSPageController, NSPageControllerDelegate {
 
     func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
         if (object as? DataStore) == datastore {
-            return settingsViewControllerIdentifier
+            return settingsPageControllerIdentifier
         }
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
 
     func pageController(_: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         if viewControllers[identifier] == nil {
-            if identifier == settingsViewControllerIdentifier {
-                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsViewController")) as! SettingsViewController
+            if identifier == settingsPageControllerIdentifier {
+                viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
             } else {
                 viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }

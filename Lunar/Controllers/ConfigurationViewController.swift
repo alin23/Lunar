@@ -16,8 +16,8 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var daylightExtensionCaption: ScrollableTextFieldCaption!
 
     func setup() {
-        noonDurationField.integerValue = datastore.defaults.noonDurationMinutes
-        daylightExtensionField.integerValue = datastore.defaults.daylightExtensionMinutes
+        noonDurationField?.integerValue = datastore.defaults.noonDurationMinutes
+        daylightExtensionField?.integerValue = datastore.defaults.daylightExtensionMinutes
 
         noonDurationField?.onValueChanged = { (value: Int) in
             datastore.defaults.set(value, forKey: "noonDurationMinutes")
@@ -28,6 +28,15 @@ class ConfigurationViewController: NSViewController {
 
         noonDurationField?.caption = noonDurationCaption
         daylightExtensionField?.caption = daylightExtensionCaption
+
+        if let settingsController = parent?.parent as? SettingsPageController {
+            noonDurationField?.onValueChangedInstant = { value in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
+            }
+            daylightExtensionField?.onValueChangedInstant = { value in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
+            }
+        }
     }
 
     override func viewDidLoad() {

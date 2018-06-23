@@ -9,9 +9,6 @@
 import Cocoa
 import HotKey
 
-var upHotkey: HotKey?
-var downHotkey: HotKey?
-
 class ScrollableTextField: NSTextField {
     @IBInspectable var lowerLimit: Int = 0
     @IBInspectable var upperLimit: Int = 100
@@ -38,7 +35,7 @@ class ScrollableTextField: NSTextField {
     var hover: Bool = false
     var scrolling: Bool = false
     var onValueChanged: ((Int) -> Void)?
-    var onValueChangedInstant: ((UInt8) -> Void)?
+    var onValueChangedInstant: ((Int) -> Void)?
     var centerAlign: NSParagraphStyle?
     var scrolledOnce: Bool = false
     var didScrollTextField: Bool = datastore.defaults.didScrollTextField
@@ -99,6 +96,7 @@ class ScrollableTextField: NSTextField {
             keyDownHandler: {
                 if self.intValue < self.upperLimit {
                     self.intValue += 1
+                    self.onValueChangedInstant?(self.integerValue)
                 }
             },
             keyUpHandler: {
@@ -109,6 +107,7 @@ class ScrollableTextField: NSTextField {
             keyDownHandler: {
                 if self.intValue > self.lowerLimit {
                     self.intValue -= 1
+                    self.onValueChangedInstant?(self.integerValue)
                 }
             },
             keyUpHandler: {
@@ -153,7 +152,7 @@ class ScrollableTextField: NSTextField {
                 if intValue < upperLimit {
                     if scrolledOnce {
                         intValue += 1
-                        onValueChangedInstant?(UInt8(integerValue))
+                        onValueChangedInstant?(integerValue)
                         scrolledOnce = false
                     } else {
                         scrolledOnce = true
@@ -168,7 +167,7 @@ class ScrollableTextField: NSTextField {
                 if intValue > lowerLimit {
                     if scrolledOnce {
                         intValue -= 1
-                        onValueChangedInstant?(UInt8(integerValue))
+                        onValueChangedInstant?(integerValue)
                         scrolledOnce = false
                     } else {
                         scrolledOnce = true

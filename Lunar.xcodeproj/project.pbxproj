@@ -14,11 +14,14 @@
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C735DD751FD5B35E00FBD16F /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; };
 		C735DD761FD5B35E00FBD16F /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C735DD741FD5B35E00FBD16F /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
 		C76545211FD88F5800DBACE9 /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C765451F1FD88F5600DBACE9 /* Solar.framework */; };
 		C76545221FD88F5800DBACE9 /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C765451F1FD88F5600DBACE9 /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C76545291FD8A56B00DBACE9 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C76545261FD8A11000DBACE9 /* DDC.c */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
+		C76A129E20D8084E005D4BE3 /* HourValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */; };
+		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
@@ -118,12 +121,15 @@
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73853F91FEDBFA300C6B797 /* PocketSVG.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PocketSVG.framework; path = Carthage/Build/Mac/PocketSVG.framework; sourceTree = "<group>"; };
 		C73853FA1FEDBFA300C6B797 /* PocketSVG.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = PocketSVG.framework.dSYM; path = Carthage/Build/Mac/PocketSVG.framework.dSYM; sourceTree = "<group>"; };
+		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
 		C765451F1FD88F5600DBACE9 /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
 		C76545201FD88F5700DBACE9 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Solar.framework.dSYM; path = Carthage/Build/Mac/Solar.framework.dSYM; sourceTree = "<group>"; };
 		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
 		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
+		C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourValueFormatter.swift; sourceTree = "<group>"; };
+		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableContrast.swift; sourceTree = "<group>"; };
 		C77CC7541FED5501009AA718 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
@@ -212,6 +218,7 @@
 				C794E1751FF01EF500549462 /* Model.xcdatamodeld */,
 				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
 				C72776EC201F26CB0055934F /* AppException.swift */,
+				C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -226,6 +233,7 @@
 				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
 				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
+				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -254,6 +262,7 @@
 				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
 				C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */,
 				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
+				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -466,10 +475,12 @@
 				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
+				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
@@ -477,6 +488,7 @@
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
+				C76A129E20D8084E005D4BE3 /* HourValueFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,

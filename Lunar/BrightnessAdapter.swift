@@ -40,6 +40,13 @@ class BrightnessAdapter {
 
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
     var running: Bool = datastore.defaults.adaptiveBrightnessEnabled
+    var firstDisplay: Display {
+        if displays.count > 0 {
+            return displays.values.first(where: { d in d.active }) ?? displays.values.first!
+        } else {
+            return GENERIC_DISPLAY
+        }
+    }
 
     func toggle() {
         datastore.defaults.set(!running, forKey: "adaptiveBrightnessEnabled")
@@ -165,7 +172,11 @@ class BrightnessAdapter {
         minBrightness: UInt8? = nil,
         maxBrightness: UInt8? = nil,
         minContrast: UInt8? = nil,
-        maxContrast: UInt8? = nil
+        maxContrast: UInt8? = nil,
+        daylightExtension: Int? = nil,
+        noonDuration: Int? = nil,
+        brightnessOffset: Int = 0,
+        contrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
         if moment == nil {
             log.warning("Day moments aren't fetched yet")
@@ -176,7 +187,11 @@ class BrightnessAdapter {
             minBrightness: minBrightness,
             maxBrightness: maxBrightness,
             minContrast: minContrast,
-            maxContrast: maxContrast
+            maxContrast: maxContrast,
+            daylightExtension: daylightExtension,
+            noonDuration: noonDuration,
+            brightnessOffset: brightnessOffset,
+            contrastOffset: contrastOffset
         )
     }
 

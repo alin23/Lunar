@@ -17,6 +17,7 @@ let launcherAppId = "com.alinp.LunarService"
 let log = SwiftyBeaver.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
+var activeDisplay: Display?
 
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
@@ -31,6 +32,10 @@ let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
 let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
 let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
 let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
+var upHotkey: HotKey?
+var downHotkey: HotKey?
+var leftHotkey: HotKey?
+var rightHotkey: HotKey?
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -145,6 +150,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationDidResignActive(_: Notification) {
         upHotkey = nil
         downHotkey = nil
+        leftHotkey = nil
+        rightHotkey = nil
+    }
+
+    func applicationDidBecomeActive(_: Notification) {
+        if let pageController = windowController?.window?.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
+            pageController.setupHotkeys()
+        }
     }
 
     func manageBrightnessAdapterActivity(start: Bool) {

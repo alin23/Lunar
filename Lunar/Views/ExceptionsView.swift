@@ -23,5 +23,17 @@ class ExceptionsView: NSTableView {
         scrollableContrast.onValueChanged = { value in
             app.setValue(value, forKey: "contrast")
         }
+        if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
+            if let controller = exceptionsController.parent?.parent as? SettingsPageController {
+                scrollableBrightness.onValueChangedInstant = { value in
+                    controller.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value,
+                                             contrastOffset: scrollableContrast.integerValue)
+                }
+                scrollableContrast.onValueChangedInstant = { value in
+                    controller.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: scrollableBrightness.integerValue,
+                                             contrastOffset: value)
+                }
+            }
+        }
     }
 }

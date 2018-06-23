@@ -63,5 +63,10 @@ let offButtonColor = red
 let xColor = red
 let removeButtonColor = red.highlight(withLevel: 0.3)!
 
-let brightnessGraphColor = lunarYellow.highlight(withLevel: 0.5)!
-let contrastGraphColor = red.withAlphaComponent(0.3)
+let contrastGraphColor = lunarYellow.highlight(withLevel: 0.3)!
+let brightnessGraphColor = red.withAlphaComponent(0.3)
+let xAxisLabelColor = mauve.withAlphaComponent(0.5)
+
+let contrastGraphColorYellow = mauve.withAlphaComponent(0.6)
+let brightnessGraphColorYellow = mauve.withAlphaComponent(0.6)
+let xAxisLabelColorYellow = white
