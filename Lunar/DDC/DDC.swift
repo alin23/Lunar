@@ -33,7 +33,8 @@ class DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: UInt8, newValue: UInt8) -> Bool {
         var command = DDCWriteCommand(
-            control_id: controlID, new_value: newValue
+            control_id: controlID,
+            new_value: newValue
         )
 
         let result = DDCWrite(displayID, &command)
@@ -44,7 +45,10 @@ class DDC {
 
     static func read(displayID: CGDirectDisplayID, controlID: UInt8) -> DDCReadResult {
         var command = DDCReadCommand(
-            control_id: controlID, success: false, max_value: 0, current_value: 0
+            control_id: controlID,
+            success: false,
+            max_value: 0,
+            current_value: 0
         )
         DDCRead(displayID, &command)
         print("Current Value: \(String(command.current_value))")

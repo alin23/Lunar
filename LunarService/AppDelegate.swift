@@ -37,7 +37,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self,
                 selector: #selector(terminate),
                 name: .killLauncher,
-                object: mainAppIdentifier)
+                object: mainAppIdentifier
+            )
 
             let path = Bundle.main.bundlePath as NSString
             var components = path.pathComponents

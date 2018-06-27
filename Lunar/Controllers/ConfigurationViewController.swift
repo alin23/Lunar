@@ -36,6 +36,12 @@ class ConfigurationViewController: NSViewController {
             daylightExtensionField?.onValueChangedInstant = { value in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
             }
+            noonDurationField?.onMouseEnter = {
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
+            }
+            daylightExtensionField?.onMouseEnter = {
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
+            }
         }
     }
 

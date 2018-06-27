@@ -143,7 +143,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if isRunning {
             DistributedNotificationCenter.default().post(
                 name: .killLauncher,
-                object: Bundle.main.bundleIdentifier!)
+                object: Bundle.main.bundleIdentifier!
+            )
         }
     }
 
@@ -203,7 +204,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self,
             selector: #selector(adaptToScreenConfiguration(notification:)),
             name: NSApplication.didChangeScreenParametersNotification,
-            object: nil)
+            object: nil
+        )
     }
 
     func listenForRunningApps() {

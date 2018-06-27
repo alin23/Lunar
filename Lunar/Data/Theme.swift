@@ -9,6 +9,7 @@
 import Cocoa
 
 let mauve = #colorLiteral(red: 0.1921568627, green: 0.1647058824, blue: 0.2980392157, alpha: 1)
+let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
@@ -63,10 +64,10 @@ let offButtonColor = red
 let xColor = red
 let removeButtonColor = red.highlight(withLevel: 0.3)!
 
-let contrastGraphColor = lunarYellow.highlight(withLevel: 0.3)!
-let brightnessGraphColor = red.withAlphaComponent(0.3)
+let contrastGraphColor = lunarYellow
+let brightnessGraphColor = violet
 let xAxisLabelColor = mauve.withAlphaComponent(0.5)
 
-let contrastGraphColorYellow = mauve.withAlphaComponent(0.6)
-let brightnessGraphColorYellow = mauve.withAlphaComponent(0.6)
-let xAxisLabelColorYellow = white
+let contrastGraphColorYellow = white
+let brightnessGraphColorYellow = violet
+let xAxisLabelColorYellow = NSColor.black.withAlphaComponent(0.5)
