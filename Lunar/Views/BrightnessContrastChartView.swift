@@ -25,6 +25,12 @@ class BrightnessContrastChartView: LineChartView {
     }
 
     func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor) {
+        if display == nil || display?.id == GENERIC_DISPLAY_ID {
+            isHidden = true
+        } else {
+            isHidden = false
+        }
+
         var brightnessChartEntry = brightnessGraph.values
         var contrastChartEntry = contrastGraph.values
 
@@ -36,7 +42,7 @@ class BrightnessContrastChartView: LineChartView {
         var brightnessY: Double = 0
         var contrastY: Double = 0
         for hour in 0 ..< 24 {
-            if let display = display {
+            if let display = display, display.id != GENERIC_DISPLAY_ID {
                 let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(for: display, hour: hour)
                 brightnessY = brightness.doubleValue
                 contrastY = contrast.doubleValue
@@ -98,6 +104,8 @@ class BrightnessContrastChartView: LineChartView {
 
         chartDescription = nil
         legend.enabled = false
+        noDataText = ""
+        noDataTextColor = .clear
         animate(yAxisDuration: 1.5, easingOption: ChartEasingOption.easeOutExpo)
     }
 

@@ -168,7 +168,9 @@ class BrightnessAdapter {
     }
 
     func getBrightnessContrast(
-        for display: Display, hour: Int? = nil, minute: Int = 0,
+        for display: Display,
+        hour: Int? = nil,
+        minute: Int = 0,
         minBrightness: UInt8? = nil,
         maxBrightness: UInt8? = nil,
         minContrast: UInt8? = nil,
@@ -183,7 +185,9 @@ class BrightnessAdapter {
             return (0, 0)
         }
         return display.getBrightnessContrast(
-            moment: moment, hour: hour, minute: minute,
+            moment: moment,
+            hour: hour,
+            minute: minute,
             minBrightness: minBrightness,
             maxBrightness: maxBrightness,
             minContrast: minContrast,
@@ -202,7 +206,8 @@ class BrightnessAdapter {
             span: 100.0,
             min: display.minBrightness.uint8Value,
             max: display.maxBrightness.uint8Value,
-            factor: datastore.defaults.interpolationFactor)
+            factor: datastore.defaults.interpolationFactor
+        )
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
@@ -224,7 +229,8 @@ class BrightnessAdapter {
             span: 100.0,
             min: display.minContrast.uint8Value,
             max: display.maxContrast.uint8Value,
-            factor: datastore.defaults.interpolationFactor)
+            factor: datastore.defaults.interpolationFactor
+        )
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {

@@ -34,8 +34,13 @@ class ScrollableTextField: NSTextField {
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
+
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
+
+    var onMouseEnter: (() -> Void)?
+    var onMouseExit: (() -> Void)?
+
     var centerAlign: NSParagraphStyle?
     var scrolledOnce: Bool = false
     var didScrollTextField: Bool = datastore.defaults.didScrollTextField
@@ -92,7 +97,8 @@ class ScrollableTextField: NSTextField {
         hover = true
         lightenUp(color: textFieldColorHover)
         upHotkey = HotKey(
-            key: .upArrow, modifiers: [],
+            key: .upArrow,
+            modifiers: [],
             keyDownHandler: {
                 if self.intValue < self.upperLimit {
                     self.intValue += 1
@@ -101,9 +107,11 @@ class ScrollableTextField: NSTextField {
             },
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
-        })
+            }
+        )
         downHotkey = HotKey(
-            key: .downArrow, modifiers: [],
+            key: .downArrow,
+            modifiers: [],
             keyDownHandler: {
                 if self.intValue > self.lowerLimit {
                     self.intValue -= 1
@@ -112,7 +120,9 @@ class ScrollableTextField: NSTextField {
             },
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
-        })
+            }
+        )
+        onMouseEnter?()
     }
 
     override func mouseExited(with _: NSEvent) {
@@ -120,6 +130,7 @@ class ScrollableTextField: NSTextField {
         darken(color: textFieldColor)
         upHotkey = nil
         downHotkey = nil
+        onMouseExit?()
     }
 
     func lightenUp(color: NSColor) {

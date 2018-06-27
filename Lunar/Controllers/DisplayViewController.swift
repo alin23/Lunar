@@ -32,7 +32,12 @@ class DisplayViewController: NSViewController {
     var deleteButtonTrackingArea: NSTrackingArea!
 
     func update(from display: Display) {
-        displayName?.stringValue = display.name
+        if display.id == GENERIC_DISPLAY_ID {
+            displayName?.stringValue = "No Display"
+        } else {
+            displayName?.stringValue = display.name
+        }
+
         if display.adaptive {
             adaptiveButton?.state = .on
         } else {
@@ -46,11 +51,13 @@ class DisplayViewController: NSViewController {
 
         for hour in 0 ..< 24 {
             let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                for: display, hour: hour,
+                for: display,
+                hour: hour,
                 minBrightness: minBrightness,
                 maxBrightness: maxBrightness,
                 minContrast: minContrast,
-                maxContrast: maxContrast)
+                maxContrast: maxContrast
+            )
             brightnessChartEntry[hour].y = brightness.doubleValue
             contrastChartEntry[hour].y = contrast.doubleValue
         }
@@ -130,6 +137,7 @@ class DisplayViewController: NSViewController {
         adaptiveButton.isHidden = value
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
+        brightnessContrastChart.isHidden = value
     }
 
     func initGraph() {

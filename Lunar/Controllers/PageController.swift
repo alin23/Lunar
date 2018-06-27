@@ -69,13 +69,15 @@ class PageController: NSPageController, NSPageControllerDelegate {
 
     func setupHotkeys() {
         leftHotkey = HotKey(
-            key: .leftArrow, modifiers: [],
+            key: .leftArrow,
+            modifiers: [],
             keyDownHandler: {
                 self.navigateBack(nil)
             }
         )
         rightHotkey = HotKey(
-            key: .rightArrow, modifiers: [],
+            key: .rightArrow,
+            modifiers: [],
             keyDownHandler: {
                 self.navigateForward(nil)
             }

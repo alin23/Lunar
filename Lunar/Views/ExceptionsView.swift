@@ -26,12 +26,39 @@ class ExceptionsView: NSTableView {
         if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
             if let controller = exceptionsController.parent?.parent as? SettingsPageController {
                 scrollableBrightness.onValueChangedInstant = { value in
-                    controller.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value,
-                                             contrastOffset: scrollableContrast.integerValue)
+                    controller.updateDataset(
+                        display: brightnessAdapter.firstDisplay,
+                        brightnessOffset: value,
+                        contrastOffset: scrollableContrast.integerValue
+                    )
                 }
                 scrollableContrast.onValueChangedInstant = { value in
-                    controller.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: scrollableBrightness.integerValue,
-                                             contrastOffset: value)
+                    controller.updateDataset(
+                        display: brightnessAdapter.firstDisplay,
+                        brightnessOffset: scrollableBrightness.integerValue,
+                        contrastOffset: value
+                    )
+                }
+
+                scrollableBrightness.onMouseEnter = {
+                    let brightnessOffset = scrollableBrightness.integerValue
+                    let contrastOffset = scrollableContrast.integerValue
+                    controller.updateDataset(
+                        display: brightnessAdapter.firstDisplay,
+                        brightnessOffset: brightnessOffset,
+                        contrastOffset: contrastOffset,
+                        withAnimation: true
+                    )
+                }
+                scrollableContrast.onMouseEnter = {
+                    let brightnessOffset = scrollableBrightness.integerValue
+                    let contrastOffset = scrollableContrast.integerValue
+                    controller.updateDataset(
+                        display: brightnessAdapter.firstDisplay,
+                        brightnessOffset: brightnessOffset,
+                        contrastOffset: contrastOffset,
+                        withAnimation: true
+                    )
                 }
             }
         }
