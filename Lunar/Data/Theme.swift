@@ -32,6 +32,8 @@ let scrollableTextFieldColorWhite = white
 let scrollableTextFieldColorHoverWhite = mauve.withAlphaComponent(0.7)
 let scrollableTextFieldColorLightWhite = mauve.withAlphaComponent(0.9)
 
+let scrollableCaptionColorWhite = mauve.withAlphaComponent(0.5)
+
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
 let adaptiveButtonBgOn = lunarYellow
