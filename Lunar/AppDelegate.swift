@@ -241,8 +241,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
-        let pageController = (windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController
-        pageController?.setup()
+        if let pageController = (windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController {
+            pageController.setup()
+        }
     }
 
     func addObservers() {
