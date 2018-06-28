@@ -18,6 +18,9 @@ class ExceptionsView: NSTableView {
         let scrollableBrightness = (rowView.view(atColumn: 2) as! NSTableCellView).subviews[0] as! ScrollableTextField
         let scrollableContrast = (rowView.view(atColumn: 3) as! NSTableCellView).subviews[0] as! ScrollableTextField
 
+        let scrollableBrightnessCaption = (rowView.view(atColumn: 2) as! NSTableCellView).subviews[1] as! ScrollableTextFieldCaption
+        let scrollableContrastCaption = (rowView.view(atColumn: 3) as! NSTableCellView).subviews[1] as! ScrollableTextFieldCaption
+
         scrollableBrightness.textFieldColor = scrollableTextFieldColorWhite
         scrollableBrightness.textFieldColorHover = scrollableTextFieldColorHoverWhite
         scrollableBrightness.textFieldColorLight = scrollableTextFieldColorLightWhite
@@ -25,6 +28,9 @@ class ExceptionsView: NSTableView {
         scrollableContrast.textFieldColor = scrollableTextFieldColorWhite
         scrollableContrast.textFieldColorHover = scrollableTextFieldColorHoverWhite
         scrollableContrast.textFieldColorLight = scrollableTextFieldColorLightWhite
+
+        scrollableBrightnessCaption.textColor = scrollableCaptionColorWhite
+        scrollableContrastCaption.textColor = scrollableCaptionColorWhite
 
         scrollableBrightness.onValueChanged = { value in
             app.setValue(value, forKey: "brightness")

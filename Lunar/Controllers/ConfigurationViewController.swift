@@ -27,6 +27,9 @@ class ConfigurationViewController: NSViewController {
         daylightExtensionField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
         daylightExtensionField?.textFieldColorLight = scrollableTextFieldColorLightWhite
 
+        noonDurationCaption.textColor = scrollableCaptionColorWhite
+        daylightExtensionCaption.textColor = scrollableCaptionColorWhite
+
         noonDurationField?.onValueChanged = { (value: Int) in
             datastore.defaults.set(value, forKey: "noonDurationMinutes")
         }
