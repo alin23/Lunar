@@ -17,6 +17,15 @@ class ExceptionsView: NSTableView {
         let app = (rowView.view(atColumn: 1) as! NSTableCellView).objectValue as! AppException
         let scrollableBrightness = (rowView.view(atColumn: 2) as! NSTableCellView).subviews[0] as! ScrollableTextField
         let scrollableContrast = (rowView.view(atColumn: 3) as! NSTableCellView).subviews[0] as! ScrollableTextField
+
+        scrollableBrightness.textFieldColor = scrollableTextFieldColorWhite
+        scrollableBrightness.textFieldColorHover = scrollableTextFieldColorHoverWhite
+        scrollableBrightness.textFieldColorLight = scrollableTextFieldColorLightWhite
+
+        scrollableContrast.textFieldColor = scrollableTextFieldColorWhite
+        scrollableContrast.textFieldColorHover = scrollableTextFieldColorHoverWhite
+        scrollableContrast.textFieldColorLight = scrollableTextFieldColorLightWhite
+
         scrollableBrightness.onValueChanged = { value in
             app.setValue(value, forKey: "brightness")
         }

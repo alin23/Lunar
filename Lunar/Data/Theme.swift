@@ -17,19 +17,20 @@ let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 
 let bgColor = white
+let settingsBgColor = lunarYellow
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
-let scrollableTextFieldCaptionColor = mauve
+let scrollableTextFieldCaptionColor = mauve.withAlphaComponent(0.7)
 let adaptiveButtonLabelColor = mauve
 
 let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05)!
 let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1)!
 let scrollableTextFieldColorLight = lunarYellow.highlight(withLevel: 0.3)!
 
-let scrollableTextFieldColorWhite = white.withAlphaComponent(0.7)
-let scrollableTextFieldColorHoverWhite = white.withAlphaComponent(0.9)
-let scrollableTextFieldColorLightWhite = white
+let scrollableTextFieldColorWhite = white
+let scrollableTextFieldColorHoverWhite = mauve.withAlphaComponent(0.7)
+let scrollableTextFieldColorLightWhite = mauve.withAlphaComponent(0.9)
 
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
@@ -48,7 +49,7 @@ let stateButtonLabelColorHoverDisplay = mauve
 let stateButtonColorDisplay = gray
 let stateButtonColorHoverDisplay = lunarYellow
 
-let stateButtonLabelColorSettings = white
+let stateButtonLabelColorSettings = mauve.withAlphaComponent(0.7)
 let stateButtonLabelColorHoverSettings = lunarYellow
 let stateButtonColorSettings = white.withAlphaComponent(0.3)
 let stateButtonColorHoverSettings = mauve.withAlphaComponent(0.5)

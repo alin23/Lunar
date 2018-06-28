@@ -93,7 +93,7 @@ class SettingsPageController: NSViewController {
     }
 
     func initGraph(display: Display?) {
-        brightnessContrastChart.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow)
+        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow)
     }
 
     func zeroGraph() {
@@ -103,7 +103,7 @@ class SettingsPageController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.wantsLayer = true
-        view.layer!.backgroundColor = logoColor.cgColor
+        view.layer!.backgroundColor = settingsBgColor.cgColor
         initGraph(display: nil)
     }
 }

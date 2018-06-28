@@ -53,8 +53,14 @@ class PageController: NSPageController, NSPageControllerDelegate {
 
     func setup() {
         delegate = self
+
+        let settingsViewController = viewControllers.values.first
         viewControllers.removeAll(keepingCapacity: false)
         arrangedObjects = [datastore]
+        if settingsViewController != nil {
+            viewControllers[settingsPageControllerIdentifier] = settingsViewController!
+        }
+
         if !brightnessAdapter.displays.isEmpty {
             let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
@@ -63,8 +69,10 @@ class PageController: NSPageController, NSPageControllerDelegate {
         } else {
             arrangedObjects.append(GENERIC_DISPLAY)
         }
+
         setupPageControl(size: arrangedObjects.count)
         selectedIndex = 1
+        completeTransition()
     }
 
     func setupHotkeys() {
@@ -93,22 +101,23 @@ class PageController: NSPageController, NSPageControllerDelegate {
     func pageControllerDidEndLiveTransition(_: NSPageController) {
         if let splitViewController = parent as? SplitViewController {
             let identifier = pageController(self, identifierFor: arrangedObjects[selectedIndex])
+            let viewController = pageController(self, viewControllerForIdentifier: identifier)
             if selectedIndex == 0 {
                 splitViewController.yellowBackground()
-                if let settingsController = viewControllers[identifier] as? SettingsPageController {
+                if let settingsController = viewController as? SettingsPageController {
                     settingsController.initGraph(display: brightnessAdapter.firstDisplay)
                 }
             } else {
                 if !splitViewController.hasWhiteBackground() {
                     splitViewController.whiteBackground()
                 }
-                if let displayController = viewControllers[identifier] as? DisplayViewController {
+                if let displayController = viewController as? DisplayViewController {
                     displayController.initGraph()
                 }
             }
-            for (id, controller) in viewControllers.filter({ key, _ in key != identifier }) {
-                if id == settingsPageControllerIdentifier {
-                    (controller as! SettingsPageController).zeroGraph()
+            for (_, controller) in viewControllers.filter({ key, _ in key != identifier }) {
+                if let c = controller as? SettingsPageController {
+                    c.zeroGraph()
                 } else {
                     (controller as! DisplayViewController).zeroGraph()
                 }
@@ -132,6 +141,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
                 viewControllers[identifier] = NSStoryboard.main!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
         }
+
         if let controller = viewControllers[identifier] as? DisplayViewController {
             let displayId = CGDirectDisplayID(identifier)!
             if displayId != GENERIC_DISPLAY.id {
@@ -140,6 +150,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
                 controller.display = GENERIC_DISPLAY
             }
         }
+
         return viewControllers[identifier]!
     }
 
