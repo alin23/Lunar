@@ -55,12 +55,11 @@ class PageController: NSPageController, NSPageControllerDelegate {
         delegate = self
 
         let settingsViewController = viewControllers.values.first
-        viewControllers.removeAll(keepingCapacity: false)
-        arrangedObjects = [datastore]
         if settingsViewController != nil {
             viewControllers[settingsPageControllerIdentifier] = settingsViewController!
         }
 
+        arrangedObjects = [datastore]
         if !brightnessAdapter.displays.isEmpty {
             let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
@@ -73,6 +72,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         setupPageControl(size: arrangedObjects.count)
         selectedIndex = 1
         completeTransition()
+        view.setNeedsDisplay(view.rectForPage(1))
     }
 
     func setupHotkeys() {
@@ -115,7 +115,12 @@ class PageController: NSPageController, NSPageControllerDelegate {
                     displayController.initGraph()
                 }
             }
-            for (_, controller) in viewControllers.filter({ key, _ in key != identifier }) {
+            for object in arrangedObjects {
+                let otherIdentifier = pageController(self, identifierFor: object)
+                if identifier == otherIdentifier {
+                    continue
+                }
+                let controller = pageController(self, viewControllerForIdentifier: otherIdentifier)
                 if let c = controller as? SettingsPageController {
                     c.zeroGraph()
                 } else {
@@ -142,13 +147,12 @@ class PageController: NSPageController, NSPageControllerDelegate {
             }
         }
 
-        if let controller = viewControllers[identifier] as? DisplayViewController {
-            if let displayId = CGDirectDisplayID(identifier) {
-                if displayId != GENERIC_DISPLAY.id {
-                    controller.display = brightnessAdapter.displays[displayId]
-                } else {
-                    controller.display = GENERIC_DISPLAY
-                }
+        if let controller = viewControllers[identifier] as? DisplayViewController,
+            let displayId = CGDirectDisplayID(identifier) {
+            if displayId != GENERIC_DISPLAY.id {
+                controller.display = brightnessAdapter.displays[displayId]
+            } else {
+                controller.display = GENERIC_DISPLAY
             }
         }
 
