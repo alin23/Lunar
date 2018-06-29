@@ -111,15 +111,21 @@ class BrightnessAdapter {
     }
 
     func fetchMoments() {
-        if let solar = Solar(coordinate: self.geolocation.coordinate) {
+        let now = DateInRegion()
+        var date = now.absoluteDate
+        date += TimeInterval(now.region.timeZone.secondsFromGMT())
+        if let solar = Solar(for: date, coordinate: self.geolocation.coordinate) {
             moment = Moment(solar)
+            log.debug("Computed moment from Solar")
             return
         }
         if let moment = Moment() {
             if moment.solarNoon.isToday {
                 self.moment = moment
+                log.debug("Computed moment is today, storing it")
                 return
             }
+            log.debug("Computed moment is not today, not storing it")
         }
 
         Alamofire.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { response in
