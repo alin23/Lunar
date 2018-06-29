@@ -119,14 +119,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         })
     }
 
+    func listenForWindowClose(window: NSWindow) {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillClose(notification:)),
+            name: NSWindow.willCloseNotification,
+            object: window
+        )
+    }
+
     func showWindow() {
         if windowController == nil {
             windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
+        } else if windowController?.window == nil {
+            windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
-        if let windowController = self.windowController,
-            let window = windowController.window {
-            windowController.showWindow(nil)
-            window.orderFrontRegardless()
+
+        if let wc = self.windowController {
+            wc.showWindow(nil)
+            if let window = wc.window {
+                window.orderFrontRegardless()
+                listenForWindowClose(window: window)
+            }
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
     }
@@ -208,6 +222,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         )
     }
 
+    @objc func windowWillClose(notification _: Notification) {
+        windowController?.window = nil
+        windowController = nil
+    }
+
     func listenForRunningApps() {
         let appNames = NSWorkspace.shared.runningApplications.map({ app in app.bundleIdentifier ?? "" })
         runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
@@ -241,8 +260,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
-        if let pageController = (windowController?.window?.contentViewController as? SplitViewController)?.children[0] as? PageController {
-            pageController.setup()
+        if let visible = windowController?.window?.isVisible, visible {
+            windowController?.close()
+            windowController?.window = nil
+            windowController = nil
+            showWindow()
         }
     }
 
