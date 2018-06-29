@@ -9,6 +9,7 @@
 import Cocoa
 import CoreLocation
 import HotKey
+import Sentry
 import ServiceManagement
 import SwiftyBeaver
 import WAYWindow
@@ -61,6 +62,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var toggleMenuItem: NSMenuItem!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+
+    func application(
+        application _: NSApplication,
+        didFinishLaunchingWithOptions _: [NSObject: AnyObject]?
+    ) -> Bool {
+        do {
+            Client.shared = try Client(dsn: "https://ba8be236fd94466f83fcf732301c8663@sentry.io/1235087")
+            try Client.shared?.startCrashHandler()
+        } catch let error {
+            log.error(error)
+        }
+
+        return true
+    }
 
     func menuWillOpen(_: NSMenu) {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
