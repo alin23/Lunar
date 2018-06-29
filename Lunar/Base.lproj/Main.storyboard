@@ -16,8 +16,8 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="Preferences…" keyEquivalent="L" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                        <menuItem title="Preferences…" keyEquivalent="l" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showWindowWithSender:" target="Voe-Tx-rLC" id="qbP-Ur-gqG"/>
                                             </connections>

@@ -24,9 +24,9 @@ extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
 }
 
-let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control, .option])
-let startHotKey = HotKey(key: .l, modifiers: [.command, .control])
-let pauseHotKey = HotKey(key: .l, modifiers: [.command, .control, .shift])
+let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
+let startHotKey = HotKey(key: .l, modifiers: [.command, .control, .option])
+let pauseHotKey = HotKey(key: .l, modifiers: [.command, .control, .option, .shift])
 let lunarHotKey = HotKey(key: .l, modifiers: [.command, .option])
 let percent0HotKey = HotKey(key: .zero, modifiers: [.command, .control])
 let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
