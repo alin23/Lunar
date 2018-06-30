@@ -114,6 +114,7 @@ class BrightnessAdapter {
         let now = DateInRegion()
         var date = now.absoluteDate
         date += TimeInterval(now.region.timeZone.secondsFromGMT())
+        log.debug("Getting moments for \(date)")
         if let solar = Solar(for: date, coordinate: self.geolocation.coordinate) {
             moment = Moment(solar)
             log.debug("Computed moment from Solar")
