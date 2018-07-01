@@ -20,6 +20,20 @@ class DisplayViewController: NSViewController {
     @IBOutlet var deleteButton: DeleteButton!
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
 
+    @IBOutlet var swipeLeftHint: NSTextField!
+    @IBOutlet var swipeRightHint: NSTextField!
+    var swipeLeftHintVisible = false {
+        didSet {
+            swipeLeftHint?.isHidden = !swipeLeftHintVisible
+        }
+    }
+
+    var swipeRightHintVisible = false {
+        didSet {
+            swipeRightHint?.isHidden = !swipeRightHintVisible
+        }
+    }
+
     var display: Display! {
         didSet {
             if let display = display {
@@ -138,6 +152,8 @@ class DisplayViewController: NSViewController {
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
+        swipeLeftHintVisible = !value
+        swipeRightHintVisible = !value
     }
 
     func initGraph() {
@@ -151,17 +167,25 @@ class DisplayViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        swipeLeftHint.isHidden = !swipeLeftHintVisible
+        swipeRightHint.isHidden = !swipeRightHintVisible
+
         if let display = display, display != GENERIC_DISPLAY {
             update(from: display)
+
             scrollableBrightness.display = display
             scrollableContrast.display = display
+
             initAdaptiveButton()
+
             scrollableBrightness.label.textColor = scrollableViewLabelColor
             scrollableContrast.label.textColor = scrollableViewLabelColor
+
             scrollableBrightness.onMinValueChanged = { (value: Int) in self.updateDataset(minBrightness: UInt8(value)) }
             scrollableBrightness.onMaxValueChanged = { (value: Int) in self.updateDataset(maxBrightness: UInt8(value)) }
             scrollableContrast.onMinValueChanged = { (value: Int) in self.updateDataset(minContrast: UInt8(value)) }
             scrollableContrast.onMaxValueChanged = { (value: Int) in self.updateDataset(maxContrast: UInt8(value)) }
+
             initGraph()
         } else {
             setIsHidden(true)
