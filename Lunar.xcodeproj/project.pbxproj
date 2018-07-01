@@ -12,6 +12,8 @@
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
+		C739E0A020E8B3BF00F14344 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C739E09F20E8B3BF00F14344 /* Sparkle.framework */; };
+		C739E0A120E8B3BF00F14344 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C739E09F20E8B3BF00F14344 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C748488B20E6A271007F85D9 /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C748488120E6A270007F85D9 /* Solar.framework */; };
 		C748488C20E6A271007F85D9 /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C748488120E6A270007F85D9 /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C748488D20E6A271007F85D9 /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C748488220E6A270007F85D9 /* WAYWindow.framework */; };
@@ -75,6 +77,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C739E0A120E8B3BF00F14344 /* Sparkle.framework in Embed Frameworks */,
 				C748488E20E6A271007F85D9 /* WAYWindow.framework in Embed Frameworks */,
 				C748489620E6A271007F85D9 /* SwiftyBeaver.framework in Embed Frameworks */,
 				C748489E20E6A271007F85D9 /* NSPageControl.framework in Embed Frameworks */,
@@ -119,11 +122,8 @@
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		C73853F91FEDBFA300C6B797 /* PocketSVG.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PocketSVG.framework; path = Carthage/Build/Mac/PocketSVG.framework; sourceTree = "<group>"; };
-		C73853FA1FEDBFA300C6B797 /* PocketSVG.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = PocketSVG.framework.dSYM; path = Carthage/Build/Mac/PocketSVG.framework.dSYM; sourceTree = "<group>"; };
+		C739E09F20E8B3BF00F14344 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		C73D86F620E6A1330006225D /* Sentry.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Sentry.framework.dSYM; path = Carthage/Build/Mac/Sentry.framework.dSYM; sourceTree = "<group>"; };
-		C73D86F720E6A1330006225D /* CustomSegue.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CustomSegue.framework; path = Carthage/Build/Mac/CustomSegue.framework; sourceTree = "<group>"; };
-		C73D86F820E6A1330006225D /* CustomSegue.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CustomSegue.framework.dSYM; path = Carthage/Build/Mac/CustomSegue.framework.dSYM; sourceTree = "<group>"; };
 		C73D86F920E6A1330006225D /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C73D870920E6A1C30006225D /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C73D870A20E6A1C40006225D /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
@@ -203,6 +203,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C739E0A020E8B3BF00F14344 /* Sparkle.framework in Frameworks */,
 				C748488D20E6A271007F85D9 /* WAYWindow.framework in Frameworks */,
 				C748489520E6A271007F85D9 /* SwiftyBeaver.framework in Frameworks */,
 				C748489D20E6A271007F85D9 /* NSPageControl.framework in Frameworks */,
@@ -288,6 +289,7 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C739E09F20E8B3BF00F14344 /* Sparkle.framework */,
 				C73D871220E6A1C50006225D /* Alamofire.framework */,
 				C748488420E6A270007F85D9 /* Alamofire.framework */,
 				C748488520E6A270007F85D9 /* Charts.framework */,
@@ -364,16 +366,12 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C73D86F720E6A1330006225D /* CustomSegue.framework */,
-				C73D86F820E6A1330006225D /* CustomSegue.framework.dSYM */,
 				C73D86F920E6A1330006225D /* Sentry.framework */,
 				C73D86F620E6A1330006225D /* Sentry.framework.dSYM */,
 				C7DE93882019E1160017F965 /* HotKey.framework */,
 				C7DE93892019E1160017F965 /* HotKey.framework.dSYM */,
 				C794E16C1FEFD03100549462 /* NSPageControl.framework */,
 				C794E16B1FEFD03000549462 /* NSPageControl.framework.dSYM */,
-				C73853F91FEDBFA300C6B797 /* PocketSVG.framework */,
-				C73853FA1FEDBFA300C6B797 /* PocketSVG.framework.dSYM */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
 			);

@@ -98,16 +98,44 @@ class PageController: NSPageController, NSPageControllerDelegate {
         setupHotkeys()
     }
 
+    func hideSwipeLeftHint() {
+        if !datastore.defaults.didSwipeLeft {
+            datastore.defaults.set(true, forKey: "didSwipeLeft")
+            if let display = arrangedObjects[1] as? Display {
+                let identifier = pageController(self, identifierFor: display)
+                if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
+                    controller.swipeLeftHintVisible = false
+                }
+            }
+        }
+    }
+
+    func hideSwipeRightHint() {
+        if !datastore.defaults.didSwipeRight {
+            datastore.defaults.set(true, forKey: "didSwipeRight")
+            if let display = arrangedObjects[1] as? Display {
+                let identifier = pageController(self, identifierFor: display)
+                if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
+                    controller.swipeRightHintVisible = false
+                }
+            }
+        }
+    }
+
     func pageControllerDidEndLiveTransition(_: NSPageController) {
         if let splitViewController = parent as? SplitViewController {
             let identifier = pageController(self, identifierFor: arrangedObjects[selectedIndex])
             let viewController = pageController(self, viewControllerForIdentifier: identifier)
             if selectedIndex == 0 {
+                hideSwipeLeftHint()
                 splitViewController.yellowBackground()
                 if let settingsController = viewController as? SettingsPageController {
                     settingsController.initGraph(display: brightnessAdapter.firstDisplay)
                 }
             } else {
+                if selectedIndex > 1 {
+                    hideSwipeRightHint()
+                }
                 if !splitViewController.hasWhiteBackground() {
                     splitViewController.whiteBackground()
                 }
@@ -151,6 +179,14 @@ class PageController: NSPageController, NSPageControllerDelegate {
             let displayId = CGDirectDisplayID(identifier) {
             if displayId != GENERIC_DISPLAY.id {
                 controller.display = brightnessAdapter.displays[displayId]
+                if let display = arrangedObjects[1] as? Display, display.id == displayId {
+                    if !datastore.defaults.didSwipeLeft {
+                        controller.swipeLeftHintVisible = true
+                    }
+                    if !datastore.defaults.didSwipeRight && arrangedObjects.count > 2 {
+                        controller.swipeRightHintVisible = true
+                    }
+                }
             } else {
                 controller.display = GENERIC_DISPLAY
             }

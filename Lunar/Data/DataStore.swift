@@ -29,6 +29,14 @@ extension UserDefaults {
         return bool(forKey: "didScrollTextField")
     }
 
+    @objc dynamic var didSwipeLeft: Bool {
+        return bool(forKey: "didSwipeLeft")
+    }
+
+    @objc dynamic var didSwipeRight: Bool {
+        return bool(forKey: "didSwipeRight")
+    }
+
     @objc dynamic var adaptiveBrightnessEnabled: Bool {
         return bool(forKey: "adaptiveBrightnessEnabled")
     }
@@ -97,6 +105,12 @@ class DataStore: NSObject {
         }
         if DataStore.defaults.object(forKey: "didScrollTextField") == nil {
             DataStore.defaults.set(false, forKey: "didScrollTextField")
+        }
+        if DataStore.defaults.object(forKey: "didSwipeLeft") == nil {
+            DataStore.defaults.set(false, forKey: "didSwipeLeft")
+        }
+        if DataStore.defaults.object(forKey: "didSwipeRight") == nil {
+            DataStore.defaults.set(false, forKey: "didSwipeRight")
         }
         if DataStore.defaults.object(forKey: "startAtLogin") == nil {
             DataStore.defaults.set(true, forKey: "startAtLogin")
