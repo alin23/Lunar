@@ -66,9 +66,19 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="DeQ-n5-ddV"/>
-                                        <menuItem title="Quit Lunar" keyEquivalent="q" id="4sb-4s-VLi">
+                                        <menuItem title="Check for updates..." id="4sb-4s-VLi">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
+                                                <binding destination="JCY-9H-EwC" name="target" keyPath="self" id="8zz-pd-58u">
+                                                    <dictionary key="options">
+                                                        <string key="NSSelectorName">checkForUpdates:</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Quit Lunar" keyEquivalent="q" id="8Oe-Go-Jnc">
+                                            <connections>
+                                                <action selector="terminate:" target="Ady-hI-5gd" id="TqM-KS-73o"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -120,6 +130,7 @@
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
                     </connections>
                 </customObject>
+                <customObject id="JCY-9H-EwC" customClass="SUUpdater"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -860,6 +871,28 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="54O-dg-1WQ">
+                                <rect key="frame" x="34" y="388" width="182" height="38"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" focusRingType="none" alignment="center" id="79O-SG-Ogd">
+                                    <font key="font" size="13" name="Menlo-Bold"/>
+                                    <string key="title">Swipe left or press 
+← to view Settings</string>
+                                    <color key="textColor" red="1" green="0.36862745098039218" blue="0.52549019607843139" alpha="0.90459947183098588" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0WE-QT-onu">
+                                <rect key="frame" x="534" y="388" width="182" height="38"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" focusRingType="none" alignment="center" id="Xhe-mJ-6JY">
+                                    <font key="font" size="13" name="Menlo-Bold"/>
+                                    <string key="title">Swipe right or press →
+to view other displays</string>
+                                    <color key="textColor" red="1" green="0.36862745098039218" blue="0.52549019607843139" alpha="0.89951034330985913" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -869,6 +902,8 @@
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
+                        <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="byK-6k-amO"/>
+                        <outlet property="swipeRightHint" destination="0WE-QT-onu" id="zgQ-IC-ToC"/>
                     </connections>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
