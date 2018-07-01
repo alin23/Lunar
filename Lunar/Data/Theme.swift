@@ -72,5 +72,5 @@ let brightnessGraphColor = violet
 let xAxisLabelColor = mauve.withAlphaComponent(0.5)
 
 let contrastGraphColorYellow = white
-let brightnessGraphColorYellow = violet
+let brightnessGraphColorYellow = lunarYellow.shadow(withLevel: 0.3)!
 let xAxisLabelColorYellow = NSColor.black.withAlphaComponent(0.5)
