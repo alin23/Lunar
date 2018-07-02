@@ -69,13 +69,18 @@ class DataStore: NSObject {
     }
 
     func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
+        return try DataStore.fetchAppException(by: identifier, context: (context ?? self.context))
+    }
+    
+    static func fetchAppException(by identifier: String, context: NSManagedObjectContext) throws -> AppException? {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
-        return try (context ?? self.context).fetch(fetchRequest).first
+        return try context.fetch(fetchRequest).first
     }
 
     static func firstRun(context: NSManagedObjectContext) {
         log.debug("First run")
+        thisIsFirstRun = true
         for app in DEFAULT_APP_EXCEPTIONS {
             let appPath = "/Applications/\(app).app"
             if FileManager.default.fileExists(atPath: appPath) {
@@ -84,7 +89,9 @@ class DataStore: NSObject {
                     let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                _ = AppException(identifier: id, name: name, context: context)
+                if (try? DataStore.fetchAppException(by: id, context: context)) == nil {
+                    _ = AppException(identifier: id, name: name, context: context)
+                }
             }
         }
     }
@@ -96,6 +103,7 @@ class DataStore: NSObject {
             }
         })
         context = container.newBackgroundContext()
+        log.debug("Checking First Run")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
             DataStore.firstRun(context: context)
             DataStore.defaults.set(true, forKey: "firstRun")
