@@ -8,8 +8,9 @@
 
 import Cocoa
 import CoreLocation
+import Crashlytics
+import Fabric
 import HotKey
-import Sentry
 import ServiceManagement
 import SwiftyBeaver
 import WAYWindow
@@ -63,20 +64,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var toggleMenuItem: NSMenuItem!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-
-    func application(
-        application _: NSApplication,
-        didFinishLaunchingWithOptions _: [NSObject: AnyObject]?
-    ) -> Bool {
-        do {
-            Client.shared = try Client(dsn: "***REMOVED***")
-            try Client.shared?.startCrashHandler()
-        } catch let error {
-            log.error(error)
-        }
-
-        return true
-    }
 
     func menuWillOpen(_: NSMenu) {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
@@ -294,6 +281,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
+        Fabric.with([Crashlytics.self])
         initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()
@@ -341,16 +330,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         geolocationFallback()
     }
 
+    func locationManager(_: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .notDetermined:
+            locationManager.startMonitoringSignificantLocationChanges()
+        case .denied, .restricted:
+            log.warning("User has not authorized location services")
+            geolocationFallback()
+        case .authorizedAlways:
+            locationManager.startMonitoringSignificantLocationChanges()
+        }
+    }
+
     func startReceivingSignificantLocationChanges() {
         locationManager = CLLocationManager()
         locationManager.delegate = self
-        locationManager.startMonitoringSignificantLocationChanges()
-        let authorizationStatus = CLLocationManager.authorizationStatus()
-        guard authorizationStatus == .authorized else {
-            log.warning("User has not authorized location services")
-            geolocationFallback()
-            return
-        }
+        locationManager.startUpdatingLocation()
+        locationManager.stopUpdatingLocation()
 
         guard CLLocationManager.significantLocationChangeMonitoringAvailable() else {
             log.warning("Location services are not available")

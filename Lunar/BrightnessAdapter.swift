@@ -9,6 +9,7 @@
 import Alamofire
 import Cocoa
 import CoreLocation
+import Crashlytics
 import Foundation
 import Solar
 import SwiftDate
@@ -67,6 +68,12 @@ class BrightnessAdapter {
         displays = BrightnessAdapter.getDisplays()
     }
 
+    static func setDisplayKeys(_ displays: [Display]) {
+        for (i, display) in displays.enumerated() {
+            Crashlytics.sharedInstance().setObjectValue(display.serial, forKey: "display\(i)")
+        }
+    }
+
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
@@ -100,13 +107,16 @@ class BrightnessAdapter {
             }
 
             datastore.save()
+            BrightnessAdapter.setDisplayKeys(displays.values.map({ d in d }))
             return displays
         } catch {
             log.error("Error on fetching displays: \(error)")
             displays = Dictionary(uniqueKeysWithValues: displayIDs.map { id in (id, Display(id: id, active: true)) })
             displays.values.forEach({ $0.addObservers() })
         }
+
         datastore.save()
+        BrightnessAdapter.setDisplayKeys(displays.values.map({ d in d }))
         return displays
     }
 
@@ -150,7 +160,7 @@ class BrightnessAdapter {
             return
         }
 
-        Alamofire.request("https://freegeoip.net/json").validate().responseJSON { response in
+        Alamofire.request("http://api.ipstack.com/check?access_key=***REMOVED***").validate().responseJSON { response in
             switch response.result {
             case let .success(value):
                 let json = JSON(value)

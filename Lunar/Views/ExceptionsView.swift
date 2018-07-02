@@ -24,10 +24,12 @@ class ExceptionsView: NSTableView {
         scrollableBrightness.textFieldColor = scrollableTextFieldColorWhite
         scrollableBrightness.textFieldColorHover = scrollableTextFieldColorHoverWhite
         scrollableBrightness.textFieldColorLight = scrollableTextFieldColorLightWhite
+        scrollableBrightness.caption = scrollableBrightnessCaption
 
         scrollableContrast.textFieldColor = scrollableTextFieldColorWhite
         scrollableContrast.textFieldColorHover = scrollableTextFieldColorHoverWhite
         scrollableContrast.textFieldColorLight = scrollableTextFieldColorLightWhite
+        scrollableContrast.caption = scrollableContrastCaption
 
         scrollableBrightnessCaption.textColor = scrollableCaptionColorWhite
         scrollableContrastCaption.textColor = scrollableCaptionColorWhite
