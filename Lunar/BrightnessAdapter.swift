@@ -68,9 +68,10 @@ class BrightnessAdapter {
         displays = BrightnessAdapter.getDisplays()
     }
 
-    static func setDisplayKeys(_ displays: [Display]) {
+    static func logDisplays(_ displays: [Display]) {
         for (i, display) in displays.enumerated() {
             Crashlytics.sharedInstance().setObjectValue(display.serial, forKey: "display\(i)")
+            Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial, "name": display.name])
         }
     }
 
@@ -107,7 +108,7 @@ class BrightnessAdapter {
             }
 
             datastore.save()
-            BrightnessAdapter.setDisplayKeys(displays.values.map({ d in d }))
+            BrightnessAdapter.logDisplays(displays.values.map({ d in d }))
             return displays
         } catch {
             log.error("Error on fetching displays: \(error)")
@@ -116,7 +117,7 @@ class BrightnessAdapter {
         }
 
         datastore.save()
-        BrightnessAdapter.setDisplayKeys(displays.values.map({ d in d }))
+        BrightnessAdapter.logDisplays(displays.values.map({ d in d }))
         return displays
     }
 
