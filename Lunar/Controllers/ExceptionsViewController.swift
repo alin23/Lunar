@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Crashlytics
 
 class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet var tableView: NSTableView!
@@ -43,6 +44,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
                 if try! datastore.fetchAppException(by: id) == nil {
                     let app = AppException(identifier: id, name: name)
                     arrayController.addObject(app)
+                    Answers.logCustomEvent(withName: "Added AppException", customAttributes: ["id": id, "name": name])
                 }
             }
         } else {
