@@ -37,6 +37,7 @@ var upHotkey: HotKey?
 var downHotkey: HotKey?
 var leftHotkey: HotKey?
 var rightHotkey: HotKey?
+var thisIsFirstRun = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -306,6 +307,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         listenForRunningApps()
 
         addObservers()
+        if thisIsFirstRun {
+            showWindow()
+        }
+        log.debug("App finished launching")
     }
 
     func applicationWillTerminate(_: Notification) {
