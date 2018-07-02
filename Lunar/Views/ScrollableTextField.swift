@@ -147,8 +147,10 @@ class ScrollableTextField: NSTextField {
         if !didScrollTextField {
             didScrollTextField = true
             datastore.defaults.set(true, forKey: "didScrollTextField")
-            removeTrackingArea(captionTrackingArea!)
-            caption.resetText()
+            if let area = captionTrackingArea {
+                removeTrackingArea(area)
+            }
+            caption?.resetText()
         }
     }
 

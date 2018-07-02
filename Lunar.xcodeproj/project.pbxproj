@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C70495BF20EA48C5006824CC /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C70495BE20EA48C5006824CC /* Sentry.framework */; };
+		C70495C020EA48C5006824CC /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C70495BE20EA48C5006824CC /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
@@ -55,8 +57,6 @@
 		C7EA515720EA326E00F2B06B /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7EA515820EA326E00F2B06B /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514A20EA326D00F2B06B /* WAYWindow.framework */; };
 		C7EA515920EA326E00F2B06B /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514A20EA326D00F2B06B /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515A20EA326E00F2B06B /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514B20EA326D00F2B06B /* Sentry.framework */; };
-		C7EA515B20EA326E00F2B06B /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514B20EA326D00F2B06B /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7EA515C20EA326E00F2B06B /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514C20EA326D00F2B06B /* Charts.framework */; };
 		C7EA515D20EA326E00F2B06B /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514C20EA326D00F2B06B /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7EA515E20EA326E00F2B06B /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514D20EA326D00F2B06B /* NSPageControl.framework */; };
@@ -69,6 +69,8 @@
 		C7EA516520EA326E00F2B06B /* HotKey.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515020EA326D00F2B06B /* HotKey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7EA516620EA326E00F2B06B /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515120EA326D00F2B06B /* SwiftDate.framework */; };
 		C7EA516720EA326E00F2B06B /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515120EA326D00F2B06B /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7EA516C20EA477900F2B06B /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA516A20EA477800F2B06B /* Crashlytics.framework */; };
+		C7EA516D20EA477900F2B06B /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA516B20EA477900F2B06B /* Fabric.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -100,6 +102,7 @@
 			files = (
 				C7EA516120EA326E00F2B06B /* SwiftyJSON.framework in Embed Frameworks */,
 				C7EA515920EA326E00F2B06B /* WAYWindow.framework in Embed Frameworks */,
+				C70495C020EA48C5006824CC /* Sentry.framework in Embed Frameworks */,
 				C7EA515520EA326E00F2B06B /* Solar.framework in Embed Frameworks */,
 				C7EA515720EA326E00F2B06B /* SwiftyBeaver.framework in Embed Frameworks */,
 				C7EA516720EA326E00F2B06B /* SwiftDate.framework in Embed Frameworks */,
@@ -107,7 +110,6 @@
 				C7EA515D20EA326E00F2B06B /* Charts.framework in Embed Frameworks */,
 				C7EA516520EA326E00F2B06B /* HotKey.framework in Embed Frameworks */,
 				C7EA515F20EA326E00F2B06B /* NSPageControl.framework in Embed Frameworks */,
-				C7EA515B20EA326E00F2B06B /* Sentry.framework in Embed Frameworks */,
 				C7EA515320EA326E00F2B06B /* Alamofire.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -116,6 +118,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C70495BE20EA48C5006824CC /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
 		C716B2051FD32B4900F22F90 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
 		C72776E6201F02140055934F /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PageControl.swift; path = Lunar/Views/PageControl.swift; sourceTree = SOURCE_ROOT; };
@@ -128,7 +131,6 @@
 		C73CD23F20EA2F1800B13DDE /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
 		C73CD24020EA2F1900B13DDE /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
 		C73CD24120EA2F1900B13DDE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
-		C73CD24220EA2F1900B13DDE /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C73CD24320EA2F1900B13DDE /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
 		C73CD24420EA2F1900B13DDE /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
 		C73CD24520EA2F1900B13DDE /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
@@ -178,13 +180,14 @@
 		C7EA514820EA326D00F2B06B /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
 		C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
 		C7EA514A20EA326D00F2B06B /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
-		C7EA514B20EA326D00F2B06B /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C7EA514C20EA326D00F2B06B /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
 		C7EA514D20EA326D00F2B06B /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
 		C7EA514E20EA326D00F2B06B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
 		C7EA514F20EA326D00F2B06B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		C7EA515020EA326D00F2B06B /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
 		C7EA515120EA326D00F2B06B /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
+		C7EA516A20EA477800F2B06B /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		C7EA516B20EA477900F2B06B /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,8 +203,10 @@
 				C7EA516220EA326E00F2B06B /* Sparkle.framework in Frameworks */,
 				C7EA515C20EA326E00F2B06B /* Charts.framework in Frameworks */,
 				C7EA516420EA326E00F2B06B /* HotKey.framework in Frameworks */,
+				C70495BF20EA48C5006824CC /* Sentry.framework in Frameworks */,
+				C7EA516D20EA477900F2B06B /* Fabric.framework in Frameworks */,
 				C7EA515E20EA326E00F2B06B /* NSPageControl.framework in Frameworks */,
-				C7EA515A20EA326E00F2B06B /* Sentry.framework in Frameworks */,
+				C7EA516C20EA477900F2B06B /* Crashlytics.framework in Frameworks */,
 				C7EA515220EA326E00F2B06B /* Alamofire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -278,6 +283,9 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C70495BE20EA48C5006824CC /* Sentry.framework */,
+				C7EA516A20EA477800F2B06B /* Crashlytics.framework */,
+				C7EA516B20EA477900F2B06B /* Fabric.framework */,
 				C73CD23E20EA2F1800B13DDE /* Alamofire.framework */,
 				C73CD23F20EA2F1800B13DDE /* Charts.framework */,
 				C73CD24020EA2F1900B13DDE /* HotKey.framework */,
@@ -285,8 +293,6 @@
 				C73CD24520EA2F1900B13DDE /* NSPageControl.framework */,
 				C7EA514C20EA326D00F2B06B /* Charts.framework */,
 				C7EA514D20EA326D00F2B06B /* NSPageControl.framework */,
-				C73CD24220EA2F1900B13DDE /* Sentry.framework */,
-				C7EA514B20EA326D00F2B06B /* Sentry.framework */,
 				C73CD23D20EA2F1800B13DDE /* Solar.framework */,
 				C73CD24120EA2F1900B13DDE /* Sparkle.framework */,
 				C73CD24420EA2F1900B13DDE /* SwiftDate.framework */,
@@ -367,6 +373,7 @@
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7CFEA221FD37836000AC4A6 /* CopyFiles */,
 				C7EA516820EA326E00F2B06B /* Embed Frameworks */,
+				C7EA516920EA470800F2B06B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -467,6 +474,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C7EA516920EA470800F2B06B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run 6add03c19270459b747dc239adefc6ae01b27381 54931e0beaebf5eb8bdd6507a845575472d7b3e25e34f3757823a5ab3b1f0c35\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C7AEC7F11FD0B4350039B562 /* Sources */ = {
@@ -658,6 +685,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -666,7 +694,7 @@
 				);
 				INFOPLIST_FILE = Lunar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.Lunar;
+				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
@@ -692,7 +720,7 @@
 				);
 				INFOPLIST_FILE = Lunar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.Lunar;
+				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";

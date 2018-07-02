@@ -71,7 +71,7 @@ class DataStore: NSObject {
     func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
         return try DataStore.fetchAppException(by: identifier, context: (context ?? self.context))
     }
-    
+
     static func fetchAppException(by identifier: String, context: NSManagedObjectContext) throws -> AppException? {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
@@ -89,8 +89,12 @@ class DataStore: NSObject {
                     let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                if (try? DataStore.fetchAppException(by: id, context: context)) == nil {
-                    _ = AppException(identifier: id, name: name, context: context)
+                if let exc = (try? DataStore.fetchAppException(by: id, context: context)) {
+                    if exc == nil {
+                        _ = AppException(identifier: id, name: name, context: context)
+                    }
+                    log.debug("Existing app for \(app): \(String(describing: exc))")
+                    continue
                 }
             }
         }
