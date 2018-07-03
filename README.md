@@ -6,4 +6,4 @@
 
 #### Installation
 - Download DMG from [Official website](https://lunarapp.site)
-- `brew cask install lunar` (_not yet_)
+- `brew cask install lunar`
