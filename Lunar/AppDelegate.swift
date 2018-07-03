@@ -132,10 +132,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func showWindow() {
+        var mainStoryboard: NSStoryboard?
+        if #available(OSX 10.13, *) {
+            mainStoryboard = NSStoryboard.main
+        } else {
+            mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
+        }
+
         if windowController == nil {
-            windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
+            windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         } else if windowController?.window == nil {
-            windowController = NSStoryboard.main?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
+            windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
 
         if let wc = self.windowController {
