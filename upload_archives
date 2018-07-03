@@ -1,0 +1,4 @@
+#!/usr/bin/env fish
+
+gsutil -m rsync -r -x '.*\.DS_Store|\..+' ~/Temp/LunarArchives gs://static.lunarapp.site
+gsutil -m acl ch -r -u AllUsers:R gs://static.lunarapp.site

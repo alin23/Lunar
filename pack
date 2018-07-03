@@ -1,0 +1,48 @@
+#!/usr/bin/env fish
+rm -rf ~/Temp/Lunar/*
+cp -R /private/tmp/DerivedData/Lunar-awgakuaxmexierhhqifxvodvwpri/Build/Products/Release/Lunar.app ~/Temp/Lunar/
+
+set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" ~/Temp/Lunar/Lunar.app/Contents/Info.plist)
+set -l appLatestDmg ~/Temp/LunarArchives/Lunar.dmg
+set -l appDmg ~/Temp/LunarArchives/Lunar-$appVersion.dmg
+set -l appTmpDmg ~/Temp/Lunar-$appVersion.dmg
+
+if test -f $appDmg
+    echo (set_color red)"Deleting $appDmg"(set_color normal)
+    rm $appDmg
+end
+if test -f $appLatestDmg
+    echo \n(set_color red)"Deleting $appLatestDmg"(set_color normal)
+    rm $appLatestDmg
+end
+if test -f $appTmpDmg
+    echo \n(set_color red)"Deleting $appTmpDmg"(set_color normal)
+    rm $appTmpDmg
+end
+if test -d /Volumes/Lunar
+    echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
+    hdiutil detach /Volumes/Lunar
+end
+
+
+echo \n(set_color green)"Creating $appTmpDmg"(set_color normal)
+hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder ~/Temp/Lunar -ov -format UDRW $appTmpDmg
+
+echo \n(set_color green)"Linking /Applications"(set_color normal)
+ln -s /Applications /Volumes/Lunar/Applications
+
+echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
+hdiutil detach /Volumes/Lunar
+
+echo \n(set_color blue)"Compressing $appTmpDmg to $appDmg"(set_color normal)
+hdiutil convert -format UDZO -o $appDmg $appTmpDmg
+
+echo \n(set_color green)"Signing $appDmg"(set_color normal)
+xattr -cr $appDmg
+codesign -fs "Mac Developer: alin.p32@gmail.com (FVP7HX44T5)" $appDmg
+
+echo \n(set_color yellow)"Generating AppCast"(set_color normal)
+generate_appcast ~/Documents/Keys/dsa_priv.pem ~/Temp/LunarArchives
+ccat ~/Temp/LunarArchives/appcast.xml
+
+cp $appDmg $appLatestDmg
