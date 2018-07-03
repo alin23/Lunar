@@ -14,7 +14,7 @@ let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
 let MAX_CONTRAST: UInt8 = 100
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
-let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.container.newBackgroundContext())
+let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
 
 class Display: NSManagedObject {
     @NSManaged var id: CGDirectDisplayID
