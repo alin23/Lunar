@@ -11,7 +11,8 @@ from lxml.builder import ElementMaker
 appcast_path = Path(sys.argv[1])
 key_path = Path(sys.argv[2])
 
-appcast = etree.parse(str(appcast_path))
+parser = etree.XMLParser(strip_cdata=False)
+appcast = etree.parse(str(appcast_path), parser=parser)
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 SIGNER = "/usr/local/sbin/sign_update"
 DELTA_PATTERN = re.compile(
@@ -44,7 +45,7 @@ for item in appcast.iter("item"):
     for delta in item.findall(sparkle("deltas")):
         item.remove(delta)
 
-    for delta in appcast_path.parent.glob(f"Lunar*-{version}.delta"):
+    for delta in appcast_path.parent.glob(f"Lunar{version}-*.delta"):
         new_version, old_version = DELTA_PATTERN.match(delta.name).groups()
         enclosure = E.enclosure(
             url=f"https://lunarapp.site/{delta.name}",
