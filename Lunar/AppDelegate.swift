@@ -421,6 +421,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func showWindow(sender _: Any?) {
         showWindow()
     }
+
+    @IBAction func buyMeACoffee(_: Any) {
+        NSWorkspace.shared.open(URL(string: "https://www.buymeacoffee.com/alin23")!)
+    }
 }
 
 // Helper function inserted by Swift 4.2 migrator.
