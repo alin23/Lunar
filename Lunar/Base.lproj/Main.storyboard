@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14269.14" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14295.6" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.14"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14295.6"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -65,10 +66,16 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="DeQ-n5-ddV"/>
-                                        <menuItem title="Check for updates..." id="4sb-4s-VLi">
+                                        <menuItem title="Buy me a coffee!" id="4sb-4s-VLi">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <binding destination="JCY-9H-EwC" name="target" keyPath="self" id="8zz-pd-58u">
+                                                <action selector="buyMeACoffee:" target="Voe-Tx-rLC" id="jVR-8h-xBL"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Check for updates..." id="Gfc-g2-RLO">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="JCY-9H-EwC" name="target" keyPath="self" id="zcB-He-gIG">
                                                     <dictionary key="options">
                                                         <string key="NSSelectorName">checkForUpdates:</string>
                                                     </dictionary>
@@ -169,7 +176,7 @@
                     </connections>
                 </windowController>
             </objects>
-            <point key="canvasLocation" x="75" y="415"/>
+            <point key="canvasLocation" x="96" y="602"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="cHE-73-x2e">

@@ -42,7 +42,7 @@ extension UserDefaults {
     }
 }
 
-@available(OSX 10.12, * )
+@available(OSX 10.12, *)
 let container = NSPersistentContainer(name: "Model")
 let coordinator = NSPersistentStoreCoordinator()
 
@@ -104,7 +104,7 @@ class DataStore: NSObject {
     }
 
     override init() {
-        if #available(OSX 10.12, * ) {
+        if #available(OSX 10.12, *) {
             container.loadPersistentStores(completionHandler: { _, error in
                 if let error = error {
                     fatalError("Unable to load persistent stores: \(error)")
