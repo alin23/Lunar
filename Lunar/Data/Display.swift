@@ -133,8 +133,8 @@ class Display: NSManagedObject {
         let daylightExtension = daylightExtension ?? datastore.defaults.daylightExtensionMinutes
         let noonDuration = noonDuration ?? datastore.defaults.noonDurationMinutes
 
-        let daylightStart = moment.civilSunrise - daylightExtension.minutes
-        let daylightEnd = moment.civilSunset + daylightExtension.minutes
+        let daylightStart = moment.sunrise - daylightExtension.minutes
+        let daylightEnd = moment.sunset + daylightExtension.minutes
 
         let noonStart = moment.solarNoon - (noonDuration / 2).minutes
         let noonEnd = moment.solarNoon + (noonDuration / 2).minutes
