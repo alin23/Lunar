@@ -64,8 +64,11 @@ class Display: NSManagedObject {
         if let readaptListener = onReadapt {
             readaptListener()
         }
-        if display.adaptive && change.newValue as! NSNumber != change.oldValue as! NSNumber {
-            display.adapt(moment: brightnessAdapter.moment)
+        if let newVal = change.newValue as? NSNumber,
+            let oldVal = change.oldValue as? NSNumber {
+            if display.adaptive && newVal != oldVal {
+                display.adapt(moment: brightnessAdapter.moment)
+            }
         }
     }
 
