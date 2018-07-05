@@ -79,14 +79,18 @@ class Display: NSManagedObject {
             observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.brightness, options: [.new], changeHandler: { _, change in
-                let newBrightness = min(max(change.newValue!.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
-                _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
-                log.debug("\(self.name): Set brightness to \(newBrightness)")
+                if self.id != GENERIC_DISPLAY_ID {
+                    let newBrightness = min(max(change.newValue!.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
+                    _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
+                    log.debug("\(self.name): Set brightness to \(newBrightness)")
+                }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
-                let newContrast = min(max(change.newValue!.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
-                _ = DDC.setContrast(for: self.id, contrast: newContrast)
-                log.debug("\(self.name): Set contrast to \(newContrast)")
+                if self.id != GENERIC_DISPLAY_ID {
+                    let newContrast = min(max(change.newValue!.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
+                    _ = DDC.setContrast(for: self.id, contrast: newContrast)
+                    log.debug("\(self.name): Set contrast to \(newContrast)")
+                }
             }),
         ]
     }
