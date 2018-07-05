@@ -27,16 +27,20 @@ class Moment: NSObject, NSCoding {
     static let ArchiveURL = DocumentsDirectory.appendingPathComponent("moments")
 
     init(_ solar: Solar) {
-        sunrise = DateInRegion(absoluteDate: solar.sunrise!, in: Region.Local())
-        sunset = DateInRegion(absoluteDate: solar.sunset!, in: Region.Local())
-        solarNoon = DateInRegion(absoluteDate: solar.solarNoon!, in: Region.Local())
+        let sevenAM = DateInRegion().startOf(component: .day).atTime(hour: 7, minute: 0, second: 0)?.absoluteDate
+        let noon = DateInRegion().startOf(component: .day).atTime(hour: 12, minute: 0, second: 0)?.absoluteDate
+        let sevenPM = DateInRegion().startOf(component: .day).atTime(hour: 19, minute: 0, second: 0)?.absoluteDate
+
+        sunrise = DateInRegion(absoluteDate: solar.sunrise ?? sevenAM!, in: Region.Local())
+        sunset = DateInRegion(absoluteDate: solar.sunset ?? sevenPM!, in: Region.Local())
+        solarNoon = DateInRegion(absoluteDate: solar.solarNoon ?? noon!, in: Region.Local())
         dayLength = UInt64(solar.sunset! - solar.sunset!)
-        civilSunrise = DateInRegion(absoluteDate: solar.civilSunrise!, in: Region.Local())
-        civilSunset = DateInRegion(absoluteDate: solar.civilSunset!, in: Region.Local())
-        nauticalSunrise = DateInRegion(absoluteDate: solar.nauticalSunrise!, in: Region.Local())
-        nauticalSunset = DateInRegion(absoluteDate: solar.nauticalSunset!, in: Region.Local())
-        astronomicalSunrise = DateInRegion(absoluteDate: solar.astronomicalSunrise!, in: Region.Local())
-        astronomicalSunset = DateInRegion(absoluteDate: solar.astronomicalSunset!, in: Region.Local())
+        civilSunrise = DateInRegion(absoluteDate: solar.civilSunrise ?? sevenAM!, in: Region.Local())
+        civilSunset = DateInRegion(absoluteDate: solar.civilSunset ?? sevenPM!, in: Region.Local())
+        nauticalSunrise = DateInRegion(absoluteDate: solar.nauticalSunrise ?? sevenAM!, in: Region.Local())
+        nauticalSunset = DateInRegion(absoluteDate: solar.nauticalSunset ?? sevenPM!, in: Region.Local())
+        astronomicalSunrise = DateInRegion(absoluteDate: solar.astronomicalSunrise ?? sevenAM!, in: Region.Local())
+        astronomicalSunset = DateInRegion(absoluteDate: solar.astronomicalSunset ?? sevenPM!, in: Region.Local())
     }
 
     init(result: [String: JSON]) {
