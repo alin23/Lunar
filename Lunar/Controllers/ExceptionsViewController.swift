@@ -58,8 +58,8 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             button.wantsLayer = true
 
             button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
-            button.layer!.cornerRadius = button.frame.width / 2
-            button.layer!.backgroundColor = white.cgColor
+            button.layer?.cornerRadius = button.frame.width / 2
+            button.layer?.backgroundColor = white.cgColor
             button.alphaValue = 0.8
 
             addAppButtonShadow = button.shadow
