@@ -67,9 +67,16 @@ class DDC {
     }
 
     static func printTextDescriptors(displayID: CGDirectDisplayID) {
-        guard let (_, edid) = try? test(displayID: displayID) else {
-            return
+        for str in DDC.getTextDescriptors(displayID: displayID) {
+            print(str)
         }
+    }
+
+    static func getTextDescriptors(displayID: CGDirectDisplayID) -> [String] {
+        guard let (_, edid) = try? test(displayID: displayID) else {
+            return []
+        }
+        var descriptorStrings: [String] = []
         var tmp = edid.descriptors
         let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
 
@@ -78,9 +85,10 @@ class DDC {
             var tmp = descriptor.text.data
             let chars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
             if let data = NSString(bytes: chars, length: 13, encoding: String.Encoding.utf8.rawValue) as String? {
-                print("\(type) : \(data)")
+                descriptorStrings.append("\(type) : \(data)")
             }
         }
+        return descriptorStrings
     }
 
     static func extractName(from edid: EDID) -> String {
