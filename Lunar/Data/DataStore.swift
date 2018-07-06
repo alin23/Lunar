@@ -44,7 +44,11 @@ extension UserDefaults {
 
 @available(OSX 10.12, *)
 let container = NSPersistentContainer(name: "Model")
-let coordinator = NSPersistentStoreCoordinator()
+
+let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+let persistentStoreUrl = FileManager().urls(for: .applicationSupportDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("Model.sqlite", isDirectory: false)
+let model = NSManagedObjectModel(contentsOf: Bundle.main.url(forResource: "Model", withExtension: "momd")!)
+let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model!)
 
 class DataStore: NSObject {
     static let defaults: UserDefaults = UserDefaults()
@@ -112,6 +116,14 @@ class DataStore: NSObject {
             })
             context = container.newBackgroundContext()
         } else {
+            do {
+                if coordinator.persistentStore(for: persistentStoreUrl) == nil {
+                    try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: persistentStoreUrl, options: nil)
+                }
+            } catch {
+                fatalError("Unable to load persistent stores: \(error)")
+            }
+
             context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             context.persistentStoreCoordinator = coordinator
         }
