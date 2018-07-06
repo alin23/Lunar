@@ -71,6 +71,9 @@ class BrightnessAdapter {
     static func logDisplays(_ displays: [Display]) {
         for (i, display) in displays.enumerated() {
             Crashlytics.sharedInstance().setObjectValue(display.serial, forKey: "display\(i)")
+            for (j, str) in DDC.getTextDescriptors(displayID: display.id).enumerated() {
+                Crashlytics.sharedInstance().setObjectValue(str, forKey: "display\(i)-descriptor\(j)")
+            }
             Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial, "name": display.name])
         }
     }
