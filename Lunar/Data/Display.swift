@@ -99,7 +99,8 @@ class Display: NSManagedObject {
         observers.removeAll(keepingCapacity: true)
     }
 
-    func interpolate(value: Double, span: Double, minVal _: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
+    func interpolate(value: Double, span: Double, minVal: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
+        log.debug("Interpolating \(value) in \(span) between \(minVal) - \(maxVal) with a factor of \(factor)")
         let maxValue = Double(max(min(maxVal, 100), 0))
         let minValue = Double(max(min(maxVal, 100), 0))
         let valueSpan = maxValue - minValue
