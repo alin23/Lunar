@@ -12,11 +12,20 @@ import Crashlytics
 import Fabric
 import HotKey
 import ServiceManagement
-import SwiftyBeaver
 import WAYWindow
 
+var lunarDisplayNames = [
+    "Moony",
+    "Celestial",
+    "Interstellar",
+    "Lunatic",
+    "Planetary",
+    "Solar",
+    "Stellar",
+]
+
 let launcherAppId = "com.alinp.LunarService"
-let log = SwiftyBeaver.self
+let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
 var activeDisplay: Display?
@@ -67,14 +76,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func menuWillOpen(_: NSMenu) {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
-    }
-
-    func initLogger() {
-        let console = ConsoleDestination()
-        let file = FileDestination()
-
-        log.addDestination(console)
-        log.addDestination(file)
     }
 
     func initHotkeys() {
@@ -288,9 +289,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        lunarDisplayNames.shuffle()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         Fabric.with([Crashlytics.self])
-        initLogger()
+        log.initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()
 
