@@ -99,14 +99,15 @@ class Display: NSManagedObject {
         observers.removeAll(keepingCapacity: true)
     }
 
-    func interpolate(value: Double, span: Double, min: UInt8, max: UInt8, factor: Double) -> NSNumber {
-        let maxValue = Double(max)
-        let minValue = Double(min)
+    func interpolate(value: Double, span: Double, minVal _: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
+        let maxValue = Double(max(min(maxVal, 100), 0))
+        let minValue = Double(max(min(maxVal, 100), 0))
         let valueSpan = maxValue - minValue
         var interpolated = ((value * valueSpan) / span)
         let normalized = interpolated / valueSpan
         interpolated = minValue + pow(normalized, factor) * valueSpan
-        return NSNumber(value: UInt8(interpolated))
+        let intInterpolated = Int(max(min(interpolated, maxValue), minValue))
+        return NSNumber(value: UInt8(intInterpolated))
     }
 
     func getBrightnessContrast(
@@ -147,13 +148,13 @@ class Display: NSManagedObject {
         case daylightStart ... noonStart:
             let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
             let minutesSinceSunrise = ((now - daylightStart) / seconds)
-            newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: 1 / interpolationFactor)
-            newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, min: minContrast, max: maxContrast, factor: 1 / interpolationFactor)
+            newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: 1 / interpolationFactor)
+            newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: 1 / interpolationFactor)
         case noonEnd ... daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
             let minutesSinceNoon = ((now - noonEnd) / seconds)
-            let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minBrightness, max: maxBrightness, factor: interpolationFactor)
-            let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, min: minContrast, max: maxContrast, factor: interpolationFactor)
+            let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: interpolationFactor)
+            let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: interpolationFactor)
             newBrightness = NSNumber(value: maxBrightness + minBrightness - interpolatedBrightness.uint8Value)
             newContrast = NSNumber(value: maxContrast + minContrast - interpolatedContrast.uint8Value)
         case noonStart ... noonEnd:

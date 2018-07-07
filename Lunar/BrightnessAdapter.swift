@@ -229,8 +229,8 @@ class BrightnessAdapter {
         return display.interpolate(
             value: Double(percent),
             span: 100.0,
-            min: display.minBrightness.uint8Value,
-            max: display.maxBrightness.uint8Value,
+            minVal: display.minBrightness.uint8Value,
+            maxVal: display.maxBrightness.uint8Value,
             factor: datastore.defaults.interpolationFactor
         )
     }
@@ -252,8 +252,8 @@ class BrightnessAdapter {
         return display.interpolate(
             value: Double(percent),
             span: 100.0,
-            min: display.minContrast.uint8Value,
-            max: display.maxContrast.uint8Value,
+            minVal: display.minContrast.uint8Value,
+            maxVal: display.maxContrast.uint8Value,
             factor: datastore.defaults.interpolationFactor
         )
     }
