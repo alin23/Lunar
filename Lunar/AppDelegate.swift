@@ -17,11 +17,13 @@ import WAYWindow
 var lunarDisplayNames = [
     "Moony",
     "Celestial",
-    "Interstellar",
     "Lunatic",
-    "Planetary",
     "Solar",
     "Stellar",
+    "Apollo",
+    "Selene",
+    "Auroral",
+    "Luna",
 ]
 
 let launcherAppId = "com.alinp.LunarService"
@@ -61,6 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
     var activity: NSBackgroundActivityScheduler!
+    var activityScheduled = false
 
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
@@ -192,11 +195,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func manageBrightnessAdapterActivity(start: Bool) {
-        if start {
+        if start && !activityScheduled {
             log.debug("Started BrightnessAdapter")
             brightnessAdapter.adaptBrightness()
             activity.schedule { completion in
-                //                let context = datastore.container.newBackgroundContext()
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
                 do {
                     let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
@@ -206,9 +208,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
                 completion(NSBackgroundActivityScheduler.Result.finished)
             }
+            activityScheduled = true
         } else {
             log.debug("Paused BrightnessAdapter")
             activity.invalidate()
+            activityScheduled = false
         }
     }
 
