@@ -53,4 +53,4 @@ cp $appDmg $appLatestDmg
 
 echo \n(set_color yellow)"Signing Updates"(set_color normal)
 ./sign_updates.py "$appcast" "$privKey"
-ccat $appcast
+subl $appcast

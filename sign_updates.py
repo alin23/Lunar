@@ -45,25 +45,25 @@ for item in appcast.iter("item"):
     for delta in item.findall(sparkle("deltas")):
         item.remove(delta)
 
-    for delta in appcast_path.parent.glob(f"Lunar{version}-*.delta"):
-        new_version, old_version = DELTA_PATTERN.match(delta.name).groups()
-        enclosure = E.enclosure(
-            url=f"https://lunarapp.site/{delta.name}",
-            length=str(delta.stat().st_size),
-            type="application/octet-stream",
-            **{
-                sparkle("version"): new_version,
-                sparkle("deltaFrom"): old_version,
-                sparkle("dsaSignature"): get_signature(str(delta)),
-            },
-        )
-        delta_enclosures.append(enclosure)
-    if delta_enclosures:
-        item.append(
-            ElementMaker(namespace=SPARKLE, nsmap={"sparkle": SPARKLE}).deltas(
-                *delta_enclosures
-            )
-        )
+    # for delta in appcast_path.parent.glob(f"Lunar{version}-*.delta"):
+    #     new_version, old_version = DELTA_PATTERN.match(delta.name).groups()
+    #     enclosure = E.enclosure(
+    #         url=f"https://lunarapp.site/{delta.name}",
+    #         length=str(delta.stat().st_size),
+    #         type="application/octet-stream",
+    #         **{
+    #             sparkle("version"): new_version,
+    #             sparkle("deltaFrom"): old_version,
+    #             sparkle("dsaSignature"): get_signature(str(delta)),
+    #         },
+    #     )
+    #     delta_enclosures.append(enclosure)
+    # if delta_enclosures:
+    #     item.append(
+    #         ElementMaker(namespace=SPARKLE, nsmap={"sparkle": SPARKLE}).deltas(
+    #             *delta_enclosures
+    #         )
+    #     )
 
 appcast.write(
     str(appcast_path),
