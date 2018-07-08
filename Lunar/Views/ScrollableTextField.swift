@@ -190,6 +190,7 @@ class ScrollableTextField: NSTextField {
                 if scrolling {
                     scrolling = false
                     scrolledOnce = false
+                    log.debug("Changed \(caption?.stringValue ?? "") to \(integerValue)")
                     onValueChanged?(integerValue)
                     darken(color: textFieldColorHover)
                 }

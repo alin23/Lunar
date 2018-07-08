@@ -97,18 +97,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         percent0HotKey.keyDownHandler = {
             self.setLightPercent(percent: 0)
+            log.debug("0% Hotkey pressed")
         }
         percent25HotKey.keyDownHandler = {
             self.setLightPercent(percent: 25)
+            log.debug("25% Hotkey pressed")
         }
         percent50HotKey.keyDownHandler = {
             self.setLightPercent(percent: 50)
+            log.debug("50% Hotkey pressed")
         }
         percent75HotKey.keyDownHandler = {
             self.setLightPercent(percent: 75)
+            log.debug("75% Hotkey pressed")
         }
         percent100HotKey.keyDownHandler = {
             self.setLightPercent(percent: 100)
+            log.debug("100% Hotkey pressed")
         }
     }
 
@@ -327,7 +332,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if let location = locations.last {
             brightnessAdapter.geolocation = Geolocation(location: location)
             locationManager.stopMonitoringSignificantLocationChanges()
-            log.debug("LocationManager coordinates: \(brightnessAdapter.geolocation.latitude), \(brightnessAdapter.geolocation.longitude)")
+            if brightnessAdapter.geolocation.latitude != 0 && brightnessAdapter.geolocation.longitude != 0 {
+                log.debug("Zero LocationManager coordinates")
+            } else {
+                log.debug("Got LocationManager coordinates")
+            }
             brightnessAdapter.fetchMoments()
         } else {
             geolocationFallback()
