@@ -73,6 +73,7 @@ class BrightnessAdapter {
             Crashlytics.sharedInstance().setObjectValue(display.serial, forKey: "display\(i)")
             for (j, str) in DDC.getTextDescriptors(displayID: display.id).enumerated() {
                 Crashlytics.sharedInstance().setObjectValue(str, forKey: "display\(i)-descriptor\(j)")
+                log.debug("display\(i)-descriptor\(j): \(str)")
             }
             Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial, "name": display.name])
         }
@@ -225,13 +226,17 @@ class BrightnessAdapter {
     }
 
     func computeBrightnessFromPercent(percent: Int8, for display: Display) -> NSNumber {
-        let percent = min(max(percent, 0), 100)
+        let percent = Double(min(max(percent, 0), 100))
+        let minBrightness = display.minBrightness.uint8Value
+        let maxBrightness = display.maxBrightness.uint8Value
+        let factor = datastore.defaults.interpolationFactor
+        log.debug("Interpolating brightness from \(percent)% between \(minBrightness) - \(maxBrightness) with a factor of \(factor)")
         return display.interpolate(
-            value: Double(percent),
+            value: percent,
             span: 100.0,
-            minVal: display.minBrightness.uint8Value,
-            maxVal: display.maxBrightness.uint8Value,
-            factor: datastore.defaults.interpolationFactor
+            minVal: minBrightness,
+            maxVal: maxBrightness,
+            factor: factor
         )
     }
 
@@ -248,13 +253,17 @@ class BrightnessAdapter {
     }
 
     func computeContrastFromPercent(percent: Int8, for display: Display) -> NSNumber {
-        let percent = min(max(percent, 0), 100)
+        let percent = Double(min(max(percent, 0), 100))
+        let minContrast = display.minContrast.uint8Value
+        let maxContrast = display.maxContrast.uint8Value
+        let factor = datastore.defaults.interpolationFactor
+        log.debug("Interpolating contrast from \(percent)% between \(minContrast) - \(maxContrast) with a factor of \(factor)")
         return display.interpolate(
-            value: Double(percent),
+            value: percent,
             span: 100.0,
-            minVal: display.minContrast.uint8Value,
-            maxVal: display.maxContrast.uint8Value,
-            factor: datastore.defaults.interpolationFactor
+            minVal: minContrast,
+            maxVal: maxContrast,
+            factor: factor
         )
     }
 

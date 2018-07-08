@@ -14,9 +14,11 @@ class Logger: SwiftyBeaver {
     class func initLogger() {
         let console = ConsoleDestination()
         let file = FileDestination()
+        let platform = SBPlatformDestination(appID: "lRPGE2", appSecret: "***REMOVED***", encryptionKey: "***REMOVED***")
 
         Logger.addDestination(console)
         Logger.addDestination(file)
+        Logger.addDestination(platform)
     }
 
     open override class func verbose(
