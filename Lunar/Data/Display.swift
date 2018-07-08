@@ -38,8 +38,11 @@ class Display: NSManagedObject {
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
-        self.init(entity: entity, insertInto: context)
-
+        if id != GENERIC_DISPLAY_ID {
+            self.init(entity: entity, insertInto: context)
+        } else {
+            self.init(entity: entity, insertInto: nil)
+        }
         self.id = id
         if let name = name, !name.isEmpty {
             self.name = name
