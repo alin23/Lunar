@@ -15,6 +15,12 @@ import Solar
 import SwiftDate
 import SwiftyJSON
 
+enum AdaptiveMode: Int {
+    case location = 1
+    case sync = -1
+    case manual = 0
+}
+
 class BrightnessAdapter {
     var geolocation: Geolocation! {
         didSet {
@@ -40,7 +46,11 @@ class BrightnessAdapter {
     }
 
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
-    var running: Bool = datastore.defaults.adaptiveBrightnessEnabled
+    var builtinDisplay = DDC.getBuiltinDisplay()
+
+    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
+    var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
+
     var firstDisplay: Display {
         if displays.count > 0 {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
@@ -50,15 +60,30 @@ class BrightnessAdapter {
     }
 
     func toggle() {
-        datastore.defaults.set(!running, forKey: "adaptiveBrightnessEnabled")
+        switch mode {
+        case .location:
+            datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
+        case .sync:
+            datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
+        case .manual:
+            datastore.defaults.set(AdaptiveMode.location.rawValue, forKey: "adaptiveBrightnessMode")
+        }
     }
 
     func disable() {
-        datastore.defaults.set(false, forKey: "adaptiveBrightnessEnabled")
+        lastMode = mode
+        mode = .manual
+        datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
     }
 
-    func enable() {
-        datastore.defaults.set(true, forKey: "adaptiveBrightnessEnabled")
+    func enable(mode: AdaptiveMode? = nil) {
+        if let newMode = mode {
+            self.mode = newMode
+            datastore.defaults.set(newMode.rawValue, forKey: "adaptiveBrightnessMode")
+        } else {
+            self.mode = lastMode
+            datastore.defaults.set(lastMode.rawValue, forKey: "adaptiveBrightnessMode")
+        }
     }
 
     func resetDisplayList() {
@@ -182,15 +207,30 @@ class BrightnessAdapter {
     }
 
     func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil) {
-        if moment == nil {
+        if mode == .location && moment == nil {
             log.warning("Day moments aren't fetched yet")
             return
         }
-        if let displays = displays {
-            displays.forEach({ display in display.adapt(moment: moment, app: app) })
-        } else {
-            self.displays.values.forEach({ display in display.adapt(moment: moment, app: app) })
+        var builtinBrightness: Double?
+        if mode == .sync {
+            builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness()
         }
+
+        if let displays = displays {
+            displays.forEach({ display in display.adapt(moment: moment, app: app, percent: builtinBrightness) })
+        } else {
+            self.displays.values.forEach({ display in display.adapt(moment: moment, app: app, percent: builtinBrightness) })
+        }
+    }
+
+    func getBuiltinDisplayBrightness() -> Double? {
+        if let displayID = builtinDisplay {
+            let brightness = DDC.getBrightness(for: displayID)
+            if brightness >= 0.0 && brightness <= 1.0 {
+                return brightness * 100
+            }
+        }
+        return nil
     }
 
     func getBrightnessContrast(
@@ -227,17 +267,7 @@ class BrightnessAdapter {
 
     func computeBrightnessFromPercent(percent: Int8, for display: Display) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        let minBrightness = display.minBrightness.uint8Value
-        let maxBrightness = display.maxBrightness.uint8Value
-        let factor = datastore.defaults.interpolationFactor
-        log.debug("Interpolating brightness from \(percent)% between \(minBrightness) - \(maxBrightness) with a factor of \(factor)")
-        return display.interpolate(
-            value: percent,
-            span: 100.0,
-            minVal: minBrightness,
-            maxVal: maxBrightness,
-            factor: factor
-        )
+        return display.computeBrightness(from: percent)
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
@@ -254,17 +284,7 @@ class BrightnessAdapter {
 
     func computeContrastFromPercent(percent: Int8, for display: Display) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        let minContrast = display.minContrast.uint8Value
-        let maxContrast = display.maxContrast.uint8Value
-        let factor = datastore.defaults.interpolationFactor
-        log.debug("Interpolating contrast from \(percent)% between \(minContrast) - \(maxContrast) with a factor of \(factor)")
-        return display.interpolate(
-            value: percent,
-            span: 100.0,
-            minVal: minContrast,
-            maxVal: maxContrast,
-            factor: factor
-        )
+        return display.computeContrast(from: percent)
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
