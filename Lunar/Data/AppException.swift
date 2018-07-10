@@ -40,10 +40,14 @@ class AppException: NSManagedObject {
     func addObservers() {
         observers = [
             observe(\.brightness, options: [.new], changeHandler: { _, change in
-                log.debug("\(self.name): Set brightness to \(change.newValue!.uint8Value)")
+                if let newVal = change.newValue {
+                    log.debug("\(self.name): Set brightness to \(newVal.uint8Value)")
+                }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
-                log.debug("\(self.name): Set contrast to \(change.newValue!.uint8Value)")
+                if let newVal = change.newValue {
+                    log.debug("\(self.name): Set contrast to \(newVal.uint8Value)")
+                }
             }),
         ]
     }

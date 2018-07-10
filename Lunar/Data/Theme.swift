@@ -46,23 +46,32 @@ let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
 
-let stateButtonLabelColorDisplay = mauve.withAlphaComponent(0.25)
-let stateButtonLabelColorHoverDisplay = mauve
-let stateButtonColorDisplay = gray
-let stateButtonColorHoverDisplay = lunarYellow
+let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
+    .on: [
+        .settings: lunarYellow,
+        .display: mauve,
+    ],
+    .off: [
+        .settings: mauve.withAlphaComponent(0.7),
+        .display: mauve.withAlphaComponent(0.25),
+    ],
+]
+let stateButtonColor: [HoverState: [Page: NSColor]] = [
+    .on: [
+        .settings: mauve.withAlphaComponent(0.5),
+        .display: lunarYellow,
+    ],
+    .off: [
+        .settings: white.withAlphaComponent(0.3),
+        .display: gray,
+    ],
+]
 
-let stateButtonLabelColorSettings = mauve.withAlphaComponent(0.7)
-let stateButtonLabelColorHoverSettings = lunarYellow
-let stateButtonColorSettings = white.withAlphaComponent(0.3)
-let stateButtonColorHoverSettings = mauve.withAlphaComponent(0.5)
-
-var stateButtonLabelColor = stateButtonLabelColorDisplay
-var stateButtonLabelColorHover = stateButtonLabelColorHoverDisplay
-var stateButtonColor = stateButtonColorDisplay
-var stateButtonColorHover = stateButtonColorHoverDisplay
-
-let onButtonColor = green
-let offButtonColor = red
+let buttonDotColor: [AdaptiveMode: NSColor] = [
+    .sync: green,
+    .location: lunarYellow,
+    .manual: red,
+]
 
 let xColor = red
 let removeButtonColor = red.highlight(withLevel: 0.3)!

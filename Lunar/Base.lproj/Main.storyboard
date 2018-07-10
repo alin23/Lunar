@@ -16,6 +16,10 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
+                                        <menuItem title="State" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="YMI-RQ-F1Z">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" title="Intensity" id="kCx-OE-vgT"/>
                                         <menuItem title="Preferences…" keyEquivalent="l" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
@@ -29,7 +33,7 @@
                                                 <action selector="toggleBrightnessAdapterWithSender:" target="Voe-Tx-rLC" id="WZa-gt-6uZ"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" title="Intensity" id="kCx-OE-vgT"/>
+                                        <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
                                         <menuItem title="0%" keyEquivalent="0" id="9Jm-7d-C6T">
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
@@ -133,6 +137,7 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
+                        <outlet property="stateMenuItem" destination="YMI-RQ-F1Z" id="cCj-Nl-eqb"/>
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
                     </connections>
                 </customObject>
@@ -194,9 +199,9 @@
                                 </connections>
                             </containerView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="651" y="454" width="74" height="14"/>
+                                <rect key="frame" x="643" y="454" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Start      ⚫︎" alternateTitle="Pause    ⚫︎" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
+                                <buttonCell key="cell" type="inline" title="Start      ⚫︎" alternateTitle="Pause    ⚫︎" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <string key="keyEquivalent">d</string>
@@ -225,7 +230,7 @@
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1047"/>
+            <point key="canvasLocation" x="-829" y="1189"/>
         </scene>
         <!--Page Controller-->
         <scene sceneID="fpi-QH-es0">
@@ -914,7 +919,7 @@ to view other displays</string>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1047"/>
+            <point key="canvasLocation" x="902" y="1197"/>
         </scene>
     </scenes>
     <resources>
