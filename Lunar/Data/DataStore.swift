@@ -37,8 +37,8 @@ extension UserDefaults {
         return bool(forKey: "didSwipeRight")
     }
 
-    @objc dynamic var adaptiveBrightnessEnabled: Bool {
-        return bool(forKey: "adaptiveBrightnessEnabled")
+    @objc dynamic var adaptiveBrightnessMode: Int {
+        return integer(forKey: "adaptiveBrightnessMode")
     }
 }
 

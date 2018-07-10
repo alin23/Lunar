@@ -31,6 +31,18 @@ class DDC {
         return displayIDs
     }
 
+    static func getBuiltinDisplay() -> CGDirectDisplayID? {
+        for screen in NSScreen.screens {
+            if screen.deviceDescription[NSDeviceDescriptionKey.isScreen]! as! String == "YES" {
+                let screenNumber = CGDirectDisplayID(truncating: screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as! NSNumber)
+                if CGDisplayIsBuiltin(screenNumber) == 1 {
+                    return screenNumber
+                }
+            }
+        }
+        return nil
+    }
+
     static func write(displayID: CGDirectDisplayID, controlID: UInt8, newValue: UInt8) -> Bool {
         var command = DDCWriteCommand(
             control_id: controlID,
@@ -170,5 +182,13 @@ class DDC {
 
     static func reset(displayID: CGDirectDisplayID) -> Bool {
         return write(displayID: displayID, controlID: UInt8(RESET), newValue: 100)
+    }
+
+    static func getBrightness(for _: CGDirectDisplayID) -> Double {
+        let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
+        var brightness: Float = 0.0
+        IODisplayGetFloatParameter(service, 0, kIODisplayBrightnessKey as CFString, &brightness)
+        IOObjectRelease(service)
+        return Double(brightness)
     }
 }

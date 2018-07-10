@@ -63,7 +63,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
     var activity: NSBackgroundActivityScheduler!
-    var activityScheduled = false
 
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
@@ -73,12 +72,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var runningAppExceptions: [AppException]!
     @IBOutlet var menu: NSMenu!
+    @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     func menuWillOpen(_: NSMenu) {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
+        stateMenuItem.title = AppDelegate.getStateMenuItemTitle()
     }
 
     func initHotkeys() {
@@ -121,13 +122,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForAdaptiveEnabled() {
-        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessEnabled, options: [.old, .new], changeHandler: { _, change in
-            guard let running = change.newValue, let oldRunning = change.oldValue, running != oldRunning else {
+        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
             }
-            brightnessAdapter.running = running
+            brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .location
             self.resetElements()
-            self.manageBrightnessAdapterActivity(start: running)
+            self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
         })
     }
 
@@ -194,9 +195,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func manageBrightnessAdapterActivity(start: Bool) {
-        if start && !activityScheduled {
-            log.debug("Started BrightnessAdapter")
+    func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
+        activity.invalidate()
+        switch mode {
+        case .location:
+            log.debug("Started BrightnessAdapter in Location mode")
+            activity.interval = 60
+        case .sync:
+            log.debug("Started BrightnessAdapter in Sync mode")
+            activity.interval = 2
+        case .manual:
+            log.debug("BrightnessAdapter set to manual")
+        }
+        if mode != .manual {
             brightnessAdapter.adaptBrightness()
             activity.schedule { completion in
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
@@ -208,20 +219,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
                 completion(NSBackgroundActivityScheduler.Result.finished)
             }
-            activityScheduled = true
-        } else {
-            log.debug("Paused BrightnessAdapter")
-            activity.invalidate()
-            activityScheduled = false
         }
     }
 
-    func initBrightnessAdapterActivity(interval: TimeInterval) {
+    func initBrightnessAdapterActivity() {
         activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
         activity.repeats = true
-        activity.interval = interval
         activity.qualityOfService = .userInitiated
-        manageBrightnessAdapterActivity(start: brightnessAdapter.running)
+        manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
     }
 
     func initMenubarIcon() {
@@ -280,6 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
+        brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
         if let visible = windowController?.window?.isVisible, visible {
             windowController?.close()
             windowController?.window = nil
@@ -305,7 +311,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         handleDaemon()
         startReceivingSignificantLocationChanges()
 
-        initBrightnessAdapterActivity(interval: 60)
+        initBrightnessAdapterActivity()
         initMenubarIcon()
         initHotkeys()
 
@@ -378,10 +384,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     static func getToggleMenuItemTitle() -> String {
-        if brightnessAdapter.running {
-            return "Pause Lunar"
-        } else {
-            return "Start Lunar"
+        switch brightnessAdapter.mode {
+        case .location:
+            return "Adapt brightness based on built-in display"
+        case .sync:
+            return "Disable adaptive brightness"
+        case .manual:
+            return "Adapt brightness based on location"
+        }
+    }
+
+    static func getStateMenuItemTitle() -> String {
+        switch brightnessAdapter.mode {
+        case .location:
+            return "☀️ Location Mode"
+        case .sync:
+            return "💻 Display Sync Mode"
+        case .manual:
+            return "🖥 Manual Mode"
         }
     }
 
