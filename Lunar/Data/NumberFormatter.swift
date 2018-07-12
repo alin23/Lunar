@@ -11,13 +11,24 @@ import Foundation
 class HourValueFormatter: IAxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         let value = Int(value)
-        if value == 0 {
+        switch value {
+        case 0:
             return "12AM"
-        } else if value < 12 {
+        case 1 ..< 12:
             return "\(value)AM"
-        } else if value == 12 {
+        case 12:
             return "12PM"
+        default:
+            return "\(value % 12)PM"
         }
-        return "\(value % 12)PM"
+    }
+}
+
+class PercentValueFormatter: IAxisValueFormatter {
+    func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
+        if value == 100.0 || value == 0.0 {
+            return ""
+        }
+        return "\(Int(value))%"
     }
 }

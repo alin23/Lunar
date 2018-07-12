@@ -11,6 +11,7 @@ import Cocoa
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
+    var adaptiveModeObserver: NSKeyValueObservation?
 
     func updateDataset(
         display: Display,
@@ -25,20 +26,33 @@ class SettingsPageController: NSViewController {
         }
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
-        for hour in 0 ..< 24 {
-            let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                for: display,
-                hour: hour,
-                daylightExtension: daylightExtension,
-                noonDuration: noonDuration,
-                brightnessOffset: brightnessOffset,
-                contrastOffset: contrastOffset
-            )
-            brightnessChartEntry[hour].y = brightness.doubleValue
-            contrastChartEntry[hour].y = contrast.doubleValue
+
+        let maxValues = brightnessContrastChart.getMaxValues()
+
+        for x in 0 ..< (maxValues - 1) {
+            if brightnessAdapter.mode == .location {
+                let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
+                    for: display,
+                    hour: x,
+                    daylightExtension: daylightExtension,
+                    noonDuration: noonDuration,
+                    brightnessOffset: brightnessOffset,
+                    contrastOffset: contrastOffset
+                )
+                brightnessChartEntry[x].y = brightness.doubleValue
+                contrastChartEntry[x].y = contrast.doubleValue
+            } else {
+                brightnessChartEntry[x].y = brightnessAdapter.computeBrightnessFromPercent(percent: Int8(x), for: display, offset: brightnessOffset).doubleValue
+                contrastChartEntry[x].y = brightnessAdapter.computeContrastFromPercent(percent: Int8(x), for: display, offset: contrastOffset).doubleValue
+            }
         }
-        brightnessChartEntry[24] = brightnessChartEntry[0]
-        contrastChartEntry[24] = contrastChartEntry[0]
+        if brightnessAdapter.mode == .location {
+            brightnessChartEntry[24] = brightnessChartEntry[0]
+            contrastChartEntry[24] = contrastChartEntry[0]
+        } else {
+            brightnessChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display, offset: brightnessOffset).doubleValue)
+            contrastChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeContrastFromPercent(percent: 100, for: display, offset: contrastOffset).doubleValue)
+        }
 
         if withAnimation {
             brightnessContrastChart.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
@@ -47,53 +61,20 @@ class SettingsPageController: NSViewController {
         }
     }
 
-    func easeOutExpo(elapsed: TimeInterval, duration: TimeInterval) -> Double {
-        return (elapsed == duration) ? 1.0 : (-Double(pow(2.0, -10.0 * elapsed / duration)) + 1.0)
-    }
-
-    func transitionDataset(
-        display: Display,
-        daylightExtension: Int? = nil,
-        noonDuration: Int? = nil,
-        brightnessOffset: Int = 0,
-        contrastOffset: Int = 0,
-        duration: TimeInterval = 0.5
-    ) {
-        let steps = Double(MAX_BRIGHTNESS)
-        let delay = duration / steps
-        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
-        var contrastChartEntry = brightnessContrastChart.contrastGraph.values
-        var newBrightnessChartEntry = brightnessContrastChart.brightnessGraph.values.map({ value in value.y })
-        var newContrastChartEntry = brightnessContrastChart.contrastGraph.values.map({ value in value.y })
-
-        for hour in 0 ..< 24 {
-            let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                for: display,
-                hour: hour,
-                daylightExtension: daylightExtension,
-                noonDuration: noonDuration,
-                brightnessOffset: brightnessOffset,
-                contrastOffset: contrastOffset
-            )
-            newBrightnessChartEntry[hour] = brightness.doubleValue
-            newContrastChartEntry[hour] = contrast.doubleValue
-        }
-        newBrightnessChartEntry[24] = newBrightnessChartEntry[0]
-        newContrastChartEntry[24] = newContrastChartEntry[0]
-
-        for step in 0 ..< MAX_BRIGHTNESS {
-            let factor = easeOutExpo(elapsed: Double(step), duration: steps)
-            for hour in 0 ..< 24 {
-                brightnessChartEntry[hour].y = (brightnessChartEntry[hour].y - newBrightnessChartEntry[hour]) * factor + newBrightnessChartEntry[hour]
-                contrastChartEntry[hour].y = (contrastChartEntry[hour].y - newContrastChartEntry[hour]) * factor + newContrastChartEntry[hour]
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                return
             }
-            brightnessContrastChart.notifyDataSetChanged()
-            Thread.sleep(forTimeInterval: delay)
-        }
+            let adaptiveMode = AdaptiveMode(rawValue: mode)
+            if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                self.initGraph(display: brightnessAdapter.firstDisplay, mode: adaptiveMode)
+            }
+        })
     }
 
-    func initGraph(display: Display?) {
-        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow)
+    func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
+        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
     }
 
     func zeroGraph() {
@@ -105,5 +86,6 @@ class SettingsPageController: NSViewController {
         view.wantsLayer = true
         view.layer!.backgroundColor = settingsBgColor.cgColor
         initGraph(display: nil)
+        listenForAdaptiveModeChange()
     }
 }

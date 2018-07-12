@@ -44,6 +44,7 @@ class DisplayViewController: NSViewController {
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var deleteButtonTrackingArea: NSTrackingArea!
+    var adaptiveModeObserver: NSKeyValueObservation?
 
     func update(from display: Display) {
         if display.id == GENERIC_DISPLAY_ID {
@@ -62,21 +63,32 @@ class DisplayViewController: NSViewController {
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil) {
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
+        let maxValues = brightnessContrastChart.getMaxValues()
 
-        for hour in 0 ..< 24 {
-            let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                for: display,
-                hour: hour,
-                minBrightness: minBrightness,
-                maxBrightness: maxBrightness,
-                minContrast: minContrast,
-                maxContrast: maxContrast
-            )
-            brightnessChartEntry[hour].y = brightness.doubleValue
-            contrastChartEntry[hour].y = contrast.doubleValue
+        for x in 0 ..< (maxValues - 1) {
+            if brightnessAdapter.mode == .location {
+                let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
+                    for: display,
+                    hour: x,
+                    minBrightness: minBrightness,
+                    maxBrightness: maxBrightness,
+                    minContrast: minContrast,
+                    maxContrast: maxContrast
+                )
+                brightnessChartEntry[x].y = brightness.doubleValue
+                contrastChartEntry[x].y = contrast.doubleValue
+            } else {
+                brightnessChartEntry[x].y = brightnessAdapter.computeBrightnessFromPercent(percent: Int8(x), for: display).doubleValue
+                contrastChartEntry[x].y = brightnessAdapter.computeContrastFromPercent(percent: Int8(x), for: display).doubleValue
+            }
         }
-        brightnessChartEntry[24] = brightnessChartEntry[0]
-        contrastChartEntry[24] = contrastChartEntry[0]
+        if brightnessAdapter.mode == .location {
+            brightnessChartEntry[24] = brightnessChartEntry[0]
+            contrastChartEntry[24] = contrastChartEntry[0]
+        } else {
+            brightnessChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display).doubleValue)
+            contrastChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeContrastFromPercent(percent: 100, for: display).doubleValue)
+        }
 
         brightnessContrastChart.notifyDataSetChanged()
     }
@@ -156,8 +168,20 @@ class DisplayViewController: NSViewController {
         swipeRightHintVisible = !value
     }
 
-    func initGraph() {
-        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                return
+            }
+            let adaptiveMode = AdaptiveMode(rawValue: mode)
+            if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                self.initGraph(mode: adaptiveMode)
+            }
+        })
+    }
+
+    func initGraph(mode: AdaptiveMode? = nil) {
+        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor, mode: mode)
     }
 
     func zeroGraph() {
@@ -190,5 +214,6 @@ class DisplayViewController: NSViewController {
         } else {
             setIsHidden(true)
         }
+        listenForAdaptiveModeChange()
     }
 }

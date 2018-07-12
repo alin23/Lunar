@@ -115,7 +115,7 @@ class Display: NSManagedObject {
     }
 
     func interpolate(value: Double, span: Double, minVal: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
-        log.debug("Interpolating \(value) in \(span) between \(minVal) - \(maxVal) with a factor of \(factor)")
+//        log.verbose("Interpolating \(value) in \(span) between \(minVal) - \(maxVal) with a factor of \(factor)")
         let maxValue = Double(max(min(maxVal, 100), 0))
         let minValue = Double(max(min(minVal, UInt8(Int(maxValue - 1))), 0))
         let valueSpan = maxValue - minValue
@@ -126,32 +126,42 @@ class Display: NSManagedObject {
         return NSNumber(value: UInt8(intInterpolated))
     }
 
-    func computeBrightness(from percent: Double) -> NSNumber {
+    func computeBrightness(from percent: Double, offset: Int = 0) -> NSNumber {
         let minBrightness = self.minBrightness.uint8Value
         let maxBrightness = self.maxBrightness.uint8Value
         let factor = datastore.defaults.interpolationFactor
-        log.debug("Interpolating brightness from \(percent)% between \(minBrightness) - \(maxBrightness) with a factor of \(factor)")
-        return interpolate(
+//        log.verbose("Interpolating brightness from \(percent)% between \(minBrightness) - \(maxBrightness) with a factor of \(factor)")
+        var brightness = interpolate(
             value: percent,
             span: 100.0,
             minVal: minBrightness,
             maxVal: maxBrightness,
             factor: factor
         )
+
+        if offset > 0 {
+            brightness = NSNumber(value: min(brightness.intValue + offset, Int(MAX_BRIGHTNESS)))
+        }
+        return brightness
     }
 
-    func computeContrast(from percent: Double) -> NSNumber {
+    func computeContrast(from percent: Double, offset: Int = 0) -> NSNumber {
         let minContrast = self.minContrast.uint8Value
         let maxContrast = self.maxContrast.uint8Value
         let factor = datastore.defaults.interpolationFactor
-        log.debug("Interpolating contrast from \(percent)% between \(minContrast) - \(maxContrast) with a factor of \(factor)")
-        return interpolate(
+//        log.verbose("Interpolating contrast from \(percent)% between \(minContrast) - \(maxContrast) with a factor of \(factor)")
+        var contrast = interpolate(
             value: percent,
             span: 100.0,
             minVal: minContrast,
             maxVal: maxContrast,
             factor: factor
         )
+
+        if offset > 0 {
+            contrast = NSNumber(value: min(contrast.intValue + offset, Int(MAX_CONTRAST)))
+        }
+        return contrast
     }
 
     func getBrightnessContrast(
@@ -224,8 +234,8 @@ class Display: NSManagedObject {
         if let moment = moment {
             (newBrightness, newContrast) = getBrightnessContrast(moment: moment, brightnessOffset: app?.brightness.intValue ?? 0, contrastOffset: app?.contrast.intValue ?? 0)
         } else if let percent = percent {
-            newBrightness = computeBrightness(from: percent)
-            newContrast = computeContrast(from: percent)
+            newBrightness = computeBrightness(from: percent, offset: app?.brightness.intValue ?? 0)
+            newContrast = computeContrast(from: percent, offset: app?.contrast.intValue ?? 0)
         }
 
         var changed = false
