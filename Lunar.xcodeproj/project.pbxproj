@@ -18,7 +18,7 @@
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
 		C76545291FD8A56B00DBACE9 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C76545261FD8A11000DBACE9 /* DDC.c */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
-		C76A129E20D8084E005D4BE3 /* HourValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */; };
+		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
@@ -142,7 +142,7 @@
 		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
 		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
-		C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourValueFormatter.swift; sourceTree = "<group>"; };
+		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableContrast.swift; sourceTree = "<group>"; };
@@ -233,7 +233,7 @@
 				C794E1751FF01EF500549462 /* Model.xcdatamodeld */,
 				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
 				C72776EC201F26CB0055934F /* AppException.swift */,
-				C76A129D20D8084E005D4BE3 /* HourValueFormatter.swift */,
+				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
 				C78AB66620F0C73900863CB1 /* Logger.swift */,
 			);
 			path = Data;
@@ -529,7 +529,7 @@
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
-				C76A129E20D8084E005D4BE3 /* HourValueFormatter.swift in Sources */,
+				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,

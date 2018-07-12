@@ -47,21 +47,21 @@ let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
 
 let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
-    .on: [
+    .hover: [
         .settings: lunarYellow,
         .display: mauve,
     ],
-    .off: [
+    .noHover: [
         .settings: mauve.withAlphaComponent(0.7),
-        .display: mauve.withAlphaComponent(0.25),
+        .display: mauve.withAlphaComponent(0.35),
     ],
 ]
 let stateButtonColor: [HoverState: [Page: NSColor]] = [
-    .on: [
+    .hover: [
         .settings: mauve.withAlphaComponent(0.5),
         .display: lunarYellow,
     ],
-    .off: [
+    .noHover: [
         .settings: white.withAlphaComponent(0.3),
         .display: gray,
     ],

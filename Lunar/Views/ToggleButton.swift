@@ -9,8 +9,8 @@
 import Cocoa
 
 enum HoverState: Int {
-    case on
-    case off
+    case hover
+    case noHover
 }
 
 enum Page: Int {
@@ -27,39 +27,39 @@ let titleString: [AdaptiveMode: String] = [
 class ToggleButton: NSButton {
     let stateTitle: [AdaptiveMode: [HoverState: [Page: NSMutableAttributedString]]] = [
         .sync: [
-            .off: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .off, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .off, page: .settings),
+            .noHover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .noHover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .noHover, page: .settings),
             ],
-            .on: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .on, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .on, page: .settings),
+            .hover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .hover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .hover, page: .settings),
             ],
         ],
         .manual: [
-            .off: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .off, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .off, page: .settings),
+            .noHover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .noHover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .noHover, page: .settings),
             ],
-            .on: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .on, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .on, page: .settings),
+            .hover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .hover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .hover, page: .settings),
             ],
         ],
         .location: [
-            .off: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .off, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .off, page: .settings),
+            .noHover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .noHover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .noHover, page: .settings),
             ],
-            .on: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .on, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .on, page: .settings),
+            .hover: [
+                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .hover, page: .display),
+                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .hover, page: .settings),
             ],
         ],
     ]
 
     var page = Page.display
-    var hoverState = HoverState.off
+    var hoverState = HoverState.noHover
     var bgColor: CGColor {
         return stateButtonColor[hoverState]![page]!.cgColor
     }
@@ -100,14 +100,14 @@ class ToggleButton: NSButton {
     }
 
     func defocus() {
-        hoverState = .off
+        hoverState = .noHover
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         layer?.backgroundColor = bgColor
         setTitle()
     }
 
     func hover() {
-        hoverState = .on
+        hoverState = .hover
         layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
         layer?.backgroundColor = bgColor
         setTitle()

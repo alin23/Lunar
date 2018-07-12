@@ -15,16 +15,26 @@ class BrightnessContrastChartView: LineChartView {
     let graphData = LineChartData()
 
     func zero() {
-        var brightnessChartEntry = brightnessGraph.values
-        var contrastChartEntry = contrastGraph.values
-        for hour in 0 ... 24 {
-            brightnessChartEntry[hour].y = 0
-            contrastChartEntry[hour].y = 0
+        for (brightnessEntry, contrastEntry) in zip(brightnessGraph.values, contrastGraph.values) {
+            brightnessEntry.y = 0
+            contrastEntry.y = 0
         }
         notifyDataSetChanged()
     }
 
-    func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor) {
+    func getMaxValues(mode: AdaptiveMode? = nil) -> Int {
+        let mode = mode ?? brightnessAdapter.mode
+
+        var maxValues: Int
+        if mode == .location {
+            maxValues = 25
+        } else {
+            maxValues = 101
+        }
+        return maxValues
+    }
+
+    func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             isHidden = true
         } else {
@@ -33,29 +43,47 @@ class BrightnessContrastChartView: LineChartView {
 
         var brightnessChartEntry = brightnessGraph.values
         var contrastChartEntry = contrastGraph.values
+        let adaptiveMode = mode ?? brightnessAdapter.mode
+        let maxValues = getMaxValues(mode: adaptiveMode)
 
-        brightnessChartEntry.reserveCapacity(25)
-        contrastChartEntry.reserveCapacity(25)
-        brightnessChartEntry.removeAll(keepingCapacity: true)
-        contrastChartEntry.removeAll(keepingCapacity: true)
+        brightnessChartEntry.removeAll(keepingCapacity: false)
+        contrastChartEntry.removeAll(keepingCapacity: false)
+        brightnessChartEntry.reserveCapacity(maxValues)
+        contrastChartEntry.reserveCapacity(maxValues)
 
         var brightnessY: Double = 0
         var contrastY: Double = 0
-        for hour in 0 ..< 24 {
+        for x in 0 ..< (maxValues - 1) {
             if let display = display, display.id != GENERIC_DISPLAY_ID {
-                let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(for: display, hour: hour)
-                brightnessY = brightness.doubleValue
-                contrastY = contrast.doubleValue
+                if adaptiveMode == .location {
+                    let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(for: display, hour: x)
+                    brightnessY = brightness.doubleValue
+                    contrastY = contrast.doubleValue
+                } else {
+                    brightnessY = brightnessAdapter.computeBrightnessFromPercent(percent: Int8(x), for: display).doubleValue
+                    contrastY = brightnessAdapter.computeContrastFromPercent(percent: Int8(x), for: display).doubleValue
+                }
             }
-            brightnessChartEntry.append(ChartDataEntry(x: Double(hour), y: brightnessY))
-            contrastChartEntry.append(ChartDataEntry(x: Double(hour), y: contrastY))
+            brightnessChartEntry.append(ChartDataEntry(x: Double(x), y: brightnessY))
+            contrastChartEntry.append(ChartDataEntry(x: Double(x), y: contrastY))
         }
-        brightnessChartEntry.append(brightnessChartEntry[0])
-        contrastChartEntry.append(contrastChartEntry[0])
+
+        if let display = display, display.id != GENERIC_DISPLAY_ID {
+            if adaptiveMode == .location {
+                brightnessChartEntry.append(brightnessChartEntry[0])
+                contrastChartEntry.append(contrastChartEntry[0])
+            } else {
+                brightnessChartEntry.append(ChartDataEntry(x: 100.0, y: brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display).doubleValue))
+                contrastChartEntry.append(ChartDataEntry(x: 100.0, y: brightnessAdapter.computeContrastFromPercent(percent: 100, for: display).doubleValue))
+            }
+        }
 
         brightnessGraph.values = brightnessChartEntry
         contrastGraph.values = contrastChartEntry
 
+        for dataset in graphData.dataSets {
+            graphData.removeDataSet(dataset)
+        }
         graphData.addDataSet(brightnessGraph)
         graphData.addDataSet(contrastGraph)
 
@@ -74,10 +102,10 @@ class BrightnessContrastChartView: LineChartView {
         xAxis.labelTextColor = labelColor
 
         data = graphData
-        setup()
+        setup(mode: adaptiveMode)
     }
 
-    func setup() {
+    func setup(mode: AdaptiveMode? = nil) {
         gridBackgroundColor = NSColor.clear
         drawGridBackgroundEnabled = false
         drawBordersEnabled = false
@@ -99,8 +127,14 @@ class BrightnessContrastChartView: LineChartView {
         xAxis.drawLabelsEnabled = true
         xAxis.labelFont = NSFont.systemFont(ofSize: 12, weight: .bold)
         xAxis.labelPosition = .bottomInside
-        xAxis.valueFormatter = HourValueFormatter()
         xAxis.drawAxisLineEnabled = false
+
+        let mode = mode ?? brightnessAdapter.mode
+        if mode == .location {
+            xAxis.valueFormatter = HourValueFormatter()
+        } else {
+            xAxis.valueFormatter = PercentValueFormatter()
+        }
 
         chartDescription = nil
         legend.enabled = false
