@@ -207,19 +207,24 @@ class BrightnessAdapter {
     }
 
     func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil) {
+        var adapt: (Display) -> Void
         if mode == .location && moment == nil {
             log.warning("Day moments aren't fetched yet")
             return
         }
-        var builtinBrightness: Double?
-        if mode == .sync {
-            builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness()
+        switch mode {
+        case .sync:
+            adapt = { display in display.adapt(moment: nil, app: app, percent: brightnessAdapter.getBuiltinDisplayBrightness()) }
+        case .location:
+            adapt = { display in display.adapt(moment: self.moment, app: app, percent: nil) }
+        default:
+            adapt = { _ in () }
         }
 
         if let displays = displays {
-            displays.forEach({ display in display.adapt(moment: moment, app: app, percent: builtinBrightness) })
+            displays.forEach(adapt)
         } else {
-            self.displays.values.forEach({ display in display.adapt(moment: moment, app: app, percent: builtinBrightness) })
+            self.displays.values.forEach(adapt)
         }
     }
 
