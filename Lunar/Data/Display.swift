@@ -227,9 +227,19 @@ class Display: NSManagedObject {
             newBrightness = computeBrightness(from: percent)
             newContrast = computeContrast(from: percent)
         }
-        setValue(newBrightness, forKey: "brightness")
-        setValue(newContrast, forKey: "contrast")
-        log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
-        datastore.save(context: managedObjectContext!)
+
+        var changed = false
+        if brightness != newBrightness {
+            setValue(newBrightness, forKey: "brightness")
+            changed = true
+        }
+        if contrast != newContrast {
+            setValue(newContrast, forKey: "contrast")
+            changed = true
+        }
+        if changed {
+            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
+            datastore.save(context: managedObjectContext!)
+        }
     }
 }
