@@ -207,6 +207,10 @@ class BrightnessAdapter {
     }
 
     func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil) {
+        if mode == .manual {
+            return
+        }
+
         var adapt: (Display) -> Void
         if mode == .location && moment == nil {
             log.warning("Day moments aren't fetched yet")
