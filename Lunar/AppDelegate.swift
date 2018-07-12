@@ -68,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
-    var adaptiveEnabledObserver: NSKeyValueObservation?
+    var adaptiveModeObserver: NSKeyValueObservation?
 
     var runningAppExceptions: [AppException]!
     @IBOutlet var menu: NSMenu!
@@ -122,7 +122,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
             }
@@ -412,11 +412,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adapt() {
-        if !runningAppExceptions.isEmpty {
-            let lastApp = runningAppExceptions.last!
+        if let lastApp = runningAppExceptions.last {
             brightnessAdapter.adaptBrightness(app: lastApp)
         } else {
-            brightnessAdapter.enable()
             brightnessAdapter.adaptBrightness()
         }
     }

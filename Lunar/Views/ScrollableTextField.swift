@@ -42,7 +42,6 @@ class ScrollableTextField: NSTextField {
     var onMouseExit: (() -> Void)?
 
     var centerAlign: NSParagraphStyle?
-    var scrolledOnce: Bool = false
     var didScrollTextField: Bool = datastore.defaults.didScrollTextField
 
     var normalSize: CGSize?
@@ -155,7 +154,7 @@ class ScrollableTextField: NSTextField {
     }
 
     override func scrollWheel(with event: NSEvent) {
-        if abs(event.scrollingDeltaX) <= 1.0 {
+        if abs(event.scrollingDeltaX) <= 3.0 {
             if event.scrollingDeltaY < 0.0 {
                 disableScrollHint()
                 if !scrolling {
@@ -163,12 +162,11 @@ class ScrollableTextField: NSTextField {
                     lightenUp(color: textFieldColorLight)
                 }
                 if intValue < upperLimit {
-                    if scrolledOnce {
-                        intValue += 1
-                        onValueChangedInstant?(integerValue)
-                        scrolledOnce = false
-                    } else {
-                        scrolledOnce = true
+                    intValue += 1
+                    if let callback = onValueChangedInstant {
+                        DispatchQueue.main.async {
+                            callback(self.integerValue)
+                        }
                     }
                 }
             } else if event.scrollingDeltaY > 0.0 {
@@ -178,18 +176,16 @@ class ScrollableTextField: NSTextField {
                     lightenUp(color: textFieldColorLight)
                 }
                 if intValue > lowerLimit {
-                    if scrolledOnce {
-                        intValue -= 1
-                        onValueChangedInstant?(integerValue)
-                        scrolledOnce = false
-                    } else {
-                        scrolledOnce = true
+                    intValue -= 1
+                    if let callback = onValueChangedInstant {
+                        DispatchQueue.main.async {
+                            callback(self.integerValue)
+                        }
                     }
                 }
             } else {
                 if scrolling {
                     scrolling = false
-                    scrolledOnce = false
                     log.debug("Changed \(caption?.stringValue ?? "") to \(integerValue)")
                     onValueChanged?(integerValue)
                     darken(color: textFieldColorHover)

@@ -274,9 +274,9 @@ class BrightnessAdapter {
         )
     }
 
-    func computeBrightnessFromPercent(percent: Int8, for display: Display) -> NSNumber {
+    func computeBrightnessFromPercent(percent: Int8, for display: Display, offset: Int = 0) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        return display.computeBrightness(from: percent)
+        return display.computeBrightness(from: percent, offset: offset)
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
@@ -291,9 +291,9 @@ class BrightnessAdapter {
         }
     }
 
-    func computeContrastFromPercent(percent: Int8, for display: Display) -> NSNumber {
+    func computeContrastFromPercent(percent: Int8, for display: Display, offset: Int = 0) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        return display.computeContrast(from: percent)
+        return display.computeContrast(from: percent, offset: offset)
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
