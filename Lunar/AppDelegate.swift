@@ -121,7 +121,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func listenForAdaptiveEnabled() {
+    func listenForAdaptiveModeChange() {
         adaptiveEnabledObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
@@ -315,7 +315,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initMenubarIcon()
         initHotkeys()
 
-        listenForAdaptiveEnabled()
+        listenForAdaptiveModeChange()
         listenForScreenConfigurationChanged()
         listenForRunningApps()
 
