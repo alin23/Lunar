@@ -51,6 +51,8 @@ class BrightnessAdapter {
     var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
     var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
 
+    var lastBuiltinBrightness = 0.0
+
     var firstDisplay: Display {
         if displays.count > 0 {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
@@ -206,7 +208,7 @@ class BrightnessAdapter {
         }
     }
 
-    func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil) {
+    func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil, percent: Double? = nil) {
         if mode == .manual {
             return
         }
@@ -218,7 +220,7 @@ class BrightnessAdapter {
         }
         switch mode {
         case .sync:
-            adapt = { display in display.adapt(moment: nil, app: app, percent: brightnessAdapter.getBuiltinDisplayBrightness()) }
+            adapt = { display in display.adapt(moment: nil, app: app, percent: percent) }
         case .location:
             adapt = { display in display.adapt(moment: self.moment, app: app, percent: nil) }
         default:
