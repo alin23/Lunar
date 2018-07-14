@@ -177,9 +177,9 @@ class Display: NSManagedObject {
         brightnessOffset: Int = 0,
         contrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
-        var now = DateInRegion()
+        var now = DateInRegion().convertTo(region: Region.local)
         if let hour = hour {
-            now = now.atTime(hour: hour, minute: minute, second: 0)!
+            now = now.dateBySet(hour: hour, min: minute, secs: 0)!
         }
         let seconds = 60.0
         let minBrightness = minBrightness ?? self.minBrightness.uint8Value
@@ -200,13 +200,13 @@ class Display: NSManagedObject {
 
         switch now {
         case daylightStart ... noonStart:
-            let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
-            let minutesSinceSunrise = ((now - daylightStart) / seconds)
+            let firstHalfDayMinutes = ((noonStart - daylightStart).timeInterval / seconds)
+            let minutesSinceSunrise = ((now - daylightStart).timeInterval / seconds)
             newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: 1 / interpolationFactor)
             newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: 1 / interpolationFactor)
         case noonEnd ... daylightEnd:
-            let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
-            let minutesSinceNoon = ((now - noonEnd) / seconds)
+            let secondHalfDayMinutes = ((daylightEnd - noonEnd).timeInterval / seconds)
+            let minutesSinceNoon = ((now - noonEnd).timeInterval / seconds)
             let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: interpolationFactor)
             let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: interpolationFactor)
             newBrightness = NSNumber(value: maxBrightness + minBrightness - interpolatedBrightness.uint8Value)
