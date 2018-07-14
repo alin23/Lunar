@@ -303,6 +303,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         })
     }
 
+    func acquirePrivileges() -> Bool {
+        let accessEnabled = AXIsProcessTrustedWithOptions(
+            [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        )
+
+        if accessEnabled != true {
+            log.warning("You need to enable the event listener in the System Preferences")
+        }
+        return accessEnabled
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         lunarDisplayNames.shuffle()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
@@ -323,6 +334,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if thisIsFirstRun {
             showWindow()
         }
+
         log.debug("App finished launching")
     }
 
