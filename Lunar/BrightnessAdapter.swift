@@ -64,7 +64,11 @@ class BrightnessAdapter {
     func toggle() {
         switch mode {
         case .location:
-            datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
+            if builtinDisplay != nil {
+                datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
+            } else {
+                datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
+            }
         case .sync:
             datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
         case .manual:
