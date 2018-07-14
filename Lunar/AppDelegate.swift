@@ -201,13 +201,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
             activity.interval = 60
-        case .sync:
-            log.debug("Started BrightnessAdapter in Sync mode")
-            activity.interval = 2
-        case .manual:
-            log.debug("BrightnessAdapter set to manual")
-        }
-        if mode != .manual {
+            activity.tolerance = 10
             brightnessAdapter.adaptBrightness()
             activity.schedule { completion in
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
@@ -219,6 +213,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
                 completion(NSBackgroundActivityScheduler.Result.finished)
             }
+        case .sync:
+            log.debug("Started BrightnessAdapter in Sync mode")
+            activity.interval = 1
+            activity.tolerance = 0.5
+            activity.schedule { completion in
+                if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                    brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                    brightnessAdapter.lastBuiltinBrightness = builtinBrightness
+                    let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
+                    do {
+                        let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
+                        brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
+                    } catch {
+                        log.error("Error on fetching Displays by IDs")
+                    }
+                }
+                completion(NSBackgroundActivityScheduler.Result.finished)
+            }
+        case .manual:
+            log.debug("BrightnessAdapter set to manual")
         }
     }
 
@@ -296,10 +310,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addObservers() {
         daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: { _, _ in
-            brightnessAdapter.adaptBrightness()
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
         })
         noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: { _, _ in
-            brightnessAdapter.adaptBrightness()
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
         })
     }
 
@@ -424,10 +442,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adapt() {
-        if let lastApp = runningAppExceptions.last {
-            brightnessAdapter.adaptBrightness(app: lastApp)
-        } else {
-            brightnessAdapter.adaptBrightness()
+        if brightnessAdapter.mode == .location {
+            brightnessAdapter.adaptBrightness(app: runningAppExceptions.last)
+        } else if brightnessAdapter.mode == .sync {
+            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness() {
+                brightnessAdapter.adaptBrightness(app: runningAppExceptions.last, percent: builtinBrightness)
+            }
         }
     }
 
