@@ -49,7 +49,7 @@ class Display: NSManagedObject {
         } else {
             self.name = DDC.getDisplayName(for: id)
         }
-        self.serial = serial ?? DDC.getDisplaySerial(for: id)
+        self.serial = (serial ?? DDC.getDisplaySerial(for: id)).stripped
         self.active = active
         if id != GENERIC_DISPLAY_ID {
             self.minBrightness = NSNumber(value: minBrightness)
@@ -94,15 +94,15 @@ class Display: NSManagedObject {
             observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.brightness, options: [.new], changeHandler: { _, change in
-                if self.id != GENERIC_DISPLAY_ID {
-                    let newBrightness = min(max(change.newValue!.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
+                if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
+                    let newBrightness = min(max(newBrightness.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
                     _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
                     log.debug("\(self.name): Set brightness to \(newBrightness)")
                 }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
-                if self.id != GENERIC_DISPLAY_ID {
-                    let newContrast = min(max(change.newValue!.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
+                if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
+                    let newContrast = min(max(newContrast.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
                     _ = DDC.setContrast(for: self.id, contrast: newContrast)
                     log.debug("\(self.name): Set contrast to \(newContrast)")
                 }
@@ -115,7 +115,6 @@ class Display: NSManagedObject {
     }
 
     func interpolate(value: Double, span: Double, minVal: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
-//        log.verbose("Interpolating \(value) in \(span) between \(minVal) - \(maxVal) with a factor of \(factor)")
         let maxValue = Double(max(min(maxVal, 100), 0))
         let minValue = Double(max(min(minVal, UInt8(Int(maxValue - 1))), 0))
         let valueSpan = maxValue - minValue
@@ -130,7 +129,6 @@ class Display: NSManagedObject {
         let minBrightness = self.minBrightness.uint8Value
         let maxBrightness = self.maxBrightness.uint8Value
         let factor = datastore.defaults.interpolationFactor
-//        log.verbose("Interpolating brightness from \(percent)% between \(minBrightness) - \(maxBrightness) with a factor of \(factor)")
         var brightness = interpolate(
             value: percent,
             span: 100.0,
@@ -149,7 +147,6 @@ class Display: NSManagedObject {
         let minContrast = self.minContrast.uint8Value
         let maxContrast = self.maxContrast.uint8Value
         let factor = datastore.defaults.interpolationFactor
-//        log.verbose("Interpolating contrast from \(percent)% between \(minContrast) - \(maxContrast) with a factor of \(factor)")
         var contrast = interpolate(
             value: percent,
             span: 100.0,
