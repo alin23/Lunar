@@ -58,11 +58,20 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
+extension String {
+    var stripped: String {
+        let okayChars = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
+        return filter { okayChars.contains($0) }
+    }
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
     var activity: NSBackgroundActivityScheduler!
+    var adapterSyncQueue: OperationQueue!
+    var adapterSyncActivity: NSObjectProtocol!
 
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
@@ -197,6 +206,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
         activity.invalidate()
+        if adapterSyncActivity != nil {
+            ProcessInfo.processInfo.endActivity(adapterSyncActivity)
+        }
+
         switch mode {
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
@@ -215,21 +228,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
-            activity.interval = 1
-            activity.tolerance = 0.5
-            activity.schedule { completion in
-                if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                    brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
-                    brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                    let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
-                    do {
-                        let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
-                        brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
-                    } catch {
-                        log.error("Error on fetching Displays by IDs")
+            adapterSyncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
+            adapterSyncQueue.addOperation {
+                while true {
+                    if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                        brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                        brightnessAdapter.lastBuiltinBrightness = builtinBrightness
+                        let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
+                        do {
+                            let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
+                            brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
+                        } catch {
+                            log.error("Error on fetching Displays by IDs")
+                        }
                     }
+                    Thread.sleep(forTimeInterval: 1)
                 }
-                completion(NSBackgroundActivityScheduler.Result.finished)
             }
         case .manual:
             log.debug("BrightnessAdapter set to manual")
@@ -240,6 +254,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
         activity.repeats = true
         activity.qualityOfService = .userInitiated
+        adapterSyncQueue = OperationQueue()
         manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
     }
 
