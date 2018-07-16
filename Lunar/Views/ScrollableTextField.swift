@@ -164,9 +164,7 @@ class ScrollableTextField: NSTextField {
                 if intValue < upperLimit {
                     intValue += 1
                     if let callback = onValueChangedInstant {
-                        DispatchQueue.main.async {
-                            callback(self.integerValue)
-                        }
+                        callback(integerValue)
                     }
                 }
             } else if event.scrollingDeltaY > 0.0 {
@@ -178,9 +176,7 @@ class ScrollableTextField: NSTextField {
                 if intValue > lowerLimit {
                     intValue -= 1
                     if let callback = onValueChangedInstant {
-                        DispatchQueue.main.async {
-                            callback(self.integerValue)
-                        }
+                        callback(integerValue)
                     }
                 }
             } else {
