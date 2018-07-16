@@ -47,11 +47,11 @@ class SettingsPageController: NSViewController {
             }
         }
         if brightnessAdapter.mode == .location {
-            brightnessChartEntry[24] = brightnessChartEntry[0]
-            contrastChartEntry[24] = contrastChartEntry[0]
+            brightnessChartEntry[24].y = brightnessChartEntry[0].y
+            contrastChartEntry[24].y = contrastChartEntry[0].y
         } else {
-            brightnessChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display, offset: brightnessOffset).doubleValue)
-            contrastChartEntry[100] = ChartDataEntry(x: 100.0, y: brightnessAdapter.computeContrastFromPercent(percent: 100, for: display, offset: contrastOffset).doubleValue)
+            brightnessChartEntry[100].y = brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display, offset: brightnessOffset).doubleValue
+            contrastChartEntry[100].y = brightnessAdapter.computeContrastFromPercent(percent: 100, for: display, offset: contrastOffset).doubleValue
         }
 
         if withAnimation {
