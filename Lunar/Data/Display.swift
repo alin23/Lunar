@@ -126,39 +126,41 @@ class Display: NSManagedObject {
     }
 
     func computeBrightness(from percent: Double, offset: Int = 0) -> NSNumber {
-        let minBrightness = self.minBrightness.uint8Value
-        let maxBrightness = self.maxBrightness.uint8Value
-        let factor = datastore.defaults.interpolationFactor
-        var brightness = interpolate(
-            value: percent,
-            span: 100.0,
-            minVal: minBrightness,
-            maxVal: maxBrightness,
-            factor: factor
-        )
+        let minBrightness = self.minBrightness.doubleValue
+        let maxBrightness = self.maxBrightness.doubleValue
+
+        var factor = 1.0
+        if datastore.defaults.brightnessOffset > 0 {
+            factor = 1.0 - (Double(datastore.defaults.brightnessOffset) / 100.0)
+        } else if datastore.defaults.brightnessOffset < 0 {
+            factor = 1.0 + (Double(-datastore.defaults.brightnessOffset) / 100.0)
+        }
+        var brightness = pow((((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0), factor) * 100.0
+        brightness = cap(brightness, minVal: minBrightness, maxVal: maxBrightness)
 
         if offset > 0 {
-            brightness = NSNumber(value: min(brightness.intValue + offset, Int(MAX_BRIGHTNESS)))
+            brightness = cap(brightness + Double(offset), minVal: minBrightness, maxVal: maxBrightness)
         }
-        return brightness
+        return NSNumber(value: Int(brightness))
     }
 
     func computeContrast(from percent: Double, offset: Int = 0) -> NSNumber {
-        let minContrast = self.minContrast.uint8Value
-        let maxContrast = self.maxContrast.uint8Value
-        let factor = datastore.defaults.interpolationFactor
-        var contrast = interpolate(
-            value: percent,
-            span: 100.0,
-            minVal: minContrast,
-            maxVal: maxContrast,
-            factor: factor
-        )
+        let minContrast = self.minContrast.doubleValue
+        let maxContrast = self.maxContrast.doubleValue
+
+        var factor = 1.0
+        if datastore.defaults.contrastOffset > 0 {
+            factor = 1.0 - (Double(datastore.defaults.contrastOffset) / 100.0)
+        } else if datastore.defaults.contrastOffset < 0 {
+            factor = 1.0 + (Double(-datastore.defaults.contrastOffset) / 100.0)
+        }
+        var contrast = pow((((percent / 100.0) * (maxContrast - minContrast) + minContrast) / 100.0), factor) * 100.0
+        contrast = cap(contrast, minVal: minContrast, maxVal: maxContrast)
 
         if offset > 0 {
-            contrast = NSNumber(value: min(contrast.intValue + offset, Int(MAX_CONTRAST)))
+            contrast = cap(contrast + Double(offset), minVal: minContrast, maxVal: maxContrast)
         }
-        return contrast
+        return NSNumber(value: Int(contrast))
     }
 
     func getBrightnessContrast(

@@ -36,6 +36,10 @@ extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
 }
 
+func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
+    return max(min(number, maxVal), minVal)
+}
+
 let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
 let startHotKey = HotKey(key: .l, modifiers: [.command, .control, .option])
 let pauseHotKey = HotKey(key: .l, modifiers: [.command, .control, .option, .shift])
@@ -76,6 +80,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
+    var brightnessOffsetObserver: NSKeyValueObservation?
+    var contrastOffsetObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
 
@@ -228,6 +234,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
+            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness() {
+                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+            }
             adapterSyncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
             adapterSyncQueue.addOperation {
                 while true {
@@ -337,6 +346,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: { _, _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
+            }
+        })
+        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, changeHandler: { _, _ in
+            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                brightnessAdapter.mode == .sync {
+                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+            }
+        })
+        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, changeHandler: { _, _ in
+            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                brightnessAdapter.mode == .sync {
+                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
             }
         })
     }
