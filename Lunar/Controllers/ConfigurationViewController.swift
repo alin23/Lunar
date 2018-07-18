@@ -9,55 +9,114 @@
 import Cocoa
 
 class ConfigurationViewController: NSViewController {
-    @IBOutlet var noonDurationField: ScrollableTextField!
-    @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
+    @IBOutlet var firstField: ScrollableTextField!
+    @IBOutlet var firstFieldCaption: ScrollableTextFieldCaption!
 
-    @IBOutlet var daylightExtensionField: ScrollableTextField!
-    @IBOutlet var daylightExtensionCaption: ScrollableTextFieldCaption!
+    @IBOutlet var secondField: ScrollableTextField!
+    @IBOutlet var secondFieldCaption: ScrollableTextFieldCaption!
+    @IBOutlet var firstFieldLabel: NSTextField!
+    @IBOutlet var secondFieldLabel: NSTextField!
+    var adaptiveModeObserver: NSKeyValueObservation?
+
+    func setupFirstField(mode: AdaptiveMode) {
+        switch mode {
+        case .location:
+            firstFieldLabel?.stringValue = "Noon duration"
+            firstField?.integerValue = datastore.defaults.noonDurationMinutes
+            firstField?.onValueChanged = { (value: Int) in
+                datastore.defaults.set(value, forKey: "noonDurationMinutes")
+            }
+            firstField?.lowerLimit = 0
+            firstField?.upperLimit = 240
+            firstFieldCaption?.stringValue = "MINUTES"
+            if let settingsController = parent?.parent as? SettingsPageController {
+                firstField?.onValueChangedInstant = { value in
+                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
+                }
+                firstField?.onMouseEnter = {
+                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.firstField.integerValue, withAnimation: true)
+                }
+            }
+        default:
+            firstFieldLabel?.stringValue = "Brightness offset"
+            firstField?.integerValue = datastore.defaults.brightnessOffset
+            firstField?.onValueChanged = { (value: Int) in
+                datastore.defaults.set(value, forKey: "brightnessOffset")
+            }
+            firstField?.lowerLimit = -50
+            firstField?.upperLimit = 50
+            firstField?.onValueChangedInstant = nil
+            firstField?.onMouseEnter = nil
+            firstFieldCaption?.stringValue = "BRIGHTNESS"
+        }
+    }
+
+    func setupSecondField(mode: AdaptiveMode) {
+        switch mode {
+        case .location:
+            secondFieldLabel?.stringValue = "Daylight extension"
+            secondField?.integerValue = datastore.defaults.daylightExtensionMinutes
+            secondField?.onValueChanged = { (value: Int) in
+                datastore.defaults.set(value, forKey: "daylightExtensionMinutes")
+            }
+            secondField?.lowerLimit = 0
+            secondField?.upperLimit = 240
+            secondFieldCaption?.stringValue = "MINUTES"
+            if let settingsController = parent?.parent as? SettingsPageController {
+                secondField?.onValueChangedInstant = { value in
+                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
+                }
+                secondField?.onMouseEnter = {
+                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.secondField.integerValue, withAnimation: true)
+                }
+            }
+        default:
+            secondFieldLabel?.stringValue = "Contrast offset"
+            secondField?.integerValue = datastore.defaults.contrastOffset
+            secondField?.onValueChanged = { (value: Int) in
+                datastore.defaults.set(value, forKey: "contrastOffset")
+            }
+            secondField?.lowerLimit = -50
+            secondField?.upperLimit = 50
+            secondField?.onValueChangedInstant = nil
+            secondField?.onMouseEnter = nil
+            secondFieldCaption?.stringValue = "CONTRAST"
+        }
+    }
 
     func setup() {
-        noonDurationField?.integerValue = datastore.defaults.noonDurationMinutes
-        daylightExtensionField?.integerValue = datastore.defaults.daylightExtensionMinutes
+        firstField?.textFieldColor = scrollableTextFieldColorWhite
+        firstField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
+        firstField?.textFieldColorLight = scrollableTextFieldColorLightWhite
 
-        noonDurationField?.textFieldColor = scrollableTextFieldColorWhite
-        noonDurationField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        noonDurationField?.textFieldColorLight = scrollableTextFieldColorLightWhite
+        secondField?.textFieldColor = scrollableTextFieldColorWhite
+        secondField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
+        secondField?.textFieldColorLight = scrollableTextFieldColorLightWhite
 
-        daylightExtensionField?.textFieldColor = scrollableTextFieldColorWhite
-        daylightExtensionField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        daylightExtensionField?.textFieldColorLight = scrollableTextFieldColorLightWhite
+        firstFieldCaption.textColor = scrollableCaptionColorWhite
+        secondFieldCaption.textColor = scrollableCaptionColorWhite
 
-        noonDurationCaption.textColor = scrollableCaptionColorWhite
-        daylightExtensionCaption.textColor = scrollableCaptionColorWhite
+        firstField?.caption = firstFieldCaption
+        secondField?.caption = secondFieldCaption
 
-        noonDurationField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "noonDurationMinutes")
-        }
-        daylightExtensionField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "daylightExtensionMinutes")
-        }
+        setupFirstField(mode: brightnessAdapter.mode)
+        setupSecondField(mode: brightnessAdapter.mode)
+    }
 
-        noonDurationField?.caption = noonDurationCaption
-        daylightExtensionField?.caption = daylightExtensionCaption
-
-        if let settingsController = parent?.parent as? SettingsPageController {
-            noonDurationField?.onValueChangedInstant = { value in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                return
             }
-            daylightExtensionField?.onValueChangedInstant = { value in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
-            }
-            noonDurationField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
-            }
-            daylightExtensionField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
-            }
-        }
+            let adaptiveMode = AdaptiveMode(rawValue: mode) ?? .location
+            self.setupFirstField(mode: adaptiveMode)
+            self.setupSecondField(mode: adaptiveMode)
+        })
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        listenForAdaptiveModeChange()
     }
 }

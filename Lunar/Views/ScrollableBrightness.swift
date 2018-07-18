@@ -19,6 +19,12 @@ class ScrollableBrightness: NSView {
     @IBOutlet var currentValueCaption: ScrollableTextFieldCaption!
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
+    var disabled = false {
+        didSet {
+            minValue.disabled = disabled
+            maxValue.disabled = disabled
+        }
+    }
 
     var display: Display! {
         didSet {
