@@ -40,6 +40,14 @@ extension UserDefaults {
     @objc dynamic var adaptiveBrightnessMode: Int {
         return integer(forKey: "adaptiveBrightnessMode")
     }
+
+    @objc dynamic var brightnessOffset: Int {
+        return integer(forKey: "brightnessOffset")
+    }
+
+    @objc dynamic var contrastOffset: Int {
+        return integer(forKey: "contrastOffset")
+    }
 }
 
 @available(OSX 10.12, *)
@@ -152,6 +160,12 @@ class DataStore: NSObject {
         }
         if DataStore.defaults.object(forKey: "noonDurationMinutes") == nil {
             DataStore.defaults.set(240, forKey: "noonDurationMinutes")
+        }
+        if DataStore.defaults.object(forKey: "brightnessOffset") == nil {
+            DataStore.defaults.set(0, forKey: "brightnessOffset")
+        }
+        if DataStore.defaults.object(forKey: "contrastOffset") == nil {
+            DataStore.defaults.set(0, forKey: "contrastOffset")
         }
     }
 }

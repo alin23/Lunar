@@ -421,10 +421,12 @@
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="daylightExtensionCaption" destination="7xo-Ez-g9m" id="tcA-SF-lgJ"/>
-                        <outlet property="daylightExtensionField" destination="H5y-th-bQ1" id="nXd-ff-ul0"/>
-                        <outlet property="noonDurationCaption" destination="xSp-32-U36" id="ai7-im-YU1"/>
-                        <outlet property="noonDurationField" destination="gR8-S6-VJx" id="uhd-gR-fkf"/>
+                        <outlet property="firstField" destination="gR8-S6-VJx" id="uhd-gR-fkf"/>
+                        <outlet property="firstFieldCaption" destination="xSp-32-U36" id="ai7-im-YU1"/>
+                        <outlet property="firstFieldLabel" destination="jCD-nB-vFN" id="t70-d3-hXo"/>
+                        <outlet property="secondField" destination="H5y-th-bQ1" id="nXd-ff-ul0"/>
+                        <outlet property="secondFieldCaption" destination="7xo-Ez-g9m" id="tcA-SF-lgJ"/>
+                        <outlet property="secondFieldLabel" destination="gmb-rW-1Qy" id="jBR-tX-LmS"/>
                     </connections>
                 </viewController>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
