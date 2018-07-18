@@ -63,10 +63,11 @@ class DisplayViewController: NSViewController {
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil) {
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
-        let maxValues = brightnessContrastChart.getMaxValues()
+        let maxValues = brightnessContrastChart.maxValues
 
-        for x in 0 ..< (maxValues - 1) {
-            if brightnessAdapter.mode == .location {
+        switch brightnessAdapter.mode {
+        case .location:
+            for x in 0 ..< (maxValues - 1) {
                 let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
                     for: display,
                     hour: x,
@@ -77,17 +78,11 @@ class DisplayViewController: NSViewController {
                 )
                 brightnessChartEntry[x].y = brightness.doubleValue
                 contrastChartEntry[x].y = contrast.doubleValue
-            } else {
-                brightnessChartEntry[x].y = brightnessAdapter.computeBrightnessFromPercent(percent: Int8(x), for: display).doubleValue
-                contrastChartEntry[x].y = brightnessAdapter.computeContrastFromPercent(percent: Int8(x), for: display).doubleValue
             }
-        }
-        if brightnessAdapter.mode == .location {
-            brightnessChartEntry[24].y = brightnessChartEntry[0].y
-            contrastChartEntry[24].y = contrastChartEntry[0].y
-        } else {
-            brightnessChartEntry[100].y = brightnessAdapter.computeBrightnessFromPercent(percent: 100, for: display).doubleValue
-            contrastChartEntry[100].y = brightnessAdapter.computeContrastFromPercent(percent: 100, for: display).doubleValue
+            brightnessChartEntry[maxValues - 1].y = brightnessChartEntry[0].y
+            contrastChartEntry[maxValues - 1].y = contrastChartEntry[0].y
+        default:
+            break
         }
 
         brightnessContrastChart.notifyDataSetChanged()
@@ -176,6 +171,13 @@ class DisplayViewController: NSViewController {
             let adaptiveMode = AdaptiveMode(rawValue: mode)
             if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
                 self.initGraph(mode: adaptiveMode)
+            }
+            if adaptiveMode == .manual {
+                self.scrollableBrightness.disabled = true
+                self.scrollableContrast.disabled = true
+            } else {
+                self.scrollableBrightness.disabled = false
+                self.scrollableContrast.disabled = false
             }
         })
     }
