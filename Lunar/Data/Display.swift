@@ -248,7 +248,6 @@ class Display: NSManagedObject {
         }
         if changed {
             log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
-            datastore.save(context: managedObjectContext!)
         }
     }
 }
