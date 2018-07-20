@@ -196,7 +196,7 @@ class DisplayViewController: NSViewController {
         swipeLeftHint.isHidden = !swipeLeftHintVisible
         swipeRightHint.isHidden = !swipeRightHintVisible
 
-        if let display = display, display != GENERIC_DISPLAY {
+        if let display = display, display.id != GENERIC_DISPLAY_ID {
             update(from: display)
 
             scrollableBrightness.display = display
