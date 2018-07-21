@@ -72,7 +72,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func mouseEntered(with _: NSEvent) {
         if let button = addAppButton {
-            button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
+            button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
             button.alphaValue = 1.0
             button.shadow = addAppButtonShadow
         }
@@ -80,7 +80,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func mouseExited(with _: NSEvent) {
         if let button = addAppButton {
-            button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+            button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             button.alphaValue = 0.8
             button.shadow = nil
         }

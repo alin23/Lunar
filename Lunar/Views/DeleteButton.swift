@@ -24,12 +24,12 @@ class DeleteButton: NSButton {
     }
 
     override func mouseEntered(with _: NSEvent) {
-        layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         alphaValue = 1.0
     }
 
     override func mouseExited(with _: NSEvent) {
-        layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
+        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
         alphaValue = 0.0
     }
 
