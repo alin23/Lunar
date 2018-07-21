@@ -9,7 +9,8 @@
 - `brew cask install lunar`
 
 ## Features
-- **Adaptive Brightness** (and contrast) based on the sunrise/sunset times in your location
+- **Sync-based Adaptive Brightness** (and contrast) based on the built-in light sensor of the Macbook or iMac
+- **Location-based Adaptive Brightness** (and contrast) based on the sunrise/sunset times in your location
 - **App Exception** list if you need more brightness for specific activities (watching movies, design work)
 - individual settings per display
 - hotkeys for setting brightness and contrast that respect the min/max values per monitor:
