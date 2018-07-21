@@ -91,10 +91,10 @@ class DisplayViewController: NSViewController {
     @IBAction func toggleAdaptive(_ sender: NSButton) {
         switch sender.state {
         case .on:
-            sender.layer!.backgroundColor = adaptiveButtonBgOn.cgColor
+            sender.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
             display?.setValue(true, forKey: "adaptive")
         case .off:
-            sender.layer!.backgroundColor = adaptiveButtonBgOff.cgColor
+            sender.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
             display?.setValue(false, forKey: "adaptive")
         default:
             return
@@ -119,11 +119,11 @@ class DisplayViewController: NSViewController {
             button.attributedAlternateTitle = activeTitle
 
             button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 10))
-            button.layer!.cornerRadius = button.frame.height / 2
+            button.layer?.cornerRadius = button.frame.height / 2
             if button.state == .on {
-                button.layer!.backgroundColor = adaptiveButtonBgOn.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
             } else {
-                button.layer!.backgroundColor = adaptiveButtonBgOff.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
             }
             adaptiveButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
             button.addTrackingArea(adaptiveButtonTrackingArea)
@@ -132,24 +132,24 @@ class DisplayViewController: NSViewController {
 
     override func mouseEntered(with _: NSEvent) {
         if let button = adaptiveButton {
-            button.layer!.add(fadeTransition(duration: 0.1), forKey: "transition")
+            button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
             if button.state == .on {
-                button.layer!.backgroundColor = adaptiveButtonBgOnHover.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOnHover.cgColor
             } else {
-                button.layer!.backgroundColor = adaptiveButtonBgOffHover.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOffHover.cgColor
             }
         }
     }
 
     override func mouseExited(with _: NSEvent) {
         if let button = adaptiveButton {
-            button.layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+            button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
 
             if button.state == .on {
-                button.layer!.backgroundColor = adaptiveButtonBgOn.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
             } else {
-                button.layer!.backgroundColor = adaptiveButtonBgOff.cgColor
+                button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
             }
         }
     }
