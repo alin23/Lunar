@@ -37,13 +37,13 @@ class ScrollableTextFieldCaption: NSTextField {
     }
 
     func resetText() {
-        layer!.add(fadeTransition(duration: 0.3), forKey: "transition")
+        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
         stringValue = initialText
         alphaValue = initialAlphaValue
     }
 
     override func mouseEntered(with _: NSEvent) {
-        layer!.add(fadeTransition(duration: 0.2), forKey: "transition")
+        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         stringValue = "Scroll to change value"
         alphaValue = 0.5
     }

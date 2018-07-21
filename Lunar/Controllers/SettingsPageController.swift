@@ -79,7 +79,7 @@ class SettingsPageController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.wantsLayer = true
-        view.layer!.backgroundColor = settingsBgColor.cgColor
+        view.layer?.backgroundColor = settingsBgColor.cgColor
         initGraph(display: nil)
         listenForAdaptiveModeChange()
     }
