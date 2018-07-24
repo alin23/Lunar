@@ -133,7 +133,7 @@ class Display: NSManagedObject {
         if datastore.defaults.brightnessOffset > 0 {
             factor = 1.0 - (Double(datastore.defaults.brightnessOffset) / 100.0)
         } else if datastore.defaults.brightnessOffset < 0 {
-            factor = 1.0 + (Double(-datastore.defaults.brightnessOffset) / 100.0)
+            factor = 1.0 - (Double(datastore.defaults.brightnessOffset) / 10.0)
         }
         var brightness = pow((((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0), factor) * 100.0
         brightness = cap(brightness, minVal: minBrightness, maxVal: maxBrightness)
