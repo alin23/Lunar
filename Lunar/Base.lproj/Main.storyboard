@@ -73,14 +73,14 @@
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <action selector="setLight100PercentWithSender:" target="Voe-Tx-rLC" id="ON7-MI-6gq"/>
+                                                <action selector="brightnessUp:" target="Voe-Tx-rLC" id="mjb-GK-fA5"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Brightness Down" keyEquivalent="" id="edD-OP-hud">
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <action selector="setLight100PercentWithSender:" target="Voe-Tx-rLC" id="U4g-YA-iUI"/>
+                                                <action selector="brightnessDown:" target="Voe-Tx-rLC" id="WYu-wY-rJB"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="DeQ-n5-ddV"/>
