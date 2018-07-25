@@ -48,6 +48,10 @@ extension UserDefaults {
     @objc dynamic var contrastOffset: Int {
         return integer(forKey: "contrastOffset")
     }
+    
+    @objc dynamic var persistentBrightness: Int {
+        return integer(forKey: "persistentBrightness")
+    }
 }
 
 @available(OSX 10.12, *)
