@@ -49,6 +49,8 @@ let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
 let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
 let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
 let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
+let brightnessUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control])
+let brightnessDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control])
 var upHotkey: HotKey?
 var downHotkey: HotKey?
 var leftHotkey: HotKey?
@@ -133,6 +135,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         percent100HotKey.keyDownHandler = {
             self.setLightPercent(percent: 100)
             log.debug("100% Hotkey pressed")
+        }
+        brightnessUpHotKey.keyDownHandler = {
+            self.increaseBrightness()
+        }
+        
+        brightnessDownHotKey.keyDownHandler = {
+            self.decreaseBrightness()
         }
     }
 
@@ -501,6 +510,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
     }
+    
+    private func increaseBrightness(_ amount: Int8 = 2) {
+        adjustBrightness(amount)
+    }
+    
+    private func decreaseBrightness(_ amount: Int8 = 2) {
+        adjustBrightness(-amount)
+    }
+    
+    private func adjustBrightness(_ amount: Int8) {
+        let brightness = datastore.defaults.persistentBrightness + Int(amount)
+        setLightPercent(percent: Int8(brightness))
+        
+        datastore.defaults.set(brightness, forKey: "persistentBrightness")
+    }
 
     @IBAction func setLight0Percent(sender _: Any?) {
         setLightPercent(percent: 0)
@@ -520,6 +544,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func setLight100Percent(sender _: Any?) {
         setLightPercent(percent: 100)
+    }
+    
+    @IBAction func brightnessUp(_ sender: Any) {
+        increaseBrightness()
+        print("brightness up")
+    }
+    
+    @IBAction func brightnessDown(_ sender: Any) {
+        decreaseBrightness()
+        print("brightness down")
     }
 
     @IBAction func toggleBrightnessAdapter(sender _: Any?) {
