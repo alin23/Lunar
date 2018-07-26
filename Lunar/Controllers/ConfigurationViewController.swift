@@ -43,8 +43,8 @@ class ConfigurationViewController: NSViewController {
             firstField?.onValueChanged = { (value: Int) in
                 datastore.defaults.set(value, forKey: "brightnessOffset")
             }
-            firstField?.lowerLimit = -50
-            firstField?.upperLimit = 50
+            firstField?.lowerLimit = -100
+            firstField?.upperLimit = 90
             firstField?.onValueChangedInstant = nil
             firstField?.onMouseEnter = nil
             firstFieldCaption?.stringValue = "BRIGHTNESS"
@@ -76,8 +76,8 @@ class ConfigurationViewController: NSViewController {
             secondField?.onValueChanged = { (value: Int) in
                 datastore.defaults.set(value, forKey: "contrastOffset")
             }
-            secondField?.lowerLimit = -50
-            secondField?.upperLimit = 50
+            secondField?.lowerLimit = -100
+            secondField?.upperLimit = 90
             secondField?.onValueChangedInstant = nil
             secondField?.onMouseEnter = nil
             secondFieldCaption?.stringValue = "CONTRAST"
