@@ -530,9 +530,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
     
     private func adjustBrightness(_ amount: Int8) {
-        let currentBrightness = brightnessAdapter.displays.first?.value.brightness.intValue
         let persistentBrightness = datastore.defaults.persistentBrightness
-        let newBrightness = currentBrightness != nil ? currentBrightness! + Int(amount) : persistentBrightness + Int(amount)
+        let newBrightness = persistentBrightness + Int(amount)
         setLightPercent(percent: Int8(newBrightness))
         
         datastore.defaults.set(newBrightness, forKey: "persistentBrightness")
