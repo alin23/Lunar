@@ -69,16 +69,16 @@
                                                 <action selector="setLight100PercentWithSender:" target="Voe-Tx-rLC" id="bm5-Fr-7Kb"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Brightness Up" keyEquivalent="" id="jpb-NA-VFf">
+                                        <menuItem title="Brightness Up" keyEquivalent="" id="jpb-NA-VFf">
                                             <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
                                             <connections>
                                                 <action selector="brightnessUp:" target="Voe-Tx-rLC" id="mjb-GK-fA5"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Brightness Down" keyEquivalent="" id="edD-OP-hud">
+                                        <menuItem title="Brightness Down" keyEquivalent="" id="edD-OP-hud">
                                             <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
                                             <connections>
                                                 <action selector="brightnessDown:" target="Voe-Tx-rLC" id="WYu-wY-rJB"/>
                                             </connections>
