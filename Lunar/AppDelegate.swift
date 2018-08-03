@@ -49,9 +49,9 @@ let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
 let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
 let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
 let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
-let brightnessUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control])
+let brightnessUpHotKey = HotKey(key: .f2, modifiers: [.control])
 let preciseBrightnessUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control, .option])
-let brightnessDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control])
+let brightnessDownHotKey = HotKey(key: .f1, modifiers: [.control])
 let preciseBrightnessDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control, .option])
 var upHotkey: HotKey?
 var downHotkey: HotKey?
