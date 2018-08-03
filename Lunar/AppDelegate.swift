@@ -559,12 +559,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     
     @IBAction func brightnessUp(_ sender: Any) {
         increaseBrightness()
-        print("brightness up")
     }
     
     @IBAction func brightnessDown(_ sender: Any) {
         decreaseBrightness()
-        print("brightness down")
     }
 
     @IBAction func toggleBrightnessAdapter(sender _: Any?) {
