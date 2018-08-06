@@ -577,6 +577,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func buyMeACoffee(_: Any) {
         NSWorkspace.shared.open(URL(string: "https://www.buymeacoffee.com/alin23")!)
     }
+
+    @IBAction func leaveFeedback(_: Any) {
+        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com")!)
+    }
 }
 
 // Helper function inserted by Swift 4.2 migrator.
