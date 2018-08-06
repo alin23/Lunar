@@ -141,15 +141,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessUpHotKey.keyDownHandler = {
             self.increaseBrightness()
         }
-        
+
         preciseBrightnessUpHotKey.keyDownHandler = {
             self.increaseBrightness(1)
         }
-        
+
         brightnessDownHotKey.keyDownHandler = {
             self.decreaseBrightness()
         }
-        
+
         preciseBrightnessDownHotKey.keyDownHandler = {
             self.decreaseBrightness(1)
         }
@@ -520,21 +520,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
     }
-    
-    private func increaseBrightness(_ amount: Int8 = 2) {
+
+    private func increaseBrightness(_ amount: Int = 2) {
         adjustBrightness(amount)
     }
-    
-    private func decreaseBrightness(_ amount: Int8 = 2) {
+
+    private func decreaseBrightness(_ amount: Int = 2) {
         adjustBrightness(-amount)
     }
-    
-    private func adjustBrightness(_ amount: Int8) {
+
+    private func adjustBrightness(_ amount: Int) {
         let persistentBrightness = datastore.defaults.persistentBrightness
         let newBrightness = persistentBrightness + Int(amount)
-        setLightPercent(percent: Int8(newBrightness))
-        
-        datastore.defaults.set(newBrightness, forKey: "persistentBrightness")
+        if newBrightness <= 100 && newBrightness >= 0 {
+            setLightPercent(percent: Int8(newBrightness))
+            datastore.defaults.set(newBrightness, forKey: "persistentBrightness")
+        }
     }
 
     @IBAction func setLight0Percent(sender _: Any?) {
@@ -556,12 +557,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func setLight100Percent(sender _: Any?) {
         setLightPercent(percent: 100)
     }
-    
-    @IBAction func brightnessUp(_ sender: Any) {
+
+    @IBAction func brightnessUp(_: Any) {
         increaseBrightness()
     }
-    
-    @IBAction func brightnessDown(_ sender: Any) {
+
+    @IBAction func brightnessDown(_: Any) {
         decreaseBrightness()
     }
 
