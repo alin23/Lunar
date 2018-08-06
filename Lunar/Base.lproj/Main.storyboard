@@ -90,6 +90,13 @@
                                                 <action selector="buyMeACoffee:" target="Voe-Tx-rLC" id="jVR-8h-xBL"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Contact the developer" id="Som-uG-Ufi">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="leaveFeedback:" target="Voe-Tx-rLC" id="p7H-ng-T89"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="GNT-HB-tbd"/>
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
