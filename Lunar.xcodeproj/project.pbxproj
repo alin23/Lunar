@@ -139,6 +139,7 @@
 		C73CD24620EA2F1A00B13DDE /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
 		C73CD24720EA2F1A00B13DDE /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
+		C75047A92119B30300458191 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
 		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
 		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
@@ -820,9 +821,10 @@
 		C794E1751FF01EF500549462 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				C75047A92119B30300458191 /* Model v2.xcdatamodel */,
 				C794E1761FF01EF500549462 /* Model.xcdatamodel */,
 			);
-			currentVersion = C794E1761FF01EF500549462 /* Model.xcdatamodel */;
+			currentVersion = C75047A92119B30300458191 /* Model v2.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

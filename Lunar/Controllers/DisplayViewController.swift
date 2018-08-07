@@ -93,9 +93,11 @@ class DisplayViewController: NSViewController {
         case .on:
             sender.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
             display?.setValue(true, forKey: "adaptive")
+            setValuesHidden(false)
         case .off:
             sender.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
             display?.setValue(false, forKey: "adaptive")
+            setValuesHidden(true)
         default:
             return
         }
@@ -175,9 +177,11 @@ class DisplayViewController: NSViewController {
             if adaptiveMode == .manual {
                 self.scrollableBrightness.disabled = true
                 self.scrollableContrast.disabled = true
+                self.setValuesHidden(true, mode: adaptiveMode)
             } else {
                 self.scrollableBrightness.disabled = false
                 self.scrollableContrast.disabled = false
+                self.setValuesHidden(false, mode: adaptiveMode)
             }
         })
     }
@@ -188,6 +192,11 @@ class DisplayViewController: NSViewController {
 
     func zeroGraph() {
         brightnessContrastChart?.initGraph(display: nil, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+    }
+
+    func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
+        scrollableBrightness.setValuesHidden(hidden, mode: mode)
+        scrollableContrast.setValuesHidden(hidden, mode: mode)
     }
 
     override func viewDidLoad() {
@@ -213,6 +222,10 @@ class DisplayViewController: NSViewController {
             scrollableContrast.onMaxValueChanged = { (value: Int) in self.updateDataset(maxContrast: UInt8(value)) }
 
             initGraph()
+
+            if !display.adaptive || brightnessAdapter.mode == .manual {
+                setValuesHidden(true)
+            }
         } else {
             setIsHidden(true)
         }
