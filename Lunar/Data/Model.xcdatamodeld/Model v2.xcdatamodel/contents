@@ -16,6 +16,8 @@
         <attribute name="brightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="50" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="contrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="50" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lockedBrightness" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lockedContrast" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="maxBrightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="100" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="maxContrast" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="100" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="minBrightness" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="100" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -35,6 +37,6 @@
     <fetchRequest name="AllDisplays" entity="Display"/>
     <elements>
         <element name="AppException" positionX="-63" positionY="54" width="128" height="105"/>
-        <element name="Display" positionX="-63" positionY="-18" width="128" height="195"/>
+        <element name="Display" positionX="-63" positionY="-18" width="128" height="225"/>
     </elements>
 </model>

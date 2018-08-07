@@ -22,6 +22,8 @@ enum AdaptiveMode: Int {
 }
 
 class BrightnessAdapter {
+    var appObserver: NSKeyValueObservation?
+    var runningAppExceptions: [AppException]!
     var geolocation: Geolocation! {
         didSet {
             geolocation.store()
@@ -106,7 +108,7 @@ class BrightnessAdapter {
                 Crashlytics.sharedInstance().setObjectValue(str, forKey: "display\(i)-descriptor\(j)")
                 log.debug("display\(i)-descriptor\(j): \(str)")
             }
-            Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial, "name": display.name])
+            Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial])
         }
     }
 
@@ -212,21 +214,58 @@ class BrightnessAdapter {
         }
     }
 
-    func adaptBrightness(for displays: [Display]? = nil, app: AppException? = nil, percent: Double? = nil) {
+    func listenForRunningApps() {
+        let appNames = NSWorkspace.shared.runningApplications.map({ app in app.bundleIdentifier ?? "" })
+        runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
+        for app in runningAppExceptions {
+            app.addObservers()
+        }
+
+        adaptBrightness()
+
+        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
+            let oldAppNames = change.oldValue?.map({ app in app.bundleIdentifier ?? "" })
+            let newAppNames = change.newValue?.map({ app in app.bundleIdentifier ?? "" })
+            do {
+                if let names = newAppNames {
+                    self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
+                }
+                if let names = oldAppNames {
+                    let exceptions = try datastore.fetchAppExceptions(by: names)
+                    for exception in exceptions {
+                        if let idx = self.runningAppExceptions.index(where: { app in app.name == exception.name }) {
+                            self.runningAppExceptions.remove(at: idx)
+                        }
+                    }
+                }
+                self.adaptBrightness()
+            } catch {
+                log.error("Error on fetching app exceptions for app names: \(newAppNames ?? [""])")
+            }
+        })
+    }
+
+    func adaptBrightness(for displays: [Display]? = nil, percent: Double? = nil) {
         if mode == .manual {
             return
         }
 
         var adapt: (Display) -> Void
-        if mode == .location && moment == nil {
-            log.warning("Day moments aren't fetched yet")
-            return
-        }
+
         switch mode {
         case .sync:
-            adapt = { display in display.adapt(moment: nil, app: app, percent: percent) }
+            let builtinBrightness = percent ?? getBuiltinDisplayBrightness()
+            if builtinBrightness == nil {
+                log.warning("There's no builtin display to sync with")
+                return
+            }
+            adapt = { display in display.adapt(moment: nil, app: self.runningAppExceptions?.last, percent: builtinBrightness) }
         case .location:
-            adapt = { display in display.adapt(moment: self.moment, app: app, percent: nil) }
+            if moment == nil {
+                log.warning("Day moments aren't fetched yet")
+                return
+            }
+            adapt = { display in display.adapt(moment: self.moment, app: self.runningAppExceptions?.last, percent: nil) }
         default:
             adapt = { _ in () }
         }
@@ -258,8 +297,10 @@ class BrightnessAdapter {
         maxContrast: UInt8? = nil,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
-        brightnessOffset: Int = 0,
-        contrastOffset: Int = 0
+        brightnessOffset: Int? = nil,
+        contrastOffset: Int? = nil,
+        appBrightnessOffset: Int = 0,
+        appContrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
         if moment == nil {
             log.warning("Day moments aren't fetched yet")
@@ -276,13 +317,15 @@ class BrightnessAdapter {
             daylightExtension: daylightExtension,
             noonDuration: noonDuration,
             brightnessOffset: brightnessOffset,
-            contrastOffset: contrastOffset
+            contrastOffset: contrastOffset,
+            appBrightnessOffset: appBrightnessOffset,
+            appContrastOffset: appContrastOffset
         )
     }
 
-    func computeBrightnessFromPercent(percent: Int8, for display: Display, offset: Int = 0) -> NSNumber {
+    func computeBrightnessFromPercent(percent: Int8, for display: Display, appOffset: Int = 0) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        return display.computeBrightness(from: percent, offset: offset)
+        return display.computeBrightness(from: percent, appOffset: appOffset)
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
@@ -297,9 +340,9 @@ class BrightnessAdapter {
         }
     }
 
-    func computeContrastFromPercent(percent: Int8, for display: Display, offset: Int = 0) -> NSNumber {
+    func computeContrastFromPercent(percent: Int8, for display: Display, appOffset: Int = 0) -> NSNumber {
         let percent = Double(min(max(percent, 0), 100))
-        return display.computeContrast(from: percent, offset: offset)
+        return display.computeContrast(from: percent, appOffset: appOffset)
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
@@ -327,6 +370,30 @@ class BrightnessAdapter {
             displays.forEach({ display in display.contrast = contrast })
         } else {
             self.displays.values.forEach({ display in display.contrast = contrast })
+        }
+    }
+
+    func adjustBrightness(by offset: Int8, for displays: [Display]? = nil) {
+        if let displays = displays {
+            displays.forEach({ display in
+                let value = cap(display.brightness.int8Value + offset, minVal: 0, maxVal: 100)
+                display.brightness = NSNumber(value: value) })
+        } else {
+            self.displays.values.forEach({ display in
+                let value = cap(display.brightness.int8Value + offset, minVal: 0, maxVal: 100)
+                display.brightness = NSNumber(value: value) })
+        }
+    }
+
+    func adjustContrast(by offset: Int8, for displays: [Display]? = nil) {
+        if let displays = displays {
+            displays.forEach({ display in
+                let value = cap(display.contrast.int8Value + offset, minVal: 0, maxVal: 100)
+                display.contrast = NSNumber(value: value) })
+        } else {
+            self.displays.values.forEach({ display in
+                let value = cap(display.contrast.int8Value + offset, minVal: 0, maxVal: 100)
+                display.contrast = NSNumber(value: value) })
         }
     }
 }
