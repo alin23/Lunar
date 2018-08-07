@@ -17,6 +17,9 @@ class ScrollableBrightness: NSView {
     @IBOutlet var minValueCaption: ScrollableTextFieldCaption!
     @IBOutlet var maxValueCaption: ScrollableTextFieldCaption!
     @IBOutlet var currentValueCaption: ScrollableTextFieldCaption!
+
+    @IBOutlet var lockButton: NSButton!
+
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var disabled = false {
@@ -65,12 +68,13 @@ class ScrollableBrightness: NSView {
         }
     }
 
-    func update(from _: Display) {
+    func update(from display: Display) {
         minValue?.intValue = Int32(displayMinValue)
         minValue?.upperLimit = displayMaxValue - 1
         maxValue?.intValue = Int32(displayMaxValue)
         maxValue?.lowerLimit = displayMinValue + 1
         currentValue?.intValue = Int32(displayValue)
+        lockButton.update(from: display)
     }
 
     override init(frame frameRect: NSRect) {
@@ -101,6 +105,8 @@ class ScrollableBrightness: NSView {
 
         minValue?.caption = minValueCaption
         maxValue?.caption = maxValueCaption
+
+        lockButton?.setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

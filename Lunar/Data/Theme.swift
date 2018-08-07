@@ -43,6 +43,13 @@ let adaptiveButtonBgOff = gray
 let adaptiveButtonBgOffHover = lunarYellow
 let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
 
+let lockButtonBgOn = red
+let lockButtonBgOnHover = red.highlight(withLevel: 0.2)!
+let lockButtonLabelOn = white
+let lockButtonBgOff = gray
+let lockButtonBgOffHover = red
+let lockButtonLabelOff = mauve.withAlphaComponent(0.25)
+
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
 
