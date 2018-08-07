@@ -25,6 +25,27 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var contrastOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastOffsetLabel: NSTextField!
 
+    var brightnessOffsetObserver: NSKeyValueObservation?
+    var contrastOffsetObserver: NSKeyValueObservation?
+
+    func listenForBrightnessOffsetChange() {
+        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            self.brightnessOffsetField?.stringValue = String(brightness)
+        })
+    }
+
+    func listenForContrastOffsetChange() {
+        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, options: [.old, .new], changeHandler: { _, change in
+            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+                return
+            }
+            self.contrastOffsetField?.stringValue = String(contrast)
+        })
+    }
+
     func setupNoonDuration() {
         noonDurationField?.integerValue = datastore.defaults.noonDurationMinutes
         noonDurationField?.onValueChanged = { (value: Int) in
@@ -127,6 +148,9 @@ class ConfigurationViewController: NSViewController {
 
         setupBrightnessOffset()
         setupContrastOffset()
+
+        listenForBrightnessOffsetChange()
+        listenForContrastOffsetChange()
     }
 
     override func viewDidLoad() {
