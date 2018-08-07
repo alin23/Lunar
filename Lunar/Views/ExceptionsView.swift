@@ -45,15 +45,15 @@ class ExceptionsView: NSTableView {
                 scrollableBrightness.onValueChangedInstant = { value in
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
-                        brightnessOffset: value,
-                        contrastOffset: scrollableContrast.integerValue
+                        appBrightnessOffset: value,
+                        appContrastOffset: scrollableContrast.integerValue
                     )
                 }
                 scrollableContrast.onValueChangedInstant = { value in
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
-                        brightnessOffset: scrollableBrightness.integerValue,
-                        contrastOffset: value
+                        appBrightnessOffset: scrollableBrightness.integerValue,
+                        appContrastOffset: value
                     )
                 }
 
@@ -62,8 +62,8 @@ class ExceptionsView: NSTableView {
                     let contrastOffset = scrollableContrast.integerValue
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
-                        brightnessOffset: brightnessOffset,
-                        contrastOffset: contrastOffset,
+                        appBrightnessOffset: brightnessOffset,
+                        appContrastOffset: contrastOffset,
                         withAnimation: true
                     )
                 }
@@ -72,8 +72,8 @@ class ExceptionsView: NSTableView {
                     let contrastOffset = scrollableContrast.integerValue
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
-                        brightnessOffset: brightnessOffset,
-                        contrastOffset: contrastOffset,
+                        appBrightnessOffset: brightnessOffset,
+                        appContrastOffset: contrastOffset,
                         withAnimation: true
                     )
                 }
