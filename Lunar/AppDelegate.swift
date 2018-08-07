@@ -500,8 +500,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount)
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(amount * 3), minVal: -100, maxVal: 90)
-            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + Int(amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
 
@@ -518,8 +518,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount)
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
-            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
 
@@ -581,7 +581,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s+talk+about+Lunar%21")!)
+        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
     }
 }
 
