@@ -19,7 +19,9 @@
     - <kbd>CTRL</kbd>+<kbd>CMD</kbd>+<kbd>2</kbd> for **50%** of the range between min and max
     - <kbd>CTRL</kbd>+<kbd>CMD</kbd>+<kbd>3</kbd> for **75%** of the range between min and max
     - <kbd>CTRL</kbd>+<kbd>CMD</kbd>+<kbd>4</kbd> to set brightness/contrast to **maximum**
-    - <kbd>CTRL</kbd>+<kbd>F1</kbd> to decrease brightness/contrast
-    - <kbd>CTRL</kbd>+<kbd>F2</kbd> to increase brightness/contrast
+    - <kbd>CTRL</kbd>+<kbd>F1</kbd> to decrease brightness
+    - <kbd>CTRL</kbd>+<kbd>F2</kbd> to increase brightness
+    - <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>F1</kbd> to decrease contrast
+    - <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>F2</kbd> to increase contrast
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
