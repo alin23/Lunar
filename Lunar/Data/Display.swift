@@ -22,6 +22,9 @@ class Display: NSManagedObject {
     @NSManaged var name: String
     @NSManaged var adaptive: Bool
 
+    @NSManaged var lockedBrightness: Bool
+    @NSManaged var lockedContrast: Bool
+
     @NSManaged var minBrightness: NSNumber
     @NSManaged var maxBrightness: NSNumber
 
@@ -51,6 +54,8 @@ class Display: NSManagedObject {
         }
         self.serial = (serial ?? DDC.getDisplaySerial(for: id)).stripped
         self.active = active
+        lockedBrightness = false
+        lockedContrast = false
         if id != GENERIC_DISPLAY_ID {
             self.minBrightness = NSNumber(value: minBrightness)
             self.maxBrightness = NSNumber(value: maxBrightness)
@@ -95,14 +100,14 @@ class Display: NSManagedObject {
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.brightness, options: [.new], changeHandler: { _, change in
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
-                    let newBrightness = min(max(newBrightness.uint8Value, self.minBrightness.uint8Value), self.maxBrightness.uint8Value)
+                    let newBrightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
                     log.debug("\(self.name): Set brightness to \(newBrightness)")
                 }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
                 if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
-                    let newContrast = min(max(newContrast.uint8Value, self.minContrast.uint8Value), self.maxContrast.uint8Value)
+                    let newContrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     _ = DDC.setContrast(for: self.id, contrast: newContrast)
                     log.debug("\(self.name): Set contrast to \(newContrast)")
                 }
@@ -114,51 +119,42 @@ class Display: NSManagedObject {
         observers.removeAll(keepingCapacity: true)
     }
 
-    func interpolate(value: Double, span: Double, minVal: UInt8, maxVal: UInt8, factor: Double) -> NSNumber {
-        let maxValue = Double(max(min(maxVal, 100), 0))
-        let minValue = Double(max(min(minVal, UInt8(Int(maxValue - 1))), 0))
-        let valueSpan = maxValue - minValue
-        var interpolated = ((value * valueSpan) / span)
-        let normalized = interpolated / valueSpan
-        interpolated = minValue + pow(normalized, factor) * valueSpan
-        let intInterpolated = Int(max(min(interpolated, maxValue), minValue))
-        return NSNumber(value: UInt8(intInterpolated))
-    }
-
-    func computeBrightness(from percent: Double, offset: Int = 0) -> NSNumber {
-        let minBrightness = self.minBrightness.doubleValue
-        let maxBrightness = self.maxBrightness.doubleValue
+    func computeBrightness(from percent: Double, offset: Int? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
+        let minBrightness = minVal ?? self.minBrightness.doubleValue
+        let maxBrightness = maxVal ?? self.maxBrightness.doubleValue
+        let offset = offset ?? datastore.defaults.brightnessOffset
 
         var factor = 1.0
-        if datastore.defaults.brightnessOffset > 0 {
-            factor = 1.0 - (Double(datastore.defaults.brightnessOffset) / 100.0)
-        } else if datastore.defaults.brightnessOffset < 0 {
-            factor = 1.0 - (Double(datastore.defaults.brightnessOffset) / 10.0)
+        if offset > 0 {
+            factor = 1.0 - (Double(offset) / 100.0)
+        } else if offset < 0 {
+            factor = 1.0 - (Double(offset) / 10.0)
         }
         var brightness = pow((((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0), factor) * 100.0
         brightness = cap(brightness, minVal: minBrightness, maxVal: maxBrightness)
 
-        if offset > 0 {
-            brightness = cap(brightness + Double(offset), minVal: minBrightness, maxVal: maxBrightness)
+        if appOffset > 0 {
+            brightness = cap(brightness + Double(appOffset), minVal: minBrightness, maxVal: maxBrightness)
         }
         return NSNumber(value: Int(brightness))
     }
 
-    func computeContrast(from percent: Double, offset: Int = 0) -> NSNumber {
-        let minContrast = self.minContrast.doubleValue
-        let maxContrast = self.maxContrast.doubleValue
+    func computeContrast(from percent: Double, offset: Int? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
+        let minContrast = minVal ?? self.minContrast.doubleValue
+        let maxContrast = maxVal ?? self.maxContrast.doubleValue
+        let offset = offset ?? datastore.defaults.contrastOffset
 
         var factor = 1.0
-        if datastore.defaults.contrastOffset > 0 {
-            factor = 1.0 - (Double(datastore.defaults.contrastOffset) / 100.0)
-        } else if datastore.defaults.contrastOffset < 0 {
-            factor = 1.0 + (Double(-datastore.defaults.contrastOffset) / 100.0)
+        if offset > 0 {
+            factor = 1.0 - (Double(offset) / 100.0)
+        } else if offset < 0 {
+            factor = 1.0 + (Double(-offset) / 100.0)
         }
         var contrast = pow((((percent / 100.0) * (maxContrast - minContrast) + minContrast) / 100.0), factor) * 100.0
         contrast = cap(contrast, minVal: minContrast, maxVal: maxContrast)
 
-        if offset > 0 {
-            contrast = cap(contrast + Double(offset), minVal: minContrast, maxVal: maxContrast)
+        if appOffset > 0 {
+            contrast = cap(contrast + Double(appOffset), minVal: minContrast, maxVal: maxContrast)
         }
         return NSNumber(value: Int(contrast))
     }
@@ -173,8 +169,10 @@ class Display: NSManagedObject {
         maxContrast: UInt8? = nil,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
-        brightnessOffset: Int = 0,
-        contrastOffset: Int = 0
+        brightnessOffset: Int? = nil,
+        contrastOffset: Int? = nil,
+        appBrightnessOffset: Int = 0,
+        appContrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
         var now = DateInRegion().convertTo(region: Region.local)
         if let hour = hour {
@@ -187,7 +185,6 @@ class Display: NSManagedObject {
         let maxContrast = maxContrast ?? self.maxContrast.uint8Value
         var newBrightness = NSNumber(value: minBrightness)
         var newContrast = NSNumber(value: minContrast)
-        let interpolationFactor = datastore.defaults.interpolationFactor
         let daylightExtension = daylightExtension ?? datastore.defaults.daylightExtensionMinutes
         let noonDuration = noonDuration ?? datastore.defaults.noonDurationMinutes
 
@@ -201,15 +198,15 @@ class Display: NSManagedObject {
         case daylightStart ... noonStart:
             let firstHalfDayMinutes = ((noonStart - daylightStart).timeInterval / seconds)
             let minutesSinceSunrise = ((now - daylightStart).timeInterval / seconds)
-            newBrightness = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: 1 / interpolationFactor)
-            newContrast = interpolate(value: minutesSinceSunrise, span: firstHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: 1 / interpolationFactor)
+            let percent = (minutesSinceSunrise / firstHalfDayMinutes) * 100
+            newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
+            newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))
         case noonEnd ... daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd).timeInterval / seconds)
             let minutesSinceNoon = ((now - noonEnd).timeInterval / seconds)
-            let interpolatedBrightness = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minBrightness, maxVal: maxBrightness, factor: interpolationFactor)
-            let interpolatedContrast = interpolate(value: minutesSinceNoon, span: secondHalfDayMinutes, minVal: minContrast, maxVal: maxContrast, factor: interpolationFactor)
-            newBrightness = NSNumber(value: maxBrightness + minBrightness - interpolatedBrightness.uint8Value)
-            newContrast = NSNumber(value: maxContrast + minContrast - interpolatedContrast.uint8Value)
+            let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes) * 100
+            newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
+            newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))
         case noonStart ... noonEnd:
             newBrightness = NSNumber(value: maxBrightness)
             newContrast = NSNumber(value: maxContrast)
@@ -218,31 +215,40 @@ class Display: NSManagedObject {
             newContrast = NSNumber(value: minContrast)
         }
 
-        if brightnessOffset > 0 {
-            newBrightness = NSNumber(value: min(newBrightness.intValue + brightnessOffset, Int(MAX_BRIGHTNESS)))
+        if appBrightnessOffset > 0 {
+            newBrightness = NSNumber(value: min(newBrightness.intValue + appBrightnessOffset, Int(MAX_BRIGHTNESS)))
         }
-        if contrastOffset > 0 {
-            newContrast = NSNumber(value: min(newContrast.intValue + contrastOffset, Int(MAX_CONTRAST)))
+        if appContrastOffset > 0 {
+            newContrast = NSNumber(value: min(newContrast.intValue + appContrastOffset, Int(MAX_CONTRAST)))
         }
         return (newBrightness, newContrast)
     }
 
     func adapt(moment: Moment? = nil, app: AppException? = nil, percent: Double? = nil) {
+        if !adaptive {
+            return
+        }
+
         var newBrightness: NSNumber = 0
         var newContrast: NSNumber = 0
         if let moment = moment {
-            (newBrightness, newContrast) = getBrightnessContrast(moment: moment, brightnessOffset: app?.brightness.intValue ?? 0, contrastOffset: app?.contrast.intValue ?? 0)
+            (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: app?.brightness.intValue ?? 0, appContrastOffset: app?.contrast.intValue ?? 0)
         } else if let percent = percent {
-            newBrightness = computeBrightness(from: percent, offset: app?.brightness.intValue ?? 0)
-            newContrast = computeContrast(from: percent, offset: app?.contrast.intValue ?? 0)
+            newBrightness = computeBrightness(from: percent, appOffset: app?.brightness.intValue ?? 0)
+            newContrast = computeContrast(from: percent, appOffset: app?.contrast.intValue ?? 0)
         }
 
         var changed = false
-        if brightness != newBrightness {
+        if lockedBrightness {
+            setValue(brightness, forKey: "brightness")
+        } else if brightness != newBrightness {
             setValue(newBrightness, forKey: "brightness")
             changed = true
         }
-        if contrast != newContrast {
+
+        if lockedContrast {
+            setValue(contrast, forKey: "contrast")
+        } else if contrast != newContrast {
             setValue(newContrast, forKey: "contrast")
             changed = true
         }

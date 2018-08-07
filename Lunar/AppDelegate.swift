@@ -49,10 +49,17 @@ let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
 let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
 let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
 let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
-let brightnessUpHotKey = HotKey(key: .f2, modifiers: [.control])
+
 let preciseBrightnessUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control, .option])
-let brightnessDownHotKey = HotKey(key: .f1, modifiers: [.control])
 let preciseBrightnessDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control, .option])
+let preciseContrastUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control, .option, .shift])
+let preciseContrastDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control, .option, .shift])
+
+let brightnessUpHotKey = HotKey(key: .f2, modifiers: [.control])
+let brightnessDownHotKey = HotKey(key: .f1, modifiers: [.control])
+let contrastUpHotKey = HotKey(key: .f2, modifiers: [.control, .shift])
+let contrastDownHotKey = HotKey(key: .f1, modifiers: [.control, .shift])
+
 var upHotkey: HotKey?
 var downHotkey: HotKey?
 var leftHotkey: HotKey?
@@ -81,7 +88,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adapterSyncQueue: OperationQueue!
     var adapterSyncActivity: NSObjectProtocol!
 
-    var appObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
@@ -89,7 +95,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var loginItemObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
 
-    var runningAppExceptions: [AppException]!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
@@ -138,20 +143,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.setLightPercent(percent: 100)
             log.debug("100% Hotkey pressed")
         }
+
         brightnessUpHotKey.keyDownHandler = {
             self.increaseBrightness()
         }
-
-        preciseBrightnessUpHotKey.keyDownHandler = {
-            self.increaseBrightness(1)
-        }
-
         brightnessDownHotKey.keyDownHandler = {
             self.decreaseBrightness()
         }
+        contrastUpHotKey.keyDownHandler = {
+            self.increaseContrast()
+        }
+        contrastDownHotKey.keyDownHandler = {
+            self.decreaseContrast()
+        }
 
+        preciseBrightnessUpHotKey.keyDownHandler = {
+            self.increaseBrightness(by: 1)
+        }
         preciseBrightnessDownHotKey.keyDownHandler = {
-            self.decreaseBrightness(1)
+            self.decreaseBrightness(by: 1)
+        }
+        preciseContrastUpHotKey.keyDownHandler = {
+            self.increaseContrast(by: 1)
+        }
+        preciseContrastDownHotKey.keyDownHandler = {
+            self.decreaseContrast(by: 1)
         }
     }
 
@@ -253,9 +269,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
-            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness() {
-                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
-            }
+            brightnessAdapter.adaptBrightness()
             adapterSyncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
             adapterSyncQueue.addOperation {
                 while true {
@@ -309,37 +323,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         windowController = nil
     }
 
-    func listenForRunningApps() {
-        let appNames = NSWorkspace.shared.runningApplications.map({ app in app.bundleIdentifier ?? "" })
-        runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
-        for app in runningAppExceptions {
-            app.addObservers()
-        }
-
-        adapt()
-
-        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
-            let oldAppNames = change.oldValue?.map({ app in app.bundleIdentifier ?? "" })
-            let newAppNames = change.newValue?.map({ app in app.bundleIdentifier ?? "" })
-            do {
-                if let names = newAppNames {
-                    self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
-                }
-                if let names = oldAppNames {
-                    let exceptions = try datastore.fetchAppExceptions(by: names)
-                    for exception in exceptions {
-                        if let idx = self.runningAppExceptions.index(where: { app in app.name == exception.name }) {
-                            self.runningAppExceptions.remove(at: idx)
-                        }
-                    }
-                }
-                self.adapt()
-            } catch {
-                log.error("Error on fetching app exceptions for app names: \(newAppNames ?? [""])")
-            }
-        })
-    }
-
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
         brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
@@ -368,15 +351,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         })
         brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, changeHandler: { _, _ in
-            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                brightnessAdapter.mode == .sync {
-                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+            if brightnessAdapter.mode != .manual {
+                brightnessAdapter.adaptBrightness()
             }
         })
         contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, changeHandler: { _, _ in
-            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                brightnessAdapter.mode == .sync {
-                brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+            if brightnessAdapter.mode != .manual {
+                brightnessAdapter.adaptBrightness()
             }
         })
     }
@@ -406,7 +387,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         listenForAdaptiveModeChange()
         listenForScreenConfigurationChanged()
-        listenForRunningApps()
+        brightnessAdapter.listenForRunningApps()
 
         addObservers()
         if thisIsFirstRun {
@@ -505,13 +486,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adapt() {
-        if brightnessAdapter.mode == .location {
-            brightnessAdapter.adaptBrightness(app: runningAppExceptions.last)
-        } else if brightnessAdapter.mode == .sync {
-            if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness() {
-                brightnessAdapter.adaptBrightness(app: runningAppExceptions.last, percent: builtinBrightness)
-            }
-        }
+        brightnessAdapter.adaptBrightness()
     }
 
     func setLightPercent(percent: Int8) {
@@ -521,20 +496,39 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
-    private func increaseBrightness(_ amount: Int = 2) {
-        adjustBrightness(amount)
+    private func increaseBrightness(by amount: Int8 = 3) {
+        if brightnessAdapter.mode == .manual {
+            brightnessAdapter.adjustBrightness(by: amount)
+        } else {
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+        }
     }
 
-    private func decreaseBrightness(_ amount: Int = 2) {
-        adjustBrightness(-amount)
+    private func increaseContrast(by amount: Int8 = 3) {
+        if brightnessAdapter.mode == .manual {
+            brightnessAdapter.adjustContrast(by: amount)
+        } else {
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+        }
     }
 
-    private func adjustBrightness(_ amount: Int) {
-        let persistentBrightness = datastore.defaults.persistentBrightness
-        let newBrightness = persistentBrightness + Int(amount)
-        if newBrightness <= 100 && newBrightness >= 0 {
-            setLightPercent(percent: Int8(newBrightness))
-            datastore.defaults.set(newBrightness, forKey: "persistentBrightness")
+    private func decreaseBrightness(by amount: Int8 = 3) {
+        if brightnessAdapter.mode == .manual {
+            brightnessAdapter.adjustBrightness(by: -amount)
+        } else {
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+        }
+    }
+
+    private func decreaseContrast(by amount: Int8 = 3) {
+        if brightnessAdapter.mode == .manual {
+            brightnessAdapter.adjustContrast(by: -amount)
+        } else {
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
+            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
         }
     }
 
@@ -566,6 +560,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         decreaseBrightness()
     }
 
+    @IBAction func contrastUp(_: Any) {
+        increaseContrast()
+    }
+
+    @IBAction func contrastDown(_: Any) {
+        decreaseContrast()
+    }
+
     @IBAction func toggleBrightnessAdapter(sender _: Any?) {
         brightnessAdapter.toggle()
     }
@@ -579,7 +581,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com")!)
+        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s+talk+about+Lunar%21")!)
     }
 }
 

@@ -17,8 +17,10 @@ class SettingsPageController: NSViewController {
         display: Display,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
-        brightnessOffset: Int = 0,
-        contrastOffset: Int = 0,
+        brightnessOffset: Int? = nil,
+        contrastOffset: Int? = nil,
+        appBrightnessOffset: Int = 0,
+        appContrastOffset: Int = 0,
         withAnimation: Bool = false
     ) {
         if display.id == GENERIC_DISPLAY_ID {
@@ -38,7 +40,9 @@ class SettingsPageController: NSViewController {
                     daylightExtension: daylightExtension,
                     noonDuration: noonDuration,
                     brightnessOffset: brightnessOffset,
-                    contrastOffset: contrastOffset
+                    contrastOffset: contrastOffset,
+                    appBrightnessOffset: appBrightnessOffset,
+                    appContrastOffset: appContrastOffset
                 )
                 brightnessChartEntry[x].y = brightness.doubleValue
                 contrastChartEntry[x].y = contrast.doubleValue

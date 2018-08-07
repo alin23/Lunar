@@ -11,7 +11,7 @@ import Cocoa
 class LockButton: NSButton {
     var lockButtonTrackingArea: NSTrackingArea!
 
-    func setup() {
+    func setup(_ locked: Bool = false) {
         wantsLayer = true
 
         let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
@@ -24,9 +24,11 @@ class LockButton: NSButton {
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
         layer?.cornerRadius = frame.height / 2
-        if state == .on {
+        if locked {
+            state = .on
             layer?.backgroundColor = lockButtonBgOn.cgColor
         } else {
+            state = .off
             layer?.backgroundColor = lockButtonBgOff.cgColor
         }
         lockButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
@@ -55,13 +57,5 @@ class LockButton: NSButton {
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-    }
-
-    func update(from display: Display) {
-        if display.lockedBrightness {
-            state = .on
-        } else {
-            state = .off
-        }
     }
 }

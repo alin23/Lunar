@@ -47,7 +47,7 @@ let lockButtonBgOn = red
 let lockButtonBgOnHover = red.highlight(withLevel: 0.2)!
 let lockButtonLabelOn = white
 let lockButtonBgOff = gray
-let lockButtonBgOffHover = red
+let lockButtonBgOffHover = red.highlight(withLevel: 0.4)!
 let lockButtonLabelOff = mauve.withAlphaComponent(0.25)
 
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
