@@ -7,9 +7,6 @@
 //
 
 import Cocoa
-import SwiftyBeaver
-
-let log = SwiftyBeaver.self
 
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
@@ -22,12 +19,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        let console = ConsoleDestination()
-        let file = FileDestination()
-
-        log.addDestination(console)
-        log.addDestination(file)
-
         let mainAppIdentifier = "com.alinp.Lunar"
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == mainAppIdentifier })
@@ -49,7 +40,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             components.append("Lunar")
 
             let newPath = NSString.path(withComponents: components)
-            log.debug("Launching \(newPath)")
 
             NSWorkspace.shared.launchApplication(newPath)
         } else {
