@@ -326,11 +326,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         brightnessAdapter.resetDisplayList()
         brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
-        if brightnessAdapter.displays.isEmpty && brightnessAdapter.mode != .manual {
-            brightnessAdapter.disable()
-        } else {
-            brightnessAdapter.enable()
-        }
         if let visible = windowController?.window?.isVisible, visible {
             windowController?.close()
             windowController?.window = nil
@@ -392,9 +387,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         addObservers()
         if thisIsFirstRun {
             showWindow()
-        }
-        if brightnessAdapter.displays.isEmpty {
-            brightnessAdapter.disable()
         }
 
         log.debug("App finished launching")
