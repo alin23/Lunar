@@ -1249,7 +1249,7 @@ to view other displays</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Qf-Fh-CXU">
                                 <rect key="frame" x="265" y="400" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness -3%" id="lku-B1-wcM">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Down" id="lku-B1-wcM">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1262,7 +1262,7 @@ to view other displays</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ddz-Ba-c0d">
                                 <rect key="frame" x="265" y="320" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness +3%" id="0OD-28-VtF">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Up" id="0OD-28-VtF">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1275,7 +1275,7 @@ to view other displays</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S9L-Dx-ksA">
                                 <rect key="frame" x="265" y="240" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast -3%" id="UFl-qA-DY8">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Down" id="UFl-qA-DY8">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1288,7 +1288,7 @@ to view other displays</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Obv-oP-JEe">
                                 <rect key="frame" x="265" y="160" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast +3%" id="nRU-mZ-43S">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Up" id="nRU-mZ-43S">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
