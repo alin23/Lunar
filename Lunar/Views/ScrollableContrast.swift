@@ -81,12 +81,12 @@ class ScrollableContrast: NSView {
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
-        if currentValue.isHidden == !hidden && minValue.isHidden == hidden && maxValue.isHidden == hidden {
+        if currentValue.isHidden == !hidden, minValue.isHidden == hidden, maxValue.isHidden == hidden {
             return
         }
         if let display = display,
-            !hidden &&
-            (!display.adaptive || (mode ?? brightnessAdapter.mode) == .manual) {
+            !hidden,
+            !display.adaptive || (mode ?? brightnessAdapter.mode) == .manual {
             return
         }
 
@@ -108,7 +108,7 @@ class ScrollableContrast: NSView {
         currentValue?.layer?.add(fadeTransition(duration: currentAnimDuration), forKey: "lockingTransition")
         currentValueCaption?.layer?.add(fadeTransition(duration: currentAnimDuration), forKey: "lockingTransition")
 
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64((1_000_000_000 * 0.2)))
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(1_000_000_000 * 0.2))
         if hidden {
             minValue?.alphaValue = limitsAlpha
             minValueCaption?.alphaValue = limitsAlpha

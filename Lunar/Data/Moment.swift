@@ -49,7 +49,7 @@ class Moment: NSObject, NSCoding {
         sunrise = DateInRegion(solar.sunrise ?? sevenAM, region: Region.local)
         sunset = DateInRegion(solar.sunset ?? sevenPM, region: Region.local)
         solarNoon = DateInRegion(solar.solarNoon ?? noon, region: Region.local)
-        dayLength = UInt64((sunset - sunset).timeInterval)
+        dayLength = UInt64(sunset - sunset)
         civilSunrise = DateInRegion(solar.civilSunrise ?? sevenAM, region: Region.local)
         civilSunset = DateInRegion(solar.civilSunset ?? sevenPM, region: Region.local)
         nauticalSunrise = DateInRegion(solar.nauticalSunrise ?? sevenAM, region: Region.local)

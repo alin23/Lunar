@@ -71,6 +71,24 @@ class DataStore: NSObject {
         }
     }
 
+    func hotkeys() -> [HotkeyIdentifier: [HotkeyPart: Int]]? {
+        var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
+        guard let hotkeyConfig = defaults.dictionary(forKey: "hotkeys") else { return nil }
+        for (k, v) in hotkeyConfig {
+            guard let identifier = HotkeyIdentifier(rawValue: k), let hotkeyDict = v as? [String: Int] else { continue }
+            var hotkey: [HotkeyPart: Int] = [:]
+            for (hk, hv) in hotkeyDict {
+                guard let part = HotkeyPart(rawValue: hk) else { continue }
+                hotkey[part] = hv
+            }
+            if hotkey.count == HotkeyPart.allCases.count {
+                hotkeySettings[identifier] = hotkey
+            }
+        }
+
+        return hotkeySettings
+    }
+
     func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
         let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
         fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
@@ -84,7 +102,7 @@ class DataStore: NSObject {
     }
 
     func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
-        return try DataStore.fetchAppException(by: identifier, context: (context ?? self.context))
+        return try DataStore.fetchAppException(by: identifier, context: context ?? self.context)
     }
 
     static func fetchAppException(by identifier: String, context: NSManagedObjectContext) throws -> AppException? {
@@ -115,6 +133,30 @@ class DataStore: NSObject {
         }
     }
 
+    static func setDefault(_ value: Int, for key: String) {
+        if DataStore.defaults.object(forKey: key) == nil {
+            DataStore.defaults.set(value, forKey: key)
+        }
+    }
+
+    static func setDefault(_ value: Double, for key: String) {
+        if DataStore.defaults.object(forKey: key) == nil {
+            DataStore.defaults.set(value, forKey: key)
+        }
+    }
+
+    static func setDefault(_ value: Bool, for key: String) {
+        if DataStore.defaults.object(forKey: key) == nil {
+            DataStore.defaults.set(value, forKey: key)
+        }
+    }
+
+    static func setDefault(_ value: NSDictionary, for key: String) {
+        if DataStore.defaults.object(forKey: key) == nil {
+            DataStore.defaults.set(value, forKey: key)
+        }
+    }
+
     override init() {
         if #available(OSX 10.12, *) {
             container.loadPersistentStores(completionHandler: { _, error in
@@ -140,32 +182,17 @@ class DataStore: NSObject {
             DataStore.firstRun(context: context)
             DataStore.defaults.set(true, forKey: "firstRun")
         }
-        if DataStore.defaults.object(forKey: "interpolationFactor") == nil {
-            DataStore.defaults.set(2.0, forKey: "interpolationFactor")
-        }
-        if DataStore.defaults.object(forKey: "didScrollTextField") == nil {
-            DataStore.defaults.set(false, forKey: "didScrollTextField")
-        }
-        if DataStore.defaults.object(forKey: "didSwipeLeft") == nil {
-            DataStore.defaults.set(false, forKey: "didSwipeLeft")
-        }
-        if DataStore.defaults.object(forKey: "didSwipeRight") == nil {
-            DataStore.defaults.set(false, forKey: "didSwipeRight")
-        }
-        if DataStore.defaults.object(forKey: "startAtLogin") == nil {
-            DataStore.defaults.set(true, forKey: "startAtLogin")
-        }
-        if DataStore.defaults.object(forKey: "daylightExtensionMinutes") == nil {
-            DataStore.defaults.set(180, forKey: "daylightExtensionMinutes")
-        }
-        if DataStore.defaults.object(forKey: "noonDurationMinutes") == nil {
-            DataStore.defaults.set(240, forKey: "noonDurationMinutes")
-        }
-        if DataStore.defaults.object(forKey: "brightnessOffset") == nil {
-            DataStore.defaults.set(0, forKey: "brightnessOffset")
-        }
-        if DataStore.defaults.object(forKey: "contrastOffset") == nil {
-            DataStore.defaults.set(0, forKey: "contrastOffset")
-        }
+
+        DataStore.setDefault(2.0, for: "interpolationFactor")
+        DataStore.setDefault(false, for: "didScrollTextField")
+        DataStore.setDefault(false, for: "didSwipeLeft")
+        DataStore.setDefault(false, for: "didSwipeRight")
+        DataStore.setDefault(true, for: "startAtLogin")
+        DataStore.setDefault(180, for: "daylightExtensionMinutes")
+        DataStore.setDefault(240, for: "noonDurationMinutes")
+        DataStore.setDefault(0, for: "brightnessOffset")
+        DataStore.setDefault(0, for: "contrastOffset")
+
+        DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
 }
