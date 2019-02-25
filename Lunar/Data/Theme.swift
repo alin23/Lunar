@@ -17,6 +17,7 @@ let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 
 let bgColor = white
+let hotkeysBgColor = mauve
 let settingsBgColor = lunarYellow
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
@@ -53,22 +54,40 @@ let lockButtonLabelOff = mauve.withAlphaComponent(0.25)
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
 
+let hotkeyColor: [HoverState: [String: NSColor]] = [
+    .hover: [
+        "background": white.withAlphaComponent(0.4),
+        "tint": lunarYellow,
+        "tintDisabled": white.withAlphaComponent(0.9),
+        "tintRecording": red.highlight(withLevel: 0.4)!,
+    ],
+    .noHover: [
+        "background": white.withAlphaComponent(0.3),
+        "tint": lunarYellow.withAlphaComponent(0.9),
+        "tintDisabled": white.withAlphaComponent(0.7),
+        "tintRecording": red.highlight(withLevel: 0.4)!,
+    ],
+]
 let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
     .hover: [
+        .hotkeys: mauve,
         .settings: lunarYellow,
         .display: mauve,
     ],
     .noHover: [
+        .hotkeys: white,
         .settings: mauve.withAlphaComponent(0.7),
         .display: mauve.withAlphaComponent(0.35),
     ],
 ]
 let stateButtonColor: [HoverState: [Page: NSColor]] = [
     .hover: [
+        .hotkeys: lunarYellow.withAlphaComponent(0.9),
         .settings: mauve.withAlphaComponent(0.5),
         .display: lunarYellow,
     ],
     .noHover: [
+        .hotkeys: lunarYellow.withAlphaComponent(0.6),
         .settings: white.withAlphaComponent(0.3),
         .display: gray,
     ],

@@ -14,6 +14,7 @@ enum HoverState: Int {
 }
 
 enum Page: Int {
+    case hotkeys
     case settings
     case display
 }
@@ -25,38 +26,9 @@ let titleString: [AdaptiveMode: String] = [
 ]
 
 class ToggleButton: NSButton {
-    let stateTitle: [AdaptiveMode: [HoverState: [Page: NSMutableAttributedString]]] = [
-        .sync: [
-            .noHover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .noHover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .noHover, page: .settings),
-            ],
-            .hover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .hover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.sync]!, mode: .sync, hoverState: .hover, page: .settings),
-            ],
-        ],
-        .manual: [
-            .noHover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .noHover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .noHover, page: .settings),
-            ],
-            .hover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .hover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.manual]!, mode: .manual, hoverState: .hover, page: .settings),
-            ],
-        ],
-        .location: [
-            .noHover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .noHover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .noHover, page: .settings),
-            ],
-            .hover: [
-                .display: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .hover, page: .display),
-                .settings: ToggleButton.titleWithAttributes(title: titleString[.location]!, mode: .location, hoverState: .hover, page: .settings),
-            ],
-        ],
-    ]
+    static func getStateTitle(adaptiveMode: AdaptiveMode, hoverState: HoverState, page: Page) -> NSMutableAttributedString {
+        return ToggleButton.titleWithAttributes(title: titleString[adaptiveMode]!, mode: adaptiveMode, hoverState: hoverState, page: page)
+    }
 
     var page = Page.display
     var hoverState = HoverState.noHover
@@ -73,7 +45,7 @@ class ToggleButton: NSButton {
     }
 
     var buttonTitle: NSMutableAttributedString {
-        return stateTitle[brightnessAdapter.mode]![hoverState]![page]!
+        return ToggleButton.getStateTitle(adaptiveMode: brightnessAdapter.mode, hoverState: hoverState, page: page)
     }
 
     override init(frame frameRect: NSRect) {

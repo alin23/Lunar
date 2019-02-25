@@ -27,7 +27,7 @@ class BrightnessContrastChartView: LineChartView {
         let span = (maxVal - minVal) / Double(count)
         var values = [Double](repeating: 0.0, count: count)
         for x in 0 ..< count {
-            values[x] = minVal + pow(((Double(x) * span) / 100.0), 2.0) * 100.0
+            values[x] = minVal + pow((Double(x) * span) / 100.0, 2.0) * 100.0
         }
         return values
     }

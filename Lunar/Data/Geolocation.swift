@@ -43,7 +43,7 @@ class Geolocation: NSObject, NSCoding {
     init?(defaults: UserDefaults = datastore.defaults) {
         let latitude = defaults.double(forKey: "latitude")
         let longitude = defaults.double(forKey: "longitude")
-        if latitude == 0.0 && longitude == 0.0 {
+        if latitude == 0.0, longitude == 0.0 {
             return nil
         }
         self.latitude = latitude
