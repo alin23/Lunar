@@ -155,8 +155,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         if viewControllers[identifier] == nil {
             if identifier == hotkeyViewControllerIdentifier {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
-            } else
-            if identifier == settingsPageControllerIdentifier {
+            } else if identifier == settingsPageControllerIdentifier {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
             } else {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController

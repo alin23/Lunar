@@ -87,7 +87,7 @@ let stateButtonColor: [HoverState: [Page: NSColor]] = [
         .display: lunarYellow,
     ],
     .noHover: [
-        .hotkeys: lunarYellow.withAlphaComponent(0.6),
+        .hotkeys: lunarYellow.withAlphaComponent(0.3),
         .settings: white.withAlphaComponent(0.3),
         .display: gray,
     ],
