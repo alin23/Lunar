@@ -34,16 +34,32 @@ class SplitViewController: NSSplitViewController {
 
     func whiteBackground() {
         view.layer?.backgroundColor = bgColor.cgColor
-        logo?.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        logo?.textColor = logoColor
+        if let logo = logo {
+            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.textColor = logoColor
+            logo.stringValue = "LUNAR"
+        }
         activeStateButton?.page = .display
         activeStateButton?.fade()
     }
 
     func yellowBackground() {
-        logo?.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        logo?.textColor = bgColor
+        if let logo = logo {
+            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.textColor = bgColor
+            logo.stringValue = "LUNAR"
+        }
         activeStateButton?.page = .settings
+        activeStateButton?.fade()
+    }
+
+    func mauveBackground() {
+        if let logo = logo {
+            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.textColor = logoColor
+            logo.stringValue = "HOTKEYS"
+        }
+        activeStateButton?.page = .hotkeys
         activeStateButton?.fade()
     }
 

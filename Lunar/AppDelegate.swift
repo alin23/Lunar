@@ -6,11 +6,13 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import Carbon.HIToolbox
 import Cocoa
 import CoreLocation
 import Crashlytics
 import Fabric
-import HotKey
+import class HotKey.HotKey
+import Magnet
 import ServiceManagement
 import WAYWindow
 
@@ -26,7 +28,7 @@ var lunarDisplayNames = [
     "Luna",
 ]
 
-let launcherAppId = "com.alinp.LunarService"
+let launcherAppId = "site.lunarapp.LunarService"
 let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
@@ -39,26 +41,6 @@ extension Notification.Name {
 func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     return max(min(number, maxVal), minVal)
 }
-
-let toggleHotKey = HotKey(key: .l, modifiers: [.command, .control])
-let startHotKey = HotKey(key: .l, modifiers: [.command, .control, .option])
-let pauseHotKey = HotKey(key: .l, modifiers: [.command, .control, .option, .shift])
-let lunarHotKey = HotKey(key: .l, modifiers: [.command, .option])
-let percent0HotKey = HotKey(key: .zero, modifiers: [.command, .control])
-let percent25HotKey = HotKey(key: .one, modifiers: [.command, .control])
-let percent50HotKey = HotKey(key: .two, modifiers: [.command, .control])
-let percent75HotKey = HotKey(key: .three, modifiers: [.command, .control])
-let percent100HotKey = HotKey(key: .four, modifiers: [.command, .control])
-
-let preciseBrightnessUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control, .option])
-let preciseBrightnessDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control, .option])
-let preciseContrastUpHotKey = HotKey(key: .upArrow, modifiers: [.command, .control, .option, .shift])
-let preciseContrastDownHotKey = HotKey(key: .downArrow, modifiers: [.command, .control, .option, .shift])
-
-let brightnessUpHotKey = HotKey(key: .f2, modifiers: [.control])
-let brightnessDownHotKey = HotKey(key: .f1, modifiers: [.control])
-let contrastUpHotKey = HotKey(key: .f2, modifiers: [.control, .shift])
-let contrastDownHotKey = HotKey(key: .f1, modifiers: [.control, .shift])
 
 var upHotkey: HotKey?
 var downHotkey: HotKey?
@@ -107,67 +89,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initHotkeys() {
-        toggleHotKey.keyDownHandler = {
-            brightnessAdapter.toggle()
-            log.debug("Toggle Hotkey pressed")
-        }
-        pauseHotKey.keyDownHandler = {
-            brightnessAdapter.disable()
-            log.debug("Pause Hotkey pressed")
-        }
-        startHotKey.keyDownHandler = {
-            brightnessAdapter.enable()
-            log.debug("Start Hotkey pressed")
-        }
-        lunarHotKey.keyDownHandler = {
-            self.showWindow()
-            log.debug("Show Window Hotkey pressed")
-        }
-        percent0HotKey.keyDownHandler = {
-            self.setLightPercent(percent: 0)
-            log.debug("0% Hotkey pressed")
-        }
-        percent25HotKey.keyDownHandler = {
-            self.setLightPercent(percent: 25)
-            log.debug("25% Hotkey pressed")
-        }
-        percent50HotKey.keyDownHandler = {
-            self.setLightPercent(percent: 50)
-            log.debug("50% Hotkey pressed")
-        }
-        percent75HotKey.keyDownHandler = {
-            self.setLightPercent(percent: 75)
-            log.debug("75% Hotkey pressed")
-        }
-        percent100HotKey.keyDownHandler = {
-            self.setLightPercent(percent: 100)
-            log.debug("100% Hotkey pressed")
-        }
-
-        brightnessUpHotKey.keyDownHandler = {
-            self.increaseBrightness()
-        }
-        brightnessDownHotKey.keyDownHandler = {
-            self.decreaseBrightness()
-        }
-        contrastUpHotKey.keyDownHandler = {
-            self.increaseContrast()
-        }
-        contrastDownHotKey.keyDownHandler = {
-            self.decreaseContrast()
-        }
-
-        preciseBrightnessUpHotKey.keyDownHandler = {
-            self.increaseBrightness(by: 1)
-        }
-        preciseBrightnessDownHotKey.keyDownHandler = {
-            self.decreaseBrightness(by: 1)
-        }
-        preciseContrastUpHotKey.keyDownHandler = {
-            self.increaseContrast(by: 1)
-        }
-        preciseContrastDownHotKey.keyDownHandler = {
-            self.decreaseContrast(by: 1)
+        guard let hotkeyConfig: [HotkeyIdentifier: [HotkeyPart: Int]] = datastore.hotkeys() else { return }
+        for identifier in HotkeyIdentifier.allCases {
+            guard let hotkey = hotkeyConfig[identifier], let keyCode = hotkey[.keyCode], let enabled = hotkey[.enabled], let modifiers = hotkey[.modifiers] else { return }
+            if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
+                Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
+                if enabled == 1 {
+                    Hotkey.keys[identifier]??.register()
+                }
+            }
         }
     }
 
@@ -260,7 +190,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             activity.schedule { completion in
                 let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
                 do {
-                    let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
+                    let displays = try displayIDs.map({ id in try datastore.context.existingObject(with: id) as! Display })
                     brightnessAdapter.adaptBrightness(for: displays)
                 } catch {
                     log.error("Error on fetching Displays by IDs")
@@ -278,7 +208,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         brightnessAdapter.lastBuiltinBrightness = builtinBrightness
                         let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
                         do {
-                            let displays = try displayIDs.map({ id in (try datastore.context.existingObject(with: id) as! Display) })
+                            let displays = try displayIDs.map({ id in try datastore.context.existingObject(with: id) as! Display })
                             brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
                         } catch {
                             log.error("Error on fetching Displays by IDs")
@@ -408,7 +338,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if let location = locations.last {
             brightnessAdapter.geolocation = Geolocation(location: location)
             locationManager.stopMonitoringSignificantLocationChanges()
-            if brightnessAdapter.geolocation.latitude != 0 && brightnessAdapter.geolocation.longitude != 0 {
+            if brightnessAdapter.geolocation.latitude != 0, brightnessAdapter.geolocation.longitude != 0 {
                 log.debug("Zero LocationManager coordinates")
             } else {
                 log.debug("Got LocationManager coordinates")
@@ -488,7 +418,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
-    private func increaseBrightness(by amount: Int8 = 3) {
+    func increaseBrightness(by amount: Int8 = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount)
         } else {
@@ -497,7 +427,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    private func increaseContrast(by amount: Int8 = 3) {
+    func increaseContrast(by amount: Int8 = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: amount)
         } else {
@@ -506,7 +436,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    private func decreaseBrightness(by amount: Int8 = 3) {
+    func decreaseBrightness(by amount: Int8 = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount)
         } else {
@@ -515,7 +445,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    private func decreaseContrast(by amount: Int8 = 3) {
+    func decreaseContrast(by amount: Int8 = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: -amount)
         } else {
@@ -578,11 +508,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToCATransitionType(_ input: String) -> CATransitionType {
+private func convertToCATransitionType(_ input: String) -> CATransitionType {
     return CATransitionType(rawValue: input)
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromCATransitionType(_ input: CATransitionType) -> String {
+private func convertFromCATransitionType(_ input: CATransitionType) -> String {
     return input.rawValue
 }
