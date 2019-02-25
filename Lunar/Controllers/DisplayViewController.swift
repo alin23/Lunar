@@ -103,10 +103,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @IBAction func delete(_: NSButton) {
-        (view.superview!.nextResponder as! PageController).deleteDisplay()
-    }
-
     func initAdaptiveButton() {
         if let button = adaptiveButton {
             let buttonSize = button.frame

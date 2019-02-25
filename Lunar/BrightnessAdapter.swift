@@ -56,7 +56,7 @@ class BrightnessAdapter {
     var lastBuiltinBrightness = 0.0
 
     var firstDisplay: Display {
-        if displays.count > 0 {
+        if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
         } else {
             return GENERIC_DISPLAY
@@ -280,7 +280,7 @@ class BrightnessAdapter {
     func getBuiltinDisplayBrightness() -> Double? {
         if let displayID = builtinDisplay {
             let brightness = DDC.getBrightness(for: displayID)
-            if brightness >= 0.0 && brightness <= 1.0 {
+            if brightness >= 0.0, brightness <= 1.0 {
                 return brightness * 100
             }
         }

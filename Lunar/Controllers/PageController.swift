@@ -12,7 +12,6 @@ import HotKey
 
 class PageController: NSPageController, NSPageControllerDelegate {
     var pageControl: PageControl!
-    var lastSelectedIndex = 0
 
     override var arrangedObjects: [Any] {
         didSet {
@@ -20,6 +19,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
     }
 
+    let hotkeyViewControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("hotkey")
     let settingsPageControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
@@ -32,34 +32,14 @@ class PageController: NSPageController, NSPageControllerDelegate {
         if !view.subviews.contains(pageControl) {
             view.addSubview(pageControl)
         }
-        pageControl.setNeedsDisplay(pageControl.frame)
-    }
 
-    func deleteDisplay() {
-        if selectedIndex == 0 {
-            if selectedIndex < arrangedObjects.count {
-                navigateForward(nil)
-            }
-        } else {
-            navigateBack(nil)
-        }
-        let displayToDelete = arrangedObjects[selectedIndex] as! Display
-        let identifier = NSPageController.ObjectIdentifier(String(describing: displayToDelete.id))
-        viewControllers.removeValue(forKey: identifier)
-        arrangedObjects.remove(at: selectedIndex)
-        datastore.context.delete(displayToDelete)
-        datastore.save()
+        pageControl.setNeedsDisplay(pageControl.frame)
     }
 
     func setup() {
         delegate = self
 
-        let settingsViewController = viewControllers.values.first
-        if settingsViewController != nil {
-            viewControllers[settingsPageControllerIdentifier] = settingsViewController!
-        }
-
-        arrangedObjects = [datastore]
+        arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
         if !brightnessAdapter.displays.isEmpty {
             let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.active && !d2.active
@@ -70,9 +50,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
 
         setupPageControl(size: arrangedObjects.count)
-        selectedIndex = 1
+        selectedIndex = 2
         completeTransition()
-        view.setNeedsDisplay(view.rectForPage(1))
+        view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
     func setupHotkeys() {
@@ -128,12 +108,15 @@ class PageController: NSPageController, NSPageControllerDelegate {
             let viewController = pageController(self, viewControllerForIdentifier: identifier)
             if selectedIndex == 0 {
                 hideSwipeLeftHint()
+                splitViewController.mauveBackground()
+            } else if selectedIndex == 1 {
+                hideSwipeLeftHint()
                 splitViewController.yellowBackground()
                 if let settingsController = viewController as? SettingsPageController {
                     settingsController.initGraph(display: brightnessAdapter.firstDisplay)
                 }
             } else {
-                if selectedIndex > 1 {
+                if selectedIndex > 2 {
                     hideSwipeRightHint()
                 }
                 if !splitViewController.hasWhiteBackground() {
@@ -149,7 +132,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
                     continue
                 }
                 let controller = pageController(self, viewControllerForIdentifier: otherIdentifier)
-                if let c = controller as? SettingsPageController {
+                if (controller as? HotkeyViewController) != nil {
+                    continue
+                } else if let c = controller as? SettingsPageController {
                     c.zeroGraph()
                 } else {
                     (controller as! DisplayViewController).zeroGraph()
@@ -160,14 +145,17 @@ class PageController: NSPageController, NSPageControllerDelegate {
     }
 
     func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
-        if (object as? DataStore) == datastore {
-            return settingsPageControllerIdentifier
+        if let identifier = object as? NSPageController.ObjectIdentifier {
+            return identifier
         }
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
 
     func pageController(_: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         if viewControllers[identifier] == nil {
+            if identifier == hotkeyViewControllerIdentifier {
+                viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
+            } else
             if identifier == settingsPageControllerIdentifier {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
             } else {
@@ -183,7 +171,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
                     if !datastore.defaults.didSwipeLeft {
                         controller.swipeLeftHintVisible = true
                     }
-                    if !datastore.defaults.didSwipeRight && arrangedObjects.count > 2 {
+                    if !datastore.defaults.didSwipeRight, arrangedObjects.count > 2 {
                         controller.swipeRightHintVisible = true
                     }
                 }
@@ -193,13 +181,6 @@ class PageController: NSPageController, NSPageControllerDelegate {
         }
 
         return viewControllers[identifier]!
-    }
-
-    override func scrollWheel(with event: NSEvent) {
-        let lastIndex = arrangedObjects.count - 1
-        if arrangedObjects.count > 1 && ((selectedIndex < lastIndex && event.scrollingDeltaX < 0) || (selectedIndex == lastIndex && event.scrollingDeltaX > 0)) {
-            super.scrollWheel(with: event)
-        }
     }
 
     override var representedObject: Any? {

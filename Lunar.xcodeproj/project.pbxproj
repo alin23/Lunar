@@ -7,14 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C70495BF20EA48C5006824CC /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C70495BE20EA48C5006824CC /* Sentry.framework */; };
-		C70495C020EA48C5006824CC /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C70495BE20EA48C5006824CC /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
+		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
+		C75083402222865F0020270E /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
+		C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083422222865F0020270E /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; };
+		C75083432222865F0020270E /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083442222865F0020270E /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083362222865D0020270E /* Alamofire.framework */; };
+		C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083362222865D0020270E /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083462222865F0020270E /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; };
+		C75083472222865F0020270E /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083482222865F0020270E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083382222865E0020270E /* Sparkle.framework */; };
+		C75083492222865F0020270E /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083382222865E0020270E /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; };
+		C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833A2222865E0020270E /* SwiftyJSON.framework */; };
+		C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833A2222865E0020270E /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; };
+		C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833C2222865E0020270E /* SwiftyBeaver.framework */; };
+		C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833C2222865E0020270E /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083522222865F0020270E /* Magnet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; };
+		C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083542222865F0020270E /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; };
+		C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C75083562222865F0020270E /* HotKey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833F2222865F0020270E /* HotKey.framework */; };
+		C75083572222865F0020270E /* HotKey.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833F2222865F0020270E /* HotKey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C750835F2222BEAB0020270E /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835D2222BEAA0020270E /* Crashlytics.framework */; };
+		C75083602222BEAB0020270E /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835E2222BEAA0020270E /* Fabric.framework */; };
+		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
+		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
 		C76545291FD8A56B00DBACE9 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C76545261FD8A11000DBACE9 /* DDC.c */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
@@ -51,31 +78,31 @@
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
-		C7EA515220EA326E00F2B06B /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514720EA326D00F2B06B /* Alamofire.framework */; };
-		C7EA515320EA326E00F2B06B /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514720EA326D00F2B06B /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515420EA326E00F2B06B /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514820EA326D00F2B06B /* Solar.framework */; };
-		C7EA515520EA326E00F2B06B /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514820EA326D00F2B06B /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515620EA326E00F2B06B /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */; };
-		C7EA515720EA326E00F2B06B /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515820EA326E00F2B06B /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514A20EA326D00F2B06B /* WAYWindow.framework */; };
-		C7EA515920EA326E00F2B06B /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514A20EA326D00F2B06B /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515C20EA326E00F2B06B /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514C20EA326D00F2B06B /* Charts.framework */; };
-		C7EA515D20EA326E00F2B06B /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514C20EA326D00F2B06B /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA515E20EA326E00F2B06B /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514D20EA326D00F2B06B /* NSPageControl.framework */; };
-		C7EA515F20EA326E00F2B06B /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514D20EA326D00F2B06B /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA516020EA326E00F2B06B /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514E20EA326D00F2B06B /* SwiftyJSON.framework */; };
-		C7EA516120EA326E00F2B06B /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514E20EA326D00F2B06B /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA516220EA326E00F2B06B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514F20EA326D00F2B06B /* Sparkle.framework */; };
-		C7EA516320EA326E00F2B06B /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA514F20EA326D00F2B06B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA516420EA326E00F2B06B /* HotKey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515020EA326D00F2B06B /* HotKey.framework */; };
-		C7EA516520EA326E00F2B06B /* HotKey.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515020EA326D00F2B06B /* HotKey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA516620EA326E00F2B06B /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515120EA326D00F2B06B /* SwiftDate.framework */; };
-		C7EA516720EA326E00F2B06B /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA515120EA326D00F2B06B /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7EA516C20EA477900F2B06B /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA516A20EA477800F2B06B /* Crashlytics.framework */; };
-		C7EA516D20EA477900F2B06B /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7EA516B20EA477900F2B06B /* Fabric.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C75083582222865F0020270E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C75083572222865F0020270E /* HotKey.framework in Embed Frameworks */,
+				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
+				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
+				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
+				C75083492222865F0020270E /* Sparkle.framework in Embed Frameworks */,
+				C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */,
+				C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */,
+				C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */,
+				C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */,
+				C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */,
+				C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */,
+				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C7CFEA221FD37836000AC4A6 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -96,31 +123,9 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C7EA516820EA326E00F2B06B /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				C7EA516120EA326E00F2B06B /* SwiftyJSON.framework in Embed Frameworks */,
-				C7EA515920EA326E00F2B06B /* WAYWindow.framework in Embed Frameworks */,
-				C70495C020EA48C5006824CC /* Sentry.framework in Embed Frameworks */,
-				C7EA515520EA326E00F2B06B /* Solar.framework in Embed Frameworks */,
-				C7EA515720EA326E00F2B06B /* SwiftyBeaver.framework in Embed Frameworks */,
-				C7EA516720EA326E00F2B06B /* SwiftDate.framework in Embed Frameworks */,
-				C7EA516320EA326E00F2B06B /* Sparkle.framework in Embed Frameworks */,
-				C7EA515D20EA326E00F2B06B /* Charts.framework in Embed Frameworks */,
-				C7EA516520EA326E00F2B06B /* HotKey.framework in Embed Frameworks */,
-				C7EA515F20EA326E00F2B06B /* NSPageControl.framework in Embed Frameworks */,
-				C7EA515320EA326E00F2B06B /* Alamofire.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C70495BE20EA48C5006824CC /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Carthage/Build/Mac/Sentry.framework; sourceTree = "<group>"; };
 		C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
 		C716B2051FD32B4900F22F90 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
 		C72776E6201F02140055934F /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PageControl.swift; path = Lunar/Views/PageControl.swift; sourceTree = SOURCE_ROOT; };
@@ -128,18 +133,25 @@
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		C73CD23D20EA2F1800B13DDE /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
-		C73CD23E20EA2F1800B13DDE /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
-		C73CD23F20EA2F1800B13DDE /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
-		C73CD24020EA2F1900B13DDE /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
-		C73CD24120EA2F1900B13DDE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
-		C73CD24320EA2F1900B13DDE /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
-		C73CD24420EA2F1900B13DDE /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
-		C73CD24520EA2F1900B13DDE /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
-		C73CD24620EA2F1A00B13DDE /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
-		C73CD24720EA2F1A00B13DDE /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
+		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75047A92119B30300458191 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
+		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
+		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
+		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
+		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
+		C75083382222865E0020270E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
+		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
+		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
+		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KeyHolder.framework; path = Carthage/Build/Mac/KeyHolder.framework; sourceTree = "<group>"; };
+		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
+		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Magnet.framework; path = Carthage/Build/Mac/Magnet.framework; sourceTree = "<group>"; };
+		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
+		C750833F2222865F0020270E /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
+		C750835D2222BEAA0020270E /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		C750835E2222BEAA0020270E /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
+		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
+		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
 		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
 		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
@@ -181,18 +193,6 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
-		C7EA514720EA326D00F2B06B /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
-		C7EA514820EA326D00F2B06B /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
-		C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
-		C7EA514A20EA326D00F2B06B /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
-		C7EA514C20EA326D00F2B06B /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
-		C7EA514D20EA326D00F2B06B /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
-		C7EA514E20EA326D00F2B06B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
-		C7EA514F20EA326D00F2B06B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
-		C7EA515020EA326D00F2B06B /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
-		C7EA515120EA326D00F2B06B /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
-		C7EA516A20EA477800F2B06B /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
-		C7EA516B20EA477900F2B06B /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,19 +200,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7EA516020EA326E00F2B06B /* SwiftyJSON.framework in Frameworks */,
-				C7EA515820EA326E00F2B06B /* WAYWindow.framework in Frameworks */,
-				C7EA515420EA326E00F2B06B /* Solar.framework in Frameworks */,
-				C7EA515620EA326E00F2B06B /* SwiftyBeaver.framework in Frameworks */,
-				C7EA516620EA326E00F2B06B /* SwiftDate.framework in Frameworks */,
-				C7EA516220EA326E00F2B06B /* Sparkle.framework in Frameworks */,
-				C7EA515C20EA326E00F2B06B /* Charts.framework in Frameworks */,
-				C7EA516420EA326E00F2B06B /* HotKey.framework in Frameworks */,
-				C70495BF20EA48C5006824CC /* Sentry.framework in Frameworks */,
-				C7EA516D20EA477900F2B06B /* Fabric.framework in Frameworks */,
-				C7EA515E20EA326E00F2B06B /* NSPageControl.framework in Frameworks */,
-				C7EA516C20EA477900F2B06B /* Crashlytics.framework in Frameworks */,
-				C7EA515220EA326E00F2B06B /* Alamofire.framework in Frameworks */,
+				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
+				C75083422222865F0020270E /* Charts.framework in Frameworks */,
+				C750835F2222BEAB0020270E /* Crashlytics.framework in Frameworks */,
+				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
+				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
+				C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */,
+				C75083562222865F0020270E /* HotKey.framework in Frameworks */,
+				C75083602222BEAB0020270E /* Fabric.framework in Frameworks */,
+				C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */,
+				C75083482222865F0020270E /* Sparkle.framework in Frameworks */,
+				C75083442222865F0020270E /* Alamofire.framework in Frameworks */,
+				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
+				C75083462222865F0020270E /* Solar.framework in Frameworks */,
+				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,6 +239,7 @@
 				C72776EC201F26CB0055934F /* AppException.swift */,
 				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
 				C78AB66620F0C73900863CB1 /* Logger.swift */,
+				C73AAC4A22241B690063AD2A /* Hotkeys.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -253,6 +255,7 @@
 				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
 				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
+				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
 				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
 				C7E242642119A65B0020326C /* LockButton.swift */,
+				C75083632222DC9F0020270E /* HotKeyView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -290,30 +294,21 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
-				C70495BE20EA48C5006824CC /* Sentry.framework */,
-				C7EA516A20EA477800F2B06B /* Crashlytics.framework */,
-				C7EA516B20EA477900F2B06B /* Fabric.framework */,
-				C73CD23E20EA2F1800B13DDE /* Alamofire.framework */,
-				C73CD23F20EA2F1800B13DDE /* Charts.framework */,
-				C73CD24020EA2F1900B13DDE /* HotKey.framework */,
-				C7EA515020EA326D00F2B06B /* HotKey.framework */,
-				C73CD24520EA2F1900B13DDE /* NSPageControl.framework */,
-				C7EA514C20EA326D00F2B06B /* Charts.framework */,
-				C7EA514D20EA326D00F2B06B /* NSPageControl.framework */,
-				C73CD23D20EA2F1800B13DDE /* Solar.framework */,
-				C73CD24120EA2F1900B13DDE /* Sparkle.framework */,
-				C73CD24420EA2F1900B13DDE /* SwiftDate.framework */,
-				C7EA514F20EA326D00F2B06B /* Sparkle.framework */,
-				C7EA515120EA326D00F2B06B /* SwiftDate.framework */,
-				C73CD24620EA2F1A00B13DDE /* SwiftyBeaver.framework */,
-				C73CD24720EA2F1A00B13DDE /* SwiftyJSON.framework */,
-				C7EA514E20EA326D00F2B06B /* SwiftyJSON.framework */,
-				C73CD24320EA2F1900B13DDE /* WAYWindow.framework */,
-				C7EA514720EA326D00F2B06B /* Alamofire.framework */,
-				C7EA514820EA326D00F2B06B /* Solar.framework */,
-				C7EA514920EA326D00F2B06B /* SwiftyBeaver.framework */,
-				C7EA514A20EA326D00F2B06B /* WAYWindow.framework */,
+				C75083362222865D0020270E /* Alamofire.framework */,
+				C75083352222865D0020270E /* Charts.framework */,
+				C750833F2222865F0020270E /* HotKey.framework */,
+				C750833B2222865E0020270E /* KeyHolder.framework */,
+				C750833D2222865E0020270E /* Magnet.framework */,
+				C750833E2222865E0020270E /* NSPageControl.framework */,
+				C75083372222865E0020270E /* Solar.framework */,
+				C75083382222865E0020270E /* Sparkle.framework */,
+				C75083392222865E0020270E /* SwiftDate.framework */,
+				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
+				C750833A2222865E0020270E /* SwiftyJSON.framework */,
+				C75083342222865D0020270E /* WAYWindow.framework */,
 				C7A2574120EA249B003B3A84 /* dsa_pub.pem */,
+				C750835D2222BEAA0020270E /* Crashlytics.framework */,
+				C750835E2222BEAA0020270E /* Fabric.framework */,
 				C7AEC7F71FD0B4350039B562 /* Lunar */,
 				C7CFEA131FD376E6000AC4A6 /* LunarService */,
 				C7AEC7F61FD0B4350039B562 /* Products */,
@@ -379,8 +374,8 @@
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7CFEA221FD37836000AC4A6 /* CopyFiles */,
-				C7EA516820EA326E00F2B06B /* Embed Frameworks */,
 				C7EA516920EA470800F2B06B /* ShellScript */,
+				C75083582222865F0020270E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -520,6 +515,7 @@
 				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
 				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
@@ -533,12 +529,14 @@
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
+				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
+				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
@@ -625,7 +623,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -678,7 +676,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -754,7 +752,8 @@
 				);
 				INFOPLIST_FILE = LunarService/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -777,7 +776,8 @@
 				);
 				INFOPLIST_FILE = LunarService/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alinp.LunarService;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
