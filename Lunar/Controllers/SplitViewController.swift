@@ -44,6 +44,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func yellowBackground() {
+        view.layer?.backgroundColor = bgColor.cgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = bgColor
@@ -54,6 +55,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func mauveBackground() {
+        view.layer?.backgroundColor = mauve.cgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
