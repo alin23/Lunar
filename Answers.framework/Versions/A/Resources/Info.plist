@@ -5,19 +5,19 @@
 	<key>BuildMachineOSBuild</key>
 	<string>17G65</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>Crashlytics</string>
+	<string>Answers</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.twitter.crashlytics.mac</string>
+	<string>com.twitter.answers.mac</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Crashlytics</string>
+	<string>Answers</string>
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.12.0</string>
+	<string>1.4.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleSupportedPlatforms</key>
@@ -25,7 +25,7 @@
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>136</string>
+	<string>31</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
@@ -41,13 +41,11 @@
 	<key>DTXcodeBuild</key>
 	<string>10O35n</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2016 Crashlytics, Inc. All rights reserved.</string>
+	<string>Copyright © 2015 Crashlytics, Inc. All rights reserved.</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
 		<integer>2</integer>
-		<integer>3</integer>
-		<integer>4</integer>
 	</array>
 </dict>
 </plist>

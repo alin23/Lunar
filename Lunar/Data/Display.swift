@@ -74,7 +74,7 @@ class Display: NSManagedObject {
         }
         if let newVal = change.newValue as? NSNumber,
             let oldVal = change.oldValue as? NSNumber {
-            if display.adaptive && newVal != oldVal {
+            if display.adaptive, newVal != oldVal {
                 switch brightnessAdapter.mode {
                 case .location:
                     display.adapt(moment: brightnessAdapter.moment)
@@ -130,7 +130,7 @@ class Display: NSManagedObject {
         } else if offset < 0 {
             factor = 1.0 - (Double(offset) / 10.0)
         }
-        var brightness = pow((((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0), factor) * 100.0
+        var brightness = pow(((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0, factor) * 100.0
         brightness = cap(brightness, minVal: minBrightness, maxVal: maxBrightness)
 
         if appOffset > 0 {
@@ -150,7 +150,7 @@ class Display: NSManagedObject {
         } else if offset < 0 {
             factor = 1.0 + (Double(-offset) / 100.0)
         }
-        var contrast = pow((((percent / 100.0) * (maxContrast - minContrast) + minContrast) / 100.0), factor) * 100.0
+        var contrast = pow(((percent / 100.0) * (maxContrast - minContrast) + minContrast) / 100.0, factor) * 100.0
         contrast = cap(contrast, minVal: minContrast, maxVal: maxContrast)
 
         if appOffset > 0 {
@@ -196,14 +196,14 @@ class Display: NSManagedObject {
 
         switch now {
         case daylightStart ... noonStart:
-            let firstHalfDayMinutes = ((noonStart - daylightStart).timeInterval / seconds)
-            let minutesSinceSunrise = ((now - daylightStart).timeInterval / seconds)
+            let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
+            let minutesSinceSunrise = ((now - daylightStart) / seconds)
             let percent = (minutesSinceSunrise / firstHalfDayMinutes) * 100
             newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
             newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))
         case noonEnd ... daylightEnd:
-            let secondHalfDayMinutes = ((daylightEnd - noonEnd).timeInterval / seconds)
-            let minutesSinceNoon = ((now - noonEnd).timeInterval / seconds)
+            let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
+            let minutesSinceNoon = ((now - noonEnd) / seconds)
             let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes) * 100
             newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
             newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))

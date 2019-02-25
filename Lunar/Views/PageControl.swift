@@ -10,7 +10,7 @@ import Cocoa
 
 public class PageControl: NSView {
     public var numberOfPages: Int = 0
-    public var currentPage: Int = 1 {
+    public var currentPage: Int = 2 {
         didSet(oldValue) {
             if currentPage < 0 {
                 currentPage = 0
@@ -52,7 +52,7 @@ public class PageControl: NSView {
         super.draw(dirtyRect)
 
         let dotWidthSum: CGFloat = dotLength * CGFloat(numberOfPages)
-        let marginWidthSum: CGFloat = dotMargin * CGFloat((numberOfPages - 1))
+        let marginWidthSum: CGFloat = dotMargin * CGFloat(numberOfPages - 1)
         let minimumRequiredWidth: CGFloat = dotWidthSum + marginWidthSum
 
         let hasEnoughHeight: Bool = dirtyRect.height >= dotLength
@@ -114,11 +114,11 @@ public class PageControl: NSView {
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToCAMediaTimingFillMode(_ input: String) -> CAMediaTimingFillMode {
+private func convertToCAMediaTimingFillMode(_ input: String) -> CAMediaTimingFillMode {
     return CAMediaTimingFillMode(rawValue: input)
 }
 
 // Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromCAMediaTimingFillMode(_ input: CAMediaTimingFillMode) -> String {
+private func convertFromCAMediaTimingFillMode(_ input: CAMediaTimingFillMode) -> String {
     return input.rawValue
 }
