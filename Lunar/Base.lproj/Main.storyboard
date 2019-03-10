@@ -33,6 +33,13 @@
                                                 <action selector="toggleBrightnessAdapterWithSender:" target="Voe-Tx-rLC" id="WZa-gt-6uZ"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Start at Login" state="on" id="HeU-1X-veM">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleStartAtLoginWithSender:" target="Voe-Tx-rLC" id="UeX-aW-1MF"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
                                         <menuItem title="0%" keyEquivalent="0" id="9Jm-7d-C6T">
                                             <attributedString key="attributedTitle"/>
@@ -172,6 +179,7 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
+                        <outlet property="loginMenuItem" destination="HeU-1X-veM" id="T04-59-iC5"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
                         <outlet property="stateMenuItem" destination="YMI-RQ-F1Z" id="cCj-Nl-eqb"/>
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
