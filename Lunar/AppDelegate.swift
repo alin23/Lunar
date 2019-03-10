@@ -80,6 +80,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var menu: NSMenu!
     @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
+    @IBOutlet var loginMenuItem: NSMenuItem!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -145,13 +146,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    func setLoginMenuItemState(state: Bool) {
+        if state {
+            loginMenuItem?.state = .on
+        } else {
+            loginMenuItem?.state = .off
+        }
+    }
+
     func handleDaemon() {
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == launcherAppId })
 
         SMLoginItemSetEnabled(launcherAppId as CFString, datastore.defaults.startAtLogin)
+        setLoginMenuItemState(state: datastore.defaults.startAtLogin)
         loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, change in
             SMLoginItemSetEnabled(launcherAppId as CFString, change.newValue ?? false)
+            self.setLoginMenuItemState(state: change.newValue ?? false)
         })
 
         if isRunning {
@@ -492,6 +503,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func toggleBrightnessAdapter(sender _: Any?) {
         brightnessAdapter.toggle()
+    }
+
+    @IBAction func toggleStartAtLogin(sender _: Any?) {
+        datastore.defaults.set(!datastore.defaults.startAtLogin, forKey: "startAtLogin")
     }
 
     @IBAction func showWindow(sender _: Any?) {
