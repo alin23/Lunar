@@ -1,16 +1,18 @@
 #!/usr/bin/env fish
-set -l workDir ~/Temp
-set -l archivesDir $workDir/LunarArchives
+set -l workDir (pwd)
+set -l tmpDir /tmp/Lunar
+set -l releaseDir $workDir/Releases
 set -l privKey ~/Documents/Keys/dsa_priv.pem
-set -l appcast "$archivesDir/appcast.xml"
+set -l appcast "$releaseDir/appcast.xml"
 
-rm -rf $workDir/Lunar/*
-cp -R /private/tmp/DerivedData/Lunar-awgakuaxmexierhhqifxvodvwpri/Build/Products/Release/Lunar.app $workDir/Lunar/
+mkdir -p $tmpDir
+rm -rf $tmpDir/*
+cp -R /private/tmp/DerivedData/Lunar-awgakuaxmexierhhqifxvodvwpri/Build/Products/Release/Lunar.app $tmpDir/Lunar.app
 
-set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $workDir/Lunar/Lunar.app/Contents/Info.plist)
-set -l appLatestDmg $archivesDir/Lunar.dmg
-set -l appDmg $archivesDir/Lunar-$appVersion.dmg
-set -l appTmpDmg $workDir/Lunar-$appVersion.dmg
+set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $tmpDir/Lunar.app/Contents/Info.plist)
+set -l appLatestDmg $releaseDir/Lunar-latest.dmg
+set -l appDmg $releaseDir/Lunar-$appVersion.dmg
+set -l appTmpDmg /tmp/Lunar-$appVersion.dmg
 
 if test -f $appDmg
     echo (set_color red)"Deleting $appDmg"(set_color normal)
@@ -31,7 +33,7 @@ end
 
 
 echo \n(set_color green)"Creating $appTmpDmg"(set_color normal)
-hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder $workDir/Lunar -ov -format UDRW $appTmpDmg
+hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder $tmpDir -ov -format UDRW $appTmpDmg
 
 echo \n(set_color green)"Linking /Applications"(set_color normal)
 ln -s /Applications /Volumes/Lunar/Applications
@@ -47,9 +49,12 @@ xattr -cr $appDmg
 codesign -fs "Mac Developer: alin.p32@gmail.com (FVP7HX44T5)" $appDmg
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
-generate_appcast $privKey $archivesDir
+generate_appcast $privKey $releaseDir
 
-cp $appDmg $appLatestDmg
+echo \n(set_color red)"Removing delta files"(set_color normal)
+rm $releaseDir/*.delta
+
+ln -s $appDmg $appLatestDmg
 
 echo \n(set_color yellow)"Signing Updates"(set_color normal)
 ./sign_updates.py "$appcast" "$privKey"
