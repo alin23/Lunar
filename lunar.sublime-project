@@ -14,7 +14,12 @@
 			"folder_exclude_patterns":
 			[
 				"Carthage",
+				"Releases/.tmp",
 				"*.framework"
+			],
+			"file_exclude_patterns":
+			[
+				"Releases/*.delta"
 			],
 			"path": "."
 		}
