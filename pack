@@ -54,7 +54,7 @@ generate_appcast $privKey $releaseDir
 echo \n(set_color red)"Removing delta files"(set_color normal)
 rm $releaseDir/*.delta
 
-ln -s $appDmg $appLatestDmg
+cp $appDmg $appLatestDmg
 
 echo \n(set_color yellow)"Signing Updates"(set_color normal)
 ./sign_updates.py "$appcast" "$privKey"
