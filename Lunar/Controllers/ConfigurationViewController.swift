@@ -114,6 +114,12 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    @IBAction func goToHotkeys(_: Any?) {
+        if let settingsController = parent?.parent as? SettingsPageController {
+            settingsController.pageController?.navigateBack(nil)
+        }
+    }
+
     func setup() {
         noonDurationField?.textFieldColor = scrollableTextFieldColorWhite
         noonDurationField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
