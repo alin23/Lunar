@@ -119,9 +119,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
                 if selectedIndex > 2 {
                     hideSwipeRightHint()
                 }
-                if !splitViewController.hasWhiteBackground() {
-                    splitViewController.whiteBackground()
-                }
+                splitViewController.whiteBackground()
                 if let displayController = viewController as? DisplayViewController {
                     displayController.initGraph()
                 }

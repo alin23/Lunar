@@ -29,11 +29,12 @@ class SplitViewController: NSSplitViewController {
     }
 
     func hasWhiteBackground() -> Bool {
-        return logo?.textColor == logoColor
+        return view.layer?.backgroundColor == white.cgColor
     }
 
     func whiteBackground() {
-        view.layer?.backgroundColor = bgColor.cgColor
+        view.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        view.layer?.backgroundColor = white.cgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
