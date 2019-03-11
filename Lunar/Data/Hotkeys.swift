@@ -34,6 +34,28 @@ enum HotkeyPart: String, CaseIterable {
 }
 
 class Hotkey {
+    static let functionKeyMapping: [Int: String] = [
+        kVK_F1: String(Unicode.Scalar(NSF1FunctionKey)!),
+        kVK_F2: String(Unicode.Scalar(NSF2FunctionKey)!),
+        kVK_F3: String(Unicode.Scalar(NSF3FunctionKey)!),
+        kVK_F4: String(Unicode.Scalar(NSF4FunctionKey)!),
+        kVK_F5: String(Unicode.Scalar(NSF5FunctionKey)!),
+        kVK_F6: String(Unicode.Scalar(NSF6FunctionKey)!),
+        kVK_F7: String(Unicode.Scalar(NSF7FunctionKey)!),
+        kVK_F8: String(Unicode.Scalar(NSF8FunctionKey)!),
+        kVK_F9: String(Unicode.Scalar(NSF9FunctionKey)!),
+        kVK_F10: String(Unicode.Scalar(NSF10FunctionKey)!),
+        kVK_F11: String(Unicode.Scalar(NSF11FunctionKey)!),
+        kVK_F12: String(Unicode.Scalar(NSF12FunctionKey)!),
+        kVK_F13: String(Unicode.Scalar(NSF13FunctionKey)!),
+        kVK_F14: String(Unicode.Scalar(NSF14FunctionKey)!),
+        kVK_F15: String(Unicode.Scalar(NSF15FunctionKey)!),
+        kVK_F16: String(Unicode.Scalar(NSF16FunctionKey)!),
+        kVK_F17: String(Unicode.Scalar(NSF17FunctionKey)!),
+        kVK_F18: String(Unicode.Scalar(NSF18FunctionKey)!),
+        kVK_F19: String(Unicode.Scalar(NSF19FunctionKey)!),
+        kVK_F20: String(Unicode.Scalar(NSF20FunctionKey)!),
+    ]
     static var keys: [HotkeyIdentifier: Magnet.HotKey?] = [:]
 
     static let defaults: [HotkeyIdentifier: [HotkeyPart: Int]] = [
@@ -126,6 +148,23 @@ class Hotkey {
 
     static var defaultHotkeys: NSDictionary = Hotkey.toNSDictionary(Hotkey.defaults)
 
+    static func toDictionary(_ hotkeys: [String: Any]) -> [HotkeyIdentifier: [HotkeyPart: Int]] {
+        var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
+        for (k, v) in hotkeys {
+            guard let identifier = HotkeyIdentifier(rawValue: k), let hotkeyDict = v as? [String: Int] else { continue }
+            var hotkey: [HotkeyPart: Int] = [:]
+            for (hk, hv) in hotkeyDict {
+                guard let part = HotkeyPart(rawValue: hk) else { continue }
+                hotkey[part] = hv
+            }
+            if hotkey.count == HotkeyPart.allCases.count {
+                hotkeySettings[identifier] = hotkey
+            }
+        }
+
+        return hotkeySettings
+    }
+
     static func toNSDictionary(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) -> NSDictionary {
         let keyDict: NSMutableDictionary = [:]
         for (identifier, hotkey) in hotkeys {
@@ -174,6 +213,24 @@ class Hotkey {
             return #selector(AppDelegate.contrastUpHotkeyHandler)
         case .contrastDown:
             return #selector(AppDelegate.contrastDownHotkeyHandler)
+        }
+    }
+
+    static func setKeyEquivalent(_ identifier: HotkeyIdentifier, menuItem: NSMenuItem?, hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
+        guard let menuItem = menuItem else { return }
+        if let hk = hotkeys[identifier], let keyCode = hk[.keyCode], let enabled = hk[.enabled], let modifiers = hk[.modifiers] {
+            if enabled == 1 {
+                if let keyEquivalent = Hotkey.functionKeyMapping[keyCode] {
+                    menuItem.keyEquivalent = keyEquivalent
+                } else {
+                    menuItem.keyEquivalent = KeyCodeTransformer.shared.transformValue(keyCode, carbonModifiers: 0)
+                }
+                menuItem.keyEquivalentModifierMask = KeyTransformer.cocoaFlags(from: modifiers)
+            } else {
+                menuItem.keyEquivalent = ""
+            }
+        } else {
+            menuItem.keyEquivalent = ""
         }
     }
 }
