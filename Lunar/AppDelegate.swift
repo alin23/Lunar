@@ -76,11 +76,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var contrastOffsetObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
+    var hotkeyObserver: NSKeyValueObservation?
 
     @IBOutlet var menu: NSMenu!
+    @IBOutlet var preferencesMenuItem: NSMenuItem!
     @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
     @IBOutlet var loginMenuItem: NSMenuItem!
+
+    @IBOutlet var percent0MenuItem: NSMenuItem!
+    @IBOutlet var percent25MenuItem: NSMenuItem!
+    @IBOutlet var percent50MenuItem: NSMenuItem!
+    @IBOutlet var percent75MenuItem: NSMenuItem!
+    @IBOutlet var percent100MenuItem: NSMenuItem!
+
+    @IBOutlet var brightnessUpMenuItem: NSMenuItem!
+    @IBOutlet var brightnessDownMenuItem: NSMenuItem!
+    @IBOutlet var contrastUpMenuItem: NSMenuItem!
+    @IBOutlet var contrastDownMenuItem: NSMenuItem!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -100,6 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
         }
+        self.setKeyEquivalents(hotkeyConfig)
     }
 
     func listenForAdaptiveModeChange() {
@@ -296,6 +310,30 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 brightnessAdapter.adaptBrightness()
             }
         })
+
+        hotkeyObserver = datastore.defaults.observe(\.hotkeys, changeHandler: { _, _ in
+            if let hotkeys = datastore.hotkeys() {
+                self.setKeyEquivalents(hotkeys)
+            }
+        })
+    }
+
+    func setKeyEquivalents(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
+        Hotkey.setKeyEquivalent(.lunar, menuItem: self.preferencesMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.toggle, menuItem: self.toggleMenuItem, hotkeys: hotkeys)
+
+        Hotkey.setKeyEquivalent(.percent0, menuItem: self.percent0MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent25, menuItem: self.percent25MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent50, menuItem: self.percent50MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent75, menuItem: self.percent75MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent100, menuItem: self.percent100MenuItem, hotkeys: hotkeys)
+
+        Hotkey.setKeyEquivalent(.brightnessUp, menuItem: self.brightnessUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.brightnessDown, menuItem: self.brightnessDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.contrastUp, menuItem: self.contrastUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.contrastDown, menuItem: self.contrastDownMenuItem, hotkeys: hotkeys)
+
+        self.menu?.update()
     }
 
     func acquirePrivileges() -> Bool {

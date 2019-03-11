@@ -6,6 +6,7 @@
 //  Copyright © 2019 Alin. All rights reserved.
 //
 
+import Carbon.HIToolbox
 import KeyHolder
 import Magnet
 
@@ -38,8 +39,11 @@ class HotkeyView: RecordView, RecordViewDelegate {
         return true
     }
 
-    func recordView(_: RecordView, canRecordKeyCombo _: KeyCombo) -> Bool {
-        return true
+    func recordView(_: RecordView, canRecordKeyCombo combo: KeyCombo) -> Bool {
+        if combo.keyCode == kVK_Space {
+            return false
+        }
+        return !combo.doubledModifiers
     }
 
     func recordViewDidClearShortcut(_: RecordView) {
@@ -57,6 +61,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
         hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
         hotkey.register()
         if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
+            Hotkey.keys[identifier] = hotkey
             hotkeys[identifier]?[.enabled] = 1
             hotkeys[identifier]?[.modifiers] = keyCombo.modifiers
             hotkeys[identifier]?[.keyCode] = keyCombo.keyCode
