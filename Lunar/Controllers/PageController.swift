@@ -154,7 +154,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
             if identifier == hotkeyViewControllerIdentifier {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
             } else if identifier == settingsPageControllerIdentifier {
-                viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
+                let settingsPageController = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
+                settingsPageController.pageController = self
+                viewControllers[identifier] = settingsPageController
             } else {
                 viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
