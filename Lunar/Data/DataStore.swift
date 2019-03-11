@@ -48,6 +48,10 @@ extension UserDefaults {
     @objc dynamic var contrastOffset: Int {
         return integer(forKey: "contrastOffset")
     }
+
+    @objc dynamic var hotkeys: [String: Any]? {
+        return dictionary(forKey: "hotkeys")
+    }
 }
 
 @available(OSX 10.12, *)
@@ -72,21 +76,8 @@ class DataStore: NSObject {
     }
 
     func hotkeys() -> [HotkeyIdentifier: [HotkeyPart: Int]]? {
-        var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
-        guard let hotkeyConfig = defaults.dictionary(forKey: "hotkeys") else { return nil }
-        for (k, v) in hotkeyConfig {
-            guard let identifier = HotkeyIdentifier(rawValue: k), let hotkeyDict = v as? [String: Int] else { continue }
-            var hotkey: [HotkeyPart: Int] = [:]
-            for (hk, hv) in hotkeyDict {
-                guard let part = HotkeyPart(rawValue: hk) else { continue }
-                hotkey[part] = hv
-            }
-            if hotkey.count == HotkeyPart.allCases.count {
-                hotkeySettings[identifier] = hotkey
-            }
-        }
-
-        return hotkeySettings
+        guard let hotkeyConfig = defaults.hotkeys else { return nil }
+        return Hotkey.toDictionary(hotkeyConfig)
     }
 
     func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
