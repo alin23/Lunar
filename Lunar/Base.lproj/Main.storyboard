@@ -179,8 +179,18 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
+                        <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
+                        <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
+                        <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
+                        <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
                         <outlet property="loginMenuItem" destination="HeU-1X-veM" id="T04-59-iC5"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
+                        <outlet property="percent0MenuItem" destination="9Jm-7d-C6T" id="f9t-jn-RIA"/>
+                        <outlet property="percent100MenuItem" destination="UL7-qh-pTF" id="9lg-G5-OdX"/>
+                        <outlet property="percent25MenuItem" destination="ZLP-Iz-rrn" id="KiH-Cm-5Wq"/>
+                        <outlet property="percent50MenuItem" destination="O0t-Fi-WJU" id="NIq-hG-J6p"/>
+                        <outlet property="percent75MenuItem" destination="rXC-7i-Z75" id="rln-kM-6lF"/>
+                        <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="stateMenuItem" destination="YMI-RQ-F1Z" id="cCj-Nl-eqb"/>
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
                     </connections>
