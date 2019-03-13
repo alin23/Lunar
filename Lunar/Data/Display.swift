@@ -100,16 +100,26 @@ class Display: NSManagedObject {
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.brightness, options: [.new], changeHandler: { _, change in
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
-                    let newBrightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
-                    _ = DDC.setBrightness(for: self.id, brightness: newBrightness)
-                    log.debug("\(self.name): Set brightness to \(newBrightness)")
+                    var brightness: UInt8
+                    if brightnessAdapter.mode == AdaptiveMode.manual {
+                        brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
+                    } else {
+                        brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
+                    }
+                    _ = DDC.setBrightness(for: self.id, brightness: brightness)
+                    log.debug("\(self.name): Set brightness to \(brightness)")
                 }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
                 if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
-                    let newContrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
-                    _ = DDC.setContrast(for: self.id, contrast: newContrast)
-                    log.debug("\(self.name): Set contrast to \(newContrast)")
+                    var contrast: UInt8
+                    if brightnessAdapter.mode == AdaptiveMode.manual {
+                        contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
+                    } else {
+                        contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
+                    }
+                    _ = DDC.setContrast(for: self.id, contrast: contrast)
+                    log.debug("\(self.name): Set contrast to \(contrast)")
                 }
             }),
         ]
