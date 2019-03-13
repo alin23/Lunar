@@ -41,6 +41,7 @@ for item in appcast.iter("item"):
     dmg = appcast_path.with_name(os.path.basename(url))
     signature = get_signature(dmg)
     enclosure.set(sparkle("dsaSignature"), signature)
+    enclosure.set("url", f"https://lunarapp.site/download/{version}")
 
     for delta in item.findall(sparkle("deltas")):
         item.remove(delta)
