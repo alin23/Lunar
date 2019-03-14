@@ -105,8 +105,7 @@ class Display: NSManagedObject {
             observe(\.maxBrightness, options: [.new, .old], changeHandler: readapt),
             observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
-
-            observe(\.brightness, options: [.new], changeHandler: { _, change in
+            observe(\.brightness, options: [.new, .old], changeHandler: { _, change in
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var brightness: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
@@ -114,11 +113,24 @@ class Display: NSManagedObject {
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
-                    _ = DDC.setBrightness(for: self.id, brightness: brightness)
+					var currentValue = change.oldValue?.uint8Value ?? 50
+					let incrementing = currentValue < brightness
+					let stepValue = abs(currentValue.distance(to: brightness)) >= 50 ? 2 : 1
+					func step () {
+						currentValue = self.incrOrDecrValue(incrementing, currentValue, stepValue, targetValue: brightness)
+						_ = DDC.setBrightness(for: self.id, brightness: currentValue)
+						if currentValue == brightness {
+							return
+						}
+						DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+							step()
+						}
+					}
+					step()
                     log.debug("\(self.name): Set brightness to \(brightness)")
                 }
             }),
-            observe(\.contrast, options: [.new], changeHandler: { _, change in
+            observe(\.contrast, options: [.new, .old], changeHandler: { _, change in
                 if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var contrast: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
@@ -127,11 +139,35 @@ class Display: NSManagedObject {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
                     _ = DDC.setContrast(for: self.id, contrast: contrast)
+					var currentValue = change.oldValue?.uint8Value ?? 50
+					let incrementing = currentValue < contrast
+					let stepValue = abs(currentValue.distance(to: contrast)) >= 50 ? 2 : 1
+					func step () {
+						currentValue = self.incrOrDecrValue(incrementing, currentValue, stepValue, targetValue: contrast)
+						_ = DDC.setContrast(for: self.id, contrast: currentValue)
+						if currentValue == contrast {
+							return
+						}
+						DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+							step()
+						}
+					}
+					step()
                     log.debug("\(self.name): Set contrast to \(contrast)")
                 }
             }),
         ]
     }
+
+	func incrOrDecrValue (_ incrementing: Bool, _ currentValue: UInt8, _ stepValue: Int, targetValue: UInt8) -> UInt8 {
+		if (incrementing && currentValue < targetValue) {
+			return cap(currentValue + UInt8(stepValue), minVal: MIN_BRIGHTNESS, maxVal: MAX_BRIGHTNESS)
+		} else if (!incrementing && currentValue > targetValue) {
+			return currentValue - UInt8(cap(stepValue, minVal: 1, maxVal: abs(currentValue.distance(to: targetValue))))
+		} else {
+			return targetValue
+		}
+	}
 
     func removeObservers() {
         observers.removeAll(keepingCapacity: true)
