@@ -19,7 +19,8 @@
 			],
 			"file_exclude_patterns":
 			[
-				"Releases/*.delta"
+				"Releases/*.delta",
+				"Releases/*.dmg"
 			],
 			"path": "."
 		}
