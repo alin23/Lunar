@@ -113,7 +113,7 @@ class Display: NSManagedObject {
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
-					var currentValue = change.oldValue?.uint8Value ?? 50
+					var currentValue = change.oldValue!.uint8Value
 					let incrementing = currentValue < brightness
 					let stepValue = abs(currentValue.distance(to: brightness)) >= 50 ? 2 : 1
 					func step () {
@@ -139,7 +139,7 @@ class Display: NSManagedObject {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
                     _ = DDC.setContrast(for: self.id, contrast: contrast)
-					var currentValue = change.oldValue?.uint8Value ?? 50
+					var currentValue = change.oldValue!.uint8Value
 					let incrementing = currentValue < contrast
 					let stepValue = abs(currentValue.distance(to: contrast)) >= 50 ? 2 : 1
 					func step () {
