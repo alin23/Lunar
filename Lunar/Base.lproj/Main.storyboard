@@ -560,24 +560,14 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aPJ-Lw-ttB">
-                                <rect key="frame" x="20" y="21" width="48" height="48"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="square" title="⌘" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="dgK-X3-iXa">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system" size="32"/>
-                                </buttonCell>
-                                <color key="contentTintColor" white="1" alpha="0.79607724467746477" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                <connections>
-                                    <action selector="goToHotkeys:" target="8dO-ff-2g9" id="ySr-cs-Zhh"/>
-                                </connections>
-                            </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t5X-0u-vsH">
-                                <rect key="frame" x="14" y="11" width="60" height="20"/>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUN-Fw-jrZ">
+                                <rect key="frame" x="-2" y="12" width="182" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Hotkeys" id="L8O-4K-zke">
+                                <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="ljB-tR-ECu">
                                     <font key="font" size="13" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="0.80031360031126753" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <string key="title">Swipe left or press 
+← to view Hotkeys</string>
+                                    <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -596,6 +586,7 @@
                         <outlet property="noonDurationCaption" destination="xSp-32-U36" id="qC4-l7-vfh"/>
                         <outlet property="noonDurationField" destination="gR8-S6-VJx" id="CHn-pb-EO6"/>
                         <outlet property="noonDurationLabel" destination="jCD-nB-vFN" id="HI9-Jn-ON1"/>
+                        <outlet property="swipeLeftHint" destination="CUN-Fw-jrZ" id="kGi-c4-UJX"/>
                     </connections>
                 </viewController>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
