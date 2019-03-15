@@ -119,9 +119,14 @@ class Display: NSManagedObject {
                         stepValue = -stepValue
                     }
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+                        let now = DispatchTime.now()
+
                         for newValue in stride(from: currentValue, through: brightness, by: stepValue) {
                             _ = DDC.setBrightness(for: self.id, brightness: newValue)
                         }
+
+                        let elapsed = DispatchTime.now().rawValue - now.rawValue
+                        log.debug("It took \(elapsed)ns (\(elapsed / 1_000_000_000)s) to change brightness from \(currentValue) to \(brightness) by \(stepValue)")
                     }
                     log.debug("\(self.name): Set brightness to \(brightness)")
                 }
@@ -140,9 +145,14 @@ class Display: NSManagedObject {
                         stepValue = -stepValue
                     }
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+                        let now = DispatchTime.now()
+
                         for newValue in stride(from: currentValue, through: contrast, by: stepValue) {
                             _ = DDC.setContrast(for: self.id, contrast: newValue)
                         }
+
+                        let elapsed = DispatchTime.now().rawValue - now.rawValue
+                        log.debug("It took \(elapsed)ns (\(elapsed / 1_000_000_000)s) to change contrast from \(currentValue) to \(contrast) by \(stepValue)")
                     }
                     log.debug("\(self.name): Set contrast to \(contrast)")
                 }
