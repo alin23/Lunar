@@ -84,7 +84,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
             if let display = arrangedObjects[1] as? Display {
                 let identifier = pageController(self, identifierFor: display)
                 if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
-                    controller.swipeLeftHintVisible = false
+                    controller.swipeLeftHint?.isHidden = true
                 }
             }
         }
@@ -96,7 +96,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
             if let display = arrangedObjects[1] as? Display {
                 let identifier = pageController(self, identifierFor: display)
                 if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
-                    controller.swipeRightHintVisible = false
+                    controller.swipeRightHint?.isHidden = true
                 }
             }
         }
@@ -166,13 +166,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
             let displayId = CGDirectDisplayID(identifier) {
             if displayId != GENERIC_DISPLAY.id {
                 controller.display = brightnessAdapter.displays[displayId]
-                if let display = arrangedObjects[1] as? Display, display.id == displayId {
-                    if !datastore.defaults.didSwipeLeft {
-                        controller.swipeLeftHintVisible = true
-                    }
-                    if !datastore.defaults.didSwipeRight, arrangedObjects.count > 2 {
-                        controller.swipeRightHintVisible = true
-                    }
+                if let display = arrangedObjects[2] as? Display, display.id == displayId {
+                    controller.swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
+                    controller.swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || arrangedObjects.count <= 3
                 }
             } else {
                 controller.display = GENERIC_DISPLAY
