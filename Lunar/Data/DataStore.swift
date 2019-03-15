@@ -86,6 +86,11 @@ class DataStore: NSObject {
         return try (context ?? self.context).fetch(fetchRequest)
     }
 
+    func countDisplays(context: NSManagedObjectContext? = nil) -> Int {
+        let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
+        return (try? (context ?? self.context).count(for: fetchRequest)) ?? 0
+    }
+
     func fetchAppExceptions(by identifiers: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
         let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
         fetchRequest.predicate = NSPredicate(format: "identifier IN %@", Set(identifiers))

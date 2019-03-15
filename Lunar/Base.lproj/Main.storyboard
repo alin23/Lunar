@@ -1117,10 +1117,10 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="54O-dg-1WQ">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="54O-dg-1WQ">
                                 <rect key="frame" x="34" y="388" width="182" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" focusRingType="none" alignment="center" id="79O-SG-Ogd">
+                                <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="79O-SG-Ogd">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <string key="title">Swipe left or press 
 ← to view Settings</string>
@@ -1128,10 +1128,10 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0WE-QT-onu">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0WE-QT-onu">
                                 <rect key="frame" x="534" y="388" width="182" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" focusRingType="none" alignment="center" id="Xhe-mJ-6JY">
+                                <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="Xhe-mJ-6JY">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <string key="title">Swipe right or press →
 to view other displays</string>
@@ -1148,8 +1148,8 @@ to view other displays</string>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
-                        <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="byK-6k-amO"/>
-                        <outlet property="swipeRightHint" destination="0WE-QT-onu" id="zgQ-IC-ToC"/>
+                        <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="gBY-gE-aP5"/>
+                        <outlet property="swipeRightHint" destination="0WE-QT-onu" id="ULx-5C-kkg"/>
                     </connections>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
