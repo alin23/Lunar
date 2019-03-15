@@ -194,6 +194,11 @@ class ConfigurationViewController: NSViewController {
     func setupNoonDuration() {
         guard let field = noonDurationField, let caption = noonDurationCaption else { return }
 
+        noonDurationLabel?.toolTip = """
+        The number of minutes for which the daylight in your area is very high
+        This keeps the brightness/contrast at its highest value for as much as needed
+        """
+
         setupScrollableTextField(
             field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 240,
             onMouseEnter: { settingsController in
@@ -207,6 +212,11 @@ class ConfigurationViewController: NSViewController {
 
     func setupDaylightExtension() {
         guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
+
+        daylightExtensionLabel?.toolTip = """
+        The number of minutes for which the daylight in your area is still visible
+        This keeps the brightness/contrast from going to its lowest value too soon
+        """
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 240,
@@ -222,6 +232,10 @@ class ConfigurationViewController: NSViewController {
     func setupBrightnessOffset() {
         guard let field = brightnessOffsetField, let caption = brightnessOffsetCaption else { return }
 
+        brightnessOffsetLabel?.toolTip = """
+        Factor for adjusting the brightness curve of the adaptive algorithm
+        """
+
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
@@ -232,6 +246,10 @@ class ConfigurationViewController: NSViewController {
 
     func setupContrastOffset() {
         guard let field = contrastOffsetField, let caption = contrastOffsetCaption else { return }
+
+        contrastOffsetLabel?.toolTip = """
+        Factor for adjusting the contrast curve of the adaptive algorithm
+        """
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
@@ -246,6 +264,10 @@ class ConfigurationViewController: NSViewController {
             let maxField = brightnessLimitMaxField,
             let minCaption = brightnessLimitMinCaption,
             let maxCaption = brightnessLimitMaxCaption else { return }
+
+        brightnessLimitLabel?.toolTip = """
+        Hard limits for brightness percentage adjustments through hotkeys or menu items
+        """
 
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.brightnessLimitMax - 1,
@@ -266,6 +288,10 @@ class ConfigurationViewController: NSViewController {
             let maxField = contrastLimitMaxField,
             let minCaption = contrastLimitMinCaption,
             let maxCaption = contrastLimitMaxCaption else { return }
+
+        contrastLimitLabel?.toolTip = """
+        Hard limits for contrast percentage adjustments through hotkeys or menu items
+        """
 
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.contrastLimitMax - 1,
@@ -331,6 +357,11 @@ class ConfigurationViewController: NSViewController {
         setupContrastLimit()
 
         smoothTransitionCheckbox.setFrameSize(NSSize(width: CHECKBOX_SIZE, height: CHECKBOX_SIZE))
+        smoothTransitionCheckbox.setNeedsDisplay()
+        smoothTransitionLabel.toolTip = """
+        Allows brightness/contrast to change smoothly from a value to another
+        Note: this can make the system lag in transitions if the monitor has a slow response time
+        """
 
         if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
             showRelevantSettings(mode)
