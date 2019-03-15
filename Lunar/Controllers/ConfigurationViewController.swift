@@ -8,7 +8,12 @@
 
 import Cocoa
 
+let CHECKBOX_SIZE = 32
+
 class ConfigurationViewController: NSViewController {
+    @IBOutlet var smoothTransitionLabel: NSTextField!
+    @IBOutlet var smoothTransitionCheckbox: NSButton!
+
     @IBOutlet var noonDurationField: ScrollableTextField!
     @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
     @IBOutlet var noonDurationLabel: NSTextField!
@@ -101,6 +106,26 @@ class ConfigurationViewController: NSViewController {
         contrastOffsetVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
         contrastLimitVisible = adaptiveMode == .manual
+
+        var refX: CGFloat
+        switch adaptiveMode {
+        case .manual:
+            let refFrame1 = contrastLimitMinField.frame
+            let refFrame2 = contrastLimitMaxField.frame
+            let width = refFrame2.maxX - refFrame1.minX
+            refX = refFrame2.maxX - (width / 2)
+        case .location:
+            let refFrame = daylightExtensionField.frame
+            refX = refFrame.maxX - (refFrame.width / 2)
+        case .sync:
+            let refFrame = contrastOffsetField.frame
+            refX = refFrame.maxX - (refFrame.width / 2)
+        }
+
+        smoothTransitionCheckbox.setFrameOrigin(NSPoint(
+            x: refX - CGFloat(CHECKBOX_SIZE / 2),
+            y: smoothTransitionCheckbox.frame.origin.y
+        ))
     }
 
     func listenForBrightnessOffsetChange() {
@@ -304,6 +329,8 @@ class ConfigurationViewController: NSViewController {
         setupContrastOffset()
         setupBrightnessLimit()
         setupContrastLimit()
+
+        smoothTransitionCheckbox.setFrameSize(NSSize(width: CHECKBOX_SIZE, height: CHECKBOX_SIZE))
 
         if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
             showRelevantSettings(mode)
