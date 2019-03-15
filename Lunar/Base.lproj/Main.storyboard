@@ -729,6 +729,26 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="osm-bT-7sA">
+                                <rect key="frame" x="27" y="157" width="200" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Smooth transition" id="zxx-4L-t4t">
+                                    <font key="font" size="18" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="4tb-kQ-mbr">
+                                <rect key="frame" x="291" y="156" width="32" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="ueH-KN-tis">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="hWD-oU-Uq8" name="value" keyPath="values.smoothTransition" id="mRD-Fw-dz0"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -754,10 +774,13 @@
                         <outlet property="noonDurationCaption" destination="xSp-32-U36" id="qC4-l7-vfh"/>
                         <outlet property="noonDurationField" destination="gR8-S6-VJx" id="CHn-pb-EO6"/>
                         <outlet property="noonDurationLabel" destination="jCD-nB-vFN" id="HI9-Jn-ON1"/>
+                        <outlet property="smoothTransitionCheckbox" destination="4tb-kQ-mbr" id="SXN-IS-eQL"/>
+                        <outlet property="smoothTransitionLabel" destination="osm-bT-7sA" id="OU8-18-fgX"/>
                         <outlet property="swipeLeftHint" destination="CUN-Fw-jrZ" id="kGi-c4-UJX"/>
                     </connections>
                 </viewController>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="hWD-oU-Uq8"/>
             </objects>
             <point key="canvasLocation" x="-874" y="3351"/>
         </scene>
