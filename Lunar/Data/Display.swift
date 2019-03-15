@@ -15,6 +15,7 @@ let MIN_CONTRAST: UInt8 = 0
 let MAX_CONTRAST: UInt8 = 100
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
+let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 class Display: NSManagedObject {
     @NSManaged var id: CGDirectDisplayID
@@ -38,6 +39,7 @@ class Display: NSManagedObject {
     var observers: [NSKeyValueObservation] = []
     var datastoreObservers: [NSKeyValueObservation] = []
     var onReadapt: (() -> Void)?
+    var smoothStep = 1
 
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
         let context = context ?? datastore.context
@@ -93,6 +95,51 @@ class Display: NSManagedObject {
         }
     }
 
+    func smoothTransition(from currentValue: UInt8, to value: UInt8, adjust: @escaping ((UInt8) -> Void)) {
+        var steps = abs(value.distance(to: currentValue))
+
+        var step: Int
+        let minVal: UInt8
+        let maxVal: UInt8
+        if value < currentValue {
+            step = cap(-smoothStep, minVal: -steps, maxVal: -1)
+            minVal = value
+            maxVal = currentValue
+        } else {
+            step = cap(smoothStep, minVal: 1, maxVal: steps)
+            minVal = currentValue
+            maxVal = value
+        }
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+            let startTime = DispatchTime.now()
+            var elapsedTime: UInt64
+            var elapsedSeconds: String
+
+            adjust(UInt8(Int(currentValue) + step))
+
+            elapsedTime = DispatchTime.now().rawValue - startTime.rawValue
+            elapsedSeconds = String(format: "%.3f", Double(elapsedTime) / 1_000_000_000.0)
+            log.debug("It took \(elapsedTime)ns (\(elapsedSeconds)s) to change brightness by \(step)")
+
+            self.smoothStep = cap(Int(elapsedTime / MAX_SMOOTH_STEP_TIME_NS), minVal: 1, maxVal: 100)
+            steps = steps - abs(step)
+            if value < currentValue {
+                step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
+            } else {
+                step = cap(self.smoothStep, minVal: 1, maxVal: steps)
+            }
+
+            for newValue in stride(from: Int(currentValue), through: Int(value), by: step) {
+                adjust(cap(UInt8(newValue), minVal: minVal, maxVal: maxVal))
+            }
+            adjust(value)
+
+            elapsedTime = DispatchTime.now().rawValue - startTime.rawValue
+            elapsedSeconds = String(format: "%.3f", Double(elapsedTime) / 1_000_000_000.0)
+            log.debug("It took \(elapsedTime)ns (\(elapsedSeconds)s) to change brightness from \(currentValue) to \(value) by \(step)")
+        }
+    }
+
     func addObservers() {
         datastoreObservers = [
             datastore.defaults.observe(\UserDefaults.brightnessLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
@@ -114,19 +161,8 @@ class Display: NSManagedObject {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
                     let currentValue = change.oldValue!.uint8Value
-                    var stepValue = abs(currentValue.distance(to: brightness)) >= 50 ? 2 : 1
-                    if brightness < currentValue {
-                        stepValue = -stepValue
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-                        let now = DispatchTime.now()
-
-                        for newValue in stride(from: currentValue, through: brightness, by: stepValue) {
-                            _ = DDC.setBrightness(for: self.id, brightness: newValue)
-                        }
-
-                        let elapsed = DispatchTime.now().rawValue - now.rawValue
-                        log.debug("It took \(elapsed)ns (\(elapsed / 1_000_000_000)s) to change brightness from \(currentValue) to \(brightness) by \(stepValue)")
+                    self.smoothTransition(from: currentValue, to: brightness) { newValue in
+                        _ = DDC.setBrightness(for: self.id, brightness: newValue)
                     }
                     log.debug("\(self.name): Set brightness to \(brightness)")
                 }
@@ -140,19 +176,8 @@ class Display: NSManagedObject {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
                     let currentValue = change.oldValue!.uint8Value
-                    var stepValue = abs(currentValue.distance(to: contrast)) >= 50 ? 2 : 1
-                    if contrast < currentValue {
-                        stepValue = -stepValue
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-                        let now = DispatchTime.now()
-
-                        for newValue in stride(from: currentValue, through: contrast, by: stepValue) {
-                            _ = DDC.setContrast(for: self.id, contrast: newValue)
-                        }
-
-                        let elapsed = DispatchTime.now().rawValue - now.rawValue
-                        log.debug("It took \(elapsed)ns (\(elapsed / 1_000_000_000)s) to change contrast from \(currentValue) to \(contrast) by \(stepValue)")
+                    self.smoothTransition(from: currentValue, to: contrast) { newValue in
+                        _ = DDC.setContrast(for: self.id, contrast: newValue)
                     }
                     log.debug("\(self.name): Set contrast to \(contrast)")
                 }
