@@ -84,12 +84,16 @@ class BrightnessContrastChartView: LineChartView {
         brightnessGraph.drawCirclesEnabled = false
         brightnessGraph.drawFilledEnabled = true
         brightnessGraph.drawValuesEnabled = false
+        brightnessGraph.mode = .cubicBezier
+        brightnessGraph.cubicIntensity = 0.1
 
         contrastGraph.colors = [NSColor.clear]
         contrastGraph.fillColor = contrastColor
         contrastGraph.drawCirclesEnabled = false
         contrastGraph.drawFilledEnabled = true
         contrastGraph.drawValuesEnabled = false
+        contrastGraph.mode = .cubicBezier
+        contrastGraph.cubicIntensity = 0.1
 
         xAxis.labelTextColor = labelColor
 

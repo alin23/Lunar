@@ -12,23 +12,60 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var noonDurationField: ScrollableTextField!
     @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
     @IBOutlet var noonDurationLabel: NSTextField!
+    var noonDurationVisible: Bool = false {
+        didSet {
+            noonDurationField.isHidden = !noonDurationVisible
+            noonDurationCaption.isHidden = !noonDurationVisible
+            noonDurationLabel.isHidden = !noonDurationVisible
+        }
+    }
 
     @IBOutlet var daylightExtensionField: ScrollableTextField!
     @IBOutlet var daylightExtensionCaption: ScrollableTextFieldCaption!
     @IBOutlet var daylightExtensionLabel: NSTextField!
+    var daylightExtensionVisible: Bool = false {
+        didSet {
+            daylightExtensionField.isHidden = !daylightExtensionVisible
+            daylightExtensionCaption.isHidden = !daylightExtensionVisible
+            daylightExtensionLabel.isHidden = !daylightExtensionVisible
+        }
+    }
 
     @IBOutlet var brightnessOffsetField: ScrollableTextField!
     @IBOutlet var brightnessOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var brightnessOffsetLabel: NSTextField!
+    var brightnessOffsetVisible: Bool = false {
+        didSet {
+            brightnessOffsetField.isHidden = !brightnessOffsetVisible
+            brightnessOffsetCaption.isHidden = !brightnessOffsetVisible
+            brightnessOffsetLabel.isHidden = !brightnessOffsetVisible
+        }
+    }
 
     @IBOutlet var contrastOffsetField: ScrollableTextField!
     @IBOutlet var contrastOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastOffsetLabel: NSTextField!
+    var contrastOffsetVisible: Bool = false {
+        didSet {
+            contrastOffsetField.isHidden = !contrastOffsetVisible
+            contrastOffsetCaption.isHidden = !contrastOffsetVisible
+            contrastOffsetLabel.isHidden = !contrastOffsetVisible
+        }
+    }
+
     @IBOutlet var swipeLeftHint: NSTextField!
 
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
     var didSwipeToHotkeysObserver: NSKeyValueObservation?
+    var adaptiveModeObserver: NSKeyValueObservation?
+
+    func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
+        noonDurationVisible = adaptiveMode == .location
+        daylightExtensionVisible = adaptiveMode == .location
+        brightnessOffsetVisible = adaptiveMode == .sync
+        contrastOffsetVisible = adaptiveMode == .sync
+    }
 
     func listenForBrightnessOffsetChange() {
         brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { _, change in
@@ -45,6 +82,17 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.contrastOffsetField?.stringValue = String(contrast)
+        })
+    }
+
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                return
+            }
+            if let adaptiveMode = AdaptiveMode(rawValue: mode) {
+                self.showRelevantSettings(adaptiveMode)
+            }
         })
     }
 
@@ -155,9 +203,13 @@ class ConfigurationViewController: NSViewController {
 
         setupBrightnessOffset()
         setupContrastOffset()
+        if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
+            showRelevantSettings(mode)
+        }
 
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
+        listenForAdaptiveModeChange()
     }
 
     override func viewDidLoad() {
