@@ -33,6 +33,10 @@ extension UserDefaults {
         return bool(forKey: "didSwipeLeft")
     }
 
+    @objc dynamic var didSwipeToHotkeys: Bool {
+        return bool(forKey: "didSwipeToHotkeys")
+    }
+
     @objc dynamic var didSwipeRight: Bool {
         return bool(forKey: "didSwipeRight")
     }
@@ -181,6 +185,7 @@ class DataStore: NSObject {
 
         DataStore.setDefault(2.0, for: "interpolationFactor")
         DataStore.setDefault(false, for: "didScrollTextField")
+        DataStore.setDefault(false, for: "didSwipeToHotkeys")
         DataStore.setDefault(false, for: "didSwipeLeft")
         DataStore.setDefault(false, for: "didSwipeRight")
         DataStore.setDefault(true, for: "startAtLogin")
