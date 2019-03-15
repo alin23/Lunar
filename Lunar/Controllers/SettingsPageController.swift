@@ -20,6 +20,10 @@ class SettingsPageController: NSViewController {
         noonDuration: Int? = nil,
         brightnessOffset: Int? = nil,
         contrastOffset: Int? = nil,
+        brightnessLimitMin _: Int? = nil,
+        contrastLimitMin _: Int? = nil,
+        brightnessLimitMax _: Int? = nil,
+        contrastLimitMax _: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false

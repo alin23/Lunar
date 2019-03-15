@@ -14,9 +14,9 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var noonDurationLabel: NSTextField!
     var noonDurationVisible: Bool = false {
         didSet {
-            noonDurationField.isHidden = !noonDurationVisible
-            noonDurationCaption.isHidden = !noonDurationVisible
-            noonDurationLabel.isHidden = !noonDurationVisible
+            noonDurationField?.isHidden = !noonDurationVisible
+            noonDurationCaption?.isHidden = !noonDurationVisible
+            noonDurationLabel?.isHidden = !noonDurationVisible
         }
     }
 
@@ -25,9 +25,9 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var daylightExtensionLabel: NSTextField!
     var daylightExtensionVisible: Bool = false {
         didSet {
-            daylightExtensionField.isHidden = !daylightExtensionVisible
-            daylightExtensionCaption.isHidden = !daylightExtensionVisible
-            daylightExtensionLabel.isHidden = !daylightExtensionVisible
+            daylightExtensionField?.isHidden = !daylightExtensionVisible
+            daylightExtensionCaption?.isHidden = !daylightExtensionVisible
+            daylightExtensionLabel?.isHidden = !daylightExtensionVisible
         }
     }
 
@@ -36,9 +36,9 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var brightnessOffsetLabel: NSTextField!
     var brightnessOffsetVisible: Bool = false {
         didSet {
-            brightnessOffsetField.isHidden = !brightnessOffsetVisible
-            brightnessOffsetCaption.isHidden = !brightnessOffsetVisible
-            brightnessOffsetLabel.isHidden = !brightnessOffsetVisible
+            brightnessOffsetField?.isHidden = !brightnessOffsetVisible
+            brightnessOffsetCaption?.isHidden = !brightnessOffsetVisible
+            brightnessOffsetLabel?.isHidden = !brightnessOffsetVisible
         }
     }
 
@@ -47,9 +47,39 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var contrastOffsetLabel: NSTextField!
     var contrastOffsetVisible: Bool = false {
         didSet {
-            contrastOffsetField.isHidden = !contrastOffsetVisible
-            contrastOffsetCaption.isHidden = !contrastOffsetVisible
-            contrastOffsetLabel.isHidden = !contrastOffsetVisible
+            contrastOffsetField?.isHidden = !contrastOffsetVisible
+            contrastOffsetCaption?.isHidden = !contrastOffsetVisible
+            contrastOffsetLabel?.isHidden = !contrastOffsetVisible
+        }
+    }
+
+    @IBOutlet var brightnessLimitMinField: ScrollableTextField!
+    @IBOutlet var brightnessLimitMaxField: ScrollableTextField!
+    @IBOutlet var brightnessLimitMinCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessLimitMaxCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessLimitLabel: NSTextField!
+    var brightnessLimitVisible: Bool = false {
+        didSet {
+            brightnessLimitMinField?.isHidden = !brightnessLimitVisible
+            brightnessLimitMaxField?.isHidden = !brightnessLimitVisible
+            brightnessLimitMinCaption?.isHidden = !brightnessLimitVisible
+            brightnessLimitMaxCaption?.isHidden = !brightnessLimitVisible
+            brightnessLimitLabel?.isHidden = !brightnessLimitVisible
+        }
+    }
+
+    @IBOutlet var contrastLimitMinField: ScrollableTextField!
+    @IBOutlet var contrastLimitMaxField: ScrollableTextField!
+    @IBOutlet var contrastLimitMinCaption: ScrollableTextFieldCaption!
+    @IBOutlet var contrastLimitMaxCaption: ScrollableTextFieldCaption!
+    @IBOutlet var contrastLimitLabel: NSTextField!
+    var contrastLimitVisible: Bool = false {
+        didSet {
+            contrastLimitMinField?.isHidden = !contrastLimitVisible
+            contrastLimitMaxField?.isHidden = !contrastLimitVisible
+            contrastLimitMinCaption?.isHidden = !contrastLimitVisible
+            contrastLimitMaxCaption?.isHidden = !contrastLimitVisible
+            contrastLimitLabel?.isHidden = !contrastLimitVisible
         }
     }
 
@@ -57,6 +87,10 @@ class ConfigurationViewController: NSViewController {
 
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
+    var brightnessLimitMinObserver: NSKeyValueObservation?
+    var contrastLimitMinObserver: NSKeyValueObservation?
+    var brightnessLimitMaxObserver: NSKeyValueObservation?
+    var contrastLimitMaxObserver: NSKeyValueObservation?
     var didSwipeToHotkeysObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
 
@@ -65,6 +99,8 @@ class ConfigurationViewController: NSViewController {
         daylightExtensionVisible = adaptiveMode == .location
         brightnessOffsetVisible = adaptiveMode == .sync
         contrastOffsetVisible = adaptiveMode == .sync
+        brightnessLimitVisible = adaptiveMode == .manual
+        contrastLimitVisible = adaptiveMode == .manual
     }
 
     func listenForBrightnessOffsetChange() {
@@ -85,6 +121,40 @@ class ConfigurationViewController: NSViewController {
         })
     }
 
+    func listenForBrightnessLimitChange() {
+        brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            self.brightnessLimitMinField?.stringValue = String(brightness)
+            self.brightnessLimitMaxField?.lowerLimit = brightness + 1
+        })
+        brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            self.brightnessLimitMaxField?.stringValue = String(brightness)
+            self.brightnessLimitMinField?.upperLimit = brightness - 1
+        })
+    }
+
+    func listenForContrastLimitChange() {
+        contrastLimitMinObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.old, .new], changeHandler: { _, change in
+            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+                return
+            }
+            self.contrastLimitMinField?.stringValue = String(contrast)
+            self.contrastLimitMaxField?.lowerLimit = contrast + 1
+        })
+        contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { _, change in
+            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+                return
+            }
+            self.contrastLimitMaxField?.stringValue = String(contrast)
+            self.contrastLimitMinField?.upperLimit = contrast - 1
+        })
+    }
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
@@ -97,69 +167,127 @@ class ConfigurationViewController: NSViewController {
     }
 
     func setupNoonDuration() {
-        noonDurationField?.integerValue = datastore.defaults.noonDurationMinutes
-        noonDurationField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "noonDurationMinutes")
-        }
-        noonDurationField?.lowerLimit = 0
-        noonDurationField?.upperLimit = 240
-        if let settingsController = parent?.parent as? SettingsPageController {
-            noonDurationField?.onValueChangedInstant = { value in
+        guard let field = noonDurationField, let caption = noonDurationCaption else { return }
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 240,
+            onMouseEnter: { settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
+            },
+            onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
             }
-            noonDurationField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
-            }
-        }
-    }
-
-    func setupBrightnessOffset() {
-        brightnessOffsetField?.integerValue = datastore.defaults.brightnessOffset
-        brightnessOffsetField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "brightnessOffset")
-        }
-        brightnessOffsetField?.lowerLimit = -100
-        brightnessOffsetField?.upperLimit = 90
-        if let settingsController = parent?.parent as? SettingsPageController {
-            brightnessOffsetField?.onValueChangedInstant = { value in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value)
-            }
-            brightnessOffsetField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
-            }
-        }
-    }
-
-    func setupContrastOffset() {
-        contrastOffsetField?.integerValue = datastore.defaults.contrastOffset
-        contrastOffsetField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "contrastOffset")
-        }
-        contrastOffsetField?.lowerLimit = -100
-        contrastOffsetField?.upperLimit = 90
-        if let settingsController = parent?.parent as? SettingsPageController {
-            contrastOffsetField?.onValueChangedInstant = { value in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
-            }
-            contrastOffsetField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
-            }
-        }
+        )
     }
 
     func setupDaylightExtension() {
-        daylightExtensionField?.integerValue = datastore.defaults.daylightExtensionMinutes
-        daylightExtensionField?.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: "daylightExtensionMinutes")
-        }
-        daylightExtensionField?.lowerLimit = 0
-        daylightExtensionField?.upperLimit = 240
-        if let settingsController = parent?.parent as? SettingsPageController {
-            daylightExtensionField?.onValueChangedInstant = { value in
+        guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 240,
+            onMouseEnter: { settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
+            },
+            onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
             }
-            daylightExtensionField?.onMouseEnter = {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
+        )
+    }
+
+    func setupBrightnessOffset() {
+        guard let field = brightnessOffsetField, let caption = brightnessOffsetCaption else { return }
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value)
+            }
+        )
+    }
+
+    func setupContrastOffset() {
+        guard let field = contrastOffsetField, let caption = contrastOffsetCaption else { return }
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
+            }
+        )
+    }
+
+    func setupBrightnessLimit() {
+        guard let minField = brightnessLimitMinField,
+            let maxField = brightnessLimitMaxField,
+            let minCaption = brightnessLimitMinCaption,
+            let maxCaption = brightnessLimitMaxCaption else { return }
+
+        setupScrollableTextField(
+            minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.brightnessLimitMax - 1,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
+            }
+        )
+        setupScrollableTextField(
+            maxField, caption: maxCaption, settingKey: "brightnessLimitMax", lowerLimit: datastore.defaults.brightnessLimitMin + 1, upperLimit: 100,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
+            }
+        )
+    }
+
+    func setupContrastLimit() {
+        guard let minField = contrastLimitMinField,
+            let maxField = contrastLimitMaxField,
+            let minCaption = contrastLimitMinCaption,
+            let maxCaption = contrastLimitMaxCaption else { return }
+
+        setupScrollableTextField(
+            minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.contrastLimitMax - 1,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
+            }
+        )
+        setupScrollableTextField(
+            maxField, caption: maxCaption, settingKey: "contrastLimitMax", lowerLimit: datastore.defaults.contrastLimitMin + 1, upperLimit: 100,
+            onValueChangedInstant: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
+            }
+        )
+    }
+
+    func setupScrollableTextField(
+        _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
+        lowerLimit: Int, upperLimit: Int,
+        onMouseEnter: ((SettingsPageController) -> Void)? = nil,
+        onValueChangedInstant: ((Int, SettingsPageController) -> Void)? = nil
+    ) {
+        field.textFieldColor = scrollableTextFieldColorWhite
+        field.textFieldColorHover = scrollableTextFieldColorHoverWhite
+        field.textFieldColorLight = scrollableTextFieldColorLightWhite
+        caption.textColor = scrollableCaptionColorWhite
+        field.caption = caption
+
+        field.integerValue = datastore.defaults.integer(forKey: settingKey)
+        field.onValueChanged = { (value: Int) in
+            datastore.defaults.set(value, forKey: settingKey)
+        }
+        field.lowerLimit = lowerLimit
+        field.upperLimit = upperLimit
+        if let settingsController = parent?.parent as? SettingsPageController {
+            if let handler = onValueChangedInstant {
+                field.onValueChangedInstant = { value in
+                    handler(value, settingsController)
+                }
+            }
+            if let handler = onMouseEnter {
+                field.onMouseEnter = {
+                    handler(settingsController)
+                }
+            } else {
+                field.onMouseEnter = {
+                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
+                }
             }
         }
     }
@@ -170,45 +298,21 @@ class ConfigurationViewController: NSViewController {
             self.swipeLeftHint?.isHidden = change.newValue ?? true
         })
 
-        noonDurationField?.textFieldColor = scrollableTextFieldColorWhite
-        noonDurationField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        noonDurationField?.textFieldColorLight = scrollableTextFieldColorLightWhite
-
-        daylightExtensionField?.textFieldColor = scrollableTextFieldColorWhite
-        daylightExtensionField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        daylightExtensionField?.textFieldColorLight = scrollableTextFieldColorLightWhite
-
-        noonDurationCaption.textColor = scrollableCaptionColorWhite
-        daylightExtensionCaption.textColor = scrollableCaptionColorWhite
-
-        noonDurationField?.caption = noonDurationCaption
-        daylightExtensionField?.caption = daylightExtensionCaption
-
         setupNoonDuration()
         setupDaylightExtension()
-
-        brightnessOffsetField?.textFieldColor = scrollableTextFieldColorWhite
-        brightnessOffsetField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        brightnessOffsetField?.textFieldColorLight = scrollableTextFieldColorLightWhite
-
-        contrastOffsetField?.textFieldColor = scrollableTextFieldColorWhite
-        contrastOffsetField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        contrastOffsetField?.textFieldColorLight = scrollableTextFieldColorLightWhite
-
-        brightnessOffsetCaption.textColor = scrollableCaptionColorWhite
-        contrastOffsetCaption.textColor = scrollableCaptionColorWhite
-
-        brightnessOffsetField?.caption = noonDurationCaption
-        contrastOffsetField?.caption = daylightExtensionCaption
-
         setupBrightnessOffset()
         setupContrastOffset()
+        setupBrightnessLimit()
+        setupContrastLimit()
+
         if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
             showRelevantSettings(mode)
         }
 
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
+        listenForBrightnessLimitChange()
+        listenForContrastLimitChange()
         listenForAdaptiveModeChange()
     }
 
