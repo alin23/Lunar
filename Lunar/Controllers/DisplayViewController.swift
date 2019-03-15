@@ -17,22 +17,10 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableBrightness: ScrollableBrightness!
     @IBOutlet var scrollableContrast: ScrollableContrast!
 
-    @IBOutlet var deleteButton: DeleteButton!
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
 
     @IBOutlet var swipeLeftHint: NSTextField!
     @IBOutlet var swipeRightHint: NSTextField!
-    var swipeLeftHintVisible = false {
-        didSet {
-            swipeLeftHint?.isHidden = !swipeLeftHintVisible
-        }
-    }
-
-    var swipeRightHintVisible = false {
-        didSet {
-            swipeRightHint?.isHidden = !swipeRightHintVisible
-        }
-    }
 
     var display: Display! {
         didSet {
@@ -43,7 +31,6 @@ class DisplayViewController: NSViewController {
     }
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
-    var deleteButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
 
     func update(from display: Display) {
@@ -157,8 +144,8 @@ class DisplayViewController: NSViewController {
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
-        swipeLeftHintVisible = !value
-        swipeRightHintVisible = !value
+        swipeLeftHint.isHidden = value
+        swipeRightHint.isHidden = value
     }
 
     func listenForAdaptiveModeChange() {
@@ -198,8 +185,8 @@ class DisplayViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        swipeLeftHint.isHidden = !swipeLeftHintVisible
-        swipeRightHint.isHidden = !swipeRightHintVisible
+        swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
+        swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || datastore.countDisplays() <= 1
 
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update(from: display)
