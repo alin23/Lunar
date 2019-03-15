@@ -24,9 +24,11 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var contrastOffsetField: ScrollableTextField!
     @IBOutlet var contrastOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastOffsetLabel: NSTextField!
+    @IBOutlet var swipeLeftHint: NSTextField!
 
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
+    var didSwipeToHotkeysObserver: NSKeyValueObservation?
 
     func listenForBrightnessOffsetChange() {
         brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { _, change in
@@ -114,13 +116,12 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    @IBAction func goToHotkeys(_: Any?) {
-        if let settingsController = parent?.parent as? SettingsPageController {
-            settingsController.pageController?.navigateBack(nil)
-        }
-    }
-
     func setup() {
+        swipeLeftHint?.isHidden = datastore.defaults.didSwipeToHotkeys
+        didSwipeToHotkeysObserver = datastore.defaults.observe(\.didSwipeToHotkeys, options: [.new], changeHandler: { _, change in
+            self.swipeLeftHint?.isHidden = change.newValue ?? true
+        })
+
         noonDurationField?.textFieldColor = scrollableTextFieldColorWhite
         noonDurationField?.textFieldColorHover = scrollableTextFieldColorHoverWhite
         noonDurationField?.textFieldColorLight = scrollableTextFieldColorLightWhite

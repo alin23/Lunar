@@ -185,8 +185,8 @@ class DisplayViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
-        swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || datastore.countDisplays() <= 1
+        swipeLeftHint?.isHidden = true
+        swipeRightHint?.isHidden = true
 
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update(from: display)
