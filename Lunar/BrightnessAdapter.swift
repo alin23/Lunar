@@ -323,37 +323,39 @@ class BrightnessAdapter {
         )
     }
 
-    func computeBrightnessFromPercent(percent: Int8, for display: Display, appOffset: Int = 0) -> NSNumber {
-        let percent = Double(min(max(percent, 0), 100))
+    func computeBrightnessFromPercent(percent: Double, for display: Display, appOffset: Int = 0) -> NSNumber {
         return display.computeBrightness(from: percent, appOffset: appOffset)
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
+        let percent = Double(min(max(value, 0), 100)) / 100.0
+        let minVal = datastore.defaults.brightnessLimitMin
+        let maxVal = datastore.defaults.brightnessLimitMax
+        let brightness = Int(round(percent * Double(maxVal - minVal))) + minVal
+        let nsBrightness = NSNumber(value: cap(brightness, minVal: minVal, maxVal: maxVal))
+
         if let displays = displays {
-            displays.forEach({ display in
-                display.brightness = computeBrightnessFromPercent(percent: value, for: display)
-            })
+            displays.forEach({ display in display.brightness = nsBrightness })
         } else {
-            self.displays.values.forEach({ display in
-                display.brightness = computeBrightnessFromPercent(percent: value, for: display)
-            })
+            self.displays.values.forEach({ display in display.brightness = nsBrightness })
         }
     }
 
-    func computeContrastFromPercent(percent: Int8, for display: Display, appOffset: Int = 0) -> NSNumber {
-        let percent = Double(min(max(percent, 0), 100))
+    func computeContrastFromPercent(percent: Double, for display: Display, appOffset: Int = 0) -> NSNumber {
         return display.computeContrast(from: percent, appOffset: appOffset)
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
+        let percent = Double(min(max(value, 0), 100)) / 100.0
+        let minVal = datastore.defaults.contrastLimitMin
+        let maxVal = datastore.defaults.contrastLimitMax
+        let contrast = Int(round(percent * Double(maxVal - minVal))) + minVal
+        let nsContrast = NSNumber(value: cap(contrast, minVal: minVal, maxVal: maxVal))
+
         if let displays = displays {
-            displays.forEach({ display in
-                display.contrast = computeContrastFromPercent(percent: value, for: display)
-            })
+            displays.forEach({ display in display.contrast = nsContrast })
         } else {
-            self.displays.values.forEach({ display in
-                display.contrast = computeContrastFromPercent(percent: value, for: display)
-            })
+            self.displays.values.forEach({ display in display.contrast = nsContrast })
         }
     }
 
