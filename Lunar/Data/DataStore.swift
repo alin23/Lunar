@@ -53,6 +53,22 @@ extension UserDefaults {
         return integer(forKey: "contrastOffset")
     }
 
+    @objc dynamic var brightnessLimitMin: Int {
+        return integer(forKey: "brightnessLimitMin")
+    }
+
+    @objc dynamic var contrastLimitMin: Int {
+        return integer(forKey: "contrastLimitMin")
+    }
+
+    @objc dynamic var brightnessLimitMax: Int {
+        return integer(forKey: "brightnessLimitMax")
+    }
+
+    @objc dynamic var contrastLimitMax: Int {
+        return integer(forKey: "contrastLimitMax")
+    }
+
     @objc dynamic var hotkeys: [String: Any]? {
         return dictionary(forKey: "hotkeys")
     }
@@ -193,6 +209,10 @@ class DataStore: NSObject {
         DataStore.setDefault(240, for: "noonDurationMinutes")
         DataStore.setDefault(0, for: "brightnessOffset")
         DataStore.setDefault(0, for: "contrastOffset")
+        DataStore.setDefault(0, for: "brightnessLimitMin")
+        DataStore.setDefault(0, for: "contrastLimitMin")
+        DataStore.setDefault(100, for: "brightnessLimitMax")
+        DataStore.setDefault(100, for: "contrastLimitMax")
 
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
