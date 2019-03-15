@@ -121,8 +121,13 @@ class Display: NSManagedObject {
             elapsedSeconds = String(format: "%.3f", Double(elapsedTime) / 1_000_000_000.0)
             log.debug("It took \(elapsedTime)ns (\(elapsedSeconds)s) to change brightness by \(step)")
 
-            self.smoothStep = cap(Int(elapsedTime / MAX_SMOOTH_STEP_TIME_NS), minVal: 1, maxVal: 100)
             steps = steps - abs(step)
+            if steps <= 0 {
+                adjust(value)
+                return
+            }
+
+            self.smoothStep = cap(Int(elapsedTime / MAX_SMOOTH_STEP_TIME_NS), minVal: 1, maxVal: 100)
             if value < currentValue {
                 step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
             } else {
@@ -156,7 +161,7 @@ class Display: NSManagedObject {
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var brightness: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
-                        brightness = cap(newBrightness.uint8Value, minVal: UInt8(datastore.defaults.brightnessLimitMin), maxVal: UInt8(datastore.defaults.brightnessLimitMax))
+                        brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
@@ -171,7 +176,7 @@ class Display: NSManagedObject {
                 if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var contrast: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
-                        contrast = cap(newContrast.uint8Value, minVal: UInt8(datastore.defaults.contrastLimitMin), maxVal: UInt8(datastore.defaults.contrastLimitMax))
+                        contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
                     } else {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
