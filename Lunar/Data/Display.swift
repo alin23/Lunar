@@ -36,6 +36,7 @@ class Display: NSManagedObject {
 
     var active: Bool = false
     var observers: [NSKeyValueObservation] = []
+    var datastoreObservers: [NSKeyValueObservation] = []
     var onReadapt: (() -> Void)?
 
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
@@ -93,16 +94,23 @@ class Display: NSManagedObject {
     }
 
     func addObservers() {
+        datastoreObservers = [
+            datastore.defaults.observe(\UserDefaults.brightnessLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\UserDefaults.brightnessLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\UserDefaults.contrastLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\UserDefaults.contrastLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+        ]
         observers = [
             observe(\.minBrightness, options: [.new, .old], changeHandler: readapt),
             observe(\.maxBrightness, options: [.new, .old], changeHandler: readapt),
             observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
+
             observe(\.brightness, options: [.new], changeHandler: { _, change in
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var brightness: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
-                        brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
+                        brightness = cap(newBrightness.uint8Value, minVal: UInt8(datastore.defaults.brightnessLimitMin), maxVal: UInt8(datastore.defaults.brightnessLimitMax))
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
@@ -114,7 +122,7 @@ class Display: NSManagedObject {
                 if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
                     var contrast: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
-                        contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
+                        contrast = cap(newContrast.uint8Value, minVal: UInt8(datastore.defaults.contrastLimitMin), maxVal: UInt8(datastore.defaults.contrastLimitMax))
                     } else {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
@@ -127,6 +135,7 @@ class Display: NSManagedObject {
 
     func removeObservers() {
         observers.removeAll(keepingCapacity: true)
+        datastoreObservers.removeAll(keepingCapacity: true)
     }
 
     func computeBrightness(from percent: Double, offset: Int? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
