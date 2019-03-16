@@ -46,6 +46,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
             })
             arrangedObjects.append(contentsOf: displays)
         } else {
+            if TEST_MODE {
+                arrangedObjects.append(TEST_DISPLAY)
+            }
             arrangedObjects.append(GENERIC_DISPLAY)
         }
 
@@ -171,7 +174,9 @@ class PageController: NSPageController, NSPageControllerDelegate {
 
         if let controller = viewControllers[identifier] as? DisplayViewController,
             let displayId = CGDirectDisplayID(identifier) {
-            if displayId != GENERIC_DISPLAY.id {
+            if displayId == TEST_DISPLAY.id {
+                controller.display = TEST_DISPLAY
+            } else if displayId != GENERIC_DISPLAY.id {
                 controller.display = brightnessAdapter.displays[displayId]
             } else {
                 controller.display = GENERIC_DISPLAY
