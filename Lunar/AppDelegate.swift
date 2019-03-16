@@ -16,6 +16,8 @@ import Magnet
 import ServiceManagement
 import WAYWindow
 
+let TEST_MODE = false
+
 var lunarDisplayNames = [
     "Moony",
     "Celestial",
@@ -213,9 +215,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             activity.tolerance = 10
             brightnessAdapter.adaptBrightness()
             activity.schedule { completion in
-                let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
+                let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
                 do {
-                    let displays = try displayIDs.map({ id in try datastore.context.existingObject(with: id) as! Display })
+                    let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
                     brightnessAdapter.adaptBrightness(for: displays)
                 } catch {
                     log.error("Error on fetching Displays by IDs")
@@ -231,9 +233,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
                         brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                        let displayIDs = brightnessAdapter.displays.values.map({ $0.objectID })
+                        let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
                         do {
-                            let displays = try displayIDs.map({ id in try datastore.context.existingObject(with: id) as! Display })
+                            let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
                             brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
                         } catch {
                             log.error("Error on fetching Displays by IDs")
