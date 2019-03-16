@@ -14,7 +14,9 @@ let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
 let MAX_CONTRAST: UInt8 = 100
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
+let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
+let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context, adaptive: true)
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 class Display: NSManagedObject {
@@ -41,10 +43,10 @@ class Display: NSManagedObject {
     var onReadapt: (() -> Void)?
     var smoothStep = 1
 
-    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
+    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
-        if id != GENERIC_DISPLAY_ID {
+        if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
             self.init(entity: entity, insertInto: context)
         } else {
             self.init(entity: entity, insertInto: nil)
@@ -57,6 +59,7 @@ class Display: NSManagedObject {
         }
         self.serial = (serial ?? DDC.getDisplaySerial(for: id)).stripped
         self.active = active
+        self.adaptive = adaptive
         lockedBrightness = false
         lockedContrast = false
         if id != GENERIC_DISPLAY_ID {
@@ -158,7 +161,7 @@ class Display: NSManagedObject {
             observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
             observe(\.brightness, options: [.new, .old], changeHandler: { _, change in
-                if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID {
+                if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID, self.id != TEST_DISPLAY_ID {
                     var brightness: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
                         brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
@@ -179,7 +182,7 @@ class Display: NSManagedObject {
                 }
             }),
             observe(\.contrast, options: [.new, .old], changeHandler: { _, change in
-                if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID {
+                if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID, self.id != TEST_DISPLAY_ID {
                     var contrast: UInt8
                     if brightnessAdapter.mode == AdaptiveMode.manual {
                         contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)

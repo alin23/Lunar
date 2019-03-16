@@ -12,9 +12,11 @@ class HourValueFormatter: IAxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         let value = Int(value)
         switch value {
-        case 0:
-            return "12AM"
-        case 1 ..< 12:
+        case 0 ... 2:
+            return ""
+        case 22 ... 25:
+            return ""
+        case 3 ..< 12:
             return "\(value)AM"
         case 12:
             return "12PM"

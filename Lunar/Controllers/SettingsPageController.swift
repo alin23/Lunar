@@ -20,10 +20,10 @@ class SettingsPageController: NSViewController {
         noonDuration: Int? = nil,
         brightnessOffset: Int? = nil,
         contrastOffset: Int? = nil,
-        brightnessLimitMin _: Int? = nil,
-        contrastLimitMin _: Int? = nil,
-        brightnessLimitMax _: Int? = nil,
-        contrastLimitMax _: Int? = nil,
+        brightnessLimitMin: Int? = nil,
+        contrastLimitMin: Int? = nil,
+        brightnessLimitMax: Int? = nil,
+        contrastLimitMax: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false
@@ -34,10 +34,9 @@ class SettingsPageController: NSViewController {
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
 
-        let maxValues = brightnessContrastChart.maxValues
-
         switch brightnessAdapter.mode {
         case .location:
+            let maxValues = brightnessContrastChart.maxValuesLocation
             for x in 0 ..< (maxValues - 1) {
                 let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
                     for: display,
@@ -54,8 +53,19 @@ class SettingsPageController: NSViewController {
             }
             brightnessChartEntry[maxValues - 1].y = brightnessChartEntry[0].y
             contrastChartEntry[maxValues - 1].y = contrastChartEntry[0].y
-        default:
-            break
+        case .sync:
+            let maxValues = brightnessContrastChart.maxValuesSync
+            for x in 0 ..< (maxValues - 1) {
+                let percent = Double(x)
+                brightnessChartEntry[x].y = display.computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset).doubleValue
+                contrastChartEntry[x].y = display.computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset).doubleValue
+            }
+        case .manual:
+            let maxValues = brightnessContrastChart.maxValuesSync
+            for x in 0 ..< (maxValues - 1) {
+                brightnessChartEntry[x].y = brightnessAdapter.computeManualValueFromPercent(percent: Int8(x), key: "brightness", minVal: brightnessLimitMin, maxVal: brightnessLimitMax).doubleValue
+                contrastChartEntry[x].y = brightnessAdapter.computeManualValueFromPercent(percent: Int8(x), key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax).doubleValue
+            }
         }
 
         if withAnimation {

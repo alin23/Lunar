@@ -58,6 +58,8 @@ class BrightnessAdapter {
     var firstDisplay: Display {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
+        } else if TEST_MODE {
+            return TEST_DISPLAY
         } else {
             return GENERIC_DISPLAY
         }
@@ -115,11 +117,11 @@ class BrightnessAdapter {
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
-        var serialsAndNames = displayIDs.enumerated().map({ i, id in (DDC.getDisplaySerial(for: id).stripped, lunarDisplayNames[i % lunarDisplayNames.count]) })
-        var serials = serialsAndNames.map({ d in d.0 })
+        var serialsAndNames = displayIDs.enumerated().map { i, id in (DDC.getDisplaySerial(for: id).stripped, lunarDisplayNames[i % lunarDisplayNames.count]) }
+        var serials = serialsAndNames.map { d in d.0 }
         if serials.count != Set(serials).count {
-            serials = zip(serials, displayIDs).map({ serial, id in "\(serial)-\(id)" })
-            serialsAndNames = zip(serialsAndNames, serials).map({ d, serial in (serial, d.1) })
+            serials = zip(serials, displayIDs).map { serial, id in "\(serial)-\(id)" }
+            serialsAndNames = zip(serialsAndNames, serials).map { d, serial in (serial, d.1) }
         }
         let displaySerialIDMapping = Dictionary(uniqueKeysWithValues: zip(serials, displayIDs))
         let displaySerialNameMapping = Dictionary(uniqueKeysWithValues: serialsAndNames)
@@ -149,16 +151,16 @@ class BrightnessAdapter {
             }
 
             datastore.save()
-            BrightnessAdapter.logDisplays(displays.values.map({ d in d }))
+            BrightnessAdapter.logDisplays(displays.values.map { d in d })
             return displays
         } catch {
             log.error("Error on fetching displays: \(error)")
             displays = Dictionary(uniqueKeysWithValues: displayIDs.map { id in (id, Display(id: id, active: true)) })
-            displays.values.forEach({ $0.addObservers() })
+            displays.values.forEach { $0.addObservers() }
         }
 
         datastore.save()
-        BrightnessAdapter.logDisplays(displays.values.map({ d in d }))
+        BrightnessAdapter.logDisplays(displays.values.map { d in d })
         return displays
     }
 
@@ -215,7 +217,7 @@ class BrightnessAdapter {
     }
 
     func listenForRunningApps() {
-        let appNames = NSWorkspace.shared.runningApplications.map({ app in app.bundleIdentifier ?? "" })
+        let appNames = NSWorkspace.shared.runningApplications.map { app in app.bundleIdentifier ?? "" }
         runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
         for app in runningAppExceptions {
             app.addObservers()
@@ -224,8 +226,8 @@ class BrightnessAdapter {
         adaptBrightness()
 
         appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
-            let oldAppNames = change.oldValue?.map({ app in app.bundleIdentifier ?? "" })
-            let newAppNames = change.newValue?.map({ app in app.bundleIdentifier ?? "" })
+            let oldAppNames = change.oldValue?.map { app in app.bundleIdentifier ?? "" }
+            let newAppNames = change.newValue?.map { app in app.bundleIdentifier ?? "" }
             do {
                 if let names = newAppNames {
                     self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
@@ -323,79 +325,74 @@ class BrightnessAdapter {
         )
     }
 
-    func computeBrightnessFromPercent(percent: Double, for display: Display, appOffset: Int = 0) -> NSNumber {
-        return display.computeBrightness(from: percent, appOffset: appOffset)
+    func computeManualValueFromPercent(percent: Int8, key: String, minVal: Int? = nil, maxVal: Int? = nil) -> NSNumber {
+        let percent = Double(min(max(percent, 0), 100)) / 100.0
+        let minVal = minVal ?? datastore.defaults.integer(forKey: "\(key)LimitMin")
+        let maxVal = maxVal ?? datastore.defaults.integer(forKey: "\(key)LimitMax")
+        let value = Int(round(percent * Double(maxVal - minVal))) + minVal
+        return NSNumber(value: cap(value, minVal: minVal, maxVal: maxVal))
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
-        let percent = Double(min(max(value, 0), 100)) / 100.0
-        let minVal = datastore.defaults.brightnessLimitMin
-        let maxVal = datastore.defaults.brightnessLimitMax
-        let brightness = Int(round(percent * Double(maxVal - minVal))) + minVal
-        let nsBrightness = NSNumber(value: cap(brightness, minVal: minVal, maxVal: maxVal))
-
+        let brightness = computeManualValueFromPercent(percent: value, key: "brightness")
         if let displays = displays {
-            displays.forEach({ display in display.brightness = nsBrightness })
+            displays.forEach { display in display.brightness = brightness }
         } else {
-            self.displays.values.forEach({ display in display.brightness = nsBrightness })
+            self.displays.values.forEach { display in display.brightness = brightness }
         }
     }
 
-    func computeContrastFromPercent(percent: Double, for display: Display, appOffset: Int = 0) -> NSNumber {
-        return display.computeContrast(from: percent, appOffset: appOffset)
-    }
-
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
-        let percent = Double(min(max(value, 0), 100)) / 100.0
-        let minVal = datastore.defaults.contrastLimitMin
-        let maxVal = datastore.defaults.contrastLimitMax
-        let contrast = Int(round(percent * Double(maxVal - minVal))) + minVal
-        let nsContrast = NSNumber(value: cap(contrast, minVal: minVal, maxVal: maxVal))
+        let contrast = computeManualValueFromPercent(percent: value, key: "contrast")
 
         if let displays = displays {
-            displays.forEach({ display in display.contrast = nsContrast })
+            displays.forEach { display in display.contrast = contrast }
         } else {
-            self.displays.values.forEach({ display in display.contrast = nsContrast })
+            self.displays.values.forEach { display in display.contrast = contrast }
         }
     }
 
     func setBrightness(brightness: NSNumber, for displays: [Display]? = nil) {
         if let displays = displays {
-            displays.forEach({ display in display.brightness = brightness })
+            displays.forEach { display in display.brightness = brightness }
         } else {
-            self.displays.values.forEach({ display in display.brightness = brightness })
+            self.displays.values.forEach { display in display.brightness = brightness }
         }
     }
 
     func setContrast(contrast: NSNumber, for displays: [Display]? = nil) {
         if let displays = displays {
-            displays.forEach({ display in display.contrast = contrast })
+            displays.forEach { display in display.contrast = contrast }
         } else {
-            self.displays.values.forEach({ display in display.contrast = contrast })
+            self.displays.values.forEach { display in display.contrast = contrast }
         }
     }
 
     func adjustBrightness(by offset: Int8, for displays: [Display]? = nil) {
         if let displays = displays {
-            displays.forEach({ display in
+            displays.forEach { display in
                 let value = cap(display.brightness.int8Value + offset, minVal: 0, maxVal: 100)
-                display.brightness = NSNumber(value: value) })
+                display.brightness = NSNumber(value: value)
+            }
         } else {
-            self.displays.values.forEach({ display in
+            self.displays.values.forEach { display in
                 let value = cap(display.brightness.int8Value + offset, minVal: 0, maxVal: 100)
-                display.brightness = NSNumber(value: value) })
+                display.brightness = NSNumber(value: value)
+            }
         }
     }
 
     func adjustContrast(by offset: Int8, for displays: [Display]? = nil) {
         if let displays = displays {
-            displays.forEach({ display in
+            displays.forEach { display in
                 let value = cap(display.contrast.int8Value + offset, minVal: 0, maxVal: 100)
-                display.contrast = NSNumber(value: value) })
+                display.contrast = NSNumber(value: value)
+            }
         } else {
-            self.displays.values.forEach({ display in
+            self.displays.values.forEach { display in
                 let value = cap(display.contrast.int8Value + offset, minVal: 0, maxVal: 100)
-                display.contrast = NSNumber(value: value) })
+                display.contrast = NSNumber(value: value)
+            }
         }
     }
 }
