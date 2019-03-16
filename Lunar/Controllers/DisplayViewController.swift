@@ -50,10 +50,10 @@ class DisplayViewController: NSViewController {
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil) {
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
-        let maxValues = brightnessContrastChart.maxValues
 
         switch brightnessAdapter.mode {
         case .location:
+            let maxValues = brightnessContrastChart.maxValuesLocation
             for x in 0 ..< (maxValues - 1) {
                 let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
                     for: display,
@@ -68,6 +68,17 @@ class DisplayViewController: NSViewController {
             }
             brightnessChartEntry[maxValues - 1].y = brightnessChartEntry[0].y
             contrastChartEntry[maxValues - 1].y = contrastChartEntry[0].y
+        case .sync:
+            let maxValues = brightnessContrastChart.maxValuesSync
+            let minBrightness = minBrightness != nil ? Double(minBrightness!) : nil
+            let maxBrightness = maxBrightness != nil ? Double(maxBrightness!) : nil
+            let minContrast = minContrast != nil ? Double(minContrast!) : nil
+            let maxContrast = maxContrast != nil ? Double(maxContrast!) : nil
+            for x in 0 ..< (maxValues - 1) {
+                let percent = Double(x)
+                brightnessChartEntry[x].y = display.computeBrightness(from: percent, minVal: minBrightness, maxVal: maxBrightness).doubleValue
+                contrastChartEntry[x].y = display.computeContrast(from: percent, minVal: minContrast, maxVal: maxContrast).doubleValue
+            }
         default:
             break
         }
