@@ -16,6 +16,7 @@ class SettingsPageController: NSViewController {
 
     func updateDataset(
         display: Display,
+        factor: Double? = nil,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
         brightnessOffset: Int? = nil,
@@ -31,43 +32,60 @@ class SettingsPageController: NSViewController {
         if display.id == GENERIC_DISPLAY_ID {
             return
         }
+
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
+
+        if brightnessChartEntry.isEmpty || contrastChartEntry.isEmpty {
+            return
+        }
 
         switch brightnessAdapter.mode {
         case .location:
             let maxValues = brightnessContrastChart.maxValuesLocation
+            let steps = brightnessContrastChart.interpolationValues
+            let points = brightnessAdapter.getBrightnessContrastBatch(
+                for: display, count: maxValues, minutesBetween: steps, factor: factor,
+                daylightExtension: daylightExtension, noonDuration: noonDuration,
+                appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
+            )
             for x in 0 ..< (maxValues - 1) {
-                let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                    for: display,
-                    hour: x,
-                    daylightExtension: daylightExtension,
-                    noonDuration: noonDuration,
-                    brightnessOffset: brightnessOffset,
-                    contrastOffset: contrastOffset,
-                    appBrightnessOffset: appBrightnessOffset,
-                    appContrastOffset: appContrastOffset
-                )
-                brightnessChartEntry[x].y = brightness.doubleValue
-                contrastChartEntry[x].y = contrast.doubleValue
+                let startIndex = x * steps
+                let xPoints = points[startIndex ..< (startIndex + steps)]
+                for (i, y) in xPoints.enumerated() {
+                    brightnessChartEntry[x * steps + i].y = y.0.doubleValue
+                    contrastChartEntry[x * steps + i].y = y.1.doubleValue
+                }
             }
-            brightnessChartEntry[maxValues - 1].y = brightnessChartEntry[0].y
-            contrastChartEntry[maxValues - 1].y = contrastChartEntry[0].y
+            for (i, point) in brightnessChartEntry.prefix(steps).reversed().enumerated() {
+                brightnessChartEntry[(maxValues - 1) * steps + i].y = point.y
+            }
+            for (i, point) in contrastChartEntry.prefix(steps).reversed().enumerated() {
+                contrastChartEntry[(maxValues - 1) * steps + i].y = point.y
+            }
         case .sync:
             let maxValues = brightnessContrastChart.maxValuesSync
-            for x in 0 ..< (maxValues - 1) {
-                let percent = Double(x)
-                brightnessChartEntry[x].y = display.computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset).doubleValue
-                contrastChartEntry[x].y = display.computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset).doubleValue
+            let xs = stride(from: 0, to: maxValues - 1, by: 1)
+            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, offset: brightnessOffset, appOffset: appBrightnessOffset)) {
+                brightnessChartEntry[x].y = b.doubleValue
+            }
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, offset: contrastOffset, appOffset: appContrastOffset)) {
+                contrastChartEntry[x].y = b.doubleValue
             }
         case .manual:
             let maxValues = brightnessContrastChart.maxValuesSync
-            for x in 0 ..< (maxValues - 1) {
-                brightnessChartEntry[x].y = brightnessAdapter.computeManualValueFromPercent(percent: Int8(x), key: "brightness", minVal: brightnessLimitMin, maxVal: brightnessLimitMax).doubleValue
-                contrastChartEntry[x].y = brightnessAdapter.computeManualValueFromPercent(percent: Int8(x), key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax).doubleValue
+            let xs = stride(from: 0, to: maxValues - 1, by: 1)
+            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
+            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "brightness", minVal: brightnessLimitMin, maxVal: brightnessLimitMax)) {
+                brightnessChartEntry[x].y = b
+            }
+            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax)) {
+                contrastChartEntry[x].y = b
             }
         }
 
+        // brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode)
         if withAnimation {
             brightnessContrastChart.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
         } else {

@@ -117,14 +117,14 @@ class ScrollableBrightness: NSView {
 
             currentValue?.isHidden = !hidden
             currentValueCaption?.isHidden = !hidden
-            DispatchQueue.main.asyncAfter(deadline: deadline, execute: {
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
                 self.currentValue?.alphaValue = currentAlpha
                 self.currentValueCaption?.alphaValue = currentAlpha
                 self.minValue?.isHidden = hidden
                 self.minValueCaption?.isHidden = hidden
                 self.maxValue?.isHidden = hidden
                 self.maxValueCaption?.isHidden = hidden
-            })
+            }
         } else {
             minValue?.isHidden = hidden
             minValueCaption?.isHidden = hidden
@@ -133,22 +133,22 @@ class ScrollableBrightness: NSView {
 
             currentValue?.alphaValue = currentAlpha
             currentValueCaption?.alphaValue = currentAlpha
-            DispatchQueue.main.asyncAfter(deadline: deadline, execute: {
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
                 self.minValue?.alphaValue = limitsAlpha
                 self.minValueCaption?.alphaValue = limitsAlpha
                 self.maxValue?.alphaValue = limitsAlpha
                 self.maxValueCaption?.alphaValue = limitsAlpha
                 self.currentValue?.isHidden = !hidden
                 self.currentValueCaption?.isHidden = !hidden
-            })
+            }
         }
     }
 
     func update(from display: Display) {
         minValue?.intValue = Int32(displayMinValue)
-        minValue?.upperLimit = displayMaxValue - 1
+        minValue?.upperLimit = Double(displayMaxValue - 1)
         maxValue?.intValue = Int32(displayMaxValue)
-        maxValue?.lowerLimit = displayMinValue + 1
+        maxValue?.lowerLimit = Double(displayMinValue + 1)
         currentValue?.intValue = Int32(displayValue)
         currentValue?.lowerLimit = 0
         currentValue?.upperLimit = 100
@@ -197,14 +197,14 @@ class ScrollableBrightness: NSView {
     func setup() {
         minValue?.onValueChangedInstant = onMinValueChanged
         minValue?.onValueChanged = { (value: Int) in
-            self.maxValue?.lowerLimit = value + 1
+            self.maxValue?.lowerLimit = Double(value + 1)
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = onMaxValueChanged
         maxValue?.onValueChanged = { (value: Int) in
-            self.minValue?.upperLimit = value - 1
+            self.minValue?.upperLimit = Double(value - 1)
             if self.display != nil {
                 self.displayMaxValue = value
             }
@@ -227,14 +227,14 @@ class ScrollableBrightness: NSView {
         super.draw(dirtyRect)
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
         minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
-            self.maxValue?.lowerLimit = value + 1
+            self.maxValue?.lowerLimit = Double(value + 1)
             if self.display != nil {
                 self.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
         maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
-            self.minValue?.upperLimit = value - 1
+            self.minValue?.upperLimit = Double(value - 1)
             if self.display != nil {
                 self.displayMaxValue = value
             }

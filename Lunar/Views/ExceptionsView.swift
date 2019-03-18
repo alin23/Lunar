@@ -45,7 +45,7 @@ class ExceptionsView: NSTableView {
                 scrollableBrightness.onValueChangedInstant = { value in
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
-                        appBrightnessOffset: value,
+                        appBrightnessOffset: Int(value),
                         appContrastOffset: scrollableContrast.integerValue
                     )
                 }
@@ -53,7 +53,7 @@ class ExceptionsView: NSTableView {
                     controller.updateDataset(
                         display: brightnessAdapter.firstDisplay,
                         appBrightnessOffset: scrollableBrightness.integerValue,
-                        appContrastOffset: value
+                        appContrastOffset: Int(value)
                     )
                 }
 
