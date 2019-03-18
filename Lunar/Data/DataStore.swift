@@ -17,8 +17,8 @@ extension UserDefaults {
         return integer(forKey: "daylightExtensionMinutes")
     }
 
-    @objc dynamic var interpolationFactor: Double {
-        return double(forKey: "interpolationFactor")
+    @objc dynamic var curveFactor: Double {
+        return double(forKey: "curveFactor")
     }
 
     @objc dynamic var startAtLogin: Bool {
@@ -203,7 +203,7 @@ class DataStore: NSObject {
             DataStore.defaults.set(true, forKey: "firstRun")
         }
 
-        DataStore.setDefault(2.0, for: "interpolationFactor")
+        DataStore.setDefault(0.5, for: "curveFactor")
         DataStore.setDefault(false, for: "didScrollTextField")
         DataStore.setDefault(false, for: "didSwipeToHotkeys")
         DataStore.setDefault(false, for: "didSwipeLeft")

@@ -10,3 +10,4 @@ github "danielgindi/Charts"
 github "sparkle-project/Sparkle"
 github "Clipy/KeyHolder"
 github "Clipy/Magnet"
+github "mattt/Surge" ~> 2.0.0

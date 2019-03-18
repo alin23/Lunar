@@ -10,8 +10,9 @@ import Cocoa
 import HotKey
 
 class ScrollableTextField: NSTextField {
-    @IBInspectable var lowerLimit: Int = 0
-    @IBInspectable var upperLimit: Int = 100
+    @IBInspectable var lowerLimit: Double = 0.0
+    @IBInspectable var upperLimit: Double = 100.0
+    @IBInspectable var step: Double = 1.0
 
     @IBInspectable var textFieldColor: NSColor = scrollableTextFieldColor {
         didSet {
@@ -31,6 +32,17 @@ class ScrollableTextField: NSTextField {
 
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
+    var decimalPoints = 0
+    override var doubleValue: Double {
+        didSet {
+            if decimalPoints > 0 {
+                stringValue = String(format: "%.\(decimalPoints)f", doubleValue)
+            } else {
+                stringValue = String(Int(round(doubleValue)))
+            }
+        }
+    }
+
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
@@ -38,6 +50,8 @@ class ScrollableTextField: NSTextField {
 
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
+    var onValueChangedDouble: ((Double) -> Void)?
+    var onValueChangedInstantDouble: ((Double) -> Void)?
 
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
@@ -102,27 +116,19 @@ class ScrollableTextField: NSTextField {
         upHotkey = HotKey(
             key: .upArrow,
             modifiers: [],
-            keyDownHandler: {
-                if self.intValue < self.upperLimit {
-                    self.intValue += 1
-                    self.onValueChangedInstant?(self.integerValue)
-                }
-            },
+            keyDownHandler: increaseValue,
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
+                self.onValueChangedDouble?(self.doubleValue)
             }
         )
         downHotkey = HotKey(
             key: .downArrow,
             modifiers: [],
-            keyDownHandler: {
-                if self.intValue > self.lowerLimit {
-                    self.intValue -= 1
-                    self.onValueChangedInstant?(self.integerValue)
-                }
-            },
+            keyDownHandler: decreaseValue,
             keyUpHandler: {
                 self.onValueChanged?(self.integerValue)
+                self.onValueChangedDouble?(self.doubleValue)
             }
         )
         onMouseEnter?()
@@ -160,6 +166,22 @@ class ScrollableTextField: NSTextField {
         }
     }
 
+    func increaseValue() {
+        if doubleValue < upperLimit {
+            doubleValue += step
+            onValueChangedInstant?(integerValue)
+            onValueChangedInstantDouble?(doubleValue)
+        }
+    }
+
+    func decreaseValue() {
+        if doubleValue > lowerLimit {
+            doubleValue -= step
+            onValueChangedInstant?(integerValue)
+            onValueChangedInstantDouble?(doubleValue)
+        }
+    }
+
     override func scrollWheel(with event: NSEvent) {
         if abs(event.scrollingDeltaX) <= 3.0 {
             if disabled {
@@ -171,29 +193,20 @@ class ScrollableTextField: NSTextField {
                     scrolling = true
                     lightenUp(color: textFieldColorLight)
                 }
-                if intValue < upperLimit {
-                    intValue += 1
-                    if let callback = onValueChangedInstant {
-                        callback(integerValue)
-                    }
-                }
+                increaseValue()
             } else if event.scrollingDeltaY > 0.0 {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
                     lightenUp(color: textFieldColorLight)
                 }
-                if intValue > lowerLimit {
-                    intValue -= 1
-                    if let callback = onValueChangedInstant {
-                        callback(integerValue)
-                    }
-                }
+                decreaseValue()
             } else {
                 if scrolling {
                     scrolling = false
-                    log.debug("Changed \(caption?.stringValue ?? "") to \(integerValue)")
+                    log.debug("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
                     onValueChanged?(integerValue)
+                    onValueChangedDouble?(doubleValue)
                     darken(color: textFieldColorHover)
                 }
             }
