@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Surge
 import SwiftDate
 
 let MIN_BRIGHTNESS: UInt8 = 0
@@ -18,6 +19,11 @@ let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
 let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context, adaptive: true)
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
+
+enum ValueType {
+    case brightness
+    case contrast
+}
 
 class Display: NSManagedObject {
     @NSManaged var id: CGDirectDisplayID
@@ -210,58 +216,68 @@ class Display: NSManagedObject {
         datastoreObservers.removeAll(keepingCapacity: true)
     }
 
-    func computeBrightness(from percent: Double, offset: Int? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
-        let minBrightness = minVal ?? self.minBrightness.doubleValue
-        let maxBrightness = maxVal ?? self.maxBrightness.doubleValue
-        let offset = offset ?? datastore.defaults.brightnessOffset
-
-        var factor = 1.0
-        if offset > 0 {
-            factor = 1.0 - (Double(offset) / 100.0)
-        } else if offset < 0 {
-            factor = 1.0 - (Double(offset) / 10.0)
+    func getMinMaxFactor(type: ValueType, offset: Int? = nil, factor: Double? = nil, minVal: Double? = nil, maxVal: Double? = nil) -> (Double, Double, Double) {
+        let minValue: Double
+        let maxValue: Double
+        let offsetValue: Int
+        if type == .brightness {
+            maxValue = maxVal ?? maxBrightness.doubleValue
+            minValue = minVal ?? minBrightness.doubleValue
+            offsetValue = offset ?? datastore.defaults.brightnessOffset
+        } else {
+            maxValue = maxVal ?? maxContrast.doubleValue
+            minValue = minVal ?? minContrast.doubleValue
+            offsetValue = offset ?? datastore.defaults.contrastOffset
         }
-        var brightness = pow(((percent / 100.0) * (maxBrightness - minBrightness) + minBrightness) / 100.0, factor) * 100.0
-        brightness = cap(brightness, minVal: minBrightness, maxVal: maxBrightness)
 
-        if appOffset > 0 {
-            brightness = cap(brightness + Double(appOffset), minVal: minBrightness, maxVal: maxBrightness)
+        guard let factor = factor else {
+            var factor = 1.0
+            if offsetValue > 0 {
+                factor = 1.0 - (Double(offsetValue) / 100.0)
+            } else if offsetValue < 0 {
+                factor = 1.0 - (Double(offsetValue) / 10.0)
+            }
+            return (minValue, maxValue, factor)
         }
-        return NSNumber(value: Int(brightness))
+        return (minValue, maxValue, factor)
     }
 
-    func computeContrast(from percent: Double, offset: Int? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
-        let minContrast = minVal ?? self.minContrast.doubleValue
-        let maxContrast = maxVal ?? self.maxContrast.doubleValue
-        let offset = offset ?? datastore.defaults.contrastOffset
+    func computeValue(from percent: Double, type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
+        let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
 
-        var factor = 1.0
-        if offset > 0 {
-            factor = 1.0 - (Double(offset) / 100.0)
-        } else if offset < 0 {
-            factor = 1.0 + (Double(-offset) / 100.0)
-        }
-        var contrast = pow(((percent / 100.0) * (maxContrast - minContrast) + minContrast) / 100.0, factor) * 100.0
-        contrast = cap(contrast, minVal: minContrast, maxVal: maxContrast)
+        var value = pow((percent * (maxValue - minValue) + minValue) / 100.0, factor) * 100.0
+        value = cap(value, minVal: minValue, maxVal: maxValue)
 
         if appOffset > 0 {
-            contrast = cap(contrast + Double(appOffset), minVal: minContrast, maxVal: maxContrast)
+            value = cap(value + Double(appOffset), minVal: minValue, maxVal: maxValue)
         }
-        return NSNumber(value: Int(contrast))
+        return NSNumber(value: value)
+    }
+
+    func computeSIMDValue(from percent: [Double], type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> [NSNumber] {
+        let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
+
+        var value = (percent * (maxValue - minValue) + minValue)
+        value /= 100.0
+        value = pow(value, factor)
+
+        value = (value * 100.0 + Double(appOffset))
+        return value.map {
+            b in NSNumber(value: cap(b, minVal: minValue, maxVal: maxValue))
+        }
     }
 
     func getBrightnessContrast(
         moment: Moment,
         hour: Int? = nil,
         minute: Int = 0,
+        factor: Double? = nil,
         minBrightness: UInt8? = nil,
         maxBrightness: UInt8? = nil,
         minContrast: UInt8? = nil,
         maxContrast: UInt8? = nil,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
-        brightnessOffset: Int? = nil,
-        contrastOffset: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
@@ -289,15 +305,31 @@ class Display: NSManagedObject {
         case daylightStart ... noonStart:
             let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
             let minutesSinceSunrise = ((now - daylightStart) / seconds)
-            let percent = (minutesSinceSunrise / firstHalfDayMinutes) * 100
-            newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
-            newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))
+            let percent = (minutesSinceSunrise / firstHalfDayMinutes)
+            newBrightness = computeValue(
+                from: percent, type: .brightness,
+                factor: factor ?? datastore.defaults.curveFactor, appOffset: appBrightnessOffset,
+                minVal: Double(minBrightness), maxVal: Double(maxBrightness)
+            )
+            newContrast = computeValue(
+                from: percent, type: .contrast,
+                factor: factor ?? datastore.defaults.curveFactor, appOffset: appContrastOffset,
+                minVal: Double(minContrast), maxVal: Double(maxContrast)
+            )
         case noonEnd ... daylightEnd:
             let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
             let minutesSinceNoon = ((now - noonEnd) / seconds)
-            let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes) * 100
-            newBrightness = computeBrightness(from: percent, offset: brightnessOffset, appOffset: appBrightnessOffset, minVal: Double(minBrightness), maxVal: Double(maxBrightness))
-            newContrast = computeContrast(from: percent, offset: contrastOffset, appOffset: appContrastOffset, minVal: Double(minContrast), maxVal: Double(maxContrast))
+            let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes)
+            newBrightness = computeValue(
+                from: percent, type: .brightness,
+                factor: factor ?? datastore.defaults.curveFactor, appOffset: appBrightnessOffset,
+                minVal: Double(minBrightness), maxVal: Double(maxBrightness)
+            )
+            newContrast = computeValue(
+                from: percent, type: .contrast,
+                factor: factor ?? datastore.defaults.curveFactor, appOffset: appContrastOffset,
+                minVal: Double(minContrast), maxVal: Double(maxContrast)
+            )
         case noonStart ... noonEnd:
             newBrightness = NSNumber(value: maxBrightness)
             newContrast = NSNumber(value: maxContrast)
@@ -307,12 +339,122 @@ class Display: NSManagedObject {
         }
 
         if appBrightnessOffset > 0 {
-            newBrightness = NSNumber(value: min(newBrightness.intValue + appBrightnessOffset, Int(MAX_BRIGHTNESS)))
+            newBrightness = NSNumber(value: min(newBrightness.doubleValue + Double(appBrightnessOffset), Double(MAX_BRIGHTNESS)))
         }
         if appContrastOffset > 0 {
-            newContrast = NSNumber(value: min(newContrast.intValue + appContrastOffset, Int(MAX_CONTRAST)))
+            newContrast = NSNumber(value: min(newContrast.doubleValue + Double(appContrastOffset), Double(MAX_CONTRAST)))
         }
         return (newBrightness, newContrast)
+    }
+
+    func getBrightnessContrastBatch(
+        moment: Moment,
+        minutesBetween: Int = 0,
+        factor: Double? = nil,
+        minBrightness: UInt8? = nil,
+        maxBrightness: UInt8? = nil,
+        minContrast: UInt8? = nil,
+        maxContrast: UInt8? = nil,
+        daylightExtension: Int? = nil,
+        noonDuration: Int? = nil,
+        appBrightnessOffset: Int = 0,
+        appContrastOffset: Int = 0
+    ) -> [(NSNumber, NSNumber)] {
+        let step = 60 / minutesBetween
+        var times = [Double]()
+        times.reserveCapacity(24 * minutesBetween)
+
+        let now = DateInRegion().convertTo(region: Region.local)
+        for hour in 0 ..< 24 {
+            times.append(contentsOf: stride(from: 0, through: 59, by: step).map {
+                m in now.dateBySet(hour: hour, min: m, secs: 0)!.timeIntervalSince1970
+            })
+        }
+
+        let seconds = 60.0
+
+        let minBrightness = minBrightness ?? self.minBrightness.uint8Value
+        let maxBrightness = maxBrightness ?? self.maxBrightness.uint8Value
+        let minContrast = minContrast ?? self.minContrast.uint8Value
+        let maxContrast = maxContrast ?? self.maxContrast.uint8Value
+        let daylightExtension = daylightExtension ?? datastore.defaults.daylightExtensionMinutes
+        let noonDuration = noonDuration ?? datastore.defaults.noonDurationMinutes
+
+        let daylightStart = moment.sunrise - daylightExtension.minutes
+        let daylightEnd = moment.sunset + daylightExtension.minutes
+        let daylightStartSeconds = daylightStart.timeIntervalSince1970
+        let daylightEndSeconds = daylightEnd.timeIntervalSince1970
+
+        let noonStart = moment.solarNoon - (noonDuration / 2).minutes
+        let noonEnd = moment.solarNoon + (noonDuration / 2).minutes
+        let noonStartSeconds = noonStart.timeIntervalSince1970
+        let noonEndSeconds = noonEnd.timeIntervalSince1970
+
+        let firstHalfDayMinutes = ((noonStartSeconds - daylightStartSeconds) / seconds)
+        let secondHalfDayMinutes = ((daylightEndSeconds - noonEndSeconds) / seconds)
+
+        let maxNSBrightness = NSNumber(value: maxBrightness)
+        let maxNSContrast = NSNumber(value: maxContrast)
+        let minNSBrightness = NSNumber(value: min(minBrightness + UInt8(appBrightnessOffset), MAX_BRIGHTNESS))
+        let minNSContrast = NSNumber(value: min(minContrast + UInt8(appContrastOffset), MAX_CONTRAST))
+
+        let maxBrightnessDouble = Double(maxBrightness)
+        let maxContrastDouble = Double(maxContrast)
+        let minBrightnessDouble = Double(minBrightness)
+        let minContrastDouble = Double(minContrast)
+
+        var brightnessContrast = [(NSNumber, NSNumber)](repeating: (minNSBrightness, minNSContrast), count: 25 * minutesBetween)
+        let noonStartIndex = times.firstIndex { s in s >= noonStartSeconds }
+        let noonEndIndex = times.lastIndex { s in s <= noonEndSeconds }
+        if let start = noonStartIndex, let end = noonEndIndex, start < end {
+            let noonValues = [(NSNumber, NSNumber)](repeating: (maxNSBrightness, maxNSContrast), count: (end - start) + 1)
+            brightnessContrast.replaceSubrange(
+                start ... end, with: noonValues
+            )
+        }
+
+        let daylightStartIndex = times.firstIndex { s in s >= daylightStartSeconds } ?? 0
+        let daylightEndIndex = times.lastIndex { s in s <= daylightEndSeconds } ?? (brightnessContrast.count - 1)
+
+        let firstHalf = (daylightStartIndex ..< (noonStartIndex ?? daylightStartIndex))
+        var values = Array(times[firstHalf])
+        let minutesSinceSunrise = ((values - Double(daylightStartSeconds)) / seconds)
+        var percent = (minutesSinceSunrise / firstHalfDayMinutes)
+
+        brightnessContrast.replaceSubrange(
+            firstHalf,
+            with: zip(
+                computeSIMDValue(
+                    from: percent, type: .brightness, factor: factor ?? datastore.defaults.curveFactor,
+                    appOffset: appBrightnessOffset, minVal: minBrightnessDouble, maxVal: maxBrightnessDouble
+                ),
+                computeSIMDValue(
+                    from: percent, type: .contrast, factor: factor ?? datastore.defaults.curveFactor,
+                    appOffset: appContrastOffset, minVal: minContrastDouble, maxVal: maxContrastDouble
+                )
+            ).map { ($0, $1) }
+        )
+
+        let secondHalf = ((noonEndIndex ?? daylightEndIndex) - 1) ..< daylightEndIndex + 1
+        values = Array(times[secondHalf])
+        let minutesSinceNoon = ((values - noonEndSeconds) / seconds)
+        percent = (abs(minutesSinceNoon - secondHalfDayMinutes) / secondHalfDayMinutes)
+
+        brightnessContrast.replaceSubrange(
+            secondHalf,
+            with: zip(
+                computeSIMDValue(
+                    from: percent, type: .brightness, factor: factor ?? datastore.defaults.curveFactor,
+                    appOffset: appBrightnessOffset, minVal: minBrightnessDouble, maxVal: maxBrightnessDouble
+                ),
+                computeSIMDValue(
+                    from: percent, type: .contrast, factor: factor ?? datastore.defaults.curveFactor,
+                    appOffset: appContrastOffset, minVal: minContrastDouble, maxVal: maxContrastDouble
+                )
+            ).map { ($0, $1) }
+        )
+
+        return brightnessContrast
     }
 
     func adapt(moment: Moment? = nil, app: AppException? = nil, percent: Double? = nil) {
@@ -325,8 +467,9 @@ class Display: NSManagedObject {
         if let moment = moment {
             (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: app?.brightness.intValue ?? 0, appContrastOffset: app?.contrast.intValue ?? 0)
         } else if let percent = percent {
-            newBrightness = computeBrightness(from: percent, appOffset: app?.brightness.intValue ?? 0)
-            newContrast = computeContrast(from: percent, appOffset: app?.contrast.intValue ?? 0)
+            let percent = percent / 100.0
+            newBrightness = computeValue(from: percent, type: .brightness, appOffset: app?.brightness.intValue ?? 0)
+            newContrast = computeValue(from: percent, type: .contrast, appOffset: app?.contrast.intValue ?? 0)
         }
 
         var changed = false
