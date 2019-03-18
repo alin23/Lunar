@@ -56,7 +56,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func mauveBackground() {
-        view.layer?.backgroundColor = mauve.cgColor
+        view.layer?.backgroundColor = hotkeysBgColor.cgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor

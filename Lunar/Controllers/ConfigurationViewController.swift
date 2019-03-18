@@ -36,6 +36,17 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    @IBOutlet var curveFactorField: ScrollableTextField!
+    @IBOutlet var curveFactorCaption: ScrollableTextFieldCaption!
+    @IBOutlet var curveFactorLabel: NSTextField!
+    var curveFactorVisible: Bool = false {
+        didSet {
+            curveFactorField?.isHidden = !curveFactorVisible
+            curveFactorCaption?.isHidden = !curveFactorVisible
+            curveFactorLabel?.isHidden = !curveFactorVisible
+        }
+    }
+
     @IBOutlet var brightnessOffsetField: ScrollableTextField!
     @IBOutlet var brightnessOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var brightnessOffsetLabel: NSTextField!
@@ -90,6 +101,7 @@ class ConfigurationViewController: NSViewController {
 
     @IBOutlet var swipeLeftHint: NSTextField!
 
+    var curveFactorObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
     var brightnessLimitMinObserver: NSKeyValueObservation?
@@ -102,6 +114,7 @@ class ConfigurationViewController: NSViewController {
     func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
         noonDurationVisible = adaptiveMode == .location
         daylightExtensionVisible = adaptiveMode == .location
+        curveFactorVisible = adaptiveMode == .location
         brightnessOffsetVisible = adaptiveMode == .sync
         contrastOffsetVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
@@ -128,6 +141,15 @@ class ConfigurationViewController: NSViewController {
         ))
     }
 
+    func listenForCurveFactorChange() {
+        curveFactorObserver = datastore.defaults.observe(\.curveFactor, options: [.old, .new], changeHandler: { _, change in
+            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+                return
+            }
+            self.curveFactorField?.doubleValue = value
+        })
+    }
+
     func listenForBrightnessOffsetChange() {
         brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
@@ -152,14 +174,14 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.brightnessLimitMinField?.stringValue = String(brightness)
-            self.brightnessLimitMaxField?.lowerLimit = brightness + 1
+            self.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
         })
         brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
             self.brightnessLimitMaxField?.stringValue = String(brightness)
-            self.brightnessLimitMinField?.upperLimit = brightness - 1
+            self.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
         })
     }
 
@@ -169,14 +191,14 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.contrastLimitMinField?.stringValue = String(contrast)
-            self.contrastLimitMaxField?.lowerLimit = contrast + 1
+            self.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
         })
         contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
             self.contrastLimitMaxField?.stringValue = String(contrast)
-            self.contrastLimitMinField?.upperLimit = contrast - 1
+            self.contrastLimitMinField?.upperLimit = Double(contrast - 1)
         })
     }
 
@@ -214,7 +236,7 @@ class ConfigurationViewController: NSViewController {
         guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
 
         daylightExtensionLabel?.toolTip = """
-        The number of minutes for which the daylight in your area is still visible
+        The number of minutes for which the daylight in your area is still visible before sunrise and after sunset
         This keeps the brightness/contrast from going to its lowest value too soon
         """
 
@@ -225,6 +247,26 @@ class ConfigurationViewController: NSViewController {
             },
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
+            }
+        )
+    }
+
+    func setupCurveFactor() {
+        guard let field = curveFactorField, let caption = curveFactorCaption else { return }
+
+        curveFactorLabel?.toolTip = """
+        Value for adjusting the brightness/contrast curve
+        """
+        curveFactorField.decimalPoints = 1
+        curveFactorField.step = 0.1
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "curveFactor", lowerLimit: 0.0, upperLimit: 10.0,
+            onMouseEnter: { settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, factor: self.curveFactorField.doubleValue, withAnimation: true)
+            },
+            onValueChangedInstantDouble: { value, settingsController in
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, factor: value)
             }
         )
     }
@@ -270,13 +312,13 @@ class ConfigurationViewController: NSViewController {
         """
 
         setupScrollableTextField(
-            minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.brightnessLimitMax - 1,
+            minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.brightnessLimitMax - 1),
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
             }
         )
         setupScrollableTextField(
-            maxField, caption: maxCaption, settingKey: "brightnessLimitMax", lowerLimit: datastore.defaults.brightnessLimitMin + 1, upperLimit: 100,
+            maxField, caption: maxCaption, settingKey: "brightnessLimitMax", lowerLimit: Double(datastore.defaults.brightnessLimitMin + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
             }
@@ -294,13 +336,13 @@ class ConfigurationViewController: NSViewController {
         """
 
         setupScrollableTextField(
-            minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: datastore.defaults.contrastLimitMax - 1,
+            minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.contrastLimitMax - 1),
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
             }
         )
         setupScrollableTextField(
-            maxField, caption: maxCaption, settingKey: "contrastLimitMax", lowerLimit: datastore.defaults.contrastLimitMin + 1, upperLimit: 100,
+            maxField, caption: maxCaption, settingKey: "contrastLimitMax", lowerLimit: Double(datastore.defaults.contrastLimitMin + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
             }
@@ -309,9 +351,10 @@ class ConfigurationViewController: NSViewController {
 
     func setupScrollableTextField(
         _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
-        lowerLimit: Int, upperLimit: Int,
+        lowerLimit: Double, upperLimit: Double,
         onMouseEnter: ((SettingsPageController) -> Void)? = nil,
-        onValueChangedInstant: ((Int, SettingsPageController) -> Void)? = nil
+        onValueChangedInstant: ((Int, SettingsPageController) -> Void)? = nil,
+        onValueChangedInstantDouble: ((Double, SettingsPageController) -> Void)? = nil
     ) {
         field.textFieldColor = scrollableTextFieldColorWhite
         field.textFieldColorHover = scrollableTextFieldColorHoverWhite
@@ -319,15 +362,27 @@ class ConfigurationViewController: NSViewController {
         caption.textColor = scrollableCaptionColorWhite
         field.caption = caption
 
-        field.integerValue = datastore.defaults.integer(forKey: settingKey)
-        field.onValueChanged = { (value: Int) in
-            datastore.defaults.set(value, forKey: settingKey)
+        if field.decimalPoints > 0 {
+            field.doubleValue = datastore.defaults.double(forKey: settingKey)
+            field.onValueChangedDouble = { (value: Double) in
+                datastore.defaults.set(value, forKey: settingKey)
+            }
+        } else {
+            field.integerValue = datastore.defaults.integer(forKey: settingKey)
+            field.onValueChanged = { (value: Int) in
+                datastore.defaults.set(value, forKey: settingKey)
+            }
         }
         field.lowerLimit = lowerLimit
         field.upperLimit = upperLimit
         if let settingsController = parent?.parent as? SettingsPageController {
             if let handler = onValueChangedInstant {
                 field.onValueChangedInstant = { value in
+                    handler(value, settingsController)
+                }
+            }
+            if let handler = onValueChangedInstantDouble {
+                field.onValueChangedInstantDouble = { value in
                     handler(value, settingsController)
                 }
             }
@@ -351,6 +406,7 @@ class ConfigurationViewController: NSViewController {
 
         setupNoonDuration()
         setupDaylightExtension()
+        setupCurveFactor()
         setupBrightnessOffset()
         setupContrastOffset()
         setupBrightnessLimit()
@@ -367,6 +423,7 @@ class ConfigurationViewController: NSViewController {
             showRelevantSettings(mode)
         }
 
+        listenForCurveFactorChange()
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
         listenForBrightnessLimitChange()

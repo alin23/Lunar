@@ -12,6 +12,7 @@ import CoreLocation
 import Crashlytics
 import Foundation
 import Solar
+import Surge
 import SwiftDate
 import SwiftyJSON
 
@@ -293,14 +294,13 @@ class BrightnessAdapter {
         for display: Display,
         hour: Int? = nil,
         minute: Int = 0,
+        factor: Double? = nil,
         minBrightness: UInt8? = nil,
         maxBrightness: UInt8? = nil,
         minContrast: UInt8? = nil,
         maxContrast: UInt8? = nil,
         daylightExtension: Int? = nil,
         noonDuration: Int? = nil,
-        brightnessOffset: Int? = nil,
-        contrastOffset: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
@@ -312,25 +312,63 @@ class BrightnessAdapter {
             moment: moment,
             hour: hour,
             minute: minute,
+            factor: factor,
             minBrightness: minBrightness,
             maxBrightness: maxBrightness,
             minContrast: minContrast,
             maxContrast: maxContrast,
             daylightExtension: daylightExtension,
             noonDuration: noonDuration,
-            brightnessOffset: brightnessOffset,
-            contrastOffset: contrastOffset,
+            appBrightnessOffset: appBrightnessOffset,
+            appContrastOffset: appContrastOffset
+        )
+    }
+
+    func getBrightnessContrastBatch(
+        for display: Display,
+        count: Int,
+        minutesBetween: Int,
+        factor: Double? = nil,
+        minBrightness: UInt8? = nil,
+        maxBrightness: UInt8? = nil,
+        minContrast: UInt8? = nil,
+        maxContrast: UInt8? = nil,
+        daylightExtension: Int? = nil,
+        noonDuration: Int? = nil,
+        appBrightnessOffset: Int = 0,
+        appContrastOffset: Int = 0
+    ) -> [(NSNumber, NSNumber)] {
+        if moment == nil {
+            log.warning("Day moments aren't fetched yet")
+            return [(NSNumber, NSNumber)](repeating: (0, 0), count: count * minutesBetween)
+        }
+        return display.getBrightnessContrastBatch(
+            moment: moment,
+            minutesBetween: minutesBetween,
+            factor: factor,
+            minBrightness: minBrightness,
+            maxBrightness: maxBrightness,
+            minContrast: minContrast,
+            maxContrast: maxContrast,
+            daylightExtension: daylightExtension,
+            noonDuration: noonDuration,
             appBrightnessOffset: appBrightnessOffset,
             appContrastOffset: appContrastOffset
         )
     }
 
     func computeManualValueFromPercent(percent: Int8, key: String, minVal: Int? = nil, maxVal: Int? = nil) -> NSNumber {
-        let percent = Double(min(max(percent, 0), 100)) / 100.0
+        let percent = Double(cap(percent, minVal: 0, maxVal: 100)) / 100.0
         let minVal = minVal ?? datastore.defaults.integer(forKey: "\(key)LimitMin")
         let maxVal = maxVal ?? datastore.defaults.integer(forKey: "\(key)LimitMax")
         let value = Int(round(percent * Double(maxVal - minVal))) + minVal
         return NSNumber(value: cap(value, minVal: minVal, maxVal: maxVal))
+    }
+
+    func computeSIMDManualValueFromPercent(from percent: [Double], key: String, minVal: Int? = nil, maxVal: Int? = nil) -> [Double] {
+        let minVal = minVal ?? datastore.defaults.integer(forKey: "\(key)LimitMin")
+        let maxVal = maxVal ?? datastore.defaults.integer(forKey: "\(key)LimitMax")
+        return percent * Double(maxVal - minVal) + Double(minVal)
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
