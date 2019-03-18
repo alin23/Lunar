@@ -57,6 +57,8 @@
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C794E1751FF01EF500549462 /* Model.xcdatamodeld */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
+		C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; };
+		C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
@@ -88,6 +90,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C75083572222865F0020270E /* HotKey.framework in Embed Frameworks */,
+				C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */,
 				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
 				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
 				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
@@ -168,6 +171,7 @@
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
+		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = Carthage/Build/Mac/Surge.framework; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
@@ -212,6 +216,7 @@
 				C75083482222865F0020270E /* Sparkle.framework in Frameworks */,
 				C75083442222865F0020270E /* Alamofire.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
+				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
 			);
@@ -294,6 +299,7 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
 				C75083362222865D0020270E /* Alamofire.framework */,
 				C75083352222865D0020270E /* Charts.framework */,
 				C750833F2222865F0020270E /* HotKey.framework */,

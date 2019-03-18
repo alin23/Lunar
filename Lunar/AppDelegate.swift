@@ -16,6 +16,13 @@ import Magnet
 import ServiceManagement
 import WAYWindow
 
+extension Collection where Index: Comparable {
+    subscript(back i: Int) -> Iterator.Element {
+        let backBy = i + 1
+        return self[self.index(self.endIndex, offsetBy: -backBy)]
+    }
+}
+
 let TEST_MODE = false
 
 var lunarDisplayNames = [
@@ -366,7 +373,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.listenForRunningApps()
 
         addObservers()
-        if thisIsFirstRun {
+        if thisIsFirstRun || TEST_MODE {
             showWindow()
         }
 

@@ -47,42 +47,54 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil) {
+    func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
+        guard let display = display, display.id != GENERIC_DISPLAY_ID else { return }
+
         var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
         var contrastChartEntry = brightnessContrastChart.contrastGraph.values
 
         switch brightnessAdapter.mode {
         case .location:
             let maxValues = brightnessContrastChart.maxValuesLocation
+            let steps = brightnessContrastChart.interpolationValues
+            let points = brightnessAdapter.getBrightnessContrastBatch(
+                for: display, count: maxValues, minutesBetween: steps, factor: factor,
+                minBrightness: minBrightness, maxBrightness: maxBrightness,
+                minContrast: minContrast, maxContrast: maxContrast
+            )
             for x in 0 ..< (maxValues - 1) {
-                let (brightness, contrast) = brightnessAdapter.getBrightnessContrast(
-                    for: display,
-                    hour: x,
-                    minBrightness: minBrightness,
-                    maxBrightness: maxBrightness,
-                    minContrast: minContrast,
-                    maxContrast: maxContrast
-                )
-                brightnessChartEntry[x].y = brightness.doubleValue
-                contrastChartEntry[x].y = contrast.doubleValue
+                let startIndex = x * steps
+                let xPoints = points[startIndex ..< (startIndex + steps)]
+                for (i, y) in xPoints.enumerated() {
+                    brightnessChartEntry[x * steps + i].y = y.0.doubleValue
+                    contrastChartEntry[x * steps + i].y = y.1.doubleValue
+                }
             }
-            brightnessChartEntry[maxValues - 1].y = brightnessChartEntry[0].y
-            contrastChartEntry[maxValues - 1].y = contrastChartEntry[0].y
+            for (i, point) in brightnessChartEntry.prefix(steps).reversed().enumerated() {
+                brightnessChartEntry[(maxValues - 1) * steps + i].y = point.y
+            }
+            for (i, point) in contrastChartEntry.prefix(steps).reversed().enumerated() {
+                contrastChartEntry[(maxValues - 1) * steps + i].y = point.y
+            }
         case .sync:
             let maxValues = brightnessContrastChart.maxValuesSync
             let minBrightness = minBrightness != nil ? Double(minBrightness!) : nil
             let maxBrightness = maxBrightness != nil ? Double(maxBrightness!) : nil
             let minContrast = minContrast != nil ? Double(minContrast!) : nil
             let maxContrast = maxContrast != nil ? Double(maxContrast!) : nil
-            for x in 0 ..< (maxValues - 1) {
-                let percent = Double(x)
-                brightnessChartEntry[x].y = display.computeBrightness(from: percent, minVal: minBrightness, maxVal: maxBrightness).doubleValue
-                contrastChartEntry[x].y = display.computeContrast(from: percent, minVal: minContrast, maxVal: maxContrast).doubleValue
+            let xs = stride(from: 0, to: maxValues - 1, by: 1)
+            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, minVal: minBrightness, maxVal: maxBrightness)) {
+                brightnessChartEntry[x].y = b.doubleValue
+            }
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, minVal: minContrast, maxVal: maxContrast)) {
+                contrastChartEntry[x].y = b.doubleValue
             }
         default:
             break
         }
 
+//        brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode, minBrightness: minBrightness != nil ? Double(minBrightness!) : nil)
         brightnessContrastChart.notifyDataSetChanged()
     }
 
