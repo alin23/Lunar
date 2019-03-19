@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
 		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
@@ -197,6 +198,7 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
+		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = Secrets.generated.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -345,6 +347,7 @@
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
 				C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */,
+				G_5197027794336 /* Generated */,
 			);
 			path = Lunar;
 			sourceTree = "<group>";
@@ -367,6 +370,15 @@
 				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		G_5197027794336 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				FR_234235089941 /* Secrets.generated.swift */,
+			);
+			name = Generated;
+			path = Generated;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -489,17 +501,13 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-			);
-			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "./Fabric.framework/run 6add03c19270459b747dc239adefc6ae01b27381 54931e0beaebf5eb8bdd6507a845575472d7b3e25e34f3757823a5ab3b1f0c35\n";
+			shellScript = "./buildscript.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -546,6 +554,7 @@
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
+				BF_746411459837 /* Secrets.generated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

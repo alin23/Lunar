@@ -1,0 +1,16 @@
+project:
+  file: Lunar.xcodeproj
+  target:
+    name: Lunar
+templates:
+  - Lunar/Templates
+output:
+  path: Lunar/Generated
+  link:
+    project: Lunar.xcodeproj
+    target: Lunar
+    group: Lunar/Generated
+args:
+  appSecret: $SB_APP_SECRET
+  encryptionKey: $SB_ENCRYPTION_KEY
+  fabricApiKey: $FABRIC_API_KEY
