@@ -11,6 +11,6 @@ output:
     target: Lunar
     group: Lunar/Generated
 args:
-  appSecret: $SB_APP_SECRET
-  encryptionKey: $SB_ENCRYPTION_KEY
-  fabricApiKey: $FABRIC_API_KEY
+  appSecret: ${SB_APP_SECRET}
+  encryptionKey: ${SB_ENCRYPTION_KEY}
+  fabricApiKey: ${FABRIC_API_KEY}
