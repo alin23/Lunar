@@ -14,7 +14,7 @@ class Logger: SwiftyBeaver {
     class func initLogger() {
         let console = ConsoleDestination()
         let file = FileDestination()
-        let platform = SBPlatformDestination(appID: "lRPGE2", appSecret: "***REMOVED***", encryptionKey: "***REMOVED***")
+        let platform = SBPlatformDestination(appID: "0G8Ek7", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
 
         Logger.addDestination(console)
         Logger.addDestination(file)
