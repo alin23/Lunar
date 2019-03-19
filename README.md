@@ -27,5 +27,4 @@
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
 
 ### Contributing
-1. Install [Sourcery](https://github.com/krzysztofzablocki/Sourcery) (`brew install sourcery`)
-2. Install [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) (`brew install swiftformat`)
+Run `make dev` to prepare dev environment.
