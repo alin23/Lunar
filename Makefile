@@ -71,6 +71,6 @@ dev: install-deps install-hooks carthage-dev codegen
 
 .PHONY: release
 release: changelog
-	hub release create v$(VERSION) -a Releases/Lunar-$(VERSION).dmg#Lunar.dmg -m $$"$(VERSION)\n\n$$(cat ReleaseNotes/$(VERSION).md)"
+	hub release create v$(VERSION) -a Releases/Lunar-$(VERSION).dmg#Lunar.dmg -m "$(VERSION)\$n\$n$$(cat ReleaseNotes/$(VERSION).md)"
 
 print-%  : ; @echo $* = $($*)
