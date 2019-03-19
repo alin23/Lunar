@@ -60,6 +60,19 @@
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; };
 		C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */; };
+		C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */; };
+		C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */; };
+		C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */; };
+		C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */; };
+		C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */; };
+		C7A2BDF222411E9500C910E3 /* HotKey.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */; };
+		C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */; };
+		C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */; };
+		C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */; };
+		C7A2BDF622411E9500C910E3 /* Sparkle.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */; };
+		C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */; };
+		C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
@@ -77,7 +90,7 @@
 		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
 		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
 		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
-		C7CFEA231FD37853000AC4A6 /* LunarService.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CFEA121FD376E6000AC4A6 /* LunarService.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7CFEA231FD37853000AC4A6 /* LunarService.app in Copy Files */ = {isa = PBXBuildFile; fileRef = C7CFEA121FD376E6000AC4A6 /* LunarService.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
@@ -107,14 +120,37 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C7CFEA221FD37836000AC4A6 /* CopyFiles */ = {
+		C7A2BDDE22411E2400C910E3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */,
+				C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */,
+				C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */,
+				C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */,
+				C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */,
+				C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */,
+				C7A2BDF222411E9500C910E3 /* HotKey.framework.dSYM in CopyFiles */,
+				C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */,
+				C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */,
+				C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */,
+				C7A2BDF622411E9500C910E3 /* Sparkle.framework.dSYM in CopyFiles */,
+				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
+				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7CFEA221FD37836000AC4A6 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
-				C7CFEA231FD37853000AC4A6 /* LunarService.app in CopyFiles */,
+				C7CFEA231FD37853000AC4A6 /* LunarService.app in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C7CFEA291FD37AF3000AC4A6 /* Embed Frameworks */ = {
@@ -140,18 +176,18 @@
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75047A92119B30300458191 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
-		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Carthage/Build/Mac/WAYWindow.framework; sourceTree = "<group>"; };
-		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Carthage/Build/Mac/Charts.framework; sourceTree = "<group>"; };
-		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
-		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/Mac/Solar.framework; sourceTree = "<group>"; };
-		C75083382222865E0020270E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
-		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Carthage/Build/Mac/SwiftDate.framework; sourceTree = "<group>"; };
-		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
-		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KeyHolder.framework; path = Carthage/Build/Mac/KeyHolder.framework; sourceTree = "<group>"; };
-		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/Mac/SwiftyBeaver.framework; sourceTree = "<group>"; };
-		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Magnet.framework; path = Carthage/Build/Mac/Magnet.framework; sourceTree = "<group>"; };
-		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Carthage/Build/Mac/NSPageControl.framework; sourceTree = "<group>"; };
-		C750833F2222865F0020270E /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Carthage/Build/Mac/HotKey.framework; sourceTree = "<group>"; };
+		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Frameworks/WAYWindow.framework; sourceTree = "<group>"; };
+		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Frameworks/Charts.framework; sourceTree = "<group>"; };
+		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Frameworks/Alamofire.framework; sourceTree = "<group>"; };
+		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Frameworks/Solar.framework; sourceTree = "<group>"; };
+		C75083382222865E0020270E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Frameworks/Sparkle.framework; sourceTree = "<group>"; };
+		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Frameworks/SwiftDate.framework; sourceTree = "<group>"; };
+		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Frameworks/SwiftyJSON.framework; sourceTree = "<group>"; };
+		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KeyHolder.framework; path = Frameworks/KeyHolder.framework; sourceTree = "<group>"; };
+		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Frameworks/SwiftyBeaver.framework; sourceTree = "<group>"; };
+		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Magnet.framework; path = Frameworks/Magnet.framework; sourceTree = "<group>"; };
+		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Frameworks/NSPageControl.framework; sourceTree = "<group>"; };
+		C750833F2222865F0020270E /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Frameworks/HotKey.framework; sourceTree = "<group>"; };
 		C750835D2222BEAA0020270E /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		C750835E2222BEAA0020270E /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
@@ -172,7 +208,20 @@
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
-		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = Carthage/Build/Mac/Surge.framework; sourceTree = "<group>"; };
+		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = Frameworks/Surge.framework; sourceTree = "<group>"; };
+		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Charts.framework.dSYM; path = Frameworks/Charts.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Frameworks/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeyHolder.framework.dSYM; path = Frameworks/KeyHolder.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Solar.framework.dSYM; path = Frameworks/Solar.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = WAYWindow.framework.dSYM; path = Frameworks/WAYWindow.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Surge.framework.dSYM; path = Frameworks/Surge.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = HotKey.framework.dSYM; path = Frameworks/HotKey.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Magnet.framework.dSYM; path = Frameworks/Magnet.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftDate.framework.dSYM; path = Frameworks/SwiftDate.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyBeaver.framework.dSYM; path = Frameworks/SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Sparkle.framework.dSYM; path = Frameworks/Sparkle.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = NSPageControl.framework.dSYM; path = Frameworks/NSPageControl.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Alamofire.framework.dSYM; path = Frameworks/Alamofire.framework.dSYM; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
@@ -198,7 +247,7 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
-		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = Secrets.generated.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
+		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -301,6 +350,19 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
+				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
+				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
+				C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */,
+				C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */,
+				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
+				C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */,
+				C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */,
+				C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */,
+				C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */,
+				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
+				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
+				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
 				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
 				C75083362222865D0020270E /* Alamofire.framework */,
 				C75083352222865D0020270E /* Charts.framework */,
@@ -377,7 +439,6 @@
 			children = (
 				FR_234235089941 /* Secrets.generated.swift */,
 			);
-			name = Generated;
 			path = Generated;
 			sourceTree = "<group>";
 		};
@@ -391,9 +452,10 @@
 				C7AEC7F11FD0B4350039B562 /* Sources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C7AEC7F31FD0B4350039B562 /* Resources */,
-				C7CFEA221FD37836000AC4A6 /* CopyFiles */,
+				C7CFEA221FD37836000AC4A6 /* Copy Files */,
 				C7EA516920EA470800F2B06B /* ShellScript */,
 				C75083582222865F0020270E /* Embed Frameworks */,
+				C7A2BDDE22411E2400C910E3 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -711,7 +773,7 @@
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Lunar/Info.plist;
@@ -739,7 +801,7 @@
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Lunar/Info.plist;
@@ -765,7 +827,7 @@
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				INFOPLIST_FILE = LunarService/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -790,7 +852,7 @@
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				INFOPLIST_FILE = LunarService/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
