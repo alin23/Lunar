@@ -2,7 +2,7 @@
 set -l workDir (pwd)
 set -l tmpDir /tmp/Lunar
 set -l releaseDir $workDir/Releases
-set -l privKey ~/Documents/Keys/dsa_priv.pem
+set -l privKey $workDir/Lunar/Resources/dsa_priv.pem
 set -l appcast "$releaseDir/appcast.xml"
 
 mkdir -p $tmpDir
@@ -55,7 +55,9 @@ echo \n(set_color red)"Removing delta files"(set_color normal)
 rm $releaseDir/*.delta
 
 cp $appDmg $appLatestDmg
+git lfs track Releases/Lunar-$appVersion.dmg
+git lfs track Releases/Lunar-latest.dmg
 
 echo \n(set_color yellow)"Signing Updates"(set_color normal)
-./sign_updates.py "$appcast" "$privKey"
+./sign_updates.py "$privKey"
 subl $appcast
