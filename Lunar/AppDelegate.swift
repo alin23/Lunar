@@ -359,7 +359,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationDidFinishLaunching(_: Notification) {
         lunarDisplayNames.shuffle()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        Fabric.with([Crashlytics.self])
+        Fabric.with([Crashlytics.start(withAPIKey: secrets.fabricApiKey)])
         log.initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()

@@ -24,3 +24,6 @@ xcuserdata/
 *.xcscmblueprint
 Carthage
 Releases/.tmp
+Lunar/Generated/
+.env.sh
+Frameworks/*.framework*

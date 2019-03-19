@@ -6,13 +6,13 @@
             <title>1.0.0</title>
             <pubDate>Tue, 03 Jul 2018 18:13:23 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13893293" sparkle:dsaSignature="MEUCIQCBUbvWf4mqExYKtmVUvyst/IXc29o4yP1I2zoK7volAgIgPUDZF4FiBWTlV1EFbCwoVoJqgz5JthMbZno+IiUY6Ow=" sparkle:shortVersionString="1.0.0" sparkle:version="1.0.0" type="application/octet-stream" url="https://lunarapp.site/download/1.0.0"/>
+            <enclosure length="13893293" sparkle:dsaSignature="MEQCIC+4YgNtFFOYAYT2TprpabWlf2IUNqpU+hCTZDLMRcwtAiAsiwqMR9BOhXTzvuTMP+DIW8d4pytDM9oESNsIfda7FQ==" sparkle:shortVersionString="1.0.0" sparkle:version="1.0.0" type="application/octet-stream" url="https://lunarapp.site/download/1.0.0"/>
         </item>
         <item>
             <title>1.0.1</title>
             <pubDate>Thu, 05 Jul 2018 13:24:40 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13893887" sparkle:dsaSignature="MEUCIQCcsylA5dUbtSXnasHlJM4MKMXzJ9CstA064Rtpp1uxyAIgUa+MXNeUJgwibPchR2Sv2R9TQ382YaCQgdH/oDWGLOI=" sparkle:shortVersionString="1.0.1" sparkle:version="1.0.1" type="application/octet-stream" url="https://lunarapp.site/download/1.0.1"/>
+            <enclosure length="13893887" sparkle:dsaSignature="MEQCIG49DsybsydaleFZ9vEQXNJ9aDvtXVEcwyC1e+gvKO/uAiBJwZQKvFTgE8zk4iAxjutsp8B0xGpnrAD9PAlCKBegrA==" sparkle:shortVersionString="1.0.1" sparkle:version="1.0.1" type="application/octet-stream" url="https://lunarapp.site/download/1.0.1"/>
             <description>
                 <![CDATA[<h2>Fixes</h2><ul><li>Fixed crash on missing time for sunrise</li><li>Better check cases where Add App button layer isn't initialized</li><li>Make sure brightness/contrast changes contain both old and new values</li></ul>]]>
             </description>
@@ -21,7 +21,7 @@
             <title>1.0.2</title>
             <pubDate>Thu, 05 Jul 2018 15:32:05 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13893776" sparkle:dsaSignature="MEUCIQCLENHy27yeoRGNpQgSrFW7xVKcEh8Mq+CDPp0lt7DnHQIgS1iHR4JCG+pTwTGSxzN3pIaODoUkmZmhtTOPriyhs8Y=" sparkle:shortVersionString="1.0.2" sparkle:version="1.0.2" type="application/octet-stream" url="https://lunarapp.site/download/1.0.2"/>
+            <enclosure length="13893776" sparkle:dsaSignature="MEQCIA8dhXBnlc3Y8Wv/a5WZyOFbmVdCorIqN4+X/29KbG+sAiAOzz4/Xf8ng+VzyYK7CRqMnw4p7NMVtW/BLwraoJ8FgQ==" sparkle:shortVersionString="1.0.2" sparkle:version="1.0.2" type="application/octet-stream" url="https://lunarapp.site/download/1.0.2"/>
             <description>
                 <![CDATA[<h2>Improvements</h2><ul><li>Use sunrise/sunset instead of civilSunrise/civilSunset</li></ul>]]>
             </description>
@@ -30,7 +30,7 @@
             <title>1.0.3</title>
             <pubDate>Thu, 05 Jul 2018 22:26:52 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13162139" sparkle:dsaSignature="MEUCIQCkZ+hiAvdpafOCWrhF1yLoYQ6ZzFOE7sw2PO9x+hdcRwIgPBaFOtcmQ/TBhdt7LXfERsb+pGXL6jPbyJAaL1JZWhk=" sparkle:shortVersionString="1.0.3" sparkle:version="1.0.3" type="application/octet-stream" url="https://lunarapp.site/download/1.0.3"/>
+            <enclosure length="13162139" sparkle:dsaSignature="MEQCIF4uDse5rRKTj50EtSHh8R92T00AP5V9u/zv9Sc5gpjzAiAWj+yAcOFVrX7yLe/LlKDEljdal7TNhw7yws6bUYw2Uw==" sparkle:shortVersionString="1.0.3" sparkle:version="1.0.3" type="application/octet-stream" url="https://lunarapp.site/download/1.0.3"/>
             <description>
                 <![CDATA[<h2>Additions</h2><ul><li>Donation link</li></ul><h2>Fixes</h2><ul><li>Try to get rid of crashes when readapting to max brightness change</li></ul>]]>
             </description>
@@ -39,7 +39,7 @@
             <title>1.0.4</title>
             <pubDate>Sat, 07 Jul 2018 00:34:53 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13163821" sparkle:dsaSignature="MEYCIQCpG0RXPwsymEyt7Cv/yr07g1opG7epl2TqaNmCmfSQFAIhAIz7VyjO4a4ItsYZWEYbqQXfmZjoaVdMEAbsjR7ar7qi" sparkle:shortVersionString="1.0.4" sparkle:version="1.0.4" type="application/octet-stream" url="https://lunarapp.site/download/1.0.4"/>
+            <enclosure length="13163821" sparkle:dsaSignature="MEQCIHG0N6HPo9Vrz74ZyquLLeA1aXafUUinRmYz70j3/LnMAiA9em+jtKJV9f1XJJgDnKoR4QvDpO0ssCU6thXp4FYSpA==" sparkle:shortVersionString="1.0.4" sparkle:version="1.0.4" type="application/octet-stream" url="https://lunarapp.site/download/1.0.4"/>
             <description>
                 <![CDATA[<h2>Fixes</h2><ul><li>Fix compatibility with macOS 10.11</li></ul>]]>
             </description>
@@ -48,7 +48,7 @@
             <title>1.0.5</title>
             <pubDate>Sat, 07 Jul 2018 01:38:16 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13166458" sparkle:dsaSignature="MEUCIQCLA6g/BkqPDZWiH3FDGZV4Ql1KV3yqdRDh11AL72WiCAIgVwV4imCn2Qxm+S/u7wBc/3KW+CILSdt302k7zaChIxI=" sparkle:shortVersionString="1.0.5" sparkle:version="1.0.5" type="application/octet-stream" url="https://lunarapp.site/download/1.0.5"/>
+            <enclosure length="13166458" sparkle:dsaSignature="MEQCIAC1gzX5VstFjDvlrOdYtFsJTpI/9bw061cUaIpy5ON2AiB2auXh+DhhWsBNcal1PHEPIrzFQZ4VMHZGX0Dlka8zIA==" sparkle:shortVersionString="1.0.5" sparkle:version="1.0.5" type="application/octet-stream" url="https://lunarapp.site/download/1.0.5"/>
             <description>
                 <![CDATA[<h2>Fixes</h2><ul><li>Fix a crash when monitor serials aren't unique</li></ul><h2>Dev</h2><ul><li>Add more context to help debugging errors</li></ul>]]>
             </description>
@@ -57,7 +57,7 @@
             <title>1.0.6</title>
             <pubDate>Sat, 07 Jul 2018 12:29:29 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13175573" sparkle:dsaSignature="MEQCIFOIUrw7hWVGxS0mxnMifSqIVulSZO4yjNMhBdTsQIXWAiAJa0pOV3s91qinVZBTtEkF9ynkQCXgD+P0wuKz1r1EdA==" sparkle:shortVersionString="1.0.6" sparkle:version="1.0.6" type="application/octet-stream" url="https://lunarapp.site/download/1.0.6"/>
+            <enclosure length="13175573" sparkle:dsaSignature="MEYCIQCSPj+06p27TqqL0dH0yl7/U6R2sXCoN9GJdrsxXtICawIhAKjTI++0+M6UW3ZnWrO0MGVgDGQGyNwIRuvK6CYwW+dK" sparkle:shortVersionString="1.0.6" sparkle:version="1.0.6" type="application/octet-stream" url="https://lunarapp.site/download/1.0.6"/>
             <description>
                 <![CDATA[
 <h2>Fixes</h2><ul><li>Cap interpolated values between 0 - 100</li><li>Fallback to generated display names as it is impossible to extract the real name</li></ul><h2>Dev</h2><ul><li>Add more logging</li></ul>]]>
@@ -67,7 +67,7 @@
             <title>1.0.7</title>
             <pubDate>Sat, 07 Jul 2018 18:48:03 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13183137" sparkle:dsaSignature="MEUCIQCmadnVpwrKwUHePMU7qvWLoesBIf5DHtJ5c1eHf0RubgIgKpCZ4mp9tjhuwoimMBEFduU/SF0wDPrF3N9A3ARFmkA=" sparkle:shortVersionString="1.0.7" sparkle:version="1.0.7" type="application/octet-stream" url="https://lunarapp.site/download/1.0.7"/>
+            <enclosure length="13183137" sparkle:dsaSignature="MEQCIDxXdSDFMe0FQzQsTLuY3HbU4TWRJKUaaULl2nZ4Z8qqAiBfzkImg+NfbXPFAE9Agzu7WQRtKRdkTAX0+qQW6Lj2bA==" sparkle:shortVersionString="1.0.7" sparkle:version="1.0.7" type="application/octet-stream" url="https://lunarapp.site/download/1.0.7"/>
             <description>
                 <![CDATA[<h2>Dev</h2><ul><li>Add temporary remote logging to help fix some annoying crashes</li></ul>]]>
             </description>
@@ -76,7 +76,7 @@
             <title>1.1.0</title>
             <pubDate>Sun, 08 Jul 2018 11:49:08 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13182870" sparkle:dsaSignature="MEQCIHB4xxScmDpuaNjq/sxHGYHLPMofkINaGo0/PkuJXf21AiAgLatNYNrt6uJi+whltP4RICZbfht944MNeOyyaFHZIA==" sparkle:shortVersionString="1.1.0" sparkle:version="1.1.0" type="application/octet-stream" url="https://lunarapp.site/download/1.1.0"/>
+            <enclosure length="13182870" sparkle:dsaSignature="MEQCIGVv9Iiw3qbRmCRsj3O7omgJYJwP1STiIyag3fG/nx6EAiBfZ3U56/L0/RFK+gWDazmeXzBcK2CCJ4hG3wP2I4QRRA==" sparkle:shortVersionString="1.1.0" sparkle:version="1.1.0" type="application/octet-stream" url="https://lunarapp.site/download/1.1.0"/>
             <description>
                 <![CDATA[<h2>Fixes</h2><ul><li>Fix stupid mistake that caused the app to crash for all users</li></ul>]]>
             </description>
@@ -85,7 +85,7 @@
             <title>1.1.1</title>
             <pubDate>Sun, 08 Jul 2018 19:24:50 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="13182747" sparkle:dsaSignature="MEUCIB2AHvw7Xxmup0JKY214Q5fk8kEuNWkwNH9p6LTHVxuWAiEAodkiFZxY8xqU7qV8h8FytPZzX4b7CIg2bsh7ICZwP9w=" sparkle:shortVersionString="1.1.1" sparkle:version="1.1.1" type="application/octet-stream" url="https://lunarapp.site/download/1.1.1"/>
+            <enclosure length="13182747" sparkle:dsaSignature="MEUCIQCSXCGHcbVIOSrtYXNslirNyl8X7Z9n9NzVuCimmHFWqwIgNDsdOv5NM3O0ZoARNiKnNH2w75u6Gpk8Xyw8YZoybTA=" sparkle:shortVersionString="1.1.1" sparkle:version="1.1.1" type="application/octet-stream" url="https://lunarapp.site/download/1.1.1"/>
             <description>
                 <![CDATA[
 <h2>Fixes</h2><ul><li>Make sure Adaptive activity isn't scheduled more than once so that percent hotkeys work as expected</li><li>Fix an error that prevented the settings to persist in the database</li></ul>]]>
@@ -95,7 +95,7 @@
             <title>2.0.0</title>
             <pubDate>Wed, 18 Jul 2018 22:22:20 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14194368" sparkle:dsaSignature="MEQCID+A8AIvGcl3T2ByXkVDMdvRnu7p3wQKag0xv6N//inKAiB6aM6Wlal8g14wmOu5k3K3pfrGvoGPqVmM87wvHWhLmw==" sparkle:shortVersionString="2.0.0" sparkle:version="2.0.0" type="application/octet-stream" url="https://lunarapp.site/download/2.0.0"/>
+            <enclosure length="14194368" sparkle:dsaSignature="MEQCIEllVI2q9BPxacEvcWRURPjIJqgC9ZGGlZZCvrXaDgbSAiA/x+CGaPbfxotkuT5VETnXOhV8e9tsco7+DmTJCNS81g==" sparkle:shortVersionString="2.0.0" sparkle:version="2.0.0" type="application/octet-stream" url="https://lunarapp.site/download/2.0.0"/>
             <description>
                 <![CDATA[
                 <h2>Features</h2><ul><li>Sync mode</li><ul><li>The external monitor's brightness/contrast will be kept in sync with the brightness/contrast of the built-in display</li><li>The external monitor's brightness/contrast will still be kept within the configured per-monitor limits</li><li>There are new configurable offsets on the settings page to make the synchronization perfect</li></ul></ul><h2>Fixes</h2><ul><li>Disable adaptive brightness when no monitor is connected to get to zero energy impact</li><li>Fix interpolation formula</li><li>Disable configurable values when Manual mode is on</li></ul>]]>
@@ -105,7 +105,7 @@
             <title>2.0.1</title>
             <pubDate>Thu, 19 Jul 2018 14:15:20 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14194607" sparkle:dsaSignature="MEQCIEpmIpaexHo2/S+yY/AXEM9plm8oRosx7ntOUCAGkWkeAiBFcQXPoXBPPlAv6z3A3QnT+RPDtaPKu5Sll89EaiyefQ==" sparkle:shortVersionString="2.0.1" sparkle:version="2.0.1" type="application/octet-stream" url="https://lunarapp.site/download/2.0.1"/>
+            <enclosure length="14194607" sparkle:dsaSignature="MEQCIBemerYVD56Ksn1DlQu/sqhBIQEXBwuZoJ9BQeeEWj+nAiB4M1JIt0C6DrQ4t2h0AZKB2DCgbCipgMrRi+hyzHTMUw==" sparkle:shortVersionString="2.0.1" sparkle:version="2.0.1" type="application/octet-stream" url="https://lunarapp.site/download/2.0.1"/>
             <description>
                 <![CDATA[
 <h2>Fixes</h2><ul><li>Try not to insert nils in the database</li></ul>]]>
@@ -115,7 +115,7 @@
             <title>2.0.2</title>
             <pubDate>Sat, 21 Jul 2018 19:40:13 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14164150" sparkle:dsaSignature="MEQCIHKQCjINBc+gV8jGqpXV5+NxvpIVUqCBB7yoBsWukLchAiAegxWmUbbsl1FAJ56HwC1+unbono/VTCM3yoN/XGsxpw==" sparkle:shortVersionString="2.0.2" sparkle:version="2.0.2" type="application/octet-stream" url="https://lunarapp.site/download/2.0.2"/>
+            <enclosure length="14164150" sparkle:dsaSignature="MEQCIEtDOAFLRVKwCrBoRtVVReZ+bs5jWLhUZ0sO9T7NyIPXAiB5grC0TaR9T7ph9neWqRlMDi+Y7QWzvq9KNiucJdXIFg==" sparkle:shortVersionString="2.0.2" sparkle:version="2.0.2" type="application/octet-stream" url="https://lunarapp.site/download/2.0.2"/>
             <description>
                 <![CDATA[
 <h2>Fixes</h2><ul><li>Fix a few crashes caused by backing layers and subviews not being available on load</li></ul>]]>
@@ -125,7 +125,7 @@
             <title>2.0.3</title>
             <pubDate>Tue, 24 Jul 2018 09:31:08 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14164422" sparkle:dsaSignature="MEUCIG/p1JJouL7MAfYgwDGYu+tXGoncne0+1xCELq/IWyPUAiEAg0gdfz5TNvCOdTBShSVGHdtYP9OtcKEw2rLiknyNzdI=" sparkle:shortVersionString="2.0.3" sparkle:version="2.0.3" type="application/octet-stream" url="https://lunarapp.site/download/2.0.3"/>
+            <enclosure length="14164422" sparkle:dsaSignature="MEUCIAeqUOI0yRWKv8gDXylSgveYikngiW2h29QAPM8ew27jAiEAiEJ2XKPFd9DfFWMIUeIaNIhn6GytBDnOMpa6FUmUtoo=" sparkle:shortVersionString="2.0.3" sparkle:version="2.0.3" type="application/octet-stream" url="https://lunarapp.site/download/2.0.3"/>
             <description>
                 <![CDATA[
 <h2>Improvements</h2><ul><li>Set offset limits to [-100, 90]</li><li>Adjust offsetting formula to get more symmetrical values</li></ul>]]>
@@ -135,7 +135,7 @@
             <title>2.1.0</title>
             <pubDate>Wed, 08 Aug 2018 00:50:54 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14188581" sparkle:dsaSignature="MEUCIQCBjI9jmdUCx6Vq8r+ia3EGXCYcZhHFEfuqe+70lCp31wIgeIMsBOo53JGqcyx2Qi5j0mnCoTqf47bPpI9KJNxS4/o=" sparkle:shortVersionString="2.1.0" sparkle:version="2.1.0" type="application/octet-stream" url="https://lunarapp.site/download/2.1.0"/>
+            <enclosure length="14188581" sparkle:dsaSignature="MEUCIQCZs0YMfiJeZu3ocW7VzwN3nFr7jrsE7e8eP7Mm+vsQiAIgO1G7lpyfCnNhDbEa4TDNtQrzcw1l/QaoFse45WR/w6o=" sparkle:shortVersionString="2.1.0" sparkle:version="2.1.0" type="application/octet-stream" url="https://lunarapp.site/download/2.1.0"/>
             <description>
                 <![CDATA[
                 <div><style>* {font-family: Menlo, monospace; color: #333333; } a {color: #1DA1F2; } a:hover {color: #0077b5; } .features {color: #EDB44B; } .improvements {color: #3E3E70; } .fixes {color: #E14283; } </style><h2 class="features">Features</h2><ul><li>Add hotkeys for increasing/decreasing brightness/contrast <i><small>[Thanks Hua Duong Tran! <a href="https://github.com/duongel">@duongel</a><a href="https://github.com/alin23/Lunar/pull/2">PR #2</a>]</small></i></li><li>Add individual Lock Buttons for brightness and contrast <i><small>[Thanks Michael for the generous donations!]</small></i></li></ul><h2 class="improvements">Improvements</h2><ul><li>Offsets now work in Location mode too</li><li>Manually adjusting brightness doesn't force Manual mode anymore</li></ul><h2 class="fixes">Fixes</h2><ul><li>The Adaptive toggle below each monitor now works properly</li><li>App Exceptions were not always working, fixed those cases</li></ul></div>]]>
@@ -145,7 +145,7 @@
             <title>2.1.1</title>
             <pubDate>Tue, 14 Aug 2018 19:31:29 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14187081" sparkle:dsaSignature="MEQCIDdGFB95zNClr7s0KmVEDbgVIixybHpPD+ryLysYtG2oAiAU6YOGZDSYXNHZP+ytNIS1DLiwdxHab+F9PuogFF4tQw==" sparkle:shortVersionString="2.1.1" sparkle:version="2.1.1" type="application/octet-stream" url="https://lunarapp.site/download/2.1.1"/>
+            <enclosure length="14187081" sparkle:dsaSignature="MEUCIQCRKwOA2VONzHSpAauDZaSuoHdS+8kfE03Tiox7ktiMHgIgaJuqcGuaYNRfQ7OCu4lJJD0Ca2vdFXav7JGS/3HLfaY=" sparkle:shortVersionString="2.1.1" sparkle:version="2.1.1" type="application/octet-stream" url="https://lunarapp.site/download/2.1.1"/>
             <description>
                 <![CDATA[
                 <div><style>* {font-family: Menlo, monospace; color: #333333; } a {color: #1DA1F2; } a:hover {color: #0077b5; } .features {color: #EDB44B; } .improvements {color: #3E3E70; } .fixes {color: #E14283; } </style><h2 class="fixes">Fixes</h2><ul><li>Remove SwiftyBeaver dependency from LunarService</li></ul></div>]]>
@@ -155,14 +155,14 @@
             <title>2.1.2</title>
             <pubDate>Thu, 23 Aug 2018 14:08:26 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14187341" sparkle:dsaSignature="MEUCIDrkDuL5xx/A0cWC5ycb7E6RX1o/Wa7+jahe6q3HfD6KAiEAoPaotV3UjQPaVrhzqAH3kpADKasF8PDVZ0NNnnxf7SI=" sparkle:shortVersionString="2.1.2" sparkle:version="2.1.2" type="application/octet-stream" url="https://lunarapp.site/download/2.1.2"/>
+            <enclosure length="14187341" sparkle:dsaSignature="MEYCIQCpbljT4q09GjIMCqZgEWHvctU60PMk/LltTfAw2MufTgIhAJKsS4xsLGHOojrk/uyqYuAVc46hjqxUL8RUzKJdSCqb" sparkle:shortVersionString="2.1.2" sparkle:version="2.1.2" type="application/octet-stream" url="https://lunarapp.site/download/2.1.2"/>
             <description/>
         </item>
         <item>
             <title>2.2.0</title>
             <pubDate>Sun, 10 Mar 2019 20:57:54 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14199948" sparkle:dsaSignature="MEQCIC4lezRt/2y0/bi55IQHsd0ovlnfxVJ8OZXHgt/RFlMGAiAWko+3ILjjemeWpSRy0m3X1e1ga0xeAg4VgrfVOE3c0g==" sparkle:shortVersionString="2.2.0" sparkle:version="2.2.0" type="application/octet-stream" url="https://lunarapp.site/download/2.2.0"/>
+            <enclosure length="14199948" sparkle:dsaSignature="MEUCIACcD/mV8xE+QCP+wcr+UVBj3qpfO8JB3rNZiqXHQFuBAiEAoPaSb/iWFgSyJmw4rs9SK1vMj8z/+nrPFB3i/9+cBmE=" sparkle:shortVersionString="2.2.0" sparkle:version="2.2.0" type="application/octet-stream" url="https://lunarapp.site/download/2.2.0"/>
             <description>
                 <![CDATA[<div><style>* {font-family: Menlo, monospace; color: #333333; } a {color: #1DA1F2; } a:hover {color: #0077b5; } .features {color: #EDB44B; } .improvements {color: #3E3E70; } .fixes {color: #E14283; } </style><h2 class="fixes">Fixes</h2><ul><li>Make sure user can always swipe to settings page</li></ul><h2 class="features">Features</h2><ul><li>Add page for configuring hotkeys</li><li>Add menu item for toggling "Start at Login"</li></ul></div>]]>
             </description>
@@ -171,7 +171,7 @@
             <title>2.2.1</title>
             <pubDate>Mon, 11 Mar 2019 17:34:47 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14210595" sparkle:dsaSignature="MEUCIEn5t7NII2bClSgDa4EEff+/F2UvDbXcb7E72Sj+cm0qAiEAiXueX8hUjtoLOmP8rEa9MqAQWhOmzA2eX4h1AyaZwzg=" sparkle:shortVersionString="2.2.1" sparkle:version="2.2.1" type="application/octet-stream" url="https://lunarapp.site/download/2.2.1"/>
+            <enclosure length="14210595" sparkle:dsaSignature="MEUCIQChuugCeXpTkRo19ol5p6gAeFawgZBYd+QsHLzLMEquVwIgd3bxYX2lPZXLMS5dzcnLuAMkKQn6iMR0jYbCB7vTzOE=" sparkle:shortVersionString="2.2.1" sparkle:version="2.2.1" type="application/octet-stream" url="https://lunarapp.site/download/2.2.1"/>
             <description>
                 <![CDATA[<div><style>* {font-family: Menlo, monospace; color: #333333; } a {color: #1DA1F2; } a:hover {color: #0077b5; } .features {color: #EDB44B; } .improvements {color: #3E3E70; } .fixes {color: #E14283; } </style><h2 class="fixes">Fixes</h2><ul><li>Make the display page white when swiping back from settings</li><li>Reflect hotkey changes on the menu items</li></ul><h2 class="improvements">Improvements</h2><ul><li>Add button for going to hotkeys page</li></ul></div>]]>
             </description>
@@ -180,9 +180,65 @@
             <title>2.2.2</title>
             <pubDate>Wed, 13 Mar 2019 19:30:24 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14210700" sparkle:dsaSignature="MEQCIB7S97I3FOsclNm5rCBh5Qzp9ERnifQ7yNPzrTNuPuQyAiADoNFjamlnIPkO45bO20g+pObLwlGmGK98QSpBbcmdIQ==" sparkle:shortVersionString="2.2.2" sparkle:version="2.2.2" type="application/octet-stream" url="https://lunarapp.site/download/2.2.2"/>
+            <enclosure length="14210700" sparkle:dsaSignature="MEUCIQCY5oDecHIjEjWYVLFXE9TT8ROCvYs2+BJ/aVAPq5XyogIgFydyLj/jmt2gIXa/Nihxn9+85IevNKT7AQEZdypzwAg=" sparkle:shortVersionString="2.2.2" sparkle:version="2.2.2" type="application/octet-stream" url="https://lunarapp.site/download/2.2.2"/>
             <description>
                 <![CDATA[<div><style>* {font-family: Menlo, monospace; color: #333333; } a {color: #1DA1F2; } a:hover {color: #0077b5; } .features {color: #EDB44B; } .improvements {color: #3E3E70; } .fixes {color: #E14283; } </style><h2 class="fixes">Fixes</h2><ul><li>Don't cap brightness/contrast on manual mode</li></ul></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.3.0</title>
+            <pubDate>Mon, 18 Mar 2019 22:02:33 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14400422" sparkle:dsaSignature="MEUCIQCe55/szRQRrK92EqpInMZAW2vnbABNQdoIsIu08nAJRQIgDhcWySu+7+yUVcDGg8RjNOKwIlruLH8OZDmn3WbXMoY=" sparkle:shortVersionString="2.3.0" sparkle:version="2.3.0" type="application/octet-stream" url="https://lunarapp.site/download/2.3.0"/>
+            <description>
+                <![CDATA[<div>
+    <style>
+    * {
+        font-family: Menlo, monospace;
+        color: #333333;
+    }
+
+    a {
+        color: #1DA1F2;
+    }
+
+    a:hover {
+        color: #0077b5;
+    }
+
+    .features {
+        color: #EDB44B;
+    }
+
+    .improvements {
+        color: #3E3E70;
+    }
+
+    .fixes {
+        color: #E14283;
+    }
+    </style>
+    <h2 class="fixes">Fixes</h2>
+    <ul>
+        <li>Use brightness/contrast offsets only in Sync mode</li>
+    </ul>
+    <h2 class="features">Features</h2>
+    <ul>
+        <li>Smooth Transition option <i><small>[Thanks to Tim Traversy! <a href="https://github.com/timtraversy">@timtraversy</a><a href="https://github.com/alin23/Lunar/pull/14">PR #14</a>]</small></i> </li>
+        <ul>
+            <li>This makes the brightness/contrast change smoothly from a value to another, instead of jumping directly to that value</li>
+            <li>Check settings page to enable the option</li>
+            <li>I left it off by default because some monitors have a slow response time and smooth transitions end up not being so smooth</li>
+        </ul>
+        <li>Configurable interpolation factor for Location mode</li>
+    </ul>
+    <h2 class="improvements">Improvements</h2>
+    <ul>
+        <li>Improve charts speed and efficiency with SIMD</li>
+        <li>Smoother chart curves</li>
+    </ul>
+</div>]]>
+
             </description>
         </item>
     </channel>
