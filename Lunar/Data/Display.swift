@@ -473,16 +473,12 @@ class Display: NSManagedObject {
         }
 
         var changed = false
-        if lockedBrightness {
-            setValue(brightness, forKey: "brightness")
-        } else if brightness != newBrightness {
+        if !lockedBrightness, brightness != newBrightness {
             setValue(newBrightness, forKey: "brightness")
             changed = true
         }
 
-        if lockedContrast {
-            setValue(contrast, forKey: "contrast")
-        } else if contrast != newContrast {
+        if !lockedContrast, contrast != newContrast {
             setValue(newContrast, forKey: "contrast")
             changed = true
         }

@@ -57,6 +57,7 @@
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C794E1751FF01EF500549462 /* Model.xcdatamodeld */; };
+		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; };
 		C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */; };
@@ -206,6 +207,7 @@
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = Frameworks/Surge.framework; sourceTree = "<group>"; };
 		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Charts.framework.dSYM; path = Frameworks/Charts.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Frameworks/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
 				C750833A2222865E0020270E /* SwiftyJSON.framework */,
 				C75083342222865D0020270E /* WAYWindow.framework */,
+				C7A2574120EA249B003B3A84 /* dsa_pub.pem */,
 				C750835D2222BEAA0020270E /* Crashlytics.framework */,
 				C750835E2222BEAA0020270E /* Fabric.framework */,
 				C7AEC7F71FD0B4350039B562 /* Lunar */,
@@ -539,6 +542,7 @@
 			files = (
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
