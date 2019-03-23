@@ -49,15 +49,13 @@ xattr -cr $appDmg
 codesign -fs "Mac Developer: alin.p32@gmail.com (FVP7HX44T5)" $appDmg
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
-generate_appcast $privKey $releaseDir
-
-echo \n(set_color red)"Removing delta files"(set_color normal)
-rm $releaseDir/*.delta
+generate_appcast $releaseDir
 
 cp $appDmg $appLatestDmg
 git lfs track Releases/Lunar-$appVersion.dmg
 git lfs track Releases/Lunar-latest.dmg
+git lfs track Releases/*.delta
 
-echo \n(set_color yellow)"Signing Updates"(set_color normal)
-./sign_updates.py "$privKey"
+echo \n(set_color yellow)"Fixing appcast"(set_color normal)
+./update_appcast.py
 subl $appcast

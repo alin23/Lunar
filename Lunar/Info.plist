@@ -19,9 +19,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.3.0</string>
+	<string>2.3.1</string>
 	<key>CFBundleVersion</key>
-	<string>2.3.0</string>
+	<string>2.3.1</string>
 	<key>Fabric</key>
 	<dict>
 		<key>Kits</key>
@@ -75,7 +75,7 @@
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
 	<string>https://lunarapp.site/appcast.xml</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>lqnO6tg2A9evTIFo2SC9ArZ6NS84gtBshcAWdwh12xQ=</string>
 </dict>
 </plist>
