@@ -49,19 +49,32 @@ class SettingsPageController: NSViewController {
                 daylightExtension: daylightExtension, noonDuration: noonDuration,
                 appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
             )
+            var idx: Int
             for x in 0 ..< (maxValues - 1) {
                 let startIndex = x * steps
                 let xPoints = points[startIndex ..< (startIndex + steps)]
                 for (i, y) in xPoints.enumerated() {
-                    brightnessChartEntry[x * steps + i].y = y.0.doubleValue
-                    contrastChartEntry[x * steps + i].y = y.1.doubleValue
+                    idx = x * steps + i
+                    if idx >= brightnessChartEntry.count || idx >= contrastChartEntry.count {
+                        break
+                    }
+                    brightnessChartEntry[idx].y = y.0.doubleValue
+                    contrastChartEntry[idx].y = y.1.doubleValue
                 }
             }
             for (i, point) in brightnessChartEntry.prefix(steps).reversed().enumerated() {
-                brightnessChartEntry[(maxValues - 1) * steps + i].y = point.y
+                idx = (maxValues - 1) * steps + i
+                if idx >= brightnessChartEntry.count {
+                    break
+                }
+                brightnessChartEntry[idx].y = point.y
             }
             for (i, point) in contrastChartEntry.prefix(steps).reversed().enumerated() {
-                contrastChartEntry[(maxValues - 1) * steps + i].y = point.y
+                idx = (maxValues - 1) * steps + i
+                if idx >= contrastChartEntry.count {
+                    break
+                }
+                contrastChartEntry[idx].y = point.y
             }
         case .sync:
             let maxValues = brightnessContrastChart.maxValuesSync
