@@ -11,7 +11,6 @@ PreBuiltFrameworks/NSPageControl.framework.zip filter=lfs diff=lfs merge=lfs -te
 PreBuiltFrameworks/Solar.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/Sparkle.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/SwiftyBeaver.framework.zip filter=lfs diff=lfs merge=lfs -text
-Releases/Lunar-latest.dmg filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar-2.3.1.dmg filter=lfs diff=lfs merge=lfs -text
 LegacyReleases/Lunar-2.1.1.dmg filter=lfs diff=lfs merge=lfs -text
 LegacyReleases/Lunar-2.2.0.dmg filter=lfs diff=lfs merge=lfs -text
@@ -34,3 +33,6 @@ LegacyReleases/Lunar-1.0.0.dmg filter=lfs diff=lfs merge=lfs -text
 LegacyReleases/Lunar-2.0.3.dmg filter=lfs diff=lfs merge=lfs -text
 LegacyReleases/Lunar-2.1.0.dmg filter=lfs diff=lfs merge=lfs -text
 LegacyReleases/Lunar-2.1.2.dmg filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar-2.3.2.dmg filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.3.2-2.3.1.delta filter=lfs diff=lfs merge=lfs -text
+Lunar.dmg filter=lfs diff=lfs merge=lfs -text

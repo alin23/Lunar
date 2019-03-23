@@ -10,7 +10,7 @@ rm -rf $tmpDir/*
 cp -R /private/tmp/DerivedData/Lunar-awgakuaxmexierhhqifxvodvwpri/Build/Products/Release/Lunar.app $tmpDir/Lunar.app
 
 set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $tmpDir/Lunar.app/Contents/Info.plist)
-set -l appLatestDmg $releaseDir/Lunar-latest.dmg
+set -l appLatestDmg $releaseDir/../Lunar.dmg
 set -l appDmg $releaseDir/Lunar-$appVersion.dmg
 set -l appTmpDmg /tmp/Lunar-$appVersion.dmg
 

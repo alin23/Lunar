@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
-
 # pylint: disable=no-member
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
 from markdown2 import markdown_path
 
+try:
+    key_path = Path(sys.argv[1])
+except:
+    key_path = None
+
 release_notes = Path.cwd() / "ReleaseNotes"
 appcast_path = Path.cwd() / "Releases" / "appcast.xml"
 
 parser = etree.XMLParser(strip_cdata=False)
 appcast = etree.parse(str(appcast_path), parser=parser)
+LUNAR_SITE = "https://lunarapp.site"
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
+SIGNER = "/usr/local/sbin/sign_update"
 DELTA_PATTERN = re.compile(
     r"Lunar([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+\.[0-9]+\.[0-9]+).delta"
 )
@@ -54,17 +62,29 @@ def sparkle(attr):
     return f"{{{SPARKLE}}}{attr}"
 
 
+def get_signature(file):
+    print("Signing", file)
+    return (
+        subprocess.check_output([SIGNER, file, str(key_path)])
+        .decode()
+        .replace("\n", "")
+    )
+
+
 for item in appcast.iter("item"):
     enclosure = item.find("enclosure")
     description = item.find("description")
 
     url = enclosure.attrib["url"]
     version = enclosure.attrib[sparkle("version")]
-    enclosure.set("url", f"https://lunarapp.site/download/{version}")
+    enclosure.set("url", f"{LUNAR_SITE}/download/{version}")
+
+    if key_path:
+        dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
+        enclosure.set(sparkle("dsaSignature"), get_signature(dmg))
 
     release_notes_file = release_notes / f"{version}.md"
     if description is None and release_notes_file.exists():
-
         changelog = html.fromstring(
             markdown_path(str(release_notes_file), extras=["header-ids"])
         )
@@ -78,20 +98,21 @@ for item in appcast.iter("item"):
         item.append(description)
 
     for delta in item.findall(sparkle("deltas")):
-        item.remove(delta)
+        for enclosure in delta.findall("enclosure"):
+            new_version = enclosure.attrib[sparkle("version")]
+            old_version = enclosure.attrib[sparkle("deltaFrom")]
+            enclosure.set("url", f"{LUNAR_SITE}/delta/{new_version}/{old_version}")
 
-    delta_enclosures = []
-    for delta in appcast_path.parent.glob(f"Lunar{version}-*.delta"):
-        new_version, old_version = DELTA_PATTERN.match(delta.name).groups()
-        enclosure = E.enclosure(
-            url=f"https://lunarapp.site/delta/{new_version}/{old_version}",
-            length=str(delta.stat().st_size),
-            type="application/octet-stream",
-            **{sparkle("version"): new_version, sparkle("deltaFrom"): old_version},
-        )
-        delta_enclosures.append(enclosure)
-    if delta_enclosures:
-        item.append(E.deltas(*delta_enclosures))
+            if key_path:
+                enclosure.set(
+                    sparkle("dsaSignature"),
+                    get_signature(
+                        appcast_path.with_name(
+                            f"Lunar{new_version}-{old_version}.delta"
+                        )
+                    ),
+                )
+
 
 appcast.write(
     str(appcast_path),
