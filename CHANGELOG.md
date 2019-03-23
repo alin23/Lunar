@@ -1,3 +1,11 @@
+# 2.3.1
+## Fixes
+
+- Check chart entries bounds before updating
+
+## Improvements
+
+- Move to edDSA key for signing updates
 # 2.3.0
 ## Fixes
 
