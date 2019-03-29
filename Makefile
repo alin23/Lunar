@@ -7,6 +7,9 @@ RELEASE_NOTES_FILES := $(wildcard ReleaseNotes/*.md)
 TEMPLATE_FILES := $(wildcard Lunar/Templates/*.stencil)
 GENERATED_FILES=$(patsubst Lunar/Templates/%.stencil,Lunar/Generated/%.generated.swift,$(TEMPLATE_FILES))
 
+PATCH_FILES := $(wildcard Patches/*.patch)
+FRAMEWORK_PATCH_DIRS=$(patsubst Patches/%.patch,Carthage/Checkouts/%,$(PATCH_FILES))
+
 FRAMEWORK_FILES := $(wildcard Carthage/Build/Mac/*.framework)
 ARCHIVED_FRAMEWORK_FILES=$(patsubst Carthage/Build/Mac/%.framework,PreBuiltFrameworks/%.framework.zip,$(FRAMEWORK_FILES))
 PREBUILT_FRAMEWORK_FILES=$(patsubst Carthage/Build/Mac/%.framework,Frameworks/%.framework,$(FRAMEWORK_FILES))
@@ -14,6 +17,9 @@ PREBUILT_FRAMEWORK_FILES=$(patsubst Carthage/Build/Mac/%.framework,Frameworks/%.
 $(ARCHIVED_FRAMEWORK_FILES): PreBuiltFrameworks/%.framework.zip: Carthage/Build/Mac/%.framework
 	carthage archive $* --output PreBuiltFrameworks/
 	git lfs track $@
+
+$(FRAMEWORK_PATCH_DIRS): Carthage/Checkouts/%: Patches/%.patch
+	patch -f -d Carthage/Checkouts/$* -p1 < Patches/$*.patch || true
 
 $(PREBUILT_FRAMEWORK_FILES): Frameworks/%.framework: PreBuiltFrameworks/%.framework.zip
 	cd /tmp && \
@@ -26,11 +32,16 @@ $(GENERATED_FILES): Lunar/Generated/%.generated.swift: Lunar/Templates/%.stencil
 
 carthage-archive: $(ARCHIVED_FRAMEWORK_FILES)
 carthage-extract: $(PREBUILT_FRAMEWORK_FILES)
+carthage-patch: $(FRAMEWORK_PATCH_DIRS)
 carthage-clean:
 	rm -rf Frameworks/*.framework*
 
 carthage-update:
 	carthage update --cache-builds --platform macOS
+
+carthage-build:
+	carthage build --cache-builds --platform macOS
+
 
 carthage-track:
 	git lfs track PreBuiltFrameworks/*.zip

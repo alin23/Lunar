@@ -63,7 +63,7 @@ class Display: NSManagedObject {
         } else {
             self.name = DDC.getDisplayName(for: id)
         }
-        self.serial = (serial ?? DDC.getDisplaySerial(for: id)).stripped
+        self.serial = (serial ?? DDC.getEdidTextData(displayID: id)).stripped
         self.active = active
         self.adaptive = adaptive
         lockedBrightness = false

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
-		C716B2061FD32B4900F22F90 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716B2051FD32B4900F22F90 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
@@ -44,7 +43,6 @@
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
-		C76545291FD8A56B00DBACE9 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C76545261FD8A11000DBACE9 /* DDC.c */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
@@ -95,6 +93,16 @@
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C7151939224E335A0024C6F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C715192B224E33590024C6F6;
+			remoteInfo = EDIDReader;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		C75083582222865F0020270E /* Embed Frameworks */ = {
@@ -166,8 +174,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
-		C716B2051FD32B4900F22F90 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
+		C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EDIDReader.xcodeproj; path = EDIDReader/EDIDReader.xcodeproj; sourceTree = "<group>"; };
+		C7151941224E34BA0024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
+		C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
+		C7151944224E34BA0024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
+		C7151949224E351A0024C6F6 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Data/DDC.c; sourceTree = "<group>"; };
 		C72776E6201F02140055934F /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PageControl.swift; path = Lunar/Views/PageControl.swift; sourceTree = SOURCE_ROOT; };
 		C72776E8201F1BED0055934F /* ExceptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsView.swift; sourceTree = "<group>"; };
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
@@ -193,8 +204,6 @@
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
-		C76545261FD8A11000DBACE9 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
-		C76545271FD8A11000DBACE9 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
@@ -283,6 +292,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C7151936224E33590024C6F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C715193A224E335A0024C6F6 /* EDIDReader */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C7151945224E34BA0024C6F6 /* DDC */ = {
+			isa = PBXGroup;
+			children = (
+				C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */,
+				C7151944224E34BA0024C6F6 /* DDC.swift */,
+			);
+			path = DDC;
+			sourceTree = "<group>";
+		};
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,15 +342,6 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		C76545251FD8A11000DBACE9 /* DDC */ = {
-			isa = PBXGroup;
-			children = (
-				C70FD19B1FD1F0E700032D6B /* Lunar-Bridging-Header.h */,
-				C716B2051FD32B4900F22F90 /* DDC.swift */,
-			);
-			path = DDC;
-			sourceTree = "<group>";
-		};
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -350,6 +367,7 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
 				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
 				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
 				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
@@ -400,10 +418,10 @@
 			children = (
 				C77CC75A1FEDB367009AA718 /* Views */,
 				C76545241FD8A10200DBACE9 /* Controllers */,
+				C7151945224E34BA0024C6F6 /* DDC */,
+				C7151949224E351A0024C6F6 /* DDC.c */,
+				C7151941224E34BA0024C6F6 /* DDC.h */,
 				C76545231FD8A0E000DBACE9 /* Data */,
-				C76545251FD8A11000DBACE9 /* DDC */,
-				C76545261FD8A11000DBACE9 /* DDC.c */,
-				C76545271FD8A11000DBACE9 /* DDC.h */,
 				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
@@ -527,6 +545,12 @@
 			mainGroup = C7AEC7EC1FD0B4350039B562;
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C7151936224E33590024C6F6 /* Products */;
+					ProjectRef = C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				C7AEC7F41FD0B4350039B562 /* Lunar */,
@@ -534,6 +558,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		C715193A224E335A0024C6F6 /* EDIDReader */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = EDIDReader;
+			remoteRef = C7151939224E335A0024C6F6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C7AEC7F31FD0B4350039B562 /* Resources */ = {
@@ -585,10 +619,8 @@
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
-				C76545291FD8A56B00DBACE9 /* DDC.c in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
-				C716B2061FD32B4900F22F90 /* DDC.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
