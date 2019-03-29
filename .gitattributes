@@ -37,3 +37,7 @@ Releases/Lunar-2.3.2.dmg filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.3.2-2.3.1.delta filter=lfs diff=lfs merge=lfs -text
 Lunar.dmg filter=lfs diff=lfs merge=lfs -text
 bin/EDIDReader filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar-2.3.3.dmg filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar-latest.dmg filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.3.3-2.3.1.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.3.3-2.3.2.delta filter=lfs diff=lfs merge=lfs -text
