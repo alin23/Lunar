@@ -142,7 +142,7 @@ class DataStore: NSObject {
                     let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                if let exc = (try? DataStore.fetchAppException(by: id, context: context)) {
+                if let exc = ((try? DataStore.fetchAppException(by: id, context: context)) as AppException??) {
                     if exc == nil {
                         _ = AppException(identifier: id, name: name, context: context)
                     }

@@ -157,7 +157,7 @@ class BrightnessAdapter {
             }
 
             datastore.save()
-            BrightnessAdapter.logDisplays(displays.values.map { d in d })
+//            BrightnessAdapter.logDisplays(displays.values.map { d in d })
             return displays
         } catch {
             log.error("Error on fetching displays: \(error)")
@@ -241,7 +241,7 @@ class BrightnessAdapter {
                 if let names = oldAppNames {
                     let exceptions = try datastore.fetchAppExceptions(by: names)
                     for exception in exceptions {
-                        if let idx = self.runningAppExceptions.index(where: { app in app.name == exception.name }) {
+                        if let idx = self.runningAppExceptions.firstIndex(where: { app in app.name == exception.name }) {
                             self.runningAppExceptions.remove(at: idx)
                         }
                     }
