@@ -29,7 +29,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.verbose(message, file, function, line: line, context: context)
+        super.verbose(message(), file, function, line: line, context: context)
         crashlog(String(describing: message()))
     }
 
@@ -41,7 +41,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.debug(message, file, function, line: line, context: context)
+        super.debug(message(), file, function, line: line, context: context)
         crashlog(String(describing: message()))
     }
 
@@ -53,7 +53,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.info(message, file, function, line: line, context: context)
+        super.info(message(), file, function, line: line, context: context)
         crashlog(String(describing: message()))
     }
 
@@ -65,7 +65,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.warning(message, file, function, line: line, context: context)
+        super.warning(message(), file, function, line: line, context: context)
         crashlog(String(describing: message()))
     }
 
@@ -77,7 +77,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.error(message, file, function, line: line, context: context)
+        super.error(message(), file, function, line: line, context: context)
         crashlog(String(describing: message()))
     }
 
