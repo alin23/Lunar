@@ -421,6 +421,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             geolocationFallback()
         case .authorizedAlways:
             locationManager.startMonitoringSignificantLocationChanges()
+        @unknown default:
+            log.error("Unknown location manager status \(status)")
         }
     }
 
