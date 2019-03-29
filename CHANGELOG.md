@@ -1,3 +1,13 @@
+# 2.3.3
+## Fixes
+
+- Use all EDID data to encode monitor IDs
+    - this should allow Lunar to support multiple monitors of the same kind
+
+## Improvements
+
+- Convert to Swift 5
+
 # 2.3.2
 ## Fixes
 
