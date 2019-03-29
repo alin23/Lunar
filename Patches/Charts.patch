@@ -1,0 +1,13 @@
+diff --git a/Source/Charts/Data/Implementations/Standard/ChartDataSet.swift b/Source/Charts/Data/Implementations/Standard/ChartDataSet.swift
+index afd2b24..c89bfce 100644
+--- a/Source/Charts/Data/Implementations/Standard/ChartDataSet.swift
++++ b/Source/Charts/Data/Implementations/Standard/ChartDataSet.swift
+@@ -57,7 +57,7 @@ open class ChartDataSet: ChartBaseDataSet
+     /// - Note: Calls `notifyDataSetChanged()` after setting a new value.
+     /// - Returns: The array of y-values that this DataSet represents.
+     /// the entries that this dataset represents / holds together
+-    @available(*, deprecated, message: "Use `subscript(position:)` instead.")
++//    @available(*, deprecated, message: "Use `subscript(position:)` instead.")
+     @objc open var values: [ChartDataEntry]
+         {
+         didSet
