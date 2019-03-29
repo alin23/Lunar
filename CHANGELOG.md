@@ -1,3 +1,8 @@
+# 2.3.2
+## Fixes
+
+- Don't send DDC/CI request for locked value
+
 # 2.3.1
 ## Fixes
 

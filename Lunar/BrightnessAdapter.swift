@@ -118,7 +118,12 @@ class BrightnessAdapter {
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
-        var serialsAndNames = displayIDs.enumerated().map { i, id in (DDC.getDisplaySerial(for: id).stripped, lunarDisplayNames[i % lunarDisplayNames.count]) }
+        var serialsAndNames = displayIDs.enumerated().map { i, id in
+            (
+                DDC.getEdidTextData(displayID: id).stripped,
+                lunarDisplayNames[i % lunarDisplayNames.count]
+            )
+        }
         var serials = serialsAndNames.map { d in d.0 }
         if serials.count != Set(serials).count {
             serials = zip(serials, displayIDs).map { serial, id in "\(serial)-\(id)" }
