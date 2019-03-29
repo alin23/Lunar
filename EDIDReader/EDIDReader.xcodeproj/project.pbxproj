@@ -264,6 +264,7 @@
 		C7151933224E33590024C6F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -275,6 +276,7 @@
 		C7151934224E33590024C6F6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				PRODUCT_NAME = "$(TARGET_NAME)";
