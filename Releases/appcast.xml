@@ -6,7 +6,7 @@
             <title>2.3.1</title>
             <pubDate>Sat, 23 Mar 2019 14:55:46 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14406819" sparkle:edSignature="xCdmaVYMkHmcehUjr7QkbwsWJmVknCr9PgzdiaEF26Lal1o8hJZc6tGR3YdHWqNH9D87K9h0ANBe/DMzOnXZBQ==" sparkle:shortVersionString="2.3.1" sparkle:version="2.3.1" type="application/octet-stream" url="https://lunarapp.site/download/2.3.1"/>
+            <enclosure length="14406819" sparkle:dsaSignature="MEUCIHBPpaOrUB1ZED6+UuLlqDSzfeRlj2Zqb/aN35zlrRUuAiEAkwUDpeukSiPLPZ7kRvV/MNm+hi5Dmr4xfPD92YV23+c=" sparkle:edSignature="xCdmaVYMkHmcehUjr7QkbwsWJmVknCr9PgzdiaEF26Lal1o8hJZc6tGR3YdHWqNH9D87K9h0ANBe/DMzOnXZBQ==" sparkle:shortVersionString="2.3.1" sparkle:version="2.3.1" type="application/octet-stream" url="https://lunarapp.site/download/2.3.1"/>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;        color: #333333;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #3E3E70;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Check chart entries bounds before updating</li></ul><h2 id="improvements">Improvements</h2><ul><li>Move to edDSA key for signing updates</li></ul></div></div>]]>
             </description>
@@ -15,22 +15,22 @@
             <title>2.3.2</title>
             <pubDate>Sat, 23 Mar 2019 16:33:17 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14402892" sparkle:edSignature="zbzpN4NuC9QMZ/A1vKtl1Hg4CXWkgGDcB/x1NRz8oBf28GhicxnTRIl6wWEVecsm5eGOS9BuFT7C0Zc/yRyqBw==" sparkle:shortVersionString="2.3.2" sparkle:version="2.3.2" type="application/octet-stream" url="https://lunarapp.site/download/2.3.2"/>
+            <enclosure length="14402892" sparkle:dsaSignature="MEQCIGVGR253BttVBRq7iWyGnaNfnWbmdNR2Y1QcYXfak1yzAiAbdiOjKjxdeTN/oghetmW8tZKjSikV9TOMN90Th4HL7Q==" sparkle:edSignature="zbzpN4NuC9QMZ/A1vKtl1Hg4CXWkgGDcB/x1NRz8oBf28GhicxnTRIl6wWEVecsm5eGOS9BuFT7C0Zc/yRyqBw==" sparkle:shortVersionString="2.3.2" sparkle:version="2.3.2" type="application/octet-stream" url="https://lunarapp.site/download/2.3.2"/>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;        color: #333333;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #3E3E70;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Don't send DDC/CI request for locked value</li></ul></div></div>]]>
             </description>
             <sparkle:deltas>
-                <enclosure length="77215" sparkle:deltaFrom="2.3.1" sparkle:dsaSignature="MEUCIBmw3pKQWH8RhCq4xwgLTJusmX7H9Ip7v+dl+4wV+mwKAiEAjWImJMb5iExTxP95kQZ+VhgNlGIjDg5ownsRknxkaR0=" sparkle:edSignature="k02kohsMxqqQRaq1yJEBz90rsDnt0B7yD/H2YvfBWYA3wF9VmHQpyITCwsJL5Ll7LY1py/rjpC6z/nzQLAExAw==" sparkle:shortVersionString="2.3.2" sparkle:version="2.3.2" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.2/2.3.1"/>
+                <enclosure length="77215" sparkle:deltaFrom="2.3.1" sparkle:dsaSignature="MEYCIQCM1nshcaCOy3IQb41xyhk3lYAQVz8OKlTyfV7qBsPGPAIhAKm09omQuo/vsm0RqOt0jodhMdVHYLoo43RkKrYKq7BP" sparkle:edSignature="k02kohsMxqqQRaq1yJEBz90rsDnt0B7yD/H2YvfBWYA3wF9VmHQpyITCwsJL5Ll7LY1py/rjpC6z/nzQLAExAw==" sparkle:shortVersionString="2.3.2" sparkle:version="2.3.2" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.2/2.3.1"/>
             </sparkle:deltas>
         </item>
         <item>
             <title>2.3.3</title>
             <pubDate>Fri, 29 Mar 2019 15:32:20 +0200</pubDate>
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
-            <enclosure length="14142524" sparkle:edSignature="G3kt4fO9TiFMnOCJY5m0NGT/7lUrIJDaGv2UJVkt8D7oWYgu5oPzxS5Xjo25cYBTHcXQSZpfzkZHZjJhPXtfCA==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/download/2.3.3"/>
+            <enclosure length="14142524" sparkle:dsaSignature="MEQCIFRHSPtAyq9Qgkb69X0F1M+i4BfXhiCzoSSEohJRVVZaAiBQZ5ZUyvZOQw8vmuHXPsajoTZy0txo1ffqeHfyzppr3w==" sparkle:edSignature="G3kt4fO9TiFMnOCJY5m0NGT/7lUrIJDaGv2UJVkt8D7oWYgu5oPzxS5Xjo25cYBTHcXQSZpfzkZHZjJhPXtfCA==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/download/2.3.3"/>
             <sparkle:deltas>
-                <enclosure length="10508330" sparkle:deltaFrom="2.3.2" sparkle:edSignature="iip8g5jetS+awS4zNmBPerLZ6HaHDuuKwzwBiUNnp55DmGwjWbCQF5+KhpstJBhT0YgWX32qU09/E4M0eUbbDg==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.3/2.3.2"/>
-                <enclosure length="10511702" sparkle:deltaFrom="2.3.1" sparkle:edSignature="OPQNKaFD4N7T9+BxrubBO+ez5pSeQmM6Ip9a+B7dVkUT1cXsWH5QpEDaOPybJFr/Iqt3bptNAAiaiGvr56DTBw==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.3/2.3.1"/>
+                <enclosure length="10508330" sparkle:deltaFrom="2.3.2" sparkle:dsaSignature="MEQCIC948bIRhX6ZQyqFNvf3hZNoBBxbQOrMa7WRur3GeY5hAiBKwXjs0MX0Q4ecwfoi7xtszZkIXIVmMRJkExWzKi0Eug==" sparkle:edSignature="iip8g5jetS+awS4zNmBPerLZ6HaHDuuKwzwBiUNnp55DmGwjWbCQF5+KhpstJBhT0YgWX32qU09/E4M0eUbbDg==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.3/2.3.2"/>
+                <enclosure length="10511702" sparkle:deltaFrom="2.3.1" sparkle:dsaSignature="MEQCIBdHiE266Uvzn/wnWtG2UFP0QRc4u+v+g1J3akGQCItZAiBxYxCobVBYPRkLCm7kAz3aOqtjmbJ19EE6lNaobsqoMg==" sparkle:edSignature="OPQNKaFD4N7T9+BxrubBO+ez5pSeQmM6Ip9a+B7dVkUT1cXsWH5QpEDaOPybJFr/Iqt3bptNAAiaiGvr56DTBw==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunarapp.site/delta/2.3.3/2.3.1"/>
             </sparkle:deltas>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;        color: #333333;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #3E3E70;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Use all EDID data to encode monitor IDs<ul><li>this should allow Lunar to support multiple monitors of the same kind</li></ul></li></ul><h2 id="improvements">Improvements</h2><ul><li>Convert to Swift 5</li></ul></div></div>]]>
