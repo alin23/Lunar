@@ -32,7 +32,6 @@ CHANGELOG_STYLE = H.style(
     """
     * {
         font-family: Menlo, monospace;
-        color: #333333;
     }
 
     a {
