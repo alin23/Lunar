@@ -57,5 +57,5 @@ git lfs track Releases/Lunar-latest.dmg
 git lfs track Releases/*.delta
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
-./update_appcast.py
+./update_appcast.py $privKey
 subl $appcast
