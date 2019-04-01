@@ -76,10 +76,11 @@ for item in appcast.iter("item"):
     description = item.find("description")
 
     url = enclosure.attrib["url"]
+    sig = enclosure.attrib.get(sparkle("dsaSignature"))
     version = enclosure.attrib[sparkle("version")]
     enclosure.set("url", f"{LUNAR_SITE}/download/{version}")
 
-    if key_path:
+    if key_path and not sig:
         dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
         enclosure.set(sparkle("dsaSignature"), get_signature(dmg))
 
@@ -101,9 +102,10 @@ for item in appcast.iter("item"):
         for enclosure in delta.findall("enclosure"):
             new_version = enclosure.attrib[sparkle("version")]
             old_version = enclosure.attrib[sparkle("deltaFrom")]
+            sig = enclosure.attrib.get(sparkle("dsaSignature"))
             enclosure.set("url", f"{LUNAR_SITE}/delta/{new_version}/{old_version}")
 
-            if key_path:
+            if key_path and not sig:
                 enclosure.set(
                     sparkle("dsaSignature"),
                     get_signature(
