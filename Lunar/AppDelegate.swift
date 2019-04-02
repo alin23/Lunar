@@ -60,7 +60,7 @@ var thisIsFirstRun = false
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
     transition.duration = duration
-    transition.type = convertToCATransitionType(convertFromCATransitionType(CATransitionType.fade))
+    transition.type = .fade
     return transition
 }
 
@@ -357,7 +357,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        lunarDisplayNames.shuffle()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         Fabric.with([Crashlytics.start(withAPIKey: secrets.fabricApiKey)])
         log.initLogger()
@@ -478,38 +477,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
-    func increaseBrightness(by amount: Int8 = 3) {
+    func increaseBrightness(by amount: Int = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount)
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + Int(amount * 3), minVal: -100, maxVal: 90)
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
 
-    func increaseContrast(by amount: Int8 = 3) {
+    func increaseContrast(by amount: Int = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: amount)
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(amount * 3), minVal: -100, maxVal: 90)
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
         }
     }
 
-    func decreaseBrightness(by amount: Int8 = 3) {
+    func decreaseBrightness(by amount: Int = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount)
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + -amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
 
-    func decreaseContrast(by amount: Int8 = 3) {
+    func decreaseContrast(by amount: Int = 3) {
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: -amount)
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + Int(-amount * 3), minVal: -100, maxVal: 90)
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + -amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
         }
     }
@@ -569,14 +568,4 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func leaveFeedback(_: Any) {
         NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
     }
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-private func convertToCATransitionType(_ input: String) -> CATransitionType {
-    return CATransitionType(rawValue: input)
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-private func convertFromCATransitionType(_ input: CATransitionType) -> String {
-    return input.rawValue
 }
