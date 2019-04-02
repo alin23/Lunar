@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		C715192F224E33590024C6F6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715192E224E33590024C6F6 /* main.swift */; };
-		C7151948224E34F20024C6F6 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7151947224E34F20024C6F6 /* DDC.c */; };
 		C715194A224E36FA0024C6F6 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715193D224E33800024C6F6 /* DDC.swift */; };
 /* End PBXBuildFile section */
 
@@ -28,9 +27,8 @@
 		C715192B224E33590024C6F6 /* EDIDReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = EDIDReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		C715192E224E33590024C6F6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C715193C224E33800024C6F6 /* EDIDReader-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EDIDReader-Bridging-Header.h"; sourceTree = "<group>"; };
-		C715193D224E33800024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
-		C715193F224E33800024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
-		C7151947224E34F20024C6F6 /* DDC.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC.c; sourceTree = "<group>"; };
+		C715193D224E33800024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DDC.swift; path = ../../../Lunar/DDC/DDC.swift; sourceTree = "<group>"; };
+		C715193F224E33800024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DDC.h; path = ../../Lunar/DDC.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,7 +62,6 @@
 			isa = PBXGroup;
 			children = (
 				C715193E224E33800024C6F6 /* DDC */,
-				C7151947224E34F20024C6F6 /* DDC.c */,
 				C715193F224E33800024C6F6 /* DDC.h */,
 				C715192E224E33590024C6F6 /* main.swift */,
 			);
@@ -139,7 +136,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C715194A224E36FA0024C6F6 /* DDC.swift in Sources */,
-				C7151948224E34F20024C6F6 /* DDC.c in Sources */,
 				C715192F224E33590024C6F6 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

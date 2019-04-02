@@ -9,13 +9,21 @@
 import Foundation
 
 func printEdid(_ data: Data) {
-    let edid = data.map { $0 }.str(length: 128)
-    let id = data[77 ..< 90].map { $0 }.str(length: 13)
+    let edid = data.map { $0 }.str()
+    let id = data[77 ..< 90].map { $0 }.str()
     print("      EDID: \(edid)")
     print("      ID: \(id)\n")
 }
 
 func printDetails(_ id: CGDirectDisplayID) {
+    print("    CGDirectDisplayID: \(id)")
+
+    if let uuid = CGDisplayCreateUUIDFromDisplayID(id), let str = CFUUIDCreateString(nil, uuid.takeUnretainedValue()) {
+        print("    UUID: \(str)\n")
+        let newID = CGDisplayGetDisplayIDFromUUID(uuid.takeUnretainedValue())
+        print("    IDFromUUID: \(newID)\n")
+    }
+
     let sn = CGDisplaySerialNumber(id)
     let model = CGDisplayModelNumber(id)
     let vendor = CGDisplayVendorNumber(id)
@@ -32,17 +40,13 @@ func printDetails(_ id: CGDirectDisplayID) {
     print("    Serial: \(serial)\n")
 
     print("    Display unique ID: \(idData)\n")
-
-    if let data = DDC.getEdidData(displayID: id) {
-        print("    Raw data (guess match):")
-        printEdid(data)
-    }
+    print("    Display unit number: \(CGDisplayUnitNumber(id))\n")
 }
 
-if let id = DDC.getBuiltinDisplay() {
-    print("Built-in display:")
-    printDetails(id)
-}
+// if let id = DDC.getBuiltinDisplay() {
+//    print("Built-in display:")
+//    printDetails(id)
+// }
 
 DDC.findExternalDisplays().forEach { id in
     print("External displays:")
