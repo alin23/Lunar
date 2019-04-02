@@ -49,6 +49,29 @@ class Display: NSManagedObject {
     var onReadapt: (() -> Void)?
     var smoothStep = 1
 
+    static func printableName(id: CGDirectDisplayID) -> String {
+        if let name = DDC.getDisplayName(for: id) {
+            if name.stripped.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) > 7 {
+                return name.stripped
+            }
+        }
+        return lunarDisplayNames[Int(CGDisplayUnitNumber(id)) % lunarDisplayNames.count]
+    }
+
+    static func uuid(id: CGDirectDisplayID) -> String {
+        if let uuid = CGDisplayCreateUUIDFromDisplayID(id)?.takeRetainedValue() {
+            return CFUUIDCreateString(kCFAllocatorDefault, uuid) as String
+        }
+        if let edid = Display.edid(id: id) {
+            return edid
+        }
+        return String(describing: id)
+    }
+
+    static func edid(id: CGDirectDisplayID) -> String? {
+        return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
+    }
+
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
@@ -61,9 +84,9 @@ class Display: NSManagedObject {
         if let name = name, !name.isEmpty {
             self.name = name
         } else {
-            self.name = DDC.getDisplayName(for: id)
+            self.name = Display.printableName(id: id)
         }
-        self.serial = (serial ?? DDC.getEdidTextData(displayID: id)).stripped
+        self.serial = (serial ?? Display.uuid(id: id))
         self.active = active
         self.adaptive = adaptive
         lockedBrightness = false
@@ -77,7 +100,7 @@ class Display: NSManagedObject {
     }
 
     func resetName() {
-        name = DDC.getDisplayName(for: id)
+        name = Display.printableName(id: id)
     }
 
     func readapt<T>(display: Display, change: NSKeyValueObservedChange<T>) {
