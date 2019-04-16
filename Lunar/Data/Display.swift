@@ -50,9 +50,11 @@ class Display: NSManagedObject {
     var smoothStep = 1
 
     static func printableName(id: CGDirectDisplayID) -> String {
-        if let name = DDC.getDisplayName(for: id) {
-            if name.stripped.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) > 7 {
-                return name.stripped
+        if var name = DDC.getDisplayName(for: id) {
+            name = name.stripped
+            let minChars = floor(Double(name.count) * 0.8)
+            if name.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) >= minChars {
+                return name
             }
         }
         return lunarDisplayNames[Int(CGDisplayUnitNumber(id)) % lunarDisplayNames.count]
@@ -207,7 +209,7 @@ class Display: NSManagedObject {
                         _ = DDC.setBrightness(for: self.id, brightness: brightness)
                     }
 
-                    log.debug("\(self.name): Set brightness to \(brightness)")
+                    log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(self.id)")
                 }
             }),
             observe(\.contrast, options: [.new, .old], changeHandler: { _, change in

@@ -8,6 +8,8 @@
 
 import Foundation
 
+let log = Logger.self
+
 func printEdid(_ data: Data) {
     let edid = data.map { $0 }.str()
     let id = data[77 ..< 90].map { $0 }.str()
@@ -17,6 +19,7 @@ func printEdid(_ data: Data) {
 
 func printDetails(_ id: CGDirectDisplayID) {
     print("    CGDirectDisplayID: \(id)")
+    DDC.setBrightness(for: id, brightness: 30)
 
     if let uuid = CGDisplayCreateUUIDFromDisplayID(id), let str = CFUUIDCreateString(nil, uuid.takeUnretainedValue()) {
         print("    UUID: \(str)\n")
@@ -27,26 +30,28 @@ func printDetails(_ id: CGDirectDisplayID) {
     let sn = CGDisplaySerialNumber(id)
     let model = CGDisplayModelNumber(id)
     let vendor = CGDisplayVendorNumber(id)
-
-    print("    S/N: \(sn.str())")
-    print("    Model Number: \(model.str())")
-    print("    Vendor: \(vendor.str())\n")
+//
+    print("    S/N: \(sn)")
+    print("    Model Number: \(model))")
+    print("    Vendor: \(vendor)\n")
 
     let idData = DDC.getDisplayIdentificationData(displayID: id)
     let name = DDC.getDisplayName(for: id)
     let serial = DDC.getDisplaySerial(for: id)
+    let brightness = DDC.getBrightness(for: id)
 
-    print("    Name: \(name)")
-    print("    Serial: \(serial)\n")
+    print("    Name: \(name ?? "UNKNOWN")")
+    print("    Serial: \(serial ?? "UNKNOWN")\n")
+    print("    Brightness: \(brightness)\n")
 
     print("    Display unique ID: \(idData)\n")
     print("    Display unit number: \(CGDisplayUnitNumber(id))\n")
 }
 
-// if let id = DDC.getBuiltinDisplay() {
-//    print("Built-in display:")
-//    printDetails(id)
-// }
+if let id = DDC.getBuiltinDisplay() {
+    print("Built-in display:")
+    printDetails(id)
+}
 
 DDC.findExternalDisplays().forEach { id in
     print("External displays:")
