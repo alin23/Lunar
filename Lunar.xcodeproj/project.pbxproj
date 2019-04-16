@@ -367,7 +367,6 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
-				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
 				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
 				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
 				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
@@ -381,26 +380,27 @@
 				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
 				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
 				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
-				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
 				C75083362222865D0020270E /* Alamofire.framework */,
 				C75083352222865D0020270E /* Charts.framework */,
+				C750835D2222BEAA0020270E /* Crashlytics.framework */,
+				C750835E2222BEAA0020270E /* Fabric.framework */,
 				C750833F2222865F0020270E /* HotKey.framework */,
 				C750833B2222865E0020270E /* KeyHolder.framework */,
 				C750833D2222865E0020270E /* Magnet.framework */,
 				C750833E2222865E0020270E /* NSPageControl.framework */,
 				C75083372222865E0020270E /* Solar.framework */,
 				C75083382222865E0020270E /* Sparkle.framework */,
+				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
 				C75083392222865E0020270E /* SwiftDate.framework */,
 				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
 				C750833A2222865E0020270E /* SwiftyJSON.framework */,
 				C75083342222865D0020270E /* WAYWindow.framework */,
 				C7A2574120EA249B003B3A84 /* dsa_pub.pem */,
-				C750835D2222BEAA0020270E /* Crashlytics.framework */,
-				C750835E2222BEAA0020270E /* Fabric.framework */,
+				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
+				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
 				C7AEC7F71FD0B4350039B562 /* Lunar */,
 				C7CFEA131FD376E6000AC4A6 /* LunarService */,
 				C7AEC7F61FD0B4350039B562 /* Products */,
-				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

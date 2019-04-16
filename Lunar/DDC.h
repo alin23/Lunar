@@ -16,6 +16,7 @@
 #include <IOKit/graphics/IOGraphicsLib.h>
 #include <ApplicationServices/ApplicationServices.h>
 
+
 struct EDID {
     UInt64 header : 64;
     UInt8 : 1;

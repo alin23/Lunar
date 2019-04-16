@@ -98,6 +98,8 @@ class BrightnessAdapter {
     }
 
     func resetDisplayList() {
+        DDC.displayPortByUUID.removeAll(keepingCapacity: true)
+        DDC.displayUUIDByEDID.removeAll(keepingCapacity: true)
         for display in displays.values {
             display.removeObservers()
         }
@@ -125,7 +127,7 @@ class BrightnessAdapter {
 
         // Make sure serials are unique
         if serials.count != Set(serials).count {
-            serials = zip(serials, displayIDs).map { _, id in Display.edid(id: id) }
+            serials = zip(serials, displayIDs).map { serial, id in Display.edid(id: id) ?? "\(serial)-\(id)" }
             serialsAndNames = zip(serialsAndNames, serials).map { d, serial in (serial, d.1) }
         }
 
