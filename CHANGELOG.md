@@ -1,3 +1,19 @@
+# 2.4.0
+## Features
+
+- Add diagnostic tools
+    - You can now open Lunar menu and click on *Open Lunar diagnostics* to send me Lunar logs
+- Complete multi-monitor support
+
+## Fixes
+
+- Use system generated UUID to store settings per display
+
+## Improvements
+
+- Convert to DDC handling code to Swift
+- Store min/max settings as soon as they are changed
+
 # 2.3.3
 ## Fixes
 
