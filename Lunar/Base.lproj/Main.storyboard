@@ -37,7 +37,14 @@
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="toggleStartAtLoginWithSender:" target="Voe-Tx-rLC" id="UeX-aW-1MF"/>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="em1-5W-zou"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Debug Mode" id="8wq-Qw-uJg">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.debug" id="q17-cG-lR6"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
@@ -118,6 +125,12 @@
                                                 <action selector="leaveFeedback:" target="Voe-Tx-rLC" id="p7H-ng-T89"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Open Lunar diagnostics" id="kSD-gy-XkR">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="sendDebugData:" target="Voe-Tx-rLC" id="Cm0-Xt-xz2"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="GNT-HB-tbd"/>
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -136,7 +149,7 @@
                                         </menuItem>
                                     </items>
                                     <connections>
-                                        <outlet property="delegate" destination="Voe-Tx-rLC" id="Qnj-0T-tfY"/>
+                                        <outlet property="delegate" destination="Voe-Tx-rLC" id="aL5-qs-Cgt"/>
                                     </connections>
                                 </menu>
                             </menuItem>
@@ -183,7 +196,7 @@
                         <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
                         <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
                         <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
-                        <outlet property="loginMenuItem" destination="HeU-1X-veM" id="T04-59-iC5"/>
+                        <outlet property="debugMenuItem" destination="kSD-gy-XkR" id="NKJ-Lt-QFN"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
                         <outlet property="percent0MenuItem" destination="9Jm-7d-C6T" id="f9t-jn-RIA"/>
                         <outlet property="percent100MenuItem" destination="UL7-qh-pTF" id="9lg-G5-OdX"/>
@@ -198,6 +211,7 @@
                 <customObject id="JCY-9H-EwC" customClass="SUUpdater"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="3YV-ka-Eop"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
         </scene>
@@ -209,7 +223,7 @@
                     <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
                         <rect key="contentRect" x="561" y="239" width="750" height="500"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
                         <value key="minSize" type="size" width="750" height="500"/>
                         <value key="maxSize" type="size" width="750" height="500"/>
                         <userDefinedRuntimeAttributes>

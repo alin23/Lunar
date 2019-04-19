@@ -28,7 +28,7 @@ $(PREBUILT_FRAMEWORK_FILES): Frameworks/%.framework: PreBuiltFrameworks/%.framew
 	mv /tmp/Carthage/Build/Mac/$*.framework* ${PWD}/Frameworks/
 
 $(GENERATED_FILES): Lunar/Generated/%.generated.swift: Lunar/Templates/%.stencil
-	source ${PWD}/.env.sh && sourcery
+	bash ${PWD}/gencode.sh
 
 carthage-archive: $(ARCHIVED_FRAMEWORK_FILES)
 carthage-extract: $(PREBUILT_FRAMEWORK_FILES)
