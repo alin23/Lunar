@@ -45,6 +45,10 @@ extension UserDefaults {
         return bool(forKey: "smoothTransition")
     }
 
+    @objc dynamic var debug: Bool {
+        return bool(forKey: "debug")
+    }
+
     @objc dynamic var adaptiveBrightnessMode: Int {
         return integer(forKey: "adaptiveBrightnessMode")
     }
@@ -209,6 +213,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "didSwipeLeft")
         DataStore.setDefault(false, for: "didSwipeRight")
         DataStore.setDefault(false, for: "smoothTransition")
+        DataStore.setDefault(false, for: "debug")
         DataStore.setDefault(true, for: "startAtLogin")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")

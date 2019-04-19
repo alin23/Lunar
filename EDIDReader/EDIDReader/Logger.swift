@@ -9,23 +9,23 @@
 import Foundation
 
 class Logger {
-    class func verbose(_ message: Any) {
-        print("VERBOSE: \(message)")
+    class func verbose(_ message: Any, context: Any? = nil) {
+        print("VERBOSE: \(message) (context \(String(describing: context)))")
     }
 
-    class func debug(_ message: Any) {
-        print("DEBUG: \(message)")
+    class func debug(_ message: Any, context: Any? = nil) {
+        print("DEBUG: \(message) (context \(String(describing: context)))")
     }
 
-    class func info(_ message: Any) {
-        print("INFO: \(message)")
+    class func info(_ message: Any, context: Any? = nil) {
+        print("INFO: \(message) (context \(String(describing: context)))")
     }
 
-    class func warning(_ message: Any) {
-        print("WARNING: \(message)")
+    class func warning(_ message: Any, context: Any? = nil) {
+        print("WARNING: \(message) (context \(String(describing: context)))")
     }
 
-    class func error(_ message: Any) {
-        print("ERROR: \(message)")
+    class func error(_ message: Any, context: Any? = nil) {
+        print("ERROR: \(message) (context \(String(describing: context)))")
     }
 }
