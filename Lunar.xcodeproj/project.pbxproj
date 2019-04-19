@@ -98,7 +98,7 @@
 /* Begin PBXContainerItemProxy section */
 		C7151939224E335A0024C6F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */;
+			containerPortal = C7151935224E33590024C6F6 /* Project object */;
 			proxyType = 2;
 			remoteGlobalIDString = C715192B224E33590024C6F6;
 			remoteInfo = EDIDReader;
@@ -295,7 +295,7 @@
 		C7151936224E33590024C6F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C715193A224E335A0024C6F6 /* EDIDReader */,
+				C715193A224E335A0024C6F6,
 			);
 			name = Products;
 			sourceTree = "<group>";

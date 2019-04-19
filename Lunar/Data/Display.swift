@@ -187,10 +187,22 @@ class Display: NSManagedObject {
             datastore.defaults.observe(\UserDefaults.contrastLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
         ]
         observers = [
-            observe(\.minBrightness, options: [.new, .old], changeHandler: readapt),
-            observe(\.maxBrightness, options: [.new, .old], changeHandler: readapt),
-            observe(\.minContrast, options: [.new, .old], changeHandler: readapt),
-            observe(\.maxContrast, options: [.new, .old], changeHandler: readapt),
+            observe(\.minBrightness, options: [.new, .old], changeHandler: { _, v in
+                self.readapt(display: self, change: v)
+                datastore.save()
+            }),
+            observe(\.maxBrightness, options: [.new, .old], changeHandler: { _, v in
+                self.readapt(display: self, change: v)
+                datastore.save()
+            }),
+            observe(\.minContrast, options: [.new, .old], changeHandler: { _, v in
+                self.readapt(display: self, change: v)
+                datastore.save()
+            }),
+            observe(\.maxContrast, options: [.new, .old], changeHandler: { _, v in
+                self.readapt(display: self, change: v)
+                datastore.save()
+            }),
             observe(\.brightness, options: [.new, .old], changeHandler: { _, change in
                 if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID, self.id != TEST_DISPLAY_ID {
                     var brightness: UInt8
