@@ -6,8 +6,10 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import Alamofire
 import Carbon.HIToolbox
 import Cocoa
+import Compression
 import CoreLocation
 import Crashlytics
 import Fabric
@@ -24,6 +26,14 @@ extension Collection where Index: Comparable {
 }
 
 let TEST_MODE = false
+let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
+let TRANSFER_URL = "https://transfer.sh"
+let DEBUG_DATA_HEADERS: HTTPHeaders = [
+    "Content-type": "application/octet-stream",
+    "Max-Downloads": "2",
+    "Max-Days": "5",
+]
+let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
 
 var lunarDisplayNames = [
     "Moony",
@@ -83,15 +93,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var noonObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
-    var loginItemObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
     var hotkeyObserver: NSKeyValueObservation?
+    var loginItemObserver: NSKeyValueObservation?
 
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
     @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
-    @IBOutlet var loginMenuItem: NSMenuItem!
+    @IBOutlet var debugMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -169,23 +179,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func setLoginMenuItemState(state: Bool) {
-        if state {
-            loginMenuItem?.state = .on
-        } else {
-            loginMenuItem?.state = .off
-        }
-    }
-
     func handleDaemon() {
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == launcherAppId })
 
         SMLoginItemSetEnabled(launcherAppId as CFString, datastore.defaults.startAtLogin)
-        setLoginMenuItemState(state: datastore.defaults.startAtLogin)
         loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, change in
             SMLoginItemSetEnabled(launcherAppId as CFString, change.newValue ?? false)
-            self.setLoginMenuItemState(state: change.newValue ?? false)
         })
 
         if isRunning {
@@ -358,7 +358,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        Fabric.with([Crashlytics.start(withAPIKey: secrets.fabricApiKey)])
+        Fabric.with([Crashlytics.self, Answers.self])
         log.initLogger()
         handleDaemon()
         startReceivingSignificantLocationChanges()
@@ -382,6 +382,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
         datastore.save()
+        datastore.defaults.set(false, forKey: "debug")
         activity.invalidate()
     }
 
@@ -553,10 +554,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.toggle()
     }
 
-    @IBAction func toggleStartAtLogin(sender _: Any?) {
-        datastore.defaults.set(!datastore.defaults.startAtLogin, forKey: "startAtLogin")
-    }
-
     @IBAction func showWindow(sender _: Any?) {
         showWindow()
     }
@@ -567,5 +564,118 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func leaveFeedback(_: Any) {
         NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
+    }
+
+    func failDebugData() {
+        if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to send a message to the developer?") {
+            NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
+        }
+    }
+
+    @IBAction func sendDebugData(_: Any) {
+        guard dialog(message: "This will run a few diagnostic tests by trying to change the brightness and contrast of all of your external displays", info: "Do you want to continue?") else {
+            return
+        }
+
+        let oldTitle = debugMenuItem.title
+        debugMenuItem.isEnabled = false
+        debugMenuItem.title = "Diagnosing displays"
+
+        datastore.defaults.set(true, forKey: "debug")
+        let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
+        let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
+
+        brightnessAdapter.resetDisplayList()
+        for (id, display) in brightnessAdapter.displays {
+            for value in 1...100 {
+                display.brightness = NSNumber(value: value)
+                display.contrast = NSNumber(value: value)
+            }
+            if let brightness = oldBrightness[id] {
+                for value in stride(from: 100, through: brightness.intValue, by: -1) {
+                    display.brightness = NSNumber(value: value)
+                }
+            }
+            if let contrast = oldContrast[id] {
+                for value in stride(from: 100, through: contrast.intValue, by: -1) {
+                    display.contrast = NSNumber(value: value)
+                }
+            }
+        }
+
+        datastore.defaults.set(false, forKey: "debug")
+
+        debugMenuItem.title = "Gathering logs"
+        guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
+            failDebugData()
+            return
+        }
+
+        let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: sourceString.count)
+        let sourceBuffer = sourceString.map { $0 }
+        let algorithm = COMPRESSION_LZMA
+
+        debugMenuItem.title = "Compressing logs"
+        let compressedSize = compression_encode_buffer(
+            destinationBuffer, sourceString.count,
+            sourceBuffer, sourceString.count,
+            nil,
+            algorithm
+        )
+
+        var debugData = sourceString
+        var mimeType = "text/plain"
+        var fileName = "lunar.log"
+        if compressedSize > 0 {
+            let encodedFileURL = LOG_URL.appendingPathExtension("lzma")
+
+            FileManager.default.createFile(
+                atPath: encodedFileURL.path,
+                contents: nil,
+                attributes: nil
+            )
+
+            debugData = NSData(
+                bytesNoCopy: destinationBuffer,
+                length: compressedSize
+            ) as Data
+            mimeType = "application/x-lzma"
+            fileName = "lunar.log.lzma"
+        }
+
+        debugMenuItem.title = "Compressing logs"
+        Alamofire.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
+            response in
+            defer {
+                self.debugMenuItem.title = oldTitle
+                self.debugMenuItem.isEnabled = true
+            }
+            log.info("Got response from transfer.sh", context: response.response)
+            if let err = response.error {
+                log.error("Debug data upload response error: \(err)")
+                self.failDebugData()
+                return
+            }
+
+            guard let url = response.value, !url.isEmpty,
+                let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
+                let subject = "Lunar logs: \(url)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                log.error("Debug data upload response empty")
+                self.failDebugData()
+                return
+            }
+            log.info("Uploaded logs to \(url)")
+            NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?subject=\(subject)&body=\(urlEncoded)")!)
+        })
+    }
+
+    func dialog(message: String, info: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = message
+        alert.informativeText = info
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
     }
 }

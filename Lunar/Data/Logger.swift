@@ -11,14 +11,35 @@ import Foundation
 import SwiftyBeaver
 
 class Logger: SwiftyBeaver {
+    static let console = ConsoleDestination()
+    static let file = FileDestination()
+    static let platform = SBPlatformDestination(appID: "0G8Ek7", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
+    static var debugModeObserver: NSKeyValueObservation?
+
     class func initLogger() {
-        let console = ConsoleDestination()
-        let file = FileDestination()
-        let platform = SBPlatformDestination(appID: "0G8Ek7", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
+        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M (context $X)"
+        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M (context $X)"
+        platform.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M (context $X)"
+        platform.minLevel = .info
+
+        setMinLevel(debug: datastore.defaults.debug)
+        debugModeObserver = datastore.defaults.observe(\.debug, options: [.new], changeHandler: { _, change in
+            self.setMinLevel(debug: change.newValue ?? false)
+        })
 
         Logger.addDestination(console)
         Logger.addDestination(file)
         Logger.addDestination(platform)
+    }
+
+    class func setMinLevel(debug _: Bool) {
+        if !datastore.defaults.debug {
+            console.minLevel = .info
+            file.minLevel = .info
+        } else {
+            console.minLevel = .verbose
+            file.minLevel = .verbose
+        }
     }
 
     open override class func verbose(
