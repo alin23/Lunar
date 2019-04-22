@@ -26,7 +26,9 @@ extension Collection where Index: Comparable {
 }
 
 let TEST_MODE = false
+
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
+
 let TRANSFER_URL = "https://transfer.sh"
 let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Content-type": "application/octet-stream",
@@ -360,6 +362,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         Fabric.with([Crashlytics.self, Answers.self])
         log.initLogger()
+
+        if let logPath = LOG_URL.path.cString(using: .utf8) {
+            log.info("Setting log path to \(LOG_URL.path)")
+            setLogPath(logPath, logPath.count)
+        }
+
         handleDaemon()
         startReceivingSignificantLocationChanges()
 
@@ -578,10 +586,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         let oldTitle = debugMenuItem.title
+        menu.autoenablesItems = false
         debugMenuItem.isEnabled = false
         debugMenuItem.title = "Diagnosing displays"
 
         datastore.defaults.set(true, forKey: "debug")
+        setDebugMode(1)
         let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
         let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
 
@@ -604,6 +614,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         datastore.defaults.set(false, forKey: "debug")
+        setDebugMode(0)
 
         debugMenuItem.title = "Gathering logs"
         guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
@@ -611,42 +622,43 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
 
-        let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: sourceString.count)
-        let sourceBuffer = sourceString.map { $0 }
-        let algorithm = COMPRESSION_LZMA
+//        let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: sourceString.count)
+//        let sourceBuffer = sourceString.map { $0 }
+//        let algorithm = COMPRESSION_LZ4_RAW
 
-        debugMenuItem.title = "Compressing logs"
-        let compressedSize = compression_encode_buffer(
-            destinationBuffer, sourceString.count,
-            sourceBuffer, sourceString.count,
-            nil,
-            algorithm
-        )
+//        debugMenuItem.title = "Compressing logs"
+//        let compressedSize = compression_encode_buffer(
+//            destinationBuffer, sourceString.count,
+//            sourceBuffer, sourceString.count,
+//            nil,
+//            algorithm
+//        )
 
         var debugData = sourceString
         var mimeType = "text/plain"
         var fileName = "lunar.log"
-        if compressedSize > 0 {
-            let encodedFileURL = LOG_URL.appendingPathExtension("lzma")
-
-            FileManager.default.createFile(
-                atPath: encodedFileURL.path,
-                contents: nil,
-                attributes: nil
-            )
-
-            debugData = NSData(
-                bytesNoCopy: destinationBuffer,
-                length: compressedSize
-            ) as Data
-            mimeType = "application/x-lzma"
-            fileName = "lunar.log.lzma"
-        }
+//        if compressedSize > 0 {
+//            let encodedFileURL = LOG_URL.appendingPathExtension("lz4")
+//
+//            FileManager.default.createFile(
+//                atPath: encodedFileURL.path,
+//                contents: nil,
+//                attributes: nil
+//            )
+//
+//            debugData = NSData(
+//                bytesNoCopy: destinationBuffer,
+//                length: compressedSize
+//            ) as Data
+//            mimeType = "application/x-lz4"
+//            fileName = "lunar.log.lz4"
+//        }
 
         debugMenuItem.title = "Compressing logs"
         Alamofire.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
             response in
             defer {
+                self.menu.autoenablesItems = true
                 self.debugMenuItem.title = oldTitle
                 self.debugMenuItem.isEnabled = true
             }
