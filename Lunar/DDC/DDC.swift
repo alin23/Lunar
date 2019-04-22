@@ -351,108 +351,142 @@ class DDC {
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
-        var context: [String: Any] = ["displayID": displayID, "controlID": controlID, "newValue": newValue]
+        var command = DDCWriteCommand(
+            control_id: controlID.rawValue,
+            new_value: newValue
+        )
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
+        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        for (key, value) in nsDisplayUUIDByEDID {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+            }
+        }
 
-        log.debug("Sending write command", context: context)
-
-        var request: IOI2CRequest = IOI2CRequest()
-        var data = Data(count: 7)
-
-        request.commFlags = 0
-        request.sendAddress = 0x6E
-        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-        request.sendBytes = 7
-
-        data[0] = 0x51
-        data[1] = 0x84
-        data[2] = 0x03
-        data[3] = controlID.rawValue
-        data[4] = 0x00
-        data[5] = newValue >= 0xFE ? 0xFE : newValue & 0xFF
-        data[6] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5]
-
-        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CNoTransactionType))
-        request.replyBytes = 0
-
-        let nsData = NSMutableData(data: data)
-        request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
-
-        let hexData = nsData.map { $0 }.str(hex: true)
-        log.debug("Write data: \(hexData)", context: context)
-        log.debug("Write request: \(request)", context: context)
-
-        return DDC.sendDisplayRequest(displayID: displayID, request: &request)
+        return result
+//        let context: [String: Any] = ["displayID": displayID, "controlID": controlID, "newValue": newValue]
+//
+//        log.debug("Sending write command", context: context)
+//
+//        var request: IOI2CRequest = IOI2CRequest()
+//        var data = Data(count: 7)
+//
+//        request.commFlags = 0
+//        request.sendAddress = 0x6E
+//        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
+//        request.sendBytes = 7
+//
+//        data[0] = 0x51
+//        data[1] = 0x84
+//        data[2] = 0x03
+//        data[3] = controlID.rawValue
+//        data[4] = 0x00
+//        data[5] = newValue >= 0xFE ? 0xFE : newValue & 0xFF
+//        data[6] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5]
+//
+//        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CNoTransactionType))
+//        request.replyBytes = 0
+//
+//        let nsData = NSMutableData(data: data)
+//        request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
+//
+//        let hexData = nsData.map { $0 }.str(hex: true)
+//        log.debug("Write data: \(hexData)", context: context)
+//        log.debug("Write request: \(request)", context: context)
+//
+//        return DDC.sendDisplayRequest(displayID: displayID, request: &request)
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        var request: IOI2CRequest
-        var result = false
-        var context: [String: Any] = ["displayID": displayID]
-
-        guard let transactionType = DDC.getSupportedTransactionType() else { return nil }
-
-        context["transactionType"] = transactionType
-
-        for _ in 1 ... MAX_REQUESTS {
-            request = IOI2CRequest()
-            request.commFlags = 0
-            request.sendAddress = 0x6E
-            request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-
-            request.sendBytes = 5
-            request.minReplyDelay = UInt64(30 * kMillisecondScale)
-
-            var data = Data(count: 5)
-            data[0] = 0x51
-            data[1] = 0x82
-            data[2] = 0x01
-            data[3] = controlID.rawValue
-            data[4] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3]
-
-            let nsData = NSMutableData(data: data)
-            request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
-
-            request.replyTransactionType = transactionType
-            request.replyAddress = 0x6F
-            request.replySubAddress = 0x51
-
-            guard let nsReplyData = NSMutableData(length: 8) else { return nil }
-            request.replyBuffer = vm_address_t(bitPattern: OpaquePointer(nsReplyData.mutableBytes))
-            request.replyBytes = 8
-            context["request"] = request
-
-            result = sendDisplayRequest(displayID: displayID, request: &request)
-            context["result"] = result
-
-            result = (
-                result &&
-                    nsReplyData[0] == request.sendAddress &&
-                    nsReplyData[2] == 0x2 &&
-                    nsReplyData[4] == controlID.rawValue
-            )
-            if result {
-                var checksum = UInt8(request.replyAddress & 0xFF) ^ request.replySubAddress
-                checksum ^= nsReplyData[1] ^ nsReplyData[2] ^ nsReplyData[3]
-                checksum ^= nsReplyData[4] ^ nsReplyData[5] ^ nsReplyData[6]
-                checksum ^= nsReplyData[7] ^ nsReplyData[8] ^ nsReplyData[9]
-                result = nsReplyData[10] == checksum
+        var command = DDCReadCommand(
+            control_id: controlID.rawValue,
+            success: false,
+            max_value: 0,
+            current_value: 0
+        )
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
+        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        for (key, value) in nsDisplayUUIDByEDID {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
-
-            if result {
-                return DDCReadResult(
-                    controlID: controlID,
-                    maxValue: nsReplyData[7],
-                    currentValue: nsReplyData[9]
-                )
-            }
-
-            if request.result == kIOReturnUnsupportedMode {
-                log.debug("Unsupported transaction type: \(request.replyTransactionType)", context: context)
-            }
-            usleep(DDC.recoveryDelay)
         }
 
-        return nil
+        return DDCReadResult(
+            controlID: controlID,
+            maxValue: command.max_value,
+            currentValue: command.current_value
+        )
+//        var request: IOI2CRequest
+//        var result = false
+//        var context: [String: Any] = ["displayID": displayID]
+//
+//        guard let transactionType = DDC.getSupportedTransactionType() else { return nil }
+//
+//        context["transactionType"] = transactionType
+//
+//        for _ in 1 ... MAX_REQUESTS {
+//            request = IOI2CRequest()
+//            request.commFlags = 0
+//            request.sendAddress = 0x6E
+//            request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
+//
+//            request.sendBytes = 5
+//            request.minReplyDelay = UInt64(30 * kMillisecondScale)
+//
+//            var data = Data(count: 5)
+//            data[0] = 0x51
+//            data[1] = 0x82
+//            data[2] = 0x01
+//            data[3] = controlID.rawValue
+//            data[4] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3]
+//
+//            let nsData = NSMutableData(data: data)
+//            request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
+//
+//            request.replyTransactionType = transactionType
+//            request.replyAddress = 0x6F
+//            request.replySubAddress = 0x51
+//
+//            guard let nsReplyData = NSMutableData(length: 8) else { return nil }
+//            request.replyBuffer = vm_address_t(bitPattern: OpaquePointer(nsReplyData.mutableBytes))
+//            request.replyBytes = 8
+//            context["request"] = request
+//
+//            result = sendDisplayRequest(displayID: displayID, request: &request)
+//            context["result"] = result
+//
+//            result = (
+//                result &&
+//                    nsReplyData[0] == request.sendAddress &&
+//                    nsReplyData[2] == 0x2 &&
+//                    nsReplyData[4] == controlID.rawValue
+//            )
+//            if result {
+//                var checksum = UInt8(request.replyAddress & 0xFF) ^ request.replySubAddress
+//                checksum ^= nsReplyData[1] ^ nsReplyData[2] ^ nsReplyData[3]
+//                checksum ^= nsReplyData[4] ^ nsReplyData[5] ^ nsReplyData[6]
+//                checksum ^= nsReplyData[7] ^ nsReplyData[8] ^ nsReplyData[9]
+//                result = nsReplyData[10] == checksum
+//            }
+//
+//            if result {
+//                return DDCReadResult(
+//                    controlID: controlID,
+//                    maxValue: nsReplyData[7],
+//                    currentValue: nsReplyData[9]
+//                )
+//            }
+//
+//            if request.result == kIOReturnUnsupportedMode {
+//                log.debug("Unsupported transaction type: \(request.replyTransactionType)", context: context)
+//            }
+//            usleep(DDC.recoveryDelay)
+//        }
+//
+//        return nil
     }
 
     static func getSupportedTransactionType() -> IOOptionBits? {
@@ -513,28 +547,42 @@ class DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        var request = IOI2CRequest()
-        request.sendAddress = 0xA0
-        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-
-        request.sendBytes = 0x01
-        request.replyAddress = 0xA1
-        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-
-        guard let nsData = NSMutableData(length: 128) else { return nil }
-        let p = OpaquePointer(nsData.mutableBytes)
-        request.sendBuffer = vm_address_t(bitPattern: p)
-        request.replyBuffer = vm_address_t(bitPattern: p)
-        request.replyBytes = 128
-
-        if !DDC.sendDisplayRequest(displayID: displayID, request: &request) {
-            return nil
+        var edidData = [UInt8](repeating: 0, count: 128)
+        var edid = EDID()
+        
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        EDIDTest(displayID, &edid, &edidData, nsDisplayUUIDByEDID as CFMutableDictionary)
+        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        for (key, value) in nsDisplayUUIDByEDID {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+            }
         }
 
-        var edid = EDID()
-        nsData.getBytes(&edid, length: 128)
-
-        return (edid, nsData as Data)
+        return (edid, Data(bytes: &edidData, count: 128))
+        
+//        var request = IOI2CRequest()
+//        request.sendAddress = 0xA0
+//        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
+//
+//        request.sendBytes = 0x01
+//        request.replyAddress = 0xA1
+//        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
+//
+//        guard let nsData = NSMutableData(length: 128) else { return nil }
+//        let p = OpaquePointer(nsData.mutableBytes)
+//        request.sendBuffer = vm_address_t(bitPattern: p)
+//        request.replyBuffer = vm_address_t(bitPattern: p)
+//        request.replyBytes = 128
+//
+//        if !DDC.sendDisplayRequest(displayID: displayID, request: &request) {
+//            return nil
+//        }
+//
+//        var edid = EDID()
+//        nsData.getBytes(&edid, length: 128)
+//
+//        return (edid, nsData as Data)
     }
 
     static func getEdid(displayID: CGDirectDisplayID) -> EDID? {
@@ -715,3 +763,4 @@ class DDC {
         return Double(brightness)
     }
 }
+

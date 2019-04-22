@@ -19,7 +19,11 @@ func printEdid(_ data: Data) {
 
 func printDetails(_ id: CGDirectDisplayID) {
     print("    CGDirectDisplayID: \(id)")
-    DDC.setBrightness(for: id, brightness: 30)
+    let _ = DDC.setBrightness(for: id, brightness: 30)
+    
+    if let edid = DDC.getEdidData(displayID: id) {
+        printEdid(edid)
+    }
 
     if let uuid = CGDisplayCreateUUIDFromDisplayID(id), let str = CFUUIDCreateString(nil, uuid.takeUnretainedValue()) {
         print("    UUID: \(str)\n")
@@ -30,7 +34,7 @@ func printDetails(_ id: CGDirectDisplayID) {
     let sn = CGDisplaySerialNumber(id)
     let model = CGDisplayModelNumber(id)
     let vendor = CGDisplayVendorNumber(id)
-//
+
     print("    S/N: \(sn)")
     print("    Model Number: \(model))")
     print("    Vendor: \(vendor)\n")
