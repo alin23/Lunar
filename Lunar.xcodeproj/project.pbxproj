@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
-		C715194B224E420F0024C6F6 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
@@ -44,6 +43,8 @@
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
+		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
+		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
@@ -98,7 +99,7 @@
 /* Begin PBXContainerItemProxy section */
 		C7151939224E335A0024C6F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C7151935224E33590024C6F6 /* Project object */;
+			containerPortal = C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = C715192B224E33590024C6F6;
 			remoteInfo = EDIDReader;
@@ -204,6 +205,7 @@
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
+		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC.c; sourceTree = SOURCE_ROOT; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
@@ -295,7 +297,7 @@
 		C7151936224E33590024C6F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C715193A224E335A0024C6F6,
+				C715193A224E335A0024C6F6 /* EDIDReader */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -420,6 +422,7 @@
 				C76545241FD8A10200DBACE9 /* Controllers */,
 				C7151945224E34BA0024C6F6 /* DDC */,
 				C7151941224E34BA0024C6F6 /* DDC.h */,
+				C7521D32226C762A0062EC81 /* DDC.c */,
 				C76545231FD8A0E000DBACE9 /* Data */,
 				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
@@ -611,7 +614,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C715194B224E420F0024C6F6 /* DDC.swift in Sources */,
+				C7521D37226C77510062EC81 /* DDC.swift in Sources */,
+				C7521D34226C762B0062EC81 /* DDC.c in Sources */,
 				C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */,
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C72776E7201F02140055934F /* PageControl.swift in Sources */,

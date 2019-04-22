@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C715192F224E33590024C6F6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715192E224E33590024C6F6 /* main.swift */; };
-		C715194A224E36FA0024C6F6 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715193D224E33800024C6F6 /* DDC.swift */; };
+		C7521D39226C7D510062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D38226C7D510062EC81 /* DDC.c */; };
+		C7521D3A226C7D6A0062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715193D224E33800024C6F6 /* DDC.swift */; };
 		C79713D4225DFF8300891081 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79713D3225DFF8300891081 /* Logger.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		C715193C224E33800024C6F6 /* EDIDReader-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EDIDReader-Bridging-Header.h"; sourceTree = "<group>"; };
 		C715193D224E33800024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DDC.swift; path = ../../../Lunar/DDC/DDC.swift; sourceTree = "<group>"; };
 		C715193F224E33800024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DDC.h; path = ../../Lunar/DDC.h; sourceTree = "<group>"; };
+		C7521D38226C7D510062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = ../../Lunar/DDC.c; sourceTree = "<group>"; };
 		C79713D3225DFF8300891081 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		C79713D9225F643300891081 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = ../Frameworks/CoreDisplay.framework; sourceTree = "<group>"; };
 		C79713E1225F730800891081 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../Frameworks/SkyLight.framework; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			children = (
 				C715193E224E33800024C6F6 /* DDC */,
 				C715193F224E33800024C6F6 /* DDC.h */,
+				C7521D38226C7D510062EC81 /* DDC.c */,
 				C715192E224E33590024C6F6 /* main.swift */,
 				C79713D3225DFF8300891081 /* Logger.swift */,
 			);
@@ -150,7 +153,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C715194A224E36FA0024C6F6 /* DDC.swift in Sources */,
+				C7521D3A226C7D6A0062EC81 /* DDC.swift in Sources */,
+				C7521D39226C7D510062EC81 /* DDC.c in Sources */,
 				C79713D4225DFF8300891081 /* Logger.swift in Sources */,
 				C715192F224E33590024C6F6 /* main.swift in Sources */,
 			);
