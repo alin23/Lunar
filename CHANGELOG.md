@@ -1,3 +1,8 @@
+# 2.5.0
+## Fixes
+
+- Revert DDC to C implementation with added multi-monitor support
+- Fix 2.4.0 regression where only some types of connectors worked
 # 2.4.0
 ## Features
 
