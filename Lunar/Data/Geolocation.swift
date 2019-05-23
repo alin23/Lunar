@@ -11,9 +11,21 @@ import CoreLocation
 import SwiftyJSON
 
 class Geolocation: NSObject, NSCoding {
-    let latitude: Double
-    let longitude: Double
-    let coordinate: CLLocationCoordinate2D
+    var latitude: Double {
+        didSet {
+            coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
+    }
+
+    var longitude: Double {
+        didSet {
+            coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
+    }
+
+    var coordinate: CLLocationCoordinate2D
+    var latitudeObserver: NSKeyValueObservation?
+    var longitudeObserver: NSKeyValueObservation?
 
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
     static let ArchiveURL = DocumentsDirectory.appendingPathComponent("geolocation")
@@ -22,6 +34,10 @@ class Geolocation: NSObject, NSCoding {
         latitude = location.coordinate.latitude
         longitude = location.coordinate.longitude
         coordinate = location.coordinate
+        super.init()
+
+        store()
+        initObservers()
     }
 
     init(result: JSON) {
@@ -29,45 +45,76 @@ class Geolocation: NSObject, NSCoding {
             self.latitude = latitude
             self.longitude = longitude
             coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            super.init()
+
+            store()
             log.debug("IP Geolocation: \(latitude), \(longitude)")
         } else {
             latitude = 0
             longitude = 0
             coordinate = CLLocationCoordinate2D()
+            super.init()
+
             log.warning("IP Geolocation response does not contain coordinates")
         }
+        initObservers()
     }
 
     // MARK: UserDefaults
 
     init?(defaults: UserDefaults = datastore.defaults) {
-        let latitude = defaults.double(forKey: "latitude")
-        let longitude = defaults.double(forKey: "longitude")
+        let latitude = defaults.double(forKey: "locationLat")
+        let longitude = defaults.double(forKey: "locationLon")
         if latitude == 0.0, longitude == 0.0 {
             return nil
         }
         self.latitude = latitude
         self.longitude = longitude
         coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        super.init()
+
         log.debug("UserDefaults Geolocation: \(latitude), \(longitude)")
+
+        initObservers()
     }
 
     func store() {
-        datastore.defaults.set(latitude, forKey: "latitude")
-        datastore.defaults.set(longitude, forKey: "longitude")
+        datastore.defaults.set(latitude, forKey: "locationLat")
+        datastore.defaults.set(longitude, forKey: "locationLon")
+    }
+
+    func initObservers() {
+        latitudeObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { _, change in
+            guard let lat = change.newValue, let oldLat = change.oldValue, lat != oldLat else {
+                return
+            }
+            self.latitude = lat
+            brightnessAdapter.fetchMoments()
+        })
+        longitudeObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { _, change in
+            guard let lon = change.newValue, let oldLon = change.oldValue, lon != oldLon else {
+                return
+            }
+            self.longitude = lon
+            brightnessAdapter.fetchMoments()
+        })
     }
 
     // MARK: NSCoding
 
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(latitude, forKey: "latitude")
-        aCoder.encode(longitude, forKey: "longitude")
+        aCoder.encode(latitude, forKey: "locationLat")
+        aCoder.encode(longitude, forKey: "locationLon")
     }
 
     required init?(coder aDecoder: NSCoder) {
-        latitude = aDecoder.decodeDouble(forKey: "latitude")
-        longitude = aDecoder.decodeDouble(forKey: "longitude")
+        latitude = aDecoder.decodeDouble(forKey: "locationLat")
+        longitude = aDecoder.decodeDouble(forKey: "locationLon")
         coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        super.init()
+
+        store()
+        initObservers()
     }
 
     func serialize() {
@@ -79,6 +126,10 @@ class Geolocation: NSObject, NSCoding {
     }
 
     static func deserialize() -> Geolocation? {
-        return NSKeyedUnarchiver.unarchiveObject(withFile: Geolocation.ArchiveURL.path) as? Geolocation
+        let geolocation = NSKeyedUnarchiver.unarchiveObject(withFile: Geolocation.ArchiveURL.path) as? Geolocation
+        geolocation?.initObservers()
+
+        return geolocation
     }
 }
+
