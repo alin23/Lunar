@@ -27,7 +27,6 @@ class BrightnessAdapter {
     var runningAppExceptions: [AppException]!
     var geolocation: Geolocation! {
         didSet {
-            geolocation.store()
             fetchMoments()
         }
     }
@@ -436,3 +435,4 @@ class BrightnessAdapter {
         }
     }
 }
+

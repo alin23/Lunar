@@ -9,6 +9,18 @@
 import Cocoa
 
 extension UserDefaults {
+    @objc dynamic var sunrise: String {
+        return string(forKey: "sunrise") ?? ""
+    }
+
+    @objc dynamic var sunset: String {
+        return string(forKey: "sunset") ?? ""
+    }
+
+    @objc dynamic var solarNoon: String {
+        return string(forKey: "solarNoon") ?? ""
+    }
+
     @objc dynamic var noonDurationMinutes: Int {
         return integer(forKey: "noonDurationMinutes")
     }
@@ -19,6 +31,18 @@ extension UserDefaults {
 
     @objc dynamic var curveFactor: Double {
         return double(forKey: "curveFactor")
+    }
+
+    @objc dynamic var locationLat: Double {
+        return double(forKey: "locationLat")
+    }
+
+    @objc dynamic var locationLon: Double {
+        return double(forKey: "locationLon")
+    }
+
+    @objc dynamic var manualLocation: Bool {
+        return bool(forKey: "manualLocation")
     }
 
     @objc dynamic var startAtLogin: Bool {
@@ -214,6 +238,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "didSwipeRight")
         DataStore.setDefault(false, for: "smoothTransition")
         DataStore.setDefault(false, for: "debug")
+        DataStore.setDefault(false, for: "manualLocation")
         DataStore.setDefault(true, for: "startAtLogin")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")
@@ -227,3 +252,4 @@ class DataStore: NSObject {
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
 }
+
