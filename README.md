@@ -5,7 +5,7 @@
 ![Demo](lunar.gif)
 
 ## Installation
-- Download DMG from [Official website](https://lunarapp.site)
+- Download DMG from [Official website](https://lunar.fyi)
 - `brew cask install lunar`
 
 ## Features
