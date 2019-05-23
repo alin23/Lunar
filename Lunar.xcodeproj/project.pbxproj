@@ -12,6 +12,7 @@
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
+		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C75083402222865F0020270E /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
@@ -184,6 +185,7 @@
 		C72776E8201F1BED0055934F /* ExceptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsView.swift; sourceTree = "<group>"; };
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
+		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
 				C7E242642119A65B0020326C /* LockButton.swift */,
 				C75083632222DC9F0020270E /* HotKeyView.swift */,
+				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -650,6 +653,7 @@
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
+				C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 				BF_746411459837 /* Secrets.generated.swift in Sources */,

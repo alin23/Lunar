@@ -99,6 +99,23 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    @IBOutlet var locationLatField: ScrollableTextField!
+    @IBOutlet var locationLonField: ScrollableTextField!
+    @IBOutlet var locationLatCaption: ScrollableTextFieldCaption!
+    @IBOutlet var locationLonCaption: ScrollableTextFieldCaption!
+    @IBOutlet var locationLabel: NSTextField!
+    @IBOutlet var locationReset: TextButton!
+    var locationVisible: Bool = false {
+        didSet {
+            locationLatField?.isHidden = !locationVisible
+            locationLonField?.isHidden = !locationVisible
+            locationLatCaption?.isHidden = !locationVisible
+            locationLonCaption?.isHidden = !locationVisible
+            locationLabel?.isHidden = !locationVisible
+            locationReset?.isHidden = !locationVisible
+        }
+    }
+
     @IBOutlet var swipeLeftHint: NSTextField!
 
     var curveFactorObserver: NSKeyValueObservation?
@@ -110,11 +127,17 @@ class ConfigurationViewController: NSViewController {
     var contrastLimitMaxObserver: NSKeyValueObservation?
     var didSwipeToHotkeysObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
+    var sunriseObserver: NSKeyValueObservation?
+    var sunsetObserver: NSKeyValueObservation?
+    var solarNoonObserver: NSKeyValueObservation?
+    var locationLatObserver: NSKeyValueObservation?
+    var locationLonObserver: NSKeyValueObservation?
 
     func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
         noonDurationVisible = adaptiveMode == .location
         daylightExtensionVisible = adaptiveMode == .location
         curveFactorVisible = adaptiveMode == .location
+        locationVisible = adaptiveMode == .location
         brightnessOffsetVisible = adaptiveMode == .sync
         contrastOffsetVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
@@ -147,6 +170,32 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.curveFactorField?.doubleValue = value
+        })
+    }
+
+    func listenForLocationChange() {
+        let updateDataset = { (_: UserDefaults, change: NSKeyValueObservedChange<String>) -> Void in
+            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+                return
+            }
+            if let settingsController = self.parent?.parent as? SettingsPageController {
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+            }
+        }
+        sunriseObserver = datastore.defaults.observe(\.sunrise, options: [.old, .new], changeHandler: updateDataset)
+        sunsetObserver = datastore.defaults.observe(\.sunset, options: [.old, .new], changeHandler: updateDataset)
+        solarNoonObserver = datastore.defaults.observe(\.solarNoon, options: [.old, .new], changeHandler: updateDataset)
+        locationLatObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { _, change in
+            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+                return
+            }
+            self.locationLatField?.doubleValue = value
+        })
+        locationLonObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { _, change in
+            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+                return
+            }
+            self.locationLonField?.doubleValue = value
         })
     }
 
@@ -349,12 +398,48 @@ class ConfigurationViewController: NSViewController {
         )
     }
 
+    func setupLocation() {
+        guard let latField = locationLatField,
+            let lonField = locationLonField,
+            let latCaption = locationLatCaption,
+            let lonCaption = locationLonCaption else { return }
+
+        locationLabel?.toolTip = """
+        Adjustable location coordinates
+        Click to edit then press enter to set custom values
+        """
+
+        latField.decimalPoints = 2
+        latField.step = 0.01
+        lonField.decimalPoints = 2
+        lonField.step = 0.01
+
+        setupScrollableTextField(
+            latField, caption: latCaption, settingKey: "locationLat", lowerLimit: -90.00, upperLimit: 90.00,
+            onMouseEnter: { _ in },
+            onValueChangedDouble: { _, settingsController in
+                datastore.defaults.set(true, forKey: "manualLocation")
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+            }
+        )
+        setupScrollableTextField(
+            lonField, caption: lonCaption, settingKey: "locationLon", lowerLimit: -180.00, upperLimit: 180.00,
+            onMouseEnter: { _ in },
+            onValueChangedDouble: { _, settingsController in
+                datastore.defaults.set(true, forKey: "manualLocation")
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+            }
+        )
+    }
+
     func setupScrollableTextField(
         _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
         lowerLimit: Double, upperLimit: Double,
         onMouseEnter: ((SettingsPageController) -> Void)? = nil,
         onValueChangedInstant: ((Int, SettingsPageController) -> Void)? = nil,
-        onValueChangedInstantDouble: ((Double, SettingsPageController) -> Void)? = nil
+        onValueChangedInstantDouble: ((Double, SettingsPageController) -> Void)? = nil,
+        onValueChanged: ((Int, SettingsPageController) -> Void)? = nil,
+        onValueChangedDouble: ((Double, SettingsPageController) -> Void)? = nil
     ) {
         field.textFieldColor = scrollableTextFieldColorWhite
         field.textFieldColorHover = scrollableTextFieldColorHoverWhite
@@ -386,6 +471,18 @@ class ConfigurationViewController: NSViewController {
                     handler(value, settingsController)
                 }
             }
+            if let handler = onValueChanged {
+                field.onValueChanged = { value in
+                    datastore.defaults.set(value, forKey: settingKey)
+                    handler(value, settingsController)
+                }
+            }
+            if let handler = onValueChangedDouble {
+                field.onValueChangedDouble = { value in
+                    datastore.defaults.set(value, forKey: settingKey)
+                    handler(value, settingsController)
+                }
+            }
             if let handler = onMouseEnter {
                 field.onMouseEnter = {
                     handler(settingsController)
@@ -395,6 +492,13 @@ class ConfigurationViewController: NSViewController {
                     settingsController.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
                 }
             }
+        }
+    }
+
+    @IBAction func resetLocation(_: Any?) {
+        datastore.defaults.set(false, forKey: "manualLocation")
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+            appDelegate.startReceivingSignificantLocationChanges()
         }
     }
 
@@ -411,6 +515,7 @@ class ConfigurationViewController: NSViewController {
         setupContrastOffset()
         setupBrightnessLimit()
         setupContrastLimit()
+        setupLocation()
 
         smoothTransitionCheckbox.setFrameSize(NSSize(width: CHECKBOX_SIZE, height: CHECKBOX_SIZE))
         smoothTransitionCheckbox.setNeedsDisplay()
@@ -423,6 +528,7 @@ class ConfigurationViewController: NSViewController {
             showRelevantSettings(mode)
         }
 
+        listenForLocationChange()
         listenForCurveFactorChange()
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
@@ -436,3 +542,4 @@ class ConfigurationViewController: NSViewController {
         setup()
     }
 }
+
