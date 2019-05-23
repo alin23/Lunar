@@ -85,12 +85,38 @@ class ScrollableTextField: NSTextField {
         usesSingleLineMode = false
         allowsEditingTextAttributes = true
         textColor = textFieldColor
+        wantsLayer = true
+        layer?.cornerRadius = 8
 
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
         setNeedsDisplay()
+    }
+
+    override func textDidBeginEditing(_: Notification) {
+        leftHotkey = nil
+        rightHotkey = nil
+    }
+
+    override func textDidEndEditing(_: Notification) {
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+            appDelegate.setupHotkeys()
+        }
+        darken(color: textFieldColor)
+    }
+
+    override func textShouldEndEditing(_ textObject: NSText) -> Bool {
+        if let val = Double(textObject.string), val >= lowerLimit, val <= upperLimit {
+            doubleValue = val
+            onValueChanged?(integerValue)
+            onValueChangedDouble?(doubleValue)
+            onValueChangedInstant?(integerValue)
+            onValueChangedInstantDouble?(doubleValue)
+            return true
+        }
+        return false
     }
 
     override init(frame frameRect: NSRect) {
@@ -215,3 +241,4 @@ class ScrollableTextField: NSTextField {
         }
     }
 }
+

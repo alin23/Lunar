@@ -205,10 +205,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         rightHotkey = nil
     }
 
-    func applicationDidBecomeActive(_: Notification) {
+    func setupHotkeys() {
         if let pageController = windowController?.window?.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
             pageController.setupHotkeys()
         }
+    }
+
+    func applicationDidBecomeActive(_: Notification) {
+        setupHotkeys()
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
@@ -395,9 +399,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func geolocationFallback() {
-        if brightnessAdapter.geolocation == nil {
-            brightnessAdapter.fetchGeolocation()
-        }
+        brightnessAdapter.fetchGeolocation()
     }
 
     internal func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -435,6 +437,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func startReceivingSignificantLocationChanges() {
+        if datastore.defaults.manualLocation {
+            brightnessAdapter.geolocation = Geolocation()
+            return
+        }
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.startUpdatingLocation()
@@ -597,7 +603,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         brightnessAdapter.resetDisplayList()
         for (id, display) in brightnessAdapter.displays {
-            for value in 1...100 {
+            for value in 1 ... 100 {
                 display.brightness = NSNumber(value: value)
                 display.contrast = NSNumber(value: value)
             }
@@ -691,3 +697,4 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return alert.runModal() == .alertFirstButtonReturn
     }
 }
+
