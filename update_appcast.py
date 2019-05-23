@@ -19,7 +19,7 @@ appcast_path = Path.cwd() / "Releases" / "appcast.xml"
 
 parser = etree.XMLParser(strip_cdata=False)
 appcast = etree.parse(str(appcast_path), parser=parser)
-LUNAR_SITE = "https://lunarapp.site"
+LUNAR_SITE = "https://lunar.fyi"
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 SIGNER = "/usr/local/sbin/sign_update"
 DELTA_PATTERN = re.compile(
