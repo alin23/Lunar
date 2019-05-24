@@ -283,33 +283,41 @@ extension AppDelegate {
 
     @objc func brightnessUpHotkeyHandler() {
         increaseBrightness()
+        log.debug("Brightness Up Hotkey pressed")
     }
 
     @objc func brightnessDownHotkeyHandler() {
         decreaseBrightness()
+        log.debug("Brightness Down Hotkey pressed")
     }
 
     @objc func contrastUpHotkeyHandler() {
         increaseContrast()
+        log.debug("Contrast Up Hotkey pressed")
     }
 
     @objc func contrastDownHotkeyHandler() {
         decreaseContrast()
+        log.debug("Contrast Down Hotkey pressed")
     }
 
     @objc func preciseBrightnessUpHotkeyHandler() {
         increaseBrightness(by: 1)
+        log.debug("Precise Brightness Up Hotkey pressed")
     }
 
     @objc func preciseBrightnessDownHotkeyHandler() {
         decreaseBrightness(by: 1)
+        log.debug("Precise Brightness Down Hotkey pressed")
     }
 
     @objc func preciseContrastUpHotkeyHandler() {
         increaseContrast(by: 1)
+        log.debug("Precise Contrast Up Hotkey pressed")
     }
 
     @objc func preciseContrastDownHotkeyHandler() {
         decreaseContrast(by: 1)
+        log.debug("Precise Contrast Down Hotkey pressed")
     }
 }
