@@ -1,3 +1,8 @@
+# 2.6.0
+## Features
+
+- Add customizable location coordinates
+- Move updates to new domain: [lunar.fyi](https://lunar.fyi)
 # 2.5.0
 ## Fixes
 
