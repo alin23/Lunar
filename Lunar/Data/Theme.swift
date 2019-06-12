@@ -38,19 +38,19 @@ let scrollableCaptionColorWhite = mauve.withAlphaComponent(0.5)
 
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
-let adaptiveButtonBgOn = lunarYellow
-let adaptiveButtonBgOnHover = lunarYellow.highlight(withLevel: 0.2)!
+let adaptiveButtonBgOn = lunarYellow.withAlphaComponent(0.8)
+let adaptiveButtonBgOnHover = adaptiveButtonBgOn.highlight(withLevel: 0.2)!
 let adaptiveButtonLabelOn = mauve
-let adaptiveButtonBgOff = gray
-let adaptiveButtonBgOffHover = lunarYellow
+let adaptiveButtonBgOff = gray.withAlphaComponent(0.8)
+let adaptiveButtonBgOffHover = adaptiveButtonBgOn
 let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
 
-let lockButtonBgOn = red
-let lockButtonBgOnHover = red.highlight(withLevel: 0.2)!
+let lockButtonBgOn = red.withAlphaComponent(0.8)
+let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2)!
 let lockButtonLabelOn = white
-let lockButtonBgOff = gray
-let lockButtonBgOffHover = red.highlight(withLevel: 0.4)!
-let lockButtonLabelOff = mauve.withAlphaComponent(0.25)
+let lockButtonBgOff = gray.withAlphaComponent(0.8)
+let lockButtonBgOffHover = lockButtonBgOn.highlight(withLevel: 0.4)!
+let lockButtonLabelOff = mauve.withAlphaComponent(0.45)
 
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
