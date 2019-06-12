@@ -207,10 +207,15 @@ class DisplayViewController: NSViewController {
 
     func initGraph(mode: AdaptiveMode? = nil) {
         brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor, mode: mode)
+        brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
+        brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
+
     }
 
     func zeroGraph() {
         brightnessContrastChart?.initGraph(display: nil, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+        brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.0)
+        brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
