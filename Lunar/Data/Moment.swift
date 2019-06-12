@@ -89,13 +89,13 @@ class Moment: NSObject, NSCoding {
 
         guard let sunrise = defaults.string(forKey: "sunrise"),
             let sunset = defaults.string(forKey: "sunset"),
-            let solarNoon = defaults.string(forKey: "solar_noon"),
-            let civilTwilightBegin = defaults.string(forKey: "civil_twilight_begin"),
-            let civilTwilightEnd = defaults.string(forKey: "civil_twilight_end"),
-            let nauticalTwilightBegin = defaults.string(forKey: "nautical_twilight_begin"),
-            let nauticalTwilightEnd = defaults.string(forKey: "nautical_twilight_end"),
-            let astronomicalTwilightBegin = defaults.string(forKey: "astronomical_twilight_begin"),
-            let astronomicalTwilightEnd = defaults.string(forKey: "astronomical_twilight_end") else {
+            let solarNoon = defaults.string(forKey: "solarNoon"),
+            let civilTwilightBegin = defaults.string(forKey: "civilTwilightBegin"),
+            let civilTwilightEnd = defaults.string(forKey: "civilTwilightEnd"),
+            let nauticalTwilightBegin = defaults.string(forKey: "nauticalTwilightBegin"),
+            let nauticalTwilightEnd = defaults.string(forKey: "nauticalTwilightEnd"),
+            let astronomicalTwilightBegin = defaults.string(forKey: "astronomicalTwilightBegin"),
+            let astronomicalTwilightEnd = defaults.string(forKey: "astronomicalTwilightEnd") else {
             log.error("Unable to decode moment.")
             return nil
         }
@@ -103,7 +103,7 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        dayLength = UInt64(defaults.integer(forKey: "day_length"))
+        dayLength = UInt64(defaults.integer(forKey: "dayLength"))
         civilSunrise = localTime(civilTwilightBegin) ?? sevenAM
         civilSunset = localTime(civilTwilightEnd) ?? sevenPM
         nauticalSunrise = localTime(nauticalTwilightBegin) ?? sevenAM
@@ -115,14 +115,14 @@ class Moment: NSObject, NSCoding {
     func store() {
         datastore.defaults.set(sunrise.toISO(), forKey: "sunrise")
         datastore.defaults.set(sunset.toISO(), forKey: "sunset")
-        datastore.defaults.set(solarNoon.toISO(), forKey: "solar_noon")
-        datastore.defaults.set(dayLength, forKey: "day_length")
-        datastore.defaults.set(civilSunrise.toISO(), forKey: "civil_twilight_begin")
-        datastore.defaults.set(civilSunset.toISO(), forKey: "civil_twilight_end")
-        datastore.defaults.set(nauticalSunrise.toISO(), forKey: "nautical_twilight_begin")
-        datastore.defaults.set(nauticalSunset.toISO(), forKey: "nautical_twilight_end")
-        datastore.defaults.set(astronomicalSunrise.toISO(), forKey: "astronomical_twilight_begin")
-        datastore.defaults.set(astronomicalSunset.toISO(), forKey: "astronomical_twilight_end")
+        datastore.defaults.set(solarNoon.toISO(), forKey: "solarNoon")
+        datastore.defaults.set(dayLength, forKey: "dayLength")
+        datastore.defaults.set(civilSunrise.toISO(), forKey: "civilTwilightBegin")
+        datastore.defaults.set(civilSunset.toISO(), forKey: "civilTwilightEnd")
+        datastore.defaults.set(nauticalSunrise.toISO(), forKey: "nauticalTwilightBegin")
+        datastore.defaults.set(nauticalSunset.toISO(), forKey: "nauticalTwilightEnd")
+        datastore.defaults.set(astronomicalSunrise.toISO(), forKey: "astronomicalTwilightBegin")
+        datastore.defaults.set(astronomicalSunset.toISO(), forKey: "astronomicalTwilightEnd")
     }
 
     // MARK: NSCoding
@@ -130,14 +130,14 @@ class Moment: NSObject, NSCoding {
     func encode(with aCoder: NSCoder) {
         aCoder.encode(sunrise.toISO(), forKey: "sunrise")
         aCoder.encode(sunset.toISO(), forKey: "sunset")
-        aCoder.encode(solarNoon.toISO(), forKey: "solar_noon")
-        aCoder.encode(dayLength, forKey: "day_length")
-        aCoder.encode(civilSunrise.toISO(), forKey: "civil_twilight_begin")
-        aCoder.encode(civilSunset.toISO(), forKey: "civil_twilight_end")
-        aCoder.encode(nauticalSunrise.toISO(), forKey: "nautical_twilight_begin")
-        aCoder.encode(nauticalSunset.toISO(), forKey: "nautical_twilight_end")
-        aCoder.encode(astronomicalSunrise.toISO(), forKey: "astronomical_twilight_begin")
-        aCoder.encode(astronomicalSunset.toISO(), forKey: "astronomical_twilight_end")
+        aCoder.encode(solarNoon.toISO(), forKey: "solarNoon")
+        aCoder.encode(dayLength, forKey: "dayLength")
+        aCoder.encode(civilSunrise.toISO(), forKey: "civilTwilightBegin")
+        aCoder.encode(civilSunset.toISO(), forKey: "civilTwilightEnd")
+        aCoder.encode(nauticalSunrise.toISO(), forKey: "nauticalTwilightBegin")
+        aCoder.encode(nauticalSunset.toISO(), forKey: "nauticalTwilightEnd")
+        aCoder.encode(astronomicalSunrise.toISO(), forKey: "astronomicalTwilightBegin")
+        aCoder.encode(astronomicalSunset.toISO(), forKey: "astronomicalTwilightEnd")
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -149,13 +149,13 @@ class Moment: NSObject, NSCoding {
 
         guard let sunrise = aDecoder.decodeObject(forKey: "sunrise") as? String,
             let sunset = aDecoder.decodeObject(forKey: "sunset") as? String,
-            let solarNoon = aDecoder.decodeObject(forKey: "solar_noon") as? String,
-            let civilTwilightBegin = aDecoder.decodeObject(forKey: "civil_twilight_begin") as? String,
-            let civilTwilightEnd = aDecoder.decodeObject(forKey: "civil_twilight_end") as? String,
-            let nauticalTwilightBegin = aDecoder.decodeObject(forKey: "nautical_twilight_begin") as? String,
-            let nauticalTwilightEnd = aDecoder.decodeObject(forKey: "nautical_twilight_end") as? String,
-            let astronomicalTwilightBegin = aDecoder.decodeObject(forKey: "astronomical_twilight_begin") as? String,
-            let astronomicalTwilightEnd = aDecoder.decodeObject(forKey: "astronomical_twilight_end") as? String else {
+            let solarNoon = aDecoder.decodeObject(forKey: "solarNoon") as? String,
+            let civilTwilightBegin = aDecoder.decodeObject(forKey: "civilTwilightBegin") as? String,
+            let civilTwilightEnd = aDecoder.decodeObject(forKey: "civilTwilightEnd") as? String,
+            let nauticalTwilightBegin = aDecoder.decodeObject(forKey: "nauticalTwilightBegin") as? String,
+            let nauticalTwilightEnd = aDecoder.decodeObject(forKey: "nauticalTwilightEnd") as? String,
+            let astronomicalTwilightBegin = aDecoder.decodeObject(forKey: "astronomicalTwilightBegin") as? String,
+            let astronomicalTwilightEnd = aDecoder.decodeObject(forKey: "astronomicalTwilightEnd") as? String else {
             log.error("Unable to decode moment.")
             return nil
         }
@@ -163,7 +163,7 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        dayLength = UInt64(aDecoder.decodeInt64(forKey: "day_length"))
+        dayLength = UInt64(aDecoder.decodeInt64(forKey: "dayLength"))
         civilSunrise = localTime(civilTwilightBegin) ?? sevenAM
         civilSunset = localTime(civilTwilightEnd) ?? sevenPM
         nauticalSunrise = localTime(nauticalTwilightBegin) ?? sevenAM

@@ -14,7 +14,7 @@ class SettingsView: NSSplitView {
     }
 
     override func drawDivider(in rect: NSRect) {
-        let rect = NSRect(x: frame.width / 2 - 1.0, y: 200.0, width: 2.0, height: 200)
+        let rect = NSRect(x: frame.width / 2 - 1.0, y: 200.0, width: 2.0, height: 300)
         settingsDividerColor.set()
         rect.fill()
     }

@@ -69,6 +69,7 @@ class ToggleButton: NSButton {
     func fade() {
         layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
         layer?.backgroundColor = bgColor
+        setTitle()
     }
 
     func defocus() {

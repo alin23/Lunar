@@ -92,7 +92,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adapterSyncActivity: NSObjectProtocol!
 
     var daylightObserver: NSKeyValueObservation?
+    var curveFactorObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
+    var sunsetObserver: NSKeyValueObservation?
+    var sunriseObserver: NSKeyValueObservation?
+    var solarNoonObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
@@ -305,6 +309,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
+        sunsetObserver = datastore.defaults.observe(\.sunset, changeHandler: { _, _ in
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
+        })
+        sunriseObserver = datastore.defaults.observe(\.sunrise, changeHandler: { _, _ in
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
+        })
+        solarNoonObserver = datastore.defaults.observe(\.solarNoon, changeHandler: { _, _ in
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
+        })
+        curveFactorObserver = datastore.defaults.observe(\.curveFactor, changeHandler: { _, _ in
+            if brightnessAdapter.mode == .location {
+                brightnessAdapter.adaptBrightness()
+            }
+        })
         daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: { _, _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
