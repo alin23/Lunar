@@ -1,3 +1,12 @@
+# 2.8.0
+## Features
+
+- Make the UI larger to allow for more info and settings
+- Add more annotations on the brightness chart
+
+## Fixes
+
+- Fix cases where the UUID can't be allocated
 # 2.6.0
 ## Features
 
