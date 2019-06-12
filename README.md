@@ -4,6 +4,8 @@
 
 ![Demo](lunar.gif)
 
+**Note: Lunar changes the actual (physical) brightness and contrast of the monitor. It doesn't use a software overlay.**
+
 ## Installation methods
 - Download DMG from [Official website](https://lunar.fyi)
 - `brew cask install lunar`
@@ -25,6 +27,12 @@
     - <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>F2</kbd> to increase contrast
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
+
+## Caveats
+- Lunar *usually* doesn't work with monitors connected through USB hubs
+- Brightness and contrast set by the user through physical controls can't be read
+    * At startup, Lunar will overwrite whichever brightness/contrast setting the monitor has
+- Sync mode doesn't work when the Macbook lid is closed because the light sensor is completely covered
 
 ### Contributing
 Run `make dev` to prepare dev environment.
