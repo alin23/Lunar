@@ -34,7 +34,7 @@ bool logToFile(char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    
+
     vprintf(format, args);
     if (logFile == NULL) {
         logFile = fopen(logPath, "a+");
@@ -128,6 +128,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL)
     {
         CFDictionaryRef info;
+        CFUUIDRef uuid;
         io_name_t	name;
         CFIndex vendorID = 0, productID = 0, serialNumber = 0;
         CFNumberRef vendorIDRef, productIDRef, serialNumberRef;
@@ -140,8 +141,8 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         }
 
         logToFile("Checking to see if EDID already exists\n");
-        CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-        if (CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid)) {
+        uuid = CFUUIDCreate(kCFAllocatorDefault);
+        if (CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid) && uuid != 0) {
             logToFile("EDID already exists\n");
             logToFile("Checking to see if EDID corresponds to display UUID\n");
 
@@ -151,6 +152,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 //            logToFile("Display UUID: %s\n", CFStringGetCStringPtr(uuid1, kCFStringEncodingASCII));
 //            logToFile("EDID UUID: %s\n", CFStringGetCStringPtr(uuid2, kCFStringEncodingASCII));
             if (CFStringCompare(uuid1, uuid2, 0) != 0) {
+                CFRelease(uuid);
                 logToFile("UUIDs differ\n");
                 continue;
             }
@@ -179,6 +181,9 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         if (!success || busCount < 1) {
             // this does not seem to be a DDC-enabled display, skip it
             CFRelease(info);
+            if (uuid != 0) {
+                CFRelease(uuid);
+            }
             continue;
         }
         // if (framebuffer.hasDDCConnect(0)) // https://developer.apple.com/reference/kernel/ioframebuffer/1813510-hasddcconnect?language=objc
@@ -196,12 +201,19 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
             CGDisplaySerialNumber(displayID) != serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
         {
             CFRelease(info);
+            if (uuid != 0) {
+                CFRelease(uuid);
+            }
             continue;
         }
 
         servicePort = serv;
+        CFRetain(displayUUID);
         CFDictionarySetValue(displayUUIDByEDID, displayEDID, displayUUID);
         CFRelease(info);
+        if (uuid != 0) {
+            CFRelease(uuid);
+        }
         break;
     }
 
