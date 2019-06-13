@@ -213,6 +213,7 @@ class DataStore: NSObject {
                 }
             })
             context = container.newBackgroundContext()
+            context.mergePolicy = NSOverwriteMergePolicy
         } else {
             do {
                 if coordinator.persistentStore(for: persistentStoreUrl) == nil {
@@ -224,6 +225,7 @@ class DataStore: NSObject {
 
             context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             context.persistentStoreCoordinator = coordinator
+            context.mergePolicy = NSOverwriteMergePolicy
         }
         log.debug("Checking First Run")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
@@ -252,4 +254,3 @@ class DataStore: NSObject {
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
 }
-

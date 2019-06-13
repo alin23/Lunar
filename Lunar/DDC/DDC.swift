@@ -359,7 +359,7 @@ class DDC {
         let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
-            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
         }
@@ -409,7 +409,7 @@ class DDC {
         DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
-            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
         }
@@ -549,18 +549,18 @@ class DDC {
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
         var edidData = [UInt8](repeating: 0, count: 128)
         var edid = EDID()
-        
+
         let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
         EDIDTest(displayID, &edid, &edidData, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
-            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID() && CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
         }
 
         return (edid, Data(bytes: &edidData, count: 128))
-        
+
 //        var request = IOI2CRequest()
 //        request.sendAddress = 0xA0
 //        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
@@ -670,42 +670,39 @@ class DDC {
         return DDC.getTextDescriptors(displayID: displayID).joined(separator: "-")
     }
 
-    static func extractName(from edid: EDID, hex: Bool = false) -> String? {
-        var tmp = edid.descriptors
-        let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-
-        if let nameDescriptor = descriptors.first(where: { des in
-            des.text.type == EDIDTextType.name.rawValue
-        }) {
-            var tmp = nameDescriptor.text.data
-            let nameChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-            if let name = NSString(bytes: nameChars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
-                return name.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else if hex {
-                let hexData = nameChars.map { String(format: "%02X", $0) }.joined(separator: " ")
-                return hexData.trimmingCharacters(in: .whitespacesAndNewlines)
-            }
+    static func getTextData(_ descriptor: descriptor, hex: Bool = false) -> String? {
+        var tmp = descriptor.text.data
+        let nameChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
+        if let name = NSString(bytes: nameChars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
+            return name.trimmingCharacters(in: .whitespacesAndNewlines)
+        } else if hex {
+            let hexData = nameChars.map { String(format: "%02X", $0) }.joined(separator: " ")
+            return hexData.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return nil
     }
 
-    static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
-        var tmp = edid.descriptors
-        let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-
-        if let serialDescriptor = descriptors.first(where: { des in
-            des.text.type == EDIDTextType.serial.rawValue
-        }) {
-            var tmp = serialDescriptor.text.data
-            let serialChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-            if let serial = NSString(bytes: serialChars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
-                return serial.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else if hex {
-                let hexData = serialChars.map { String(format: "%02X", $0) }.joined(separator: " ")
-                return hexData.trimmingCharacters(in: .whitespacesAndNewlines)
-            }
+    static func extractDescriptorText(from edid: EDID, desType: EDIDTextType, hex: Bool = false) -> String? {
+        switch desType.rawValue {
+        case edid.descriptors.0.text.type:
+            return DDC.getTextData(edid.descriptors.0, hex: hex)
+        case edid.descriptors.1.text.type:
+            return DDC.getTextData(edid.descriptors.1, hex: hex)
+        case edid.descriptors.2.text.type:
+            return DDC.getTextData(edid.descriptors.2, hex: hex)
+        case edid.descriptors.3.text.type:
+            return DDC.getTextData(edid.descriptors.3, hex: hex)
+        default:
+            return nil
         }
-        return nil
+    }
+
+    static func extractName(from edid: EDID, hex: Bool = false) -> String? {
+        return extractDescriptorText(from: edid, desType: EDIDTextType.name, hex: hex)
+    }
+
+    static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
+        return extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
 
     static func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
@@ -763,4 +760,3 @@ class DDC {
         return Double(brightness)
     }
 }
-
