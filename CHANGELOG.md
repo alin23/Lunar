@@ -1,3 +1,8 @@
+# 2.8.2
+## Fixes
+
+- Fix memory management of EDID data
+
 # 2.8.1
 ## Fixes
 
