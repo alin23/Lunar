@@ -709,7 +709,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4tb-kQ-mbr">
                                 <rect key="frame" x="384" y="175" width="30" height="30"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="ueH-KN-tis">
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="ueH-KN-tis">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
