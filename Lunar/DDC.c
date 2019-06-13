@@ -87,6 +87,7 @@ static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
         CFDictionaryRef info = IODisplayCreateInfoDictionary(displayPort, kIODisplayOnlyPreferredName);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kIODisplayEDIDKey), (const void**)&edidData)) {
             CFRetain(edidData);
+            CFRelease(ioDisplayConnect);
             CFRelease(serviceClass);
             CFRelease(key);
             CFRelease(info);
@@ -99,6 +100,7 @@ static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
     }
 
     CFRelease(key);
+    CFRelease(ioDisplayConnect);
     CFRelease(edidData);
     IOObjectRelease(iter);
     logToFile("No EDID for framebuffer %d\n\n", framebuffer);
@@ -124,6 +126,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO), &iter);
 
     if (err != KERN_SUCCESS) {
+        CFRelease(displayUUID);
         IOObjectRelease(iter);
         return 0;
     }
@@ -146,7 +149,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 
         logToFile("Checking to see if EDID already exists\n");
         uuid = CFUUIDCreate(kCFAllocatorDefault);
-        if (uuid != 0 && CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid) && uuid != 0) {
+        if (uuid && CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid)) {
             logToFile("EDID already exists\n");
             logToFile("Checking to see if EDID corresponds to display UUID\n");
 
@@ -155,16 +158,24 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 
 //            logToFile("Display UUID: %s\n", CFStringGetCStringPtr(uuid1, kCFStringEncodingASCII));
 //            logToFile("EDID UUID: %s\n", CFStringGetCStringPtr(uuid2, kCFStringEncodingASCII));
-            if (CFStringCompare(uuid1, uuid2, 0) != 0) {
+            if (uuid1 && uuid2 && CFStringCompare(uuid1, uuid2, 0) != 0) {
                 CFRelease(uuid);
+                CFRelease(uuid1);
+                CFRelease(uuid2);
                 logToFile("UUIDs differ\n");
                 continue;
+            }
+            if (uuid1) {
+                CFRelease(uuid1);
+            }
+            if (uuid2) {
+                CFRelease(uuid2);
             }
         }
 
         // get metadata from IOreg node
         IORegistryEntryGetName(serv, name);
-        logToFile("Getting info dict for fb: %d\n", serv);
+        logToFile("Getting info dict for fb: %d - %s\n", serv, name);
         info = IODisplayCreateInfoDictionary(serv, kIODisplayOnlyPreferredName);
 
         logToFile("Getting vendor for fb: %d\n", serv);
@@ -185,7 +196,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         if (!success || busCount < 1) {
             // this does not seem to be a DDC-enabled display, skip it
             CFRelease(info);
-            if (uuid != 0) {
+            if (uuid) {
                 CFRelease(uuid);
             }
             continue;
@@ -212,10 +223,9 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         }
 
         servicePort = serv;
-        CFRetain(displayUUID);
         CFDictionarySetValue(displayUUIDByEDID, displayEDID, displayUUID);
         CFRelease(info);
-        if (uuid != 0) {
+        if (uuid) {
             CFRelease(uuid);
         }
         break;
