@@ -17,9 +17,9 @@ class Logger: SwiftyBeaver {
     static var debugModeObserver: NSKeyValueObservation?
 
     class func initLogger() {
-        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M (context $X)"
-        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M (context $X)"
-//        platform.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M (context $X)"
+        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M <$X>"
+        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M <$X>"
+//        platform.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M <$X>"
 //        platform.minLevel = .info
 
         setMinLevel(debug: datastore.defaults.debug)
