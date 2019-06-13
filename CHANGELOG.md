@@ -1,3 +1,10 @@
+# 2.8.1
+## Fixes
+
+- Fix another case where UUID can't be allocated
+- Fix display name detection
+- Allow new monitor data to overwrite cached db rows
+
 # 2.8.0
 ## Features
 
