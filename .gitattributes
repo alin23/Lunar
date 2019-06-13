@@ -72,3 +72,10 @@ Releases/Lunar2.8.1-2.5.0.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.8.1-2.8.0.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.8.1-2.3.3.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.8.1-2.4.0.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar-2.8.2.dmg filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.5.0.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.4.0.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.3.3.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.6.0.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.8.1.delta filter=lfs diff=lfs merge=lfs -text
+Releases/Lunar2.8.2-2.8.0.delta filter=lfs diff=lfs merge=lfs -text
