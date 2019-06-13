@@ -49,7 +49,7 @@ bool logToFile(char *format, ...) {
     return true;
 }
 
-static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
+static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer) {
     io_iterator_t iter;
     io_service_t serv, displayPort = 0;
 
@@ -60,7 +60,7 @@ static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
 
     CFStringRef key = CFStringCreateWithCString(kCFAllocatorDefault, kIOProviderClassKey, kCFStringEncodingASCII);
     CFStringRef ioDisplayConnect = CFStringCreateWithCString(kCFAllocatorDefault, "IODisplayConnect", kCFStringEncodingASCII);
-    CFDataRef edidData = CFDataCreate(kCFAllocatorDefault, ZEROARRAY, 128);
+    CFDataRef edidData;
 
     while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL)
     {
@@ -93,7 +93,7 @@ static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
             CFRelease(info);
             IOObjectRelease(iter);
             logToFile("Got EDID for display %d\n\n", displayPort);
-            return edidData;
+            return CFDataCreateCopy(kCFAllocatorDefault, edidData);
         }
         CFRelease(serviceClass);
         CFRelease(info);
@@ -101,7 +101,6 @@ static CFDataRef EDIDFromFramebuffer(io_service_t framebuffer) {
 
     CFRelease(key);
     CFRelease(ioDisplayConnect);
-    CFRelease(edidData);
     IOObjectRelease(iter);
     logToFile("No EDID for framebuffer %d\n\n", framebuffer);
     return NULL;
@@ -119,7 +118,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     io_service_t serv, servicePort = 0;
     CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID);
 
-    if (displayUUID == 0) {
+    if (!displayUUID) {
         return 0;
     }
 
@@ -142,24 +141,23 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         Boolean success = 0;
 
         logToFile("Getting EDID for framebuffer %d\n", serv);
-        CFDataRef displayEDID = EDIDFromFramebuffer(serv);
+        CFDataRef displayEDID = EDIDCreateFromFramebuffer(serv);
         if (displayEDID == NULL) {
             continue;
         }
 
         logToFile("Checking to see if EDID already exists\n");
-        uuid = CFUUIDCreate(kCFAllocatorDefault);
-        if (uuid && CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid)) {
+        if (CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid)) {
+            CFRetain(uuid);
+
             logToFile("EDID already exists\n");
             logToFile("Checking to see if EDID corresponds to display UUID\n");
 
             CFStringRef uuid1 = CFUUIDCreateString(kCFAllocatorDefault, displayUUID);
             CFStringRef uuid2 = CFUUIDCreateString(kCFAllocatorDefault, uuid);
 
-//            logToFile("Display UUID: %s\n", CFStringGetCStringPtr(uuid1, kCFStringEncodingASCII));
-//            logToFile("EDID UUID: %s\n", CFStringGetCStringPtr(uuid2, kCFStringEncodingASCII));
             if (uuid1 && uuid2 && CFStringCompare(uuid1, uuid2, 0) != 0) {
-                CFRelease(uuid);
+                CFRelease(displayEDID);
                 CFRelease(uuid1);
                 CFRelease(uuid2);
                 logToFile("UUIDs differ\n");
@@ -195,14 +193,10 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 
         if (!success || busCount < 1) {
             // this does not seem to be a DDC-enabled display, skip it
+            CFRelease(displayEDID);
             CFRelease(info);
-            if (uuid) {
-                CFRelease(uuid);
-            }
             continue;
         }
-        // if (framebuffer.hasDDCConnect(0)) // https://developer.apple.com/reference/kernel/ioframebuffer/1813510-hasddcconnect?language=objc
-        // kAppleDisplayTypeKey -- if this is an Apple display, can use IODisplay func to change brightness: http://stackoverflow.com/a/32691700/3878712
 
         logToFile("Getting serial number for fb: %d\n", serv);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kDisplaySerialNumber), (const void**)&serialNumberRef)) {
@@ -215,24 +209,23 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
             CGDisplayModelNumber(displayID)  != productID ||
             CGDisplaySerialNumber(displayID) != serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
         {
+            CFRelease(displayEDID);
             CFRelease(info);
-            if (uuid != 0) {
-                CFRelease(uuid);
-            }
             continue;
         }
 
         servicePort = serv;
         CFDictionarySetValue(displayUUIDByEDID, displayEDID, displayUUID);
+        CFRelease(displayEDID);
+        CFRelease(displayUUID);
         CFRelease(info);
-        if (uuid) {
-            CFRelease(uuid);
-        }
-        break;
+        IOObjectRelease(iter);
+        return servicePort;
     }
 
+    CFRelease(displayUUID);
     IOObjectRelease(iter);
-    return servicePort;
+    return 0;
 }
 
 dispatch_semaphore_t DisplayQueue(CGDirectDisplayID displayID) {
