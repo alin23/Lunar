@@ -117,6 +117,10 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     io_service_t serv, servicePort = 0;
     CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID);
 
+    if (displayUUID == 0) {
+        return 0;
+    }
+
     kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO), &iter);
 
     if (err != KERN_SUCCESS) {
@@ -142,7 +146,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 
         logToFile("Checking to see if EDID already exists\n");
         uuid = CFUUIDCreate(kCFAllocatorDefault);
-        if (CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid) && uuid != 0) {
+        if (uuid != 0 && CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid) && uuid != 0) {
             logToFile("EDID already exists\n");
             logToFile("Checking to see if EDID corresponds to display UUID\n");
 
