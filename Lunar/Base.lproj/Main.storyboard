@@ -249,7 +249,7 @@
                     </connections>
                 </windowController>
             </objects>
-            <point key="canvasLocation" x="96" y="802"/>
+            <point key="canvasLocation" x="96" y="437"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="cHE-73-x2e">
@@ -298,7 +298,7 @@
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="96" y="1531"/>
+            <point key="canvasLocation" x="96" y="1270"/>
         </scene>
         <!--Page Controller-->
         <scene sceneID="fpi-QH-es0">
@@ -311,7 +311,7 @@
                 </pagecontroller>
                 <customObject id="H0s-9S-08j" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="96" y="2207"/>
+            <point key="canvasLocation" x="96" y="2082"/>
         </scene>
         <!--Settings Page Controller-->
         <scene sceneID="hgz-Zl-vw0">
@@ -345,7 +345,7 @@
                 </viewController>
                 <customObject id="teY-QZ-vXN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-685" y="2207"/>
+            <point key="canvasLocation" x="-900" y="2007"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="QQh-JI-QxL">
@@ -370,7 +370,7 @@
                 </splitViewController>
                 <customObject id="DaR-tN-O0u" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-685" y="2861"/>
+            <point key="canvasLocation" x="-900" y="2861"/>
         </scene>
         <!--Configuration View Controller-->
         <scene sceneID="MwP-RD-6xX">
@@ -939,7 +939,7 @@
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="hWD-oU-Uq8"/>
             </objects>
-            <point key="canvasLocation" x="-976.5" y="3551"/>
+            <point key="canvasLocation" x="-1138" y="3817"/>
         </scene>
         <!--Exceptions View Controller-->
         <scene sceneID="Hpx-1r-TPC">
@@ -1235,7 +1235,7 @@
                 <arrayController mode="entity" entityName="AppException" automaticallyPreparesContent="YES" automaticallyRearrangesObjects="YES" id="qou-Pu-5OD"/>
                 <userDefaultsController representsSharedInstance="YES" id="sb3-Fd-dqq"/>
             </objects>
-            <point key="canvasLocation" x="-499.5" y="3551"/>
+            <point key="canvasLocation" x="-661" y="3817"/>
         </scene>
         <!--Display View Controller-->
         <scene sceneID="XpM-oo-Jy5">
@@ -1493,7 +1493,7 @@ to view other displays</string>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="96" y="2861"/>
+            <point key="canvasLocation" x="159" y="2861"/>
         </scene>
         <!--Hotkey View Controller-->
         <scene sceneID="JMM-DS-vfd">
@@ -1692,7 +1692,7 @@ to view other displays</string>
                 </viewController>
                 <customObject id="r0V-Yr-EMT" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1468" y="2861"/>
+            <point key="canvasLocation" x="-1952" y="2861"/>
         </scene>
     </scenes>
     <resources>
