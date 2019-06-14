@@ -173,7 +173,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
 
         // get metadata from IOreg node
         IORegistryEntryGetName(serv, name);
-        logToFile("Getting info dict for fb: %d - %s\n", serv, name);
+        logToFile("Getting info dict for fb: %d\n", serv);
         info = IODisplayCreateInfoDictionary(serv, kIODisplayOnlyPreferredName);
 
         logToFile("Getting vendor for fb: %d\n", serv);
