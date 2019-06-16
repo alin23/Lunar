@@ -9,6 +9,31 @@
 import Charts
 import Cocoa
 
+let ADAPTIVE_HELP_TEXT = """
+## Description
+
+This setting allows the user to **disable** the adaptive algorithm on a **per-monitor** basis.
+
+- `ADAPTIVE` will **allow** Lunar to change the brightness and contrast automatically for this monitor
+- `MANUAL` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
+"""
+let LOCK_BRIGHTNESS_HELP_TEXT = """
+## Description
+
+This setting allows the user to **restrict** changes on the brightness of this monitor.
+
+- `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
+- `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
+"""
+let LOCK_CONTRAST_HELP_TEXT = """
+## Description
+
+This setting allows the user to **restrict** changes on the contrast of this monitor.
+
+- `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
+- `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
+"""
+
 class DisplayViewController: NSViewController {
     @IBOutlet var displayView: DisplayView!
     @IBOutlet var displayName: NSTextField!
@@ -21,6 +46,10 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var swipeLeftHint: NSTextField!
     @IBOutlet var swipeRightHint: NSTextField!
+
+    @IBOutlet var adaptiveHelpButton: HelpButton!
+    @IBOutlet var lockContrastHelpButton: HelpButton!
+    @IBOutlet var lockBrightnessHelpButton: HelpButton!
 
     var display: Display! {
         didSet {
@@ -50,8 +79,8 @@ class DisplayViewController: NSViewController {
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
         guard let display = display, display.id != GENERIC_DISPLAY_ID else { return }
 
-        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
-        var contrastChartEntry = brightnessContrastChart.contrastGraph.values
+        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
+        var contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
         switch brightnessAdapter.mode {
         case .location:
@@ -128,6 +157,11 @@ class DisplayViewController: NSViewController {
 
     func initAdaptiveButton() {
         if let button = adaptiveButton {
+            if brightnessAdapter.mode == .manual {
+                button.isHidden = true
+                adaptiveHelpButton?.isHidden = true
+            }
+
             let buttonSize = button.frame
             button.wantsLayer = true
 
@@ -176,12 +210,23 @@ class DisplayViewController: NSViewController {
     }
 
     func setIsHidden(_ value: Bool) {
+        adaptiveHelpButton?.isHidden = value
         adaptiveButton.isHidden = value
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
         swipeLeftHint.isHidden = value
         swipeRightHint.isHidden = value
+    }
+
+    func listenForShowNavigationHintsChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+            guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
+                return
+            }
+            self.swipeLeftHint?.isHidden = !show
+            self.swipeRightHint?.isHidden = !show
+        })
     }
 
     func listenForAdaptiveModeChange() {
@@ -197,10 +242,14 @@ class DisplayViewController: NSViewController {
                 self.scrollableBrightness.disabled = true
                 self.scrollableContrast.disabled = true
                 self.setValuesHidden(true, mode: adaptiveMode)
+                self.adaptiveButton.isHidden = true
+                self.adaptiveHelpButton.isHidden = true
             } else {
                 self.scrollableBrightness.disabled = false
                 self.scrollableContrast.disabled = false
                 self.setValuesHidden(false, mode: adaptiveMode)
+                self.adaptiveButton.isHidden = false
+                self.adaptiveHelpButton.isHidden = false
             }
         })
     }
@@ -209,7 +258,6 @@ class DisplayViewController: NSViewController {
         brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor, mode: mode)
         brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
-
     }
 
     func zeroGraph() {
@@ -228,6 +276,10 @@ class DisplayViewController: NSViewController {
 
         swipeLeftHint?.isHidden = true
         swipeRightHint?.isHidden = true
+
+        adaptiveHelpButton?.helpText = ADAPTIVE_HELP_TEXT
+        lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
+        lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update(from: display)
@@ -254,5 +306,6 @@ class DisplayViewController: NSViewController {
             setIsHidden(true)
         }
         listenForAdaptiveModeChange()
+        listenForShowNavigationHintsChange()
     }
 }
