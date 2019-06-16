@@ -1,3 +1,12 @@
+# 2.8.3
+## Fixes
+
+- Fix data store merge policy
+
+## Improvements
+
+- Add help buttons with popovers for explaining settings and modes
+
 # 2.8.2
 ## Fixes
 
