@@ -45,6 +45,10 @@ extension UserDefaults {
         return bool(forKey: "manualLocation")
     }
 
+    @objc dynamic var showNavigationHints: Bool {
+        return bool(forKey: "showNavigationHints")
+    }
+
     @objc dynamic var startAtLogin: Bool {
         return bool(forKey: "startAtLogin")
     }
@@ -75,6 +79,14 @@ extension UserDefaults {
 
     @objc dynamic var adaptiveBrightnessMode: Int {
         return integer(forKey: "adaptiveBrightnessMode")
+    }
+
+    @objc dynamic var brightnessStep: Int {
+        return integer(forKey: "brightnessStep")
+    }
+
+    @objc dynamic var contrastStep: Int {
+        return integer(forKey: "contrastStep")
     }
 
     @objc dynamic var brightnessOffset: Int {
@@ -213,7 +225,7 @@ class DataStore: NSObject {
                 }
             })
             context = container.newBackgroundContext()
-            context.mergePolicy = NSOverwriteMergePolicy
+            context.mergePolicy = NSMergePolicy(merge: .overwriteMergePolicyType)
         } else {
             do {
                 if coordinator.persistentStore(for: persistentStoreUrl) == nil {
@@ -225,7 +237,7 @@ class DataStore: NSObject {
 
             context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             context.persistentStoreCoordinator = coordinator
-            context.mergePolicy = NSOverwriteMergePolicy
+            context.mergePolicy = NSMergePolicy(merge: .overwriteMergePolicyType)
         }
         log.debug("Checking First Run")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
@@ -241,6 +253,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "smoothTransition")
         DataStore.setDefault(false, for: "debug")
         DataStore.setDefault(false, for: "manualLocation")
+        DataStore.setDefault(false, for: "showNavigationHints")
         DataStore.setDefault(true, for: "startAtLogin")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")
@@ -250,6 +263,8 @@ class DataStore: NSObject {
         DataStore.setDefault(0, for: "contrastLimitMin")
         DataStore.setDefault(100, for: "brightnessLimitMax")
         DataStore.setDefault(100, for: "contrastLimitMax")
+        DataStore.setDefault(3, for: "brightnessStep")
+        DataStore.setDefault(3, for: "contrastStep")
 
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
