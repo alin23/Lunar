@@ -110,6 +110,10 @@ class PageController: NSPageController, NSPageControllerDelegate {
             }
         }
     }
+    
+    func pageControllerWillStartLiveTransition(_ pageController: NSPageController) {
+        helpPopover.close()
+    }
 
     func pageControllerDidEndLiveTransition(_: NSPageController) {
         if let splitViewController = parent as? SplitViewController {

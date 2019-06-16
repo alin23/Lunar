@@ -10,15 +10,15 @@ import Charts
 import Cocoa
 
 class BrightnessContrastChartView: LineChartView {
-    let brightnessGraph = LineChartDataSet(values: [ChartDataEntry](), label: "Brightness")
-    let contrastGraph = LineChartDataSet(values: [ChartDataEntry](), label: "Contrast")
+    let brightnessGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Brightness")
+    let contrastGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Contrast")
     let graphData = LineChartData()
     let interpolationValues = 5
     let maxValuesLocation = 25
     let maxValuesSync = 102
 
     func zero() {
-        for (brightnessEntry, contrastEntry) in zip(brightnessGraph.values, contrastGraph.values) {
+        for (brightnessEntry, contrastEntry) in zip(brightnessGraph.entries, contrastGraph.entries) {
             brightnessEntry.y = 0
             contrastEntry.y = 0
         }
@@ -28,8 +28,8 @@ class BrightnessContrastChartView: LineChartView {
     func clampDataset(display: Display, mode: AdaptiveMode, minBrightness: Double? = nil) {
         switch mode {
         case .location:
-            let brightnessChartEntry = brightnessGraph.values
-            let contrastChartEntry = contrastGraph.values
+            let brightnessChartEntry = brightnessGraph.entries
+            let contrastChartEntry = contrastGraph.entries
 
             if brightnessChartEntry.isEmpty || contrastChartEntry.isEmpty {
                 return
@@ -55,13 +55,12 @@ class BrightnessContrastChartView: LineChartView {
             isHidden = false
         }
 
-        var brightnessChartEntry = brightnessGraph.values
-        var contrastChartEntry = contrastGraph.values
+        var brightnessChartEntry = brightnessGraph.entries
+        var contrastChartEntry = contrastGraph.entries
         let adaptiveMode = mode ?? brightnessAdapter.mode
 
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
-        xAxis.removeAllLimitLines()
 
         var brightnessY: Double = 0
         var contrastY: Double = 0
@@ -105,32 +104,6 @@ class BrightnessContrastChartView: LineChartView {
                 }
                 brightnessChartEntry.append(contentsOf: brightnessChartEntry.prefix(interpolationValues).reversed())
                 contrastChartEntry.append(contentsOf: contrastChartEntry.prefix(interpolationValues).reversed())
-                if let m = brightnessAdapter.moment {
-                    let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise (\(m.sunrise.toRelative()))")
-                    let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon     (\(m.solarNoon.toRelative()))")
-                    let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset (\(m.sunset.toRelative()))")
-                    
-                    sunsetLine.labelPosition = .leftBottom
-                    sunsetLine.yOffset = 30
-                    solarNoonLine.xOffset = -42
-                    solarNoonLine.yOffset = 60
-
-                    sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-                    solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-                    sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-
-                    sunriseLine.valueTextColor = labelColor.withAlphaComponent(0.4)
-                    solarNoonLine.valueTextColor = labelColor.withAlphaComponent(0.4)
-                    sunsetLine.valueTextColor = labelColor.withAlphaComponent(0.4)
-
-                    sunriseLine.lineColor = contrastColor.withAlphaComponent(0.7)
-                    solarNoonLine.lineColor = red.blended(withFraction: 0.5, of: lunarYellow)!.withAlphaComponent(0.7)
-                    sunsetLine.lineColor = brightnessColor.withAlphaComponent(0.7)
-
-                    xAxis.addLimitLine(sunriseLine)
-                    xAxis.addLimitLine(solarNoonLine)
-                    xAxis.addLimitLine(sunsetLine)
-                }
             case .sync:
                 let xs = stride(from: 0.0, to: Double(maxValuesSync - 1), by: 1.0)
                 let percents = Array(stride(from: 0.0, to: Double(maxValuesSync - 1) / 100.0, by: 0.01))
@@ -162,8 +135,8 @@ class BrightnessContrastChartView: LineChartView {
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             }
-            brightnessGraph.values = brightnessChartEntry
-            contrastGraph.values = contrastChartEntry
+            brightnessGraph.replaceEntries(brightnessChartEntry)
+            contrastGraph.replaceEntries(contrastChartEntry)
 
             for dataset in graphData.dataSets {
                 graphData.removeDataSet(dataset)
@@ -192,7 +165,55 @@ class BrightnessContrastChartView: LineChartView {
         setupLegend()
 
         data = graphData
+        setupLimitLines(mode: adaptiveMode)
         setup(mode: adaptiveMode)
+    }
+
+    func setupLimitLines(mode: AdaptiveMode) {
+        xAxis.removeAllLimitLines()
+        
+        switch mode {
+        case .location:
+            guard let m = brightnessAdapter.moment else { return }
+            
+            let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise (\(m.sunrise.toRelative()))")
+            let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon     (\(m.solarNoon.toRelative()))")
+            let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset (\(m.sunset.toRelative()))")
+            
+            if m.sunset.hour <= 12 {
+                sunsetLine.labelPosition = .bottomRight
+            } else {
+                sunsetLine.labelPosition = .bottomLeft
+            }
+            
+            if m.sunrise.hour <= 12 {
+                sunriseLine.labelPosition = .topRight
+            } else {
+                sunriseLine.labelPosition = .topLeft
+            }
+            
+            sunsetLine.yOffset = 30
+            solarNoonLine.xOffset = -42
+            solarNoonLine.yOffset = 60
+            
+            sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+            solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+            sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+            
+            sunriseLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+            solarNoonLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+            sunsetLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+            
+            sunriseLine.lineColor = contrastGraph.fillColor.withAlphaComponent(0.7)
+            solarNoonLine.lineColor = red.blended(withFraction: 0.5, of: lunarYellow)!.withAlphaComponent(0.7)
+            sunsetLine.lineColor = brightnessGraph.fillColor.withAlphaComponent(0.7)
+            
+            xAxis.addLimitLine(sunriseLine)
+            xAxis.addLimitLine(solarNoonLine)
+            xAxis.addLimitLine(sunsetLine)
+        default:
+            return
+        }
     }
 
     func setupLegend() {
@@ -200,7 +221,7 @@ class BrightnessContrastChartView: LineChartView {
         legend.drawInside = true
         legend.font = NSFont.systemFont(ofSize: 12, weight: .bold)
         legend.textColor = xAxisLabelColor
-        legend.yOffset = 77.0
+        legend.yOffset = 68.0
         legend.xOffset = 36.0
         legend.form = .square
         legend.formSize = 14.0

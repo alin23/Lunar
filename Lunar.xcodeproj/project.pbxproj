@@ -13,6 +13,10 @@
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
+		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
+		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
+		C731261322B3DF0A001ED199 /* Down.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C731261222B3DF0A001ED199 /* Down.framework */; };
+		C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C731261222B3DF0A001ED199 /* Down.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C75083402222865F0020270E /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
@@ -124,6 +128,7 @@
 				C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */,
 				C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */,
 				C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */,
+				C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */,
 				C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */,
 				C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */,
 				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
@@ -186,6 +191,11 @@
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
 		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
+		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
+		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
+		C731261022B3DEF5001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Down.framework; path = Frameworks/Down.framework; sourceTree = "<group>"; };
+		C731261222B3DF0A001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Down.framework; path = Frameworks/Down.framework; sourceTree = "<group>"; };
+		C731261522B3DF1E001ED199 /* Down.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Down.framework.dSYM; path = Frameworks/Down.framework.dSYM; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
@@ -270,6 +280,7 @@
 			files = (
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
+				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
 				C750835F2222BEAB0020270E /* Crashlytics.framework in Frameworks */,
 				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
 				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
@@ -342,6 +353,7 @@
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
 				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
 				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
+				C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -365,6 +377,7 @@
 				C7E242642119A65B0020326C /* LockButton.swift */,
 				C75083632222DC9F0020270E /* HotKeyView.swift */,
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
+				C731260B22B38899001ED199 /* HelpButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -372,6 +385,7 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C731261522B3DF1E001ED199 /* Down.framework.dSYM */,
 				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
 				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
 				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
@@ -385,6 +399,7 @@
 				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
 				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
 				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
+				C731261222B3DF0A001ED199 /* Down.framework */,
 				C75083362222865D0020270E /* Alamofire.framework */,
 				C75083352222865D0020270E /* Charts.framework */,
 				C750835D2222BEAA0020270E /* Crashlytics.framework */,
@@ -451,6 +466,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C731261022B3DEF5001ED199 /* Down.framework */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
 			);
@@ -637,11 +653,13 @@
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
 				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
+				C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
+				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
