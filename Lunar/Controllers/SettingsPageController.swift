@@ -27,17 +27,27 @@ class SettingsPageController: NSViewController {
         contrastLimitMax: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
-        withAnimation: Bool = false
+        withAnimation: Bool = false,
+        updateLegend: Bool = false,
+        updateLimitLines: Bool = false
     ) {
         if display.id == GENERIC_DISPLAY_ID {
             return
         }
 
-        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.values
-        var contrastChartEntry = brightnessContrastChart.contrastGraph.values
+        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
+        var contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
         if brightnessChartEntry.isEmpty || contrastChartEntry.isEmpty {
             return
+        }
+
+        if updateLegend {
+            brightnessContrastChart.setupLegend()
+        }
+
+        if updateLimitLines {
+            brightnessContrastChart.setupLimitLines(mode: brightnessAdapter.mode)
         }
 
         switch brightnessAdapter.mode {

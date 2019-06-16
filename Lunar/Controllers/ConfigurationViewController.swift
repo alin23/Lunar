@@ -8,11 +8,158 @@
 
 import Cocoa
 
-let CHECKBOX_SIZE = 32
+let UI_NOTE_INFO = """
+[]()
+
+**Note:** Manual adjustments through the UI won't take these limits into account.
+"""
+let ADJUSTING_VALUES_INFO = """
+[]()
+
+## Adjusting values
+Use one of the following gestures **while hovering on the value with your mouse or trackpad**
+- Scroll vertically using the mouse or trackpad
+- Press the up/down arrow keys on your keyboard
+"""
+let NOON_DURATION_TOOLTIP = """
+## Description
+The number of minutes for which the daylight in your area is very high.
+
+## Effect
+This keeps the brightness/contrast at its highest value for as much as needed.
+\(ADJUSTING_VALUES_INFO)
+"""
+let DAYLIGHT_EXTENSION_TOOLTIP = """
+## Description
+The number of minutes for which the daylight in your area is still visible before sunrise and after sunset.
+
+## Effect
+This keeps the brightness/contrast from going to its lowest value too soon.
+\(ADJUSTING_VALUES_INFO)
+"""
+let CURVE_FACTOR_TOOLTIP = """
+## Description
+Value for adjusting the brightness/contrast curve.
+
+[How does the curve factor affect brightness?](https://www.desmos.com/calculator/zciiqhtnov)
+"""
+let BRIGHTNESS_OFFSET_TOOLTIP = """
+## Description
+Offset for adjusting the brightness curve of the adaptive algorithm.
+
+## Effect
+The offset is transformed into a curve factor using the following rules:
+  - **if** ` offset > 0 ` **then** ` factor = 1 - (offset / 100) `
+      - the result will have a value between **0.0** and **1.0**
+  - **if** ` offset <= 0 ` **then** ` factor = 1 + (offset / -10) `
+      - the result will have a value between **1.0** and **1.9**
+
+\(ADJUSTING_VALUES_INFO)
+
+[How does the curve factor affect brightness?](https://www.desmos.com/calculator/zciiqhtnov)
+"""
+let CONTRAST_OFFSET_TOOLTIP = """
+## Description
+Offset for adjusting the contrast curve of the adaptive algorithm.
+
+## Effect
+The offset is transformed into a curve factor using the following rules:
+  - **if** ` offset > 0 ` **then** ` factor = 1 - (offset / 100) `
+      - the result will have a value between **0.0** and **1.0**
+  - **if** ` offset <= 0 ` **then** ` factor = 1 + (offset / -10) `
+      - the result will have a value between **1.0** and **1.9**
+
+\(ADJUSTING_VALUES_INFO)
+
+[How does the curve factor affect contrast?](https://www.desmos.com/calculator/zciiqhtnov)
+"""
+let BRIGHTNESS_STEP_TOOLTIP = """
+## Description
+Value for adjusting how much to increase/decrease the brightness when using hotkeys.
+
+## Effect
+When using the Brightness Up/Down actions, the brightness will be computed using the following formulas:
+* Brightness Up: ` brightness = oldValue + step `
+* Brightness Down: ` brightness = oldValue - step `
+
+\(ADJUSTING_VALUES_INFO)
+
+\(UI_NOTE_INFO)
+"""
+let CONTRAST_STEP_TOOLTIP = """
+## Description
+Value for adjusting how much to increase/decrease the contrast when using hotkeys.
+
+## Effect
+When using the Contrast Up/Down actions, the contrast will be computed using the following formulas:
+* Contrast Up: ` contrast = oldValue + step `
+* Contrast Down: ` contrast = oldValue - step `
+
+\(ADJUSTING_VALUES_INFO)
+
+\(UI_NOTE_INFO)
+"""
+let BRIGHTNESS_LIMIT_TOOLTIP = """
+## Description
+Hard limits for brightness percentage adjustments through **hotkeys** or **menu items**.
+
+## Effect
+When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the brightness will be computed using the following formula:
+```
+percent / 100 * (max - min) + min
+```
+
+\(ADJUSTING_VALUES_INFO)
+
+\(UI_NOTE_INFO)
+"""
+let CONTRAST_LIMIT_TOOLTIP = """
+## Description
+Hard limits for contrast percentage adjustments through **hotkeys** or **menu items**.
+
+## Effect
+When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the contrast will be computed using the following formula:
+```
+percent / 100 * (max - min) + min
+```
+
+\(ADJUSTING_VALUES_INFO)
+
+\(UI_NOTE_INFO)
+"""
+let LOCATION_TOOLTIP = """
+## Description
+Adjustable location coordinates.
+
+## Effect
+The sunrise, noon and sunset times will be computed based on these coordinates.
+
+## Adjusting values
+- Click to edit then press enter to set custom values.
+- Press reset to use the last location stored by the system.
+"""
+let SMOOTH_TRANSITION_TOOLTIP = """
+## Description
+Allows brightness/contrast to change smoothly from a value to another.
+
+## Effect
+A custom algorithm is used to auto-adapt the smoothing logic based on each monitor's response time.
+
+If the monitor isn't fast enough, changing the brightness/contrast may look jaggy or cause flashes.
+[]()
+
+**Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
+"""
 
 class ConfigurationViewController: NSViewController {
     @IBOutlet var smoothTransitionLabel: NSTextField!
     @IBOutlet var smoothTransitionCheckbox: NSButton!
+
+    @IBOutlet var helpButton1: HelpButton!
+    @IBOutlet var helpButton2: HelpButton!
+    @IBOutlet var helpButton3: HelpButton!
+    @IBOutlet var helpButton4: HelpButton!
+    @IBOutlet var helpButtonBottom: HelpButton!
 
     @IBOutlet var noonDurationField: ScrollableTextField!
     @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
@@ -69,6 +216,28 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    @IBOutlet var brightnessStepField: ScrollableTextField!
+    @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessStepLabel: NSTextField!
+    var brightnessStepVisible: Bool = false {
+        didSet {
+            brightnessStepField?.isHidden = !brightnessStepVisible
+            brightnessStepCaption?.isHidden = !brightnessStepVisible
+            brightnessStepLabel?.isHidden = !brightnessStepVisible
+        }
+    }
+
+    @IBOutlet var contrastStepField: ScrollableTextField!
+    @IBOutlet var contrastStepCaption: ScrollableTextFieldCaption!
+    @IBOutlet var contrastStepLabel: NSTextField!
+    var contrastStepVisible: Bool = false {
+        didSet {
+            contrastStepField?.isHidden = !contrastStepVisible
+            contrastStepCaption?.isHidden = !contrastStepVisible
+            contrastStepLabel?.isHidden = !contrastStepVisible
+        }
+    }
+
     @IBOutlet var brightnessLimitMinField: ScrollableTextField!
     @IBOutlet var brightnessLimitMaxField: ScrollableTextField!
     @IBOutlet var brightnessLimitMinCaption: ScrollableTextFieldCaption!
@@ -121,6 +290,8 @@ class ConfigurationViewController: NSViewController {
     var curveFactorObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
+    var brightnessStepObserver: NSKeyValueObservation?
+    var contrastStepObserver: NSKeyValueObservation?
     var brightnessLimitMinObserver: NSKeyValueObservation?
     var contrastLimitMinObserver: NSKeyValueObservation?
     var brightnessLimitMaxObserver: NSKeyValueObservation?
@@ -142,6 +313,10 @@ class ConfigurationViewController: NSViewController {
         contrastOffsetVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
         contrastLimitVisible = adaptiveMode == .manual
+        brightnessStepVisible = adaptiveMode == .manual
+        contrastStepVisible = adaptiveMode == .manual
+
+        helpButtonBottom.helpText = SMOOTH_TRANSITION_TOOLTIP
 
         var refX: CGFloat
         switch adaptiveMode {
@@ -150,18 +325,45 @@ class ConfigurationViewController: NSViewController {
             let refFrame2 = contrastLimitMaxField.frame
             let width = refFrame2.maxX - refFrame1.minX
             refX = refFrame2.maxX - (width / 2)
+
+            helpButton1.helpText = BRIGHTNESS_LIMIT_TOOLTIP
+            helpButton2.helpText = CONTRAST_LIMIT_TOOLTIP
+            helpButton3.helpText = BRIGHTNESS_STEP_TOOLTIP
+            helpButton4.helpText = CONTRAST_STEP_TOOLTIP
         case .location:
             let refFrame = daylightExtensionField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
+
+            helpButton1.helpText = NOON_DURATION_TOOLTIP
+            helpButton2.helpText = DAYLIGHT_EXTENSION_TOOLTIP
+            helpButton3.helpText = CURVE_FACTOR_TOOLTIP
+            helpButton4.helpText = LOCATION_TOOLTIP
         case .sync:
             let refFrame = contrastOffsetField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
+
+            helpButton1.helpText = BRIGHTNESS_OFFSET_TOOLTIP
+            helpButton2.helpText = CONTRAST_OFFSET_TOOLTIP
         }
 
         smoothTransitionCheckbox.setFrameOrigin(NSPoint(
-            x: refX - CGFloat(CHECKBOX_SIZE / 2),
+            x: refX - CGFloat(4.5),
             y: smoothTransitionCheckbox.frame.origin.y
         ))
+
+        helpButton1.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
+        helpButton2.isHidden = !contrastOffsetVisible && !contrastLimitVisible && !daylightExtensionVisible
+        helpButton3.isHidden = !curveFactorVisible && !brightnessStepVisible
+        helpButton4.isHidden = !locationVisible && !contrastStepVisible
+    }
+
+    func listenForShowNavigationHintsChange() {
+        adaptiveModeObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+            guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
+                return
+            }
+            self.swipeLeftHint?.isHidden = !show
+        })
     }
 
     func listenForCurveFactorChange() {
@@ -179,7 +381,7 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             if let settingsController = self.parent?.parent as? SettingsPageController {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
             }
         }
         sunriseObserver = datastore.defaults.observe(\.sunrise, options: [.old, .new], changeHandler: updateDataset)
@@ -214,6 +416,24 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.contrastOffsetField?.stringValue = String(contrast)
+        })
+    }
+
+    func listenForBrightnessStepChange() {
+        brightnessStepObserver = datastore.defaults.observe(\.brightnessStep, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            self.brightnessStepField?.stringValue = String(brightness)
+        })
+    }
+
+    func listenForContrastStepChange() {
+        contrastStepObserver = datastore.defaults.observe(\.contrastStep, options: [.old, .new], changeHandler: { _, change in
+            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+                return
+            }
+            self.contrastStepField?.stringValue = String(contrast)
         })
     }
 
@@ -265,13 +485,10 @@ class ConfigurationViewController: NSViewController {
     func setupNoonDuration() {
         guard let field = noonDurationField, let caption = noonDurationCaption else { return }
 
-        noonDurationLabel?.toolTip = """
-        The number of minutes for which the daylight in your area is very high
-        This keeps the brightness/contrast at its highest value for as much as needed
-        """
+        // noonDurationLabel?.toolTip = NOON_DURATION_TOOLTIP
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 240,
+            field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
             },
@@ -284,13 +501,10 @@ class ConfigurationViewController: NSViewController {
     func setupDaylightExtension() {
         guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
 
-        daylightExtensionLabel?.toolTip = """
-        The number of minutes for which the daylight in your area is still visible before sunrise and after sunset
-        This keeps the brightness/contrast from going to its lowest value too soon
-        """
+        // daylightExtensionLabel?.toolTip = DAYLIGHT_EXTENSION_TOOLTIP
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 240,
+            field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
             },
@@ -303,9 +517,7 @@ class ConfigurationViewController: NSViewController {
     func setupCurveFactor() {
         guard let field = curveFactorField, let caption = curveFactorCaption else { return }
 
-        curveFactorLabel?.toolTip = """
-        Value for adjusting the brightness/contrast curve
-        """
+        // curveFactorLabel?.toolTip = CURVE_FACTOR_TOOLTIP
         curveFactorField.decimalPoints = 1
         curveFactorField.step = 0.1
 
@@ -323,9 +535,7 @@ class ConfigurationViewController: NSViewController {
     func setupBrightnessOffset() {
         guard let field = brightnessOffsetField, let caption = brightnessOffsetCaption else { return }
 
-        brightnessOffsetLabel?.toolTip = """
-        Factor for adjusting the brightness curve of the adaptive algorithm
-        """
+        // brightnessOffsetLabel?.toolTip = BRIGHTNESS_OFFSET_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
@@ -338,14 +548,36 @@ class ConfigurationViewController: NSViewController {
     func setupContrastOffset() {
         guard let field = contrastOffsetField, let caption = contrastOffsetCaption else { return }
 
-        contrastOffsetLabel?.toolTip = """
-        Factor for adjusting the contrast curve of the adaptive algorithm
-        """
+        // contrastOffsetLabel?.toolTip = CONTRAST_OFFSET_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
                 settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
+            }
+        )
+    }
+
+    func setupBrightnessStep() {
+        guard let field = brightnessStepField, let caption = brightnessStepCaption else { return }
+
+        // brightnessStepLabel?.toolTip = BRIGHTNESS_STEP_TOOLTIP
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "brightnessStep", lowerLimit: 1, upperLimit: 99,
+            onValueChangedInstant: { _, _ in
+            }
+        )
+    }
+
+    func setupContrastStep() {
+        guard let field = contrastStepField, let caption = contrastStepCaption else { return }
+
+        // contrastStepLabel?.toolTip = CONTRAST_STEP_TOOLTIP
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "contrastStep", lowerLimit: 1, upperLimit: 99,
+            onValueChangedInstant: { _, _ in
             }
         )
     }
@@ -356,9 +588,7 @@ class ConfigurationViewController: NSViewController {
             let minCaption = brightnessLimitMinCaption,
             let maxCaption = brightnessLimitMaxCaption else { return }
 
-        brightnessLimitLabel?.toolTip = """
-        Hard limits for brightness percentage adjustments through hotkeys or menu items
-        """
+        // brightnessLimitLabel?.toolTip = BRIGHTNESS_LIMIT_TOOLTIP
 
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.brightnessLimitMax - 1),
@@ -380,9 +610,7 @@ class ConfigurationViewController: NSViewController {
             let minCaption = contrastLimitMinCaption,
             let maxCaption = contrastLimitMaxCaption else { return }
 
-        contrastLimitLabel?.toolTip = """
-        Hard limits for contrast percentage adjustments through hotkeys or menu items
-        """
+        // contrastLimitLabel?.toolTip = CONTRAST_LIMIT_TOOLTIP
 
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.contrastLimitMax - 1),
@@ -404,10 +632,7 @@ class ConfigurationViewController: NSViewController {
             let latCaption = locationLatCaption,
             let lonCaption = locationLonCaption else { return }
 
-        locationLabel?.toolTip = """
-        Adjustable location coordinates
-        Click to edit then press enter to set custom values
-        """
+        // locationLabel?.toolTip = LOCATION_TOOLTIP
 
         latField.decimalPoints = 2
         latField.step = 0.01
@@ -513,16 +738,15 @@ class ConfigurationViewController: NSViewController {
         setupCurveFactor()
         setupBrightnessOffset()
         setupContrastOffset()
+        setupBrightnessStep()
+        setupContrastStep()
         setupBrightnessLimit()
         setupContrastLimit()
         setupLocation()
 
-        smoothTransitionCheckbox.setFrameSize(NSSize(width: CHECKBOX_SIZE, height: CHECKBOX_SIZE))
         smoothTransitionCheckbox.setNeedsDisplay()
-        smoothTransitionLabel.toolTip = """
-        Allows brightness/contrast to change smoothly from a value to another
-        Note: this can make the system lag in transitions if the monitor has a slow response time
-        """
+
+        // smoothTransitionLabel.toolTip = SMOOTH_TRANSITION_TOOLTIP
 
         if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
             showRelevantSettings(mode)
@@ -532,9 +756,12 @@ class ConfigurationViewController: NSViewController {
         listenForCurveFactorChange()
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
+        listenForBrightnessStepChange()
+        listenForContrastStepChange()
         listenForBrightnessLimitChange()
         listenForContrastLimitChange()
         listenForAdaptiveModeChange()
+        listenForShowNavigationHintsChange()
     }
 
     override func viewDidLoad() {
@@ -542,4 +769,3 @@ class ConfigurationViewController: NSViewController {
         setup()
     }
 }
-

@@ -54,6 +54,7 @@ let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
 var activeDisplay: Display?
+var helpPopover = NSPopover()
 
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
@@ -501,8 +502,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func resetElements() {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
-        let splitView = windowController?.window?.contentViewController as? SplitViewController
-        splitView?.activeStateButton?.setNeedsDisplay()
+        if let splitView = windowController?.window?.contentViewController as? SplitViewController {
+            splitView.activeStateButton?.setNeedsDisplay()
+            splitView.setHelpButtonText()
+        }
     }
 
     func adapt() {
@@ -516,7 +519,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
-    func increaseBrightness(by amount: Int = 3) {
+    func increaseBrightness(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount)
         } else {
@@ -525,7 +529,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func increaseContrast(by amount: Int = 3) {
+    func increaseContrast(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: amount)
         } else {
@@ -534,7 +539,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func decreaseBrightness(by amount: Int = 3) {
+    func decreaseBrightness(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount)
         } else {
@@ -543,7 +549,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func decreaseContrast(by amount: Int = 3) {
+    func decreaseContrast(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: -amount)
         } else {
