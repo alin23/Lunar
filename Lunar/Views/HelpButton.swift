@@ -11,7 +11,7 @@ import Down
 
 let STYLESHEET = """
 p, ul, ol, li, a {
-    font-family: 'SF Compact Text';
+    font-family: 'SF Compact Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 ul, ol {

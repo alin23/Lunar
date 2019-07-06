@@ -79,8 +79,8 @@ class DisplayViewController: NSViewController {
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
         guard let display = display, display.id != GENERIC_DISPLAY_ID else { return }
 
-        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
-        var contrastChartEntry = brightnessContrastChart.contrastGraph.entries
+        let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
+        let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
         switch brightnessAdapter.mode {
         case .location:
