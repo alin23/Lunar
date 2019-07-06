@@ -35,8 +35,8 @@ class SettingsPageController: NSViewController {
             return
         }
 
-        var brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
-        var contrastChartEntry = brightnessContrastChart.contrastGraph.entries
+        let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
+        let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
         if brightnessChartEntry.isEmpty || contrastChartEntry.isEmpty {
             return
