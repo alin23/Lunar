@@ -29,7 +29,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     var hotkeyEnabled: Bool {
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
+        if let hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
             return (hotkeys[identifier]?[.enabled] ?? 0) == 1
         }
         return false
