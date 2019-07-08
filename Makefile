@@ -50,7 +50,7 @@ carthage-track:
 	git add PreBuiltFrameworks/*.zip
 	git commit -m "Add prebuilt frameworks"
 
-carthage: carthage-update carthage-archive
+carthage: carthage-update carthage-patch carthage-archive carthage-extract carthage-track
 carthage-dev: carthage-extract
 
 .git/hooks/pre-commit: pre-commit.sh
