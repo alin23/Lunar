@@ -123,7 +123,7 @@ class SplitViewController: NSSplitViewController {
     @IBOutlet var containerView: NSView?
     @IBOutlet weak var helpButton: HelpButton!
     @IBOutlet weak var navigationHelpButton: HelpButton!
-    
+
     @IBAction func toggleBrightnessAdapter(sender _: NSButton?) {
         brightnessAdapter.toggle()
     }
@@ -140,10 +140,13 @@ class SplitViewController: NSSplitViewController {
         switch brightnessAdapter.mode {
         case .location:
             helpButton?.helpText = LOCATION_HELP_TEXT
+            helpButton?.link = "https://ipstack.com"
         case .sync:
             helpButton?.helpText = SYNC_HELP_TEXT
+            helpButton?.link = nil
         case .manual:
             helpButton?.helpText = MANUAL_HELP_TEXT
+            helpButton?.link = nil
         }
     }
 

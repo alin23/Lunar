@@ -37,7 +37,7 @@ carthage-clean:
 	rm -rf Frameworks/*.framework*
 
 carthage-update:
-	carthage update --cache-builds --platform macOS
+	carthage update --cache-builds --platform macOS || true
 
 carthage-build:
 	carthage build --cache-builds --platform macOS
@@ -50,7 +50,7 @@ carthage-track:
 	git add PreBuiltFrameworks/*.zip
 	git commit -m "Add prebuilt frameworks"
 
-carthage: carthage-update carthage-patch carthage-archive carthage-extract carthage-track
+carthage: carthage-update carthage-patch carthage-build carthage-archive carthage-extract carthage-track
 carthage-dev: carthage-extract
 
 .git/hooks/pre-commit: pre-commit.sh

@@ -10,9 +10,15 @@ import Cocoa
 
 class HelpPopoverController: NSViewController {
     @IBOutlet weak var helpTextField: NSTextField!
+    var onClick: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+        super.mouseDown(with: event)
     }
     
 }
