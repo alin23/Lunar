@@ -14,6 +14,14 @@ class ModernWindow: WAYWindow {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
     }
 
+    override func mouseDown(with event: NSEvent) {
+        helpPopover.close()
+        if let c = helpPopover.contentViewController as? HelpPopoverController {
+            c.onClick = nil
+        }
+        super.mouseDown(with: event)
+    }
+
     func setup() {
         titleBarHeight = 50
         verticallyCenterTitle = true
