@@ -211,9 +211,9 @@ class Display: NSManagedObject {
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
-                    let currentValue = change.oldValue!.uint8Value
 
-                    if datastore.defaults.smoothTransition {
+
+                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
                         self.smoothTransition(from: currentValue, to: brightness) { newValue in
                             _ = DDC.setBrightness(for: self.id, brightness: newValue)
                         }
@@ -232,9 +232,8 @@ class Display: NSManagedObject {
                     } else {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
-                    let currentValue = change.oldValue!.uint8Value
 
-                    if datastore.defaults.smoothTransition {
+                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
                         self.smoothTransition(from: currentValue, to: contrast) { newValue in
                             _ = DDC.setContrast(for: self.id, contrast: newValue)
                         }
