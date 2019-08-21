@@ -412,7 +412,7 @@
                         <subviews>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Us9-3f-8zT">
                                 <rect key="frame" x="18" y="15" width="364" height="16"/>
-                                <textFieldCell key="cell" selectable="YES" allowsUndo="NO" title="Help" id="A3r-aX-Sdv">
+                                <textFieldCell key="cell" allowsUndo="NO" title="Help" allowsEditingTextAttributes="YES" id="A3r-aX-Sdv">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
