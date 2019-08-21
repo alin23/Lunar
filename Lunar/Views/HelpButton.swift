@@ -51,6 +51,7 @@ pre, code {
 
 
 class HelpButton: NSButton {
+    var link: String?
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!
 
@@ -70,7 +71,7 @@ class HelpButton: NSButton {
 
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
-    
+
     func setup() {
         let buttonSize = frame
         wantsLayer = true
@@ -94,9 +95,13 @@ class HelpButton: NSButton {
 
         if let c = helpPopover.contentViewController as? HelpPopoverController, !helpText.isEmpty {
             c.helpTextField?.attributedStringValue = parsedHelpText
+            if let link = self.link {
+                c.onClick = { NSWorkspace.shared.open(URL(string: link)!) }
+            }
             helpPopover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
+            helpPopover.becomeFirstResponder()
         }
-        
+
         onMouseEnter?()
     }
 
@@ -104,8 +109,7 @@ class HelpButton: NSButton {
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         alphaValue = 0.2
         shadow = nil
-        helpPopover.close()
-        
+
         onMouseExit?()
     }
 

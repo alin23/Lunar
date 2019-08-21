@@ -8,6 +8,7 @@
 
 import Cocoa
 
+let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
 let UI_NOTE_INFO = """
 []()
 
@@ -41,7 +42,7 @@ let CURVE_FACTOR_TOOLTIP = """
 ## Description
 Value for adjusting the brightness/contrast curve.
 
-[How does the curve factor affect brightness?](https://www.desmos.com/calculator/zciiqhtnov)
+[How does the curve factor affect brightness?](\(CHART_LINK))
 """
 let BRIGHTNESS_OFFSET_TOOLTIP = """
 ## Description
@@ -56,7 +57,7 @@ The offset is transformed into a curve factor using the following rules:
 
 \(ADJUSTING_VALUES_INFO)
 
-[How does the curve factor affect brightness?](https://www.desmos.com/calculator/zciiqhtnov)
+[How does the curve factor affect brightness?](\(CHART_LINK))
 """
 let CONTRAST_OFFSET_TOOLTIP = """
 ## Description
@@ -71,7 +72,7 @@ The offset is transformed into a curve factor using the following rules:
 
 \(ADJUSTING_VALUES_INFO)
 
-[How does the curve factor affect contrast?](https://www.desmos.com/calculator/zciiqhtnov)
+[How does the curve factor affect contrast?](\(CHART_LINK))
 """
 let BRIGHTNESS_STEP_TOOLTIP = """
 ## Description
@@ -298,6 +299,7 @@ class ConfigurationViewController: NSViewController {
     var contrastLimitMaxObserver: NSKeyValueObservation?
     var didSwipeToHotkeysObserver: NSKeyValueObservation?
     var adaptiveModeObserver: NSKeyValueObservation?
+    var showNavigationHintsObserver: NSKeyValueObservation?
     var sunriseObserver: NSKeyValueObservation?
     var sunsetObserver: NSKeyValueObservation?
     var solarNoonObserver: NSKeyValueObservation?
@@ -327,23 +329,33 @@ class ConfigurationViewController: NSViewController {
             refX = refFrame2.maxX - (width / 2)
 
             helpButton1.helpText = BRIGHTNESS_LIMIT_TOOLTIP
+            helpButton1.link = nil
             helpButton2.helpText = CONTRAST_LIMIT_TOOLTIP
+            helpButton2.link = CHART_LINK
             helpButton3.helpText = BRIGHTNESS_STEP_TOOLTIP
+            helpButton3.link = nil
             helpButton4.helpText = CONTRAST_STEP_TOOLTIP
+            helpButton4.link = CHART_LINK
         case .location:
             let refFrame = daylightExtensionField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
 
             helpButton1.helpText = NOON_DURATION_TOOLTIP
+            helpButton1.link = nil
             helpButton2.helpText = DAYLIGHT_EXTENSION_TOOLTIP
+            helpButton2.link = nil
             helpButton3.helpText = CURVE_FACTOR_TOOLTIP
+            helpButton3.link = CHART_LINK
             helpButton4.helpText = LOCATION_TOOLTIP
+            helpButton4.link = nil
         case .sync:
             let refFrame = contrastOffsetField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
 
             helpButton1.helpText = BRIGHTNESS_OFFSET_TOOLTIP
+            helpButton1.link = CHART_LINK
             helpButton2.helpText = CONTRAST_OFFSET_TOOLTIP
+            helpButton2.link = CHART_LINK
         }
 
         smoothTransitionCheckbox.setFrameOrigin(NSPoint(
@@ -358,7 +370,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForShowNavigationHintsChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }

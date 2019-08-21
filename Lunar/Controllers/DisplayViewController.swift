@@ -61,6 +61,7 @@ class DisplayViewController: NSViewController {
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
+    var showNavigationHintsObserver: NSKeyValueObservation?
 
     func update(from display: Display) {
         if display.id == GENERIC_DISPLAY_ID {
@@ -220,7 +221,7 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForShowNavigationHintsChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }

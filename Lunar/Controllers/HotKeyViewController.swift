@@ -42,7 +42,8 @@ class HotkeyViewController: NSViewController {
         contrastDownHotkeyView.hotkey = Hotkey.keys[.contrastDown] ?? nil
     }
 
-    override func mouseDown(with _: NSEvent) {
+    override func mouseDown(with event: NSEvent) {
         view.window?.makeFirstResponder(nil)
+        super.mouseDown(with: event)
     }
 }
