@@ -7,7 +7,7 @@ set -l appcast "$releaseDir/appcast.xml"
 
 mkdir -p $tmpDir
 rm -rf $tmpDir/*
-cp -R /private/tmp/DerivedData/Lunar-awgakuaxmexierhhqifxvodvwpri/Build/Products/Release/Lunar.app $tmpDir/Lunar.app
+cp -R $HOME/Library/Developer/Xcode/DerivedData/Lunar-fxhkdhkacqkrwacfenhbdjuksach/Build/Products/Release/Lunar.app $tmpDir/Lunar.app
 
 set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $tmpDir/Lunar.app/Contents/Info.plist)
 set -l appLatestDmg $releaseDir/../Lunar.dmg
