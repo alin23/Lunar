@@ -74,6 +74,26 @@ The offset is transformed into a curve factor using the following rules:
 
 [How does the curve factor affect contrast?](\(CHART_LINK))
 """
+let POLLING_INTERVAL_TOOLTIP = """
+## Description
+Value that describes how often Lunar should check for changes in the built-in display brightness.
+
+## Effect
+The adaptive algorithm synchronizes the monitors with the built-in display brightness
+using the following steps:
+    - Read built-in display brightness
+    - Compute each monitor's brightness by taking into account the configured offsets
+    - Apply the brightness for each monitor
+    - *Sleep for `x` seconds*
+
+The last step uses this value to know how much to sleep.
+If you experience lags and system freeze in Sync mode,
+your monitor might have slow DDC response time.
+
+In this case, you might benefit from a larger polling interval like 10 seconds.
+
+\(ADJUSTING_VALUES_INFO)
+"""
 let BRIGHTNESS_STEP_TOOLTIP = """
 ## Description
 Value for adjusting how much to increase/decrease the brightness when using hotkeys.
@@ -228,6 +248,17 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    @IBOutlet var pollingIntervalField: ScrollableTextField!
+    @IBOutlet var pollingIntervalCaption: ScrollableTextFieldCaption!
+    @IBOutlet var pollingIntervalLabel: NSTextField!
+    var pollingIntervalVisible: Bool = false {
+        didSet {
+            pollingIntervalField?.isHidden = !pollingIntervalVisible
+            pollingIntervalCaption?.isHidden = !pollingIntervalVisible
+            pollingIntervalLabel?.isHidden = !pollingIntervalVisible
+        }
+    }
+
     @IBOutlet var contrastStepField: ScrollableTextField!
     @IBOutlet var contrastStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastStepLabel: NSTextField!
@@ -291,6 +322,7 @@ class ConfigurationViewController: NSViewController {
     var curveFactorObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
     var contrastOffsetObserver: NSKeyValueObservation?
+    var pollingIntervalObserver: NSKeyValueObservation?
     var brightnessStepObserver: NSKeyValueObservation?
     var contrastStepObserver: NSKeyValueObservation?
     var brightnessLimitMinObserver: NSKeyValueObservation?
@@ -313,6 +345,7 @@ class ConfigurationViewController: NSViewController {
         locationVisible = adaptiveMode == .location
         brightnessOffsetVisible = adaptiveMode == .sync
         contrastOffsetVisible = adaptiveMode == .sync
+        pollingIntervalVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
         contrastLimitVisible = adaptiveMode == .manual
         brightnessStepVisible = adaptiveMode == .manual
@@ -356,6 +389,8 @@ class ConfigurationViewController: NSViewController {
             helpButton1.link = CHART_LINK
             helpButton2.helpText = CONTRAST_OFFSET_TOOLTIP
             helpButton2.link = CHART_LINK
+            helpButton3.helpText = POLLING_INTERVAL_TOOLTIP
+            helpButton3.link = nil
         }
 
         smoothTransitionCheckbox.setFrameOrigin(NSPoint(
@@ -365,7 +400,7 @@ class ConfigurationViewController: NSViewController {
 
         helpButton1.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
         helpButton2.isHidden = !contrastOffsetVisible && !contrastLimitVisible && !daylightExtensionVisible
-        helpButton3.isHidden = !curveFactorVisible && !brightnessStepVisible
+        helpButton3.isHidden = !curveFactorVisible && !brightnessStepVisible && !pollingIntervalVisible
         helpButton4.isHidden = !locationVisible && !contrastStepVisible
     }
 
@@ -437,6 +472,15 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             self.brightnessStepField?.stringValue = String(brightness)
+        })
+    }
+
+    func listenForPollingIntervalChange() {
+        pollingIntervalObserver = datastore.defaults.observe(\.pollingInterval, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            self.pollingIntervalField?.stringValue = String(brightness)
         })
     }
 
@@ -577,6 +621,18 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessStep", lowerLimit: 1, upperLimit: 99,
+            onValueChangedInstant: { _, _ in
+            }
+        )
+    }
+
+    func setupPollingInterval() {
+        guard let field = pollingIntervalField, let caption = pollingIntervalCaption else { return }
+
+        // pollingIntervalLabel?.toolTip = BRIGHTNESS_STEP_TOOLTIP
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "pollingInterval", lowerLimit: 1, upperLimit: 300,
             onValueChangedInstant: { _, _ in
             }
         )
@@ -751,6 +807,7 @@ class ConfigurationViewController: NSViewController {
         setupBrightnessOffset()
         setupContrastOffset()
         setupBrightnessStep()
+        setupPollingInterval()
         setupContrastStep()
         setupBrightnessLimit()
         setupContrastLimit()
@@ -769,6 +826,7 @@ class ConfigurationViewController: NSViewController {
         listenForBrightnessOffsetChange()
         listenForContrastOffsetChange()
         listenForBrightnessStepChange()
+        listenForPollingIntervalChange()
         listenForContrastStepChange()
         listenForBrightnessLimitChange()
         listenForContrastLimitChange()
