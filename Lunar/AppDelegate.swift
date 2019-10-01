@@ -259,7 +259,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             log.error("Error on fetching Displays by IDs")
                         }
                     }
-                    Thread.sleep(forTimeInterval: 1)
+                    Thread.sleep(forTimeInterval: datastore.defaults.syncPollingSeconds)
                 }
             }
         case .manual:
@@ -728,4 +728,3 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return alert.runModal() == .alertFirstButtonReturn
     }
 }
-
