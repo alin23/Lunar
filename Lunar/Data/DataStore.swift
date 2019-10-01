@@ -77,6 +77,10 @@ extension UserDefaults {
         return bool(forKey: "debug")
     }
 
+    @objc dynamic var syncPollingSeconds: Int {
+        return integer(forKey: "syncPollingSeconds")
+    }
+
     @objc dynamic var adaptiveBrightnessMode: Int {
         return integer(forKey: "adaptiveBrightnessMode")
     }
@@ -265,6 +269,7 @@ class DataStore: NSObject {
         DataStore.setDefault(100, for: "contrastLimitMax")
         DataStore.setDefault(3, for: "brightnessStep")
         DataStore.setDefault(3, for: "contrastStep")
+        DataStore.setDefault(1, for: "syncPollingSeconds")
 
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
