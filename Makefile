@@ -37,7 +37,7 @@ carthage-clean:
 	rm -rf Frameworks/*.framework*
 
 carthage-update:
-	carthage update --cache-builds --platform macOS || true
+	carthage update --cache-builds --no-build --platform macOS || true
 
 carthage-build:
 	carthage build --cache-builds --platform macOS

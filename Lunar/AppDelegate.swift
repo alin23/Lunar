@@ -259,7 +259,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             log.error("Error on fetching Displays by IDs")
                         }
                     }
-                    Thread.sleep(forTimeInterval: datastore.defaults.syncPollingSeconds)
+                    Thread.sleep(forTimeInterval: TimeInterval(datastore.defaults.syncPollingSeconds))
                 }
             }
         case .manual:
@@ -268,7 +268,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initBrightnessAdapterActivity() {
-        activity = NSBackgroundActivityScheduler(identifier: "com.alinp.Lunar.adaptBrightness")
+        activity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
         activity.repeats = true
         activity.qualityOfService = .userInitiated
         adapterSyncQueue = OperationQueue()

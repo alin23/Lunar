@@ -30,3 +30,4 @@ Frameworks/*.framework*
 .gitsecret/keys/random_seed
 Lunar/Resources/dsa_priv.pem
 GoogleService-Info.plist
+Frameworks/Extern
