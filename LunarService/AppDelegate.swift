@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        let mainAppIdentifier = "com.alinp.Lunar"
+        let mainAppIdentifier = "site.lunarapp.Lunar"
         let runningApps = NSWorkspace.shared.runningApplications
         let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == mainAppIdentifier })
 

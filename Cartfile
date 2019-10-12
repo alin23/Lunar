@@ -7,7 +7,6 @@ github "alin23/Solar"
 github "nerd0geek1/NSPageControl"
 github "soffes/HotKey"
 github "danielgindi/Charts"
-github "sparkle-project/Sparkle"
 github "Clipy/KeyHolder"
 github "Clipy/Magnet"
 github "mattt/Surge" ~> 2.0.0

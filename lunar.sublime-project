@@ -11,16 +11,17 @@
 	"folders":
 	[
 		{
-			"folder_exclude_patterns":
-			[
-				"Carthage",
-				"Releases/.tmp",
-				"*.framework"
-			],
 			"file_exclude_patterns":
 			[
 				"Releases/*.delta",
 				"Releases/*.dmg"
+			],
+			"folder_exclude_patterns":
+			[
+				"Carthage",
+				"Releases/.tmp",
+				"*.framework",
+				"Extern"
 			],
 			"path": "."
 		}
