@@ -476,11 +476,11 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForPollingIntervalChange() {
-        pollingIntervalObserver = datastore.defaults.observe(\.pollingInterval, options: [.old, .new], changeHandler: { _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        pollingIntervalObserver = datastore.defaults.observe(\.syncPollingSeconds, options: [.old, .new], changeHandler: { _, change in
+            guard let seconds = change.newValue, let oldSeconds = change.oldValue, seconds != oldSeconds else {
                 return
             }
-            self.pollingIntervalField?.stringValue = String(brightness)
+            self.pollingIntervalField?.stringValue = String(seconds)
         })
     }
 
@@ -632,7 +632,7 @@ class ConfigurationViewController: NSViewController {
         // pollingIntervalLabel?.toolTip = BRIGHTNESS_STEP_TOOLTIP
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "pollingInterval", lowerLimit: 1, upperLimit: 300,
+            field, caption: caption, settingKey: "syncPollingSeconds", lowerLimit: 1, upperLimit: 300,
             onValueChangedInstant: { _, _ in
             }
         )

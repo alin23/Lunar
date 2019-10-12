@@ -1,0 +1,4 @@
+[submodule "Frameworks/Extern/Sparkle"]
+	path = Frameworks/Extern/Sparkle
+	url = https://github.com/sparkle-project/Sparkle.git
+	branch = ui-separation-and-xpc
