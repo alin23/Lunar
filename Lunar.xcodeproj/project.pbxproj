@@ -27,8 +27,6 @@
 		C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083362222865D0020270E /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083462222865F0020270E /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; };
 		C75083472222865F0020270E /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083482222865F0020270E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083382222865E0020270E /* Sparkle.framework */; };
-		C75083492222865F0020270E /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083382222865E0020270E /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; };
 		C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833A2222865E0020270E /* SwiftyJSON.framework */; };
@@ -43,13 +41,18 @@
 		C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083562222865F0020270E /* HotKey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833F2222865F0020270E /* HotKey.framework */; };
 		C75083572222865F0020270E /* HotKey.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833F2222865F0020270E /* HotKey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C750835F2222BEAB0020270E /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835D2222BEAA0020270E /* Crashlytics.framework */; };
-		C75083602222BEAB0020270E /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835E2222BEAA0020270E /* Fabric.framework */; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
+		C7574EFB2351E3D300358397 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835D2222BEAA0020270E /* Crashlytics.framework */; };
+		C7574EFD2351E3D500358397 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750835E2222BEAA0020270E /* Fabric.framework */; };
+		C7574F702351F71A00358397 /* org.sparkle-project.InstallerConnection.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C7574F592351F70900358397 /* org.sparkle-project.InstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7574F712351F71A00358397 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C7574F572351F70900358397 /* org.sparkle-project.InstallerLauncher.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7574F722351F71A00358397 /* org.sparkle-project.InstallerStatus.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C7574F5B2351F70900358397 /* org.sparkle-project.InstallerStatus.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7574F732351F71A00358397 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7574F512351F70900358397 /* Sparkle.framework */; };
+		C7574F742351F71B00358397 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7574F512351F70900358397 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
@@ -75,7 +78,6 @@
 		C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */; };
 		C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */; };
 		C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */; };
-		C7A2BDF622411E9500C910E3 /* Sparkle.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */; };
 		C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */; };
 		C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
@@ -109,6 +111,118 @@
 			remoteGlobalIDString = C715192B224E33590024C6F6;
 			remoteInfo = EDIDReader;
 		};
+		C7574F502351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
+		C7574F522351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 72A5D59C1D6927730009E5AC;
+			remoteInfo = SparkleCore;
+		};
+		C7574F542351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 72B398D21D3D879300EE297F;
+			remoteInfo = Autoupdate;
+		};
+		C7574F562351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 726E07AD1CAF08D6001A286B;
+			remoteInfo = SparkleInstallerLauncher;
+		};
+		C7574F582351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 724BB36C1D31D0B7005D534A;
+			remoteInfo = SparkleInstallerConnection;
+		};
+		C7574F5A2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 724BB3931D333832005D534A;
+			remoteInfo = SparkleInstallerStatus;
+		};
+		C7574F5C2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 726E07EF1CAF37BD001A286B;
+			remoteInfo = SparkleDownloader;
+		};
+		C7574F5E2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 61B5F90209C4CEE200B25A18;
+			remoteInfo = "Sparkle Test App";
+		};
+		C7574F602351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 726E4A161C86C88F00C57C6A;
+			remoteInfo = TestAppHelper;
+		};
+		C7574F622351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 612279D90DB5470200AB99EA;
+			remoteInfo = "Sparkle Unit Tests";
+		};
+		C7574F642351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5D06E8D00FD68C7C005AE3F6;
+			remoteInfo = BinaryDelta;
+		};
+		C7574F662351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 72D9549E1CBB415B006F28BD;
+			remoteInfo = "sparkle-cli";
+		};
+		C7574F682351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 721C24451CB753E6005440CB;
+			remoteInfo = "Installer Progress";
+		};
+		C7574F6A2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 726B2B5D1C645FC900388755;
+			remoteInfo = "UI Tests";
+		};
+		C7574F6C2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7205C43E1E13049400E370AE;
+			remoteInfo = generate_appcast;
+		};
+		C7574F6E2351F70900358397 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EA1E280F22B64522004AA304;
+			remoteInfo = bsdiff;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -121,9 +235,9 @@
 				C75083572222865F0020270E /* HotKey.framework in Embed Frameworks */,
 				C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */,
 				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
+				C7574F742351F71B00358397 /* Sparkle.framework in Embed Frameworks */,
 				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
 				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
-				C75083492222865F0020270E /* Sparkle.framework in Embed Frameworks */,
 				C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */,
 				C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */,
 				C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */,
@@ -134,6 +248,19 @@
 				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7574F752351F71B00358397 /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				C7574F722351F71A00358397 /* org.sparkle-project.InstallerStatus.xpc in Embed XPC Services */,
+				C7574F712351F71A00358397 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */,
+				C7574F702351F71A00358397 /* org.sparkle-project.InstallerConnection.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C7A2BDDE22411E2400C910E3 /* CopyFiles */ = {
@@ -152,7 +279,6 @@
 				C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */,
 				C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */,
 				C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */,
-				C7A2BDF622411E9500C910E3 /* Sparkle.framework.dSYM in CopyFiles */,
 				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
 				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
 			);
@@ -193,31 +319,30 @@
 		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
-		C731261022B3DEF5001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Down.framework; path = Frameworks/Down.framework; sourceTree = "<group>"; };
-		C731261222B3DF0A001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Down.framework; path = Frameworks/Down.framework; sourceTree = "<group>"; };
-		C731261522B3DF1E001ED199 /* Down.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Down.framework.dSYM; path = Frameworks/Down.framework.dSYM; sourceTree = "<group>"; };
+		C731261222B3DF0A001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Down.framework; sourceTree = "<group>"; };
+		C731261522B3DF1E001ED199 /* Down.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Down.framework.dSYM; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75047A92119B30300458191 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
-		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WAYWindow.framework; path = Frameworks/WAYWindow.framework; sourceTree = "<group>"; };
-		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = Frameworks/Charts.framework; sourceTree = "<group>"; };
-		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Frameworks/Alamofire.framework; sourceTree = "<group>"; };
-		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Frameworks/Solar.framework; sourceTree = "<group>"; };
-		C75083382222865E0020270E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Frameworks/Sparkle.framework; sourceTree = "<group>"; };
-		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftDate.framework; path = Frameworks/SwiftDate.framework; sourceTree = "<group>"; };
-		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Frameworks/SwiftyJSON.framework; sourceTree = "<group>"; };
-		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KeyHolder.framework; path = Frameworks/KeyHolder.framework; sourceTree = "<group>"; };
-		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Frameworks/SwiftyBeaver.framework; sourceTree = "<group>"; };
-		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Magnet.framework; path = Frameworks/Magnet.framework; sourceTree = "<group>"; };
-		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSPageControl.framework; path = Frameworks/NSPageControl.framework; sourceTree = "<group>"; };
-		C750833F2222865F0020270E /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HotKey.framework; path = Frameworks/HotKey.framework; sourceTree = "<group>"; };
+		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WAYWindow.framework; sourceTree = "<group>"; };
+		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Charts.framework; sourceTree = "<group>"; };
+		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Alamofire.framework; sourceTree = "<group>"; };
+		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Solar.framework; sourceTree = "<group>"; };
+		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftDate.framework; sourceTree = "<group>"; };
+		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyJSON.framework; sourceTree = "<group>"; };
+		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeyHolder.framework; sourceTree = "<group>"; };
+		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyBeaver.framework; sourceTree = "<group>"; };
+		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Magnet.framework; sourceTree = "<group>"; };
+		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NSPageControl.framework; sourceTree = "<group>"; };
+		C750833F2222865F0020270E /* HotKey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HotKey.framework; sourceTree = "<group>"; };
 		C750835D2222BEAA0020270E /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		C750835E2222BEAA0020270E /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
 		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC.c; sourceTree = SOURCE_ROOT; };
+		C7574EFF2351F28200358397 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = Extern/Sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
@@ -231,20 +356,19 @@
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
-		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Surge.framework; path = Frameworks/Surge.framework; sourceTree = "<group>"; };
-		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Charts.framework.dSYM; path = Frameworks/Charts.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Frameworks/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeyHolder.framework.dSYM; path = Frameworks/KeyHolder.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Solar.framework.dSYM; path = Frameworks/Solar.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = WAYWindow.framework.dSYM; path = Frameworks/WAYWindow.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Surge.framework.dSYM; path = Frameworks/Surge.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = HotKey.framework.dSYM; path = Frameworks/HotKey.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Magnet.framework.dSYM; path = Frameworks/Magnet.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftDate.framework.dSYM; path = Frameworks/SwiftDate.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyBeaver.framework.dSYM; path = Frameworks/SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Sparkle.framework.dSYM; path = Frameworks/Sparkle.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = NSPageControl.framework.dSYM; path = Frameworks/NSPageControl.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Alamofire.framework.dSYM; path = Frameworks/Alamofire.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Surge.framework; sourceTree = "<group>"; };
+		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Charts.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = KeyHolder.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Solar.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = WAYWindow.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Surge.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = HotKey.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Magnet.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftDate.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = NSPageControl.framework.dSYM; sourceTree = "<group>"; };
+		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Alamofire.framework.dSYM; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
@@ -281,19 +405,19 @@
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
 				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
-				C750835F2222BEAB0020270E /* Crashlytics.framework in Frameworks */,
+				C7574EFD2351E3D500358397 /* Fabric.framework in Frameworks */,
 				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
 				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
 				C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */,
 				C75083562222865F0020270E /* HotKey.framework in Frameworks */,
-				C75083602222BEAB0020270E /* Fabric.framework in Frameworks */,
 				C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */,
-				C75083482222865F0020270E /* Sparkle.framework in Frameworks */,
+				C7574EFB2351E3D300358397 /* Crashlytics.framework in Frameworks */,
 				C75083442222865F0020270E /* Alamofire.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
 				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
+				C7574F732351F71A00358397 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +446,29 @@
 				C7151944224E34BA0024C6F6 /* DDC.swift */,
 			);
 			path = DDC;
+			sourceTree = "<group>";
+		};
+		C7574F3B2351F70900358397 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C7574F512351F70900358397 /* Sparkle.framework */,
+				C7574F532351F70900358397 /* SparkleCore.framework */,
+				C7574F552351F70900358397 /* Autoupdate */,
+				C7574F572351F70900358397 /* org.sparkle-project.InstallerLauncher.xpc */,
+				C7574F592351F70900358397 /* org.sparkle-project.InstallerConnection.xpc */,
+				C7574F5B2351F70900358397 /* org.sparkle-project.InstallerStatus.xpc */,
+				C7574F5D2351F70900358397 /* org.sparkle-project.Downloader.xpc */,
+				C7574F5F2351F70900358397 /* Sparkle Test App.app */,
+				C7574F612351F70900358397 /* TestAppHelper.xpc */,
+				C7574F632351F70900358397 /* Sparkle Unit Tests.xctest */,
+				C7574F652351F70900358397 /* BinaryDelta */,
+				C7574F672351F70900358397 /* sparkle.app */,
+				C7574F692351F70900358397 /* Updater.app */,
+				C7574F6B2351F70900358397 /* UI Tests.xctest */,
+				C7574F6D2351F70900358397 /* generate_appcast */,
+				C7574F6F2351F70900358397 /* libbsdiff.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		C76545231FD8A0E000DBACE9 /* Data */ = {
@@ -385,36 +532,6 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
-				C731261522B3DF1E001ED199 /* Down.framework.dSYM */,
-				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
-				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
-				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
-				C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */,
-				C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */,
-				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
-				C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */,
-				C7A2BDE922411E9500C910E3 /* Sparkle.framework.dSYM */,
-				C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */,
-				C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */,
-				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
-				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
-				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
-				C731261222B3DF0A001ED199 /* Down.framework */,
-				C75083362222865D0020270E /* Alamofire.framework */,
-				C75083352222865D0020270E /* Charts.framework */,
-				C750835D2222BEAA0020270E /* Crashlytics.framework */,
-				C750835E2222BEAA0020270E /* Fabric.framework */,
-				C750833F2222865F0020270E /* HotKey.framework */,
-				C750833B2222865E0020270E /* KeyHolder.framework */,
-				C750833D2222865E0020270E /* Magnet.framework */,
-				C750833E2222865E0020270E /* NSPageControl.framework */,
-				C75083372222865E0020270E /* Solar.framework */,
-				C75083382222865E0020270E /* Sparkle.framework */,
-				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
-				C75083392222865E0020270E /* SwiftDate.framework */,
-				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
-				C750833A2222865E0020270E /* SwiftyJSON.framework */,
-				C75083342222865D0020270E /* WAYWindow.framework */,
 				C7A2574120EA249B003B3A84 /* dsa_pub.pem */,
 				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
 				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
@@ -466,11 +583,39 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C731261022B3DEF5001ED199 /* Down.framework */,
+				C731261522B3DF1E001ED199 /* Down.framework.dSYM */,
+				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
+				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
+				C7A2BDE522411E9400C910E3 /* HotKey.framework.dSYM */,
+				C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */,
+				C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */,
+				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
+				C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */,
+				C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */,
+				C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */,
+				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
+				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
+				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
+				C731261222B3DF0A001ED199 /* Down.framework */,
+				C75083362222865D0020270E /* Alamofire.framework */,
+				C75083352222865D0020270E /* Charts.framework */,
+				C750835D2222BEAA0020270E /* Crashlytics.framework */,
+				C750835E2222BEAA0020270E /* Fabric.framework */,
+				C750833F2222865F0020270E /* HotKey.framework */,
+				C750833B2222865E0020270E /* KeyHolder.framework */,
+				C750833D2222865E0020270E /* Magnet.framework */,
+				C750833E2222865E0020270E /* NSPageControl.framework */,
+				C75083372222865E0020270E /* Solar.framework */,
+				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
+				C75083392222865E0020270E /* SwiftDate.framework */,
+				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
+				C750833A2222865E0020270E /* SwiftyJSON.framework */,
+				C75083342222865D0020270E /* WAYWindow.framework */,
+				C7574EFF2351F28200358397 /* Sparkle.xcodeproj */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
 			);
-			name = Frameworks;
+			path = Frameworks;
 			sourceTree = "<group>";
 		};
 		G_5197027794336 /* Generated */ = {
@@ -495,6 +640,7 @@
 				C7EA516920EA470800F2B06B /* ShellScript */,
 				C75083582222865F0020270E /* Embed Frameworks */,
 				C7A2BDDE22411E2400C910E3 /* CopyFiles */,
+				C7574F752351F71B00358397 /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
@@ -530,7 +676,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -571,6 +717,10 @@
 					ProductGroup = C7151936224E33590024C6F6 /* Products */;
 					ProjectRef = C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */;
 				},
+				{
+					ProductGroup = C7574F3B2351F70900358397 /* Products */;
+					ProjectRef = C7574EFF2351F28200358397 /* Sparkle.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -586,6 +736,118 @@
 			fileType = "compiled.mach-o.executable";
 			path = EDIDReader;
 			remoteRef = C7151939224E335A0024C6F6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F512351F70900358397 /* Sparkle.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Sparkle.framework;
+			remoteRef = C7574F502351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F532351F70900358397 /* SparkleCore.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SparkleCore.framework;
+			remoteRef = C7574F522351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F552351F70900358397 /* Autoupdate */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Autoupdate;
+			remoteRef = C7574F542351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F572351F70900358397 /* org.sparkle-project.InstallerLauncher.xpc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.xpc-service";
+			path = "org.sparkle-project.InstallerLauncher.xpc";
+			remoteRef = C7574F562351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F592351F70900358397 /* org.sparkle-project.InstallerConnection.xpc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.xpc-service";
+			path = "org.sparkle-project.InstallerConnection.xpc";
+			remoteRef = C7574F582351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F5B2351F70900358397 /* org.sparkle-project.InstallerStatus.xpc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.xpc-service";
+			path = "org.sparkle-project.InstallerStatus.xpc";
+			remoteRef = C7574F5A2351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F5D2351F70900358397 /* org.sparkle-project.Downloader.xpc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.xpc-service";
+			path = "org.sparkle-project.Downloader.xpc";
+			remoteRef = C7574F5C2351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F5F2351F70900358397 /* Sparkle Test App.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Sparkle Test App.app";
+			remoteRef = C7574F5E2351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F612351F70900358397 /* TestAppHelper.xpc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.xpc-service";
+			path = TestAppHelper.xpc;
+			remoteRef = C7574F602351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F632351F70900358397 /* Sparkle Unit Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Sparkle Unit Tests.xctest";
+			remoteRef = C7574F622351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F652351F70900358397 /* BinaryDelta */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = BinaryDelta;
+			remoteRef = C7574F642351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F672351F70900358397 /* sparkle.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = sparkle.app;
+			remoteRef = C7574F662351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F692351F70900358397 /* Updater.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = Updater.app;
+			remoteRef = C7574F682351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F6B2351F70900358397 /* UI Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "UI Tests.xctest";
+			remoteRef = C7574F6A2351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F6D2351F70900358397 /* generate_appcast */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = generate_appcast;
+			remoteRef = C7574F6C2351F70900358397 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C7574F6F2351F70900358397 /* libbsdiff.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libbsdiff.a;
+			remoteRef = C7574F6E2351F70900358397 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -827,8 +1089,10 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2.9.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = RDDXV84A73;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -838,6 +1102,7 @@
 				INFOPLIST_FILE = Lunar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 2.9.0;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -857,7 +1122,9 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2.9.0;
 				DEVELOPMENT_TEAM = RDDXV84A73;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -867,6 +1134,7 @@
 				INFOPLIST_FILE = Lunar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks $(CONFIGURATION_BUILD_DIR) @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 2.9.0;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -886,6 +1154,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -911,6 +1180,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
