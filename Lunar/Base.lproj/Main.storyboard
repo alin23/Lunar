@@ -208,7 +208,7 @@
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
                     </connections>
                 </customObject>
-                <customObject id="JCY-9H-EwC" customClass="SUUpdater"/>
+                <customObject id="JCY-9H-EwC" customClass="SPUStandardUpdaterController"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="3YV-ka-Eop"/>

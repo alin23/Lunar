@@ -1,8 +1,0 @@
-framework module Answers {
-    header "Answers.h"
-    header "ANSCompatibility.h"
-
-    export *
-
-    link "z"
-}
