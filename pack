@@ -49,7 +49,7 @@ xattr -cr $appDmg
 codesign -fs "Mac Developer: alin.p32@gmail.com (FVP7HX44T5)" $appDmg
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
-generate_appcast $releaseDir
+./bin/generate_appcast $releaseDir
 
 cp $appDmg $appLatestDmg
 git lfs track Releases/Lunar-$appVersion.dmg
