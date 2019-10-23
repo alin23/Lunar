@@ -3,11 +3,12 @@ set -l workDir (pwd)
 set -l tmpDir /tmp/Lunar
 set -l releaseDir $workDir/Releases
 set -l privKey $workDir/Lunar/Resources/dsa_priv.pem
+set -l edPrivKey $workDir/Lunar/Resources/eddsa_priv
 set -l appcast "$releaseDir/appcast.xml"
 
 mkdir -p $tmpDir
 rm -rf $tmpDir/*
-cp -R $HOME/Library/Developer/Xcode/DerivedData/Lunar-fxhkdhkacqkrwacfenhbdjuksach/Build/Products/Release/Lunar.app $tmpDir/Lunar.app
+cp -R $HOME/Temp/Lunar/Lunar.app $tmpDir/Lunar.app
 
 set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $tmpDir/Lunar.app/Contents/Info.plist)
 set -l appLatestDmg $releaseDir/../Lunar.dmg
@@ -46,10 +47,10 @@ hdiutil convert -format UDZO -o $appDmg $appTmpDmg
 
 echo \n(set_color green)"Signing $appDmg"(set_color normal)
 xattr -cr $appDmg
-codesign -fs "Mac Developer: alin.p32@gmail.com (FVP7HX44T5)" $appDmg
+codesign -fs "Developer ID Application: Alin Panaitiu (RDDXV84A73)" $appDmg -o runtime
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
-./bin/generate_appcast $releaseDir
+./bin/generate_appcast -f $privKey $releaseDir
 
 cp $appDmg $appLatestDmg
 git lfs track Releases/Lunar-$appVersion.dmg
@@ -57,5 +58,5 @@ git lfs track Releases/Lunar-latest.dmg
 git lfs track Releases/*.delta
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
-./update_appcast.py $privKey
+./update_appcast.py $privKey (cat $edPrivKey)
 subl $appcast
