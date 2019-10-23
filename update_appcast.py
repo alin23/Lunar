@@ -21,7 +21,7 @@ parser = etree.XMLParser(strip_cdata=False)
 appcast = etree.parse(str(appcast_path), parser=parser)
 LUNAR_SITE = "https://lunar.fyi"
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
-SIGNER = "/usr/local/sbin/sign_update"
+SIGNER = Path.cwd() / "bin" / "sign_update"
 DELTA_PATTERN = re.compile(
     r"Lunar([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+\.[0-9]+\.[0-9]+).delta"
 )
@@ -64,7 +64,7 @@ def sparkle(attr):
 def get_signature(file):
     print("Signing", file)
     return (
-        subprocess.check_output([SIGNER, file, str(key_path)])
+        subprocess.check_output([str(SIGNER), file, str(key_path)])
         .decode()
         .replace("\n", "")
     )
