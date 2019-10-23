@@ -31,3 +31,4 @@ Frameworks/*.framework*
 Lunar/Resources/dsa_priv.pem
 GoogleService-Info.plist
 Frameworks/Extern
+Lunar/Resources/eddsa_priv

@@ -14,6 +14,11 @@ try:
 except:
     key_path = None
 
+try:
+    new_key = Path(sys.argv[2])
+except:
+    new_key = None
+
 release_notes = Path.cwd() / "ReleaseNotes"
 appcast_path = Path.cwd() / "Releases" / "appcast.xml"
 
@@ -21,7 +26,8 @@ parser = etree.XMLParser(strip_cdata=False)
 appcast = etree.parse(str(appcast_path), parser=parser)
 LUNAR_SITE = "https://lunar.fyi"
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
-SIGNER = Path.cwd() / "bin" / "sign_update"
+SIGNER = Path.cwd() / "bin" / "sign_update_dsa"
+SIGNER_NEW = Path.cwd() / "bin" / "sign_update_eddsa"
 DELTA_PATTERN = re.compile(
     r"Lunar([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+\.[0-9]+\.[0-9]+).delta"
 )
@@ -62,9 +68,18 @@ def sparkle(attr):
 
 
 def get_signature(file):
-    print("Signing", file)
+    print("Signing (DSA)", file)
     return (
         subprocess.check_output([str(SIGNER), file, str(key_path)])
+        .decode()
+        .replace("\n", "")
+    )
+
+
+def get_new_signature(file):
+    print("Signing (EDDSA)", file)
+    return (
+        subprocess.check_output([str(SIGNER_NEW), "-s", str(new_key), file])
         .decode()
         .replace("\n", "")
     )
@@ -79,9 +94,11 @@ for item in appcast.iter("item"):
     version = enclosure.attrib[sparkle("version")]
     enclosure.set("url", f"{LUNAR_SITE}/download/{version}")
 
+    dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
     if key_path and not sig:
-        dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
         enclosure.set(sparkle("dsaSignature"), get_signature(dmg))
+    if new_key and not sig:
+        enclosure.set(sparkle("edSignature"), get_new_signature(dmg))
 
     release_notes_file = release_notes / f"{version}.md"
     if description is None and release_notes_file.exists():
@@ -104,15 +121,13 @@ for item in appcast.iter("item"):
             sig = enclosure.attrib.get(sparkle("dsaSignature"))
             enclosure.set("url", f"{LUNAR_SITE}/delta/{new_version}/{old_version}")
 
+            delta_file = appcast_path.with_name(
+                f"Lunar{new_version}-{old_version}.delta"
+            )
             if key_path and not sig:
-                enclosure.set(
-                    sparkle("dsaSignature"),
-                    get_signature(
-                        appcast_path.with_name(
-                            f"Lunar{new_version}-{old_version}.delta"
-                        )
-                    ),
-                )
+                enclosure.set(sparkle("dsaSignature"), get_signature(delta_file))
+            if new_key and not sig:
+                enclosure.set(sparkle("edSignature"), get_new_signature(delta_file))
 
 
 appcast.write(
