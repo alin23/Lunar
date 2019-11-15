@@ -103,3 +103,6 @@ Releases/Lunar2.9.0-2.8.3.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.9.0-2.6.0.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.9.0-2.8.1.delta filter=lfs diff=lfs merge=lfs -text
 Releases/Lunar2.9.0-2.8.2.delta filter=lfs diff=lfs merge=lfs -text
+PreBuiltFrameworks/CrashLib.framework.zip filter=lfs diff=lfs merge=lfs -text
+PreBuiltFrameworks/KSCrash.framework.zip filter=lfs diff=lfs merge=lfs -text
+PreBuiltFrameworks/Sentry.framework.zip filter=lfs diff=lfs merge=lfs -text
