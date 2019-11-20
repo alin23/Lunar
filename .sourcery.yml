@@ -13,4 +13,4 @@ output:
 args:
   appSecret: ${SB_APP_SECRET}
   encryptionKey: ${SB_ENCRYPTION_KEY}
-  fabricApiKey: ${FABRIC_API_KEY}
+  sentryDSN: ${SENTRY_DSN}

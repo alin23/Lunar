@@ -6,7 +6,6 @@
 //  Copyright © 2018 Alin. All rights reserved.
 //
 
-import Crashlytics
 import Foundation
 import SwiftyBeaver
 
@@ -51,7 +50,6 @@ class Logger: SwiftyBeaver {
         context: Any? = nil
     ) {
         super.verbose(message(), file, function, line: line, context: context)
-        crashlog(String(describing: message()))
     }
 
     open override class func debug(
@@ -63,7 +61,6 @@ class Logger: SwiftyBeaver {
         context: Any? = nil
     ) {
         super.debug(message(), file, function, line: line, context: context)
-        crashlog(String(describing: message()))
     }
 
     open override class func info(
@@ -75,7 +72,6 @@ class Logger: SwiftyBeaver {
         context: Any? = nil
     ) {
         super.info(message(), file, function, line: line, context: context)
-        crashlog(String(describing: message()))
     }
 
     open override class func warning(
@@ -87,7 +83,6 @@ class Logger: SwiftyBeaver {
         context: Any? = nil
     ) {
         super.warning(message(), file, function, line: line, context: context)
-        crashlog(String(describing: message()))
     }
 
     open override class func error(
@@ -99,10 +94,5 @@ class Logger: SwiftyBeaver {
         context: Any? = nil
     ) {
         super.error(message(), file, function, line: line, context: context)
-        crashlog(String(describing: message()))
-    }
-
-    class func crashlog(_ message: String) {
-        CLSLogv("%@", getVaList([message]))
     }
 }
