@@ -44,7 +44,7 @@ class ScrollableTextFieldCaption: NSTextField {
 
     override func mouseEntered(with _: NSEvent) {
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        stringValue = "Scroll to change value"
+        stringValue = "Scroll to change"
         alphaValue = 0.5
     }
 

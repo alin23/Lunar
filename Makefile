@@ -18,7 +18,7 @@ $(ARCHIVED_FRAMEWORK_FILES): PreBuiltFrameworks/%.framework.zip: Carthage/Build/
 	carthage archive $* --output PreBuiltFrameworks/
 	git lfs track $@
 
-$(FRAMEWORK_PATCH_DIRS): Carthage/Checkouts/%: Patches/%.patch
+Patches/%.patch: Carthage/Checkouts/%
 	patch -f -d Carthage/Checkouts/$* -p1 < Patches/$*.patch || true
 
 $(PREBUILT_FRAMEWORK_FILES): Frameworks/%.framework: PreBuiltFrameworks/%.framework.zip
@@ -32,9 +32,11 @@ $(GENERATED_FILES): Lunar/Generated/%.generated.swift: Lunar/Templates/%.stencil
 
 carthage-archive: $(ARCHIVED_FRAMEWORK_FILES)
 carthage-extract: $(PREBUILT_FRAMEWORK_FILES)
-carthage-patch: $(FRAMEWORK_PATCH_DIRS)
-carthage-swift-version:
+carthage-patch: $(PATCH_FILES)
+carthage-replace:
 	sd 'SWIFT_VERSION = [0-4].[0-9]' 'SWIFT_VERSION = 5.0' $$(rg -l 'SWIFT_VERSION = ' Carthage/Checkouts/)
+	sd 'MACOSX_DEPLOYMENT_TARGET = 10.1[2-5]' 'MACOSX_DEPLOYMENT_TARGET = 10.11' $$(rg -l 'MACOSX_DEPLOYMENT_TARGET = 10.1' Carthage/Checkouts/)
+	sd 'kCAFillModeForwards' 'CAMediaTimingFillMode.forwards' $$(rg -l 'kCAFillModeForwards' Carthage/Checkouts/)
 
 carthage-clean:
 	rm -rf Frameworks/*.framework*
@@ -53,7 +55,7 @@ carthage-track:
 	git add PreBuiltFrameworks/*.zip
 	git commit -m "Add prebuilt frameworks"
 
-carthage: carthage-update carthage-patch carthage-swift-version carthage-build carthage-archive carthage-extract carthage-track
+carthage: carthage-update carthage-patch carthage-replace carthage-build carthage-archive carthage-extract carthage-track
 carthage-dev: carthage-extract
 
 .git/hooks/pre-commit: pre-commit.sh
@@ -92,5 +94,6 @@ release: changelog
 	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
 	rsync -v -e ssh Releases/* noiseblend:/static/Lunar
 	rsync -v -e ssh Lunar.dmg noiseblend:/static/Lunar
+	./release.sh
 
 print-%  : ; @echo $* = $($*)
