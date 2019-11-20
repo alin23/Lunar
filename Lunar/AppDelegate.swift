@@ -11,10 +11,8 @@ import Carbon.HIToolbox
 import Cocoa
 import Compression
 import CoreLocation
-import Crashlytics
-import Fabric
-import class HotKey.HotKey
 import Magnet
+import Sentry
 import ServiceManagement
 import WAYWindow
 
@@ -64,10 +62,10 @@ func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     return max(min(number, maxVal), minVal)
 }
 
-var upHotkey: HotKey?
-var downHotkey: HotKey?
-var leftHotkey: HotKey?
-var rightHotkey: HotKey?
+var upHotkey: Magnet.HotKey?
+var downHotkey: Magnet.HotKey?
+var leftHotkey: Magnet.HotKey?
+var rightHotkey: Magnet.HotKey?
 var thisIsFirstRun = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
@@ -139,7 +137,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
         }
-        self.setKeyEquivalents(hotkeyConfig)
+        setKeyEquivalents(hotkeyConfig)
     }
 
     func listenForAdaptiveModeChange() {
@@ -204,20 +202,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidResignActive(_: Notification) {
+        log.debug("applicationDidResignActive")
+
+        upHotkey?.unregister()
+        downHotkey?.unregister()
         upHotkey = nil
         downHotkey = nil
-        leftHotkey = nil
-        rightHotkey = nil
+
+        setupHotkeys(enable: false)
     }
 
-    func setupHotkeys() {
+    func setupHotkeys(enable: Bool) {
         if let pageController = windowController?.window?.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
-            pageController.setupHotkeys()
+            pageController.setupHotkeys(enable: enable)
         }
     }
 
     func applicationDidBecomeActive(_: Notification) {
-        setupHotkeys()
+        setupHotkeys(enable: true)
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
@@ -359,21 +361,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func setKeyEquivalents(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
-        Hotkey.setKeyEquivalent(.lunar, menuItem: self.preferencesMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.toggle, menuItem: self.toggleMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.lunar, menuItem: preferencesMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.toggle, menuItem: toggleMenuItem, hotkeys: hotkeys)
 
-        Hotkey.setKeyEquivalent(.percent0, menuItem: self.percent0MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent25, menuItem: self.percent25MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent50, menuItem: self.percent50MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent75, menuItem: self.percent75MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent100, menuItem: self.percent100MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent0, menuItem: percent0MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent25, menuItem: percent25MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent50, menuItem: percent50MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent75, menuItem: percent75MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.percent100, menuItem: percent100MenuItem, hotkeys: hotkeys)
 
-        Hotkey.setKeyEquivalent(.brightnessUp, menuItem: self.brightnessUpMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.brightnessDown, menuItem: self.brightnessDownMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.contrastUp, menuItem: self.contrastUpMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.contrastDown, menuItem: self.contrastDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.brightnessUp, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.brightnessDown, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.contrastUp, menuItem: contrastUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(.contrastDown, menuItem: contrastDownMenuItem, hotkeys: hotkeys)
 
-        self.menu?.update()
+        menu?.update()
     }
 
     func acquirePrivileges() -> Bool {
@@ -389,7 +391,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        Fabric.with([Crashlytics.self, Answers.self])
+        do {
+            Client.shared = try Client(dsn: secrets.sentryDSN)
+            try Client.shared?.startCrashHandler()
+        } catch {
+            print("\(error)")
+        }
         log.initLogger()
 
         if let logPath = LOG_URL.path.cString(using: .utf8) {
@@ -599,7 +606,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.toggle()
     }
 
-    @IBAction func showWindow(sender _: Any?) {
+    @IBAction func showPreferencesWindow(sender _: Any?) {
         showWindow()
     }
 
