@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Magnet
 
 class ModernWindowController: NSWindowController, NSWindowDelegate {
     var observer: NSKeyValueObservation?
@@ -38,6 +39,9 @@ class ModernWindowController: NSWindowController, NSWindowDelegate {
     func windowWillClose(_: Notification) {
         log.info("Window closing")
 
+        log.debug("Unregistering up/down hotkeys")
+        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
         upHotkey?.unregister()
         downHotkey?.unregister()
         upHotkey = nil
