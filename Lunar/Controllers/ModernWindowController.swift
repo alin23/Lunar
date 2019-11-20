@@ -37,10 +37,15 @@ class ModernWindowController: NSWindowController, NSWindowDelegate {
 
     func windowWillClose(_: Notification) {
         log.info("Window closing")
+
+        upHotkey?.unregister()
+        downHotkey?.unregister()
         upHotkey = nil
         downHotkey = nil
-        leftHotkey = nil
-        rightHotkey = nil
+
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+            appDelegate.setupHotkeys(enable: false)
+        }
         helpPopover.contentViewController = nil
     }
 }

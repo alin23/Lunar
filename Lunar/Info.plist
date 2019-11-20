@@ -22,28 +22,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>Fabric</key>
-	<dict>
-		<key>APIKey</key>
-		<string>7c951a09e2bbe159caece2d3ea316c430bcf53f8</string>
-		<key>Kits</key>
-		<array>
-			<dict>
-				<key>KitInfo</key>
-				<dict>
-					<key>KitName</key>
-					<string>Crashlytics</string>
-				</dict>
-			</dict>
-			<dict>
-				<key>KitInfo</key>
-				<dict>
-					<key>KitName</key>
-					<string>Answers</string>
-				</dict>
-			</dict>
-		</array>
-	</dict>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>

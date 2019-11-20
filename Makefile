@@ -33,6 +33,9 @@ $(GENERATED_FILES): Lunar/Generated/%.generated.swift: Lunar/Templates/%.stencil
 carthage-archive: $(ARCHIVED_FRAMEWORK_FILES)
 carthage-extract: $(PREBUILT_FRAMEWORK_FILES)
 carthage-patch: $(FRAMEWORK_PATCH_DIRS)
+carthage-swift-version:
+	sd 'SWIFT_VERSION = [0-4].[0-9]' 'SWIFT_VERSION = 5.0' $$(rg -l 'SWIFT_VERSION = ' Carthage/Checkouts/)
+
 carthage-clean:
 	rm -rf Frameworks/*.framework*
 
@@ -50,7 +53,7 @@ carthage-track:
 	git add PreBuiltFrameworks/*.zip
 	git commit -m "Add prebuilt frameworks"
 
-carthage: carthage-update carthage-patch carthage-build carthage-archive carthage-extract carthage-track
+carthage: carthage-update carthage-patch carthage-swift-version carthage-build carthage-archive carthage-extract carthage-track
 carthage-dev: carthage-extract
 
 .git/hooks/pre-commit: pre-commit.sh
