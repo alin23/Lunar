@@ -6,8 +6,9 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import Carbon.HIToolbox
 import Cocoa
-import HotKey
+import Magnet
 
 class ScrollableTextField: NSTextField {
     @IBInspectable var lowerLimit: Double = 0.0
@@ -96,13 +97,15 @@ class ScrollableTextField: NSTextField {
     }
 
     override func textDidBeginEditing(_: Notification) {
-        leftHotkey = nil
-        rightHotkey = nil
+        log.debug("Editing text")
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+            appDelegate.setupHotkeys(enable: false)
+        }
     }
 
     override func textDidEndEditing(_: Notification) {
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-            appDelegate.setupHotkeys()
+            appDelegate.setupHotkeys(enable: true)
         }
         darken(color: textFieldColor)
     }
@@ -139,24 +142,20 @@ class ScrollableTextField: NSTextField {
         }
         hover = true
         lightenUp(color: textFieldColorHover)
-        upHotkey = HotKey(
-            key: .upArrow,
-            modifiers: [],
-            keyDownHandler: increaseValue,
-            keyUpHandler: {
-                self.onValueChanged?(self.integerValue)
-                self.onValueChangedDouble?(self.doubleValue)
-            }
-        )
-        downHotkey = HotKey(
-            key: .downArrow,
-            modifiers: [],
-            keyDownHandler: decreaseValue,
-            keyUpHandler: {
-                self.onValueChanged?(self.integerValue)
-                self.onValueChangedDouble?(self.doubleValue)
-            }
-        )
+
+        upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: KeyCombo(keyCode: kVK_UpArrow, carbonModifiers: 0)!) { _ in
+            self.increaseValue()
+            self.onValueChanged?(self.integerValue)
+            self.onValueChangedDouble?(self.doubleValue)
+        }
+        downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: KeyCombo(keyCode: kVK_DownArrow, carbonModifiers: 0)!) { _ in
+            self.decreaseValue()
+            self.onValueChanged?(self.integerValue)
+            self.onValueChangedDouble?(self.doubleValue)
+        }
+        upHotkey?.register()
+        downHotkey?.register()
+
         onMouseEnter?()
     }
 
@@ -166,6 +165,8 @@ class ScrollableTextField: NSTextField {
         }
         hover = false
         darken(color: textFieldColor)
+        upHotkey?.unregister()
+        downHotkey?.unregister()
         upHotkey = nil
         downHotkey = nil
         onMouseExit?()
@@ -241,4 +242,3 @@ class ScrollableTextField: NSTextField {
         }
     }
 }
-

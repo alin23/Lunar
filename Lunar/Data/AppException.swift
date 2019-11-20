@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import Crashlytics
 
 let APP_MAX_BRIGHTNESS: UInt8 = 50
 let APP_MAX_CONTRAST: UInt8 = 30
@@ -32,7 +31,6 @@ class AppException: NSManagedObject {
     }
 
     @objc func remove() {
-        Answers.logCustomEvent(withName: "Removed AppException", customAttributes: ["id": self.identifier, "name": self.name])
         datastore.context.delete(self)
         try? datastore.context.save()
     }

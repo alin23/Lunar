@@ -6,9 +6,10 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import Carbon.HIToolbox
 import Cocoa
 import Foundation
-import HotKey
+import Magnet
 
 class PageController: NSPageController, NSPageControllerDelegate {
     var pageControl: PageControl!
@@ -42,7 +43,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
         if !brightnessAdapter.displays.isEmpty {
             let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
-                d1.active && !d2.active                 
+                d1.active && !d2.active
             })
             arrangedObjects.append(contentsOf: displays)
         } else {
@@ -58,27 +59,28 @@ class PageController: NSPageController, NSPageControllerDelegate {
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
-    func setupHotkeys() {
-        leftHotkey = HotKey(
-            key: .leftArrow,
-            modifiers: [],
-            keyDownHandler: {
-                self.navigateBack(nil)
-            }
-        )
-        rightHotkey = HotKey(
-            key: .rightArrow,
-            modifiers: [],
-            keyDownHandler: {
-                self.navigateForward(nil)
-            }
-        )
+    func setupHotkeys(enable: Bool) {
+        log.debug("Setting up left and right arrow keys")
+
+        if enable {
+            leftHotkey?.unregister()
+            rightHotkey?.unregister()
+
+            leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0)!, target: self, action: #selector(navigateBack(_:)))
+            rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0)!, target: self, action: #selector(navigateForward(_:)))
+
+            leftHotkey?.register()
+            rightHotkey?.register()
+        } else {
+            leftHotkey?.unregister()
+            rightHotkey?.unregister()
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        setupHotkeys()
+        setupHotkeys(enable: true)
     }
 
     func hideSwipeToHotkeysHint() {
@@ -110,8 +112,8 @@ class PageController: NSPageController, NSPageControllerDelegate {
             }
         }
     }
-    
-    func pageControllerWillStartLiveTransition(_ pageController: NSPageController) {
+
+    func pageControllerWillStartLiveTransition(_: NSPageController) {
         helpPopover.close()
     }
 
