@@ -2,7 +2,6 @@ PreBuiltFrameworks/SwiftyJSON.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/WAYWindow.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/Alamofire.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/Charts.framework.zip filter=lfs diff=lfs merge=lfs -text
-PreBuiltFrameworks/HotKey.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/KeyHolder.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/Surge.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/SwiftDate.framework.zip filter=lfs diff=lfs merge=lfs -text
