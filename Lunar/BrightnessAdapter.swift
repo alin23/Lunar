@@ -9,7 +9,6 @@
 import Alamofire
 import Cocoa
 import CoreLocation
-import Crashlytics
 import Foundation
 import Solar
 import Surge
@@ -105,13 +104,6 @@ class BrightnessAdapter {
         displays = BrightnessAdapter.getDisplays()
     }
 
-    static func logDisplays(_ displays: [Display]) {
-        for (i, display) in displays.enumerated() {
-            Crashlytics.sharedInstance().setObjectValue(display.serial, forKey: "display\(i)")
-            Answers.logCustomEvent(withName: "Found Display", customAttributes: ["serial": display.serial, "name": display.name])
-        }
-    }
-
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
@@ -162,7 +154,6 @@ class BrightnessAdapter {
         }
 
         datastore.save()
-        BrightnessAdapter.logDisplays(displays.values.map { d in d })
         return displays
     }
 
@@ -435,4 +426,3 @@ class BrightnessAdapter {
         }
     }
 }
-
