@@ -143,6 +143,11 @@ class ScrollableTextField: NSTextField {
         hover = true
         lightenUp(color: textFieldColorHover)
 
+        log.debug("Unregistering up/down hotkeys")
+        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
+
+        log.debug("Registering up/down hotkeys")
         upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: KeyCombo(keyCode: kVK_UpArrow, carbonModifiers: 0)!) { _ in
             self.increaseValue()
             self.onValueChanged?(self.integerValue)
@@ -165,10 +170,15 @@ class ScrollableTextField: NSTextField {
         }
         hover = false
         darken(color: textFieldColor)
+
+        log.debug("Unregistering up/down hotkeys")
+        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
         upHotkey?.unregister()
         downHotkey?.unregister()
         upHotkey = nil
         downHotkey = nil
+
         onMouseExit?()
     }
 
