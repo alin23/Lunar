@@ -14,6 +14,12 @@ let MIN_BRIGHTNESS: UInt8 = 0
 let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
 let MAX_CONTRAST: UInt8 = 100
+
+let DEFAULT_MIN_BRIGHTNESS: UInt8 = 5
+let DEFAULT_MAX_BRIGHTNESS: UInt8 = 90
+let DEFAULT_MIN_CONTRAST: UInt8 = 20
+let DEFAULT_MAX_CONTRAST: UInt8 = 70
+
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
@@ -74,7 +80,7 @@ class Display: NSManagedObject {
         return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
 
-    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = MIN_BRIGHTNESS, maxBrightness: UInt8 = MAX_BRIGHTNESS, minContrast: UInt8 = MIN_CONTRAST, maxContrast: UInt8 = MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
+    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS, maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS, minContrast: UInt8 = DEFAULT_MIN_CONTRAST, maxContrast: UInt8 = DEFAULT_MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
         if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
@@ -211,7 +217,6 @@ class Display: NSManagedObject {
                     } else {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
-
 
                     if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
                         self.smoothTransition(from: currentValue, to: brightness) { newValue in
