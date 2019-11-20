@@ -34,6 +34,34 @@ let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Max-Days": "5",
 ]
 let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
+let DIAGNOSTICS_EMAIL_BODY = """
+# Diagnostics
+DIAGNOSTICS_URL
+
+# Write your issue details below
+
+Was the diagnostics process able to change the brightness on your external monitor(s)?
+    # write response here
+
+Mac device where Lunar is installed (Macbook Pro 2019, iMac, Mac Mini, Hackintosh etc.):
+    # write response here
+
+Monitor connection to the Mac device (HDMI-to-USB-C, USB-C-to-USB-C, miniDisplayPort-to-DisplayPort etc.):
+    # write response here
+
+Using an USB Docking Station or Hub:
+    # write yes or no here
+
+Lunar mode used (check it in the top-right corner of the Lunar interface)
+    # Sync, Location or Manual
+
+(only if you know how to compile a C program) Does this utility work for you? https://github.com/kfix/ddcctl
+    # optional response
+
+
+Issue description:
+    # write a short description of what doesn't work as expected
+"""
 
 var lunarDisplayNames = [
     "Moony",
@@ -204,6 +232,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationDidResignActive(_: Notification) {
         log.debug("applicationDidResignActive")
 
+        log.debug("Unregistering up/down hotkeys")
+        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
         upHotkey?.unregister()
         downHotkey?.unregister()
         upHotkey = nil
@@ -714,7 +745,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             guard let url = response.value, !url.isEmpty,
-                let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
+                let urlEncoded = DIAGNOSTICS_EMAIL_BODY.replacingOccurrences(of: "DIAGNOSTICS_URL", with: url).addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
                 let subject = "Lunar logs: \(url)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
                 log.error("Debug data upload response empty")
                 self.failDebugData()

@@ -13,4 +13,3 @@ if which sentry-cli >/dev/null; then
 else
     echo "warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
 fi
-# test "$FABRIC_BUILD_SECRET" && $DIR/Frameworks/Fabric.framework/run $FABRIC_API_KEY $FABRIC_BUILD_SECRET || true

@@ -406,8 +406,8 @@
         <scene sceneID="Etk-gP-K6U">
             <objects>
                 <viewController storyboardIdentifier="HelpPopoverController" id="dYu-c2-Vop" customClass="HelpPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="RyY-cf-cX2">
-                        <rect key="frame" x="0.0" y="0.0" width="400" height="45"/>
+                    <view key="view" id="RyY-cf-cX2">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="46"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Us9-3f-8zT">
@@ -496,7 +496,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xSp-32-U36" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="477" width="100" height="16"/>
+                                <rect key="frame" x="335" y="477" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MINUTES" id="oL8-hX-2by">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -540,7 +540,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7xo-Ez-g9m" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="411" width="100" height="16"/>
+                                <rect key="frame" x="335" y="411" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MINUTES" id="Q5X-IC-Qmg">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -584,7 +584,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ugZ-qJ-vyb" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="345" width="100" height="16"/>
+                                <rect key="frame" x="335" y="345" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="EXP" id="SDL-Nm-V8a">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -628,7 +628,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f7A-iG-9Ye" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="345" width="100" height="17"/>
+                                <rect key="frame" x="335" y="345" width="130" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="STEP" id="alH-YI-1PH">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -672,7 +672,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uAE-HJ-vLk" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="345" width="100" height="17"/>
+                                <rect key="frame" x="335" y="345" width="130" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="SECONDS" id="6wl-ua-zr3">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -725,7 +725,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MXC-Hz-JPg" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="477" width="100" height="16"/>
+                                <rect key="frame" x="335" y="477" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="OJ4-QA-2BF">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -769,7 +769,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rdW-wb-yK8" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="411" width="100" height="16"/>
+                                <rect key="frame" x="335" y="411" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="zbT-C7-njG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -813,7 +813,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7N4-kW-2Jn" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="411" width="100" height="16"/>
+                                <rect key="frame" x="351" y="411" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="01Z-ov-DBh">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -848,7 +848,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UIc-7f-vS4" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="287" y="411" width="100" height="16"/>
+                                <rect key="frame" x="272" y="411" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="Aou-iN-jN3">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -886,7 +886,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ddp-9H-WcU" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="272" width="100" height="16"/>
+                                <rect key="frame" x="335" y="272" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="LONGITUDE" id="T9r-by-Kew">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -921,7 +921,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cnu-VZ-hsX" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="224" y="272" width="100" height="16"/>
+                                <rect key="frame" x="209" y="272" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="LATITUDE" id="2pH-Nn-K4a">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -991,7 +991,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="llI-KQ-U6f" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="478" width="100" height="16"/>
+                                <rect key="frame" x="351" y="478" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="vaJ-5c-shp">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1026,7 +1026,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YHl-hl-IJJ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="287" y="478" width="100" height="16"/>
+                                <rect key="frame" x="272" y="478" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="cvf-Gh-ecq">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1153,7 +1153,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pCQ-eH-V02" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="353" y="279" width="100" height="17"/>
+                                <rect key="frame" x="338" y="279" width="130" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="STEP" id="gDj-GM-ZR3">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1243,7 +1243,7 @@
                                             <tableColumns>
                                                 <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="message" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1279,7 +1279,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="256" minWidth="256" maxWidth="256" id="Dt1-Ce-6Rl" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="message" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1319,7 +1319,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="DLe-P9-tVg" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="message" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1368,7 +1368,7 @@
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C68-N6-aA6" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="-5" width="80" height="20"/>
+                                                                    <rect key="frame" x="-20" y="-5" width="120" height="20"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="9bg-Bk-YCG">
                                                                         <font key="font" size="11" name="Menlo-Bold"/>
@@ -1382,7 +1382,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="ZQc-qo-r6X" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="message" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1431,7 +1431,7 @@
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mt6-ZS-1wJ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="-5" width="80" height="20"/>
+                                                                    <rect key="frame" x="-20" y="-5" width="120" height="20"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="hOm-J9-pO3">
                                                                         <font key="font" size="11" name="Menlo-Bold"/>

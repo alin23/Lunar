@@ -261,15 +261,21 @@ class DataStore: NSObject {
         DataStore.setDefault(true, for: "startAtLogin")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")
-        DataStore.setDefault(0, for: "brightnessOffset")
+        DataStore.setDefault(-5, for: "brightnessOffset")
         DataStore.setDefault(0, for: "contrastOffset")
-        DataStore.setDefault(0, for: "brightnessLimitMin")
-        DataStore.setDefault(0, for: "contrastLimitMin")
-        DataStore.setDefault(100, for: "brightnessLimitMax")
-        DataStore.setDefault(100, for: "contrastLimitMax")
+        DataStore.setDefault(5, for: "brightnessLimitMin")
+        DataStore.setDefault(20, for: "contrastLimitMin")
+        DataStore.setDefault(90, for: "brightnessLimitMax")
+        DataStore.setDefault(70, for: "contrastLimitMax")
         DataStore.setDefault(3, for: "brightnessStep")
         DataStore.setDefault(3, for: "contrastStep")
-        DataStore.setDefault(1, for: "syncPollingSeconds")
+        DataStore.setDefault(2, for: "syncPollingSeconds")
+
+        if DDC.getBuiltinDisplay() != nil {
+            DataStore.setDefault(AdaptiveMode.sync.rawValue, for: "adaptiveBrightnessMode")
+        } else {
+            DataStore.setDefault(AdaptiveMode.location.rawValue, for: "adaptiveBrightnessMode")
+        }
 
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
