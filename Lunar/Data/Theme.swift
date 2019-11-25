@@ -12,6 +12,7 @@ let mauve = #colorLiteral(red: 0.1921568627, green: 0.1647058824, blue: 0.298039
 let darkMauve = #colorLiteral(red: 0.1512770126, green: 0.14105705, blue: 0.1921568627, alpha: 1)
 let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
+let sunYellow = #colorLiteral(red: 0.991425693, green: 0.7912780643, blue: 0.2255264819, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
 let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
