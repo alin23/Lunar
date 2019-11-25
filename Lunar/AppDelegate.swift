@@ -23,6 +23,10 @@ extension Collection where Index: Comparable {
     }
 }
 
+private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
+private let kAppleInterfaceStyle = "AppleInterfaceStyle"
+private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
+
 let TEST_MODE = false
 
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
@@ -81,6 +85,10 @@ let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
 var activeDisplay: Display?
 var helpPopover = NSPopover()
+var menuPopover = NSPopover()
+let menuPopoverCloser = DispatchWorkItem {
+    menuPopover.close()
+}
 
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
@@ -129,6 +137,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adaptiveModeObserver: NSKeyValueObservation?
     var hotkeyObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
+
+    var statusButtonTrackingArea: NSTrackingArea?
+    var statusItemButtonController: StatusItemButtonController?
 
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
@@ -312,9 +323,57 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("MenubarIcon"))
             button.image?.isTemplate = true
+
+            statusItemButtonController = StatusItemButtonController(button: button)
+            statusButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: statusItemButtonController, userInfo: nil)
+            if let trackingArea = statusButtonTrackingArea {
+                button.addTrackingArea(trackingArea)
+            }
+            button.addSubview(statusItemButtonController!)
         }
         statusItem.menu = menu
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
+
+        if menuPopover.contentViewController == nil {
+            var storyboard: NSStoryboard?
+            if #available(OSX 10.13, *) {
+                storyboard = NSStoryboard.main
+            } else {
+                storyboard = NSStoryboard(name: "Main", bundle: nil)
+            }
+
+            menuPopover.contentViewController = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
+            menuPopover.contentViewController!.loadView()
+
+            DistributedNotificationCenter.default().addObserver(
+                self,
+                selector: #selector(appleInterfaceThemeChangedNotification(notification:)),
+                name: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification),
+                object: nil
+            )
+            adaptAppearance()
+        }
+    }
+
+    @objc func appleInterfaceThemeChangedNotification(notification _: Notification) {
+        adaptAppearance()
+    }
+
+    func adaptAppearance() {
+        menuPopover.appearance = NSAppearance(named: .vibrantLight)
+        if #available(OSX 10.15, *) {
+            let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
+            if appearanceDescription.contains("dark") {
+                menuPopover.appearance = NSAppearance(named: .vibrantDark)
+            }
+
+        } else if #available(OSX 10.14, *) {
+            if let appleInterfaceStyle = UserDefaults.standard.object(forKey: kAppleInterfaceStyle) as? String {
+                if appleInterfaceStyle.lowercased().contains("dark") {
+                    menuPopover.appearance = NSAppearance(named: .vibrantDark)
+                }
+            }
+        }
     }
 
     func listenForScreenConfigurationChanged() {
@@ -561,6 +620,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount)
+        } else if brightnessAdapter.mode == .location {
+            let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
             let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
@@ -571,6 +633,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: amount)
+        } else if brightnessAdapter.mode == .location {
+            let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
             let newContrastOffset = cap(datastore.defaults.contrastOffset + amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
@@ -581,6 +646,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount)
+        } else if brightnessAdapter.mode == .location {
+            let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
             let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + -amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
@@ -591,6 +659,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: -amount)
+        } else if brightnessAdapter.mode == .location {
+            let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
             let newContrastOffset = cap(datastore.defaults.contrastOffset + -amount * 3, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
