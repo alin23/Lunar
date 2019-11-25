@@ -79,6 +79,7 @@
 		C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */; };
 		C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */; };
 		C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */; };
+		C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* MenuPopoverController.swift */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
@@ -93,6 +94,8 @@
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
+		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
+		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
 		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
 		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
@@ -266,6 +269,7 @@
 		C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = NSPageControl.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Alamofire.framework.dSYM; sourceTree = "<group>"; };
+		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
@@ -282,6 +286,8 @@
 		C7C68F08201B75C700F49A2B /* DeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteButton.swift; sourceTree = "<group>"; };
 		C7C68F0A201D356800F49A2B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
+		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -373,6 +379,7 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */,
 				C7AEC7FA1FD0B4350039B562 /* PageController.swift */,
 				C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */,
 				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
@@ -383,6 +390,7 @@
 				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
 				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
 				C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */,
+				C7A63204238C04C10005D792 /* MenuPopoverController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -390,6 +398,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
 				C72776E6201F02140055934F /* PageControl.swift */,
 				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
 				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
@@ -705,6 +714,7 @@
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
 				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
+				C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
@@ -715,11 +725,13 @@
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
+				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
+				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
