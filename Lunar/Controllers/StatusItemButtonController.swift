@@ -10,6 +10,7 @@ import Cocoa
 
 class StatusItemButtonController: NSView {
     var statusButton: NSStatusBarButton?
+    var menuPopoverOpener: DispatchWorkItem?
 
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
@@ -17,14 +18,27 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if let area = event.trackingArea, let button = statusButton {
-            menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
-            menuPopover.becomeFirstResponder()
+        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem {
+            if let area = event.trackingArea, let button = self.statusButton {
+                menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
+                menuPopover.becomeFirstResponder()
+            }
+            self.menuPopoverOpener = nil
         }
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(700_000_000))
+
+        DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverOpener!)
     }
 
     override func mouseExited(with _: NSEvent) {
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(2_000_000_000))
+        if let opener = menuPopoverOpener {
+            opener.cancel()
+            menuPopoverOpener = nil
+        }
+        menuPopoverCloser = DispatchWorkItem {
+            menuPopover.close()
+        }
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(1_000_000_000))
 
         DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser)
     }

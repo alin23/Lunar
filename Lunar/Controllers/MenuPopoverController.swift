@@ -46,7 +46,7 @@ class ModeButtonResponder: NSResponder {
         button.attributedTitle = inactiveTitle
         button.attributedAlternateTitle = activeTitle
 
-        button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 4))
+        button.setFrameSize(NSSize(width: buttonSize.width, height: 20))
         button.layer?.cornerRadius = button.frame.height / 2
 
         trackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
@@ -80,6 +80,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var manualModeButton: NSButton!
 
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
@@ -96,6 +97,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             self,
             selector: #selector(popoverDidShow(notification:)),
             name: NSPopover.didShowNotification,
+            object: menuPopover
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(popoverWillShow(notification:)),
+            name: NSPopover.willShowNotification,
             object: menuPopover
         )
         NotificationCenter.default.addObserver(
@@ -123,6 +130,18 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
         arrayController.managedObjectContext = datastore.context
         tableView.headerView = nil
+    }
+
+    @objc func popoverWillShow(notification _: Notification) {
+        let scrollFrame = scrollView.frame
+        view.setFrameSize(NSSize(width: view.frame.size.width, height: view.frame.size.height + (tableView.frame.size.height - scrollView.frame.size.height)))
+        menuPopover.contentSize = view.frame.size
+
+        scrollView.setFrameSize(tableView.frame.size)
+        scrollView.setFrameOrigin(scrollFrame.origin)
+
+        scrollView.setNeedsDisplay(scrollView.frame)
+        view.setNeedsDisplay(view.frame)
     }
 
     @objc func popoverDidShow(notification _: Notification) {
