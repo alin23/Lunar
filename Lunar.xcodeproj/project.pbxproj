@@ -64,7 +64,6 @@
 		C792241F2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
-		C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C794E1751FF01EF500549462 /* Model.xcdatamodeld */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; };
 		C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -96,6 +95,7 @@
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
+		C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */; };
 		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
 		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
 		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
@@ -219,7 +219,6 @@
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
-		C75047A92119B30300458191 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
 		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WAYWindow.framework; sourceTree = "<group>"; };
 		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Charts.framework; sourceTree = "<group>"; };
 		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Alamofire.framework; sourceTree = "<group>"; };
@@ -255,7 +254,6 @@
 		C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerConnection.xpc"; path = "XPCServices/org.sparkle-project.InstallerConnection.xpc"; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
-		C794E1761FF01EF500549462 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Surge.framework; sourceTree = "<group>"; };
 		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Charts.framework.dSYM; sourceTree = "<group>"; };
@@ -288,6 +286,8 @@
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
+		C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
+		C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -362,11 +362,11 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */,
 				C7C1F7081FD639970039507C /* DataStore.swift */,
 				C7C1F7041FD635360039507C /* Moment.swift */,
 				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
 				C7C1F7021FD5FD390039507C /* Display.swift */,
-				C794E1751FF01EF500549462 /* Model.xcdatamodeld */,
 				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
 				C72776EC201F26CB0055934F /* AppException.swift */,
 				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
@@ -723,7 +723,6 @@
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
-				C794E1771FF01EF500549462 /* Model.xcdatamodeld in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
@@ -731,6 +730,7 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
+				C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
@@ -1063,13 +1063,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		C794E1751FF01EF500549462 /* Model.xcdatamodeld */ = {
+		C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				C75047A92119B30300458191 /* Model v2.xcdatamodel */,
-				C794E1761FF01EF500549462 /* Model.xcdatamodel */,
+				C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */,
+				C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */,
 			);
-			currentVersion = C75047A92119B30300458191 /* Model v2.xcdatamodel */;
+			currentVersion = C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

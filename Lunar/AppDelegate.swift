@@ -86,7 +86,7 @@ let datastore = DataStore()
 var activeDisplay: Display?
 var helpPopover = NSPopover()
 var menuPopover = NSPopover()
-let menuPopoverCloser = DispatchWorkItem {
+var menuPopoverCloser = DispatchWorkItem {
     menuPopover.close()
 }
 
@@ -736,7 +736,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         debugMenuItem.isEnabled = false
         debugMenuItem.title = "Diagnosing displays"
 
+        oldDebugState = datastore.defaults.debug
+        oldSmoothTransitionState = datastore.defaults.smoothTransition
         datastore.defaults.set(true, forKey: "debug")
+        datastore.defaults.set(false, forKey: "smoothTransition")
+
         setDebugMode(1)
         let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
         let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
@@ -759,7 +763,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
 
-        datastore.defaults.set(false, forKey: "debug")
+        datastore.defaults.set(oldDebugState, forKey: "debug")
+        datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+
         setDebugMode(0)
 
         debugMenuItem.title = "Gathering logs"
