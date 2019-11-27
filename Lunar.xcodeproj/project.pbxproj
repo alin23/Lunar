@@ -107,6 +107,7 @@
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
+		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -299,6 +300,7 @@
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF004238EC82200031E93 /* alin_public_key.asc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = alin_public_key.asc; path = Resources/alin_public_key.asc; sourceTree = "<group>"; };
 		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
+		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
 		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */,
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
@@ -490,6 +493,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
 				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
 				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
 				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
@@ -920,6 +924,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2.9.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -957,6 +962,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2.9.1;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
