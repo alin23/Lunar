@@ -205,9 +205,9 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         }
 
         // compare IOreg's metadata to CGDisplay's metadata to infer if the IOReg's I2C monitor is the display for the given NSScreen.displayID
-        if (CGDisplayVendorNumber(displayID) != vendorID  ||
-            CGDisplayModelNumber(displayID)  != productID ||
-            CGDisplaySerialNumber(displayID) != serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
+        if (CGDisplayVendorNumber(displayID) != (UInt32)vendorID  ||
+            CGDisplayModelNumber(displayID)  != (UInt32)productID ||
+            CGDisplaySerialNumber(displayID) != (UInt32)serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
         {
             CFRelease(displayEDID);
             CFRelease(info);

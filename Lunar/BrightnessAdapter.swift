@@ -273,8 +273,7 @@ class BrightnessAdapter {
     }
 
     func getBuiltinDisplayBrightness() -> Double? {
-        if let displayID = builtinDisplay {
-            let brightness = DDC.getBrightness(for: displayID)
+        if builtinDisplay != nil, let brightness = DDC.getBrightness() {
             if brightness >= 0.0, brightness <= 1.0 {
                 return brightness * 100
             }
