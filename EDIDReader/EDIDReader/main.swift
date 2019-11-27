@@ -10,6 +10,33 @@ import Foundation
 
 let log = Logger.self
 
+func sha256(data: Data) -> Data {
+    var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+    data.withUnsafeBytes {
+        _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash)
+    }
+    return Data(hash)
+}
+
+func getSerialNumberHash() -> String? {
+    let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+
+    guard platformExpert > 0 else {
+        return nil
+    }
+
+    guard let serialNumber = (IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0).takeUnretainedValue() as? String)?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
+        return nil
+    }
+
+    IOObjectRelease(platformExpert)
+
+    guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else { return nil }
+    return sha256(data: serialNumberData).str(hex: true, separator: "")
+}
+
+print("Serial Number Hash: \(getSerialNumberHash())")
+
 func printEdid(_ data: Data) {
     let edid = data.map { $0 }.str()
     let id = data[77 ..< 90].map { $0 }.str()
@@ -19,8 +46,8 @@ func printEdid(_ data: Data) {
 
 func printDetails(_ id: CGDirectDisplayID) {
     print("    CGDirectDisplayID: \(id)")
-    let _ = DDC.setBrightness(for: id, brightness: 30)
-    
+    _ = DDC.setBrightness(for: id, brightness: 30)
+
     if let edid = DDC.getEdidData(displayID: id) {
         printEdid(edid)
     }

@@ -96,6 +96,16 @@
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */; };
+		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
+		C7CBF000238EC50C00031E93 /* ObjectivePGP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; };
+		C7CBF002238EC51200031E93 /* ObjectivePGP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; };
+		C7CBF003238EC51200031E93 /* ObjectivePGP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7CBF005238EC82200031E93 /* alin_public_key.asc in Resources */ = {isa = PBXBuildFile; fileRef = C7CBF004238EC82200031E93 /* alin_public_key.asc */; };
+		C7CBF006238EC8A400031E93 /* ObjectivePGP.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */; };
+		C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */; };
+		C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C731261522B3DF1E001ED199 /* Down.framework.dSYM */; };
+		C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
+		C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
 		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
 		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
 		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
@@ -128,6 +138,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C7CBF003238EC51200031E93 /* ObjectivePGP.framework in Embed Frameworks */,
 				C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */,
 				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
 				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
@@ -165,17 +176,21 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				C7CBF006238EC8A400031E93 /* ObjectivePGP.framework.dSYM in CopyFiles */,
+				C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */,
+				C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */,
+				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
 				C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */,
-				C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */,
 				C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */,
-				C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */,
-				C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */,
-				C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */,
 				C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */,
+				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
+				C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */,
+				C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */,
 				C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */,
 				C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */,
-				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
-				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
+				C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */,
+				C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */,
+				C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +303,11 @@
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
 		C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectivePGP.framework; sourceTree = "<group>"; };
+		C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = ObjectivePGP.framework.dSYM; sourceTree = "<group>"; };
+		C7CBF004238EC82200031E93 /* alin_public_key.asc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = alin_public_key.asc; path = Resources/alin_public_key.asc; sourceTree = "<group>"; };
+		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
 		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -309,6 +329,7 @@
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
+				C7CBF000238EC50C00031E93 /* ObjectivePGP.framework in Frameworks */,
 				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
 				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
 				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
@@ -320,6 +341,7 @@
 				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
+				C7CBF002238EC51200031E93 /* ObjectivePGP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +384,7 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBEFFC238E81FF00031E93 /* Util.swift */,
 				C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */,
 				C7C1F7081FD639970039507C /* DataStore.swift */,
 				C7C1F7041FD635360039507C /* Moment.swift */,
@@ -445,6 +468,7 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBF004238EC82200031E93 /* alin_public_key.asc */,
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
 				C77CC75A1FEDB367009AA718 /* Views */,
 				C76545241FD8A10200DBACE9 /* Controllers */,
@@ -477,6 +501,9 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
+				C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */,
+				C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */,
 				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
 				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
 				C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */,
@@ -640,6 +667,8 @@
 			files = (
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+				C7CBF005238EC82200031E93 /* alin_public_key.asc in Resources */,
+				C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -671,7 +700,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n./gencode.sh\n\n./bin/codesign_embedded_executable \"Developer ID Application: Alin Panaitiu (RDDXV84A73)\" Frameworks/XPCServices/*.xpc\n./bin/codesign_embedded_executable \"Developer ID Application: Alin Panaitiu (RDDXV84A73)\" Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate\n./bin/codesign_embedded_executable \"Developer ID Application: Alin Panaitiu (RDDXV84A73)\" Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app/\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n./gencode.sh\n\nif [[ $CONFIGURATION == \"Release\" ]]; then\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/XPCServices/*.xpc\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app/\nfi\n";
 		};
 		C78B9223237ED34E0060DC7C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -689,7 +718,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n./buildscript.sh\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [[ $CONFIGURATION == \"Release\" ]]; then\n    ./buildscript.sh\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -735,6 +764,7 @@
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
+				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
@@ -904,7 +934,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.9.0;
+				CURRENT_PROJECT_VERSION = 2.9.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -922,7 +952,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 2.9.0;
+				MARKETING_VERSION = 2.9.1;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -942,7 +972,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.9.0;
+				CURRENT_PROJECT_VERSION = 2.9.1;
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -959,7 +989,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 2.9.0;
+				MARKETING_VERSION = 2.9.1;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
