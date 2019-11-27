@@ -26,6 +26,8 @@ let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_
 let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context, adaptive: true)
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
+let ULTRAFINE_NAME = "LG UltraFine"
+
 enum ValueType {
     case brightness
     case contrast
@@ -220,10 +222,18 @@ class Display: NSManagedObject {
 
                     if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
                         self.smoothTransition(from: currentValue, to: brightness) { newValue in
-                            _ = DDC.setBrightness(for: self.id, brightness: newValue)
+                            if !self.name.contains(ULTRAFINE_NAME) {
+                                _ = DDC.setBrightness(for: self.id, brightness: newValue)
+                            } else {
+                                CoreDisplay_Display_SetUserBrightness(self.id, Double(newValue) / 100.0)
+                            }
                         }
                     } else {
-                        _ = DDC.setBrightness(for: self.id, brightness: brightness)
+                        if !self.name.contains(ULTRAFINE_NAME) {
+                            _ = DDC.setBrightness(for: self.id, brightness: brightness)
+                        } else {
+                            CoreDisplay_Display_SetUserBrightness(self.id, Double(brightness) / 100.0)
+                        }
                     }
 
                     log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(self.id)")
