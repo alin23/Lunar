@@ -14,6 +14,7 @@ import CoreLocation
 import Magnet
 import Sentry
 import ServiceManagement
+import SwiftDate
 import WAYWindow
 
 extension Collection where Index: Comparable {
@@ -140,6 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
+    var alamoFireManager: SessionManager?
 
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
@@ -479,6 +481,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return accessEnabled
     }
 
+    func sendUniqueVisitorHash() {
+        guard let serialNumberHash = getSerialNumberHash(),
+            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String),
+            let data = "\(serialNumberHash) \(appVersion)".data(using: .utf8, allowLossyConversion: true) else {
+            return
+        }
+
+        Alamofire.upload(data, to: "https://patchbay.pub/count-lunar-unique-users-anonymously")
+    }
+
+    func configureAlamofire() {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 24.hours.timeInterval
+        configuration.timeoutIntervalForResource = 7.days.timeInterval
+        alamoFireManager = Alamofire.SessionManager(configuration: configuration)
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         do {
@@ -510,6 +529,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             showWindow()
         }
 
+        configureAlamofire()
+        sendUniqueVisitorHash()
         log.debug("App finished launching")
     }
 
@@ -736,8 +757,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         debugMenuItem.isEnabled = false
         debugMenuItem.title = "Diagnosing displays"
 
-        oldDebugState = datastore.defaults.debug
-        oldSmoothTransitionState = datastore.defaults.smoothTransition
+        let oldDebugState = datastore.defaults.debug
+        let oldSmoothTransitionState = datastore.defaults.smoothTransition
         datastore.defaults.set(true, forKey: "debug")
         datastore.defaults.set(false, forKey: "smoothTransition")
 
@@ -769,7 +790,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         setDebugMode(0)
 
         debugMenuItem.title = "Gathering logs"
-        guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
+        guard let sourceString = FileManager().contents(atPath: LOG_URL.path),
+            let encryptedString = encrypt(message: sourceString) else {
             failDebugData()
             return
         }
@@ -786,8 +808,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 //            algorithm
 //        )
 
-        var debugData = sourceString
-        var mimeType = "text/plain"
+        var debugData = encryptedString
+        var mimeType = "application/octet-stream"
         var fileName = "lunar.log"
 //        if compressedSize > 0 {
 //            let encodedFileURL = LOG_URL.appendingPathExtension("lz4")
