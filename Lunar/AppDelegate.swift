@@ -790,8 +790,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         setDebugMode(0)
 
         debugMenuItem.title = "Gathering logs"
-        guard let sourceString = FileManager().contents(atPath: LOG_URL.path),
-            let encryptedString = encrypt(message: sourceString) else {
+        guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
             failDebugData()
             return
         }
@@ -808,8 +807,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 //            algorithm
 //        )
 
-        var debugData = encryptedString
-        var mimeType = "application/octet-stream"
+        var debugData = sourceString
+        var mimeType = "text/plain"
         var fileName = "lunar.log"
 //        if compressedSize > 0 {
 //            let encodedFileURL = LOG_URL.appendingPathExtension("lz4")
