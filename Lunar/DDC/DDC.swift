@@ -748,11 +748,79 @@ class DDC {
         return write(displayID: displayID, controlID: ControlID.CONTRAST, newValue: contrast)
     }
 
+    static func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt8) -> Bool {
+        return write(displayID: displayID, controlID: ControlID.RED_GAIN, newValue: redGain)
+    }
+
+    static func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt8) -> Bool {
+        return write(displayID: displayID, controlID: ControlID.GREEN_GAIN, newValue: greenGain)
+    }
+
+    static func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt8) -> Bool {
+        return write(displayID: displayID, controlID: ControlID.BLUE_GAIN, newValue: blueGain)
+    }
+
+    static func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt8) -> Bool {
+        return write(displayID: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME, newValue: audioSpeakerVolume)
+    }
+
+    static func setAudioMuted(for displayID: CGDirectDisplayID, audioMuted: Bool) -> Bool {
+        if audioMuted {
+            return write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: 1)
+        } else {
+            return write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: 2)
+        }
+    }
+
     static func reset(displayID: CGDirectDisplayID) -> Bool {
         return write(displayID: displayID, controlID: ControlID.RESET, newValue: 100)
     }
 
-    static func getBrightness(for _: CGDirectDisplayID) -> Double {
+    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> Double? {
+        guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
+            return nil
+        }
+        return Double(result.currentValue)
+    }
+
+    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> Double? {
+        guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
+            return nil
+        }
+        return Double(result.maxValue)
+    }
+
+    static func getRedGain(for displayID: CGDirectDisplayID) -> Double? {
+        return DDC.getValue(for: displayID, controlID: ControlID.RED_GAIN)
+    }
+
+    static func getGreenGain(for displayID: CGDirectDisplayID) -> Double? {
+        return DDC.getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
+    }
+
+    static func getBlueGain(for displayID: CGDirectDisplayID) -> Double? {
+        return DDC.getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
+    }
+
+    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> Double? {
+        return DDC.getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
+    }
+
+    static func isAudioMuted(for displayID: CGDirectDisplayID) -> Bool? {
+        guard let mute = DDC.getValue(for: displayID, controlID: ControlID.AUDIO_MUTE) else {
+            return nil
+        }
+        return mute == 1.0
+    }
+
+    static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
+        return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
+    }
+
+    static func getBrightness(for displayID: CGDirectDisplayID? = nil) -> Double? {
+        if let id = displayID {
+            return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
+        }
         let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
         var brightness: Float = 0.0
         IODisplayGetFloatParameter(service, 0, kIODisplayBrightnessKey as CFString, &brightness)

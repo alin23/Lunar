@@ -46,7 +46,6 @@ func printEdid(_ data: Data) {
 
 func printDetails(_ id: CGDirectDisplayID) {
     print("    CGDirectDisplayID: \(id)")
-    _ = DDC.setBrightness(for: id, brightness: 30)
 
     if let edid = DDC.getEdidData(displayID: id) {
         printEdid(edid)
@@ -69,20 +68,26 @@ func printDetails(_ id: CGDirectDisplayID) {
     let idData = DDC.getDisplayIdentificationData(displayID: id)
     let name = DDC.getDisplayName(for: id)
     let serial = DDC.getDisplaySerial(for: id)
-    let brightness = DDC.getBrightness(for: id)
 
     print("    Name: \(name ?? "UNKNOWN")")
     print("    Serial: \(serial ?? "UNKNOWN")\n")
-    print("    Brightness: \(brightness)\n")
+
+    print("    RedGain: \(DDC.getRedGain(for: id))\n")
+    print("    GreenGain: \(DDC.getGreenGain(for: id))\n")
+    print("    BlueGain: \(DDC.getBlueGain(for: id))\n")
+    print("    AudioSpeakerVolume: \(DDC.getAudioSpeakerVolume(for: id))\n")
+    print("    AudioMute: \(DDC.isAudioMuted(for: id))\n")
+    print("    Contrast: \(DDC.getContrast(for: id))\n")
+    print("    Brightness: \(DDC.getBrightness(for: id))\n")
 
     print("    Display unique ID: \(idData)\n")
     print("    Display unit number: \(CGDisplayUnitNumber(id))\n")
 }
 
-if let id = DDC.getBuiltinDisplay() {
-    print("Built-in display:")
-    printDetails(id)
-}
+// if let id = DDC.getBuiltinDisplay() {
+//     print("Built-in display:")
+//     printDetails(id)
+// }
 
 DDC.findExternalDisplays().forEach { id in
     print("External displays:")
