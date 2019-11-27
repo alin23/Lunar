@@ -74,18 +74,18 @@ enum ControlID: UInt8 {
 }
 
 extension Data {
-    func str(hex: Bool = false) -> String {
-        return map { $0 }.str(hex: hex)
+    func str(hex: Bool = false, separator: String = " ") -> String {
+        return map { $0 }.str(hex: hex, separator: separator)
     }
 }
 
 extension Array where Element == UInt8 {
-    func str(hex: Bool = false) -> String {
+    func str(hex: Bool = false, separator: String = " ") -> String {
         if !hex, !contains(where: { n in !(0x20 ... 0x7E).contains(n) }),
             let value = NSString(bytes: self, length: count, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
             return value
         } else {
-            return map { n in String(format: "%02X", n) }.joined(separator: " ")
+            return map { n in String(format: "%02X", n) }.joined(separator: separator)
         }
     }
 }

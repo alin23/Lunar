@@ -3,3 +3,4 @@
 //
 
 #import "DDC.h"
+#import <CommonCrypto/CommonDigest.h>
