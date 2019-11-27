@@ -33,7 +33,6 @@
 		C715193F224E33800024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DDC.h; path = ../../Lunar/DDC.h; sourceTree = "<group>"; };
 		C7521D38226C7D510062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = ../../Lunar/DDC.c; sourceTree = "<group>"; };
 		C79713D3225DFF8300891081 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		C79713D9225F643300891081 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = ../Frameworks/CoreDisplay.framework; sourceTree = "<group>"; };
 		C79713E1225F730800891081 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../Frameworks/SkyLight.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,7 +89,6 @@
 			isa = PBXGroup;
 			children = (
 				C79713E1225F730800891081 /* SkyLight.framework */,
-				C79713D9225F643300891081 /* CoreDisplay.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -197,7 +195,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf-with-dsym;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../Frameworks";
