@@ -202,15 +202,15 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         case .on:
             sender.state = .on
             if sender == syncModeButton {
-                log.info("SYNC")
+                log.debug("SYNC")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .sync).cgColor
                 brightnessAdapter.enable(mode: .sync)
             } else if sender == locationModeButton {
-                log.info("LOCATION")
+                log.debug("LOCATION")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .location).cgColor
                 brightnessAdapter.enable(mode: .location)
             } else {
-                log.info("MANUAL")
+                log.debug("MANUAL")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .manual).cgColor
                 brightnessAdapter.enable(mode: .manual)
             }
@@ -236,12 +236,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     override func mouseEntered(with _: NSEvent) {
-        log.info("Mouse entered menu popover")
+        log.debug("Mouse entered menu popover")
         menuPopoverCloser.cancel()
     }
 
     override func mouseExited(with _: NSEvent) {
-        log.info("Mouse exited menu popover")
+        log.debug("Mouse exited menu popover")
         menuPopover.close()
     }
 }
