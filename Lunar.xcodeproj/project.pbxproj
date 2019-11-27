@@ -97,11 +97,6 @@
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
-		C7CBF000238EC50C00031E93 /* ObjectivePGP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; };
-		C7CBF002238EC51200031E93 /* ObjectivePGP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; };
-		C7CBF003238EC51200031E93 /* ObjectivePGP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C7CBF005238EC82200031E93 /* alin_public_key.asc in Resources */ = {isa = PBXBuildFile; fileRef = C7CBF004238EC82200031E93 /* alin_public_key.asc */; };
-		C7CBF006238EC8A400031E93 /* ObjectivePGP.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */; };
 		C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */; };
 		C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C731261522B3DF1E001ED199 /* Down.framework.dSYM */; };
 		C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
@@ -138,7 +133,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C7CBF003238EC51200031E93 /* ObjectivePGP.framework in Embed Frameworks */,
 				C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */,
 				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
 				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
@@ -176,7 +170,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				C7CBF006238EC8A400031E93 /* ObjectivePGP.framework.dSYM in CopyFiles */,
 				C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */,
 				C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */,
 				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
@@ -304,8 +297,6 @@
 		C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
 		C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
-		C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectivePGP.framework; sourceTree = "<group>"; };
-		C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = ObjectivePGP.framework.dSYM; sourceTree = "<group>"; };
 		C7CBF004238EC82200031E93 /* alin_public_key.asc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = alin_public_key.asc; path = Resources/alin_public_key.asc; sourceTree = "<group>"; };
 		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
 		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -329,7 +320,6 @@
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
-				C7CBF000238EC50C00031E93 /* ObjectivePGP.framework in Frameworks */,
 				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
 				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
 				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
@@ -341,7 +331,6 @@
 				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
-				C7CBF002238EC51200031E93 /* ObjectivePGP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,8 +491,6 @@
 			isa = PBXGroup;
 			children = (
 				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
-				C7CBEFFE238EC50B00031E93 /* ObjectivePGP.framework */,
-				C7CBEFFF238EC50C00031E93 /* ObjectivePGP.framework.dSYM */,
 				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
 				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
 				C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */,
@@ -600,13 +587,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 1110;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 1020;
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -616,7 +602,6 @@
 					C7CFEA111FD376E6000AC4A6 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 1020;
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -667,7 +652,6 @@
 			files = (
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
-				C7CBF005238EC82200031E93 /* alin_public_key.asc in Resources */,
 				C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 			);
@@ -969,8 +953,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Lunar/LunarRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2.9.1;
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1035,8 +1019,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LunarService/LunarServiceRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
