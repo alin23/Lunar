@@ -133,7 +133,7 @@ class DDC {
             if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String, isScreenStr == "YES" {
                 if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
                     let screenID = CGDirectDisplayID(truncating: screenNumber)
-                    if CGDisplayIsBuiltin(screenID) == 1 {
+                    if CGDisplayIsBuiltin(screenID) != 0 {
                         continue
                     }
                     displayIDs.append(screenID)
@@ -145,9 +145,10 @@ class DDC {
 
     static func getBuiltinDisplay() -> CGDirectDisplayID? {
         for screen in NSScreen.screens {
-            if screen.deviceDescription[NSDeviceDescriptionKey.isScreen]! as! String == "YES" {
-                let screenNumber = CGDirectDisplayID(truncating: screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as! NSNumber)
-                if CGDisplayIsBuiltin(screenNumber) == 1 {
+            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen] as? String, isScreen == "YES",
+                let nsScreenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
+                let screenNumber = CGDirectDisplayID(truncating: nsScreenNumber)
+                if CGDisplayIsBuiltin(screenNumber) != 0 {
                     return screenNumber
                 }
             }
@@ -355,7 +356,8 @@ class DDC {
             control_id: controlID.rawValue,
             new_value: newValue
         )
-        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        let displayUUIDByEDIDCopy = displayUUIDByEDID
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
         let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
@@ -405,7 +407,8 @@ class DDC {
             max_value: 0,
             current_value: 0
         )
-        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        let displayUUIDByEDIDCopy = displayUUIDByEDID
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
         DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
@@ -550,7 +553,8 @@ class DDC {
         var edidData = [UInt8](repeating: 0, count: 128)
         var edid = EDID()
 
-        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDID)
+        let displayUUIDByEDIDCopy = displayUUIDByEDID
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
         EDIDTest(displayID, &edid, &edidData, nsDisplayUUIDByEDID as CFMutableDictionary)
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {

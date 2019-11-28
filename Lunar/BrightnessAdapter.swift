@@ -22,6 +22,9 @@ enum AdaptiveMode: Int {
 }
 
 class BrightnessAdapter {
+    var lidClosed: Bool = IsLidClosed()
+    var clamshellMode: Bool = false
+
     var appObserver: NSKeyValueObservation?
     var runningAppExceptions: [AppException]!
     var geolocation: Geolocation! {
@@ -52,6 +55,7 @@ class BrightnessAdapter {
     var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
     var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
 
+    var builtinBrightnessHistory = BoundedArray<UInt8>(capacity: 10)
     var lastBuiltinBrightness = 0.0
 
     var firstDisplay: Display {
@@ -67,7 +71,7 @@ class BrightnessAdapter {
     func toggle() {
         switch mode {
         case .location:
-            if builtinDisplay != nil {
+            if builtinDisplay != nil, !IsLidClosed() {
                 datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
             } else {
                 datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
@@ -80,8 +84,10 @@ class BrightnessAdapter {
     }
 
     func disable() {
-        lastMode = mode
-        mode = .manual
+        if mode != .manual {
+            lastMode = mode
+            mode = .manual
+        }
         datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
     }
 
@@ -155,6 +161,31 @@ class BrightnessAdapter {
 
         datastore.save()
         return displays
+    }
+
+    func activateClamshellMode() {
+        if mode != .manual {
+            clamshellMode = true
+            disable()
+        }
+    }
+
+    func deactivateClamshellMode() {
+        if mode == .manual {
+            clamshellMode = false
+            enable()
+        }
+    }
+
+    func manageClamshellMode() {
+        lidClosed = IsLidClosed()
+        log.info("Lid closed: \(lidClosed)")
+
+        if lidClosed {
+            activateClamshellMode()
+        } else if clamshellMode {
+            deactivateClamshellMode()
+        }
     }
 
     func fetchMoments() {
@@ -280,9 +311,11 @@ class BrightnessAdapter {
     }
 
     func getBuiltinDisplayBrightness() -> Double? {
-        if builtinDisplay != nil, let brightness = DDC.getBrightness() {
+        if builtinDisplay != nil, !IsLidClosed(), let brightness = DDC.getBrightness() {
             if brightness >= 0.0, brightness <= 1.0 {
-                return brightness * 100
+                let percentBrightness = brightness * 100.0
+                builtinBrightnessHistory.push(UInt8(round(percentBrightness)))
+                return percentBrightness
             }
         }
         return nil
