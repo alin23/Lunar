@@ -33,7 +33,7 @@ enum ValueType {
     case contrast
 }
 
-class Display: NSManagedObject {
+class Display: NSManagedObject, NSCopying {
     @NSManaged var id: CGDirectDisplayID
     @NSManaged var serial: String
     @NSManaged var name: String
@@ -82,6 +82,21 @@ class Display: NSManagedObject {
         return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
 
+    func copy(with _: NSZone? = nil) -> Any {
+        return Display(
+            id: id,
+            serial: serial,
+            name: name,
+            active: active,
+            minBrightness: minBrightness.uint8Value,
+            maxBrightness: maxBrightness.uint8Value,
+            minContrast: minContrast.uint8Value,
+            maxContrast: maxContrast.uint8Value,
+            context: nil,
+            adaptive: adaptive
+        )
+    }
+
     convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS, maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS, minContrast: UInt8 = DEFAULT_MIN_CONTRAST, maxContrast: UInt8 = DEFAULT_MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
         let context = context ?? datastore.context
         let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
@@ -118,12 +133,12 @@ class Display: NSManagedObject {
         name = Display.printableName(id: id)
     }
 
-    func readapt<T>(display: Display, change: NSKeyValueObservedChange<T>) {
+    func readapt<T: Equatable>(display: Display, change: NSKeyValueObservedChange<T>) {
         if let readaptListener = onReadapt {
             readaptListener()
         }
-        if let newVal = change.newValue as? NSNumber,
-            let oldVal = change.oldValue as? NSNumber {
+        if let newVal = change.newValue,
+            let oldVal = change.oldValue {
             if display.adaptive, newVal != oldVal {
                 switch brightnessAdapter.mode {
                 case .location:
@@ -157,7 +172,7 @@ class Display: NSManagedObject {
             minVal = currentValue
             maxVal = value
         }
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now(), qos: .userInteractive, flags: .barrier) {
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: String
