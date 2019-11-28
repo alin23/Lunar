@@ -28,5 +28,15 @@
 		{
 			"path": "/Users/alin/Downloads/simplepink/BF63602CEFC93F24B3CE38D956565E87"
 		}
-	]
+	],
+	"settings":
+	{
+		"LSP":
+		{
+			"cquery":
+			{
+				"enabled": true
+			}
+		}
+	}
 }

@@ -13,19 +13,27 @@ let textFieldColorHover = sunYellow.blended(withFraction: 0.1, of: red)!
 let textFieldColorLight = sunYellow.blended(withFraction: 0.3, of: red)!
 
 class DisplayValuesView: NSTableView {
-    var observers: [NSKeyValueObservation] = []
+    var brightnessObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
+    var contrastObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
 
-    override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
-        let scrollableBrightness = (rowView.view(atColumn: 0) as! NSTableCellView).subviews[0] as! ScrollableTextField
-        let display = (rowView.view(atColumn: 1) as! NSTableCellView).objectValue as! Display
-        let scrollableContrast = (rowView.view(atColumn: 2) as! NSTableCellView).subviews[0] as! ScrollableTextField
+    override func didRemove(_ rowView: NSTableRowView, forRow _: Int) {
+        guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display else {
+            return
+        }
+        brightnessObservers.removeValue(forKey: display.id)
+        contrastObservers.removeValue(forKey: display.id)
+    }
 
-        let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as! NSTableCellView).subviews[1] as! ScrollableTextFieldCaption
-        let scrollableContrastCaption = (rowView.view(atColumn: 2) as! NSTableCellView).subviews[1] as! ScrollableTextFieldCaption
+    override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
+        guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+            let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
+            let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+            let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
+            let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
 
         scrollableBrightness.textFieldColor = textFieldColor
         scrollableBrightness.textFieldColorHover = textFieldColorHover
@@ -52,7 +60,7 @@ class DisplayValuesView: NSTableView {
                 brightnessAdapter.disable()
             }
         }
-        observers.append(display.observe(
+        brightnessObservers[display.id] = display.observe(
             \.brightness,
             options: [.new, .old],
             changeHandler: { d, change in
@@ -64,8 +72,8 @@ class DisplayValuesView: NSTableView {
                 }
             }
         )
-        )
-        observers.append(display.observe(
+
+        contrastObservers[display.id] = display.observe(
             \.contrast,
             options: [.new, .old],
             changeHandler: { d, change in
@@ -76,7 +84,6 @@ class DisplayValuesView: NSTableView {
                     }
                 }
             }
-        )
         )
     }
 }

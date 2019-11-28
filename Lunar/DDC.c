@@ -6,34 +6,35 @@
 //  See http://github.com/jontaylor/DDC-CI-Tools-for-OS-X
 //
 
-
 #include "DDC.h"
 #include <stdarg.h>
 
 #define kMaxRequests 10
 
-const UInt8 ZEROARRAY[128] = {0};
+const UInt8 ZEROARRAY[128] = { 0 };
 
-void setDebugMode(UInt8 debug_mode) {
+void setDebugMode(UInt8 debug_mode)
+{
     DEBUG_FLAG = debug_mode;
 }
 
-void setLogPath(const char *newLogPath, ssize_t length) {
+void setLogPath(const char* newLogPath, ssize_t length)
+{
     if (logFile != NULL) {
         fclose(logFile);
         logFile = NULL;
     }
-    logPath = (char *)calloc(length + 1, sizeof(char));
+    logPath = (char*)calloc(length + 1, sizeof(char));
     strcpy(logPath, newLogPath);
 }
 
-bool logToFile(char *format, ...) {
+bool logToFile(char* format, ...)
+{
     if (DEBUG_FLAG == 0) {
         return false;
     }
     va_list args;
     va_start(args, format);
-
 
     vprintf(format, args);
     if (logFile == NULL) {
@@ -49,7 +50,45 @@ bool logToFile(char *format, ...) {
     return true;
 }
 
-static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer) {
+bool IsLidClosed(void)
+{
+    bool isClosed = false;
+    io_registry_entry_t rootDomain;
+    mach_port_t masterPort;
+    CFTypeRef clamShellStateRef = NULL;
+
+    IOReturn ioReturn = IOMasterPort(MACH_PORT_NULL, &masterPort);
+    if (ioReturn != 0) {
+        logToFile("Error on getting master port: %d\n", ioReturn);
+        return false;
+    }
+
+    // Check to see if the "AppleClamshellClosed" property is in the PM root domain:
+    rootDomain = IORegistryEntryFromPath(masterPort, kIOPowerPlane ":/IOPowerConnection/IOPMrootDomain");
+
+    clamShellStateRef = IORegistryEntryCreateCFProperty(rootDomain, CFSTR("AppleClamshellState"), kCFAllocatorDefault, 0);
+    if (clamShellStateRef == NULL) {
+        if (rootDomain)
+            IOObjectRelease(rootDomain);
+    }
+
+    if (CFBooleanGetValue((CFBooleanRef)(clamShellStateRef)) == true) {
+        isClosed = true;
+    }
+
+    if (rootDomain) {
+        IOObjectRelease(rootDomain);
+    }
+
+    if (clamShellStateRef) {
+        CFRelease(clamShellStateRef);
+    }
+
+    return isClosed;
+}
+
+static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
+{
     io_iterator_t iter;
     io_service_t serv, displayPort = 0;
 
@@ -62,18 +101,17 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer) {
     CFStringRef ioDisplayConnect = CFStringCreateWithCString(kCFAllocatorDefault, "IODisplayConnect", kCFStringEncodingASCII);
     CFDataRef edidData;
 
-    while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL)
-    {
+    while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL) {
         logToFile("Getting service class for child %d\n", serv);
         CFStringRef serviceClass = IORegistryEntrySearchCFProperty(serv, kIOServicePlane, key, kCFAllocatorDefault, kIORegistryIterateRecursively);
         if (serviceClass == NULL) {
             logToFile("No service class for child %d\n", serv);
             continue;
         }
-//        const char *cServiceClass = CFStringGetCStringPtr(serviceClass, kCFStringEncodingASCII);
-//        if (cServiceClass != NULL) {
-//            logToFile("Got service class for child %d: %s\n", serv, cServiceClass);
-//        }
+        //        const char *cServiceClass = CFStringGetCStringPtr(serviceClass, kCFStringEncodingASCII);
+        //        if (cServiceClass != NULL) {
+        //            logToFile("Got service class for child %d: %s\n", serv, cServiceClass);
+        //        }
         logToFile("Got service class for child %d", serv);
 
         if (CFStringCompare(ioDisplayConnect, serviceClass, 0) == 0 && IORegistryEntryGetChildEntry(serv, kIOServicePlane, &displayPort) == KERN_SUCCESS) {
@@ -131,11 +169,10 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     }
 
     // now recurse the IOReg tree
-    while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL)
-    {
+    while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL) {
         CFDictionaryRef info;
         CFUUIDRef uuid;
-        io_name_t	name;
+        io_name_t name;
         CFIndex vendorID = 0, productID = 0, serialNumber = 0;
         CFNumberRef vendorIDRef, productIDRef, serialNumberRef;
         Boolean success = 0;
@@ -191,7 +228,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         IOItemCount busCount;
         IOFBGetI2CInterfaceCount(serv, &busCount);
 
-        if (!success || busCount < 1) {
+        if (!success || busCount < 1 || CGDisplayIsBuiltin(displayID)) {
             // this does not seem to be a DDC-enabled display, skip it
             CFRelease(displayEDID);
             CFRelease(info);
@@ -205,9 +242,7 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
         }
 
         // compare IOreg's metadata to CGDisplay's metadata to infer if the IOReg's I2C monitor is the display for the given NSScreen.displayID
-        if (CGDisplayVendorNumber(displayID) != (UInt32)vendorID  ||
-            CGDisplayModelNumber(displayID)  != (UInt32)productID ||
-            CGDisplaySerialNumber(displayID) != (UInt32)serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
+        if (CGDisplayVendorNumber(displayID) != (UInt32)vendorID || CGDisplayModelNumber(displayID) != (UInt32)productID || CGDisplaySerialNumber(displayID) != (UInt32)serialNumber) // SN is zero in lots of cases, so duplicate-monitors can confuse us :-/
         {
             CFRelease(displayEDID);
             CFRelease(info);
@@ -228,9 +263,13 @@ static io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID
     return 0;
 }
 
-dispatch_semaphore_t DisplayQueue(CGDirectDisplayID displayID) {
+dispatch_semaphore_t DisplayQueue(CGDirectDisplayID displayID)
+{
     static UInt64 queueCount = 0;
-    static struct DDCQueue {CGDirectDisplayID id; dispatch_semaphore_t queue;} *queues = NULL;
+    static struct DDCQueue {
+        CGDirectDisplayID id;
+        dispatch_semaphore_t queue;
+    }* queues = NULL;
     dispatch_semaphore_t queue = NULL;
     if (!queues)
         queues = calloc(50, sizeof(*queues)); //FIXME: specify
@@ -243,11 +282,12 @@ dispatch_semaphore_t DisplayQueue(CGDirectDisplayID displayID) {
     if (queues[i].id == displayID)
         queue = queues[i].queue;
     else
-        queues[queueCount++] = (struct DDCQueue){displayID, (queue = dispatch_semaphore_create(1))};
+        queues[queueCount++] = (struct DDCQueue) { displayID, (queue = dispatch_semaphore_create(1)) };
     return queue;
 }
 
-bool DisplayRequest(CGDirectDisplayID displayID, IOI2CRequest *request, CFMutableDictionaryRef displayUUIDByEDID) {
+bool DisplayRequest(CGDirectDisplayID displayID, IOI2CRequest* request, CFMutableDictionaryRef displayUUIDByEDID)
+{
     dispatch_semaphore_t queue = DisplayQueue(displayID);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
     bool result = false;
@@ -268,7 +308,8 @@ bool DisplayRequest(CGDirectDisplayID displayID, IOI2CRequest *request, CFMutabl
                     IOI2CInterfaceClose(connect, kNilOptions);
                 }
                 IOObjectRelease(interface);
-                if (result) break;
+                if (result)
+                    break;
             }
         }
         IOObjectRelease(framebuffer);
@@ -279,18 +320,19 @@ bool DisplayRequest(CGDirectDisplayID displayID, IOI2CRequest *request, CFMutabl
     return result && request->result == KERN_SUCCESS;
 }
 
-bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand *write, CFMutableDictionaryRef displayUUIDByEDID) {
-    IOI2CRequest    request;
-    UInt8           data[128];
+bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand* write, CFMutableDictionaryRef displayUUIDByEDID)
+{
+    IOI2CRequest request;
+    UInt8 data[128];
 
-    bzero( &request, sizeof(request));
+    bzero(&request, sizeof(request));
 
-    request.commFlags                       = 0;
+    request.commFlags = 0;
 
-    request.sendAddress                     = 0x6E;
-    request.sendTransactionType             = kIOI2CSimpleTransactionType;
-    request.sendBuffer                      = (vm_address_t) &data[0];
-    request.sendBytes                       = 7;
+    request.sendAddress = 0x6E;
+    request.sendTransactionType = kIOI2CSimpleTransactionType;
+    request.sendBuffer = (vm_address_t)&data[0];
+    request.sendBytes = 7;
 
     data[0] = 0x51;
     data[1] = 0x84;
@@ -298,30 +340,31 @@ bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand *write, CFMuta
     data[3] = write->control_id;
     data[4] = (write->new_value) >> 8;
     data[5] = write->new_value & 255;
-    data[6] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3]^ data[4] ^ data[5];
+    data[6] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5];
 
-    request.replyTransactionType            = kIOI2CNoTransactionType;
-    request.replyBytes                      = 0;
+    request.replyTransactionType = kIOI2CNoTransactionType;
+    request.replyBytes = 0;
 
     bool result = DisplayRequest(displayID, &request, displayUUIDByEDID);
     return result;
 }
 
-bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutableDictionaryRef displayUUIDByEDID) {
+bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand* read, CFMutableDictionaryRef displayUUIDByEDID)
+{
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
     bool result = false;
     UInt8 data[128];
 
-    for (int i=1; i<=kMaxRequests; i++) {
+    for (int i = 1; i <= kMaxRequests; i++) {
         bzero(&request, sizeof(request));
 
-        request.commFlags                       = 0;
-        request.sendAddress                     = 0x6E;
-        request.sendTransactionType             = kIOI2CSimpleTransactionType;
-        request.sendBuffer                      = (vm_address_t) &data[0];
-        request.sendBytes                       = 5;
-        request.minReplyDelay                   = 30 * kMillisecondScale;
+        request.commFlags = 0;
+        request.sendAddress = 0x6E;
+        request.sendTransactionType = kIOI2CSimpleTransactionType;
+        request.sendBuffer = (vm_address_t)&data[0];
+        request.sendBytes = 5;
+        request.minReplyDelay = 30 * kMillisecondScale;
 
         data[0] = 0x51;
         data[1] = 0x82;
@@ -329,16 +372,16 @@ bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutable
         data[3] = read->control_id;
         data[4] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3];
 #ifdef TT_SIMPLE
-        request.replyTransactionType    = kIOI2CSimpleTransactionType;
+        request.replyTransactionType = kIOI2CSimpleTransactionType;
 #elif defined TT_DDC
-        request.replyTransactionType    = kIOI2CDDCciReplyTransactionType;
+        request.replyTransactionType = kIOI2CDDCciReplyTransactionType;
 #else
-        request.replyTransactionType    = SupportedTransactionType();
+        request.replyTransactionType = SupportedTransactionType();
 #endif
-        request.replyAddress            = 0x6F;
-        request.replySubAddress         = 0x51;
+        request.replyAddress = 0x6F;
+        request.replySubAddress = 0x51;
 
-        request.replyBuffer = (vm_address_t) reply_data;
+        request.replyBuffer = (vm_address_t)reply_data;
         request.replyBytes = sizeof(reply_data);
 
         result = DisplayRequest(displayID, &request, displayUUIDByEDID);
@@ -371,17 +414,18 @@ bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutable
     return result;
 }
 
-UInt32 SupportedTransactionType() {
-   /*
+UInt32 SupportedTransactionType()
+{
+    /*
      With my setup (Intel HD4600 via displaylink to 'DELL U2515H') the original app failed to read ddc and freezes my system.
      This happens because AppleIntelFramebuffer do not support kIOI2CDDCciReplyTransactionType.
      So this version comes with a reworked ddc read function to detect the correct TransactionType.
      --SamanVDR 2016
    */
 
-    kern_return_t   kr;
-    io_iterator_t   io_objects;
-    io_service_t    io_service;
+    kern_return_t kr;
+    io_iterator_t io_objects;
+    io_service_t io_service;
 
     kr = IOServiceGetMatchingServices(kIOMasterPortDefault,
                                       IOServiceNameMatching("IOFramebufferI2CInterface"), &io_objects);
@@ -393,15 +437,13 @@ UInt32 SupportedTransactionType() {
 
     UInt32 supportedType = 0;
 
-    while((io_service = IOIteratorNext(io_objects)) != MACH_PORT_NULL)
-    {
+    while ((io_service = IOIteratorNext(io_objects)) != MACH_PORT_NULL) {
         CFMutableDictionaryRef service_properties;
         CFIndex types = 0;
         CFNumberRef typesRef;
 
         kr = IORegistryEntryCreateCFProperties(io_service, &service_properties, kCFAllocatorDefault, kNilOptions);
-        if (kr == KERN_SUCCESS)
-        {
+        if (kr == KERN_SUCCESS) {
             if (CFDictionaryGetValueIfPresent(service_properties, CFSTR(kIOI2CTransactionTypesKey), (const void**)&typesRef))
                 CFNumberGetValue(typesRef, kCFNumberCFIndexType, &types);
 
@@ -414,7 +456,7 @@ UInt32 SupportedTransactionType() {
                 logToFile("\nD: IOI2CTransactionTypes: 0x%02lx (%ld)\n", types, types);
 
                 // kIOI2CNoTransactionType = 0
-                if ( 0 == ((1 << kIOI2CNoTransactionType) & (UInt64)types)) {
+                if (0 == ((1 << kIOI2CNoTransactionType) & (UInt64)types)) {
                     logToFile("E: IOI2CNoTransactionType                   unsupported \n");
                 } else {
                     logToFile("D: IOI2CNoTransactionType                   supported \n");
@@ -422,7 +464,7 @@ UInt32 SupportedTransactionType() {
                 }
 
                 // kIOI2CSimpleTransactionType = 1
-                if ( 0 == ((1 << kIOI2CSimpleTransactionType) & (UInt64)types)) {
+                if (0 == ((1 << kIOI2CSimpleTransactionType) & (UInt64)types)) {
                     logToFile("E: IOI2CSimpleTransactionType               unsupported \n");
                 } else {
                     logToFile("D: IOI2CSimpleTransactionType               supported \n");
@@ -430,7 +472,7 @@ UInt32 SupportedTransactionType() {
                 }
 
                 // kIOI2CDDCciReplyTransactionType = 2
-                if ( 0 == ((1 << kIOI2CDDCciReplyTransactionType) & (UInt64)types)) {
+                if (0 == ((1 << kIOI2CDDCciReplyTransactionType) & (UInt64)types)) {
                     logToFile("E: IOI2CDDCciReplyTransactionType           unsupported \n");
                 } else {
                     logToFile("D: IOI2CDDCciReplyTransactionType           supported \n");
@@ -438,7 +480,7 @@ UInt32 SupportedTransactionType() {
                 }
 
                 // kIOI2CCombinedTransactionType = 3
-                if ( 0 == ((1 << kIOI2CCombinedTransactionType) & (UInt64)types)) {
+                if (0 == ((1 << kIOI2CCombinedTransactionType) & (UInt64)types)) {
                     logToFile("E: IOI2CCombinedTransactionType             unsupported \n");
                 } else {
                     logToFile("D: IOI2CCombinedTransactionType             supported \n");
@@ -446,7 +488,7 @@ UInt32 SupportedTransactionType() {
                 }
 
                 // kIOI2CDisplayPortNativeTransactionType = 4
-                if ( 0 == ((1 << kIOI2CDisplayPortNativeTransactionType) & (UInt64)types)) {
+                if (0 == ((1 << kIOI2CDisplayPortNativeTransactionType) & (UInt64)types)) {
                     logToFile("E: IOI2CDisplayPortNativeTransactionType    unsupported\n");
                 } else {
                     logToFile("D: IOI2CDisplayPortNativeTransactionType    supported \n");
@@ -456,16 +498,17 @@ UInt32 SupportedTransactionType() {
                 }
 #else
                 // kIOI2CSimpleTransactionType = 1
-                if ( 0 != ((1 << kIOI2CSimpleTransactionType) & (UInt64)types)) {
+                if (0 != ((1 << kIOI2CSimpleTransactionType) & (UInt64)types)) {
                     supportedType = kIOI2CSimpleTransactionType;
                 }
 
                 // kIOI2CDDCciReplyTransactionType = 2
-                if ( 0 != ((1 << kIOI2CDDCciReplyTransactionType) & (UInt64)types)) {
+                if (0 != ((1 << kIOI2CDDCciReplyTransactionType) & (UInt64)types)) {
                     supportedType = kIOI2CDDCciReplyTransactionType;
                 }
 #endif
-            } else logToFile("E: Fatal - No supported Transaction Types! \n");
+            } else
+                logToFile("E: Fatal - No supported Transaction Types! \n");
 
             CFRelease(service_properties);
             CFRelease(typesRef);
@@ -474,16 +517,17 @@ UInt32 SupportedTransactionType() {
         IOObjectRelease(io_service);
 
         // Mac OS offers three framebuffer devices, but we can leave here
-        if (supportedType > 0) return supportedType;
+        if (supportedType > 0)
+            return supportedType;
     }
 
     return supportedType;
 }
 
-
-bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[128], CFMutableDictionaryRef displayUUIDByEDID) {
+bool EDIDTest(CGDirectDisplayID displayID, struct EDID* edid, uint8_t edidData[128], CFMutableDictionaryRef displayUUIDByEDID)
+{
     IOI2CRequest request = {};
-/*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
+    /*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
  *  not in https://developer.apple.com/reference/kernel/1659924-ioi2cinterface.h/ioi2crequest?changes=latest_beta&language=objc
  * @abstract A structure defining an I2C bus transaction.
  * @discussion This structure is used to request an I2C transaction consisting of a send (write) to and reply (read) from a device, either of which is optional, to be carried out atomically on an I2C bus.
@@ -518,14 +562,15 @@ bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[1
     UInt8 data[128] = {};
     request.sendAddress = 0xA0;
     request.sendTransactionType = kIOI2CSimpleTransactionType;
-    request.sendBuffer = (vm_address_t) data;
+    request.sendBuffer = (vm_address_t)data;
     request.sendBytes = 0x01;
     data[0] = 0x00;
     request.replyAddress = 0xA1;
     request.replyTransactionType = kIOI2CSimpleTransactionType;
-    request.replyBuffer = (vm_address_t) data;
+    request.replyBuffer = (vm_address_t)data;
     request.replyBytes = sizeof(data);
-    if (!DisplayRequest(displayID, &request, displayUUIDByEDID)) return false;
+    if (!DisplayRequest(displayID, &request, displayUUIDByEDID))
+        return false;
     if (edid) {
         memcpy(edid, &data, 128);
         memcpy(edidData, &data, 128);
@@ -534,7 +579,8 @@ bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[1
     UInt8 sum = 0;
     while (i < request.replyBytes) {
         if (i % 128 == 0) {
-            if (sum) break;
+            if (sum)
+                break;
             sum = 0;
         }
         sum += data[i++];
