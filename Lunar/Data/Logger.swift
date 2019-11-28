@@ -12,14 +12,11 @@ import SwiftyBeaver
 class Logger: SwiftyBeaver {
     static let console = ConsoleDestination()
     static let file = FileDestination()
-//    static let platform = SBPlatformDestination(appID: "0G8Ek7", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
     static var debugModeObserver: NSKeyValueObservation?
 
     class func initLogger() {
-        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M <$X>"
-        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M <$X>"
-//        platform.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M <$X>"
-//        platform.minLevel = .info
+        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n$X"
+        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n$X"
 
         setMinLevel(debug: datastore.defaults.debug)
         debugModeObserver = datastore.defaults.observe(\.debug, options: [.new], changeHandler: { _, change in
@@ -28,7 +25,6 @@ class Logger: SwiftyBeaver {
 
         Logger.addDestination(console)
         Logger.addDestination(file)
-//        Logger.addDestination(platform)
     }
 
     class func setMinLevel(debug _: Bool) {

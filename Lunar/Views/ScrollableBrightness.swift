@@ -47,7 +47,7 @@ class ScrollableBrightness: NSView {
             return (display.value(forKey: "minBrightness") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "minBrightness")
+            display.setValue(NSNumber(value: newValue), forKey: "minBrightness")
         }
     }
 
@@ -56,7 +56,7 @@ class ScrollableBrightness: NSView {
             return (display.value(forKey: "maxBrightness") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "maxBrightness")
+            display.setValue(NSNumber(value: newValue), forKey: "maxBrightness")
         }
     }
 
@@ -65,7 +65,7 @@ class ScrollableBrightness: NSView {
             return (display.value(forKey: "brightness") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "brightness")
+            display.setValue(NSNumber(value: newValue), forKey: "brightness")
         }
     }
 

@@ -106,6 +106,11 @@ class Display: NSManagedObject {
             self.maxBrightness = NSNumber(value: maxBrightness)
             self.minContrast = NSNumber(value: minContrast)
             self.maxContrast = NSNumber(value: maxContrast)
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.refreshBrightness()
+                self.refreshContrast()
+            }
         }
     }
 
@@ -236,6 +241,7 @@ class Display: NSManagedObject {
                         }
                     }
 
+                    datastore.save()
                     log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(self.id)")
                 }
             }),
@@ -256,10 +262,64 @@ class Display: NSManagedObject {
                         _ = DDC.setContrast(for: self.id, contrast: contrast)
                     }
 
+                    datastore.save()
                     log.debug("\(self.name): Set contrast to \(contrast)")
                 }
             }),
         ]
+    }
+
+    func readContrast() -> UInt8? {
+        if let c = DDC.getContrast(for: self.id) {
+            return UInt8(c)
+        }
+        return nil
+    }
+
+    func readBrightness() -> UInt8? {
+        if !name.contains(ULTRAFINE_NAME) {
+            if let b = DDC.getBrightness(for: self.id) {
+                return UInt8(b)
+            }
+        } else {
+            return UInt8(round(CoreDisplay_Display_GetUserBrightness(id) * 100.0))
+        }
+
+        return nil
+    }
+
+    func refreshBrightness() {
+        guard let newBrightness = readBrightness() else {
+            log.warning("Can't read brightness for \(name)")
+            return
+        }
+        if newBrightness != brightness.uint8Value {
+            log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
+
+            let oldSmoothTransitionState = datastore.defaults.smoothTransition
+            datastore.defaults.set(false, forKey: "smoothTransition")
+
+            setValue(NSNumber(value: newBrightness), forKey: "brightness")
+
+            datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+        }
+    }
+
+    func refreshContrast() {
+        guard let newContrast = readContrast() else {
+            log.warning("Can't read contrast for \(name)")
+            return
+        }
+        if newContrast != contrast.uint8Value {
+            log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
+
+            let oldSmoothTransitionState = datastore.defaults.smoothTransition
+            datastore.defaults.set(false, forKey: "smoothTransition")
+
+            setValue(NSNumber(value: newContrast), forKey: "contrast")
+
+            datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+        }
     }
 
     func removeObservers() {
@@ -534,7 +594,7 @@ class Display: NSManagedObject {
             changed = true
         }
         if changed {
-            log.info("\n\(name):\n\tBrightness: \(newBrightness)\n\tContrast: \(newContrast)")
+            log.info("\n\(name):\n\tBrightness: \(newBrightness.uint8Value)\n\tContrast: \(newContrast.uint8Value)")
         }
     }
 }

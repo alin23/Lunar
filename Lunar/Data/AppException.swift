@@ -39,11 +39,13 @@ class AppException: NSManagedObject {
         observers = [
             observe(\.brightness, options: [.new], changeHandler: { _, change in
                 if let newVal = change.newValue {
+                    datastore.save()
                     log.debug("\(self.name): Set brightness to \(newVal.uint8Value)")
                 }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
                 if let newVal = change.newValue {
+                    datastore.save()
                     log.debug("\(self.name): Set contrast to \(newVal.uint8Value)")
                 }
             }),

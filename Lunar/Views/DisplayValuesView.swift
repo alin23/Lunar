@@ -41,13 +41,13 @@ class DisplayValuesView: NSTableView {
         scrollableContrastCaption.textColor = NSColor.textColor
 
         scrollableBrightness.onValueChanged = { value in
-            display.setValue(value, forKey: "brightness")
+            display.setValue(NSNumber(value: value), forKey: "brightness")
             if brightnessAdapter.mode != .manual {
                 brightnessAdapter.disable()
             }
         }
         scrollableContrast.onValueChanged = { value in
-            display.setValue(value, forKey: "contrast")
+            display.setValue(NSNumber(value: value), forKey: "contrast")
             if brightnessAdapter.mode != .manual {
                 brightnessAdapter.disable()
             }
