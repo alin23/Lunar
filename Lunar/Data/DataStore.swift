@@ -131,7 +131,7 @@ let model = NSManagedObjectModel(contentsOf: Bundle.main.url(forResource: "Model
 let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model!)
 
 class DataStore: NSObject {
-    static let defaults: UserDefaults = UserDefaults()
+    static let defaults: UserDefaults = NSUserDefaultsController.shared.defaults
     let defaults: UserDefaults = DataStore.defaults
     var context: NSManagedObjectContext
 
@@ -222,6 +222,8 @@ class DataStore: NSObject {
     }
 
     override init() {
+        NSUserDefaultsController.shared.appliesImmediately = true
+
         if #available(OSX 10.12, *) {
             container.loadPersistentStores(completionHandler: { _, error in
                 if let error = error {
