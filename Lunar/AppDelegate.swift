@@ -123,9 +123,10 @@ extension String {
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
-    var activity: NSBackgroundActivityScheduler!
-    var adapterSyncQueue: OperationQueue!
-    var adapterSyncActivity: NSObjectProtocol!
+    var brightnessReaderActivity: NSBackgroundActivityScheduler!
+    var locationActivity: NSBackgroundActivityScheduler!
+    var syncQueue: OperationQueue!
+    var syncActivity: NSObjectProtocol!
 
     var daylightObserver: NSKeyValueObservation?
     var curveFactorObserver: NSKeyValueObservation?
@@ -267,18 +268,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
-        activity.invalidate()
-        if adapterSyncActivity != nil {
-            ProcessInfo.processInfo.endActivity(adapterSyncActivity)
+        locationActivity.invalidate()
+        if syncActivity != nil {
+            ProcessInfo.processInfo.endActivity(syncActivity)
         }
 
         switch mode {
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
-            activity.interval = 60
-            activity.tolerance = 10
             brightnessAdapter.adaptBrightness()
-            activity.schedule { completion in
+
+            locationActivity.interval = 60
+            locationActivity.tolerance = 10
+            locationActivity.schedule { completion in
                 let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
                 do {
                     let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
@@ -291,8 +293,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
             brightnessAdapter.adaptBrightness()
-            adapterSyncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
-            adapterSyncQueue.addOperation {
+            syncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
+            syncQueue.addOperation {
                 while true {
                     if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
@@ -314,10 +316,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initBrightnessAdapterActivity() {
-        activity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
-        activity.repeats = true
-        activity.qualityOfService = .userInitiated
-        adapterSyncQueue = OperationQueue()
+        brightnessReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshBrightness")
+        brightnessReaderActivity.repeats = true
+        brightnessReaderActivity.qualityOfService = .userInitiated
+        brightnessReaderActivity.interval = 5
+        brightnessReaderActivity.tolerance = 3
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            brightnessAdapter.fetchBrightness()
+        }
+
+        brightnessReaderActivity.schedule { completion in
+            let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
+            do {
+                let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
+                brightnessAdapter.fetchBrightness(for: displays)
+            } catch {
+                log.error("Error on fetching Displays by IDs")
+            }
+            completion(NSBackgroundActivityScheduler.Result.finished)
+        }
+
+        locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
+        locationActivity.repeats = true
+        locationActivity.qualityOfService = .userInitiated
+
+        syncQueue = OperationQueue()
         manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
     }
 
@@ -536,9 +560,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
+
         datastore.save()
         datastore.defaults.set(false, forKey: "debug")
-        activity.invalidate()
+
+        locationActivity.invalidate()
+        brightnessReaderActivity.invalidate()
     }
 
     func geolocationFallback() {

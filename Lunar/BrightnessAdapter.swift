@@ -240,6 +240,13 @@ class BrightnessAdapter {
         })
     }
 
+    func fetchBrightness(for displays: [Display]? = nil) {
+        for display in displays ?? self.displays.values.map({ $0 }) {
+            display.refreshBrightness()
+            display.refreshContrast()
+        }
+    }
+
     func adaptBrightness(for displays: [Display]? = nil, percent: Double? = nil) {
         if mode == .manual {
             return
