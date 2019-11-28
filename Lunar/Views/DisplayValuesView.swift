@@ -31,9 +31,14 @@ class DisplayValuesView: NSTableView {
     override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
         guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
             let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
+            let adaptiveButton = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                where: { v in (v as? QuickAdaptiveButton) != nil }
+            ) as? QuickAdaptiveButton,
             let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
             let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
             let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
+
+        adaptiveButton.setup(displayID: display.id)
 
         scrollableBrightness.textFieldColor = textFieldColor
         scrollableBrightness.textFieldColorHover = textFieldColorHover
@@ -50,15 +55,11 @@ class DisplayValuesView: NSTableView {
 
         scrollableBrightness.onValueChanged = { value in
             display.setValue(NSNumber(value: value), forKey: "brightness")
-            if brightnessAdapter.mode != .manual {
-                brightnessAdapter.disable()
-            }
+            display.setValue(false, forKey: "adaptive")
         }
         scrollableContrast.onValueChanged = { value in
             display.setValue(NSNumber(value: value), forKey: "contrast")
-            if brightnessAdapter.mode != .manual {
-                brightnessAdapter.disable()
-            }
+            display.setValue(false, forKey: "adaptive")
         }
         brightnessObservers[display.id] = display.observe(
             \.brightness,
