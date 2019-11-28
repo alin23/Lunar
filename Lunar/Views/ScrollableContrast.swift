@@ -47,7 +47,7 @@ class ScrollableContrast: NSView {
             return (display.value(forKey: "minContrast") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "minContrast")
+            display.setValue(NSNumber(value: newValue), forKey: "minContrast")
         }
     }
 
@@ -56,7 +56,7 @@ class ScrollableContrast: NSView {
             return (display.value(forKey: "maxContrast") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "maxContrast")
+            display.setValue(NSNumber(value: newValue), forKey: "maxContrast")
         }
     }
 
@@ -65,7 +65,7 @@ class ScrollableContrast: NSView {
             return (display.value(forKey: "contrast") as! NSNumber).intValue
         }
         set {
-            display.setValue(newValue, forKey: "contrast")
+            display.setValue(NSNumber(value: newValue), forKey: "contrast")
         }
     }
 
