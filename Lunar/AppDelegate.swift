@@ -296,8 +296,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             syncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
             syncQueue.addOperation {
                 while true {
-                    if let builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                    if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                        if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
+                            let lastBrightness = brightnessAdapter.builtinBrightnessHistory.last(where: { b in b > 0 && b < 100 }) {
+                            builtinBrightness = Double(lastBrightness)
+                        }
+
                         brightnessAdapter.lastBuiltinBrightness = builtinBrightness
                         let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
                         do {
@@ -417,6 +422,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
+        brightnessAdapter.manageClamshellMode()
         brightnessAdapter.resetDisplayList()
         brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
         if let visible = windowController?.window?.isVisible, visible {

@@ -113,6 +113,21 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         )
     }
 
+    func listenForScreenConfigurationChanged() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(adaptToScreenConfiguration(notification:)),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+    }
+
+    @objc func adaptToScreenConfiguration(notification _: Notification) {
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(2_000_000_000))
+
+        DispatchQueue.main.asyncAfter(deadline: deadline) { self.arrayController.rearrangeObjects() }
+    }
+
     override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         listenForPopoverEvents()

@@ -247,4 +247,5 @@ bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[1
 UInt32 SupportedTransactionType(void);
 void setDebugMode(UInt8);
 void setLogPath(const char*, ssize_t);
+bool IsLidClosed(void);
 #endif
