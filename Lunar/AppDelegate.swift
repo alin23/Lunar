@@ -335,7 +335,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
             do {
                 let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-                brightnessAdapter.fetchBrightness(for: displays)
+                DispatchQueue.main.async {
+                    brightnessAdapter.fetchBrightness(for: displays)
+                }
             } catch {
                 log.error("Error on fetching Displays by IDs")
             }

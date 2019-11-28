@@ -61,6 +61,7 @@ class DisplayViewController: NSViewController {
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
+    var adaptiveObserver: NSKeyValueObservation?
     var showNavigationHintsObserver: NSKeyValueObservation?
 
     func update(from display: Display) {
@@ -230,6 +231,29 @@ class DisplayViewController: NSViewController {
         })
     }
 
+    func listenForAdaptiveChange() {
+        adaptiveObserver = display?.observe(
+            \.adaptive,
+            options: [.new, .old],
+            changeHandler: { _, change in
+                if let newAdaptive = change.newValue, let button = self.adaptiveButton, let display = self.display {
+                    DispatchQueue.main.async {
+                        if newAdaptive {
+                            button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
+                            self.setValuesHidden(false)
+                            button.state = .on
+                        } else {
+                            button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
+                            self.setValuesHidden(true)
+                            button.state = .off
+                        }
+                        display.readapt(display: display, change: change)
+                    }
+                }
+            }
+        )
+    }
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
@@ -306,6 +330,7 @@ class DisplayViewController: NSViewController {
         } else {
             setIsHidden(true)
         }
+        listenForAdaptiveChange()
         listenForAdaptiveModeChange()
         listenForShowNavigationHintsChange()
     }
