@@ -109,6 +109,7 @@
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
 		C7FE72522390268A00EBA6DA /* BoundedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE72512390268900EBA6DA /* BoundedArray.swift */; };
+		C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -312,6 +313,7 @@
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
 		C7FE72512390268900EBA6DA /* BoundedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundedArray.swift; sourceTree = "<group>"; };
+		C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickAdaptiveButton.swift; sourceTree = "<group>"; };
 		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -416,6 +418,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
 				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
 				C72776E6201F02140055934F /* PageControl.swift */,
 				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
@@ -729,6 +732,7 @@
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
+				C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
