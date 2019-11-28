@@ -148,6 +148,15 @@ class DataStore: NSObject {
         return Hotkey.toDictionary(hotkeyConfig)
     }
 
+    func cleanUpDisplays(context: NSManagedObjectContext? = nil) throws {
+        if let display = DDC.getBuiltinDisplay() {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Display")
+            fetchRequest.predicate = NSPredicate(format: "id == %@", NSNumber(value: display))
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            try (context ?? self.context).execute(deleteRequest)
+        }
+    }
+
     func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
         let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
         fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
@@ -245,10 +254,14 @@ class DataStore: NSObject {
             context.persistentStoreCoordinator = coordinator
             context.mergePolicy = NSMergePolicy(merge: .overwriteMergePolicyType)
         }
+        super.init()
+
         log.debug("Checking First Run")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
             DataStore.firstRun(context: context)
             DataStore.defaults.set(true, forKey: "firstRun")
+        } else {
+            try? cleanUpDisplays()
         }
 
         DataStore.setDefault(0.5, for: "curveFactor")
