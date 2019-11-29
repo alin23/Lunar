@@ -122,7 +122,7 @@ class Display: NSManagedObject, NSCopying {
             self.minContrast = NSNumber(value: minContrast)
             self.maxContrast = NSNumber(value: maxContrast)
 
-            DispatchQueue.global(qos: .userInitiated).async {
+            fgQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
             }
@@ -172,7 +172,7 @@ class Display: NSManagedObject, NSCopying {
             minVal = currentValue
             maxVal = value
         }
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now(), qos: .userInteractive, flags: .barrier) {
+        fgQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) {
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: String
