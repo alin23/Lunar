@@ -36,38 +36,10 @@ let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).fir
 let TRANSFER_URL = "https://transfer.sh"
 let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Content-type": "application/octet-stream",
-    "Max-Downloads": "2",
+    "Max-Downloads": "50",
     "Max-Days": "5",
 ]
 let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
-let DIAGNOSTICS_EMAIL_BODY = """
-# Diagnostics
-DIAGNOSTICS_URL
-
-# Write your issue details below
-
-Was the diagnostics process able to change the brightness on your external monitor(s)?
-    # write response here
-
-Mac device where Lunar is installed (Macbook Pro 2019, iMac, Mac Mini, Hackintosh etc.):
-    # write response here
-
-Monitor connection to the Mac device (HDMI-to-USB-C, USB-C-to-USB-C, miniDisplayPort-to-DisplayPort etc.):
-    # write response here
-
-Using an USB Docking Station or Hub:
-    # write yes or no here
-
-Lunar mode used (check it in the top-right corner of the Lunar interface)
-    # Sync, Location or Manual
-
-(only if you know how to compile a C program) Does this utility work for you? https://github.com/kfix/ddcctl
-    # optional response
-
-
-Issue description:
-    # write a short description of what doesn't work as expected
-"""
 
 var lunarDisplayNames = [
     "Moony",
@@ -188,7 +160,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
             }
-            brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .location
+            brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .sync
             self.resetElements()
             self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
         })
@@ -778,8 +750,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func failDebugData() {
-        if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to send a message to the developer?") {
-            NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
+        DispatchQueue.main.sync {
+            if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to open a Github issue?") {
+                NSWorkspace.shared.open(
+                    URL(
+                        string:
+                        "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D"
+                    )!)
+            }
         }
     }
 
@@ -799,95 +777,90 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         datastore.defaults.set(false, forKey: "smoothTransition")
 
         setDebugMode(1)
-        let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
-        let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
 
-        brightnessAdapter.resetDisplayList()
-        for (id, display) in brightnessAdapter.displays {
-            for value in 1 ... 100 {
-                display.brightness = NSNumber(value: value)
-                display.contrast = NSNumber(value: value)
-            }
-            if let brightness = oldBrightness[id] {
-                for value in stride(from: 100, through: brightness.intValue, by: -1) {
+        fgQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
+            let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
+            let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
+
+            brightnessAdapter.resetDisplayList()
+            for (id, display) in brightnessAdapter.displays {
+                for value in 1 ... 100 {
                     display.brightness = NSNumber(value: value)
-                }
-            }
-            if let contrast = oldContrast[id] {
-                for value in stride(from: 100, through: contrast.intValue, by: -1) {
                     display.contrast = NSNumber(value: value)
                 }
+                if let brightness = oldBrightness[id] {
+                    for value in stride(from: 100, through: brightness.intValue, by: -1) {
+                        display.brightness = NSNumber(value: value)
+                    }
+                }
+                if let contrast = oldContrast[id] {
+                    for value in stride(from: 100, through: contrast.intValue, by: -1) {
+                        display.contrast = NSNumber(value: value)
+                    }
+                }
             }
-        }
 
-        datastore.defaults.set(oldDebugState, forKey: "debug")
-        datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
-
-        setDebugMode(0)
-
-        debugMenuItem.title = "Gathering logs"
-        guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
-            failDebugData()
-            return
-        }
-
-//        let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: sourceString.count)
-//        let sourceBuffer = sourceString.map { $0 }
-//        let algorithm = COMPRESSION_LZ4_RAW
-
-//        debugMenuItem.title = "Compressing logs"
-//        let compressedSize = compression_encode_buffer(
-//            destinationBuffer, sourceString.count,
-//            sourceBuffer, sourceString.count,
-//            nil,
-//            algorithm
-//        )
-
-        var debugData = sourceString
-        var mimeType = "text/plain"
-        var fileName = "lunar.log"
-//        if compressedSize > 0 {
-//            let encodedFileURL = LOG_URL.appendingPathExtension("lz4")
-//
-//            FileManager.default.createFile(
-//                atPath: encodedFileURL.path,
-//                contents: nil,
-//                attributes: nil
-//            )
-//
-//            debugData = NSData(
-//                bytesNoCopy: destinationBuffer,
-//                length: compressedSize
-//            ) as Data
-//            mimeType = "application/x-lz4"
-//            fileName = "lunar.log.lz4"
-//        }
-
-        debugMenuItem.title = "Compressing logs"
-        Alamofire.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
-            response in
-            defer {
-                self.menu.autoenablesItems = true
-                self.debugMenuItem.title = oldTitle
-                self.debugMenuItem.isEnabled = true
+            DispatchQueue.main.sync {
+                datastore.defaults.set(oldDebugState, forKey: "debug")
+                datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
             }
-            log.info("Got response from transfer.sh", context: response.response)
-            if let err = response.error {
-                log.error("Debug data upload response error: \(err)")
+
+            setDebugMode(0)
+
+            DispatchQueue.main.sync {
+                self.debugMenuItem.title = "Gathering logs"
+            }
+            guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
                 self.failDebugData()
                 return
             }
 
-            guard let url = response.value, !url.isEmpty,
-                let urlEncoded = DIAGNOSTICS_EMAIL_BODY.replacingOccurrences(of: "DIAGNOSTICS_URL", with: url).addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
-                let subject = "Lunar logs: \(url)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
-                log.error("Debug data upload response empty")
-                self.failDebugData()
-                return
+            let data: Data
+            let mimeType: String
+            let fileName: String
+            if #available(OSX 10.13, *) {
+                DispatchQueue.main.sync {
+                    self.debugMenuItem.title = "Encrypting logs"
+                }
+                data = encrypt(message: sourceString) ?? sourceString
+                mimeType = "application/octet-stream"
+                fileName = "lunar.log.enc"
+            } else {
+                data = sourceString
+                mimeType = "text/plain"
+                fileName = "lunar.log"
             }
-            log.info("Uploaded logs to \(url)")
-            NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?subject=\(subject)&body=\(urlEncoded)")!)
-        })
+
+            let debugData = data
+
+            Alamofire.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
+                response in
+                defer {
+                    self.menu.autoenablesItems = true
+                    self.debugMenuItem.title = oldTitle
+                    self.debugMenuItem.isEnabled = true
+                }
+                log.info("Got response from transfer.sh", context: response.response)
+                if let err = response.error {
+                    log.error("Debug data upload response error: \(err)")
+                    self.failDebugData()
+                    return
+                }
+
+                guard let url = response.value, !url.isEmpty,
+                    let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                    log.error("Debug data upload response empty")
+                    self.failDebugData()
+                    return
+                }
+                log.info("Uploaded logs to \(url)")
+                NSWorkspace.shared.open(
+                    URL(
+                        string:
+                        "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D"
+                    )!)
+            })
+        }
     }
 
     func dialog(message: String, info: String) -> Bool {

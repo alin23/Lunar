@@ -106,3 +106,7 @@ PreBuiltFrameworks/CrashLib.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/KSCrash.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/Sentry.framework.zip filter=lfs diff=lfs merge=lfs -text
 PreBuiltFrameworks/ObjectivePGP.framework.zip filter=lfs diff=lfs merge=lfs -text
+/Users/alin/Projects/Lunar/Releases/Lunar-File[[:space:]]Doesn't[[:space:]]Exist,[[:space:]]Will[[:space:]]Create:[[:space:]]/tmp/Lunar/Lunar.app/Contents/Info.plist.dmg filter=lfs diff=lfs merge=lfs -text
+/Users/alin/Projects/Lunar/Releases/Lunar-latest.dmg filter=lfs diff=lfs merge=lfs -text
+/Users/alin/Projects/Lunar/Releases/*.delta filter=lfs diff=lfs merge=lfs -text
+/Users/alin/Projects/Lunar/Releases/Lunar-2.9.1.dmg filter=lfs diff=lfs merge=lfs -text
