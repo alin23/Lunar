@@ -1,62 +1,126 @@
 #!/usr/bin/env fish
-set -l workDir (pwd)
-set -l tmpDir /tmp/Lunar
-set -l releaseDir $workDir/Releases
-set -l privKey $workDir/Lunar/Resources/dsa_priv.pem
-set -l edPrivKey $workDir/Lunar/Resources/eddsa_priv
-set -l appcast "$releaseDir/appcast.xml"
-
-mkdir -p $tmpDir
-rm -rf $tmpDir/*
-cp -R $HOME/Temp/Lunar/Lunar.app $tmpDir/Lunar.app
-
-set -l appVersion (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $tmpDir/Lunar.app/Contents/Info.plist)
-set -l appLatestDmg $releaseDir/../Lunar.dmg
-set -l appDmg $releaseDir/Lunar-$appVersion.dmg
-set -l appTmpDmg /tmp/Lunar-$appVersion.dmg
-
-if test -f $appDmg
-    echo (set_color red)"Deleting $appDmg"(set_color normal)
-    rm $appDmg
+set DIR (cd (dirname (status -f)); and pwd)
+if test -f "$DIR/.env.sh"
+    cat $DIR/.env.sh | sed 's/export/set -xg/g' | sed 's/=/ /g' | source
 end
-if test -f $appLatestDmg
-    echo \n(set_color red)"Deleting $appLatestDmg"(set_color normal)
-    rm $appLatestDmg
+
+function notarize
+    echo "Sending $argv[1] for notarization"
+    set XCRUN_OUTPUT (xcrun altool --notarize-app -f "$argv[1]" --primary-bundle-id site.lunarapp.Lunar -u 'alin.p32@gmail.com' -p $APP_STORE_PASSWORD)
+    echo "$XCRUN_OUTPUT"
+    set REQUEST_UUID (echo "$XCRUN_OUTPUT" | rg -o -r '$1' 'RequestUUID = (\S+)')
+
+    echo "Checking notarization for $REQUEST_UUID"
+    while not xcrun altool --notarization-info "$REQUEST_UUID" -u 'alin.p32@gmail.com' -p $APP_STORE_PASSWORD | grep -q 'Package Approved'
+        echo "Waiting for notarization approval"
+        sleep 3
+    end
+    while xcrun altool --notarization-info "$REQUEST_UUID" -u 'alin.p32@gmail.com' -p $APP_STORE_PASSWORD | grep -q 'Status: in progress'
+        echo "Waiting for notarization completion"
+        sleep 3
+    end
+    xcrun stapler staple "$argv[2]"
+
+    for i in (seq 10)
+        echo "Checking if $argv[2] is notarized"
+        if spctl --assess -vvvvv --no-cache --ignore-cache --type "$argv[3]" "$argv[2]" 2>&1 | grep -q 'source=Notarized Developer ID'
+            echo "Notarization success for $argv[2]"
+            return
+        end
+        sleep 10
+    end
+
+    if spctl --assess -vvvvv --no-cache --ignore-cache "$argv[2]" 2>&1 | grep -q 'source=Unnotarized Developer ID'
+        echo "Error notarizing $argv[2]"
+        xcrun altool --notarization-info "$REQUEST_UUID" -u 'alin.p32@gmail.com' -p $APP_STORE_PASSWORD
+        exit 1
+    end
 end
-if test -f $appTmpDmg
-    echo \n(set_color red)"Deleting $appTmpDmg"(set_color normal)
-    rm $appTmpDmg
+
+set -l WORK_DIR "$PROJECT_DIR"
+set -l BUILD_DIR "$CODESIGNING_FOLDER_PATH"
+set -l TMP_DIR /tmp/Lunar
+set -l TMP_DMG_DIR "$TMP_DIR/DMG"
+set -l RELEASE_DIR "$WORK_DIR/Releases"
+set -l PRIV_KEY "$WORK_DIR/Lunar/Resources/dsa_priv.pem"
+set -l ED_PRIV_KEY "$WORK_DIR/Lunar/Resources/eddsa_priv"
+set -l APPCAST "$RELEASE_DIR/appcast.xml"
+
+set -l APP_TMP "$TMP_DIR/Lunar.app"
+set -l APP_ZIP_TMP "$TMP_DIR/Lunar.zip"
+
+mkdir -p $TMP_DIR
+rm -rf $TMP_DIR
+mkdir -p $TMP_DMG_DIR
+cp -R "$BUILD_DIR" "$APP_TMP"
+
+codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --entitlements "$WORK_DIR/LunarService/LunarServiceRelease.entitlements" --preserve-metadata=identifier,entitlements,flags "$APP_TMP/Contents/Library/LoginItems/LunarService.app"
+codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --entitlements "$WORK_DIR/Lunar/LunarRelease.entitlements" --deep "$APP_TMP"
+if not codesign -vvv --deep --strict "$APP_TMP"
+    echo 'Bad signature'
+    exit 1
+end
+
+if not spctl --assess -vvvvv --no-cache --ignore-cache "$APP_TMP" 2>&1 | grep -q 'source=Unnotarized Developer ID'
+    echo 'Bad signature'
+    exit 1
+end
+
+ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
+
+notarize "$APP_ZIP_TMP" "$APP_TMP" "execute"
+
+set -l APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist")
+set -l APP_LATEST_DMG "$RELEASE_DIR/../Lunar.dmg"
+set -l APP_DMG "$RELEASE_DIR/Lunar-$APP_VERSION.dmg"
+set -l APP_TMP_DMG "$TMP_DMG_DIR/Lunar $APP_VERSION.dmg"
+
+if test -f "$APP_DMG"
+    echo (set_color red)"Deleting $APP_DMG"(set_color normal)
+    rm "$APP_DMG"
+end
+if test -f "$APP_LATEST_DMG"
+    echo \n(set_color red)"Deleting $APP_LATEST_DMG"(set_color normal)
+    rm "$APP_LATEST_DMG"
+end
+if test -f "$APP_TMP_DMG"
+    echo \n(set_color red)"Deleting $APP_TMP_DMG"(set_color normal)
+    rm "$APP_TMP_DMG"
 end
 if test -d /Volumes/Lunar
     echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
     hdiutil detach /Volumes/Lunar
 end
 
+create-dmg --identity="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_TMP" "$TMP_DMG_DIR"
+cp "$APP_TMP_DMG" "$APP_DMG"
 
-echo \n(set_color green)"Creating $appTmpDmg"(set_color normal)
-hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder $tmpDir -ov -format UDRW $appTmpDmg
+# echo \n(set_color green)"Creating $APP_TMP_DMG"(set_color normal)
+# hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder "$TMP_DIR" -ov -format UDRW "$APP_TMP_DMG"
 
-echo \n(set_color green)"Linking /Applications"(set_color normal)
-ln -s /Applications /Volumes/Lunar/Applications
+# echo \n(set_color green)"Linking /Applications"(set_color normal)
+# ln -s /Applications /Volumes/Lunar/Applications
 
-echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
-hdiutil detach /Volumes/Lunar
+# echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
+# hdiutil detach /Volumes/Lunar
 
-echo \n(set_color blue)"Compressing $appTmpDmg to $appDmg"(set_color normal)
-hdiutil convert -format UDZO -o $appDmg $appTmpDmg
+# echo \n(set_color blue)"Compressing $APP_TMP_DMG to $APP_DMG"(set_color normal)
+# hdiutil convert -format UDZO -o "$APP_DMG" "$APP_TMP_DMG"
 
-echo \n(set_color green)"Signing $appDmg"(set_color normal)
-xattr -cr $appDmg
-codesign -fs "Developer ID Application: Alin Panaitiu (RDDXV84A73)" $appDmg -o runtime
+# echo \n(set_color green)"Signing "$APP_DMG""(set_color normal)
+# xattr -cr "$APP_DMG"
+# codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_DMG" -o runtime
+
+notarize "$APP_DMG" "$APP_DMG" "install"
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
-./bin/generate_appcast -f $privKey $releaseDir
+"$WORK_DIR/bin/generate_appcast" -f "$PRIV_KEY" "$RELEASE_DIR"
 
-cp $appDmg $appLatestDmg
-git lfs track Releases/Lunar-$appVersion.dmg
-git lfs track Releases/Lunar-latest.dmg
-git lfs track Releases/*.delta
+cp "$APP_DMG" "$APP_LATEST_DMG"
+git lfs track "$RELEASE_DIR/Lunar-$APP_VERSION.dmg"
+git lfs track "$RELEASE_DIR/Lunar-latest.dmg"
+git lfs track "$RELEASE_DIR/*.delta"
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
-./update_appcast.py $privKey (cat $edPrivKey)
-subl $appcast
+"$WORK_DIR/update_appcast.py" "$PRIV_KEY" (cat "$ED_PRIV_KEY")
+subl "$APPCAST"
