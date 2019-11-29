@@ -28,10 +28,11 @@ private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChange
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
+let bgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.bg", qos: .background, attributes: .concurrent)
+let fgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
+
 let TEST_MODE = false
-
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
-
 let TRANSFER_URL = "https://transfer.sh"
 let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Content-type": "application/octet-stream",
@@ -327,7 +328,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessReaderActivity.interval = 5
         brightnessReaderActivity.tolerance = 3
 
-        DispatchQueue.global(qos: .userInitiated).async {
+        fgQueue.async {
             brightnessAdapter.fetchBrightness()
         }
 
@@ -335,7 +336,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
             do {
                 let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-                DispatchQueue.main.async {
+                fgQueue.async {
                     brightnessAdapter.fetchBrightness(for: displays)
                 }
             } catch {
