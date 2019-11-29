@@ -285,13 +285,7 @@ class DataStore: NSObject {
         DataStore.setDefault(3, for: "brightnessStep")
         DataStore.setDefault(3, for: "contrastStep")
         DataStore.setDefault(2, for: "syncPollingSeconds")
-
-        if DDC.getBuiltinDisplay() != nil {
-            DataStore.setDefault(AdaptiveMode.sync.rawValue, for: "adaptiveBrightnessMode")
-        } else {
-            DataStore.setDefault(AdaptiveMode.location.rawValue, for: "adaptiveBrightnessMode")
-        }
-
+        DataStore.setDefault(AdaptiveMode.sync.rawValue, for: "adaptiveBrightnessMode")
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
 }

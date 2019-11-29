@@ -1,14 +1,11 @@
 ---
 name: Lunar Diagnostics Report
 about: Report containing Lunar diagnostics data and issue details
-title: "[BUG] Lunar Diagnostics Report"
+title: "Lunar Diagnostics Report"
 labels: diagnostics
 assignees: alin23
 
 ---
-
-# Diagnostics
-[Lunar Log](paste the URL received from Lunar diagnostics here)
 
 # Issue details
 - Was the diagnostics process able to change the brightness on your external monitor(s)?
