@@ -28,10 +28,16 @@
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
 
+## Tested and known to work with the following types of connections
+- HDMI (1.0 - 2.1)
+- DisplayPort (1.0 - 2.0)
+- Thunderbolt 3 (USB Type-C)
+- Thunderbolt 2 (mini DisplayPort)
+- VGA
+- Adapters that forward DDC messages properly
+
 ## Caveats
-- Lunar *usually* doesn't work with monitors connected through USB hubs
-- Brightness and contrast set by the user through physical controls can't be read
-    * At startup, Lunar will overwrite whichever brightness/contrast setting the monitor has
+- Lunar *usually* doesn't work with monitors connected through USB hubs/docks/adapters **because a lot of them don't forward DDC messages properly**
 - Sync mode doesn't work when the Macbook lid is closed because the light sensor is completely covered
 
 ### Contributing

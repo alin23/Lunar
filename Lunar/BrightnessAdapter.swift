@@ -52,8 +52,8 @@ class BrightnessAdapter {
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
     var builtinDisplay = DDC.getBuiltinDisplay()
 
-    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
-    var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .location
+    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
+    var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
 
     var builtinBrightnessHistory = BoundedArray<UInt8>(capacity: 10)
     var lastBuiltinBrightness = 0.0

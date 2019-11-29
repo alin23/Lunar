@@ -1,27 +1,26 @@
+import CryptorECC
 import Foundation
-// import ObjectivePGP
-//
-// func encrypt(message: Data) -> Data? {
-//    let path = Bundle.main.bundlePath as NSString
-//    var components = path.pathComponents
-//    components.append("Contents")
-//    components.append("Resources")
-//    components.append("alin_public_key.asc")
-//
-//    let keyPath = NSString.path(withComponents: components)
-//
-//    do {
-//        let keyring = ObjectivePGP.defaultKeyring
-//        try keyring.import(keyIdentifier:"E3629673D6E15976", fromPath:keyPath)
-////        let keys = try ObjectivePGP.readKeys(fromPath: newPath)
-//        let encrypted = try ObjectivePGP.encrypt(message, addSignature: false, using: keyring.keys)
-//
-//        return encrypted
-//    } catch {
-//        log.error("Error when encrypting message: \(error)")
-//        return nil
-//    }
-// }
+
+let publicKey =
+    """
+    -----BEGIN PUBLIC KEY-----
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKGs3ARma5DHHnBb/vvTQmRV6sS3Y
+    KtuJCVywyiA6TqoFEuQWDVmVwScqPbm5zmdRIUK31iZvxGjFjggMutstEA==
+    -----END PUBLIC KEY-----
+    """
+
+@available(OSX 10.13, *)
+func encrypt(message: Data) -> Data? {
+    do {
+        let eccPublicKey = try ECPublicKey(key: publicKey)
+        let encrypted = try message.encrypt(with: eccPublicKey)
+
+        return encrypted
+    } catch {
+        log.error("Error when encrypting message: \(error)")
+        return nil
+    }
+}
 
 func sha256(data: Data) -> Data {
     var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
