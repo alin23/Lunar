@@ -35,12 +35,7 @@ class StatusItemButtonController: NSView {
             opener.cancel()
             menuPopoverOpener = nil
         }
-        menuPopoverCloser = DispatchWorkItem {
-            menuPopover.close()
-        }
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(1_000_000_000))
-
-        DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser)
+        closeMenuPopover(after: 2000)
     }
 
     override func mouseDown(with event: NSEvent) {
