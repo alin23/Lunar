@@ -54,8 +54,8 @@ rm -rf $TMP_DIR
 mkdir -p $TMP_DMG_DIR
 cp -R "$BUILD_DIR" "$APP_TMP"
 
-codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --entitlements "$WORK_DIR/LunarService/LunarServiceRelease.entitlements" --preserve-metadata=identifier,entitlements,flags "$APP_TMP/Contents/Library/LoginItems/LunarService.app"
-codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --entitlements "$WORK_DIR/Lunar/LunarRelease.entitlements" --deep "$APP_TMP"
+codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,entitlements,flags "$APP_TMP/Contents/Library/LoginItems/LunarService.app"
+codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,entitlements,flags --deep "$APP_TMP"
 if not codesign -vvv --deep --strict "$APP_TMP"
     echo 'Bad signature'
     exit 1
