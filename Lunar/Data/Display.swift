@@ -122,9 +122,11 @@ class Display: NSManagedObject, NSCopying {
             self.minContrast = NSNumber(value: minContrast)
             self.maxContrast = NSNumber(value: maxContrast)
 
-            fgQueue.async {
-                self.refreshBrightness()
-                self.refreshContrast()
+            if datastore.defaults.refreshBrightness {
+                fgQueue.async {
+                    self.refreshBrightness()
+                    self.refreshContrast()
+                }
             }
         }
     }
@@ -209,10 +211,10 @@ class Display: NSManagedObject, NSCopying {
 
     func addObservers() {
         datastoreObservers = [
-            datastore.defaults.observe(\UserDefaults.brightnessLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\UserDefaults.brightnessLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\UserDefaults.contrastLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\UserDefaults.contrastLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
         ]
         observers = [
             observe(\.minBrightness, options: [.new, .old], changeHandler: { _, v in
@@ -245,6 +247,7 @@ class Display: NSManagedObject, NSCopying {
                             if !self.name.contains(ULTRAFINE_NAME) {
                                 _ = DDC.setBrightness(for: self.id, brightness: newValue)
                             } else {
+                                log.debug("Writing brightness using CoreDisplay")
                                 CoreDisplay_Display_SetUserBrightness(self.id, Double(newValue) / 100.0)
                             }
                         }
@@ -252,6 +255,7 @@ class Display: NSManagedObject, NSCopying {
                         if !self.name.contains(ULTRAFINE_NAME) {
                             _ = DDC.setBrightness(for: self.id, brightness: brightness)
                         } else {
+                            log.debug("Writing brightness using CoreDisplay")
                             CoreDisplay_Display_SetUserBrightness(self.id, Double(brightness) / 100.0)
                         }
                     }
@@ -297,6 +301,7 @@ class Display: NSManagedObject, NSCopying {
                 return UInt8(b)
             }
         } else {
+            log.debug("Reading brightness using CoreDisplay")
             return UInt8(round(CoreDisplay_Display_GetUserBrightness(id) * 100.0))
         }
 

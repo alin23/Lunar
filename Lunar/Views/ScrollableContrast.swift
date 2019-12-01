@@ -20,6 +20,8 @@ class ScrollableContrast: NSView {
 
     @IBOutlet var lockButton: LockButton!
 
+    var minObserver: NSKeyValueObservation?
+    var maxObserver: NSKeyValueObservation?
     var contrastObserver: NSKeyValueObservation?
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
@@ -70,9 +72,43 @@ class ScrollableContrast: NSView {
     }
 
     func addObserver(_ display: Display) {
+        minObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
+            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+            DispatchQueue.main.async {
+                currentValue.lowerLimit = Double(val)
+                let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                currentValue.stringValue = String(newContrast)
+                if brightnessAdapter.mode == .manual {
+                    currentValue.onValueChanged?(newContrast)
+                }
+            }
+        })
+        maxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
+            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+            DispatchQueue.main.async {
+                currentValue.upperLimit = Double(val)
+                let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                currentValue.stringValue = String(newContrast)
+                if brightnessAdapter.mode == .manual {
+                    currentValue.onValueChanged?(newContrast)
+                }
+            }
+        })
+
         contrastObserver = display.observe(\.contrast, options: [.new], changeHandler: { _, change in
             if let newContrast = change.newValue, let display = self.display, display.id != GENERIC_DISPLAY_ID {
-                let newContrast = cap(newContrast.uint8Value, minVal: display.minContrast.uint8Value, maxVal: display.maxContrast.uint8Value)
+                let minContrast: UInt8
+                let maxContrast: UInt8
+
+                if brightnessAdapter.mode != .manual {
+                    minContrast = display.minContrast.uint8Value
+                    maxContrast = display.maxContrast.uint8Value
+                } else {
+                    minContrast = UInt8(datastore.defaults.contrastLimitMin)
+                    maxContrast = UInt8(datastore.defaults.contrastLimitMax)
+                }
+
+                let newContrast = cap(newContrast.uint8Value, minVal: minContrast, maxVal: maxContrast)
                 DispatchQueue.main.async {
                     self.currentValue?.stringValue = String(newContrast)
                 }
@@ -150,8 +186,8 @@ class ScrollableContrast: NSView {
         maxValue?.intValue = Int32(displayMaxValue)
         maxValue?.lowerLimit = Double(displayMinValue + 1)
         currentValue?.intValue = Int32(displayValue)
-        currentValue?.lowerLimit = 0
-        currentValue?.upperLimit = 100
+        currentValue?.lowerLimit = Double(datastore.defaults.contrastLimitMin)
+        currentValue?.upperLimit = Double(datastore.defaults.contrastLimitMax)
 
         if let button = lockButton {
             button.setup(display.lockedContrast)

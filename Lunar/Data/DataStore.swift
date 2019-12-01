@@ -73,6 +73,10 @@ extension UserDefaults {
         return bool(forKey: "smoothTransition")
     }
 
+    @objc dynamic var refreshBrightness: Bool {
+        return bool(forKey: "refreshBrightness")
+    }
+
     @objc dynamic var debug: Bool {
         return bool(forKey: "debug")
     }
@@ -270,6 +274,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "didSwipeLeft")
         DataStore.setDefault(false, for: "didSwipeRight")
         DataStore.setDefault(false, for: "smoothTransition")
+        DataStore.setDefault(false, for: "refreshBrightness")
         DataStore.setDefault(false, for: "debug")
         DataStore.setDefault(false, for: "manualLocation")
         DataStore.setDefault(false, for: "showNavigationHints")

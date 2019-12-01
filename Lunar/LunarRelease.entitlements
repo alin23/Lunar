@@ -2,24 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.security.app-sandbox</key>
-	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>$(TeamIdentifierPrefix)</string>
 	</array>
-	<key>com.apple.security.files.user-selected.read-only</key>
-	<true/>
-	<key>com.apple.security.network.client</key>
-	<true/>
-	<key>com.apple.security.personal-information.location</key>
-	<true/>
 	<key>com.apple.security.temporary-exception.sbpl</key>
 	<array>
 		<string>(allow user-preference-read (preference-domain domain))</string>
 		<string>(allow iokit-open)</string>
-		<string>(allow iokit-set-properties (iokit-property &quot;ConsoleUID&quot;))</string>
-		<string>(allow mach-lookup (global-name &quot;com.apple.AssetCacheLocatorService&quot;))</string>
+		<string>(allow iokit-set-properties (iokit-property "ConsoleUID"))</string>
+		<string>(allow mach-lookup (global-name "com.apple.AssetCacheLocatorService"))</string>
 	</array>
 </dict>
 </plist>
