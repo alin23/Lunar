@@ -95,22 +95,6 @@ end
 create-dmg --identity="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_TMP" "$TMP_DMG_DIR"
 cp "$APP_TMP_DMG" "$APP_DMG"
 
-# echo \n(set_color green)"Creating $APP_TMP_DMG"(set_color normal)
-# hdiutil create -attach -fs HFS+ -volname Lunar -srcfolder "$TMP_DIR" -ov -format UDRW "$APP_TMP_DMG"
-
-# echo \n(set_color green)"Linking /Applications"(set_color normal)
-# ln -s /Applications /Volumes/Lunar/Applications
-
-# echo \n(set_color red)"Unmounting /Volumes/Lunar"(set_color normal)
-# hdiutil detach /Volumes/Lunar
-
-# echo \n(set_color blue)"Compressing $APP_TMP_DMG to $APP_DMG"(set_color normal)
-# hdiutil convert -format UDZO -o "$APP_DMG" "$APP_TMP_DMG"
-
-# echo \n(set_color green)"Signing "$APP_DMG""(set_color normal)
-# xattr -cr "$APP_DMG"
-# codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_DMG" -o runtime
-
 notarize "$APP_DMG" "$APP_DMG" "install"
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)

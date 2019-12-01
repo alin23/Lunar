@@ -64,6 +64,16 @@ var menuPopoverCloser = DispatchWorkItem {
     menuPopover.close()
 }
 
+func closeMenuPopover(after ms: Int) {
+    menuPopoverCloser.cancel()
+    menuPopoverCloser = DispatchWorkItem {
+        menuPopover.close()
+    }
+    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+
+    DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser)
+}
+
 extension Notification.Name {
     static let killLauncher = Notification.Name("killLauncher")
 }
@@ -105,6 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var curveFactorObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
     var sunsetObserver: NSKeyValueObservation?
+    var refreshBrightnessObserver: NSKeyValueObservation?
     var sunriseObserver: NSKeyValueObservation?
     var solarNoonObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
@@ -116,6 +127,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager: SessionManager?
+    let brightnessRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
+        let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
+        do {
+            let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
+            fgQueue.async {
+                brightnessAdapter.fetchBrightness(for: displays)
+            }
+        } catch {
+            log.error("Error on fetching Displays by IDs")
+        }
+        completion(NSBackgroundActivityScheduler.Result.finished)
+    }
 
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
@@ -297,24 +320,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshBrightness")
         brightnessReaderActivity.repeats = true
         brightnessReaderActivity.qualityOfService = .userInitiated
-        brightnessReaderActivity.interval = 5
-        brightnessReaderActivity.tolerance = 3
+        brightnessReaderActivity.interval = 10
+        brightnessReaderActivity.tolerance = 5
 
-        fgQueue.async {
-            brightnessAdapter.fetchBrightness()
-        }
-
-        brightnessReaderActivity.schedule { completion in
-            let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
-            do {
-                let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-                fgQueue.async {
-                    brightnessAdapter.fetchBrightness(for: displays)
-                }
-            } catch {
-                log.error("Error on fetching Displays by IDs")
+        if datastore.defaults.refreshBrightness {
+            fgQueue.async {
+                brightnessAdapter.fetchBrightness()
             }
-            completion(NSBackgroundActivityScheduler.Result.finished)
+
+            brightnessReaderActivity.schedule(brightnessRefresher)
         }
 
         locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
@@ -409,6 +423,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
+        refreshBrightnessObserver = datastore.defaults.observe(\.refreshBrightness, changeHandler: { _, change in
+            if let shouldRefreshBrightness = change.newValue {
+                if shouldRefreshBrightness {
+                    self.brightnessReaderActivity.schedule(self.brightnessRefresher)
+                } else {
+                    self.brightnessReaderActivity.invalidate()
+                }
+            }
+        })
         sunsetObserver = datastore.defaults.observe(\.sunset, changeHandler: { _, _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()

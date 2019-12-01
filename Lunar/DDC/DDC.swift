@@ -818,11 +818,13 @@ class DDC {
     }
 
     static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
+        log.info("DDC reading contrast for \(displayID)")
         return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 
     static func getBrightness(for displayID: CGDirectDisplayID? = nil) -> Double? {
         if let id = displayID {
+            log.info("DDC reading brightness for \(id)")
             return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
         }
         let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
