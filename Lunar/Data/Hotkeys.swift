@@ -283,21 +283,37 @@ extension AppDelegate {
 
     @objc func brightnessUpHotkeyHandler() {
         increaseBrightness()
+        if let statusButton = statusItem.button {
+            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+            closeMenuPopover(after: 2500)
+        }
         log.debug("Brightness Up Hotkey pressed")
     }
 
     @objc func brightnessDownHotkeyHandler() {
         decreaseBrightness()
+        if let statusButton = statusItem.button {
+            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+            closeMenuPopover(after: 2500)
+        }
         log.debug("Brightness Down Hotkey pressed")
     }
 
     @objc func contrastUpHotkeyHandler() {
         increaseContrast()
+        if let statusButton = statusItem.button {
+            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+            closeMenuPopover(after: 2500)
+        }
         log.debug("Contrast Up Hotkey pressed")
     }
 
     @objc func contrastDownHotkeyHandler() {
         decreaseContrast()
+        if let statusButton = statusItem.button {
+            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+            closeMenuPopover(after: 2500)
+        }
         log.debug("Contrast Down Hotkey pressed")
     }
 
