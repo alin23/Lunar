@@ -1,3 +1,12 @@
+# 2.9.3
+## Fixes
+
+- Fix system freeze caused by trying to read monitor brightness using DDC
+- Fix Manual mode values not respecting limits
+
+## Improvements
+
+- Show Quick Actions when changing brightness/contrast using hotkeys
 # 2.9.1
 ## Features
 - Quick Actions popover when hovering over the menu item
