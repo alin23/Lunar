@@ -112,6 +112,10 @@ extension UserDefaults {
         return bool(forKey: "debug")
     }
 
+    @objc dynamic var showQuickActions: Bool {
+        return bool(forKey: "showQuickActions")
+    }
+
     @objc dynamic var syncPollingSeconds: Int {
         return integer(forKey: "syncPollingSeconds")
     }
@@ -318,6 +322,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "smoothTransition")
         DataStore.setDefault(false, for: "refreshBrightness")
         DataStore.setDefault(false, for: "debug")
+        DataStore.setDefault(true, for: "showQuickActions")
         DataStore.setDefault(false, for: "manualLocation")
         DataStore.setDefault(false, for: "showNavigationHints")
         DataStore.setDefault(true, for: "startAtLogin")

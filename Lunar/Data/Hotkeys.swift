@@ -283,7 +283,7 @@ extension AppDelegate {
 
     @objc func brightnessUpHotkeyHandler() {
         increaseBrightness()
-        if let statusButton = statusItem.button {
+        if datastore.defaults.showQuickActions, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -292,7 +292,7 @@ extension AppDelegate {
 
     @objc func brightnessDownHotkeyHandler() {
         decreaseBrightness()
-        if let statusButton = statusItem.button {
+        if datastore.defaults.showQuickActions, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -301,7 +301,7 @@ extension AppDelegate {
 
     @objc func contrastUpHotkeyHandler() {
         increaseContrast()
-        if let statusButton = statusItem.button {
+        if datastore.defaults.showQuickActions, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -310,7 +310,7 @@ extension AppDelegate {
 
     @objc func contrastDownHotkeyHandler() {
         decreaseContrast()
-        if let statusButton = statusItem.button {
+        if datastore.defaults.showQuickActions, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
