@@ -68,8 +68,10 @@ bool IsLidClosed(void)
 
     clamShellStateRef = IORegistryEntryCreateCFProperty(rootDomain, CFSTR("AppleClamshellState"), kCFAllocatorDefault, 0);
     if (clamShellStateRef == NULL) {
-        if (rootDomain)
+        if (rootDomain) {
             IOObjectRelease(rootDomain);
+            return false;
+        }
     }
 
     if (CFBooleanGetValue((CFBooleanRef)(clamShellStateRef)) == true) {

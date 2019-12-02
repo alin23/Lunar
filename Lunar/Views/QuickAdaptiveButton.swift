@@ -63,7 +63,7 @@ class QuickAdaptiveButton: NSButton {
                             self.layer?.backgroundColor = buttonBgOff.cgColor
                             self.state = .off
                         }
-                        display.readapt(display: display, change: change)
+                        display.readapt(change: change)
                     }
                 }
             }
