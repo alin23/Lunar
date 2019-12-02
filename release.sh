@@ -6,16 +6,15 @@ fi
 if which sentry-cli >/dev/null; then
     export SENTRY_ORG=alin-panaitiu
     export SENTRY_PROJECT=lunar
-    VERSION=$(sentry-cli releases -o "$SENTRY_ORG" propose-version)
 
     # Create a release
-    ERROR=$(sentry-cli releases -o "$SENTRY_ORG" new --finalize -p $SENTRY_PROJECT $VERSION 2>&1 >/dev/null)
+    ERROR=$(sentry-cli releases -o "$SENTRY_ORG" new --finalize -p $SENTRY_PROJECT v$VERSION 2>&1 >/dev/null)
     if [ ! $? -eq 0 ]; then
         echo "warning: sentry-cli - $ERROR"
     fi
 
     # Associate commits with the release
-    ERROR=$(sentry-cli releases -o "$SENTRY_ORG" set-commits --auto $VERSION 2>&1 >/dev/null)
+    ERROR=$(sentry-cli releases -o "$SENTRY_ORG" set-commits --auto v$VERSION 2>&1 >/dev/null)
     if [ ! $? -eq 0 ]; then
         echo "warning: sentry-cli - $ERROR"
     fi
