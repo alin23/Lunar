@@ -94,25 +94,14 @@ In this case, you might benefit from a larger polling interval like 10 seconds.
 
 \(ADJUSTING_VALUES_INFO)
 """
-let BRIGHTNESS_STEP_TOOLTIP = """
+let HOTKEY_STEP_TOOLTIP = """
 ## Description
-Value for adjusting how much to increase/decrease the brightness when using hotkeys.
+Value for adjusting how much to increase/decrease the brightness/contrast when using hotkeys.
 
 ## Effect
-When using the Brightness Up/Down actions, the brightness will be computed using the following formulas:
+When using the Brightness/Contrast Up/Down actions, the brightness/contrast will be computed using the following formulas:
 * Brightness Up: ` brightness = oldValue + step `
 * Brightness Down: ` brightness = oldValue - step `
-
-\(ADJUSTING_VALUES_INFO)
-
-\(UI_NOTE_INFO)
-"""
-let CONTRAST_STEP_TOOLTIP = """
-## Description
-Value for adjusting how much to increase/decrease the contrast when using hotkeys.
-
-## Effect
-When using the Contrast Up/Down actions, the contrast will be computed using the following formulas:
 * Contrast Up: ` contrast = oldValue + step `
 * Contrast Down: ` contrast = oldValue - step `
 
@@ -180,6 +169,7 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var helpButton2: HelpButton!
     @IBOutlet var helpButton3: HelpButton!
     @IBOutlet var helpButton4: HelpButton!
+    @IBOutlet var helpButtonStep: HelpButton!
     @IBOutlet var helpButtonBottom: HelpButton!
 
     @IBOutlet var noonDurationField: ScrollableTextField!
@@ -239,12 +229,16 @@ class ConfigurationViewController: NSViewController {
 
     @IBOutlet var brightnessStepField: ScrollableTextField!
     @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
-    @IBOutlet var brightnessStepLabel: NSTextField!
-    var brightnessStepVisible: Bool = false {
+    @IBOutlet var contrastStepField: ScrollableTextField!
+    @IBOutlet var contrastStepCaption: ScrollableTextFieldCaption!
+    @IBOutlet var hotkeyStepLabel: NSTextField!
+    var hotkeyStepVisible: Bool = false {
         didSet {
-            brightnessStepField?.isHidden = !brightnessStepVisible
-            brightnessStepCaption?.isHidden = !brightnessStepVisible
-            brightnessStepLabel?.isHidden = !brightnessStepVisible
+            brightnessStepField?.isHidden = !hotkeyStepVisible
+            brightnessStepCaption?.isHidden = !hotkeyStepVisible
+            contrastStepField?.isHidden = !hotkeyStepVisible
+            contrastStepCaption?.isHidden = !hotkeyStepVisible
+            hotkeyStepLabel?.isHidden = !hotkeyStepVisible
         }
     }
 
@@ -256,17 +250,6 @@ class ConfigurationViewController: NSViewController {
             pollingIntervalField?.isHidden = !pollingIntervalVisible
             pollingIntervalCaption?.isHidden = !pollingIntervalVisible
             pollingIntervalLabel?.isHidden = !pollingIntervalVisible
-        }
-    }
-
-    @IBOutlet var contrastStepField: ScrollableTextField!
-    @IBOutlet var contrastStepCaption: ScrollableTextFieldCaption!
-    @IBOutlet var contrastStepLabel: NSTextField!
-    var contrastStepVisible: Bool = false {
-        didSet {
-            contrastStepField?.isHidden = !contrastStepVisible
-            contrastStepCaption?.isHidden = !contrastStepVisible
-            contrastStepLabel?.isHidden = !contrastStepVisible
         }
     }
 
@@ -348,9 +331,9 @@ class ConfigurationViewController: NSViewController {
         pollingIntervalVisible = adaptiveMode == .sync
         brightnessLimitVisible = adaptiveMode == .manual
         contrastLimitVisible = adaptiveMode == .manual
-        brightnessStepVisible = adaptiveMode == .manual
-        contrastStepVisible = adaptiveMode == .manual
+        hotkeyStepVisible = true
 
+        helpButtonStep.helpText = HOTKEY_STEP_TOOLTIP
         helpButtonBottom.helpText = SMOOTH_TRANSITION_TOOLTIP
 
         var refX: CGFloat
@@ -365,10 +348,6 @@ class ConfigurationViewController: NSViewController {
             helpButton1.link = nil
             helpButton2.helpText = CONTRAST_LIMIT_TOOLTIP
             helpButton2.link = CHART_LINK
-            helpButton3.helpText = BRIGHTNESS_STEP_TOOLTIP
-            helpButton3.link = nil
-            helpButton4.helpText = CONTRAST_STEP_TOOLTIP
-            helpButton4.link = CHART_LINK
         case .location:
             let refFrame = daylightExtensionField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
@@ -400,8 +379,8 @@ class ConfigurationViewController: NSViewController {
 
         helpButton1.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
         helpButton2.isHidden = !contrastOffsetVisible && !contrastLimitVisible && !daylightExtensionVisible
-        helpButton3.isHidden = !curveFactorVisible && !brightnessStepVisible && !pollingIntervalVisible
-        helpButton4.isHidden = !locationVisible && !contrastStepVisible
+        helpButton3.isHidden = !curveFactorVisible && !pollingIntervalVisible
+        helpButton4.isHidden = !locationVisible
     }
 
     func listenForShowNavigationHintsChange() {
