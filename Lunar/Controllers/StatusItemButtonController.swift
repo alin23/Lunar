@@ -18,6 +18,10 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
+        if !datastore.defaults.showQuickActions {
+            return
+        }
+
         menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem {
             if let area = event.trackingArea, let button = self.statusButton {
                 menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
