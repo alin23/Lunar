@@ -1,3 +1,13 @@
+# 2.9.4
+## Fixes
+
+- Fix lid closed detection on iMacs and Mac Minis
+
+## Improvements
+
+- Add more crash data to allow me to better diagnose issues remotely
+- Make transitions smooth by default on UltraFine displays
+- Read brightness periodically by default on UltraFine displays
 # 2.9.3
 ## Fixes
 
