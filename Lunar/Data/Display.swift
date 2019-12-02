@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Sentry
 import Surge
 import SwiftDate
 
@@ -82,6 +83,39 @@ class Display: NSManagedObject, NSCopying {
         return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
 
+    func addSentryData() {
+        if let client = Client.shared {
+            if client.extra == nil {
+                log.info("Creating Sentry extra context")
+                client.extra = [
+                    "settings": datastore.settingsDictionary(),
+                    "displays": [:],
+                    "apps": [:],
+                ]
+            }
+            if var displayExtra = client.extra?["displays"] as? [String: Any] {
+                displayExtra["\(id)"] = [
+                    "name": name,
+                    "adaptive": adaptive,
+                    "lockedBrightness": lockedBrightness,
+                    "lockedContrast": lockedContrast,
+                    "minContrast": minContrast,
+                    "minBrightness": minBrightness,
+                    "maxContrast": maxContrast,
+                    "maxBrightness": maxBrightness,
+                    "contrast": contrast,
+                    "brightness": brightness,
+                    "active": active,
+                ]
+                client.extra!["displays"] = displayExtra
+            }
+        }
+    }
+
+    func isUltraFine() -> Bool {
+        return name.contains(ULTRAFINE_NAME)
+    }
+
     func copy(with _: NSZone? = nil) -> Any {
         return Display(
             id: id,
@@ -122,11 +156,9 @@ class Display: NSManagedObject, NSCopying {
             self.minContrast = NSNumber(value: minContrast)
             self.maxContrast = NSNumber(value: maxContrast)
 
-            if datastore.defaults.refreshBrightness {
-                fgQueue.async {
-                    self.refreshBrightness()
-                    self.refreshContrast()
-                }
+            fgQueue.async {
+                self.refreshBrightness()
+                self.refreshContrast()
             }
         }
     }
@@ -135,20 +167,20 @@ class Display: NSManagedObject, NSCopying {
         name = Display.printableName(id: id)
     }
 
-    func readapt<T: Equatable>(display: Display, change: NSKeyValueObservedChange<T>) {
+    func readapt<T: Equatable>(change: NSKeyValueObservedChange<T>) {
         if let readaptListener = onReadapt {
             readaptListener()
         }
         if let newVal = change.newValue,
             let oldVal = change.oldValue {
-            if display.adaptive, newVal != oldVal {
+            if adaptive, newVal != oldVal {
                 switch brightnessAdapter.mode {
                 case .location:
-                    display.adapt(moment: brightnessAdapter.moment)
+                    adapt(moment: brightnessAdapter.moment)
                 case .sync:
                     if let brightness = brightnessAdapter.getBuiltinDisplayBrightness() {
                         log.verbose("Builtin Display Brightness: \(brightness)")
-                        display.adapt(percent: Double(brightness))
+                        adapt(percent: Double(brightness))
                     } else {
                         log.verbose("Can't get Builtin Display Brightness")
                     }
@@ -211,26 +243,50 @@ class Display: NSManagedObject, NSCopying {
 
     func addObservers() {
         datastoreObservers = [
-            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
-            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, v in self.readapt(display: self, change: v) }),
+            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(change: change)
+            }),
+            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(change: change)
+            }),
+            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(change: change)
+            }),
+            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(change: change)
+            }),
         ]
         observers = [
-            observe(\.minBrightness, options: [.new, .old], changeHandler: { _, v in
-                self.readapt(display: self, change: v)
+            observe(\.minBrightness, options: [.new, .old], changeHandler: { _, change in
+                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                    extraData["minBrightness"] = newVal
+                    Client.shared?.extra?["\(self.id)"] = extraData
+                }
+                self.readapt(change: change)
                 datastore.save()
             }),
-            observe(\.maxBrightness, options: [.new, .old], changeHandler: { _, v in
-                self.readapt(display: self, change: v)
+            observe(\.maxBrightness, options: [.new, .old], changeHandler: { _, change in
+                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                    extraData["maxBrightness"] = newVal
+                    Client.shared?.extra?["\(self.id)"] = extraData
+                }
+                self.readapt(change: change)
                 datastore.save()
             }),
-            observe(\.minContrast, options: [.new, .old], changeHandler: { _, v in
-                self.readapt(display: self, change: v)
+            observe(\.minContrast, options: [.new, .old], changeHandler: { _, change in
+                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                    extraData["minContrast"] = newVal
+                    Client.shared?.extra?["\(self.id)"] = extraData
+                }
+                self.readapt(change: change)
                 datastore.save()
             }),
-            observe(\.maxContrast, options: [.new, .old], changeHandler: { _, v in
-                self.readapt(display: self, change: v)
+            observe(\.maxContrast, options: [.new, .old], changeHandler: { _, change in
+                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                    extraData["maxContrast"] = newVal
+                    Client.shared?.extra?["\(self.id)"] = extraData
+                }
+                self.readapt(change: change)
                 datastore.save()
             }),
             observe(\.brightness, options: [.new, .old], changeHandler: { _, change in
@@ -242,9 +298,13 @@ class Display: NSManagedObject, NSCopying {
                         brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                     }
 
-                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
+                    if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                        extraData["brightness"] = brightness
+                        Client.shared?.extra?["\(self.id)"] = extraData
+                    }
+                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition || self.isUltraFine() {
                         self.smoothTransition(from: currentValue, to: brightness) { newValue in
-                            if !self.name.contains(ULTRAFINE_NAME) {
+                            if !self.isUltraFine() {
                                 _ = DDC.setBrightness(for: self.id, brightness: newValue)
                             } else {
                                 log.debug("Writing brightness using CoreDisplay")
@@ -252,7 +312,7 @@ class Display: NSManagedObject, NSCopying {
                             }
                         }
                     } else {
-                        if !self.name.contains(ULTRAFINE_NAME) {
+                        if !self.isUltraFine() {
                             _ = DDC.setBrightness(for: self.id, brightness: brightness)
                         } else {
                             log.debug("Writing brightness using CoreDisplay")
@@ -272,8 +332,11 @@ class Display: NSManagedObject, NSCopying {
                     } else {
                         contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                     }
-
-                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition {
+                    if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                        extraData["contrast"] = contrast
+                        Client.shared?.extra?["\(self.id)"] = extraData
+                    }
+                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition || self.isUltraFine() {
                         self.smoothTransition(from: currentValue, to: contrast) { newValue in
                             _ = DDC.setContrast(for: self.id, contrast: newValue)
                         }
@@ -296,7 +359,7 @@ class Display: NSManagedObject, NSCopying {
     }
 
     func readBrightness() -> UInt8? {
-        if !name.contains(ULTRAFINE_NAME) {
+        if !isUltraFine() {
             if let b = DDC.getBrightness(for: self.id) {
                 return UInt8(b)
             }
@@ -309,6 +372,10 @@ class Display: NSManagedObject, NSCopying {
     }
 
     func refreshBrightness() {
+        if !datastore.defaults.refreshBrightness, !isUltraFine() {
+            return
+        }
+
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
@@ -326,6 +393,10 @@ class Display: NSManagedObject, NSCopying {
     }
 
     func refreshContrast() {
+        if !datastore.defaults.refreshBrightness {
+            return
+        }
+
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return

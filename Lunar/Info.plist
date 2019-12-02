@@ -54,7 +54,7 @@
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>SentryCrashExceptionApplication</string>
 	<key>SUFeedURL</key>
 	<string>https://lunar.fyi/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>

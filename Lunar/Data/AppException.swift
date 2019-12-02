@@ -7,10 +7,11 @@
 //
 
 import Cocoa
+import Sentry
 
-let APP_MAX_BRIGHTNESS: UInt8 = 50
+let APP_MAX_BRIGHTNESS: UInt8 = 30
 let APP_MAX_CONTRAST: UInt8 = 30
-let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player"]
+let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix"]
 
 class AppException: NSManagedObject {
     @NSManaged var identifier: String
@@ -28,11 +29,41 @@ class AppException: NSManagedObject {
         self.name = name
         self.brightness = NSNumber(value: brightness)
         self.contrast = NSNumber(value: contrast)
+        addSentryData()
     }
 
     @objc func remove() {
         datastore.context.delete(self)
         try? datastore.context.save()
+        removeSentryData()
+    }
+
+    func addSentryData() {
+        if let client = Client.shared {
+            if client.extra == nil {
+                log.info("Creating Sentry extra context")
+                client.extra = [
+                    "settings": datastore.settingsDictionary(),
+                    "displays": [:],
+                    "apps": [:],
+                ]
+            }
+
+            if var appExtra = client.extra?["apps"] as? [String: Any] {
+                appExtra[name] = [
+                    "brightness": brightness,
+                    "contrast": contrast,
+                ]
+                client.extra!["apps"] = appExtra
+            }
+        }
+    }
+
+    func removeSentryData() {
+        if let client = Client.shared, let extra = client.extra, var appExtra = extra["apps"] as? [String: Any] {
+            appExtra.removeValue(forKey: name)
+            client.extra!["apps"] = appExtra
+        }
     }
 
     func addObservers() {
@@ -40,12 +71,14 @@ class AppException: NSManagedObject {
             observe(\.brightness, options: [.new], changeHandler: { _, change in
                 if let newVal = change.newValue {
                     datastore.save()
+                    self.addSentryData()
                     log.debug("\(self.name): Set brightness to \(newVal.uint8Value)")
                 }
             }),
             observe(\.contrast, options: [.new], changeHandler: { _, change in
                 if let newVal = change.newValue {
                     datastore.save()
+                    self.addSentryData()
                     log.debug("\(self.name): Set contrast to \(newVal.uint8Value)")
                 }
             }),

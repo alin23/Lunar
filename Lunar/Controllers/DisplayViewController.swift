@@ -247,7 +247,7 @@ class DisplayViewController: NSViewController {
                             self.setValuesHidden(true)
                             button.state = .off
                         }
-                        display.readapt(display: display, change: change)
+                        display.readapt(change: change)
                     }
                 }
             }
