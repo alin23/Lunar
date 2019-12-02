@@ -47,6 +47,13 @@
                                                 <binding destination="3YV-ka-Eop" name="value" keyPath="values.debug" id="q17-cG-lR6"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Quick Actions" id="cuD-Oj-rOj">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.showQuickActions" id="O07-8q-0Vv"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
                                         <menuItem title="0%" keyEquivalent="0" id="9Jm-7d-C6T">
                                             <attributedString key="attributedTitle"/>
