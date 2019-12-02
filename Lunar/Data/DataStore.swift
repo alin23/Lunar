@@ -8,6 +8,37 @@
 
 import Cocoa
 
+let APP_SETTINGS = [
+    "adaptiveBrightnessMode",
+    "brightnessLimitMax",
+    "brightnessLimitMin",
+    "brightnessOffset",
+    "brightnessStep",
+    "contrastLimitMax",
+    "contrastLimitMin",
+    "contrastOffset",
+    "contrastStep",
+    "curveFactor",
+    "daylightExtensionMinutes",
+    "debug",
+    "didScrollTextField",
+    "didSwipeLeft",
+    "didSwipeRight",
+    "didSwipeToHotkeys",
+    "firstRun",
+    "hotkeys",
+    "manualLocation",
+    "noonDurationMinutes",
+    "refreshBrightness",
+    "showNavigationHints",
+    "smoothTransition",
+    "solarNoon",
+    "startAtLogin",
+    "sunrise",
+    "sunset",
+    "syncPollingSeconds",
+]
+
 extension UserDefaults {
     @objc dynamic var sunrise: String {
         return string(forKey: "sunrise") ?? ""
@@ -178,8 +209,19 @@ class DataStore: NSObject {
         return try (context ?? self.context).fetch(fetchRequest)
     }
 
+    func fetchAllAppExceptions(context: NSManagedObjectContext? = nil) throws -> [AppException] {
+        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
+        return try (context ?? self.context).fetch(fetchRequest)
+    }
+
     func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
         return try DataStore.fetchAppException(by: identifier, context: context ?? self.context)
+    }
+
+    func settingsDictionary() -> [String: Any] {
+        return defaults.dictionaryRepresentation().filter { elem in
+            APP_SETTINGS.contains(elem.key)
+        }
     }
 
     static func fetchAppException(by identifier: String, context: NSManagedObjectContext) throws -> AppException? {
@@ -281,8 +323,8 @@ class DataStore: NSObject {
         DataStore.setDefault(true, for: "startAtLogin")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")
-        DataStore.setDefault(-5, for: "brightnessOffset")
-        DataStore.setDefault(0, for: "contrastOffset")
+        DataStore.setDefault(5, for: "brightnessOffset")
+        DataStore.setDefault(20, for: "contrastOffset")
         DataStore.setDefault(5, for: "brightnessLimitMin")
         DataStore.setDefault(20, for: "contrastLimitMin")
         DataStore.setDefault(90, for: "brightnessLimitMax")

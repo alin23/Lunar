@@ -115,7 +115,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var curveFactorObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
     var sunsetObserver: NSKeyValueObservation?
-    var refreshBrightnessObserver: NSKeyValueObservation?
     var sunriseObserver: NSKeyValueObservation?
     var solarNoonObserver: NSKeyValueObservation?
     var brightnessOffsetObserver: NSKeyValueObservation?
@@ -184,6 +183,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 return
             }
             brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .sync
+            Client.shared?.tags?["adaptiveMode"] = brightnessAdapter.adaptiveModeString()
+            Client.shared?.tags?["lastAdaptiveMode"] = brightnessAdapter.adaptiveModeString(last: true)
             self.resetElements()
             self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
         })
@@ -196,6 +197,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             name: NSWindow.willCloseNotification,
             object: window
         )
+    }
+
+    func listenForSettingsChange() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(adaptToSettingsChange(notification:)),
+            name: UserDefaults.didChangeNotification,
+            object: datastore.defaults
+        )
+    }
+
+    @objc func adaptToSettingsChange(notification _: Notification) {
+        if var extra = Client.shared?.extra {
+            extra["settings"] = datastore.settingsDictionary()
+        } else {
+            log.info("Creating Sentry extra context")
+            Client.shared?.extra = [
+                "settings": datastore.settingsDictionary(),
+                "displays": [:],
+                "apps": [:],
+            ]
+        }
     }
 
     func showWindow() {
@@ -323,13 +346,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessReaderActivity.interval = 10
         brightnessReaderActivity.tolerance = 5
 
-        if datastore.defaults.refreshBrightness {
-            fgQueue.async {
-                brightnessAdapter.fetchBrightness()
-            }
-
-            brightnessReaderActivity.schedule(brightnessRefresher)
+        fgQueue.async {
+            brightnessAdapter.fetchBrightness()
         }
+
+        brightnessReaderActivity.schedule(brightnessRefresher)
 
         locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
         locationActivity.repeats = true
@@ -423,15 +444,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
-        refreshBrightnessObserver = datastore.defaults.observe(\.refreshBrightness, changeHandler: { _, change in
-            if let shouldRefreshBrightness = change.newValue {
-                if shouldRefreshBrightness {
-                    self.brightnessReaderActivity.schedule(self.brightnessRefresher)
-                } else {
-                    self.brightnessReaderActivity.invalidate()
-                }
-            }
-        })
         sunsetObserver = datastore.defaults.observe(\.sunset, changeHandler: { _, _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
@@ -528,13 +540,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
+        log.initLogger()
         do {
             Client.shared = try Client(dsn: secrets.sentryDSN)
+
+            let user = User(userId: getSerialNumberHash() ?? "NOID")
+            Client.shared?.user = user
+
+            log.info("Creating Sentry extra context")
+            Client.shared?.extra = [
+                "settings": datastore.settingsDictionary(),
+                "displays": [:],
+                "apps": [:],
+            ]
+            Client.shared?.tags = [
+                "adaptiveMode": brightnessAdapter.adaptiveModeString(),
+                "lastAdaptiveMode": brightnessAdapter.adaptiveModeString(last: true),
+            ]
+            brightnessAdapter.addSentryData()
+
             try Client.shared?.startCrashHandler()
         } catch {
             print("\(error)")
         }
-        log.initLogger()
 
         if let logPath = LOG_URL.path.cString(using: .utf8) {
             log.info("Setting log path to \(LOG_URL.path)")
