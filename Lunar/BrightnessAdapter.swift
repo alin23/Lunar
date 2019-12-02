@@ -10,6 +10,7 @@ import Alamofire
 import Cocoa
 import CoreLocation
 import Foundation
+import Sentry
 import Solar
 import Surge
 import SwiftDate
@@ -108,6 +109,7 @@ class BrightnessAdapter {
             display.removeObservers()
         }
         displays = BrightnessAdapter.getDisplays()
+        addSentryData()
     }
 
     private static func getDisplays() -> [CGDirectDisplayID: Display] {
@@ -163,6 +165,46 @@ class BrightnessAdapter {
         return displays
     }
 
+    func addSentryData() {
+        if let client = Client.shared {
+            log.info("Creating Sentry extra context")
+            client.extra = [
+                "settings": datastore.settingsDictionary(),
+                "displays": [:],
+                "apps": [:],
+            ]
+            for display in displays.values {
+                display.addSentryData()
+                if display.isUltraFine() {
+                    client.tags?["ultrafine"] = "true"
+                }
+            }
+            if let appExceptions = try? datastore.fetchAllAppExceptions() {
+                for app in appExceptions {
+                    app.addSentryData()
+                }
+            }
+        }
+    }
+
+    func adaptiveModeString(last: Bool = false) -> String {
+        let mode: AdaptiveMode
+        if last {
+            mode = lastMode
+        } else {
+            mode = self.mode
+        }
+
+        switch mode {
+        case .manual:
+            return "Manual"
+        case .location:
+            return "Location"
+        case .sync:
+            return "Sync"
+        }
+    }
+
     func activateClamshellMode() {
         if mode != .manual {
             clamshellMode = true
@@ -180,6 +222,7 @@ class BrightnessAdapter {
     func manageClamshellMode() {
         lidClosed = IsLidClosed()
         log.info("Lid closed: \(lidClosed)")
+        Client.shared?.tags?["clamshellMode"] = String(lidClosed)
 
         if lidClosed {
             activateClamshellMode()
@@ -245,6 +288,7 @@ class BrightnessAdapter {
         runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
         for app in runningAppExceptions {
             app.addObservers()
+            app.addSentryData()
         }
 
         adaptBrightness()

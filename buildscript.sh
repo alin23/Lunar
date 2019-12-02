@@ -6,7 +6,7 @@ fi
 if which sentry-cli >/dev/null; then
     export SENTRY_ORG=alin-panaitiu
     export SENTRY_PROJECT=lunar
-    ERROR=$(sentry-cli upload-dif "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
+    ERROR=$(sentry-cli upload-dif --include-sources "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
     if [ ! $? -eq 0 ]; then
         echo "warning: sentry-cli - $ERROR"
     fi
