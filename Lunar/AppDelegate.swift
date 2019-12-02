@@ -542,7 +542,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         log.initLogger()
         do {
-            Client.shared = try Client(dsn: secrets.sentryDSN)
+            let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
+            Client.shared = try Client(options: [
+                "dsn": secrets.sentryDSN,
+                "enabled": true,
+                "release": "v\(release)",
+                "dist": release,
+                "environment": "production",
+            ])
 
             let user = User(userId: getSerialNumberHash() ?? "NOID")
             Client.shared?.user = user
