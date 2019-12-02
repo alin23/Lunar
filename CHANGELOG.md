@@ -1,3 +1,8 @@
+# 2.9.5
+## Features
+
+- Add option to disable Quick Actions popover
+
 # 2.9.4
 ## Fixes
 
