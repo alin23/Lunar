@@ -79,11 +79,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var locationModeButton: NSButton!
     @IBOutlet var manualModeButton: NSButton!
 
-    @IBOutlet var tableView: NSTableView!
+    @IBOutlet var tableView: DisplayValuesView!
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
+    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active })
 
     var syncModeButtonResponder: ModeButtonResponder!
     var locationModeButtonResponder: ModeButtonResponder!
@@ -91,6 +92,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     var trackingArea: NSTrackingArea?
     var adaptiveModeObserver: NSKeyValueObservation?
+    var displaysObserver: NSKeyValueObservation!
 
     func listenForPopoverEvents() {
         NotificationCenter.default.addObserver(
@@ -113,98 +115,115 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         )
     }
 
-    func listenForScreenConfigurationChanged() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSApplication.didChangeScreenParametersNotification,
-            object: nil
-        )
-    }
-
-    @objc func adaptToScreenConfiguration(notification _: Notification) {
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(2_000_000_000))
-
-        DispatchQueue.main.asyncAfter(deadline: deadline) { self.arrayController.rearrangeObjects() }
-    }
-
     override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         listenForPopoverEvents()
         listenForAdaptiveModeChange()
+        listenForDisplaysChange()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         listenForPopoverEvents()
         listenForAdaptiveModeChange()
+        listenForDisplaysChange()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        arrayController.managedObjectContext = datastore.context
         tableView.headerView = nil
     }
 
     @objc func popoverWillShow(notification _: Notification) {
-        let scrollFrame = scrollView.frame
-        view.setFrameSize(NSSize(width: view.frame.size.width, height: view.frame.size.height + (tableView.frame.size.height - scrollView.frame.size.height)))
-        menuPopover.contentSize = view.frame.size
+        runInMainThread {
+            let scrollFrame = scrollView.frame
+            if tableView.numberOfRows > 0, view.frame.size.height < tableView.frame.size.height {
+                view.setFrameSize(NSSize(width: view.frame.size.width, height: view.frame.size.height + tableView.frame.size.height))
+            }
+            menuPopover.contentSize = view.frame.size
 
-        scrollView.setFrameSize(tableView.frame.size)
-        scrollView.setFrameOrigin(scrollFrame.origin)
+            scrollView.setFrameSize(tableView.frame.size)
+            scrollView.setFrameOrigin(scrollFrame.origin)
 
-        scrollView.setNeedsDisplay(scrollView.frame)
-        view.setNeedsDisplay(view.frame)
+            scrollView.setNeedsDisplay(scrollView.frame)
+            view.setNeedsDisplay(view.frame)
+        }
     }
 
     @objc func popoverDidShow(notification _: Notification) {
-        if let area = trackingArea {
-            view.removeTrackingArea(area)
-        }
-        trackingArea = NSTrackingArea(rect: view.visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
-        view.addTrackingArea(trackingArea!)
+        runInMainThread {
+            if let area = trackingArea {
+                view.removeTrackingArea(area)
+            }
+            trackingArea = NSTrackingArea(rect: view.visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
+            view.addTrackingArea(trackingArea!)
 
-        syncModeButtonResponder = syncModeButtonResponder ?? ModeButtonResponder(button: syncModeButton, mode: .sync)
-        locationModeButtonResponder = locationModeButtonResponder ?? ModeButtonResponder(button: locationModeButton, mode: .location)
-        manualModeButtonResponder = manualModeButtonResponder ?? ModeButtonResponder(button: manualModeButton, mode: .manual)
+            syncModeButtonResponder = syncModeButtonResponder ?? ModeButtonResponder(button: syncModeButton, mode: .sync)
+            locationModeButtonResponder = locationModeButtonResponder ?? ModeButtonResponder(button: locationModeButton, mode: .location)
+            manualModeButtonResponder = manualModeButtonResponder ?? ModeButtonResponder(button: manualModeButton, mode: .manual)
+        }
     }
 
     @objc func popoverDidClose(notification _: Notification) {
-        if let area = trackingArea {
-            view.removeTrackingArea(area)
+        runInMainThread {
+            if let area = trackingArea {
+                view.removeTrackingArea(area)
+            }
+            trackingArea = nil
         }
-        trackingArea = nil
     }
 
     func grayAllButtons() {
-        syncModeButton.layer?.backgroundColor = offColor
-        locationModeButton.layer?.backgroundColor = offColor
-        manualModeButton.layer?.backgroundColor = offColor
+        runInMainThread {
+            syncModeButton.layer?.backgroundColor = offColor
+            locationModeButton.layer?.backgroundColor = offColor
+            manualModeButton.layer?.backgroundColor = offColor
 
-        syncModeButton.state = .off
-        locationModeButton.state = .off
-        manualModeButton.state = .off
+            syncModeButton.state = .off
+            locationModeButton.state = .off
+            manualModeButton.state = .off
+        }
+    }
+
+    func sameDisplays() -> Bool {
+        let newDisplays = brightnessAdapter.displays.values.map { $0 }
+        return newDisplays.count == displays.count && zip(displays, newDisplays).allSatisfy { d1, d2 in d1 === d2 }
+    }
+
+    func listenForDisplaysChange() {
+        displaysObserver = datastore.defaults.observe(\.displays, options: [.new], changeHandler: { _, _ in
+            if !self.sameDisplays() {
+                self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }), forKey: "displays")
+                runInMainThread {
+                    self.view.setNeedsDisplay(self.view.visibleRect)
+                }
+            }
+        })
     }
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
-                return
-            }
-            let adaptiveMode = AdaptiveMode(rawValue: mode)!
-            self.grayAllButtons()
-            switch adaptiveMode {
-            case .sync:
-                self.syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                self.syncModeButton.state = .on
-            case .location:
-                self.locationModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                self.locationModeButton.state = .on
-            case .manual:
-                self.manualModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                self.manualModeButton.state = .on
+            runInMainThread {
+                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                    return
+                }
+                let adaptiveMode = AdaptiveMode(rawValue: mode)!
+                self.grayAllButtons()
+                switch adaptiveMode {
+                case .sync:
+                    self.syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    self.syncModeButton.state = .on
+                    self.tableView.setAdaptiveButtonHidden(false)
+                case .location:
+                    self.locationModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    self.locationModeButton.state = .on
+                    self.tableView.setAdaptiveButtonHidden(false)
+                case .manual:
+                    self.manualModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    self.manualModeButton.state = .on
+                    self.tableView.setAdaptiveButtonHidden(true)
+                }
             }
         })
     }

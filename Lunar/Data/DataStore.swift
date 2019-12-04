@@ -31,6 +31,7 @@ let APP_SETTINGS = [
     "noonDurationMinutes",
     "refreshBrightness",
     "showNavigationHints",
+    "showQuickActions",
     "smoothTransition",
     "solarNoon",
     "startAtLogin",
@@ -159,67 +160,49 @@ extension UserDefaults {
     @objc dynamic var hotkeys: [String: Any]? {
         return dictionary(forKey: "hotkeys")
     }
+
+    @objc dynamic var displays: [Any]? {
+        return array(forKey: "displays")
+    }
+
+    @objc dynamic var appExceptions: [Any]? {
+        return array(forKey: "appExceptions")
+    }
 }
-
-@available(OSX 10.12, *)
-let container = NSPersistentContainer(name: "Model")
-
-let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
-let persistentStoreUrl = FileManager().urls(for: .applicationSupportDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("Model.sqlite", isDirectory: false)
-let model = NSManagedObjectModel(contentsOf: Bundle.main.url(forResource: "Model", withExtension: "momd")!)
-let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model!)
 
 class DataStore: NSObject {
     static let defaults: UserDefaults = NSUserDefaultsController.shared.defaults
     let defaults: UserDefaults = DataStore.defaults
-    var context: NSManagedObjectContext
-
-    func save(context: NSManagedObjectContext? = nil) {
-        do {
-            try (context ?? self.context).save()
-        } catch {
-            log.error("Error on saving context: \(error)")
-        }
-    }
 
     func hotkeys() -> [HotkeyIdentifier: [HotkeyPart: Int]]? {
         guard let hotkeyConfig = defaults.hotkeys else { return nil }
         return Hotkey.toDictionary(hotkeyConfig)
     }
 
-    func cleanUpDisplays(context: NSManagedObjectContext? = nil) throws {
-        if let display = DDC.getBuiltinDisplay() {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Display")
-            fetchRequest.predicate = NSPredicate(format: "id == %@", NSNumber(value: display))
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try (context ?? self.context).execute(deleteRequest)
-        }
+    func displays(serials: [String]? = nil) -> [Display]? {
+        guard let displayConfig = defaults.displays else { return nil }
+        return displayConfig.map { config in
+            guard let config = config as? [String: Any],
+                let serial = config["serial"] as? String else { return nil }
+
+            if let serials = serials, !serials.contains(serial) {
+                return nil
+            }
+            return Display.fromDictionary(config)
+        }.compactMap { $0 }
     }
 
-    func fetchDisplays(by serials: [String], context: NSManagedObjectContext? = nil) throws -> [Display] {
-        let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
-        fetchRequest.predicate = NSPredicate(format: "serial IN %@", Set(serials))
-        return try (context ?? self.context).fetch(fetchRequest)
-    }
+    func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
+        guard let appConfig = defaults.appExceptions else { return nil }
+        return appConfig.map { config in
+            guard let config = config as? [String: Any],
+                let identifier = config["identifier"] as? String else { return nil }
 
-    func countDisplays(context: NSManagedObjectContext? = nil) -> Int {
-        let fetchRequest = NSFetchRequest<Display>(entityName: "Display")
-        return (try? (context ?? self.context).count(for: fetchRequest)) ?? 0
-    }
-
-    func fetchAppExceptions(by identifiers: [String], context: NSManagedObjectContext? = nil) throws -> [AppException] {
-        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
-        fetchRequest.predicate = NSPredicate(format: "identifier IN %@", Set(identifiers))
-        return try (context ?? self.context).fetch(fetchRequest)
-    }
-
-    func fetchAllAppExceptions(context: NSManagedObjectContext? = nil) throws -> [AppException] {
-        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
-        return try (context ?? self.context).fetch(fetchRequest)
-    }
-
-    func fetchAppException(by identifier: String, context: NSManagedObjectContext? = nil) throws -> AppException? {
-        return try DataStore.fetchAppException(by: identifier, context: context ?? self.context)
+            if let identifiers = identifiers, !identifiers.contains(identifier) {
+                return nil
+            }
+            return AppException.fromDictionary(config)
+        }.compactMap { $0 }
     }
 
     func settingsDictionary() -> [String: Any] {
@@ -228,13 +211,83 @@ class DataStore: NSObject {
         }
     }
 
-    static func fetchAppException(by identifier: String, context: NSManagedObjectContext) throws -> AppException? {
-        let fetchRequest = NSFetchRequest<AppException>(entityName: "AppException")
-        fetchRequest.predicate = NSPredicate(format: "identifier == %@", identifier)
-        return try context.fetch(fetchRequest).first
+    static func storeAppException(app: AppException) {
+        guard var appExceptions = DataStore.defaults.appExceptions else {
+            DataStore.defaults.set([
+                app.dictionaryRepresentation(),
+            ] as NSArray, forKey: "appExceptions")
+            return
+        }
+
+        if let appIndex = appExceptions.firstIndex(where: appByIdentifier(app.identifier)) {
+            appExceptions[appIndex] = app.dictionaryRepresentation()
+        } else {
+            appExceptions.append(app.dictionaryRepresentation())
+        }
+
+        DataStore.defaults.set(appExceptions as NSArray, forKey: "appExceptions")
     }
 
-    static func firstRun(context: NSManagedObjectContext) {
+    func storeDisplays(_ displays: [Display]) -> [Display] {
+        guard let storedDisplays = self.displays() else {
+            let nsDisplays = displays.map {
+                $0.dictionaryRepresentation()
+            } as NSArray
+            defaults.set(nsDisplays, forKey: "displays")
+            return displays
+        }
+        let newDisplaySerials = displays.map { $0.serial }
+        let newDisplayIDs = displays.map { $0.id }
+
+        let inactiveDisplays = storedDisplays.filter { d in !newDisplaySerials.contains(d.serial) }
+        for display in inactiveDisplays {
+            display.active = false
+            while newDisplayIDs.contains(display.id) {
+                display.id = UInt32.random(in: 100 ... 1000)
+            }
+        }
+
+        let allDisplays = inactiveDisplays + displays
+        let nsDisplays = allDisplays.map {
+            $0.dictionaryRepresentation()
+        } as NSArray
+        defaults.set(nsDisplays, forKey: "displays")
+
+        return allDisplays
+    }
+
+    static func storeDisplay(display: Display) {
+        guard var displays = DataStore.defaults.displays else {
+            DataStore.defaults.set([
+                display.dictionaryRepresentation(),
+            ] as NSArray, forKey: "displays")
+            return
+        }
+
+        if let displayIndex = displays.firstIndex(where: displayBySerial(display.serial)) {
+            displays[displayIndex] = display.dictionaryRepresentation()
+        } else {
+            displays.append(display.dictionaryRepresentation())
+        }
+
+        DataStore.defaults.set(displays as NSArray, forKey: "displays")
+    }
+
+    static func appByIdentifier(_ identifier: String) -> ((Any) -> Bool) {
+        return { app in
+            guard let id = (app as? [String: Any])?["identifier"] as? String else { return false }
+            return id == identifier
+        }
+    }
+
+    static func displayBySerial(_ serial: String) -> ((Any) -> Bool) {
+        return { display in
+            guard let displaySerial = (display as? [String: Any])?["serial"] as? String else { return false }
+            return serial == displaySerial
+        }
+    }
+
+    static func firstRun() {
         log.debug("First run")
         thisIsFirstRun = true
         for app in DEFAULT_APP_EXCEPTIONS {
@@ -245,13 +298,11 @@ class DataStore: NSObject {
                     let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                if let exc = ((try? DataStore.fetchAppException(by: id, context: context)) as AppException??) {
-                    if exc == nil {
-                        _ = AppException(identifier: id, name: name, context: context)
-                    }
+                if let exc = defaults.appExceptions?.first(where: appByIdentifier(id)) {
                     log.debug("Existing app for \(app): \(String(describing: exc))")
                     continue
                 }
+                storeAppException(app: AppException(identifier: id, name: name))
             }
         }
     }
@@ -281,37 +332,14 @@ class DataStore: NSObject {
     }
 
     override init() {
-        NSUserDefaultsController.shared.appliesImmediately = true
-
-        if #available(OSX 10.12, *) {
-            container.loadPersistentStores(completionHandler: { _, error in
-                if let error = error {
-                    fatalError("Unable to load persistent stores: \(error)")
-                }
-            })
-            context = container.newBackgroundContext()
-            context.mergePolicy = NSMergePolicy(merge: .overwriteMergePolicyType)
-        } else {
-            do {
-                if coordinator.persistentStore(for: persistentStoreUrl) == nil {
-                    try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: persistentStoreUrl, options: nil)
-                }
-            } catch {
-                fatalError("Unable to load persistent stores: \(error)")
-            }
-
-            context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            context.persistentStoreCoordinator = coordinator
-            context.mergePolicy = NSMergePolicy(merge: .overwriteMergePolicyType)
-        }
         super.init()
+
+        NSUserDefaultsController.shared.appliesImmediately = true
 
         log.debug("Checking First Run")
         if DataStore.defaults.object(forKey: "firstRun") == nil {
-            DataStore.firstRun(context: context)
+            DataStore.firstRun()
             DataStore.defaults.set(true, forKey: "firstRun")
-        } else {
-            try? cleanUpDisplays()
         }
 
         DataStore.setDefault(0.5, for: "curveFactor")

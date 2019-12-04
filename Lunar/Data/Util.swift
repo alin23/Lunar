@@ -46,3 +46,13 @@ func getSerialNumberHash() -> String? {
     guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else { return nil }
     return sha256(data: serialNumberData).str(hex: true, separator: "")
 }
+
+func runInMainThread(_ action: () -> Void) {
+    if Thread.isMainThread {
+        action()
+    } else {
+        DispatchQueue.main.sync {
+            action()
+        }
+    }
+}
