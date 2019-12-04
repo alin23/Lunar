@@ -388,7 +388,9 @@ class ConfigurationViewController: NSViewController {
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }
-            self.swipeLeftHint?.isHidden = !show
+            runInMainThread {
+                self.swipeLeftHint?.isHidden = !show
+            }
         })
     }
 
@@ -397,7 +399,9 @@ class ConfigurationViewController: NSViewController {
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            self.curveFactorField?.doubleValue = value
+            runInMainThread {
+                self.curveFactorField?.doubleValue = value
+            }
         })
     }
 
@@ -417,13 +421,17 @@ class ConfigurationViewController: NSViewController {
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            self.locationLatField?.doubleValue = value
+            runInMainThread {
+                self.locationLatField?.doubleValue = value
+            }
         })
         locationLonObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { _, change in
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            self.locationLonField?.doubleValue = value
+            runInMainThread {
+                self.locationLonField?.doubleValue = value
+            }
         })
     }
 
@@ -432,7 +440,9 @@ class ConfigurationViewController: NSViewController {
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            self.brightnessOffsetField?.stringValue = String(brightness)
+            runInMainThread {
+                self.brightnessOffsetField?.stringValue = String(brightness)
+            }
         })
     }
 
@@ -441,7 +451,9 @@ class ConfigurationViewController: NSViewController {
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            self.contrastOffsetField?.stringValue = String(contrast)
+            runInMainThread {
+                self.contrastOffsetField?.stringValue = String(contrast)
+            }
         })
     }
 
@@ -450,7 +462,9 @@ class ConfigurationViewController: NSViewController {
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            self.brightnessStepField?.stringValue = String(brightness)
+            runInMainThread {
+                self.brightnessStepField?.stringValue = String(brightness)
+            }
         })
     }
 
@@ -459,7 +473,9 @@ class ConfigurationViewController: NSViewController {
             guard let seconds = change.newValue, let oldSeconds = change.oldValue, seconds != oldSeconds else {
                 return
             }
-            self.pollingIntervalField?.stringValue = String(seconds)
+            runInMainThread {
+                self.pollingIntervalField?.stringValue = String(seconds)
+            }
         })
     }
 
@@ -468,7 +484,9 @@ class ConfigurationViewController: NSViewController {
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            self.contrastStepField?.stringValue = String(contrast)
+            runInMainThread {
+                self.contrastStepField?.stringValue = String(contrast)
+            }
         })
     }
 
@@ -477,15 +495,19 @@ class ConfigurationViewController: NSViewController {
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            self.brightnessLimitMinField?.stringValue = String(brightness)
-            self.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
+            runInMainThread {
+                self.brightnessLimitMinField?.stringValue = String(brightness)
+                self.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
+            }
         })
         brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            self.brightnessLimitMaxField?.stringValue = String(brightness)
-            self.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
+            runInMainThread {
+                self.brightnessLimitMaxField?.stringValue = String(brightness)
+                self.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
+            }
         })
     }
 
@@ -494,15 +516,19 @@ class ConfigurationViewController: NSViewController {
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            self.contrastLimitMinField?.stringValue = String(contrast)
-            self.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
+            runInMainThread {
+                self.contrastLimitMinField?.stringValue = String(contrast)
+                self.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
+            }
         })
         contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            self.contrastLimitMaxField?.stringValue = String(contrast)
-            self.contrastLimitMinField?.upperLimit = Double(contrast - 1)
+            runInMainThread {
+                self.contrastLimitMaxField?.stringValue = String(contrast)
+                self.contrastLimitMinField?.upperLimit = Double(contrast - 1)
+            }
         })
     }
 
@@ -512,7 +538,9 @@ class ConfigurationViewController: NSViewController {
                 return
             }
             if let adaptiveMode = AdaptiveMode(rawValue: mode) {
-                self.showRelevantSettings(adaptiveMode)
+                runInMainThread {
+                    self.showRelevantSettings(adaptiveMode)
+                }
             }
         })
     }
@@ -552,7 +580,6 @@ class ConfigurationViewController: NSViewController {
     func setupCurveFactor() {
         guard let field = curveFactorField, let caption = curveFactorCaption else { return }
 
-        // curveFactorLabel?.toolTip = CURVE_FACTOR_TOOLTIP
         curveFactorField.decimalPoints = 1
         curveFactorField.step = 0.1
 
@@ -570,8 +597,6 @@ class ConfigurationViewController: NSViewController {
     func setupBrightnessOffset() {
         guard let field = brightnessOffsetField, let caption = brightnessOffsetCaption else { return }
 
-        // brightnessOffsetLabel?.toolTip = BRIGHTNESS_OFFSET_TOOLTIP
-
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
@@ -582,8 +607,6 @@ class ConfigurationViewController: NSViewController {
 
     func setupContrastOffset() {
         guard let field = contrastOffsetField, let caption = contrastOffsetCaption else { return }
-
-        // contrastOffsetLabel?.toolTip = CONTRAST_OFFSET_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
@@ -596,8 +619,6 @@ class ConfigurationViewController: NSViewController {
     func setupBrightnessStep() {
         guard let field = brightnessStepField, let caption = brightnessStepCaption else { return }
 
-        // brightnessStepLabel?.toolTip = BRIGHTNESS_STEP_TOOLTIP
-
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessStep", lowerLimit: 1, upperLimit: 99,
             onValueChangedInstant: { _, _ in
@@ -608,8 +629,6 @@ class ConfigurationViewController: NSViewController {
     func setupPollingInterval() {
         guard let field = pollingIntervalField, let caption = pollingIntervalCaption else { return }
 
-        // pollingIntervalLabel?.toolTip = BRIGHTNESS_STEP_TOOLTIP
-
         setupScrollableTextField(
             field, caption: caption, settingKey: "syncPollingSeconds", lowerLimit: 1, upperLimit: 300,
             onValueChangedInstant: { _, _ in
@@ -619,8 +638,6 @@ class ConfigurationViewController: NSViewController {
 
     func setupContrastStep() {
         guard let field = contrastStepField, let caption = contrastStepCaption else { return }
-
-        // contrastStepLabel?.toolTip = CONTRAST_STEP_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastStep", lowerLimit: 1, upperLimit: 99,
@@ -634,8 +651,6 @@ class ConfigurationViewController: NSViewController {
             let maxField = brightnessLimitMaxField,
             let minCaption = brightnessLimitMinCaption,
             let maxCaption = brightnessLimitMaxCaption else { return }
-
-        // brightnessLimitLabel?.toolTip = BRIGHTNESS_LIMIT_TOOLTIP
 
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.brightnessLimitMax - 1),
@@ -657,8 +672,6 @@ class ConfigurationViewController: NSViewController {
             let minCaption = contrastLimitMinCaption,
             let maxCaption = contrastLimitMaxCaption else { return }
 
-        // contrastLimitLabel?.toolTip = CONTRAST_LIMIT_TOOLTIP
-
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.contrastLimitMax - 1),
             onValueChangedInstant: { value, settingsController in
@@ -678,8 +691,6 @@ class ConfigurationViewController: NSViewController {
             let lonField = locationLonField,
             let latCaption = locationLatCaption,
             let lonCaption = locationLonCaption else { return }
-
-        // locationLabel?.toolTip = LOCATION_TOOLTIP
 
         latField.decimalPoints = 2
         latField.step = 0.01
@@ -793,8 +804,6 @@ class ConfigurationViewController: NSViewController {
         setupLocation()
 
         smoothTransitionCheckbox.setNeedsDisplay()
-
-        // smoothTransitionLabel.toolTip = SMOOTH_TRANSITION_TOOLTIP
 
         if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
             showRelevantSettings(mode)

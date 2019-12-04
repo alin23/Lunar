@@ -13,40 +13,73 @@ let APP_MAX_BRIGHTNESS: UInt8 = 30
 let APP_MAX_CONTRAST: UInt8 = 30
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix"]
 
-class AppException: NSManagedObject {
-    @NSManaged var identifier: String
-    @NSManaged var name: String
-    @NSManaged var brightness: NSNumber
-    @NSManaged var contrast: NSNumber
-    var observers: [NSKeyValueObservation] = []
+@objc class AppException: NSObject {
+    @objc dynamic var identifier: String {
+        didSet {
+            save()
+        }
+    }
 
-    convenience init(identifier: String, name: String, brightness: UInt8 = APP_MAX_BRIGHTNESS, contrast: UInt8 = APP_MAX_CONTRAST, context: NSManagedObjectContext? = nil) {
-        let context = context ?? datastore.context
-        let entity = NSEntityDescription.entity(forEntityName: "AppException", in: context)!
-        self.init(entity: entity, insertInto: context)
+    @objc dynamic var name: String {
+        didSet {
+            save()
+        }
+    }
 
+    @objc dynamic var brightness: NSNumber {
+        didSet {
+            save()
+            addSentryData()
+            log.debug("\(name): Set brightness to \(brightness.uint8Value)")
+        }
+    }
+
+    @objc dynamic var contrast: NSNumber {
+        didSet {
+            save()
+            addSentryData()
+            log.debug("\(name): Set contrast to \(contrast.uint8Value)")
+        }
+    }
+
+    init(identifier: String, name: String, brightness: UInt8 = APP_MAX_BRIGHTNESS, contrast: UInt8 = APP_MAX_CONTRAST) {
         self.identifier = identifier
         self.name = name
         self.brightness = NSNumber(value: brightness)
         self.contrast = NSNumber(value: contrast)
+        super.init()
         addSentryData()
     }
 
+    func save() {
+        DataStore.storeAppException(app: self)
+    }
+
+    static func fromDictionary(_ config: [String: Any]) -> AppException? {
+        guard let identifier = config["identifier"] as? String,
+            let name = config["name"] as? String else { return nil }
+
+        return AppException(
+            identifier: identifier,
+            name: name,
+            brightness: (config["brightness"] as? UInt8) ?? APP_MAX_BRIGHTNESS,
+            contrast: (config["contrast"] as? UInt8) ?? APP_MAX_CONTRAST
+        )
+    }
+
     @objc func remove() {
-        datastore.context.delete(self)
-        try? datastore.context.save()
+        if var apps = datastore.defaults.appExceptions {
+            apps.removeAll(where: DataStore.appByIdentifier(identifier))
+            datastore.defaults.set(apps as NSArray, forKey: "appExceptions")
+        }
         removeSentryData()
     }
 
     func addSentryData() {
         if let client = Client.shared {
             if client.extra == nil {
-                log.info("Creating Sentry extra context")
-                client.extra = [
-                    "settings": datastore.settingsDictionary(),
-                    "displays": [:],
-                    "apps": [:],
-                ]
+                brightnessAdapter.addSentryData()
+                return
             }
 
             if var appExtra = client.extra?["apps"] as? [String: Any] {
@@ -66,26 +99,12 @@ class AppException: NSManagedObject {
         }
     }
 
-    func addObservers() {
-        observers = [
-            observe(\.brightness, options: [.new], changeHandler: { _, change in
-                if let newVal = change.newValue {
-                    datastore.save()
-                    self.addSentryData()
-                    log.debug("\(self.name): Set brightness to \(newVal.uint8Value)")
-                }
-            }),
-            observe(\.contrast, options: [.new], changeHandler: { _, change in
-                if let newVal = change.newValue {
-                    datastore.save()
-                    self.addSentryData()
-                    log.debug("\(self.name): Set contrast to \(newVal.uint8Value)")
-                }
-            }),
+    func dictionaryRepresentation() -> [String: Any] {
+        return [
+            "identifier": identifier,
+            "name": name,
+            "brightness": brightness,
+            "contrast": contrast,
         ]
-    }
-
-    func removeObservers() {
-        observers.removeAll(keepingCapacity: true)
     }
 }

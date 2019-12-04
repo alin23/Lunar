@@ -42,12 +42,14 @@ class SettingsPageController: NSViewController {
             return
         }
 
-        if updateLegend {
-            brightnessContrastChart.setupLegend()
-        }
+        runInMainThread {
+            if updateLegend {
+                brightnessContrastChart.setupLegend()
+            }
 
-        if updateLimitLines {
-            brightnessContrastChart.setupLimitLines(mode: brightnessAdapter.mode)
+            if updateLimitLines {
+                brightnessContrastChart.setupLimitLines(mode: brightnessAdapter.mode)
+            }
         }
 
         switch brightnessAdapter.mode {
@@ -109,10 +111,12 @@ class SettingsPageController: NSViewController {
         }
 
         // brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode)
-        if withAnimation {
-            brightnessContrastChart.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
-        } else {
-            brightnessContrastChart.notifyDataSetChanged()
+        runInMainThread {
+            if withAnimation {
+                brightnessContrastChart.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
+            } else {
+                brightnessContrastChart.notifyDataSetChanged()
+            }
         }
     }
 
@@ -129,7 +133,9 @@ class SettingsPageController: NSViewController {
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
-        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
+        runInMainThread {
+            brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
+        }
     }
 
     func zeroGraph() {
