@@ -30,6 +30,7 @@ private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwit
 
 let bgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.bg", qos: .background, attributes: .concurrent)
 let fgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
+let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
 
 let TEST_MODE = false
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
@@ -127,14 +128,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager: SessionManager?
     let brightnessRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
-        let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
-        do {
-            let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-            fgQueue.async {
-                brightnessAdapter.fetchBrightness(for: displays)
-            }
-        } catch {
-            log.error("Error on fetching Displays by IDs")
+        fgQueue.async {
+            brightnessAdapter.fetchBrightness()
         }
         completion(NSBackgroundActivityScheduler.Result.finished)
     }
@@ -185,7 +180,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .sync
             Client.shared?.tags?["adaptiveMode"] = brightnessAdapter.adaptiveModeString()
             Client.shared?.tags?["lastAdaptiveMode"] = brightnessAdapter.adaptiveModeString(last: true)
-            self.resetElements()
+            runInMainThread {
+                self.resetElements()
+            }
             self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
         })
     }
@@ -209,15 +206,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToSettingsChange(notification _: Notification) {
-        if var extra = Client.shared?.extra {
-            extra["settings"] = datastore.settingsDictionary()
+        if Client.shared?.extra != nil {
+            Client.shared?.extra?["settings"] = datastore.settingsDictionary()
         } else {
-            log.info("Creating Sentry extra context")
-            Client.shared?.extra = [
-                "settings": datastore.settingsDictionary(),
-                "displays": [:],
-                "apps": [:],
-            ]
+            brightnessAdapter.addSentryData()
         }
     }
 
@@ -300,13 +292,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             locationActivity.interval = 60
             locationActivity.tolerance = 10
             locationActivity.schedule { completion in
-                let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
-                do {
-                    let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-                    brightnessAdapter.adaptBrightness(for: displays)
-                } catch {
-                    log.error("Error on fetching Displays by IDs")
-                }
+                brightnessAdapter.adaptBrightness()
                 completion(NSBackgroundActivityScheduler.Result.finished)
             }
         case .sync:
@@ -318,18 +304,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
                         if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
-                            let lastBrightness = brightnessAdapter.builtinBrightnessHistory.last(where: { b in b > 0 && b < 100 }) {
+                            let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
                             builtinBrightness = Double(lastBrightness)
                         }
 
                         brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                        let displayIDs = brightnessAdapter.displays.values.map { $0.objectID }
-                        do {
-                            let displays = try displayIDs.map { id in try datastore.context.existingObject(with: id) as! Display }
-                            brightnessAdapter.adaptBrightness(for: displays, percent: builtinBrightness)
-                        } catch {
-                            log.error("Error on fetching Displays by IDs")
-                        }
+                        brightnessAdapter.adaptBrightness(percent: builtinBrightness)
                     }
                     Thread.sleep(forTimeInterval: TimeInterval(datastore.defaults.syncPollingSeconds))
                 }
@@ -401,17 +381,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adaptAppearance() {
-        menuPopover.appearance = NSAppearance(named: .vibrantLight)
-        if #available(OSX 10.15, *) {
-            let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
-            if appearanceDescription.contains("dark") {
-                menuPopover.appearance = NSAppearance(named: .vibrantDark)
-            }
-
-        } else if #available(OSX 10.14, *) {
-            if let appleInterfaceStyle = UserDefaults.standard.object(forKey: kAppleInterfaceStyle) as? String {
-                if appleInterfaceStyle.lowercased().contains("dark") {
+        runInMainThread {
+            menuPopover.appearance = NSAppearance(named: .vibrantLight)
+            if #available(OSX 10.15, *) {
+                let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
+                if appearanceDescription.contains("dark") {
                     menuPopover.appearance = NSAppearance(named: .vibrantDark)
+                }
+
+            } else if #available(OSX 10.14, *) {
+                if let appleInterfaceStyle = UserDefaults.standard.object(forKey: kAppleInterfaceStyle) as? String {
+                    if appleInterfaceStyle.lowercased().contains("dark") {
+                        menuPopover.appearance = NSAppearance(named: .vibrantDark)
+                    }
                 }
             }
         }
@@ -487,7 +469,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         hotkeyObserver = datastore.defaults.observe(\.hotkeys, changeHandler: { _, _ in
             if let hotkeys = datastore.hotkeys() {
-                self.setKeyEquivalents(hotkeys)
+                runInMainThread {
+                    self.setKeyEquivalents(hotkeys)
+                }
             }
         })
     }
@@ -540,6 +524,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
+        ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
+        ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
+
         log.initLogger()
         do {
             let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
@@ -553,13 +540,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             let user = User(userId: getSerialNumberHash() ?? "NOID")
             Client.shared?.user = user
-
-            log.info("Creating Sentry extra context")
-            Client.shared?.extra = [
-                "settings": datastore.settingsDictionary(),
-                "displays": [:],
-                "apps": [:],
-            ]
             Client.shared?.tags = [
                 "adaptiveMode": brightnessAdapter.adaptiveModeString(),
                 "lastAdaptiveMode": brightnessAdapter.adaptiveModeString(last: true),
@@ -600,7 +580,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
 
-        datastore.save()
         datastore.defaults.set(false, forKey: "debug")
 
         locationActivity.invalidate()
@@ -808,7 +787,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func failDebugData() {
-        DispatchQueue.main.sync {
+        runInMainThread {
             if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to open a Github issue?") {
                 NSWorkspace.shared.open(
                     URL(
@@ -837,11 +816,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         setDebugMode(1)
 
         fgQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
-            let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.brightness) })
-            let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: brightnessAdapter.displays.map { ($0, $1.contrast) })
+            let activeDisplays = brightnessAdapter.activeDisplays
+            let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.brightness) })
+            let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.contrast) })
 
             brightnessAdapter.resetDisplayList()
-            for (id, display) in brightnessAdapter.displays {
+            for (id, display) in brightnessAdapter.activeDisplays {
                 for value in 1 ... 100 {
                     display.brightness = NSNumber(value: value)
                     display.contrast = NSNumber(value: value)
@@ -858,14 +838,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
-            DispatchQueue.main.sync {
+            runInMainThread {
                 datastore.defaults.set(oldDebugState, forKey: "debug")
                 datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
             }
 
             setDebugMode(0)
 
-            DispatchQueue.main.sync {
+            runInMainThread {
                 self.debugMenuItem.title = "Gathering logs"
             }
             guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
@@ -877,7 +857,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let mimeType: String
             let fileName: String
             if #available(OSX 10.13, *) {
-                DispatchQueue.main.sync {
+                runInMainThread {
                     self.debugMenuItem.title = "Encrypting logs"
                 }
                 data = encrypt(message: sourceString) ?? sourceString

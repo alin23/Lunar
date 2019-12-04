@@ -10,7 +10,7 @@ let buttonLabelOff = darkMauve
 
 class QuickAdaptiveButton: NSButton {
     var adaptiveButtonTrackingArea: NSTrackingArea?
-    var adaptiveObserver: NSKeyValueObservation?
+    var adaptiveObserver: ((Bool, Bool) -> Void)?
     var displayID: CGDirectDisplayID?
     var display: Display? {
         guard let id = displayID else { return nil }
@@ -50,24 +50,25 @@ class QuickAdaptiveButton: NSButton {
         adaptiveButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        adaptiveObserver = display?.observe(
-            \.adaptive,
-            options: [.new, .old],
-            changeHandler: { _, change in
-                if let newAdaptive = change.newValue, let display = self.display {
-                    DispatchQueue.main.async {
-                        if newAdaptive {
-                            self.layer?.backgroundColor = buttonBgOn.cgColor
-                            self.state = .on
-                        } else {
-                            self.layer?.backgroundColor = buttonBgOff.cgColor
-                            self.state = .off
-                        }
-                        display.readapt(change: change)
+        adaptiveObserver = { newAdaptive, oldValue in
+            if let display = self.display {
+                runInMainThread {
+                    if newAdaptive {
+                        self.layer?.backgroundColor = buttonBgOn.cgColor
+                        self.state = .on
+                    } else {
+                        self.layer?.backgroundColor = buttonBgOff.cgColor
+                        self.state = .off
                     }
+                    display.readapt(newValue: newAdaptive, oldValue: oldValue)
                 }
             }
-        )
+        }
+        display?.boolObservers["adaptive"]?["quickAdaptiveButton-\(self.accessibilityIdentifier())"] = adaptiveObserver!
+    }
+
+    deinit {
+        display?.boolObservers["adaptive"]?.removeValue(forKey: "quickAdaptiveButton-\(self.accessibilityIdentifier())")
     }
 
     override func mouseDown(with _: NSEvent) {
@@ -84,10 +85,10 @@ class QuickAdaptiveButton: NSButton {
     func refresh(adaptive: Bool) {
         if adaptive {
             layer?.backgroundColor = buttonBgOn.cgColor
-            display?.setValue(true, forKey: "adaptive")
+            display?.adaptive = true
         } else {
             layer?.backgroundColor = buttonBgOff.cgColor
-            display?.setValue(false, forKey: "adaptive")
+            display?.adaptive = false
         }
     }
 
