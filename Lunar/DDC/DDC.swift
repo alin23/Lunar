@@ -11,6 +11,7 @@ import CoreGraphics
 import Foundation
 
 let MAX_REQUESTS = 10
+let MAX_READ_DURATION_MS = 1500
 
 struct DDCReadResult {
     var controlID: ControlID
@@ -126,6 +127,7 @@ class DDC {
     static var displayQueues = [CGDirectDisplayID: DispatchSemaphore]()
     static var displayPortByUUID = [CFUUID: io_service_t]()
     static var displayUUIDByEDID = [Data: CFUUID]()
+    static var skipReadingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
 
     static func findExternalDisplays() -> [CGDirectDisplayID] {
         var displayIDs = [CGDirectDisplayID]()
@@ -156,201 +158,6 @@ class DDC {
         return nil
     }
 
-    static func getDisplayPort(fbPort: io_service_t) -> io_service_t? {
-        var context: [String: Any] = ["fbPort": fbPort]
-        var childIterator = io_iterator_t()
-        defer {
-            IOObjectRelease(childIterator)
-        }
-
-        if IORegistryEntryGetChildIterator(fbPort, kIOServicePlane, &childIterator) != KERN_SUCCESS {
-            log.debug("Can't get child iterator for framebuffer port", context: context)
-            return nil
-        }
-
-        var servicePort: io_service_t = 0
-        var displayPort: io_service_t = 0
-        while true {
-            servicePort = IOIteratorNext(childIterator)
-            if servicePort == 0 {
-                log.debug("Finished iterating framebuffer children", context: context)
-                break
-            }
-            log.debug("Checking framebuffer child \(servicePort)", context: context)
-
-            if let serviceClass = IORegistryEntrySearchCFProperty(servicePort, kIOServicePlane, kIOProviderClassKey as CFString, kCFAllocatorDefault, .init(bitPattern: Int32(kIORegistryIterateRecursively))) {
-                context["serviceClass"] = serviceClass
-                log.debug("Found service class for framebuffer", context: context)
-                if ((serviceClass as! CFString) as String) == "IODisplayConnect", IORegistryEntryGetChildEntry(servicePort, kIOServicePlane, &displayPort) == KERN_SUCCESS {
-                    context["servicePort"] = servicePort
-                    log.debug("Found display port for framebuffer", context: context)
-                    return displayPort
-                }
-            } else {
-                context["servicePort"] = servicePort
-                log.debug("Can't get IOProviderClass for child", context: context)
-                continue
-            }
-        }
-        return nil
-    }
-
-    static func getFramebufferPort(displayID: CGDirectDisplayID) -> io_service_t? {
-        guard let displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID)?.takeUnretainedValue() else { return nil }
-        var context: [String: Any] = ["displayID": displayID, "displayUUID": displayUUID]
-        log.debug("Getting framebuffer for display", context: context)
-
-        var servicePort: io_service_t = 0
-        var i2cServicePorts = [UInt32: [io_service_t]]()
-        var fbServicePorts = [UInt32: io_service_t]()
-        let matching = IOServiceMatching("IOFramebufferI2CInterface")
-
-        var serialPortIterator = io_iterator_t()
-        defer { IOObjectRelease(serialPortIterator) }
-
-        let kernResult = IOServiceGetMatchingServices(
-            kIOMasterPortDefault,
-            matching,
-            &serialPortIterator
-        )
-        if KERN_SUCCESS != kernResult || serialPortIterator == 0 {
-            log.debug("No IO services matching IOFramebufferI2CInterface, aborting", context: context)
-            return nil
-        }
-
-        var fbPort: io_service_t = 0
-        while true {
-            context = ["displayID": displayID, "displayUUID": displayUUID]
-            servicePort = IOIteratorNext(serialPortIterator)
-            if servicePort == 0 {
-                log.debug("Finished iterating framebuffers", context: context)
-                break
-            }
-            context["servicePort"] = servicePort
-            log.debug("Checking framebuffer I2C", context: context)
-
-            if IORegistryEntryGetParentEntry(servicePort, kIOServicePlane, &fbPort) != KERN_SUCCESS {
-                log.debug("Couldn't get parent of framebuffer I2C", context: context)
-                continue
-            }
-            context["fbPort"] = fbPort
-
-            log.debug("Got parent of framebuffer I2C", context: context)
-
-            guard let displayPort = DDC.getDisplayPort(fbPort: fbPort) else { continue }
-            let infoDict = IODisplayCreateInfoDictionary(
-                displayPort, UInt32(kIODisplayOnlyPreferredName)
-            ).takeRetainedValue()
-
-            guard let info = infoDict as NSDictionary as? [String: AnyObject], let displayEDID = info[kIODisplayEDIDKey] as? Data else {
-                log.debug("Can't get EDID for display", context: context)
-                continue
-            }
-
-            if let uuid = DDC.displayUUIDByEDID[displayEDID], uuid != displayUUID {
-                context["displayUUIDByEDID"] = uuid
-                context["displayEDID"] = displayEDID
-                log.debug("The display is already mapped to another framebuffer, skipping", context: context)
-                continue
-            }
-
-            var vendor: UInt32 = 0
-            var model: UInt32 = 0
-            var serial: UInt32 = 0
-
-            if let vendorObj = info[kDisplayVendorID] {
-                vendor = (vendorObj as? UInt32) ?? UInt32(kDisplayVendorIDUnknown)
-            }
-            if let modelObj = info[kDisplayProductID] {
-                model = (modelObj as? UInt32) ?? UInt32(kDisplayVendorIDUnknown)
-            }
-            if let serialObj = info[kDisplaySerialNumber] {
-                serial = (serialObj as? UInt32) ?? UInt32(kDisplayVendorIDUnknown)
-            }
-
-            if vendor == CGDisplayVendorNumber(displayID), model == CGDisplayModelNumber(displayID), serial == CGDisplaySerialNumber(displayID) {
-                context["vendor"] = vendor
-                context["model"] = model
-                context["serial"] = serial
-
-                log.debug("Found display port for display", context: context)
-                DDC.displayPortByUUID[displayUUID] = fbPort
-                DDC.displayUUIDByEDID[displayEDID] = displayUUID
-                break
-            }
-        }
-
-        return DDC.displayPortByUUID[displayUUID]
-    }
-
-    static func getDisplayQueue(displayID: CGDirectDisplayID) -> DispatchSemaphore {
-        if let queue = DDC.displayQueues[displayID] {
-            return queue
-        } else {
-            let sem = DispatchSemaphore(value: 1)
-            DDC.displayQueues[displayID] = sem
-            return sem
-        }
-    }
-
-    static func sendDisplayRequest(displayID: CGDirectDisplayID, request: inout IOI2CRequest) -> Bool {
-        var context: [String: Any] = ["displayID": displayID]
-
-        var result = false
-        let queue = DDC.getDisplayQueue(displayID: displayID)
-
-        queue.wait()
-        defer { queue.signal() }
-
-        guard let fbPort = DDC.getFramebufferPort(displayID: displayID) else {
-            log.debug("No framebuffer found, aborting", context: context)
-            return false
-        }
-
-        context["fbPort"] = fbPort
-        log.debug("Found framebuffer", context: context)
-        defer { IOObjectRelease(fbPort) }
-
-        var busCount: IOItemCount = 0
-        IOFBGetI2CInterfaceCount(fbPort, &busCount)
-
-        log.debug("Framebuffer has \(busCount) I2C buses", context: context)
-        for bus in 0 ..< busCount {
-            context["bus"] = bus
-            var interface: io_service_t = 0
-            if IOFBCopyI2CInterfaceForBus(fbPort, bus, &interface) != KERN_SUCCESS {
-                log.debug("Couldn't get I2C interface", context: context)
-                continue
-            }
-
-            context["interface"] = interface
-            log.debug("Got I2C interface", context: context)
-            defer { IOObjectRelease(interface) }
-
-            var connect: IOI2CConnectRef? = OpaquePointer(bitPattern: 0)
-            if IOI2CInterfaceOpen(interface, .zero, &connect) == KERN_SUCCESS, let connect = connect {
-                log.debug("Connected to I2C interface", context: context)
-                if IOI2CSendRequest(connect, .zero, &request) == KERN_SUCCESS {
-                    log.debug("Sent request to I2C interface", context: context)
-                    result = true
-                } else {
-                    log.debug("Couldn't send request to I2C interface", context: context)
-                }
-            } else {
-                log.debug("Couldn't connect to I2C interface", context: context)
-            }
-
-            if result {
-                break
-            }
-        }
-
-        if request.replyTransactionType == kIOI2CNoTransactionType {
-            usleep(DDC.requestDelay)
-        }
-        return result && request.result == KERN_SUCCESS
-    }
-
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
         var command = DDCWriteCommand(
             control_id: controlID.rawValue,
@@ -367,40 +174,13 @@ class DDC {
         }
 
         return result
-//        let context: [String: Any] = ["displayID": displayID, "controlID": controlID, "newValue": newValue]
-//
-//        log.debug("Sending write command", context: context)
-//
-//        var request: IOI2CRequest = IOI2CRequest()
-//        var data = Data(count: 7)
-//
-//        request.commFlags = 0
-//        request.sendAddress = 0x6E
-//        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-//        request.sendBytes = 7
-//
-//        data[0] = 0x51
-//        data[1] = 0x84
-//        data[2] = 0x03
-//        data[3] = controlID.rawValue
-//        data[4] = 0x00
-//        data[5] = newValue >= 0xFE ? 0xFE : newValue & 0xFF
-//        data[6] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5]
-//
-//        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CNoTransactionType))
-//        request.replyBytes = 0
-//
-//        let nsData = NSMutableData(data: data)
-//        request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
-//
-//        let hexData = nsData.map { $0 }.str(hex: true)
-//        log.debug("Write data: \(hexData)", context: context)
-//        log.debug("Write request: \(request)", context: context)
-//
-//        return DDC.sendDisplayRequest(displayID: displayID, request: &request)
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
+        if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+            return nil
+        }
+
         var command = DDCReadCommand(
             control_id: controlID.rawValue,
             success: false,
@@ -409,7 +189,18 @@ class DDC {
         )
         let displayUUIDByEDIDCopy = displayUUIDByEDID
         let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
+
+        let readStartedAt = DispatchTime.now()
         DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
+        if (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000 > MAX_READ_DURATION_MS {
+            if var propertiesToSkip = DDC.skipReadingPropertyById[displayID] {
+                propertiesToSkip.insert(controlID)
+                DDC.skipReadingPropertyById[displayID] = propertiesToSkip
+            } else {
+                DDC.skipReadingPropertyById[displayID] = Set([controlID])
+            }
+        }
+
         displayUUIDByEDID.removeAll(keepingCapacity: true)
         for (key, value) in nsDisplayUUIDByEDID {
             if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
@@ -422,131 +213,6 @@ class DDC {
             maxValue: command.max_value,
             currentValue: command.current_value
         )
-//        var request: IOI2CRequest
-//        var result = false
-//        var context: [String: Any] = ["displayID": displayID]
-//
-//        guard let transactionType = DDC.getSupportedTransactionType() else { return nil }
-//
-//        context["transactionType"] = transactionType
-//
-//        for _ in 1 ... MAX_REQUESTS {
-//            request = IOI2CRequest()
-//            request.commFlags = 0
-//            request.sendAddress = 0x6E
-//            request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-//
-//            request.sendBytes = 5
-//            request.minReplyDelay = UInt64(30 * kMillisecondScale)
-//
-//            var data = Data(count: 5)
-//            data[0] = 0x51
-//            data[1] = 0x82
-//            data[2] = 0x01
-//            data[3] = controlID.rawValue
-//            data[4] = 0x6E ^ data[0] ^ data[1] ^ data[2] ^ data[3]
-//
-//            let nsData = NSMutableData(data: data)
-//            request.sendBuffer = vm_address_t(bitPattern: OpaquePointer(nsData.mutableBytes))
-//
-//            request.replyTransactionType = transactionType
-//            request.replyAddress = 0x6F
-//            request.replySubAddress = 0x51
-//
-//            guard let nsReplyData = NSMutableData(length: 8) else { return nil }
-//            request.replyBuffer = vm_address_t(bitPattern: OpaquePointer(nsReplyData.mutableBytes))
-//            request.replyBytes = 8
-//            context["request"] = request
-//
-//            result = sendDisplayRequest(displayID: displayID, request: &request)
-//            context["result"] = result
-//
-//            result = (
-//                result &&
-//                    nsReplyData[0] == request.sendAddress &&
-//                    nsReplyData[2] == 0x2 &&
-//                    nsReplyData[4] == controlID.rawValue
-//            )
-//            if result {
-//                var checksum = UInt8(request.replyAddress & 0xFF) ^ request.replySubAddress
-//                checksum ^= nsReplyData[1] ^ nsReplyData[2] ^ nsReplyData[3]
-//                checksum ^= nsReplyData[4] ^ nsReplyData[5] ^ nsReplyData[6]
-//                checksum ^= nsReplyData[7] ^ nsReplyData[8] ^ nsReplyData[9]
-//                result = nsReplyData[10] == checksum
-//            }
-//
-//            if result {
-//                return DDCReadResult(
-//                    controlID: controlID,
-//                    maxValue: nsReplyData[7],
-//                    currentValue: nsReplyData[9]
-//                )
-//            }
-//
-//            if request.result == kIOReturnUnsupportedMode {
-//                log.debug("Unsupported transaction type: \(request.replyTransactionType)", context: context)
-//            }
-//            usleep(DDC.recoveryDelay)
-//        }
-//
-//        return nil
-    }
-
-    static func getSupportedTransactionType() -> IOOptionBits? {
-        var object: io_service_t = 0
-        var supportedType: IOOptionBits?
-        var serialPortIterator = io_iterator_t()
-        defer { IOObjectRelease(serialPortIterator) }
-
-        let kernResult = IOServiceGetMatchingServices(
-            kIOMasterPortDefault,
-            IOServiceNameMatching("IOFramebufferI2CInterface"),
-            &serialPortIterator
-        )
-        if KERN_SUCCESS != kernResult || serialPortIterator == 0 {
-            log.debug("No matching service!")
-            return nil
-        }
-        repeat {
-            object = IOIteratorNext(serialPortIterator)
-
-            var props: Unmanaged<CFMutableDictionary>?
-            if IORegistryEntryCreateCFProperties(object, &props, kCFAllocatorDefault, .zero) != KERN_SUCCESS {
-                continue
-            }
-            guard let propDict = props?.takeRetainedValue(),
-                let properties = propDict as NSDictionary as? [String: AnyObject],
-                let typesObject = properties[kIOI2CTransactionTypesKey] as? Int32 else {
-                continue
-            }
-            let types = UInt64(typesObject)
-            if (1 << kIOI2CNoTransactionType & types) != 0 {
-                log.debug("IOI2CNoTransactionType supported")
-                supportedType = IOOptionBits(bitPattern: Int32(kIOI2CNoTransactionType))
-            } else {
-                log.debug("IOI2CNoTransactionType not supported")
-            }
-
-            if (1 << kIOI2CSimpleTransactionType & types) != 0 {
-                log.debug("IOI2CSimpleTransactionType supported")
-                supportedType = IOOptionBits(bitPattern: Int32(kIOI2CSimpleTransactionType))
-            } else {
-                log.debug("IOI2CSimpleTransactionType not supported")
-            }
-
-            if (1 << kIOI2CDDCciReplyTransactionType & types) != 0 {
-                log.debug("IOI2CDDCciReplyTransactionType supported")
-                supportedType = IOOptionBits(bitPattern: Int32(kIOI2CDDCciReplyTransactionType))
-            } else {
-                log.debug("IOI2CDDCciReplyTransactionType not supported")
-            }
-
-            if let type = supportedType {
-                return type
-            }
-        } while object != 0
-
-        return nil
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
@@ -564,29 +230,6 @@ class DDC {
         }
 
         return (edid, Data(bytes: &edidData, count: 128))
-
-//        var request = IOI2CRequest()
-//        request.sendAddress = 0xA0
-//        request.sendTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-//
-//        request.sendBytes = 0x01
-//        request.replyAddress = 0xA1
-//        request.replyTransactionType = .init(bitPattern: Int32(kIOI2CSimpleTransactionType))
-//
-//        guard let nsData = NSMutableData(length: 128) else { return nil }
-//        let p = OpaquePointer(nsData.mutableBytes)
-//        request.sendBuffer = vm_address_t(bitPattern: p)
-//        request.replyBuffer = vm_address_t(bitPattern: p)
-//        request.replyBytes = 128
-//
-//        if !DDC.sendDisplayRequest(displayID: displayID, request: &request) {
-//            return nil
-//        }
-//
-//        var edid = EDID()
-//        nsData.getBytes(&edid, length: 128)
-//
-//        return (edid, nsData as Data)
     }
 
     static func getEdid(displayID: CGDirectDisplayID) -> EDID? {

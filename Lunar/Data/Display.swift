@@ -28,6 +28,7 @@ let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
+let THUNDERBOLT_NAME = "Thunderbolt"
 
 enum ValueType {
     case brightness
@@ -242,6 +243,14 @@ enum ValueType {
         return name.contains(ULTRAFINE_NAME)
     }
 
+    func isThunderbolt() -> Bool {
+        return name.contains(THUNDERBOLT_NAME)
+    }
+
+    func isAppleDisplay() -> Bool {
+        return isUltraFine() || isThunderbolt()
+    }
+
     init(
         id: CGDirectDisplayID,
         brightness: UInt8 = 50,
@@ -407,7 +416,7 @@ enum ValueType {
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
         numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in
-            let ultrafine = self.isUltraFine()
+            let appleDisplay = self.isAppleDisplay()
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
                 var brightness: UInt8
@@ -421,9 +430,9 @@ enum ValueType {
                     extraData["brightness"] = brightness
                     Client.shared?.extra?["\(id)"] = extraData
                 }
-                if datastore.defaults.smoothTransition || ultrafine {
+                if datastore.defaults.smoothTransition || appleDisplay {
                     self.smoothTransition(from: oldValue.uint8Value, to: brightness) { newValue in
-                        if !ultrafine {
+                        if !appleDisplay {
                             _ = DDC.setBrightness(for: id, brightness: newValue)
                         } else {
                             log.debug("Writing brightness using CoreDisplay")
@@ -431,7 +440,7 @@ enum ValueType {
                         }
                     }
                 } else {
-                    if !ultrafine {
+                    if !appleDisplay {
                         _ = DDC.setBrightness(for: id, brightness: brightness)
                     } else {
                         log.debug("Writing brightness using CoreDisplay")
@@ -455,7 +464,7 @@ enum ValueType {
                     extraData["contrast"] = contrast
                     Client.shared?.extra?["\(id)"] = extraData
                 }
-                if datastore.defaults.smoothTransition || self.isUltraFine() {
+                if datastore.defaults.smoothTransition || self.isAppleDisplay() {
                     self.smoothTransition(from: oldValue.uint8Value, to: contrast) { newValue in
                         _ = DDC.setContrast(for: id, contrast: newValue)
                     }
@@ -476,7 +485,7 @@ enum ValueType {
     }
 
     func readBrightness() -> UInt8? {
-        if !isUltraFine() {
+        if !isAppleDisplay() {
             if let b = DDC.getBrightness(for: self.id) {
                 return UInt8(b)
             }
@@ -489,7 +498,7 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        if !datastore.defaults.refreshBrightness, !isUltraFine() {
+        if !datastore.defaults.refreshBrightness, !isAppleDisplay() {
             return
         }
 
