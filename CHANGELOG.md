@@ -1,3 +1,15 @@
+# 2.9.6
+## Features
+
+- Show both connected and disconnected displays in Quick Actions
+
+## Fixes
+
+- Fix all kinds of crashes
+
+## Improvements
+
+- Move display and app exceptions from Core Data to User Defaults to avoid concurrency bugs
 # 2.9.5
 ## Features
 
