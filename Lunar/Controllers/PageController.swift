@@ -41,9 +41,10 @@ class PageController: NSPageController, NSPageControllerDelegate {
         delegate = self
 
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
-        if !brightnessAdapter.displays.isEmpty {
-            let displays: [Any] = brightnessAdapter.displays.values.sorted(by: { (d1, d2) -> Bool in
-                d1.active && !d2.active
+        let activeDisplays = brightnessAdapter.activeDisplays
+        if !activeDisplays.isEmpty {
+            let displays: [Any] = activeDisplays.values.sorted(by: { (d1, d2) -> Bool in
+                d1.serial < d2.serial
             })
             arrangedObjects.append(contentsOf: displays)
         } else {

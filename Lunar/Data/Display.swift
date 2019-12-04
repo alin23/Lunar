@@ -23,8 +23,8 @@ let DEFAULT_MAX_CONTRAST: UInt8 = 70
 
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let TEST_DISPLAY_ID: CGDirectDisplayID = 2
-let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context)
-let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, context: datastore.context, adaptive: true)
+let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100)
+let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, adaptive: true)
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
@@ -34,29 +34,153 @@ enum ValueType {
     case contrast
 }
 
-class Display: NSManagedObject, NSCopying {
-    @NSManaged var id: CGDirectDisplayID
-    @NSManaged var serial: String
-    @NSManaged var name: String
-    @NSManaged var adaptive: Bool
+@objc class Display: NSObject {
+    @objc dynamic var id: CGDirectDisplayID {
+        didSet {
+            save()
+        }
+    }
 
-    @NSManaged var lockedBrightness: Bool
-    @NSManaged var lockedContrast: Bool
+    @objc dynamic var serial: String {
+        didSet {
+            save()
+        }
+    }
 
-    @NSManaged var minBrightness: NSNumber
-    @NSManaged var maxBrightness: NSNumber
+    @objc dynamic var name: String {
+        didSet {
+            save()
+        }
+    }
 
-    @NSManaged var minContrast: NSNumber
-    @NSManaged var maxContrast: NSNumber
+    @objc dynamic var adaptive: Bool {
+        didSet {
+            save()
+            runBoolObservers(property: "adaptive", newValue: adaptive, oldValue: oldValue)
+        }
+    }
 
-    @NSManaged var brightness: NSNumber
-    @NSManaged var contrast: NSNumber
+    @objc dynamic var lockedBrightness: Bool {
+        didSet {
+            save()
+            runBoolObservers(property: "lockedBrightness", newValue: lockedBrightness, oldValue: oldValue)
+        }
+    }
 
-    var active: Bool = false
-    var observers: [NSKeyValueObservation] = []
+    @objc dynamic var lockedContrast: Bool {
+        didSet {
+            save()
+            runBoolObservers(property: "lockedContrast", newValue: lockedContrast, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var minBrightness: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "minBrightness", newValue: minBrightness, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var maxBrightness: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "maxBrightness", newValue: maxBrightness, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var minContrast: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "minContrast", newValue: minContrast, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var maxContrast: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "maxContrast", newValue: maxContrast, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var brightness: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "brightness", newValue: brightness, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var contrast: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "contrast", newValue: contrast, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var active: Bool = false {
+        didSet {
+            save()
+            runBoolObservers(property: "active", newValue: active, oldValue: oldValue)
+        }
+    }
+
+    var boolObservers: [String: [String: (Bool, Bool) -> Void]] = [
+        "adaptive": [:],
+        "lockedBrightness": [:],
+        "lockedContrast": [:],
+        "active": [:],
+    ]
+    var numberObservers: [String: [String: (NSNumber, NSNumber) -> Void]] = [
+        "minBrightness": [:],
+        "maxBrightness": [:],
+        "minContrast": [:],
+        "maxContrast": [:],
+        "brightness": [:],
+        "contrast": [:],
+    ]
     var datastoreObservers: [NSKeyValueObservation] = []
     var onReadapt: (() -> Void)?
     var smoothStep = 1
+
+    static func fromDictionary(_ config: [String: Any]) -> Display? {
+        guard let id = config["id"] as? CGDirectDisplayID,
+            let serial = config["serial"] as? String else { return nil }
+
+        return Display(
+            id: id,
+            brightness: (config["brightness"] as? UInt8) ?? 50,
+            contrast: (config["contrast"] as? UInt8) ?? 50,
+            serial: serial,
+            name: config["name"] as? String,
+            active: (config["active"] as? Bool) ?? false,
+            minBrightness: (config["minBrightness"] as? UInt8) ?? DEFAULT_MIN_BRIGHTNESS,
+            maxBrightness: (config["maxBrightness"] as? UInt8) ?? DEFAULT_MAX_BRIGHTNESS,
+            minContrast: (config["minContrast"] as? UInt8) ?? DEFAULT_MIN_CONTRAST,
+            maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
+            adaptive: (config["adaptive"] as? Bool) ?? true,
+            lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
+            lockedContrast: (config["lockedContrast"] as? Bool) ?? false
+        )
+    }
+
+    func save() {
+        DataStore.storeDisplay(display: self)
+    }
+
+    func runNumberObservers(property: String, newValue: NSNumber, oldValue: NSNumber) {
+        guard let obs = numberObservers[property] else { return }
+
+        for (_, observer) in obs {
+            observer(newValue, oldValue)
+        }
+    }
+
+    func runBoolObservers(property: String, newValue: Bool, oldValue: Bool) {
+        guard let obs = boolObservers[property] else { return }
+
+        for (_, observer) in obs {
+            observer(newValue, oldValue)
+        }
+    }
 
     static func printableName(id: CGDirectDisplayID) -> String {
         if var name = DDC.getDisplayName(for: id) {
@@ -83,30 +207,32 @@ class Display: NSManagedObject, NSCopying {
         return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
 
+    func dictionaryRepresentation() -> [String: Any] {
+        return [
+            "id": id,
+            "name": name,
+            "serial": serial,
+            "adaptive": adaptive,
+            "lockedBrightness": lockedBrightness,
+            "lockedContrast": lockedContrast,
+            "minContrast": minContrast.uint8Value,
+            "minBrightness": minBrightness.uint8Value,
+            "maxContrast": maxContrast.uint8Value,
+            "maxBrightness": maxBrightness.uint8Value,
+            "contrast": contrast.uint8Value,
+            "brightness": brightness.uint8Value,
+            "active": active,
+        ]
+    }
+
     func addSentryData() {
         if let client = Client.shared {
             if client.extra == nil {
-                log.info("Creating Sentry extra context")
-                client.extra = [
-                    "settings": datastore.settingsDictionary(),
-                    "displays": [:],
-                    "apps": [:],
-                ]
+                brightnessAdapter.addSentryData()
+                return
             }
             if var displayExtra = client.extra?["displays"] as? [String: Any] {
-                displayExtra["\(id)"] = [
-                    "name": name,
-                    "adaptive": adaptive,
-                    "lockedBrightness": lockedBrightness,
-                    "lockedContrast": lockedContrast,
-                    "minContrast": minContrast,
-                    "minBrightness": minBrightness,
-                    "maxContrast": maxContrast,
-                    "maxBrightness": maxBrightness,
-                    "contrast": contrast,
-                    "brightness": brightness,
-                    "active": active,
-                ]
+                displayExtra["\(serial)"] = dictionaryRepresentation()
                 client.extra!["displays"] = displayExtra
             }
         }
@@ -116,46 +242,43 @@ class Display: NSManagedObject, NSCopying {
         return name.contains(ULTRAFINE_NAME)
     }
 
-    func copy(with _: NSZone? = nil) -> Any {
-        return Display(
-            id: id,
-            serial: serial,
-            name: name,
-            active: active,
-            minBrightness: minBrightness.uint8Value,
-            maxBrightness: maxBrightness.uint8Value,
-            minContrast: minContrast.uint8Value,
-            maxContrast: maxContrast.uint8Value,
-            context: nil,
-            adaptive: adaptive
-        )
-    }
-
-    convenience init(id: CGDirectDisplayID, serial: String? = nil, name: String? = nil, active: Bool = false, minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS, maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS, minContrast: UInt8 = DEFAULT_MIN_CONTRAST, maxContrast: UInt8 = DEFAULT_MAX_CONTRAST, context: NSManagedObjectContext? = nil, adaptive: Bool = true) {
-        let context = context ?? datastore.context
-        let entity = NSEntityDescription.entity(forEntityName: "Display", in: context)!
-        if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-            self.init(entity: entity, insertInto: context)
-        } else {
-            self.init(entity: entity, insertInto: nil)
-        }
+    init(
+        id: CGDirectDisplayID,
+        brightness: UInt8 = 50,
+        contrast: UInt8 = 50,
+        serial: String? = nil,
+        name: String? = nil,
+        active: Bool = false,
+        minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS,
+        maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS,
+        minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
+        maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
+        adaptive: Bool = true,
+        lockedBrightness: Bool = false,
+        lockedContrast: Bool = false
+    ) {
         self.id = id
-        if let name = name, !name.isEmpty {
-            self.name = name
+        self.active = active
+        self.adaptive = adaptive
+        self.lockedBrightness = lockedBrightness
+        self.lockedContrast = lockedContrast
+
+        self.brightness = NSNumber(value: brightness)
+        self.contrast = NSNumber(value: contrast)
+        self.minBrightness = NSNumber(value: minBrightness)
+        self.maxBrightness = NSNumber(value: maxBrightness)
+        self.minContrast = NSNumber(value: minContrast)
+        self.maxContrast = NSNumber(value: maxContrast)
+
+        if let n = name, !n.isEmpty {
+            self.name = n
         } else {
             self.name = Display.printableName(id: id)
         }
         self.serial = (serial ?? Display.uuid(id: id))
-        self.active = active
-        self.adaptive = adaptive
-        lockedBrightness = false
-        lockedContrast = false
-        if id != GENERIC_DISPLAY_ID {
-            self.minBrightness = NSNumber(value: minBrightness)
-            self.maxBrightness = NSNumber(value: maxBrightness)
-            self.minContrast = NSNumber(value: minContrast)
-            self.maxContrast = NSNumber(value: maxContrast)
+        super.init()
 
+        if id != GENERIC_DISPLAY_ID {
             fgQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
@@ -167,12 +290,11 @@ class Display: NSManagedObject, NSCopying {
         name = Display.printableName(id: id)
     }
 
-    func readapt<T: Equatable>(change: NSKeyValueObservedChange<T>) {
+    func readapt<T: Equatable>(newValue: T?, oldValue: T?) {
         if let readaptListener = onReadapt {
             readaptListener()
         }
-        if let newVal = change.newValue,
-            let oldVal = change.oldValue {
+        if let newVal = newValue, let oldVal = oldValue {
             if adaptive, newVal != oldVal {
                 switch brightnessAdapter.mode {
                 case .location:
@@ -244,111 +366,106 @@ class Display: NSManagedObject, NSCopying {
     func addObservers() {
         datastoreObservers = [
             datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(change: change)
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
             datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(change: change)
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
             datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(change: change)
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
             datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(change: change)
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
         ]
-        observers = [
-            observe(\.minBrightness, options: [.new, .old], changeHandler: { _, change in
-                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                    extraData["minBrightness"] = newVal
-                    Client.shared?.extra?["\(self.id)"] = extraData
+        numberObservers["minBrightness"]!["self.minBrightness"] = { newValue, oldValue in
+            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                extraData["minBrightness"] = newValue
+                Client.shared?.extra?["\(self.id)"] = extraData
+            }
+            self.readapt(newValue: newValue, oldValue: oldValue)
+        }
+        numberObservers["maxBrightness"]!["self.maxBrightness"] = { newValue, oldValue in
+            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                extraData["maxBrightness"] = newValue
+                Client.shared?.extra?["\(self.id)"] = extraData
+            }
+            self.readapt(newValue: newValue, oldValue: oldValue)
+        }
+        numberObservers["minContrast"]!["self.minContrast"] = { newValue, oldValue in
+            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                extraData["minContrast"] = newValue
+                Client.shared?.extra?["\(self.id)"] = extraData
+            }
+            self.readapt(newValue: newValue, oldValue: oldValue)
+        }
+        numberObservers["maxContrast"]!["self.maxContrast"] = { newValue, oldValue in
+            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
+                extraData["maxContrast"] = newValue
+                Client.shared?.extra?["\(self.id)"] = extraData
+            }
+            self.readapt(newValue: newValue, oldValue: oldValue)
+        }
+        numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in
+            let ultrafine = self.isUltraFine()
+            let id = self.id
+            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                var brightness: UInt8
+                if brightnessAdapter.mode == AdaptiveMode.manual {
+                    brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
+                } else {
+                    brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                 }
-                self.readapt(change: change)
-                datastore.save()
-            }),
-            observe(\.maxBrightness, options: [.new, .old], changeHandler: { _, change in
-                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                    extraData["maxBrightness"] = newVal
-                    Client.shared?.extra?["\(self.id)"] = extraData
-                }
-                self.readapt(change: change)
-                datastore.save()
-            }),
-            observe(\.minContrast, options: [.new, .old], changeHandler: { _, change in
-                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                    extraData["minContrast"] = newVal
-                    Client.shared?.extra?["\(self.id)"] = extraData
-                }
-                self.readapt(change: change)
-                datastore.save()
-            }),
-            observe(\.maxContrast, options: [.new, .old], changeHandler: { _, change in
-                if let newVal = change.newValue, var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                    extraData["maxContrast"] = newVal
-                    Client.shared?.extra?["\(self.id)"] = extraData
-                }
-                self.readapt(change: change)
-                datastore.save()
-            }),
-            observe(\.brightness, options: [.new, .old], changeHandler: { _, change in
-                if let newBrightness = change.newValue, self.id != GENERIC_DISPLAY_ID, self.id != TEST_DISPLAY_ID {
-                    var brightness: UInt8
-                    if brightnessAdapter.mode == AdaptiveMode.manual {
-                        brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
-                    } else {
-                        brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
-                    }
 
-                    if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                        extraData["brightness"] = brightness
-                        Client.shared?.extra?["\(self.id)"] = extraData
-                    }
-                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition || self.isUltraFine() {
-                        self.smoothTransition(from: currentValue, to: brightness) { newValue in
-                            if !self.isUltraFine() {
-                                _ = DDC.setBrightness(for: self.id, brightness: newValue)
-                            } else {
-                                log.debug("Writing brightness using CoreDisplay")
-                                CoreDisplay_Display_SetUserBrightness(self.id, Double(newValue) / 100.0)
-                            }
-                        }
-                    } else {
-                        if !self.isUltraFine() {
-                            _ = DDC.setBrightness(for: self.id, brightness: brightness)
+                if var extraData = Client.shared?.extra?["\(id)"] as? [String: Any] {
+                    extraData["brightness"] = brightness
+                    Client.shared?.extra?["\(id)"] = extraData
+                }
+                if datastore.defaults.smoothTransition || ultrafine {
+                    self.smoothTransition(from: oldValue.uint8Value, to: brightness) { newValue in
+                        if !ultrafine {
+                            _ = DDC.setBrightness(for: id, brightness: newValue)
                         } else {
                             log.debug("Writing brightness using CoreDisplay")
-                            CoreDisplay_Display_SetUserBrightness(self.id, Double(brightness) / 100.0)
+                            CoreDisplay_Display_SetUserBrightness(id, Double(newValue) / 100.0)
                         }
                     }
-
-                    datastore.save()
-                    log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(self.id)")
-                }
-            }),
-            observe(\.contrast, options: [.new, .old], changeHandler: { _, change in
-                if let newContrast = change.newValue, self.id != GENERIC_DISPLAY_ID, self.id != TEST_DISPLAY_ID {
-                    var contrast: UInt8
-                    if brightnessAdapter.mode == AdaptiveMode.manual {
-                        contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
+                } else {
+                    if !ultrafine {
+                        _ = DDC.setBrightness(for: id, brightness: brightness)
                     } else {
-                        contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
+                        log.debug("Writing brightness using CoreDisplay")
+                        CoreDisplay_Display_SetUserBrightness(id, Double(brightness) / 100.0)
                     }
-                    if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                        extraData["contrast"] = contrast
-                        Client.shared?.extra?["\(self.id)"] = extraData
-                    }
-                    if let currentValue = change.oldValue?.uint8Value, datastore.defaults.smoothTransition || self.isUltraFine() {
-                        self.smoothTransition(from: currentValue, to: contrast) { newValue in
-                            _ = DDC.setContrast(for: self.id, contrast: newValue)
-                        }
-                    } else {
-                        _ = DDC.setContrast(for: self.id, contrast: contrast)
-                    }
-
-                    datastore.save()
-                    log.debug("\(self.name): Set contrast to \(contrast)")
                 }
-            }),
-        ]
+
+                log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(id)")
+            }
+        }
+        numberObservers["contrast"]!["self.contrast"] = { newContrast, oldValue in
+            let id = self.id
+            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                var contrast: UInt8
+                if brightnessAdapter.mode == AdaptiveMode.manual {
+                    contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
+                } else {
+                    contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
+                }
+                if var extraData = Client.shared?.extra?["\(id)"] as? [String: Any] {
+                    extraData["contrast"] = contrast
+                    Client.shared?.extra?["\(id)"] = extraData
+                }
+                if datastore.defaults.smoothTransition || self.isUltraFine() {
+                    self.smoothTransition(from: oldValue.uint8Value, to: contrast) { newValue in
+                        _ = DDC.setContrast(for: id, contrast: newValue)
+                    }
+                } else {
+                    _ = DDC.setContrast(for: id, contrast: contrast)
+                }
+
+                log.debug("\(self.name): Set contrast to \(contrast)")
+            }
+        }
     }
 
     func readContrast() -> UInt8? {
@@ -386,7 +503,7 @@ class Display: NSManagedObject, NSCopying {
             let oldSmoothTransitionState = datastore.defaults.smoothTransition
             datastore.defaults.set(false, forKey: "smoothTransition")
 
-            setValue(NSNumber(value: newBrightness), forKey: "brightness")
+            brightness = NSNumber(value: newBrightness)
 
             datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
         }
@@ -407,14 +524,15 @@ class Display: NSManagedObject, NSCopying {
             let oldSmoothTransitionState = datastore.defaults.smoothTransition
             datastore.defaults.set(false, forKey: "smoothTransition")
 
-            setValue(NSNumber(value: newContrast), forKey: "contrast")
+            contrast = NSNumber(value: newContrast)
 
             datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
         }
     }
 
     func removeObservers() {
-        observers.removeAll(keepingCapacity: true)
+        boolObservers.removeAll(keepingCapacity: true)
+        numberObservers.removeAll(keepingCapacity: true)
         datastoreObservers.removeAll(keepingCapacity: true)
     }
 
@@ -453,7 +571,7 @@ class Display: NSManagedObject, NSCopying {
         if appOffset > 0 {
             value = cap(value + Double(appOffset), minVal: minValue, maxVal: maxValue)
         }
-        return NSNumber(value: value)
+        return NSNumber(value: value.rounded())
     }
 
     func computeSIMDValue(from percent: [Double], type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> [NSNumber] {
@@ -541,10 +659,10 @@ class Display: NSManagedObject, NSCopying {
         }
 
         if appBrightnessOffset > 0 {
-            newBrightness = NSNumber(value: min(newBrightness.doubleValue + Double(appBrightnessOffset), Double(MAX_BRIGHTNESS)))
+            newBrightness = NSNumber(value: min(newBrightness.doubleValue + Double(appBrightnessOffset), Double(MAX_BRIGHTNESS)).rounded())
         }
         if appContrastOffset > 0 {
-            newContrast = NSNumber(value: min(newContrast.doubleValue + Double(appContrastOffset), Double(MAX_CONTRAST)))
+            newContrast = NSNumber(value: min(newContrast.doubleValue + Double(appContrastOffset), Double(MAX_CONTRAST)).rounded())
         }
         return (newBrightness, newContrast)
     }
@@ -676,12 +794,12 @@ class Display: NSManagedObject, NSCopying {
 
         var changed = false
         if !lockedBrightness, brightness != newBrightness {
-            setValue(newBrightness, forKey: "brightness")
+            brightness = newBrightness
             changed = true
         }
 
         if !lockedContrast, contrast != newContrast {
-            setValue(newContrast, forKey: "contrast")
+            contrast = newContrast
             changed = true
         }
         if changed {

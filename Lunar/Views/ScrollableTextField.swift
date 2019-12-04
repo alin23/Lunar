@@ -47,7 +47,6 @@ class ScrollableTextField: NSTextField {
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
-    var disabled: Bool = false
 
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
@@ -137,7 +136,7 @@ class ScrollableTextField: NSTextField {
     }
 
     override func mouseEntered(with _: NSEvent) {
-        if disabled {
+        if !isEnabled {
             return
         }
         hover = true
@@ -165,7 +164,7 @@ class ScrollableTextField: NSTextField {
     }
 
     override func mouseExited(with _: NSEvent) {
-        if disabled {
+        if !isEnabled {
             return
         }
         hover = false
@@ -221,7 +220,7 @@ class ScrollableTextField: NSTextField {
 
     override func scrollWheel(with event: NSEvent) {
         if abs(event.scrollingDeltaX) <= 3.0 {
-            if disabled {
+            if !isEnabled {
                 return
             }
             if event.scrollingDeltaY < 0.0 {

@@ -22,13 +22,13 @@ class ScrollableContrast: NSView {
 
     var minObserver: NSKeyValueObservation?
     var maxObserver: NSKeyValueObservation?
-    var contrastObserver: NSKeyValueObservation?
+
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var disabled = false {
         didSet {
-            minValue.disabled = disabled
-            maxValue.disabled = disabled
+            minValue.isEnabled = !disabled
+            maxValue.isEnabled = !disabled
         }
     }
 
@@ -46,35 +46,37 @@ class ScrollableContrast: NSView {
 
     var displayMinValue: Int {
         get {
-            return (display.value(forKey: "minContrast") as! NSNumber).intValue
+            return display.minContrast.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "minContrast")
+            display.minContrast = NSNumber(value: newValue)
         }
     }
 
     var displayMaxValue: Int {
         get {
-            return (display.value(forKey: "maxContrast") as! NSNumber).intValue
+            return display.maxContrast.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "maxContrast")
+            display.maxContrast = NSNumber(value: newValue)
         }
     }
 
     var displayValue: Int {
         get {
-            return (display.value(forKey: "contrast") as! NSNumber).intValue
+            return display.contrast.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "contrast")
+            display.contrast = NSNumber(value: newValue)
         }
     }
+
+    var contrastObserver: ((NSNumber, NSNumber) -> Void)?
 
     func addObserver(_ display: Display) {
         minObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
             guard let val = change.newValue, let currentValue = self.currentValue else { return }
-            DispatchQueue.main.async {
+            runInMainThread {
                 currentValue.lowerLimit = Double(val)
                 let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newContrast)
@@ -85,7 +87,7 @@ class ScrollableContrast: NSView {
         })
         maxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
             guard let val = change.newValue, let currentValue = self.currentValue else { return }
-            DispatchQueue.main.async {
+            runInMainThread {
                 currentValue.upperLimit = Double(val)
                 let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newContrast)
@@ -94,9 +96,8 @@ class ScrollableContrast: NSView {
                 }
             }
         })
-
-        contrastObserver = display.observe(\.contrast, options: [.new], changeHandler: { _, change in
-            if let newContrast = change.newValue, let display = self.display, display.id != GENERIC_DISPLAY_ID {
+        contrastObserver = { newContrast, _ in
+            if let display = self.display, display.id != GENERIC_DISPLAY_ID {
                 let minContrast: UInt8
                 let maxContrast: UInt8
 
@@ -109,11 +110,12 @@ class ScrollableContrast: NSView {
                 }
 
                 let newContrast = cap(newContrast.uint8Value, minVal: minContrast, maxVal: maxContrast)
-                DispatchQueue.main.async {
+                runInMainThread {
                     self.currentValue?.stringValue = String(newContrast)
                 }
             }
-        })
+        }
+        display.numberObservers["contrast"]?["scrollableContrast-\(self.accessibilityIdentifier())"] = contrastObserver!
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
@@ -200,8 +202,11 @@ class ScrollableContrast: NSView {
             }
         }
 
-        contrastObserver = nil
         addObserver(display)
+    }
+
+    deinit {
+        display.numberObservers["contrast"]?.removeValue(forKey: "scrollableContrast-\(self.accessibilityIdentifier())")
     }
 
     override init(frame frameRect: NSRect) {
@@ -218,11 +223,11 @@ class ScrollableContrast: NSView {
         switch sender.state {
         case .on:
             sender.layer?.backgroundColor = lockButtonBgOn.cgColor
-            display?.setValue(true, forKey: "lockedContrast")
+            display?.lockedContrast = true
             setValuesHidden(true)
         case .off:
             sender.layer?.backgroundColor = lockButtonBgOff.cgColor
-            display?.setValue(false, forKey: "lockedContrast")
+            display?.lockedContrast = false
             setValuesHidden(false)
         default:
             return
