@@ -108,6 +108,7 @@ class BrightnessAdapter {
     func resetDisplayList() {
         DDC.displayPortByUUID.removeAll(keepingCapacity: true)
         DDC.displayUUIDByEDID.removeAll(keepingCapacity: true)
+        DDC.skipReadingPropertyById.removeAll(keepingCapacity: true)
         for display in displays.values {
             display.removeObservers()
         }
@@ -176,7 +177,11 @@ class BrightnessAdapter {
             for display in displays.values {
                 if display.isUltraFine() {
                     client.tags?["ultrafine"] = "true"
-                    return
+                    continue
+                }
+                if display.isThunderbolt() {
+                    client.tags?["thunderbolt"] = "true"
+                    continue
                 }
             }
         }

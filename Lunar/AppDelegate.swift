@@ -323,8 +323,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshBrightness")
         brightnessReaderActivity.repeats = true
         brightnessReaderActivity.qualityOfService = .userInitiated
-        brightnessReaderActivity.interval = 10
-        brightnessReaderActivity.tolerance = 5
+        brightnessReaderActivity.interval = 4
+        brightnessReaderActivity.tolerance = 2
 
         fgQueue.async {
             brightnessAdapter.fetchBrightness()

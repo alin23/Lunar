@@ -229,6 +229,12 @@ class DataStore: NSObject {
     }
 
     func storeDisplays(_ displays: [Display]) -> [Display] {
+        let displays = displays.filter {
+            display in display.id != TEST_DISPLAY_ID &&
+                display.id != GENERIC_DISPLAY_ID &&
+                (CGDisplayIsBuiltin(display.id) == 0)
+        }
+
         guard let storedDisplays = self.displays() else {
             let nsDisplays = displays.map {
                 $0.dictionaryRepresentation()
@@ -247,7 +253,11 @@ class DataStore: NSObject {
             }
         }
 
-        let allDisplays = inactiveDisplays + displays
+        let allDisplays = (inactiveDisplays + displays).filter {
+            display in display.id != TEST_DISPLAY_ID &&
+                display.id != GENERIC_DISPLAY_ID &&
+                (CGDisplayIsBuiltin(display.id) == 0)
+        }
         let nsDisplays = allDisplays.map {
             $0.dictionaryRepresentation()
         } as NSArray
@@ -257,6 +267,10 @@ class DataStore: NSObject {
     }
 
     static func storeDisplay(display: Display) {
+        if display.id == TEST_DISPLAY_ID || display.id == GENERIC_DISPLAY_ID {
+            return
+        }
+
         guard var displays = DataStore.defaults.displays else {
             DataStore.defaults.set([
                 display.dictionaryRepresentation(),
