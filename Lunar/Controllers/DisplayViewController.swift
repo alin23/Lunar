@@ -61,7 +61,7 @@ class DisplayViewController: NSViewController {
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
-    var adaptiveObserver: NSKeyValueObservation?
+    var adaptiveObserver: ((Bool, Bool) -> Void)?
     var showNavigationHintsObserver: NSKeyValueObservation?
 
     func update(from display: Display) {
@@ -146,11 +146,11 @@ class DisplayViewController: NSViewController {
         switch sender.state {
         case .on:
             sender.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
-            display?.setValue(true, forKey: "adaptive")
+            display?.adaptive = true
             setValuesHidden(false)
         case .off:
             sender.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
-            display?.setValue(false, forKey: "adaptive")
+            display?.adaptive = false
             setValuesHidden(true)
         default:
             return
@@ -226,55 +226,60 @@ class DisplayViewController: NSViewController {
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }
-            self.swipeLeftHint?.isHidden = !show
-            self.swipeRightHint?.isHidden = !show
+            runInMainThread {
+                self.swipeLeftHint?.isHidden = !show
+                self.swipeRightHint?.isHidden = !show
+            }
         })
     }
 
+    deinit {
+        display.boolObservers["adaptive"]?.removeValue(forKey: "displayViewController-\(self.view.accessibilityIdentifier())")
+    }
+
     func listenForAdaptiveChange() {
-        adaptiveObserver = display?.observe(
-            \.adaptive,
-            options: [.new, .old],
-            changeHandler: { _, change in
-                if let newAdaptive = change.newValue, let button = self.adaptiveButton, let display = self.display {
-                    DispatchQueue.main.async {
-                        if newAdaptive {
-                            button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
-                            self.setValuesHidden(false)
-                            button.state = .on
-                        } else {
-                            button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
-                            self.setValuesHidden(true)
-                            button.state = .off
-                        }
-                        display.readapt(change: change)
+        adaptiveObserver = { newAdaptive, oldValue in
+            if let button = self.adaptiveButton, let display = self.display {
+                runInMainThread {
+                    if newAdaptive {
+                        button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
+                        self.setValuesHidden(false)
+                        button.state = .on
+                    } else {
+                        button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
+                        self.setValuesHidden(true)
+                        button.state = .off
                     }
+                    display.readapt(newValue: newAdaptive, oldValue: oldValue)
                 }
             }
-        )
+        }
+        display.boolObservers["adaptive"]?["displayViewController-\(self.view.accessibilityIdentifier())"] = adaptiveObserver!
     }
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
-                return
-            }
-            let adaptiveMode = AdaptiveMode(rawValue: mode)
-            if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
-                self.initGraph(mode: adaptiveMode)
-            }
-            if adaptiveMode == .manual {
-                self.scrollableBrightness.disabled = true
-                self.scrollableContrast.disabled = true
-                self.setValuesHidden(true, mode: adaptiveMode)
-                self.adaptiveButton.isHidden = true
-                self.adaptiveHelpButton.isHidden = true
-            } else {
-                self.scrollableBrightness.disabled = false
-                self.scrollableContrast.disabled = false
-                self.setValuesHidden(false, mode: adaptiveMode)
-                self.adaptiveButton.isHidden = false
-                self.adaptiveHelpButton.isHidden = false
+            runInMainThread {
+                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                    return
+                }
+                let adaptiveMode = AdaptiveMode(rawValue: mode)
+                if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                    self.initGraph(mode: adaptiveMode)
+                }
+                if adaptiveMode == .manual {
+                    self.scrollableBrightness.disabled = true
+                    self.scrollableContrast.disabled = true
+                    self.setValuesHidden(true, mode: adaptiveMode)
+                    self.adaptiveButton.isHidden = true
+                    self.adaptiveHelpButton.isHidden = true
+                } else {
+                    self.scrollableBrightness.disabled = false
+                    self.scrollableContrast.disabled = false
+                    self.setValuesHidden(false, mode: adaptiveMode)
+                    self.adaptiveButton.isHidden = false
+                    self.adaptiveHelpButton.isHidden = false
+                }
             }
         })
     }

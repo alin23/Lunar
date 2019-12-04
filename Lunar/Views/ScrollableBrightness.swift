@@ -22,13 +22,12 @@ class ScrollableBrightness: NSView {
 
     var minObserver: NSKeyValueObservation?
     var maxObserver: NSKeyValueObservation?
-    var brightnessObserver: NSKeyValueObservation?
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var disabled = false {
         didSet {
-            minValue.disabled = disabled
-            maxValue.disabled = disabled
+            minValue.isEnabled = !disabled
+            maxValue.isEnabled = !disabled
         }
     }
 
@@ -46,35 +45,37 @@ class ScrollableBrightness: NSView {
 
     var displayMinValue: Int {
         get {
-            return (display.value(forKey: "minBrightness") as! NSNumber).intValue
+            return display.minBrightness.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "minBrightness")
+            display.minBrightness = NSNumber(value: newValue)
         }
     }
 
     var displayMaxValue: Int {
         get {
-            return (display.value(forKey: "maxBrightness") as! NSNumber).intValue
+            return display.maxBrightness.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "maxBrightness")
+            display.maxBrightness = NSNumber(value: newValue)
         }
     }
 
     var displayValue: Int {
         get {
-            return (display.value(forKey: "brightness") as! NSNumber).intValue
+            return display.brightness.intValue
         }
         set {
-            display.setValue(NSNumber(value: newValue), forKey: "brightness")
+            display.brightness = NSNumber(value: newValue)
         }
     }
+
+    var brightnessObserver: ((NSNumber, NSNumber) -> Void)?
 
     func addObserver(_ display: Display) {
         minObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
             guard let val = change.newValue, let currentValue = self.currentValue else { return }
-            DispatchQueue.main.async {
+            runInMainThread {
                 currentValue.lowerLimit = Double(val)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
@@ -85,7 +86,7 @@ class ScrollableBrightness: NSView {
         })
         maxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, change in
             guard let val = change.newValue, let currentValue = self.currentValue else { return }
-            DispatchQueue.main.async {
+            runInMainThread {
                 currentValue.upperLimit = Double(val)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
@@ -95,8 +96,8 @@ class ScrollableBrightness: NSView {
             }
         })
 
-        brightnessObserver = display.observe(\.brightness, options: [.new], changeHandler: { _, change in
-            if let newBrightness = change.newValue, let display = self.display, display.id != GENERIC_DISPLAY_ID {
+        brightnessObserver = { newBrightness, _ in
+            if let display = self.display, display.id != GENERIC_DISPLAY_ID {
                 let minBrightness: UInt8
                 let maxBrightness: UInt8
 
@@ -109,11 +110,12 @@ class ScrollableBrightness: NSView {
                 }
 
                 let newBrightness = cap(newBrightness.uint8Value, minVal: minBrightness, maxVal: maxBrightness)
-                DispatchQueue.main.async {
+                runInMainThread {
                     self.currentValue?.stringValue = String(newBrightness)
                 }
             }
-        })
+        }
+        display.numberObservers["brightness"]?["scrollableBrightness-\(self.accessibilityIdentifier())"] = brightnessObserver!
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
@@ -200,8 +202,11 @@ class ScrollableBrightness: NSView {
             }
         }
 
-        brightnessObserver = nil
         addObserver(display)
+    }
+
+    deinit {
+        display.numberObservers["brightness"]?.removeValue(forKey: "scrollableBrightness-\(self.accessibilityIdentifier())")
     }
 
     override init(frame frameRect: NSRect) {
@@ -218,11 +223,11 @@ class ScrollableBrightness: NSView {
         switch sender.state {
         case .on:
             sender.layer?.backgroundColor = lockButtonBgOn.cgColor
-            display?.setValue(true, forKey: "lockedBrightness")
+            display?.lockedBrightness = true
             setValuesHidden(true)
         case .off:
             sender.layer?.backgroundColor = lockButtonBgOff.cgColor
-            display?.setValue(false, forKey: "lockedBrightness")
+            display?.lockedBrightness = false
             setValuesHidden(false)
         default:
             return

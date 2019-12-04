@@ -52,11 +52,14 @@ class BrightnessAdapter {
 
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
     var builtinDisplay = DDC.getBuiltinDisplay()
+    var activeDisplays: [CGDirectDisplayID: Display] {
+        displays.filter { $1.active }
+    }
 
     var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
     var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
 
-    var builtinBrightnessHistory = BoundedArray<UInt8>(capacity: 10)
+    var builtinBrightnessHistory: UInt64 = 0
     var lastBuiltinBrightness = 0.0
 
     var firstDisplay: Display {
@@ -130,8 +133,7 @@ class BrightnessAdapter {
         let displaySerialNameMapping = Dictionary(uniqueKeysWithValues: serialsAndNames)
         let displayIDSerialNameMapping = Dictionary(uniqueKeysWithValues: zip(displayIDs, serialsAndNames))
 
-        do {
-            let displayList = try datastore.fetchDisplays(by: serials)
+        if let displayList = datastore.displays(serials: serials) {
             for display in displayList {
                 display.id = displaySerialIDMapping[display.serial]!
                 display.name = displaySerialNameMapping[display.serial]!
@@ -153,16 +155,14 @@ class BrightnessAdapter {
                 displays[id]?.addObservers()
             }
 
-            datastore.save()
-            return displays
-        } catch {
-            log.error("Error on fetching displays: \(error)")
-            displays = Dictionary(uniqueKeysWithValues: displayIDs.map { id in (id, Display(id: id, active: true)) })
-            displays.values.forEach { $0.addObservers() }
+            let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
+            return Dictionary(uniqueKeysWithValues: storedDisplays.map { d in (d.id, d) })
         }
+        displays = Dictionary(uniqueKeysWithValues: displayIDs.map { id in (id, Display(id: id, active: true)) })
+        displays.values.forEach { $0.addObservers() }
 
-        datastore.save()
-        return displays
+        let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
+        return Dictionary(uniqueKeysWithValues: storedDisplays.map { d in (d.id, d) })
     }
 
     func addSentryData() {
@@ -170,18 +170,13 @@ class BrightnessAdapter {
             log.info("Creating Sentry extra context")
             client.extra = [
                 "settings": datastore.settingsDictionary(),
-                "displays": [:],
-                "apps": [:],
+                "displays": datastore.defaults.displays ?? [:],
+                "apps": datastore.defaults.appExceptions ?? [:],
             ]
             for display in displays.values {
-                display.addSentryData()
                 if display.isUltraFine() {
                     client.tags?["ultrafine"] = "true"
-                }
-            }
-            if let appExceptions = try? datastore.fetchAllAppExceptions() {
-                for app in appExceptions {
-                    app.addSentryData()
+                    return
                 }
             }
         }
@@ -284,39 +279,29 @@ class BrightnessAdapter {
     }
 
     func listenForRunningApps() {
-        let appNames = NSWorkspace.shared.runningApplications.map { app in app.bundleIdentifier ?? "" }
-        runningAppExceptions = (try? datastore.fetchAppExceptions(by: appNames)) ?? []
-        for app in runningAppExceptions {
-            app.addObservers()
-            app.addSentryData()
-        }
-
+        let appIdentifiers = NSWorkspace.shared.runningApplications.map { app in app.bundleIdentifier }.compactMap { $0 }
+        runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
         appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
-            let oldAppNames = change.oldValue?.map { app in app.bundleIdentifier ?? "" }
-            let newAppNames = change.newValue?.map { app in app.bundleIdentifier ?? "" }
-            do {
-                if let names = newAppNames {
-                    self.runningAppExceptions.append(contentsOf: try datastore.fetchAppExceptions(by: names))
-                }
-                if let names = oldAppNames {
-                    let exceptions = try datastore.fetchAppExceptions(by: names)
-                    for exception in exceptions {
-                        if let idx = self.runningAppExceptions.firstIndex(where: { app in app.name == exception.name }) {
-                            self.runningAppExceptions.remove(at: idx)
-                        }
+            let oldAppIdentifiers = change.oldValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
+            let newAppIdentifiers = change.newValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
+            if let identifiers = newAppIdentifiers, let newApps = datastore.appExceptions(identifiers: identifiers) {
+                self.runningAppExceptions.append(contentsOf: newApps)
+            }
+            if let identifiers = oldAppIdentifiers, let exceptions = datastore.appExceptions(identifiers: identifiers) {
+                for exception in exceptions {
+                    if let idx = self.runningAppExceptions.firstIndex(where: { app in app.identifier == exception.identifier }) {
+                        self.runningAppExceptions.remove(at: idx)
                     }
                 }
-                self.adaptBrightness()
-            } catch {
-                log.error("Error on fetching app exceptions for app names: \(newAppNames ?? [""])")
             }
+            self.adaptBrightness()
         })
     }
 
     func fetchBrightness(for displays: [Display]? = nil) {
-        for display in displays ?? self.displays.values.map({ $0 }) {
+        for display in displays ?? activeDisplays.values.map({ $0 }) {
             display.refreshBrightness()
             display.refreshContrast()
         }
@@ -350,15 +335,28 @@ class BrightnessAdapter {
         if let displays = displays {
             displays.forEach(adapt)
         } else {
-            self.displays.values.forEach(adapt)
+            activeDisplays.values.forEach(adapt)
         }
+    }
+
+    func lastValidBuiltinBrightness(_ condition: (UInt8) -> Bool) -> UInt8? {
+        var brightnessHistory: UInt64 = builtinBrightnessHistory
+        var result: UInt8 = 0
+        while brightnessHistory > 0 {
+            result = UInt8(brightnessHistory & 0xFF)
+            if condition(result) {
+                return result
+            }
+            brightnessHistory >>= 8
+        }
+        return nil
     }
 
     func getBuiltinDisplayBrightness() -> Double? {
         if builtinDisplay != nil, !IsLidClosed(), let brightness = DDC.getBrightness() {
             if brightness >= 0.0, brightness <= 1.0 {
                 let percentBrightness = brightness * 100.0
-                builtinBrightnessHistory.push(UInt8(round(percentBrightness)))
+                builtinBrightnessHistory = (builtinBrightnessHistory << 8) | UInt64(UInt8(round(percentBrightness)))
                 return percentBrightness
             }
         }
@@ -451,7 +449,7 @@ class BrightnessAdapter {
         if let displays = displays {
             displays.forEach { display in display.brightness = brightness }
         } else {
-            self.displays.values.forEach { display in display.brightness = brightness }
+            activeDisplays.values.forEach { display in display.brightness = brightness }
         }
     }
 
@@ -461,7 +459,7 @@ class BrightnessAdapter {
         if let displays = displays {
             displays.forEach { display in display.contrast = contrast }
         } else {
-            self.displays.values.forEach { display in display.contrast = contrast }
+            activeDisplays.values.forEach { display in display.contrast = contrast }
         }
     }
 
@@ -469,7 +467,7 @@ class BrightnessAdapter {
         if let displays = displays {
             displays.forEach { display in display.brightness = brightness }
         } else {
-            self.displays.values.forEach { display in display.brightness = brightness }
+            activeDisplays.values.forEach { display in display.brightness = brightness }
         }
     }
 
@@ -477,7 +475,7 @@ class BrightnessAdapter {
         if let displays = displays {
             displays.forEach { display in display.contrast = contrast }
         } else {
-            self.displays.values.forEach { display in display.contrast = contrast }
+            activeDisplays.values.forEach { display in display.contrast = contrast }
         }
     }
 
@@ -488,7 +486,7 @@ class BrightnessAdapter {
                 display.brightness = NSNumber(value: value)
             }
         } else {
-            self.displays.values.forEach { display in
+            activeDisplays.values.forEach { display in
                 let value = cap(display.brightness.intValue + offset, minVal: datastore.defaults.brightnessLimitMin, maxVal: datastore.defaults.brightnessLimitMax)
                 display.brightness = NSNumber(value: value)
             }
@@ -502,7 +500,7 @@ class BrightnessAdapter {
                 display.contrast = NSNumber(value: value)
             }
         } else {
-            self.displays.values.forEach { display in
+            activeDisplays.values.forEach { display in
                 let value = cap(display.contrast.intValue + offset, minVal: datastore.defaults.contrastLimitMin, maxVal: datastore.defaults.contrastLimitMax)
                 display.contrast = NSNumber(value: value)
             }

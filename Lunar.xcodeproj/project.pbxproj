@@ -79,6 +79,7 @@
 		C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */; };
 		C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */; };
 		C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* MenuPopoverController.swift */; };
+		C7AB59782396C4A90028E573 /* Transformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB59762396C4A80028E573 /* Transformers.swift */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
@@ -95,7 +96,6 @@
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
-		C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */; };
 		C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C731261522B3DF1E001ED199 /* Down.framework.dSYM */; };
@@ -108,7 +108,6 @@
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
-		C7FE72522390268A00EBA6DA /* BoundedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE72512390268900EBA6DA /* BoundedArray.swift */; };
 		C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */; };
 		C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */ = {isa = PBXBuildFile; productRef = C7FE72562391B3BC00EBA6DA /* CryptorECC */; };
 /* End PBXBuildFile section */
@@ -280,6 +279,7 @@
 		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = NSPageControl.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Alamofire.framework.dSYM; sourceTree = "<group>"; };
 		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
+		C7AB59762396C4A80028E573 /* Transformers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transformers.swift; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7AEC7FA1FD0B4350039B562 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
@@ -298,8 +298,6 @@
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
-		C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model v2.xcdatamodel"; sourceTree = "<group>"; };
-		C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
@@ -312,7 +310,6 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
-		C7FE72512390268900EBA6DA /* BoundedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundedArray.swift; sourceTree = "<group>"; };
 		C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickAdaptiveButton.swift; sourceTree = "<group>"; };
 		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -381,9 +378,8 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				C7FE72512390268900EBA6DA /* BoundedArray.swift */,
+				C7AB59762396C4A80028E573 /* Transformers.swift */,
 				C7CBEFFC238E81FF00031E93 /* Util.swift */,
-				C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */,
 				C7C1F7081FD639970039507C /* DataStore.swift */,
 				C7C1F7041FD635360039507C /* Moment.swift */,
 				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
@@ -734,7 +730,6 @@
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C72776E7201F02140055934F /* PageControl.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
-				C7FE72522390268A00EBA6DA /* BoundedArray.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
@@ -762,7 +757,7 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
-				C7CBEFFB238D5F0000031E93 /* Model.xcdatamodeld in Sources */,
+				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
@@ -937,7 +932,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.9.5;
+				CURRENT_PROJECT_VERSION = 2.9.6;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -956,7 +951,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 2.9.5;
+				MARKETING_VERSION = 2.9.6;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -976,7 +971,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.9.5;
+				CURRENT_PROJECT_VERSION = 2.9.6;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -994,7 +989,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 2.9.5;
+				MARKETING_VERSION = 2.9.6;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1115,20 +1110,6 @@
 			productName = CryptorECC;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		C7CBEFF8238D5F0000031E93 /* Model.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */,
-				C7CBEFFA238D5F0000031E93 /* Model.xcdatamodel */,
-			);
-			currentVersion = C7CBEFF9238D5F0000031E93 /* Model v2.xcdatamodel */;
-			path = Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = C7AEC7ED1FD0B4350039B562 /* Project object */;
 }

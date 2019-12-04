@@ -16,6 +16,9 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     @IBOutlet var addAppButton: NSButton!
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
+    var observer: NSKeyValueObservation!
+
+    @IBInspectable dynamic var appExceptions: [AppException] = datastore.appExceptions() ?? []
 
     @IBAction func addAppException(_: NSButton) {
         let dialog = NSOpenPanel()
@@ -40,9 +43,9 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
                     log.warning("Bundle for \(res.path) does not contain required fields")
                     return
                 }
-                if try! datastore.fetchAppException(by: id) == nil {
+                if !(datastore.defaults.appExceptions?.contains(where: DataStore.appByIdentifier(id)) ?? false) {
                     let app = AppException(identifier: id, name: name)
-                    arrayController.addObject(app)
+                    DataStore.storeAppException(app: app)
                 }
             }
         } else {
@@ -86,8 +89,12 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        arrayController.managedObjectContext = datastore.context
         tableView.headerView = nil
         initAddAppButton()
+        observer = datastore.defaults.observe(\.appExceptions, options: [.new], changeHandler: { _, change in
+            if let newVal = change.newValue, (newVal?.count ?? 0) != self.appExceptions.count {
+                self.setValue(datastore.appExceptions(), forKey: "appExceptions")
+            }
+        })
     }
 }
