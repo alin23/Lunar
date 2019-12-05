@@ -21,8 +21,8 @@ class DisplayValuesView: NSTableView {
     }
 
     func setAdaptiveButtonHidden(_ hidden: Bool) {
-        for row in 0 ..< numberOfRows {
-            if let nameCell = view(atColumn: 1, row: row, makeIfNecessary: false) as? NSTableCellView,
+        enumerateAvailableRowViews { rowView, _ in
+            if let nameCell = rowView.view(atColumn: 1) as? NSTableCellView,
                 let display = nameCell.objectValue as? Display,
                 let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
                 display.active {
@@ -32,11 +32,42 @@ class DisplayValuesView: NSTableView {
     }
 
     deinit {
-        for row in 0 ..< numberOfRows {
-            if let display = (view(atColumn: 1, row: row, makeIfNecessary: false) as? NSTableCellView)?.objectValue as? Display {
+        enumerateAvailableRowViews { rowView, _ in
+            if let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display {
                 display.numberObservers["brightness"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
                 display.numberObservers["contrast"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
             }
+        }
+    }
+
+    func resetDeleteButtons() {
+        enumerateAvailableRowViews { rowView, row in
+            guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
+                let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                    where: { v in (v as? NotConnectedTextField) != nil }
+                ) as? NotConnectedTextField else {
+                return
+            }
+            notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
+        }
+    }
+
+    func getDeleteAction(displayID: CGDirectDisplayID, row: Int) -> (() -> Void) {
+        return {
+            runInMainThread {
+                self.beginUpdates()
+                self.removeRows(at: [row], withAnimation: .effectFade)
+                self.endUpdates()
+                if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
+                    runInMainThreadAsyncAfter(ms: 200) {
+                        menuPopover.animates = false
+                        controller.adaptViewSize()
+                        menuPopover.animates = true
+                        self.resetDeleteButtons()
+                    }
+                }
+            }
+            brightnessAdapter.removeDisplay(id: displayID)
         }
     }
 
@@ -69,22 +100,7 @@ class DisplayValuesView: NSTableView {
             let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
             let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
 
-        let displayID = display.id
-        notConnectedTextField.onClick = {
-            runInMainThread {
-                self.beginUpdates()
-                self.removeRows(at: [row], withAnimation: .effectFade)
-                self.endUpdates()
-                if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
-                    runInMainThreadAsyncAfter(ms: 200) {
-                        menuPopover.animates = false
-                        controller.adaptViewSize()
-                        menuPopover.animates = true
-                    }
-                }
-            }
-            brightnessAdapter.removeDisplay(id: displayID)
-        }
+        notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
         adaptiveButton.setup(displayID: display.id)
         if display.active {
             if brightnessAdapter.mode == .manual {
