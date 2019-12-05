@@ -94,6 +94,7 @@ release: changelog
 	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
 	rsync -v -e ssh Releases/* noiseblend:/static/Lunar
 	rsync -v -e ssh Lunar.dmg noiseblend:/static/Lunar
+sentry-release:
 	./release.sh
 
 print-%  : ; @echo $* = $($*)
