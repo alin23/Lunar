@@ -181,8 +181,8 @@ class PageController: NSPageController, NSPageControllerDelegate {
 
         if let controller = viewControllers[identifier] as? DisplayViewController,
             let displayId = CGDirectDisplayID(identifier) {
-            if displayId == TEST_DISPLAY.id {
-                controller.display = TEST_DISPLAY
+            if displayId == TEST_DISPLAY_ID {
+                controller.display = TEST_DISPLAY()
             } else if displayId != GENERIC_DISPLAY.id {
                 controller.display = brightnessAdapter.displays[displayId]
             } else {

@@ -51,7 +51,12 @@ class BrightnessAdapter {
     }
 
     var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
-    var builtinDisplay = DDC.getBuiltinDisplay()
+    var builtinDisplay = DDC.getBuiltinDisplay() {
+        didSet {
+            BrightnessAdapter.lastKnownBuiltinDisplayID = builtinDisplay ?? GENERIC_DISPLAY_ID
+        }
+    }
+
     var activeDisplays: [CGDirectDisplayID: Display] {
         displays.filter { $1.active }
     }
@@ -61,15 +66,20 @@ class BrightnessAdapter {
 
     var builtinBrightnessHistory: UInt64 = 0
     var lastBuiltinBrightness = 0.0
+    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
     var firstDisplay: Display {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
         } else if TEST_MODE {
-            return TEST_DISPLAY
+            return TEST_DISPLAY()
         } else {
             return GENERIC_DISPLAY
         }
+    }
+
+    static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
+        return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
     }
 
     func toggle() {
@@ -106,9 +116,7 @@ class BrightnessAdapter {
     }
 
     func resetDisplayList() {
-        DDC.displayPortByUUID.removeAll(keepingCapacity: true)
-        DDC.displayUUIDByEDID.removeAll(keepingCapacity: true)
-        DDC.skipReadingPropertyById.removeAll(keepingCapacity: true)
+        DDC.reset()
         for display in displays.values {
             display.removeObservers()
         }
@@ -149,9 +157,9 @@ class BrightnessAdapter {
             let loadedDisplayIDs = Set(displays.keys)
             for id in displayIDs.subtracting(loadedDisplayIDs) {
                 if let (serial, name) = displayIDSerialNameMapping[id] {
-                    displays[id] = Display(id: id, serial: serial, name: name)
+                    displays[id] = Display(id: id, serial: serial, name: name, active: true)
                 } else {
-                    displays[id] = Display(id: id)
+                    displays[id] = Display(id: id, active: true)
                 }
                 displays[id]?.addObservers()
             }
@@ -510,5 +518,9 @@ class BrightnessAdapter {
                 display.contrast = NSNumber(value: value)
             }
         }
+    }
+
+    init() {
+        BrightnessAdapter.lastKnownBuiltinDisplayID = builtinDisplay ?? GENERIC_DISPLAY_ID
     }
 }

@@ -12,6 +12,9 @@ import Foundation
 
 let MAX_REQUESTS = 10
 let MAX_READ_DURATION_MS = 1500
+let MAX_WRITE_DURATION_MS = 2000
+let MAX_READ_FAULTS = 10
+let MAX_WRITE_FAULTS = 20
 
 struct DDCReadResult {
     var controlID: ControlID
@@ -124,10 +127,21 @@ extension UInt8 {
 class DDC {
     static let requestDelay: useconds_t = 20000
     static let recoveryDelay: useconds_t = 40000
-    static var displayQueues = [CGDirectDisplayID: DispatchSemaphore]()
     static var displayPortByUUID = [CFUUID: io_service_t]()
     static var displayUUIDByEDID = [Data: CFUUID]()
     static var skipReadingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
+    static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
+    static var readFaults = [CGDirectDisplayID: [ControlID: Int]]()
+    static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
+
+    static func reset() {
+        DDC.displayPortByUUID.removeAll()
+        DDC.displayUUIDByEDID.removeAll()
+        DDC.skipReadingPropertyById.removeAll()
+        DDC.skipWritingPropertyById.removeAll()
+        DDC.readFaults.removeAll()
+        DDC.writeFaults.removeAll()
+    }
 
     static func findExternalDisplays() -> [CGDirectDisplayID] {
         var displayIDs = [CGDirectDisplayID]()
@@ -135,7 +149,7 @@ class DDC {
             if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String, isScreenStr == "YES" {
                 if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
                     let screenID = CGDirectDisplayID(truncating: screenNumber)
-                    if CGDisplayIsBuiltin(screenID) != 0 {
+                    if BrightnessAdapter.isBuiltinDisplay(screenID) {
                         continue
                     }
                     displayIDs.append(screenID)
@@ -150,7 +164,7 @@ class DDC {
             if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen] as? String, isScreen == "YES",
                 let nsScreenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
                 let screenNumber = CGDirectDisplayID(truncating: nsScreenNumber)
-                if CGDisplayIsBuiltin(screenNumber) != 0 {
+                if BrightnessAdapter.isBuiltinDisplay(screenNumber) {
                     return screenNumber
                 }
             }
@@ -159,25 +173,77 @@ class DDC {
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
+        if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+            log.debug("Skipping write for \(controlID)", context: displayID)
+            return false
+        }
+
         var command = DDCWriteCommand(
             control_id: controlID.rawValue,
             new_value: newValue
         )
         let displayUUIDByEDIDCopy = displayUUIDByEDID
         let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
+
+        let writeStartedAt = DispatchTime.now()
         let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
-        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
+        if writeMs > MAX_WRITE_DURATION_MS {
+            log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
+            DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+        }
+
+        displayUUIDByEDID.removeAll()
         for (key, value) in nsDisplayUUIDByEDID {
             if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
         }
 
+        if !result {
+            log.debug("Error writing \(controlID)", context: displayID)
+            guard let propertyFaults = DDC.writeFaults[displayID] else {
+                DDC.writeFaults[displayID] = [controlID: 1]
+                return false
+            }
+            guard var faults = propertyFaults[controlID] else {
+                DDC.writeFaults[displayID]![controlID] = 1
+                return false
+            }
+            faults += 1
+            DDC.writeFaults[displayID]![controlID] = faults
+
+            if faults > MAX_WRITE_FAULTS {
+                DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+            }
+
+            return false
+        }
+
         return result
+    }
+
+    static func skipReadingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
+        if var propertiesToSkip = DDC.skipReadingPropertyById[displayID] {
+            propertiesToSkip.insert(controlID)
+            DDC.skipReadingPropertyById[displayID] = propertiesToSkip
+        } else {
+            DDC.skipReadingPropertyById[displayID] = Set([controlID])
+        }
+    }
+
+    static func skipWritingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
+        if var propertiesToSkip = DDC.skipWritingPropertyById[displayID] {
+            propertiesToSkip.insert(controlID)
+            DDC.skipWritingPropertyById[displayID] = propertiesToSkip
+        } else {
+            DDC.skipWritingPropertyById[displayID] = Set([controlID])
+        }
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
         if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+            log.debug("Skipping read for \(controlID)", context: displayID)
             return nil
         }
 
@@ -192,20 +258,37 @@ class DDC {
 
         let readStartedAt = DispatchTime.now()
         DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
-        if (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000 > MAX_READ_DURATION_MS {
-            if var propertiesToSkip = DDC.skipReadingPropertyById[displayID] {
-                propertiesToSkip.insert(controlID)
-                DDC.skipReadingPropertyById[displayID] = propertiesToSkip
-            } else {
-                DDC.skipReadingPropertyById[displayID] = Set([controlID])
-            }
+        let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
+        if readMs > MAX_READ_DURATION_MS {
+            log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
+            DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
         }
 
-        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        displayUUIDByEDID.removeAll()
         for (key, value) in nsDisplayUUIDByEDID {
             if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
             }
+        }
+
+        if !command.success {
+            log.debug("Error reading \(controlID)", context: displayID)
+            guard let propertyFaults = DDC.readFaults[displayID] else {
+                DDC.readFaults[displayID] = [controlID: 1]
+                return nil
+            }
+            guard var faults = propertyFaults[controlID] else {
+                DDC.readFaults[displayID]![controlID] = 1
+                return nil
+            }
+            faults += 1
+            DDC.readFaults[displayID]![controlID] = faults
+
+            if faults > MAX_READ_FAULTS {
+                DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
+            }
+
+            return nil
         }
 
         return DDCReadResult(
@@ -222,7 +305,7 @@ class DDC {
         let displayUUIDByEDIDCopy = displayUUIDByEDID
         let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
         EDIDTest(displayID, &edid, &edidData, nsDisplayUUIDByEDID as CFMutableDictionary)
-        displayUUIDByEDID.removeAll(keepingCapacity: true)
+        displayUUIDByEDID.removeAll()
         for (key, value) in nsDisplayUUIDByEDID {
             if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
                 displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
@@ -461,13 +544,13 @@ class DDC {
     }
 
     static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
-        log.info("DDC reading contrast for \(displayID)")
+        log.debug("DDC reading contrast for \(displayID)")
         return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 
     static func getBrightness(for displayID: CGDirectDisplayID? = nil) -> Double? {
         if let id = displayID {
-            log.info("DDC reading brightness for \(id)")
+            log.debug("DDC reading brightness for \(id)")
             return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
         }
         let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
