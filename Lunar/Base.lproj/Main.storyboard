@@ -2151,7 +2151,7 @@ to view other displays</string>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">
-                                                                    <rect key="frame" x="0.0" y="56" width="140" height="22"/>
+                                                                    <rect key="frame" x="0.0" y="56" width="140" height="25"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="LG UltraFine" id="C0V-a0-Ryd">
                                                                         <font key="font" size="18" name="Menlo-Bold"/>

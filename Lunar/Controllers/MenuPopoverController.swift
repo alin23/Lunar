@@ -137,6 +137,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func adaptViewSize() {
+        menuPopover.animates = false
+
         let scrollFrame = scrollView.frame
         viewHeight = viewHeight ?? view.frame.size.height
         let neededHeight = viewHeight! + tableView.fittingSize.height
@@ -152,6 +154,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
         scrollView.setNeedsDisplay(scrollView.frame)
         view.setNeedsDisplay(view.frame)
+
+        menuPopover.animates = true
     }
 
     @objc func popoverWillShow(notification _: Notification) {
