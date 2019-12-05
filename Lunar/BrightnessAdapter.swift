@@ -1,5 +1,5 @@
 //
-//  LunarBrightness.swift
+//  BrightnessAdapter.swift
 //  Lunar
 //
 //  Created by Alin on 02/12/2017.
@@ -80,6 +80,16 @@ class BrightnessAdapter {
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
+    }
+
+    func removeDisplay(id: CGDirectDisplayID) {
+        if let display = displays.removeValue(forKey: id) {
+            display.removeObservers()
+        }
+        let nsDisplays = displays.values.map {
+            $0.dictionaryRepresentation()
+        } as NSArray
+        datastore.defaults.set(nsDisplays, forKey: "displays")
     }
 
     func toggle() {
