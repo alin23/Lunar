@@ -86,6 +86,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var contrastColumn: NSTableColumn!
     @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active })
 
+    var viewHeight: CGFloat?
     var syncModeButtonResponder: ModeButtonResponder!
     var locationModeButtonResponder: ModeButtonResponder!
     var manualModeButtonResponder: ModeButtonResponder!
@@ -138,8 +139,13 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @objc func popoverWillShow(notification _: Notification) {
         runInMainThread {
             let scrollFrame = scrollView.frame
-            if tableView.numberOfRows > 0, view.frame.size.height < tableView.frame.size.height {
-                view.setFrameSize(NSSize(width: view.frame.size.width, height: view.frame.size.height + tableView.frame.size.height))
+            viewHeight = viewHeight ?? view.frame.size.height
+            let neededHeight = viewHeight! + tableView.frame.size.height
+            if tableView.numberOfRows == 0 {
+                view.setFrameSize(NSSize(width: view.frame.size.width, height: viewHeight!))
+            } else
+            if view.frame.size.height != neededHeight {
+                view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
             }
             menuPopover.contentSize = view.frame.size
 
@@ -193,10 +199,13 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func listenForDisplaysChange() {
         displaysObserver = datastore.defaults.observe(\.displays, options: [.new], changeHandler: { _, _ in
-            if !self.sameDisplays() {
-                self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }), forKey: "displays")
-                runInMainThread {
+            runInMainThreadAsyncAfter(ms: 2000) {
+                if !self.sameDisplays() {
+                    self.tableView.beginUpdates()
+                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }), forKey: "displays")
+                    self.tableView.reloadData()
                     self.view.setNeedsDisplay(self.view.visibleRect)
+                    self.tableView.endUpdates()
                 }
             }
         })

@@ -230,9 +230,7 @@ class DataStore: NSObject {
 
     func storeDisplays(_ displays: [Display]) -> [Display] {
         let displays = displays.filter {
-            display in display.id != TEST_DISPLAY_ID &&
-                display.id != GENERIC_DISPLAY_ID &&
-                (CGDisplayIsBuiltin(display.id) == 0)
+            display in !BrightnessAdapter.isBuiltinDisplay(display.id)
         }
 
         guard let storedDisplays = self.displays() else {
@@ -254,9 +252,7 @@ class DataStore: NSObject {
         }
 
         let allDisplays = (inactiveDisplays + displays).filter {
-            display in display.id != TEST_DISPLAY_ID &&
-                display.id != GENERIC_DISPLAY_ID &&
-                (CGDisplayIsBuiltin(display.id) == 0)
+            display in !BrightnessAdapter.isBuiltinDisplay(display.id)
         }
         let nsDisplays = allDisplays.map {
             $0.dictionaryRepresentation()
