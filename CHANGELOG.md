@@ -1,3 +1,16 @@
+# 2.9.7
+## Features
+
+- Add special support for Apple Thunderbolt Display
+- Add option to manually enable brightness monitoring (only for the brave)
+
+## Fixes
+
+- Filter out built-in and testing displays from saved data
+
+## Improvements
+
+- Make an attempt to detect slow DDC implementations and skip reading in those cases
 # 2.9.6
 ## Features
 
