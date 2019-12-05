@@ -85,6 +85,7 @@
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
+		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
 		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
 		C7C1F7031FD5FD390039507C /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7021FD5FD390039507C /* Display.swift */; };
@@ -287,6 +288,7 @@
 		C7AEC7FF1FD0B4350039B562 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
 		C7C1F7021FD5FD390039507C /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
@@ -415,6 +417,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */,
 				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
 				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
 				C72776E6201F02140055934F /* PageControl.swift */,
@@ -727,6 +730,7 @@
 				C7521D37226C77510062EC81 /* DDC.swift in Sources */,
 				C7521D34226C762B0062EC81 /* DDC.c in Sources */,
 				C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */,
+				C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */,
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C72776E7201F02140055934F /* PageControl.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
