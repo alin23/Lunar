@@ -1,3 +1,16 @@
+# 2.9.8
+## Features
+
+- Add option to remove disconnected displays from the Quick Actions popover
+- Better detection of builtin displays
+
+## Fixes
+
+- Fix a memory corruption bug
+
+## Improvements
+
+- Improve detection of slow DDC implementations
 # 2.9.7
 ## Features
 
