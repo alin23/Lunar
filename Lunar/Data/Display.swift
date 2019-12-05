@@ -24,7 +24,7 @@ let DEFAULT_MAX_CONTRAST: UInt8 = 70
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100)
-let TEST_DISPLAY: Display = Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, adaptive: true)
+let TEST_DISPLAY = { Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, adaptive: true) }
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
@@ -431,19 +431,29 @@ enum ValueType {
                     Client.shared?.extra?["\(id)"] = extraData
                 }
                 if datastore.defaults.smoothTransition || appleDisplay {
+                    var faults = 0
                     self.smoothTransition(from: oldValue.uint8Value, to: brightness) { newValue in
+                        if faults > 5 {
+                            return
+                        }
+
                         if !appleDisplay {
-                            _ = DDC.setBrightness(for: id, brightness: newValue)
+                            if !DDC.setBrightness(for: id, brightness: newValue) {
+                                faults += 1
+                                log.warning("Error writing brightness using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults])
+                            }
                         } else {
-                            log.debug("Writing brightness using CoreDisplay")
+                            log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
                             CoreDisplay_Display_SetUserBrightness(id, Double(newValue) / 100.0)
                         }
                     }
                 } else {
                     if !appleDisplay {
-                        _ = DDC.setBrightness(for: id, brightness: brightness)
+                        if !DDC.setBrightness(for: id, brightness: brightness) {
+                            log.warning("Error writing brightness using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+                        }
                     } else {
-                        log.debug("Writing brightness using CoreDisplay")
+                        log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
                         CoreDisplay_Display_SetUserBrightness(id, Double(brightness) / 100.0)
                     }
                 }
@@ -465,11 +475,21 @@ enum ValueType {
                     Client.shared?.extra?["\(id)"] = extraData
                 }
                 if datastore.defaults.smoothTransition || self.isAppleDisplay() {
+                    var faults = 0
                     self.smoothTransition(from: oldValue.uint8Value, to: contrast) { newValue in
-                        _ = DDC.setContrast(for: id, contrast: newValue)
+                        if faults > 5 {
+                            return
+                        }
+
+                        if !DDC.setContrast(for: id, contrast: newValue) {
+                            faults += 1
+                            log.warning("Error writing contrast using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults])
+                        }
                     }
                 } else {
-                    _ = DDC.setContrast(for: id, contrast: contrast)
+                    if !DDC.setContrast(for: id, contrast: contrast) {
+                        log.warning("Error writing contrast using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+                    }
                 }
 
                 log.debug("\(self.name): Set contrast to \(contrast)")
