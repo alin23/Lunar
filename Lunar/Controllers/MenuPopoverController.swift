@@ -84,7 +84,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
-    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active })
+    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active })
 
     var viewHeight: CGFloat?
     var syncModeButtonResponder: ModeButtonResponder!
@@ -136,24 +136,27 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         tableView.headerView = nil
     }
 
+    func adaptViewSize() {
+        let scrollFrame = scrollView.frame
+        viewHeight = viewHeight ?? view.frame.size.height
+        let neededHeight = viewHeight! + tableView.fittingSize.height
+        if tableView.numberOfRows == 0 {
+            view.setFrameSize(NSSize(width: view.frame.size.width, height: viewHeight!))
+        } else if view.frame.size.height != neededHeight {
+            view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
+        }
+        menuPopover.contentSize = view.frame.size
+
+        scrollView.setFrameSize(NSSize(width: scrollFrame.size.width, height: tableView.fittingSize.height))
+        scrollView.setFrameOrigin(scrollFrame.origin)
+
+        scrollView.setNeedsDisplay(scrollView.frame)
+        view.setNeedsDisplay(view.frame)
+    }
+
     @objc func popoverWillShow(notification _: Notification) {
         runInMainThread {
-            let scrollFrame = scrollView.frame
-            viewHeight = viewHeight ?? view.frame.size.height
-            let neededHeight = viewHeight! + tableView.frame.size.height
-            if tableView.numberOfRows == 0 {
-                view.setFrameSize(NSSize(width: view.frame.size.width, height: viewHeight!))
-            } else
-            if view.frame.size.height != neededHeight {
-                view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
-            }
-            menuPopover.contentSize = view.frame.size
-
-            scrollView.setFrameSize(tableView.frame.size)
-            scrollView.setFrameOrigin(scrollFrame.origin)
-
-            scrollView.setNeedsDisplay(scrollView.frame)
-            view.setNeedsDisplay(view.frame)
+            adaptViewSize()
         }
     }
 
@@ -202,10 +205,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             runInMainThreadAsyncAfter(ms: 2000) {
                 if !self.sameDisplays() {
                     self.tableView.beginUpdates()
-                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }), forKey: "displays")
+                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
                     self.tableView.reloadData()
                     self.view.setNeedsDisplay(self.view.visibleRect)
                     self.tableView.endUpdates()
+
+                    self.adaptViewSize()
                 }
             }
         })

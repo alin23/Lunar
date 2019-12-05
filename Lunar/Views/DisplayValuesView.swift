@@ -56,16 +56,35 @@ class DisplayValuesView: NSTableView {
         }
     }
 
-    func addRow(_ rowView: NSTableRowView, forRow _: Int) {
+    func addRow(_ rowView: NSTableRowView, forRow row: Int) {
         guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
             let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
             let adaptiveButton = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
                 where: { v in (v as? QuickAdaptiveButton) != nil }
             ) as? QuickAdaptiveButton,
+            let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                where: { v in (v as? NotConnectedTextField) != nil }
+            ) as? NotConnectedTextField,
             let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
             let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
             let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
 
+        let displayID = display.id
+        notConnectedTextField.onClick = {
+            runInMainThread {
+                self.beginUpdates()
+                self.removeRows(at: [row], withAnimation: .effectFade)
+                self.endUpdates()
+                if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
+                    runInMainThreadAsyncAfter(ms: 200) {
+                        menuPopover.animates = false
+                        controller.adaptViewSize()
+                        menuPopover.animates = true
+                    }
+                }
+            }
+            brightnessAdapter.removeDisplay(id: displayID)
+        }
         adaptiveButton.setup(displayID: display.id)
         if display.active {
             if brightnessAdapter.mode == .manual {
