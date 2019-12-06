@@ -38,6 +38,7 @@ let APP_SETTINGS = [
     "sunrise",
     "sunset",
     "syncPollingSeconds",
+    "clamshellModeDetection",
 ]
 
 extension UserDefaults {
@@ -83,6 +84,10 @@ extension UserDefaults {
 
     @objc dynamic var startAtLogin: Bool {
         return bool(forKey: "startAtLogin")
+    }
+
+    @objc dynamic var clamshellModeDetection: Bool {
+        return bool(forKey: "clamshellModeDetection")
     }
 
     @objc dynamic var didScrollTextField: Bool {
@@ -364,6 +369,7 @@ class DataStore: NSObject {
         DataStore.setDefault(false, for: "manualLocation")
         DataStore.setDefault(false, for: "showNavigationHints")
         DataStore.setDefault(true, for: "startAtLogin")
+        DataStore.setDefault(true, for: "clamshellModeDetection")
         DataStore.setDefault(180, for: "daylightExtensionMinutes")
         DataStore.setDefault(240, for: "noonDurationMinutes")
         DataStore.setDefault(5, for: "brightnessOffset")
