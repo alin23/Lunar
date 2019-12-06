@@ -166,8 +166,12 @@ class BrightnessAdapter {
 
         if let displayList = datastore.displays(serials: serials) {
             for display in displayList {
-                display.id = displaySerialIDMapping[display.serial]!
-                display.name = displaySerialNameMapping[display.serial]!
+                if let newID = displaySerialIDMapping[display.serial] {
+                    display.id = newID
+                }
+                if let newName = displaySerialNameMapping[display.serial] {
+                    display.name = newName
+                }
                 display.active = true
                 display.addObservers()
             }

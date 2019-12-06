@@ -149,18 +149,21 @@ class ScrollableTextField: NSTextField {
         HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
 
         log.debug("Registering up/down hotkeys")
-        upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: KeyCombo(keyCode: kVK_UpArrow, carbonModifiers: 0)!) { _ in
-            self.increaseValue()
-            self.onValueChanged?(self.integerValue)
-            self.onValueChangedDouble?(self.doubleValue)
+        if let upKeyCombo = KeyCombo(keyCode: kVK_UpArrow, carbonModifiers: 0),
+            let downKeyCombo = KeyCombo(keyCode: kVK_DownArrow, carbonModifiers: 0) {
+            upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: upKeyCombo) { _ in
+                self.increaseValue()
+                self.onValueChanged?(self.integerValue)
+                self.onValueChangedDouble?(self.doubleValue)
+            }
+            downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: downKeyCombo) { _ in
+                self.decreaseValue()
+                self.onValueChanged?(self.integerValue)
+                self.onValueChangedDouble?(self.doubleValue)
+            }
+            upHotkey?.register()
+            downHotkey?.register()
         }
-        downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: KeyCombo(keyCode: kVK_DownArrow, carbonModifiers: 0)!) { _ in
-            self.decreaseValue()
-            self.onValueChanged?(self.integerValue)
-            self.onValueChangedDouble?(self.doubleValue)
-        }
-        upHotkey?.register()
-        downHotkey?.register()
 
         onMouseEnter?()
     }
