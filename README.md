@@ -18,7 +18,7 @@
 - **Location-based Adaptive Brightness** (and contrast) based on the sunrise/sunset times in your location
 - **App Exception** list if you need more brightness for specific activities (watching movies, design work)
 - individual settings per display
-- **Manual controls** hotkeys for setting brightness and contrast that respect the min/max values per monitor:
+- **Manual controls** hotkeys for setting brightness and contrast that respect the min/max values per monitor
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
 
