@@ -30,10 +30,10 @@ private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwit
 
 let bgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.bg", qos: .background, attributes: .concurrent)
 let fgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
-let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = false
-let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
+let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
 let TRANSFER_URL = "https://transfer.sh"
 let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Content-type": "application/octet-stream",
@@ -552,8 +552,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             print("\(error)")
         }
 
-        if let logPath = LOG_URL.path.cString(using: .utf8) {
-            log.info("Setting log path to \(LOG_URL.path)")
+        if let logPath = LOG_URL?.path.cString(using: .utf8) {
+            log.info("Setting log path to \(LOG_URL?.path ?? "")")
             setLogPath(logPath, logPath.count)
         }
 
@@ -780,11 +780,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func buyMeACoffee(_: Any) {
-        NSWorkspace.shared.open(URL(string: "https://www.buymeacoffee.com/alin23")!)
+        if let url = URL(string: "https://www.buymeacoffee.com/alin23") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        NSWorkspace.shared.open(URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21")!)
+        if let url = URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     func failDebugData() {
@@ -849,7 +853,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             runInMainThread {
                 self.debugMenuItem.title = "Gathering logs"
             }
-            guard let sourceString = FileManager().contents(atPath: LOG_URL.path) else {
+            guard let logURL = LOG_URL, let sourceString = FileManager().contents(atPath: logURL.path) else {
                 self.failDebugData()
                 return
             }
@@ -893,11 +897,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     return
                 }
                 log.info("Uploaded logs to \(url)")
-                NSWorkspace.shared.open(
-                    URL(
-                        string:
-                        "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D"
-                    )!)
+                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D") {
+                    NSWorkspace.shared.open(url)
+                }
             })
         }
     }

@@ -2,7 +2,7 @@ import Cocoa
 import Foundation
 
 let buttonBgOn = sunYellow
-let buttonBgOnHover = buttonBgOn.blended(withFraction: 0.2, of: red)!
+let buttonBgOnHover = buttonBgOn.blended(withFraction: 0.2, of: red) ?? buttonBgOn
 let buttonLabelOn = darkMauve
 let buttonBgOff = gray
 let buttonBgOffHover = buttonBgOn
