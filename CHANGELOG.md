@@ -1,3 +1,10 @@
+# 2.9.9
+## Fixes
+
+- Minimize non-null assertions
+- Fix Day Length calculation in Location mode
+- Fix "end scrolling" detection
+
 # 2.9.8
 ## Features
 
