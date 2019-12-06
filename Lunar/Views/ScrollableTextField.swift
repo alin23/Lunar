@@ -77,6 +77,8 @@ class ScrollableTextField: NSTextField {
         }
     }
 
+    var adaptToScrollingFinished: DispatchWorkItem?
+
     func setup() {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
@@ -167,6 +169,9 @@ class ScrollableTextField: NSTextField {
         if !isEnabled {
             return
         }
+
+        finishScrolling()
+
         hover = false
         darken(color: textFieldColor)
 
@@ -218,7 +223,29 @@ class ScrollableTextField: NSTextField {
         }
     }
 
+    func finishScrolling() {
+        adaptToScrollingFinished?.cancel()
+        adaptToScrollingFinished = nil
+        if scrolling {
+            scrolling = false
+            log.debug("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
+            onValueChanged?(integerValue)
+            onValueChangedDouble?(doubleValue)
+            darken(color: textFieldColorHover)
+        }
+    }
+
+    func finishScrolling(after ms: Int) {
+        adaptToScrollingFinished?.cancel()
+        adaptToScrollingFinished = DispatchWorkItem {
+            self.finishScrolling()
+            self.adaptToScrollingFinished = nil
+        }
+        runInMainThreadAsyncAfter(ms: ms, adaptToScrollingFinished!)
+    }
+
     override func scrollWheel(with event: NSEvent) {
+//        log.debug(event.scrollingDeltaY)
         if abs(event.scrollingDeltaX) <= 3.0 {
             if !isEnabled {
                 return
@@ -230,6 +257,7 @@ class ScrollableTextField: NSTextField {
                     lightenUp(color: textFieldColorLight)
                 }
                 increaseValue()
+                finishScrolling(after: 1000)
             } else if event.scrollingDeltaY > 0.0 {
                 disableScrollHint()
                 if !scrolling {
@@ -237,14 +265,9 @@ class ScrollableTextField: NSTextField {
                     lightenUp(color: textFieldColorLight)
                 }
                 decreaseValue()
+                finishScrolling(after: 1000)
             } else {
-                if scrolling {
-                    scrolling = false
-                    log.debug("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
-                    onValueChanged?(integerValue)
-                    onValueChangedDouble?(doubleValue)
-                    darken(color: textFieldColorHover)
-                }
+                finishScrolling()
             }
         } else {
             super.scrollWheel(with: event)
