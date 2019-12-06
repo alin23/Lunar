@@ -258,10 +258,12 @@ class BrightnessAdapter {
         log.info("Lid closed: \(lidClosed)")
         Client.shared?.tags?["clamshellMode"] = String(lidClosed)
 
-        if lidClosed {
-            activateClamshellMode()
-        } else if clamshellMode {
-            deactivateClamshellMode()
+        if datastore.defaults.clamshellModeDetection {
+            if lidClosed {
+                activateClamshellMode()
+            } else if clamshellMode {
+                deactivateClamshellMode()
+            }
         }
     }
 
