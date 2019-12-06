@@ -9,8 +9,8 @@
 import Cocoa
 
 let textFieldColor = sunYellow
-let textFieldColorHover = sunYellow.blended(withFraction: 0.2, of: red)!
-let textFieldColorLight = sunYellow.blended(withFraction: 0.4, of: red)!
+let textFieldColorHover = sunYellow.blended(withFraction: 0.2, of: red) ?? textFieldColor
+let textFieldColorLight = sunYellow.blended(withFraction: 0.4, of: red) ?? textFieldColor
 
 class DisplayValuesView: NSTableView {
     var brightnessObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]

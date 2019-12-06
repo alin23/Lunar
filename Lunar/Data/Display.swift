@@ -634,7 +634,8 @@ enum ValueType {
     ) -> (NSNumber, NSNumber) {
         var now = DateInRegion().convertTo(region: Region.local)
         if let hour = hour {
-            now = now.dateBySet(hour: hour, min: minute, secs: 0)!
+            now = (now.dateBySet(hour: hour, min: minute, secs: 0) ??
+                DateInRegion(year: now.year, month: now.month, day: now.day, hour: hour, minute: minute, second: 0, nanosecond: 0, region: now.region))
         }
         let seconds = 60.0
         let minBrightness = minBrightness ?? self.minBrightness.uint8Value
@@ -717,8 +718,11 @@ enum ValueType {
 
         let now = DateInRegion().convertTo(region: Region.local)
         for hour in 0 ..< 24 {
-            times.append(contentsOf: stride(from: 0, through: 59, by: step).map {
-                m in now.dateBySet(hour: hour, min: m, secs: 0)!.timeIntervalSince1970
+            times.append(contentsOf: stride(from: 0, through: 59, by: step).map { minute in
+                let newNow = (now.dateBySet(hour: hour, min: minute, secs: 0) ??
+                    DateInRegion(year: now.year, month: now.month, day: now.day, hour: hour, minute: minute, second: 0, nanosecond: 0, region: now.region))
+
+                return newNow.timeIntervalSince1970
             })
         }
 
