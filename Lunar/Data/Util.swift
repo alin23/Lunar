@@ -64,3 +64,9 @@ func runInMainThreadAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
         action()
     }
 }
+
+func runInMainThreadAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
+    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+
+    DispatchQueue.main.asyncAfter(deadline: deadline, execute: action)
+}
