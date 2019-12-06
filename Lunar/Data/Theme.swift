@@ -27,9 +27,9 @@ let settingsDividerColor = white.withAlphaComponent(0.3)
 let scrollableTextFieldCaptionColor = mauve.withAlphaComponent(0.7)
 let adaptiveButtonLabelColor = mauve
 
-let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05)!
-let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1)!
-let scrollableTextFieldColorLight = lunarYellow.highlight(withLevel: 0.3)!
+let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow
+let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow
+let scrollableTextFieldColorLight = lunarYellow.highlight(withLevel: 0.3) ?? lunarYellow
 
 let scrollableTextFieldColorWhite = white
 let scrollableTextFieldColorHoverWhite = mauve.withAlphaComponent(0.7)
@@ -40,17 +40,17 @@ let scrollableCaptionColorWhite = mauve.withAlphaComponent(0.5)
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
 let adaptiveButtonBgOn = lunarYellow.withAlphaComponent(0.8)
-let adaptiveButtonBgOnHover = adaptiveButtonBgOn.highlight(withLevel: 0.2)!
+let adaptiveButtonBgOnHover = adaptiveButtonBgOn.highlight(withLevel: 0.2) ?? adaptiveButtonBgOn
 let adaptiveButtonLabelOn = mauve
 let adaptiveButtonBgOff = gray.withAlphaComponent(0.8)
 let adaptiveButtonBgOffHover = adaptiveButtonBgOn
 let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
 
 let lockButtonBgOn = red.withAlphaComponent(0.8)
-let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2)!
+let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn
 let lockButtonLabelOn = white
 let lockButtonBgOff = gray.withAlphaComponent(0.8)
-let lockButtonBgOffHover = lockButtonBgOn.highlight(withLevel: 0.4)!
+let lockButtonBgOffHover = lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn
 let lockButtonLabelOff = mauve.withAlphaComponent(0.45)
 
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
@@ -61,13 +61,13 @@ let hotkeyColor: [HoverState: [String: NSColor]] = [
         "background": white.withAlphaComponent(0.4),
         "tint": lunarYellow,
         "tintDisabled": white.withAlphaComponent(0.9),
-        "tintRecording": red.highlight(withLevel: 0.4)!,
+        "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
     .noHover: [
         "background": white.withAlphaComponent(0.3),
         "tint": lunarYellow.withAlphaComponent(0.9),
         "tintDisabled": white.withAlphaComponent(0.7),
-        "tintRecording": red.highlight(withLevel: 0.4)!,
+        "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
 ]
 let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
@@ -102,12 +102,12 @@ let buttonDotColor: [AdaptiveMode: NSColor] = [
 ]
 
 let xColor = red
-let removeButtonColor = red.highlight(withLevel: 0.3)!
+let removeButtonColor = red.highlight(withLevel: 0.3) ?? red
 
 let contrastGraphColor = lunarYellow
 let brightnessGraphColor = violet
 let xAxisLabelColor = mauve.withAlphaComponent(0.5)
 
 let contrastGraphColorYellow = white
-let brightnessGraphColorYellow = lunarYellow.shadow(withLevel: 0.3)!
+let brightnessGraphColorYellow = lunarYellow.shadow(withLevel: 0.3) ?? lunarYellow
 let xAxisLabelColorYellow = NSColor.black.withAlphaComponent(0.5)

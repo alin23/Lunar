@@ -171,43 +171,43 @@ class BrightnessContrastChartView: LineChartView {
 
     func setupLimitLines(mode: AdaptiveMode) {
         xAxis.removeAllLimitLines()
-        
+
         switch mode {
         case .location:
             guard let m = brightnessAdapter.moment else { return }
-            
+
             let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise (\(m.sunrise.toRelative()))")
             let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon     (\(m.solarNoon.toRelative()))")
             let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset (\(m.sunset.toRelative()))")
-            
+
             if m.sunset.hour <= 12 {
                 sunsetLine.labelPosition = .bottomRight
             } else {
                 sunsetLine.labelPosition = .bottomLeft
             }
-            
+
             if m.sunrise.hour <= 12 {
                 sunriseLine.labelPosition = .topRight
             } else {
                 sunriseLine.labelPosition = .topLeft
             }
-            
+
             sunsetLine.yOffset = 30
             solarNoonLine.xOffset = -42
             solarNoonLine.yOffset = 60
-            
+
             sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
             solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
             sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-            
+
             sunriseLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
             solarNoonLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
             sunsetLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-            
+
             sunriseLine.lineColor = contrastGraph.fillColor.withAlphaComponent(0.7)
-            solarNoonLine.lineColor = red.blended(withFraction: 0.5, of: lunarYellow)!.withAlphaComponent(0.7)
+            solarNoonLine.lineColor = (red.blended(withFraction: 0.5, of: lunarYellow) ?? red).withAlphaComponent(0.7)
             sunsetLine.lineColor = brightnessGraph.fillColor.withAlphaComponent(0.7)
-            
+
             xAxis.addLimitLine(sunriseLine)
             xAxis.addLimitLine(solarNoonLine)
             xAxis.addLimitLine(sunsetLine)

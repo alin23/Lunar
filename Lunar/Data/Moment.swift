@@ -23,13 +23,20 @@ class Moment: NSObject, NSCoding {
     let astronomicalSunrise: DateInRegion
     let astronomicalSunset: DateInRegion
 
-    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("moments")
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
+    static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("moments")
 
     static func defaultMoments() -> (DateInRegion, DateInRegion, DateInRegion) {
-        let sevenAM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 7, min: 0, secs: 0)!
-        let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0)!
-        let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0)!
+        guard let sevenAM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 7, min: 0, secs: 0),
+            let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0),
+            let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0) else {
+            let today = Date.nowAt(.startOfDay)
+            return (
+                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 7, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local),
+                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 12, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local),
+                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 19, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local)
+            )
+        }
 
         return (sevenAM, noon, sevenPM)
     }
@@ -49,7 +56,7 @@ class Moment: NSObject, NSCoding {
         sunrise = DateInRegion(solar.sunrise ?? sevenAM, region: Region.local)
         sunset = DateInRegion(solar.sunset ?? sevenPM, region: Region.local)
         solarNoon = DateInRegion(solar.solarNoon ?? noon, region: Region.local)
-        dayLength = UInt64(sunset - sunset)
+        dayLength = UInt64(sunset - sunrise)
         civilSunrise = DateInRegion(solar.civilSunrise ?? sevenAM, region: Region.local)
         civilSunset = DateInRegion(solar.civilSunset ?? sevenPM, region: Region.local)
         nauticalSunrise = DateInRegion(solar.nauticalSunrise ?? sevenAM, region: Region.local)
@@ -69,7 +76,12 @@ class Moment: NSObject, NSCoding {
         sunrise = localTime("sunrise") ?? sevenAM
         sunset = localTime("sunset") ?? sevenPM
         solarNoon = localTime("solar_noon") ?? noon
-        dayLength = result["day_length"]!.uInt64Value
+        let length = result["day_length"]?.uInt64Value ?? 0
+        if length == 0 {
+            dayLength = UInt64((localTime("sunset") ?? sevenPM) - (localTime("sunrise") ?? sevenAM))
+        } else {
+            dayLength = length
+        }
         civilSunrise = localTime("civil_twilight_begin") ?? sevenAM
         civilSunset = localTime("civil_twilight_end") ?? sevenPM
         nauticalSunrise = localTime("nautical_twilight_begin") ?? sevenAM
@@ -103,7 +115,12 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        dayLength = UInt64(defaults.integer(forKey: "dayLength"))
+        let length = UInt64(defaults.integer(forKey: "dayLength"))
+        if length == 0 {
+            dayLength = UInt64(self.sunset - self.sunrise)
+        } else {
+            dayLength = length
+        }
         civilSunrise = localTime(civilTwilightBegin) ?? sevenAM
         civilSunset = localTime(civilTwilightEnd) ?? sevenPM
         nauticalSunrise = localTime(nauticalTwilightBegin) ?? sevenAM
@@ -163,7 +180,12 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        dayLength = UInt64(aDecoder.decodeInt64(forKey: "dayLength"))
+        let length = UInt64(aDecoder.decodeInt64(forKey: "dayLength"))
+        if length == 0 {
+            dayLength = UInt64(self.sunset - self.sunrise)
+        } else {
+            dayLength = length
+        }
         civilSunrise = localTime(civilTwilightBegin) ?? sevenAM
         civilSunset = localTime(civilTwilightEnd) ?? sevenPM
         nauticalSunrise = localTime(nauticalTwilightBegin) ?? sevenAM
@@ -173,14 +195,19 @@ class Moment: NSObject, NSCoding {
     }
 
     func serialize() {
-        if NSKeyedArchiver.archiveRootObject(self, toFile: Moment.ArchiveURL.path) {
-            log.info("Saved moment data to \(Moment.ArchiveURL.path)")
-        } else {
-            log.error("Failed to save moment data to \(Moment.ArchiveURL.path)")
+        if let archiveURL = Moment.ArchiveURL {
+            if NSKeyedArchiver.archiveRootObject(self, toFile: archiveURL.path) {
+                log.info("Saved moment data to \(archiveURL.path)")
+            } else {
+                log.error("Failed to save moment data to \(archiveURL.path)")
+            }
         }
     }
 
     static func deserialize() -> Moment? {
-        return NSKeyedUnarchiver.unarchiveObject(withFile: Moment.ArchiveURL.path) as? Moment
+        if let archiveURL = Moment.ArchiveURL {
+            return NSKeyedUnarchiver.unarchiveObject(withFile: archiveURL.path) as? Moment
+        }
+        return nil
     }
 }

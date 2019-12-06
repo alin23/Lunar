@@ -67,11 +67,14 @@ class PageController: NSPageController, NSPageControllerDelegate {
             leftHotkey?.unregister()
             rightHotkey?.unregister()
 
-            leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0)!, target: self, action: #selector(navigateBack(_:)))
-            rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0)!, target: self, action: #selector(navigateForward(_:)))
+            if let leftKeyCombo = KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0),
+                let rightKeyCombo = KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0) {
+                leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
+                rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
 
-            leftHotkey?.register()
-            rightHotkey?.register()
+                leftHotkey?.register()
+                rightHotkey?.register()
+            }
         } else {
             leftHotkey?.unregister()
             rightHotkey?.unregister()
@@ -151,8 +154,8 @@ class PageController: NSPageController, NSPageControllerDelegate {
                     continue
                 } else if let c = controller as? SettingsPageController {
                     c.zeroGraph()
-                } else {
-                    (controller as! DisplayViewController).zeroGraph()
+                } else if let c = controller as? DisplayViewController {
+                    c.zeroGraph()
                 }
             }
         }
