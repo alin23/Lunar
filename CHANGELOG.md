@@ -67,6 +67,11 @@
 ## Improvements
 
 - Show Quick Actions when changing brightness/contrast using hotkeys
+# 2.9.10
+## Improvements
+
+- Clamshell mode detection toggle in menu
+
 # 2.9.1
 ## Features
 - Quick Actions popover when hovering over the menu item
