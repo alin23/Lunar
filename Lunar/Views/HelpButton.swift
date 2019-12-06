@@ -49,24 +49,22 @@ pre, code {
 }
 """
 
-
 class HelpButton: NSButton {
     var link: String?
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!
 
     var parsedHelpText: NSAttributedString {
-        get {
-            let down = Down(markdownString: helpText)
+        let down = Down(markdownString: helpText)
 
-            do {
-                return try down.toAttributedString(.default, stylesheet: (helpPopover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET))
-            } catch {
-                log.error("Markdown error: \(error)")
-                return NSAttributedString(string: "")
-            }
+        do {
+            return try down.toAttributedString(.default, stylesheet: helpPopover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET)
+        } catch {
+            log.error("Markdown error: \(error)")
+            return NSAttributedString(string: "")
         }
     }
+
     @IBInspectable var helpText: String = ""
 
     var onMouseEnter: (() -> Void)?
@@ -96,7 +94,11 @@ class HelpButton: NSButton {
         if let c = helpPopover.contentViewController as? HelpPopoverController, !helpText.isEmpty {
             c.helpTextField?.attributedStringValue = parsedHelpText
             if let link = self.link {
-                c.onClick = { NSWorkspace.shared.open(URL(string: link)!) }
+                c.onClick = {
+                    if let url = URL(string: link) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
             }
             helpPopover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
             helpPopover.becomeFirstResponder()

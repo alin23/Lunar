@@ -27,8 +27,8 @@ class Geolocation: NSObject, NSCoding {
     var latitudeObserver: NSKeyValueObservation?
     var longitudeObserver: NSKeyValueObservation?
 
-    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("geolocation")
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
+    static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("geolocation")
 
     init(location: CLLocation) {
         latitude = location.coordinate.latitude
@@ -118,18 +118,22 @@ class Geolocation: NSObject, NSCoding {
     }
 
     func serialize() {
-        if NSKeyedArchiver.archiveRootObject(self, toFile: Geolocation.ArchiveURL.path) {
-            log.info("Saved geolocation data to \(Geolocation.ArchiveURL.path)")
-        } else {
-            log.error("Failed to save geolocation data to \(Geolocation.ArchiveURL.path)")
+        if let archiveURL = Geolocation.ArchiveURL {
+            if NSKeyedArchiver.archiveRootObject(self, toFile: archiveURL.path) {
+                log.info("Saved geolocation data to \(archiveURL.path)")
+            } else {
+                log.error("Failed to save geolocation data to \(archiveURL.path)")
+            }
         }
     }
 
     static func deserialize() -> Geolocation? {
-        let geolocation = NSKeyedUnarchiver.unarchiveObject(withFile: Geolocation.ArchiveURL.path) as? Geolocation
-        geolocation?.initObservers()
+        if let archiveURL = Geolocation.ArchiveURL {
+            let geolocation = NSKeyedUnarchiver.unarchiveObject(withFile: archiveURL.path) as? Geolocation
+            geolocation?.initObservers()
 
-        return geolocation
+            return geolocation
+        }
+        return nil
     }
 }
-
