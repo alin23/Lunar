@@ -414,6 +414,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
+        menuPopover.close()
         brightnessAdapter.manageClamshellMode()
         brightnessAdapter.resetDisplayList()
         brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()

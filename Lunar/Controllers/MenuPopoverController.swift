@@ -9,6 +9,15 @@
 import Cocoa
 
 let offColor = gray.withAlphaComponent(0.5).cgColor
+let disabledColor = gray.withAlphaComponent(0.25).cgColor
+
+func getOffColor(_ button: NSButton) -> CGColor {
+    if button.isEnabled {
+        return offColor
+    } else {
+        return disabledColor
+    }
+}
 
 func buttonBackgroundColor(mode: AdaptiveMode) -> NSColor {
     return buttonDotColor[mode]!.withAlphaComponent(0.9)
@@ -26,6 +35,18 @@ class ModeButtonResponder: NSResponder {
         initModeButton()
     }
 
+    func disable(tooltipMessage: String) {
+        button.isEnabled = false
+        button.toolTip = tooltipMessage
+        button.layer?.backgroundColor = disabledColor
+        button.state = .off
+    }
+
+    func enable() {
+        button.isEnabled = true
+        button.toolTip = nil
+    }
+
     func initModeButton() {
         let buttonSize = button.frame
         button.wantsLayer = true
@@ -35,13 +56,13 @@ class ModeButtonResponder: NSResponder {
             button.layer?.backgroundColor = buttonBackgroundColor(mode: mode).cgColor
         } else {
             button.state = .off
-            button.layer?.backgroundColor = offColor
+            button.layer?.backgroundColor = getOffColor(button)
         }
 
         let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: mauve.withAlphaComponent(0.7), range: NSMakeRange(0, activeTitle.length))
+        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.black.withAlphaComponent(0.8), range: NSMakeRange(0, activeTitle.length))
         let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: mauve.withAlphaComponent(0.5), range: NSMakeRange(0, inactiveTitle.length))
+        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.black.withAlphaComponent(0.8), range: NSMakeRange(0, inactiveTitle.length))
 
         button.attributedTitle = inactiveTitle
         button.attributedAlternateTitle = activeTitle
@@ -54,6 +75,10 @@ class ModeButtonResponder: NSResponder {
     }
 
     override func mouseEntered(with _: NSEvent) {
+        if !button.isEnabled {
+            return
+        }
+
         button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
         if button.state == .on {
@@ -64,12 +89,16 @@ class ModeButtonResponder: NSResponder {
     }
 
     override func mouseExited(with _: NSEvent) {
+        if !button.isEnabled {
+            return
+        }
+
         button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
 
         if button.state == .on {
             button.layer?.backgroundColor = buttonBackgroundColor(mode: mode).cgColor
         } else {
-            button.layer?.backgroundColor = offColor
+            button.layer?.backgroundColor = getOffColor(button)
         }
     }
 }
@@ -175,6 +204,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             syncModeButtonResponder = syncModeButtonResponder ?? ModeButtonResponder(button: syncModeButton, mode: .sync)
             locationModeButtonResponder = locationModeButtonResponder ?? ModeButtonResponder(button: locationModeButton, mode: .location)
             manualModeButtonResponder = manualModeButtonResponder ?? ModeButtonResponder(button: manualModeButton, mode: .manual)
+
+            if brightnessAdapter.clamshellMode {
+                syncModeButtonResponder?.disable(tooltipMessage: "Sync mode can't be activated in clamshell mode")
+            } else {
+                syncModeButtonResponder?.enable()
+            }
         }
     }
 
@@ -189,9 +224,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func grayAllButtons() {
         runInMainThread {
-            syncModeButton.layer?.backgroundColor = offColor
-            locationModeButton.layer?.backgroundColor = offColor
-            manualModeButton.layer?.backgroundColor = offColor
+            syncModeButton.layer?.backgroundColor = getOffColor(syncModeButton)
+            locationModeButton.layer?.backgroundColor = getOffColor(locationModeButton)
+            manualModeButton.layer?.backgroundColor = getOffColor(manualModeButton)
 
             syncModeButton.state = .off
             locationModeButton.state = .off
@@ -267,7 +302,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 brightnessAdapter.enable(mode: .manual)
             }
         case .off:
-            sender.layer?.backgroundColor = offColor
+            sender.layer?.backgroundColor = getOffColor(sender)
             if sender == manualModeButton {
                 brightnessAdapter.enable()
                 if brightnessAdapter.mode == .location {

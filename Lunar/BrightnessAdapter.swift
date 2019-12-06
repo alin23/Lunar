@@ -61,7 +61,14 @@ class BrightnessAdapter {
         displays.filter { $1.active }
     }
 
-    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
+    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync {
+        didSet {
+            if oldValue != .manual {
+                lastMode = oldValue
+            }
+        }
+    }
+
     var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
 
     var builtinBrightnessHistory: UInt64 = 0
@@ -120,8 +127,13 @@ class BrightnessAdapter {
             self.mode = newMode
             datastore.defaults.set(newMode.rawValue, forKey: "adaptiveBrightnessMode")
         } else {
-            self.mode = lastMode
-            datastore.defaults.set(lastMode.rawValue, forKey: "adaptiveBrightnessMode")
+            if IsLidClosed(), self.mode == .manual {
+                self.mode = .location
+            } else {
+                self.mode = lastMode
+            }
+
+            datastore.defaults.set(self.mode.rawValue, forKey: "adaptiveBrightnessMode")
         }
     }
 
