@@ -299,7 +299,7 @@ class DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        var edidData = [UInt8](repeating: 0, count: 128)
+        var edidData = [UInt8](repeating: 0, count: 256)
         var edid = EDID()
 
         let displayUUIDByEDIDCopy = displayUUIDByEDID
@@ -312,7 +312,7 @@ class DDC {
             }
         }
 
-        return (edid, Data(bytes: &edidData, count: 128))
+        return (edid, Data(bytes: &edidData, count: 256))
     }
 
     static func getEdid(displayID: CGDirectDisplayID) -> EDID? {
