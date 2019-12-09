@@ -10,6 +10,15 @@ import Foundation
 
 let log = Logger.self
 
+let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
+let TEST_DISPLAY_ID: CGDirectDisplayID = 2
+
+class BrightnessAdapter {
+    static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
+        return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1)
+    }
+}
+
 func sha256(data: Data) -> Data {
     var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
     data.withUnsafeBytes {
@@ -35,7 +44,7 @@ func getSerialNumberHash() -> String? {
     return sha256(data: serialNumberData).str(hex: true, separator: "")
 }
 
-print("Serial Number Hash: \(getSerialNumberHash())")
+print("Serial Number Hash: \(getSerialNumberHash() ?? "READ ERROR")")
 
 func printEdid(_ data: Data) {
     let edid = data.map { $0 }.str()
@@ -72,13 +81,13 @@ func printDetails(_ id: CGDirectDisplayID) {
     print("    Name: \(name ?? "UNKNOWN")")
     print("    Serial: \(serial ?? "UNKNOWN")\n")
 
-    print("    RedGain: \(DDC.getRedGain(for: id))\n")
-    print("    GreenGain: \(DDC.getGreenGain(for: id))\n")
-    print("    BlueGain: \(DDC.getBlueGain(for: id))\n")
-    print("    AudioSpeakerVolume: \(DDC.getAudioSpeakerVolume(for: id))\n")
-    print("    AudioMute: \(DDC.isAudioMuted(for: id))\n")
-    print("    Contrast: \(DDC.getContrast(for: id))\n")
-    print("    Brightness: \(DDC.getBrightness(for: id))\n")
+    print("    RedGain: \(DDC.getRedGain(for: id) ?? -1)\n")
+    print("    GreenGain: \(DDC.getGreenGain(for: id) ?? -1)\n")
+    print("    BlueGain: \(DDC.getBlueGain(for: id) ?? -1)\n")
+    print("    AudioSpeakerVolume: \(DDC.getAudioSpeakerVolume(for: id) ?? -1)\n")
+    print("    AudioMute: \(DDC.isAudioMuted(for: id) ?? false)\n")
+    print("    Contrast: \(DDC.getContrast(for: id) ?? -1)\n")
+    print("    Brightness: \(DDC.getBrightness(for: id) ?? -1)\n")
 
     print("    Display unique ID: \(idData)\n")
     print("    Display unit number: \(CGDisplayUnitNumber(id))\n")

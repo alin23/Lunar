@@ -238,12 +238,26 @@ struct EDID {
     } descriptors[4];
     UInt8 extensions : 8;
     UInt8 checksum : 8;
+
+    union extensiondata {
+        struct cea861 {
+            UInt8 type : 1;
+            UInt8 revision : 1;
+            UInt8 timingdescriptoraddress : 1;
+            UInt8 timingdescriptorcount: 1;
+            char timingdescriptordata[123];
+            UInt8 checksum: 1;
+        } cea861;
+        struct generic {
+            char data[128];
+        } generic;
+    } extensiondata;
 };
 
 bool logToFile(char* format, ...);
 bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand *write, CFMutableDictionaryRef displayUUIDByEDID);
 bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutableDictionaryRef displayUUIDByEDID);
-bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[128], CFMutableDictionaryRef displayUUIDByEDID);
+bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[256], CFMutableDictionaryRef displayUUIDByEDID);
 UInt32 SupportedTransactionType(void);
 void setDebugMode(UInt8);
 void setLogPath(const char*, ssize_t);
