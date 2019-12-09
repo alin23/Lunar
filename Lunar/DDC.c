@@ -11,7 +11,7 @@
 
 #define kMaxRequests 10
 
-const UInt8 ZEROARRAY[128] = { 0 };
+const UInt8 ZEROARRAY[256] = { 0 };
 
 void setDebugMode(UInt8 debug_mode)
 {
@@ -325,7 +325,7 @@ bool DisplayRequest(CGDirectDisplayID displayID, IOI2CRequest* request, CFMutabl
 bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand* write, CFMutableDictionaryRef displayUUIDByEDID)
 {
     IOI2CRequest request;
-    UInt8 data[128];
+    UInt8 data[256];
 
     bzero(&request, sizeof(request));
 
@@ -356,7 +356,7 @@ bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand* read, CFMutable
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
     bool result = false;
-    UInt8 data[128];
+    UInt8 data[256];
 
     for (int i = 1; i <= kMaxRequests; i++) {
         bzero(&request, sizeof(request));
@@ -526,7 +526,7 @@ UInt32 SupportedTransactionType()
     return supportedType;
 }
 
-bool EDIDTest(CGDirectDisplayID displayID, struct EDID* edid, uint8_t edidData[128], CFMutableDictionaryRef displayUUIDByEDID)
+bool EDIDTest(CGDirectDisplayID displayID, struct EDID* edid, uint8_t edidData[256], CFMutableDictionaryRef displayUUIDByEDID)
 {
     IOI2CRequest request = {};
     /*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
@@ -561,7 +561,7 @@ bool EDIDTest(CGDirectDisplayID displayID, struct EDID* edid, uint8_t edidData[1
  * @field __reservedD Set to zero.
  */
 
-    UInt8 data[128] = {};
+    UInt8 data[256] = {};
     request.sendAddress = 0xA0;
     request.sendTransactionType = kIOI2CSimpleTransactionType;
     request.sendBuffer = (vm_address_t)data;
@@ -574,13 +574,13 @@ bool EDIDTest(CGDirectDisplayID displayID, struct EDID* edid, uint8_t edidData[1
     if (!DisplayRequest(displayID, &request, displayUUIDByEDID))
         return false;
     if (edid) {
-        memcpy(edid, &data, 128);
-        memcpy(edidData, &data, 128);
+        memcpy(edid, &data, 256);
+        memcpy(edidData, &data, 256);
     }
     UInt32 i = 0;
     UInt8 sum = 0;
     while (i < request.replyBytes) {
-        if (i % 128 == 0) {
+        if (i % 256 == 0) {
             if (sum)
                 break;
             sum = 0;
