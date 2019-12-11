@@ -30,6 +30,17 @@ It doesn't interfere at all with the native adaptive brightness that macOS imple
 - VGA
 - Adapters that forward DDC messages properly
 
+## Troubleshooting
+1. If Lunar freezes your system, make sure you have the latest version installed
+    - Version 2.9.1 was trying to read the monitor brightness periodically through DDC and if the monitor didn't support that, the system freezed
+2. If you activated the *Read Monitor Brightness Periodically* and your system freezes when using Lunar
+    - Make sure Lunar is not running
+    - Open Terminal.app
+    - Run the following command `defaults write site.lunarapp.Lunar refreshBrightness 0`
+3. If you get system lag or occasional UI freeze, this might be caused by a slow DDC response from the monitor
+    - Make sure *Smooth Transition* is turned off in Lunar preferences
+    - If you are using *Sync* mode, set the *Polling Interval* to a bigger value like 5 seconds to avoid making DDC requests too often
+
 ## Caveats
 - Lunar *usually* doesn't work with monitors connected through USB hubs/docks/adapters **because a lot of them don't forward DDC messages properly**
 - Sync mode doesn't work when the Macbook lid is closed because the light sensor is completely covered
