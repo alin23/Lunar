@@ -37,6 +37,9 @@ It doesn't interfere at all with the native adaptive brightness that macOS imple
     - Make sure Lunar is not running
     - Open Terminal.app
     - Run the following command `defaults write site.lunarapp.Lunar refreshBrightness 0`
+    - If the above doesn't work, you can reset Lunar settings by deleting the following file:
+        - `~/Library/Preferences/site.lunarapp.Lunar.plist`
+    - If Lunar starts at login and freezes the computer before you can do anything, try doing the above in [Safe Mode](https://support.apple.com/en-us/HT201262)
 3. If you get system lag or occasional UI freeze, this might be caused by a slow DDC response from the monitor
     - Make sure *Smooth Transition* is turned off in Lunar preferences
     - If you are using *Sync* mode, set the *Polling Interval* to a bigger value like 5 seconds to avoid making DDC requests too often
