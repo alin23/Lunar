@@ -69,10 +69,12 @@ func printDetails(_ id: CGDirectDisplayID) {
     let sn = CGDisplaySerialNumber(id)
     let model = CGDisplayModelNumber(id)
     let vendor = CGDisplayVendorNumber(id)
+    let metalDevice = CGDirectDisplayCopyCurrentMetalDevice(id)
 
     print("    S/N: \(sn)")
     print("    Model Number: \(model))")
     print("    Vendor: \(vendor)\n")
+    print("    GPU: \(metalDevice?.name ?? "")\n")
 
     let idData = DDC.getDisplayIdentificationData(displayID: id)
     let name = DDC.getDisplayName(for: id)
