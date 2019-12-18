@@ -351,7 +351,7 @@ bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand* write, CFMuta
     return result;
 }
 
-bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand* read, CFMutableDictionaryRef displayUUIDByEDID)
+bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand* read, CFMutableDictionaryRef displayUUIDByEDID, long ddcMinReplyDelay)
 {
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
@@ -366,7 +366,7 @@ bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand* read, CFMutable
         request.sendTransactionType = kIOI2CSimpleTransactionType;
         request.sendBuffer = (vm_address_t)&data[0];
         request.sendBytes = 5;
-        request.minReplyDelay = 30 * kMillisecondScale;
+        request.minReplyDelay = ddcMinReplyDelay * kNanosecondScale;
 
         data[0] = 0x51;
         data[1] = 0x82;
