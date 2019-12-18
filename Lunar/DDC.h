@@ -256,7 +256,7 @@ struct EDID {
 
 bool logToFile(char* format, ...);
 bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand *write, CFMutableDictionaryRef displayUUIDByEDID);
-bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutableDictionaryRef displayUUIDByEDID);
+bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutableDictionaryRef displayUUIDByEDID, long ddcMinReplyDelay);
 bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[256], CFMutableDictionaryRef displayUUIDByEDID);
 UInt32 SupportedTransactionType(void);
 void setDebugMode(UInt8);

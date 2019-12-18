@@ -16,6 +16,10 @@ let MAX_WRITE_DURATION_MS = 2000
 let MAX_READ_FAULTS = 10
 let MAX_WRITE_FAULTS = 20
 
+let DDC_MIN_REPLY_DELAY_AMD = 30_000_000
+let DDC_MIN_REPLY_DELAY_INTEL = 1
+let DDC_MIN_REPLY_DELAY_NVIDIA = 1
+
 struct DDCReadResult {
     var controlID: ControlID
     var maxValue: UInt8
@@ -256,8 +260,18 @@ class DDC {
         let displayUUIDByEDIDCopy = displayUUIDByEDID
         let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
 
+        let metalDevice = CGDirectDisplayCopyCurrentMetalDevice(displayID)
+        var ddcDelay = DDC_MIN_REPLY_DELAY_INTEL
+        if let gpu = metalDevice {
+            if gpu.name.lowercased().contains("amd") {
+                ddcDelay = DDC_MIN_REPLY_DELAY_AMD
+            } else if gpu.name.lowercased().contains("nvidia") {
+                ddcDelay = DDC_MIN_REPLY_DELAY_NVIDIA
+            }
+        }
+
         let readStartedAt = DispatchTime.now()
-        DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
+        DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary, ddcDelay)
         let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
         if readMs > MAX_READ_DURATION_MS {
             log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
