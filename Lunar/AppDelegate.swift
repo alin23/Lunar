@@ -891,13 +891,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 guard let url = response.value, !url.isEmpty,
-                    let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                    let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
+                    let serialNumberHash = getSerialNumberHash(),
+                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
                     log.error("Debug data upload response empty")
                     self.failDebugData()
                     return
                 }
                 log.info("Uploaded logs to \(url)")
-                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D") {
+                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D") {
                     NSWorkspace.shared.open(url)
                 }
             })
