@@ -786,7 +786,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        if let url = URL(string: "mailto:alin.panaitiu@gmail.com?Subject=Let%27s%20talk%20about%20Lunar%21") {
+        if let url = URL(string: "https://alinpanaitiu.com/contact/") {
             NSWorkspace.shared.open(url)
         }
     }
