@@ -36,7 +36,7 @@ It doesn't interfere at all with the native adaptive brightness that macOS imple
 2. If you activated the *Read Monitor Brightness Periodically* and your system freezes when using Lunar
     - Make sure Lunar is not running
     - Open Terminal.app
-    - Run the following command `defaults write site.lunarapp.Lunar refreshBrightness 0`
+    - Run the following command `defaults write site.lunarapp.Lunar refreshValues 0`
     - If the above doesn't work, you can reset Lunar settings by deleting the following file:
         - `~/Library/Preferences/site.lunarapp.Lunar.plist`
     - If Lunar starts at login and freezes the computer before you can do anything, try doing the above in [Safe Mode](https://support.apple.com/en-us/HT201262)
