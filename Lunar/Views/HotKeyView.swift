@@ -29,8 +29,10 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     var hotkeyEnabled: Bool {
-        if let hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
-            return (hotkeys[identifier]?[.enabled] ?? 0) == 1
+        if let hotkeys = datastore.hotkeys(),
+            let identifier = HotkeyIdentifier(rawValue: hotkey.identifier),
+            let hotkey = (hotkeys[identifier] ?? Hotkey.defaults[identifier]) {
+            return (hotkey[.enabled] ?? 0) == 1
         }
         return false
     }
@@ -48,7 +50,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewDidClearShortcut(_: RecordView) {
         hotkey.unregister()
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
+        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
             hotkeys[identifier]?[.enabled] = 0
             datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
         }
@@ -60,7 +62,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
         hotkey.unregister()
         hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
         hotkey.register()
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: self.hotkey.identifier) {
+        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
             Hotkey.keys[identifier] = hotkey
             hotkeys[identifier]?[.enabled] = 1
             hotkeys[identifier]?[.modifiers] = keyCombo.modifiers

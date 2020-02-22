@@ -22,6 +22,8 @@ class HotkeyViewController: NSViewController {
     @IBOutlet var brightnessDownHotkeyView: HotkeyView!
     @IBOutlet var contrastUpHotkeyView: HotkeyView!
     @IBOutlet var contrastDownHotkeyView: HotkeyView!
+    @IBOutlet var volumeDownHotkeyView: HotkeyView!
+    @IBOutlet var volumeUpHotkeyView: HotkeyView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +42,8 @@ class HotkeyViewController: NSViewController {
         brightnessDownHotkeyView.hotkey = Hotkey.keys[.brightnessDown] ?? nil
         contrastUpHotkeyView.hotkey = Hotkey.keys[.contrastUp] ?? nil
         contrastDownHotkeyView.hotkey = Hotkey.keys[.contrastDown] ?? nil
+        volumeUpHotkeyView.hotkey = Hotkey.keys[.volumeUp] ?? nil
+        volumeDownHotkeyView.hotkey = Hotkey.keys[.volumeDown] ?? nil
     }
 
     override func mouseDown(with event: NSEvent) {

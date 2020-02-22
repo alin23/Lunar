@@ -35,7 +35,7 @@ carthage-extract: $(PREBUILT_FRAMEWORK_FILES)
 carthage-patch: $(PATCH_FILES)
 carthage-replace:
 	sd 'SWIFT_VERSION = [0-4].[0-9]' 'SWIFT_VERSION = 5.0' $$(rg -l 'SWIFT_VERSION = ' Carthage/Checkouts/)
-	sd 'MACOSX_DEPLOYMENT_TARGET = 10.1[2-5]' 'MACOSX_DEPLOYMENT_TARGET = 10.11' $$(rg -l 'MACOSX_DEPLOYMENT_TARGET = 10.1' Carthage/Checkouts/)
+	sd 'MACOSX_DEPLOYMENT_TARGET = 10.1[3-5]' 'MACOSX_DEPLOYMENT_TARGET = 10.12' $$(rg -l 'MACOSX_DEPLOYMENT_TARGET = 10.1' Carthage/Checkouts/)
 	sd 'kCAFillModeForwards' 'CAMediaTimingFillMode.forwards' $$(rg -l 'kCAFillModeForwards' Carthage/Checkouts/)
 
 carthage-clean:

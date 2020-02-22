@@ -11,6 +11,8 @@ import Sentry
 import Surge
 import SwiftDate
 
+let MIN_VOLUME: UInt8 = 0
+let MAX_VOLUME: UInt8 = 100
 let MIN_BRIGHTNESS: UInt8 = 0
 let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
@@ -31,6 +33,7 @@ let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
+let LED_CINEMA_NAME = "LED Cinema"
 
 enum ValueType {
     case brightness
@@ -119,6 +122,20 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var volume: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "volume", newValue: volume, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var audioMuted: Bool {
+        didSet {
+            save()
+            runBoolObservers(property: "audioMuted", newValue: audioMuted, oldValue: oldValue)
+        }
+    }
+
     @objc dynamic var active: Bool = false {
         didSet {
             save()
@@ -131,6 +148,7 @@ enum ValueType {
         "lockedBrightness": [:],
         "lockedContrast": [:],
         "active": [:],
+        "audioMuted": [:],
     ]
     var numberObservers: [String: [String: (NSNumber, NSNumber) -> Void]] = [
         "minBrightness": [:],
@@ -139,6 +157,7 @@ enum ValueType {
         "maxContrast": [:],
         "brightness": [:],
         "contrast": [:],
+        "volume": [:],
     ]
     var datastoreObservers: [NSKeyValueObservation] = []
     var onReadapt: (() -> Void)?
@@ -161,7 +180,9 @@ enum ValueType {
             maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
             adaptive: (config["adaptive"] as? Bool) ?? true,
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
-            lockedContrast: (config["lockedContrast"] as? Bool) ?? false
+            lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
+            volume: (config["contrast"] as? UInt8) ?? 10,
+            audioMuted: (config["audioMuted"] as? Bool) ?? false
         )
     }
 
@@ -224,6 +245,8 @@ enum ValueType {
             "maxBrightness": maxBrightness.uint8Value,
             "contrast": contrast.uint8Value,
             "brightness": brightness.uint8Value,
+            "volume": volume.uint8Value,
+            "audioMuted": audioMuted,
             "active": active,
         ]
     }
@@ -249,8 +272,12 @@ enum ValueType {
         return name.contains(THUNDERBOLT_NAME)
     }
 
+    func isLEDCinema() -> Bool {
+        return name.contains(LED_CINEMA_NAME)
+    }
+
     func isAppleDisplay() -> Bool {
-        return isUltraFine() || isThunderbolt()
+        return isUltraFine() || isThunderbolt() || isLEDCinema()
     }
 
     init(
@@ -266,16 +293,20 @@ enum ValueType {
         maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
         adaptive: Bool = true,
         lockedBrightness: Bool = false,
-        lockedContrast: Bool = false
+        lockedContrast: Bool = false,
+        volume: UInt8 = 10,
+        audioMuted: Bool = false
     ) {
         self.id = id
         self.active = active
         self.adaptive = adaptive
         self.lockedBrightness = lockedBrightness
         self.lockedContrast = lockedContrast
+        self.audioMuted = audioMuted
 
         self.brightness = NSNumber(value: brightness)
         self.contrast = NSNumber(value: contrast)
+        self.volume = NSNumber(value: volume)
         self.minBrightness = NSNumber(value: minBrightness)
         self.maxBrightness = NSNumber(value: maxBrightness)
         self.minContrast = NSNumber(value: minContrast)
@@ -293,6 +324,7 @@ enum ValueType {
             fgQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
+                self.refreshVolume()
             }
         }
     }
@@ -417,6 +449,16 @@ enum ValueType {
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
+        numberObservers["volume"]!["self.volume"] = { newVolume, _ in
+            if !DDC.setAudioSpeakerVolume(for: self.id, audioSpeakerVolume: newVolume.uint8Value) {
+                log.warning("Error writing volume using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+            }
+        }
+        boolObservers["audioMuted"]!["self.audioMuted"] = { newAudioMuted, _ in
+            if !DDC.setAudioMuted(for: self.id, audioMuted: newAudioMuted) {
+                log.warning("Error writing muted audio using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+            }
+        }
         numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in
             let appleDisplay = self.isAppleDisplay()
             let id = self.id
@@ -476,7 +518,7 @@ enum ValueType {
                     extraData["contrast"] = contrast
                     Client.shared?.extra?["\(id)"] = extraData
                 }
-                if datastore.defaults.smoothTransition || self.isAppleDisplay() {
+                if datastore.defaults.smoothTransition {
                     var faults = 0
                     self.smoothTransition(from: oldValue.uint8Value, to: contrast) { newValue in
                         if faults > 5 {
@@ -499,8 +541,19 @@ enum ValueType {
         }
     }
 
+    func readAudioMuted() -> Bool? {
+        return DDC.isAudioMuted(for: id)
+    }
+
+    func readVolume() -> UInt8? {
+        if let c = DDC.getAudioSpeakerVolume(for: id) {
+            return UInt8(c)
+        }
+        return nil
+    }
+
     func readContrast() -> UInt8? {
-        if let c = DDC.getContrast(for: self.id) {
+        if let c = DDC.getContrast(for: id) {
             return UInt8(c)
         }
         return nil
@@ -508,7 +561,7 @@ enum ValueType {
 
     func readBrightness() -> UInt8? {
         if !isAppleDisplay() {
-            if let b = DDC.getBrightness(for: self.id) {
+            if let b = DDC.getBrightness(for: id) {
                 return UInt8(b)
             }
         } else {
@@ -520,7 +573,7 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        if !datastore.defaults.refreshBrightness, !isAppleDisplay() {
+        if !datastore.defaults.refreshValues, !isAppleDisplay() {
             return
         }
 
@@ -531,17 +584,14 @@ enum ValueType {
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
-            let oldSmoothTransitionState = datastore.defaults.smoothTransition
-            datastore.defaults.set(false, forKey: "smoothTransition")
-
-            brightness = NSNumber(value: newBrightness)
-
-            datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+            withoutSmoothTransition {
+                brightness = NSNumber(value: newBrightness)
+            }
         }
     }
 
     func refreshContrast() {
-        if !datastore.defaults.refreshBrightness {
+        if !datastore.defaults.refreshValues {
             return
         }
 
@@ -552,13 +602,44 @@ enum ValueType {
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
-            let oldSmoothTransitionState = datastore.defaults.smoothTransition
-            datastore.defaults.set(false, forKey: "smoothTransition")
-
-            contrast = NSNumber(value: newContrast)
-
-            datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+            withoutSmoothTransition {
+                contrast = NSNumber(value: newContrast)
+            }
         }
+    }
+
+    func refreshVolume() {
+        if !datastore.defaults.refreshValues {
+            return
+        }
+
+        guard let newVolume = readVolume(), let newAudioMuted = readAudioMuted() else {
+            log.warning("Can't read volume for \(name)")
+            return
+        }
+
+        if newAudioMuted != audioMuted {
+            log.info("Refreshing mute value: \(audioMuted) <> \(newAudioMuted)")
+            audioMuted = newAudioMuted
+        }
+        if newVolume != volume.uint8Value {
+            log.info("Refreshing volume: \(volume.uint8Value) <> \(newVolume)")
+
+            withoutSmoothTransition {
+                volume = NSNumber(value: newVolume)
+            }
+        }
+    }
+
+    func withoutSmoothTransition(_ block: () -> Void) {
+        if !datastore.defaults.smoothTransition {
+            block()
+            return
+        }
+
+        datastore.defaults.set(false, forKey: "smoothTransition")
+        block()
+        datastore.defaults.set(true, forKey: "smoothTransition")
     }
 
     func removeObservers() {
