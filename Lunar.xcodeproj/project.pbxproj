@@ -85,6 +85,14 @@
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
+		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
+		C7B9E48424018AA500A48347 /* OSD.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7B9E4892401C35800A48347 /* AMCoreAudio.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */; };
+		C7B9E48C2401C35800A48347 /* MediaKeyTap.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */; };
+		C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4872401C35800A48347 /* AMCoreAudio.framework */; };
+		C7B9E48E2401C39F00A48347 /* AMCoreAudio.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4872401C35800A48347 /* AMCoreAudio.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; };
+		C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
 		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
@@ -147,10 +155,13 @@
 				C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */,
 				C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */,
 				C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */,
+				C7B9E48E2401C39F00A48347 /* AMCoreAudio.framework in Embed Frameworks */,
 				C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */,
 				C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */,
 				C78B9221237ECDDA0060DC7C /* Sentry.framework in Embed Frameworks */,
+				C7B9E48424018AA500A48347 /* OSD.framework in Embed Frameworks */,
 				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
+				C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +299,11 @@
 		C7AEC7FF1FD0B4350039B562 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OSD.framework; sourceTree = "<group>"; };
+		C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = AMCoreAudio.framework.dSYM; sourceTree = "<group>"; };
+		C7B9E4862401C35800A48347 /* MediaKeyTap.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MediaKeyTap.framework; sourceTree = "<group>"; };
+		C7B9E4872401C35800A48347 /* AMCoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMCoreAudio.framework; sourceTree = "<group>"; };
+		C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = MediaKeyTap.framework.dSYM; sourceTree = "<group>"; };
 		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
@@ -323,6 +339,7 @@
 			files = (
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */,
+				C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */,
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
 				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
@@ -334,10 +351,12 @@
 				C75083442222865F0020270E /* Alamofire.framework in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C78B9220237ECDDA0060DC7C /* Sentry.framework in Frameworks */,
+				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
 				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
+				C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,26 +517,31 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7B9E47F2401767E00A48347 /* OSD.framework */,
 				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
-				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
-				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
-				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
 				C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */,
 				C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */,
 				C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */,
 				C79224172360BA030037B559 /* Sparkle.framework */,
 				C731261522B3DF1E001ED199 /* Down.framework.dSYM */,
+				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
 				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
 				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
 				C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */,
 				C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */,
+				C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */,
+				C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */,
 				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
 				C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */,
 				C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */,
 				C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */,
+				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
 				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
 				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
 				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
+				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
+				C7B9E4862401C35800A48347 /* MediaKeyTap.framework */,
+				C7B9E4872401C35800A48347 /* AMCoreAudio.framework */,
 				C731261222B3DF0A001ED199 /* Down.framework */,
 				C75083362222865D0020270E /* Alamofire.framework */,
 				C75083352222865D0020270E /* Charts.framework */,
@@ -667,8 +691,10 @@
 			files = (
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+				C7B9E4892401C35800A48347 /* AMCoreAudio.framework.dSYM in Resources */,
 				C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
+				C7B9E48C2401C35800A48347 /* MediaKeyTap.framework.dSYM in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -960,7 +986,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 2.9.11;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
@@ -969,6 +995,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Debug;
 		};
@@ -1003,7 +1033,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 2.9.11;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
@@ -1012,6 +1042,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Release;
 		};
@@ -1034,7 +1068,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1064,7 +1098,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp --deep";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
