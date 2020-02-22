@@ -217,6 +217,10 @@ class BrightnessAdapter {
                     client.tags?["thunderbolt"] = "true"
                     continue
                 }
+                if display.isLEDCinema() {
+                    client.tags?["ledcinema"] = "true"
+                    continue
+                }
             }
         }
     }
@@ -272,7 +276,7 @@ class BrightnessAdapter {
         var date = now.date
         date += TimeInterval(Region.local.timeZone.secondsFromGMT())
         log.debug("Getting moments for \(date)")
-        if let solar = Solar(for: date, coordinate: self.geolocation.coordinate) {
+        if let solar = Solar(for: date, coordinate: geolocation.coordinate) {
             moment = Moment(solar)
             log.debug("Computed moment from Solar")
             return
@@ -286,7 +290,7 @@ class BrightnessAdapter {
             log.debug("Computed moment is not today, not storing it")
         }
 
-        Alamofire.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { response in
+        AF.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { response in
             switch response.result {
             case let .success(value):
                 let json = JSON(value)
@@ -307,7 +311,7 @@ class BrightnessAdapter {
             return
         }
 
-        Alamofire.request("http://api.ipstack.com/check?access_key=4ce42ebf00e768aad70140eab4a95c75").validate().responseJSON { response in
+        AF.request("http://api.ipstack.com/check?access_key=4ce42ebf00e768aad70140eab4a95c75").validate().responseJSON { response in
             switch response.result {
             case let .success(value):
                 let json = JSON(value)
@@ -341,10 +345,11 @@ class BrightnessAdapter {
         })
     }
 
-    func fetchBrightness(for displays: [Display]? = nil) {
+    func fetchValues(for displays: [Display]? = nil) {
         for display in displays ?? activeDisplays.values.map({ $0 }) {
             display.refreshBrightness()
             display.refreshContrast()
+            display.refreshVolume()
         }
     }
 
@@ -520,30 +525,53 @@ class BrightnessAdapter {
         }
     }
 
-    func adjustBrightness(by offset: Int, for displays: [Display]? = nil) {
-        if let displays = displays {
-            displays.forEach { display in
-                let value = cap(display.brightness.intValue + offset, minVal: datastore.defaults.brightnessLimitMin, maxVal: datastore.defaults.brightnessLimitMax)
-                display.brightness = NSNumber(value: value)
-            }
-        } else {
-            activeDisplays.values.forEach { display in
-                let value = cap(display.brightness.intValue + offset, minVal: datastore.defaults.brightnessLimitMin, maxVal: datastore.defaults.brightnessLimitMax)
-                display.brightness = NSNumber(value: value)
-            }
+    func toggleAudioMuted(for displays: [Display]? = nil, currentDisplay: Bool = false) {
+        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            display.audioMuted = !display.audioMuted
         }
     }
 
-    func adjustContrast(by offset: Int, for displays: [Display]? = nil) {
-        if let displays = displays {
+    func adjustVolume(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            let value = cap(display.volume.uint8Value + UInt8(offset), minVal: MIN_VOLUME, maxVal: MAX_VOLUME)
+            display.volume = NSNumber(value: value)
+        }
+    }
+
+    func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            let value = cap(display.brightness.intValue + offset, minVal: datastore.defaults.brightnessLimitMin, maxVal: datastore.defaults.brightnessLimitMax)
+            display.brightness = NSNumber(value: value)
+        }
+    }
+
+    func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            let value = cap(display.contrast.intValue + offset, minVal: datastore.defaults.contrastLimitMin, maxVal: datastore.defaults.contrastLimitMax)
+            display.contrast = NSNumber(value: value)
+        }
+    }
+
+    func adjustValue(for displays: [Display]? = nil, currentDisplay: Bool = false, _ setValue: (Display) -> Void) {
+        if currentDisplay {
+            let displays = displays ?? activeDisplays.values.map { $0 }
+            if displays.count == 1 {
+                setValue(displays[0])
+            } else {
+                for display in displays {
+                    if CGDisplayIsMain(display.id) == 1 {
+                        setValue(display)
+                        break
+                    }
+                }
+            }
+        } else if let displays = displays {
             displays.forEach { display in
-                let value = cap(display.contrast.intValue + offset, minVal: datastore.defaults.contrastLimitMin, maxVal: datastore.defaults.contrastLimitMax)
-                display.contrast = NSNumber(value: value)
+                setValue(display)
             }
         } else {
             activeDisplays.values.forEach { display in
-                let value = cap(display.contrast.intValue + offset, minVal: datastore.defaults.contrastLimitMin, maxVal: datastore.defaults.contrastLimitMax)
-                display.contrast = NSNumber(value: value)
+                setValue(display)
             }
         }
     }
