@@ -20,7 +20,7 @@ import WAYWindow
 extension Collection where Index: Comparable {
     subscript(back i: Int) -> Iterator.Element {
         let backBy = i + 1
-        return self[self.index(self.endIndex, offsetBy: -backBy)]
+        return self[index(endIndex, offsetBy: -backBy)]
     }
 }
 
@@ -107,11 +107,12 @@ extension String {
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
-    var brightnessReaderActivity: NSBackgroundActivityScheduler!
+    var valuesReaderActivity: NSBackgroundActivityScheduler!
     var locationActivity: NSBackgroundActivityScheduler!
     var syncQueue: OperationQueue!
     var syncActivity: NSObjectProtocol!
 
+    var mediaKeysEnabledObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var curveFactorObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
@@ -126,10 +127,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
-    var alamoFireManager: SessionManager?
-    let brightnessRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
+    var alamoFireManager: Session?
+    let valuesRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
         fgQueue.async {
-            brightnessAdapter.fetchBrightness()
+            brightnessAdapter.fetchValues()
         }
         completion(NSBackgroundActivityScheduler.Result.finished)
     }
@@ -161,7 +162,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func initHotkeys() {
         guard let hotkeyConfig: [HotkeyIdentifier: [HotkeyPart: Int]] = datastore.hotkeys() else { return }
         for identifier in HotkeyIdentifier.allCases {
-            guard let hotkey = hotkeyConfig[identifier], let keyCode = hotkey[.keyCode], let enabled = hotkey[.enabled], let modifiers = hotkey[.modifiers] else { return }
+            guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier], let keyCode = hotkey[.keyCode], let enabled = hotkey[.enabled], let modifiers = hotkey[.modifiers] else { return }
             if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
                 Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
                 if enabled == 1 {
@@ -170,6 +171,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
         setKeyEquivalents(hotkeyConfig)
+        if datastore.defaults.mediaKeysEnabled {
+            startOrRestartMediaKeyTap()
+        }
     }
 
     func listenForAdaptiveModeChange() {
@@ -227,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
 
-        if let wc = self.windowController {
+        if let wc = windowController {
             wc.showWindow(nil)
             if let window = wc.window {
                 window.orderFrontRegardless()
@@ -320,17 +324,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initBrightnessAdapterActivity() {
-        brightnessReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshBrightness")
-        brightnessReaderActivity.repeats = true
-        brightnessReaderActivity.qualityOfService = .userInitiated
-        brightnessReaderActivity.interval = 4
-        brightnessReaderActivity.tolerance = 2
+        valuesReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshValues")
+        valuesReaderActivity.repeats = true
+        valuesReaderActivity.qualityOfService = .userInitiated
+        valuesReaderActivity.interval = 4
+        valuesReaderActivity.tolerance = 2
 
         fgQueue.async {
-            brightnessAdapter.fetchBrightness()
+            brightnessAdapter.fetchValues()
         }
 
-        brightnessReaderActivity.schedule(brightnessRefresher)
+        valuesReaderActivity.schedule(valuesRefresher)
 
         locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
         locationActivity.repeats = true
@@ -475,6 +479,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
         })
+        mediaKeysEnabledObserver = datastore.defaults.observe(\.mediaKeysEnabled, changeHandler: { _, change in
+            guard let enabled = change.newValue, let oldEnabled = change.oldValue, enabled != oldEnabled else {
+                return
+            }
+
+            if enabled {
+                mediaKeyTap?.stop()
+            } else {
+                self.startOrRestartMediaKeyTap()
+            }
+        })
     }
 
     func setKeyEquivalents(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
@@ -513,14 +528,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
 
-        Alamofire.upload(data, to: "https://patchbay.pub/count-lunar-unique-users-anonymously")
+        _ = AF.upload(data, to: "https://patchbay.pub/count-lunar-unique-users-anonymously")
     }
 
     func configureAlamofire() {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 24.hours.timeInterval
         configuration.timeoutIntervalForResource = 7.days.timeInterval
-        alamoFireManager = Alamofire.SessionManager(configuration: configuration)
+        alamoFireManager = Session(configuration: configuration)
     }
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -584,7 +599,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         datastore.defaults.set(false, forKey: "debug")
 
         locationActivity.invalidate()
-        brightnessReaderActivity.invalidate()
+        valuesReaderActivity.invalidate()
     }
 
     func geolocationFallback() {
@@ -681,6 +696,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.setBrightnessPercent(value: percent)
         brightnessAdapter.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
+    }
+
+    func toggleAudioMuted() {
+        brightnessAdapter.toggleAudioMuted(currentDisplay: true)
+    }
+
+    func increaseVolume(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.volumeStep
+        brightnessAdapter.adjustVolume(by: amount, currentDisplay: true)
+    }
+
+    func decreaseVolume(by amount: Int? = nil) {
+        let amount = amount ?? datastore.defaults.volumeStep
+        brightnessAdapter.adjustVolume(by: -amount, currentDisplay: true)
     }
 
     func increaseBrightness(by amount: Int? = nil) {
@@ -876,7 +905,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             let debugData = data
 
-            Alamofire.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
+            _ = AF.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
                 response in
                 defer {
                     self.menu.autoenablesItems = true

@@ -13,6 +13,7 @@ let APP_SETTINGS = [
     "brightnessLimitMax",
     "brightnessLimitMin",
     "brightnessOffset",
+    "volumeStep",
     "brightnessStep",
     "contrastLimitMax",
     "contrastLimitMin",
@@ -29,7 +30,7 @@ let APP_SETTINGS = [
     "hotkeys",
     "manualLocation",
     "noonDurationMinutes",
-    "refreshBrightness",
+    "refreshValues",
     "showNavigationHints",
     "showQuickActions",
     "smoothTransition",
@@ -39,6 +40,7 @@ let APP_SETTINGS = [
     "sunset",
     "syncPollingSeconds",
     "clamshellModeDetection",
+    "mediaKeysEnabled",
 ]
 
 extension UserDefaults {
@@ -72,6 +74,10 @@ extension UserDefaults {
 
     @objc dynamic var locationLon: Double {
         return double(forKey: "locationLon")
+    }
+
+    @objc dynamic var mediaKeysEnabled: Bool {
+        return bool(forKey: "mediaKeysEnabled")
     }
 
     @objc dynamic var manualLocation: Bool {
@@ -110,8 +116,8 @@ extension UserDefaults {
         return bool(forKey: "smoothTransition")
     }
 
-    @objc dynamic var refreshBrightness: Bool {
-        return bool(forKey: "refreshBrightness")
+    @objc dynamic var refreshValues: Bool {
+        return bool(forKey: "refreshValues")
     }
 
     @objc dynamic var debug: Bool {
@@ -128,6 +134,10 @@ extension UserDefaults {
 
     @objc dynamic var adaptiveBrightnessMode: Int {
         return integer(forKey: "adaptiveBrightnessMode")
+    }
+
+    @objc dynamic var volumeStep: Int {
+        return integer(forKey: "volumeStep")
     }
 
     @objc dynamic var brightnessStep: Int {
@@ -358,12 +368,13 @@ class DataStore: NSObject {
         }
 
         DataStore.setDefault(0.5, for: "curveFactor")
+        DataStore.setDefault(true, for: "mediaKeysEnabled")
         DataStore.setDefault(false, for: "didScrollTextField")
         DataStore.setDefault(false, for: "didSwipeToHotkeys")
         DataStore.setDefault(false, for: "didSwipeLeft")
         DataStore.setDefault(false, for: "didSwipeRight")
         DataStore.setDefault(false, for: "smoothTransition")
-        DataStore.setDefault(false, for: "refreshBrightness")
+        DataStore.setDefault(DataStore.defaults.bool(forKey: "refreshBrightness"), for: "refreshValues")
         DataStore.setDefault(false, for: "debug")
         DataStore.setDefault(true, for: "showQuickActions")
         DataStore.setDefault(false, for: "manualLocation")
@@ -380,6 +391,7 @@ class DataStore: NSObject {
         DataStore.setDefault(70, for: "contrastLimitMax")
         DataStore.setDefault(3, for: "brightnessStep")
         DataStore.setDefault(3, for: "contrastStep")
+        DataStore.setDefault(3, for: "volumeStep")
         DataStore.setDefault(2, for: "syncPollingSeconds")
         DataStore.setDefault(AdaptiveMode.sync.rawValue, for: "adaptiveBrightnessMode")
         DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")

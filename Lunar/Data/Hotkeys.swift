@@ -6,8 +6,12 @@
 //  Copyright © 2019 Alin. All rights reserved.
 //
 
+import AMCoreAudio
 import Carbon.HIToolbox
 import Magnet
+import MediaKeyTap
+
+var mediaKeyTap: MediaKeyTap?
 
 enum HotkeyIdentifier: String, CaseIterable {
     case toggle,
@@ -26,11 +30,21 @@ enum HotkeyIdentifier: String, CaseIterable {
         brightnessUp,
         brightnessDown,
         contrastUp,
-        contrastDown
+        contrastDown,
+        muteAudio,
+        volumeUp,
+        volumeDown
 }
 
 enum HotkeyPart: String, CaseIterable {
     case modifiers, keyCode, enabled
+}
+
+enum OSDImage: Int64 {
+    case brightness = 1
+    case contrast = 11
+    case volume = 3
+    case muted = 4
 }
 
 class Hotkey {
@@ -144,6 +158,21 @@ class Hotkey {
             .keyCode: kVK_F1,
             .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift]),
         ],
+        .muteAudio: [
+            .enabled: 1,
+            .keyCode: kVK_F10,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+        ],
+        .volumeUp: [
+            .enabled: 1,
+            .keyCode: kVK_F12,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+        ],
+        .volumeDown: [
+            .enabled: 1,
+            .keyCode: kVK_F11,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+        ],
     ]
 
     static var defaultHotkeys: NSDictionary = Hotkey.toNSDictionary(Hotkey.defaults)
@@ -213,6 +242,12 @@ class Hotkey {
             return #selector(AppDelegate.contrastUpHotkeyHandler)
         case .contrastDown:
             return #selector(AppDelegate.contrastDownHotkeyHandler)
+        case .muteAudio:
+            return #selector(AppDelegate.muteAudioHotkeyHandler)
+        case .volumeUp:
+            return #selector(AppDelegate.volumeUpHotkeyHandler)
+        case .volumeDown:
+            return #selector(AppDelegate.volumeDownHotkeyHandler)
         }
     }
 
@@ -233,9 +268,65 @@ class Hotkey {
             menuItem.keyEquivalent = ""
         }
     }
+
+    static func showOsd(osdImage: OSDImage, value: UInt32, displayID: CGDirectDisplayID) {
+        guard let manager = OSDManager.sharedManager() as? OSDManager else {
+            log.warning("No OSDManager available")
+            return
+        }
+
+        manager.showImage(
+            osdImage.rawValue,
+            onDisplayID: displayID,
+            priority: 0x1F4,
+            msecUntilFade: 2000,
+            filledChiclets: value,
+            totalChiclets: 100,
+            locked: false
+        )
+    }
 }
 
-extension AppDelegate {
+extension AppDelegate: MediaKeyTapDelegate {
+    func startOrRestartMediaKeyTap() {
+        var keys: [MediaKey]
+
+        keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
+        if let audioDevice = AudioDevice.defaultOutputDevice(), audioDevice.canSetVirtualMasterVolume(direction: .playback) {
+            let keysToDelete: [MediaKey] = [.volumeUp, .volumeDown, .mute]
+            keys.removeAll { keysToDelete.contains($0) }
+        }
+
+        mediaKeyTap?.stop()
+        mediaKeyTap = MediaKeyTap(delegate: self, for: keys, observeBuiltIn: false)
+        mediaKeyTap?.start()
+    }
+
+    func handle(mediaKey: MediaKey, event _: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?) {
+        switch mediaKey {
+        case .brightnessUp:
+            if flags?.contains(.control) ?? false {
+                increaseContrast()
+            } else {
+                increaseBrightness()
+            }
+        case .brightnessDown:
+            if flags?.contains(.control) ?? false {
+                decreaseContrast()
+            } else {
+                decreaseBrightness()
+            }
+        case .volumeUp:
+            increaseVolume()
+        case .volumeDown:
+            decreaseVolume()
+        case .mute:
+            toggleAudioMuted()
+        default:
+            log.info("Media key pressed")
+        }
+    }
+
     @objc func toggleHotkeyHandler() {
         brightnessAdapter.toggle()
         log.debug("Toggle Hotkey pressed")
@@ -283,7 +374,12 @@ extension AppDelegate {
 
     @objc func brightnessUpHotkeyHandler() {
         increaseBrightness()
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 0, let statusButton = statusItem.button {
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
+        }
+
+        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -292,7 +388,12 @@ extension AppDelegate {
 
     @objc func brightnessDownHotkeyHandler() {
         decreaseBrightness()
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 0, let statusButton = statusItem.button {
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
+        }
+
+        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -301,7 +402,12 @@ extension AppDelegate {
 
     @objc func contrastUpHotkeyHandler() {
         increaseContrast()
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 0, let statusButton = statusItem.button {
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
+        }
+
+        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
@@ -310,11 +416,55 @@ extension AppDelegate {
 
     @objc func contrastDownHotkeyHandler() {
         decreaseContrast()
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 0, let statusButton = statusItem.button {
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
+        }
+
+        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
             menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
             closeMenuPopover(after: 2500)
         }
         log.debug("Contrast Down Hotkey pressed")
+    }
+
+    @objc func muteAudioHotkeyHandler() {
+        toggleAudioMuted()
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            if CGDisplayIsMain(id) == 1 {
+                Hotkey.showOsd(osdImage: .muted, value: display.volume.uint32Value, displayID: id)
+                break
+            }
+        }
+
+        log.debug("Audio Mute Hotkey pressed")
+    }
+
+    @objc func volumeUpHotkeyHandler() {
+        increaseVolume()
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            if CGDisplayIsMain(id) == 1 {
+                Hotkey.showOsd(osdImage: .volume, value: display.volume.uint32Value, displayID: id)
+                break
+            }
+        }
+
+        log.debug("Volume Up Hotkey pressed")
+    }
+
+    @objc func volumeDownHotkeyHandler() {
+        decreaseVolume()
+
+        for (id, display) in brightnessAdapter.activeDisplays {
+            if CGDisplayIsMain(id) == 1 {
+                Hotkey.showOsd(osdImage: .volume, value: display.volume.uint32Value, displayID: id)
+                break
+            }
+        }
+
+        log.debug("Volume Down Hotkey pressed")
     }
 
     @objc func preciseBrightnessUpHotkeyHandler() {
@@ -335,5 +485,23 @@ extension AppDelegate {
     @objc func preciseContrastDownHotkeyHandler() {
         decreaseContrast(by: 1)
         log.debug("Precise Contrast Down Hotkey pressed")
+    }
+}
+
+extension AppDelegate: EventSubscriber {
+    /**
+     Fires off when the default audio device changes.
+     */
+    func eventReceiver(_ event: Event) {
+        if case let .defaultOutputDeviceChanged(audioDevice)? = event as? AudioHardwareEvent {
+            log.debug("Default output device changed to \(audioDevice.name).")
+            if audioDevice.canSetVirtualMasterVolume(direction: .playback) {
+                log.debug("The device can set its own volume")
+            } else {
+                log.debug("The device can't set its own volume")
+            }
+
+            self.startOrRestartMediaKeyTap()
+        }
     }
 }
