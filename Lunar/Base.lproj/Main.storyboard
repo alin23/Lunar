@@ -283,10 +283,8 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
                         <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
-                        <outlet property="brightnessKeysMenuItem" destination="36q-pn-c3B" id="CJt-Xf-L1m"/>
                         <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
                         <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
-                        <outlet property="contrastKeysMenuItem" destination="HtT-Zf-9Y0" id="SFZ-gy-qxP"/>
                         <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
                         <outlet property="debugMenuItem" destination="kSD-gy-XkR" id="NKJ-Lt-QFN"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
@@ -298,7 +296,6 @@
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="stateMenuItem" destination="YMI-RQ-F1Z" id="cCj-Nl-eqb"/>
                         <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
-                        <outlet property="volumeKeysMenuItem" destination="XHb-a4-o7N" id="lr6-4H-KIt"/>
                     </connections>
                 </customObject>
                 <customObject id="JCY-9H-EwC" customClass="SPUStandardUpdaterController"/>
@@ -1202,7 +1199,7 @@
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fCl-dS-CXv" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="270" y="243" width="106" height="40"/>
+                                <rect key="frame" x="275" y="243" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="cES-lL-RA0">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -1228,7 +1225,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="flo-Nr-g61" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="258" y="231" width="130" height="17"/>
+                                <rect key="frame" x="263" y="231" width="130" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="6Cp-c9-oaG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1254,6 +1251,41 @@
                                 <rect key="frame" x="275" y="493" width="130" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="cvf-Gh-ecq">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcL-nB-ff6" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="184" y="243" width="106" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="CDG-Ok-ECd">
+                                    <font key="font" metaFont="systemHeavy" size="35"/>
+                                    <color key="textColor" white="1" alpha="0.70059419010000001" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" white="1" alpha="0.69921875" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" white="1" alpha="0.89981294020000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="600"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TaK-4f-5Y3" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="172" y="231" width="130" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="tXp-WY-TaJ">
                                     <font key="font" size="11" name="Menlo-Bold"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1310,6 +1342,8 @@
                         <outlet property="smoothTransitionCheckbox" destination="4tb-kQ-mbr" id="SXN-IS-eQL"/>
                         <outlet property="smoothTransitionLabel" destination="osm-bT-7sA" id="OU8-18-fgX"/>
                         <outlet property="swipeLeftHint" destination="CUN-Fw-jrZ" id="kGi-c4-UJX"/>
+                        <outlet property="volumeStepCaption" destination="TaK-4f-5Y3" id="nv1-L7-jMW"/>
+                        <outlet property="volumeStepField" destination="dcL-nB-ff6" id="Ted-sD-P8C"/>
                     </connections>
                 </viewController>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1341,7 +1375,7 @@
                                             <tableColumns>
                                                 <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1377,7 +1411,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="256" minWidth="256" maxWidth="256" id="Dt1-Ce-6Rl" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1417,7 +1451,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="DLe-P9-tVg" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1480,7 +1514,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="ZQc-qo-r6X" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1646,6 +1680,18 @@
                                     <action selector="toggleAdaptive:" target="1Bn-Ca-ETm" id="lN7-m5-AxW"/>
                                 </connections>
                             </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveDDCTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="390" y="221" width="170" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive DDC" id="dgU-DI-4YJ">
+                                    <font key="font" size="13" name="Menlo-Bold"/>
+                                    <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="yMj-md-h9o"/>
+                                </connections>
+                            </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ASQ-wq-GuY" customClass="ScrollableBrightness" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="45" y="253" width="250" height="292"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1916,6 +1962,7 @@ to view other displays</string>
                     </connections>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController representsSharedInstance="YES" id="rew-Tm-BHz"/>
             </objects>
             <point key="canvasLocation" x="159" y="2861"/>
         </scene>
@@ -1928,11 +1975,11 @@ to view other displays</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qSg-Ez-8IX" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="493" width="220" height="34"/>
+                                <rect key="frame" x="35" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vw7-rh-88K">
-                                <rect key="frame" x="35" y="535" width="220" height="19"/>
+                                <rect key="frame" x="35" y="575" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Change Adaptive Mode" id="fsL-v4-7G3">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -1941,11 +1988,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NFS-Qe-xXa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="493" width="220" height="34"/>
+                                <rect key="frame" x="695" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iJ1-yY-kOt">
-                                <rect key="frame" x="697" y="535" width="220" height="19"/>
+                                <rect key="frame" x="697" y="575" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="0% Brightness/Contrast" id="o19-LF-ZDK">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -1954,11 +2001,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rE2-oz-MBj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="413" width="220" height="34"/>
+                                <rect key="frame" x="695" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mQ5-GB-kAw">
-                                <rect key="frame" x="697" y="455" width="220" height="19"/>
+                                <rect key="frame" x="697" y="495" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="25% Brightness/Contrast" id="9Hf-vd-KLe">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -1967,11 +2014,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMg-N3-c8c" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="333" width="220" height="34"/>
+                                <rect key="frame" x="695" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9mU-Sj-Sma">
-                                <rect key="frame" x="697" y="375" width="220" height="19"/>
+                                <rect key="frame" x="697" y="415" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="50% Brightness/Contrast" id="4KO-fz-0yx">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -1980,11 +2027,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pdK-Vf-9Uj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="253" width="220" height="34"/>
+                                <rect key="frame" x="695" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UOh-D1-P9g">
-                                <rect key="frame" x="697" y="295" width="220" height="19"/>
+                                <rect key="frame" x="697" y="335" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="75% Brightness/Contrast" id="2QW-X6-kAU">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -1993,11 +2040,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xwH-nW-wyC" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="173" width="220" height="34"/>
+                                <rect key="frame" x="695" y="213" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="efg-HE-aLk">
-                                <rect key="frame" x="697" y="215" width="220" height="19"/>
+                                <rect key="frame" x="697" y="255" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="100% Brightness/Contrast" id="7iI-aM-1Xk">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2006,11 +2053,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qpQ-sn-PDN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="413" width="220" height="34"/>
+                                <rect key="frame" x="35" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJl-1a-wCR">
-                                <rect key="frame" x="35" y="455" width="220" height="19"/>
+                                <rect key="frame" x="35" y="495" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Pause Adaptive Mode" id="VKy-Y3-qLI">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2019,11 +2066,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fS1-2j-dXP" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="333" width="220" height="34"/>
+                                <rect key="frame" x="35" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q2B-JF-iLj">
-                                <rect key="frame" x="35" y="375" width="220" height="19"/>
+                                <rect key="frame" x="35" y="415" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Unpause Adaptive Mode" id="TTb-1A-cWv">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2032,11 +2079,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQS-7I-I6a" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="253" width="220" height="34"/>
+                                <rect key="frame" x="35" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mRo-oA-SEK">
-                                <rect key="frame" x="35" y="295" width="220" height="19"/>
+                                <rect key="frame" x="35" y="335" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Show Lunar" id="clw-eG-154">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2045,11 +2092,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v3W-ni-TYa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="493" width="220" height="34"/>
+                                <rect key="frame" x="365" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Qf-Fh-CXU">
-                                <rect key="frame" x="365" y="535" width="220" height="19"/>
+                                <rect key="frame" x="365" y="575" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Down" id="lku-B1-wcM">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2058,11 +2105,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fJo-VM-XnY" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="413" width="220" height="34"/>
+                                <rect key="frame" x="365" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ddz-Ba-c0d">
-                                <rect key="frame" x="365" y="455" width="220" height="19"/>
+                                <rect key="frame" x="365" y="495" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Up" id="0OD-28-VtF">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2071,11 +2118,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F4a-Ib-syq" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="333" width="220" height="34"/>
+                                <rect key="frame" x="365" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S9L-Dx-ksA">
-                                <rect key="frame" x="365" y="375" width="220" height="19"/>
+                                <rect key="frame" x="365" y="415" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Down" id="UFl-qA-DY8">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2084,11 +2131,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TJV-V1-URJ" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="253" width="220" height="34"/>
+                                <rect key="frame" x="365" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Obv-oP-JEe">
-                                <rect key="frame" x="365" y="295" width="220" height="19"/>
+                                <rect key="frame" x="365" y="335" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Up" id="nRU-mZ-43S">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2097,11 +2144,11 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Us2-PS-6r3" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="169" width="220" height="34"/>
+                                <rect key="frame" x="365" y="213" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q8C-C9-9hd">
-                                <rect key="frame" x="365" y="211" width="220" height="19"/>
+                                <rect key="frame" x="365" y="255" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Volume Down" id="pMz-dY-YOe">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -2110,13 +2157,26 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0AC-Li-Jzu" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="89" width="220" height="34"/>
+                                <rect key="frame" x="365" y="133" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3B8-H3-sE9">
-                                <rect key="frame" x="365" y="131" width="220" height="19"/>
+                                <rect key="frame" x="365" y="175" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Volume Up" id="xfV-4O-86q">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ucS-rK-pL2" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="365" y="53" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZXp-8n-lcU">
+                                <rect key="frame" x="365" y="95" width="220" height="19"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Mute Audio" id="fTV-9X-Yi0">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2130,6 +2190,7 @@ to view other displays</string>
                         <outlet property="contrastDownHotkeyView" destination="F4a-Ib-syq" id="ZMX-Cv-IWz"/>
                         <outlet property="contrastUpHotkeyView" destination="TJV-V1-URJ" id="JqT-rI-nTy"/>
                         <outlet property="lunarHotkeyView" destination="MQS-7I-I6a" id="PLl-7v-ffj"/>
+                        <outlet property="muteAudioHotkeyView" destination="ucS-rK-pL2" id="57B-QM-1zQ"/>
                         <outlet property="pauseHotkeyView" destination="qpQ-sn-PDN" id="tl0-Xc-UFi"/>
                         <outlet property="percent0HotkeyView" destination="NFS-Qe-xXa" id="OsE-nj-Eu3"/>
                         <outlet property="percent100HotkeyView" destination="xwH-nW-wyC" id="i1i-Wx-0KX"/>
@@ -2170,7 +2231,7 @@ to view other displays</string>
                                             <tableColumns>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="KxF-Xb-zCR" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2211,7 +2272,7 @@ to view other displays</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
-                                                                        <binding destination="HbC-w6-tw4" name="enabled" keyPath="objectValue.active" id="mA4-8u-hD2"/>
+                                                                        <binding destination="HbC-w6-tw4" name="enabled" keyPath="objectValue.activeAndResponsive" id="EHh-Tl-OK6"/>
                                                                         <binding destination="HbC-w6-tw4" name="value" keyPath="objectValue.brightness" id="IHs-Ck-rkZ">
                                                                             <dictionary key="options">
                                                                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -2234,7 +2295,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="140" minWidth="140" maxWidth="140" id="LOs-bc-sm1" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2277,6 +2338,18 @@ to view other displays</string>
                                                                         <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" id="AnX-xS-ue0"/>
                                                                     </connections>
                                                                 </textField>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XHp-xG-73x" customClass="NonResponsiveDDCTextField" customModule="Lunar" customModuleProvider="target">
+                                                                    <rect key="frame" x="-15" y="33" width="170" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive DDC" id="R6i-Zk-viN">
+                                                                        <font key="font" size="13" name="Menlo-Bold"/>
+                                                                        <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                    <connections>
+                                                                        <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.responsive" id="m40-Ru-3D7"/>
+                                                                    </connections>
+                                                                </textField>
                                                                 <button focusRingType="none" verticalHuggingPriority="750" id="XPe-bn-XeV" customClass="QuickAdaptiveButton" customModule="Lunar" customModuleProvider="target">
                                                                     <rect key="frame" x="28" y="28" width="83" height="16"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2287,7 +2360,7 @@ to view other displays</string>
                                                                         <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" id="tDX-6h-7PU">
+                                                                        <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.activeAndResponsive" id="wfg-xe-Ttx">
                                                                             <dictionary key="options">
                                                                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                             </dictionary>
@@ -2303,7 +2376,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="xyt-ZY-Lle" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="menu" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -2344,7 +2417,7 @@ to view other displays</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
-                                                                        <binding destination="hLc-sr-Ed2" name="enabled" keyPath="objectValue.active" id="dfR-BX-dmV"/>
+                                                                        <binding destination="hLc-sr-Ed2" name="enabled" keyPath="objectValue.activeAndResponsive" id="kKe-hK-FY4"/>
                                                                         <binding destination="hLc-sr-Ed2" name="value" keyPath="objectValue.contrast" id="fwg-2l-Fbd">
                                                                             <dictionary key="options">
                                                                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>

@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C71075E824081647001EFCBF /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71075E42408157D001EFCBF /* CoreDisplay.framework */; };
 		C715192F224E33590024C6F6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715192E224E33590024C6F6 /* main.swift */; };
+		C730422224080B480016E591 /* AmbientDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C730422124080B480016E591 /* AmbientDisplay.framework */; };
+		C730422424080B770016E591 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C730422324080B770016E591 /* SkyLight.framework */; };
 		C7521D39226C7D510062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D38226C7D510062EC81 /* DDC.c */; };
 		C7521D3A226C7D6A0062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C715193D224E33800024C6F6 /* DDC.swift */; };
 		C79713D4225DFF8300891081 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79713D3225DFF8300891081 /* Logger.swift */; };
@@ -26,14 +29,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C71075E42408157D001EFCBF /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
 		C715192B224E33590024C6F6 /* EDIDReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = EDIDReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		C715192E224E33590024C6F6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C715193C224E33800024C6F6 /* EDIDReader-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EDIDReader-Bridging-Header.h"; sourceTree = "<group>"; };
 		C715193D224E33800024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DDC.swift; path = ../../../Lunar/DDC/DDC.swift; sourceTree = "<group>"; };
 		C715193F224E33800024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DDC.h; path = ../../Lunar/DDC.h; sourceTree = "<group>"; };
+		C73042162407CC790016E591 /* DeviceGammaContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceGammaContext.h; sourceTree = "<group>"; };
+		C730422024080AF70016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = AmbientDisplay.framework/Headers; sourceTree = "<group>"; };
+		C730422124080B480016E591 /* AmbientDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AmbientDisplay.framework; path = /System/Library/PrivateFrameworks/AmbientDisplay.framework; sourceTree = "<absolute>"; };
+		C730422324080B770016E591 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = /System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<absolute>"; };
 		C7521D38226C7D510062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = ../../Lunar/DDC.c; sourceTree = "<group>"; };
 		C79713D3225DFF8300891081 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		C79713E1225F730800891081 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../Frameworks/SkyLight.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +48,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C71075E824081647001EFCBF /* CoreDisplay.framework in Frameworks */,
+				C730422224080B480016E591 /* AmbientDisplay.framework in Frameworks */,
+				C730422424080B770016E591 /* SkyLight.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +89,7 @@
 		C715193E224E33800024C6F6 /* DDC */ = {
 			isa = PBXGroup;
 			children = (
+				C73042162407CC790016E591 /* DeviceGammaContext.h */,
 				C715193C224E33800024C6F6 /* EDIDReader-Bridging-Header.h */,
 				C715193D224E33800024C6F6 /* DDC.swift */,
 			);
@@ -88,7 +99,10 @@
 		C79713D8225F643300891081 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C79713E1225F730800891081 /* SkyLight.framework */,
+				C71075E42408157D001EFCBF /* CoreDisplay.framework */,
+				C730422324080B770016E591 /* SkyLight.framework */,
+				C730422124080B480016E591 /* AmbientDisplay.framework */,
+				C730422024080AF70016E591 /* Headers */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -281,32 +295,44 @@
 		C7151933224E33590024C6F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "EDIDReader/DDC/EDIDReader-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Debug;
 		};
 		C7151934224E33590024C6F6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "EDIDReader/DDC/EDIDReader-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Release;
 		};
