@@ -11,8 +11,8 @@ import Sentry
 import Surge
 import SwiftDate
 
-let MIN_VOLUME: UInt8 = 0
-let MAX_VOLUME: UInt8 = 100
+let MIN_VOLUME: Int = 0
+let MAX_VOLUME: Int = 100
 let MIN_BRIGHTNESS: UInt8 = 0
 let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
@@ -143,11 +143,25 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var responsive: Bool = true {
+        didSet {
+            runBoolObservers(property: "responsive", newValue: responsive, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var activeAndResponsive: Bool = false {
+        didSet {
+            runBoolObservers(property: "activeAndResponsive", newValue: activeAndResponsive, oldValue: oldValue)
+        }
+    }
+
     var boolObservers: [String: [String: (Bool, Bool) -> Void]] = [
         "adaptive": [:],
         "lockedBrightness": [:],
         "lockedContrast": [:],
         "active": [:],
+        "responsive": [:],
+        "activeAndResponsive": [:],
         "audioMuted": [:],
     ]
     var numberObservers: [String: [String: (NSNumber, NSNumber) -> Void]] = [
@@ -248,6 +262,7 @@ enum ValueType {
             "volume": volume.uint8Value,
             "audioMuted": audioMuted,
             "active": active,
+            "responsive": responsive,
         ]
     }
 
@@ -299,6 +314,7 @@ enum ValueType {
     ) {
         self.id = id
         self.active = active
+        activeAndResponsive = active || id == GENERIC_DISPLAY_ID
         self.adaptive = adaptive
         self.lockedBrightness = lockedBrightness
         self.lockedContrast = lockedContrast
@@ -457,6 +473,16 @@ enum ValueType {
         boolObservers["audioMuted"]!["self.audioMuted"] = { newAudioMuted, _ in
             if !DDC.setAudioMuted(for: self.id, audioMuted: newAudioMuted) {
                 log.warning("Error writing muted audio using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+            }
+        }
+        boolObservers["active"]!["self.active"] = { newActive, _ in
+            runInMainThread {
+                self.activeAndResponsive = newActive && self.responsive
+            }
+        }
+        boolObservers["responsive"]!["self.responsive"] = { newResponsive, _ in
+            runInMainThread {
+                self.activeAndResponsive = newResponsive && self.active
             }
         }
         numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in

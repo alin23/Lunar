@@ -25,7 +25,7 @@ class DisplayValuesView: NSTableView {
             if let nameCell = rowView.view(atColumn: 1) as? NSTableCellView,
                 let display = nameCell.objectValue as? Display,
                 let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
-                display.active {
+                display.activeAndResponsive {
                 adaptiveButton.isHidden = hidden
             }
         }
@@ -102,7 +102,7 @@ class DisplayValuesView: NSTableView {
 
         notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
         adaptiveButton.setup(displayID: display.id)
-        if display.active {
+        if display.activeAndResponsive {
             if brightnessAdapter.mode == .manual {
                 adaptiveButton.isHidden = true
             } else {
@@ -115,7 +115,7 @@ class DisplayValuesView: NSTableView {
         scrollableBrightness.textFieldColorLight = textFieldColorLight
         scrollableBrightness.doubleValue = display.brightness.doubleValue.rounded()
         scrollableBrightness.caption = scrollableBrightnessCaption
-        if !display.active {
+        if !display.activeAndResponsive {
             scrollableBrightness.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?.shadow(withLevel: 0.3) ?? textFieldColor
         }
 
@@ -124,7 +124,7 @@ class DisplayValuesView: NSTableView {
         scrollableContrast.textFieldColorLight = textFieldColorLight
         scrollableContrast.doubleValue = display.contrast.doubleValue.rounded()
         scrollableContrast.caption = scrollableContrastCaption
-        if !display.active {
+        if !display.activeAndResponsive {
             scrollableContrast.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?.shadow(withLevel: 0.3) ?? textFieldColor
         }
 

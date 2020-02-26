@@ -7,6 +7,7 @@
 //
 
 import Alamofire
+import AMCoreAudio
 import Carbon.HIToolbox
 import Cocoa
 import Compression
@@ -103,6 +104,27 @@ extension String {
     }
 }
 
+class AudioEventSubscriber: EventSubscriber {
+    func eventReceiver(_ event: AMCoreAudio.Event) {
+        guard let hwEvent = event as? AudioHardwareEvent else {
+            return
+        }
+
+        switch hwEvent {
+        case .defaultOutputDeviceChanged, .defaultSystemOutputDeviceChanged:
+            runInMainThread {
+                if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                    appDelegate.startOrRestartMediaKeyTap()
+                }
+            }
+        default:
+            return
+        }
+    }
+
+    var hashValue: Int = 100
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
@@ -171,9 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
         setKeyEquivalents(hotkeyConfig)
-        if datastore.defaults.mediaKeysEnabled {
-            startOrRestartMediaKeyTap()
-        }
+        startOrRestartMediaKeyTap()
     }
 
     func listenForAdaptiveModeChange() {
@@ -479,17 +499,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
         })
-        mediaKeysEnabledObserver = datastore.defaults.observe(\.mediaKeysEnabled, changeHandler: { _, change in
-            guard let enabled = change.newValue, let oldEnabled = change.oldValue, enabled != oldEnabled else {
-                return
-            }
-
-            if enabled {
-                mediaKeyTap?.stop()
-            } else {
-                self.startOrRestartMediaKeyTap()
-            }
+        mediaKeysEnabledObserver = datastore.defaults.observe(\.mediaKeysEnabled, changeHandler: { _, _ in
+            self.startOrRestartMediaKeyTap()
         })
+
+        fgQueue.async {
+            AMCoreAudio.NotificationCenter.defaultCenter.subscribe(AudioEventSubscriber(), eventType: AudioHardwareEvent.self, dispatchQueue: fgQueue)
+        }
     }
 
     func setKeyEquivalents(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
@@ -702,20 +718,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         brightnessAdapter.toggleAudioMuted(currentDisplay: true)
     }
 
-    func increaseVolume(by amount: Int? = nil) {
+    func increaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.volumeStep
-        brightnessAdapter.adjustVolume(by: amount, currentDisplay: true)
+        brightnessAdapter.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
-    func decreaseVolume(by amount: Int? = nil) {
+    func decreaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.volumeStep
-        brightnessAdapter.adjustVolume(by: -amount, currentDisplay: true)
+        brightnessAdapter.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay)
     }
 
-    func increaseBrightness(by amount: Int? = nil) {
+    func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustBrightness(by: amount)
+            brightnessAdapter.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
             let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
@@ -725,10 +741,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func increaseContrast(by amount: Int? = nil) {
+    func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustContrast(by: amount)
+            brightnessAdapter.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
             let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
@@ -738,10 +754,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func decreaseBrightness(by amount: Int? = nil) {
+    func decreaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.brightnessStep
         if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustBrightness(by: -amount)
+            brightnessAdapter.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
             let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
@@ -751,10 +767,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func decreaseContrast(by amount: Int? = nil) {
+    func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? datastore.defaults.contrastStep
         if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustContrast(by: -amount)
+            brightnessAdapter.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
             let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")

@@ -13,11 +13,18 @@ let log = Logger.self
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 
+class Display {
+    var responsive = true
+}
+
 class BrightnessAdapter {
+    var displays: [CGDirectDisplayID: Display] = [:]
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1)
     }
 }
+
+let brightnessAdapter = BrightnessAdapter()
 
 func sha256(data: Data) -> Data {
     var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
