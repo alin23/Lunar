@@ -85,6 +85,20 @@ class BrightnessAdapter {
         }
     }
 
+    var currentDisplay: Display? {
+        let displays = activeDisplays.values.map { $0 }
+        if displays.count == 1 {
+            return displays[0]
+        } else {
+            for display in displays {
+                if CGDisplayIsMain(display.id) == 1 {
+                    return display
+                }
+            }
+        }
+        return nil
+    }
+
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
     }
@@ -533,7 +547,7 @@ class BrightnessAdapter {
 
     func adjustVolume(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
-            let value = cap(display.volume.uint8Value + UInt8(offset), minVal: MIN_VOLUME, maxVal: MAX_VOLUME)
+            let value = cap(display.volume.intValue + offset, minVal: MIN_VOLUME, maxVal: MAX_VOLUME)
             display.volume = NSNumber(value: value)
         }
     }
@@ -554,16 +568,8 @@ class BrightnessAdapter {
 
     func adjustValue(for displays: [Display]? = nil, currentDisplay: Bool = false, _ setValue: (Display) -> Void) {
         if currentDisplay {
-            let displays = displays ?? activeDisplays.values.map { $0 }
-            if displays.count == 1 {
-                setValue(displays[0])
-            } else {
-                for display in displays {
-                    if CGDisplayIsMain(display.id) == 1 {
-                        setValue(display)
-                        break
-                    }
-                }
+            if let display = self.currentDisplay {
+                setValue(display)
             }
         } else if let displays = displays {
             displays.forEach { display in

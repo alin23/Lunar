@@ -96,14 +96,16 @@ In this case, you might benefit from a larger polling interval like 10 seconds.
 """
 let HOTKEY_STEP_TOOLTIP = """
 ## Description
-Value for adjusting how much to increase/decrease the brightness/contrast when using hotkeys.
+Value for adjusting how much to increase/decrease the brightness/contrast/volume when using hotkeys.
 
 ## Effect
-When using the Brightness/Contrast Up/Down actions, the brightness/contrast will be computed using the following formulas:
+When using the Brightness/Contrast/Volume Up/Down actions, the values will be computed using the following formulas:
 * Brightness Up: ` brightness = oldValue + step `
 * Brightness Down: ` brightness = oldValue - step `
 * Contrast Up: ` contrast = oldValue + step `
 * Contrast Down: ` contrast = oldValue - step `
+* Volume Up: ` volume = oldValue + step `
+* Volume Down: ` volume = oldValue - step `
 
 \(ADJUSTING_VALUES_INFO)
 
@@ -231,6 +233,8 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastStepField: ScrollableTextField!
     @IBOutlet var contrastStepCaption: ScrollableTextFieldCaption!
+    @IBOutlet var volumeStepField: ScrollableTextField!
+    @IBOutlet var volumeStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var hotkeyStepLabel: NSTextField!
     var hotkeyStepVisible: Bool = false {
         didSet {
@@ -238,6 +242,8 @@ class ConfigurationViewController: NSViewController {
             brightnessStepCaption?.isHidden = !hotkeyStepVisible
             contrastStepField?.isHidden = !hotkeyStepVisible
             contrastStepCaption?.isHidden = !hotkeyStepVisible
+            volumeStepField?.isHidden = !hotkeyStepVisible
+            volumeStepCaption?.isHidden = !hotkeyStepVisible
             hotkeyStepLabel?.isHidden = !hotkeyStepVisible
         }
     }
@@ -308,6 +314,7 @@ class ConfigurationViewController: NSViewController {
     var pollingIntervalObserver: NSKeyValueObservation?
     var brightnessStepObserver: NSKeyValueObservation?
     var contrastStepObserver: NSKeyValueObservation?
+    var volumeStepObserver: NSKeyValueObservation?
     var brightnessLimitMinObserver: NSKeyValueObservation?
     var contrastLimitMinObserver: NSKeyValueObservation?
     var brightnessLimitMaxObserver: NSKeyValueObservation?
@@ -490,6 +497,17 @@ class ConfigurationViewController: NSViewController {
         })
     }
 
+    func listenForVolumeStepChange() {
+        volumeStepObserver = datastore.defaults.observe(\.volumeStep, options: [.old, .new], changeHandler: { _, change in
+            guard let volume = change.newValue, let oldVolume = change.oldValue, volume != oldVolume else {
+                return
+            }
+            runInMainThread {
+                self.volumeStepField?.stringValue = String(volume)
+            }
+        })
+    }
+
     func listenForBrightnessLimitChange() {
         brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
@@ -641,6 +659,16 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastStep", lowerLimit: 1, upperLimit: 99,
+            onValueChangedInstant: { _, _ in
+            }
+        )
+    }
+
+    func setupVolumeStep() {
+        guard let field = volumeStepField, let caption = volumeStepCaption else { return }
+
+        setupScrollableTextField(
+            field, caption: caption, settingKey: "volumeStep", lowerLimit: 1, upperLimit: 99,
             onValueChangedInstant: { _, _ in
             }
         )
@@ -799,6 +827,7 @@ class ConfigurationViewController: NSViewController {
         setupBrightnessStep()
         setupPollingInterval()
         setupContrastStep()
+        setupVolumeStep()
         setupBrightnessLimit()
         setupContrastLimit()
         setupLocation()
@@ -816,6 +845,7 @@ class ConfigurationViewController: NSViewController {
         listenForBrightnessStepChange()
         listenForPollingIntervalChange()
         listenForContrastStepChange()
+        listenForVolumeStepChange()
         listenForBrightnessLimitChange()
         listenForContrastLimitChange()
         listenForAdaptiveModeChange()

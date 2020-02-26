@@ -9,23 +9,43 @@
 import Foundation
 
 class Logger {
-    class func verbose(_ message: Any, context: Any? = nil) {
-        print("VERBOSE: \(message) (context \(String(describing: context)))")
+    class func verbose(_ message: Any, context: Any? = nil, _ function: String = #function, line: Int = #line) {
+        if let ctx = context {
+            print("VERBOSE [\(function):\(line)]: \(message) (context \(String(describing: ctx)))")
+        } else {
+            print("VERBOSE [\(function):\(line)]: \(message)")
+        }
     }
 
-    class func debug(_ message: Any, context: Any? = nil) {
-        print("DEBUG: \(message) (context \(String(describing: context)))")
+    class func debug(_ message: Any, context: Any? = nil, _ function: String = #function, line: Int = #line) {
+        if let ctx = context {
+            print("DEBUG [\(function):\(line)]: \(message) (context \(String(describing: ctx)))")
+        } else {
+            print("DEBUG [\(function):\(line)]: \(message)")
+        }
     }
 
-    class func info(_ message: Any, context: Any? = nil) {
-        print("INFO: \(message) (context \(String(describing: context)))")
+    class func info(_ message: Any, context: Any? = nil, _ function: String = #function, line: Int = #line) {
+        if let ctx = context {
+            print("INFO [\(function):\(line)]: \(message) (context \(String(describing: ctx)))")
+        } else {
+            print("INFO [\(function):\(line)]: \(message)")
+        }
     }
 
-    class func warning(_ message: Any, context: Any? = nil) {
-        print("WARNING: \(message) (context \(String(describing: context)))")
+    class func warning(_ message: Any, context: Any? = nil, _ function: String = #function, line: Int = #line) {
+        if let ctx = context {
+            print("WARNING [\(function):\(line)]: \(message) (context \(String(describing: ctx)))")
+        } else {
+            print("WARNING [\(function):\(line)]: \(message)")
+        }
     }
 
-    class func error(_ message: Any, context: Any? = nil) {
-        print("ERROR: \(message) (context \(String(describing: context)))")
+    class func error(_ message: Any, context: Any? = nil, _ function: String = #function, line: Int = #line) {
+        if let ctx = context {
+            print("ERROR [\(function):\(line)]: \(message) (context \(String(describing: ctx)))")
+        } else {
+            print("ERROR [\(function):\(line)]: \(message)")
+        }
     }
 }

@@ -123,6 +123,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var trackingArea: NSTrackingArea?
     var adaptiveModeObserver: NSKeyValueObservation?
     var displaysObserver: NSKeyValueObservation!
+    var responsiveDDCObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
 
     func listenForPopoverEvents() {
         NotificationCenter.default.addObserver(
@@ -150,6 +151,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         listenForPopoverEvents()
         listenForAdaptiveModeChange()
         listenForDisplaysChange()
+        listenForResponsiveDDCChange()
     }
 
     required init?(coder: NSCoder) {
@@ -157,6 +159,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         listenForPopoverEvents()
         listenForAdaptiveModeChange()
         listenForDisplaysChange()
+        listenForResponsiveDDCChange()
     }
 
     override func viewDidLoad() {
@@ -250,9 +253,33 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     self.tableView.endUpdates()
 
                     self.adaptViewSize()
+                    self.listenForResponsiveDDCChange()
                 }
             }
         })
+    }
+
+    func listenForResponsiveDDCChange() {
+        responsiveDDCObservers.removeAll()
+        for (id, display) in brightnessAdapter.activeDisplays {
+            responsiveDDCObservers[id] = display.observe(\.responsive, options: [.new], changeHandler: { _, _ in
+                runInMainThreadAsyncAfter(ms: 1000) {
+                    self.tableView.beginUpdates()
+                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
+                    self.tableView.reloadData()
+                    self.view.setNeedsDisplay(self.view.visibleRect)
+                    self.tableView.endUpdates()
+
+                    self.adaptViewSize()
+                    if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1,
+                        let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+                        let statusButton = appDelegate.statusItem.button {
+                        menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+                        closeMenuPopover(after: 2500)
+                    }
+                }
+            })
+        }
     }
 
     func listenForAdaptiveModeChange() {
