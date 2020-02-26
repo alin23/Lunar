@@ -243,6 +243,9 @@ class DDC {
         } else {
             DDC.skipWritingPropertyById[displayID] = Set([controlID])
         }
+        if controlID == ControlID.BRIGHTNESS || controlID == ControlID.CONTRAST {
+            brightnessAdapter.displays[displayID]?.responsive = false
+        }
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {

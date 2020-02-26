@@ -288,40 +288,68 @@ class Hotkey {
 }
 
 extension AppDelegate: MediaKeyTapDelegate {
-    func startOrRestartMediaKeyTap() {
-        var keys: [MediaKey]
-
-        keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
-        if let audioDevice = AudioDevice.defaultOutputDevice(), audioDevice.canSetVirtualMasterVolume(direction: .playback) {
-            let keysToDelete: [MediaKey] = [.volumeUp, .volumeDown, .mute]
-            keys.removeAll { keysToDelete.contains($0) }
+    func volumeOsdImage(display: Display? = nil) -> OSDImage {
+        guard let display = (display ?? brightnessAdapter.currentDisplay) else {
+            return .volume
         }
 
-        mediaKeyTap?.stop()
-        mediaKeyTap = MediaKeyTap(delegate: self, for: keys, observeBuiltIn: false)
-        mediaKeyTap?.start()
+        if display.audioMuted {
+            return .muted
+        } else {
+            return .volume
+        }
+    }
+
+    func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil) {
+        fgQueue.async {
+            var keys: [MediaKey]
+
+            mediaKeyTap?.stop()
+            mediaKeyTap = nil
+            if mediaKeysEnabled ?? datastore.defaults.mediaKeysEnabled {
+                keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
+
+                if let audioDevice = AudioDevice.defaultOutputDevice(), audioDevice.canSetVirtualMasterVolume(direction: .playback) {
+                    let keysToDelete: [MediaKey] = [.volumeUp, .volumeDown, .mute]
+                    keys.removeAll { keysToDelete.contains($0) }
+                }
+                mediaKeyTap = MediaKeyTap(delegate: self, for: keys, observeBuiltIn: false)
+                mediaKeyTap?.start()
+            }
+        }
     }
 
     func handle(mediaKey: MediaKey, event _: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?) {
+        guard let display = brightnessAdapter.currentDisplay else {
+            return
+        }
+
         switch mediaKey {
         case .brightnessUp:
             if flags?.contains(.control) ?? false {
-                increaseContrast()
+                increaseContrast(currentDisplay: true)
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id)
             } else {
-                increaseBrightness()
+                increaseBrightness(currentDisplay: true)
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id)
             }
         case .brightnessDown:
             if flags?.contains(.control) ?? false {
-                decreaseContrast()
+                decreaseContrast(currentDisplay: true)
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id)
             } else {
-                decreaseBrightness()
+                decreaseBrightness(currentDisplay: true)
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id)
             }
         case .volumeUp:
-            increaseVolume()
+            increaseVolume(currentDisplay: true)
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
         case .volumeDown:
-            decreaseVolume()
+            decreaseVolume(currentDisplay: true)
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
         case .mute:
             toggleAudioMuted()
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
         default:
             log.info("Media key pressed")
         }
@@ -379,10 +407,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-            closeMenuPopover(after: 2500)
-        }
+        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
+        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+        //     closeMenuPopover(after: 2500)
+        // }
         log.debug("Brightness Up Hotkey pressed")
     }
 
@@ -393,10 +421,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-            closeMenuPopover(after: 2500)
-        }
+        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
+        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+        //     closeMenuPopover(after: 2500)
+        // }
         log.debug("Brightness Down Hotkey pressed")
     }
 
@@ -407,10 +435,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-            closeMenuPopover(after: 2500)
-        }
+        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
+        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+        //     closeMenuPopover(after: 2500)
+        // }
         log.debug("Contrast Up Hotkey pressed")
     }
 
@@ -421,47 +449,38 @@ extension AppDelegate: MediaKeyTapDelegate {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
-        if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-            menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-            closeMenuPopover(after: 2500)
-        }
+        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
+        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+        //     closeMenuPopover(after: 2500)
+        // }
         log.debug("Contrast Down Hotkey pressed")
     }
 
     @objc func muteAudioHotkeyHandler() {
         toggleAudioMuted()
 
-        for (id, display) in brightnessAdapter.activeDisplays {
-            if CGDisplayIsMain(id) == 1 {
-                Hotkey.showOsd(osdImage: .muted, value: display.volume.uint32Value, displayID: id)
-                break
-            }
+        if let display = brightnessAdapter.currentDisplay {
+            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 
         log.debug("Audio Mute Hotkey pressed")
     }
 
     @objc func volumeUpHotkeyHandler() {
-        increaseVolume()
+        increaseVolume(currentDisplay: true)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
-            if CGDisplayIsMain(id) == 1 {
-                Hotkey.showOsd(osdImage: .volume, value: display.volume.uint32Value, displayID: id)
-                break
-            }
+        if let display = brightnessAdapter.currentDisplay {
+            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 
         log.debug("Volume Up Hotkey pressed")
     }
 
     @objc func volumeDownHotkeyHandler() {
-        decreaseVolume()
+        decreaseVolume(currentDisplay: true)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
-            if CGDisplayIsMain(id) == 1 {
-                Hotkey.showOsd(osdImage: .volume, value: display.volume.uint32Value, displayID: id)
-                break
-            }
+        if let display = brightnessAdapter.currentDisplay {
+            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 
         log.debug("Volume Down Hotkey pressed")
