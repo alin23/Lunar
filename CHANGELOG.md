@@ -1,3 +1,26 @@
+# 3.0.0
+## Features
+- Add support for changing monitor volume and mute state
+- Show native OSD when changing monitor brightness, contrast and volume
+- Implement listeners for media keys
+    * Lunar will ask for accessibility permissions to enable this functionality
+    * Instructions: 
+        * Press keyboard brightness keys while the cursor is on an external monitor to change the brightness on that monitor 
+        * Press Control + keyboard brightness keys to adjust contrast 
+        * Press keyboard volume/mute keys while the audio output is set to the monitor audio device to adjust volume/mute
+        * In multi-monitor setups, Lunar can't detect which monitor audio device is selected so it will change the volume of the display that the cursor is on
+- Many thanks to Hongfeng Xu (@Mic238) for helping me with extensive testing on these features!
+
+
+## Improvements
+
+- Detect non-responsive monitors and show that in the Quick Actions popover
+- Automatic detection of GPU for adaptive DDC reply delay
+    - This should minimize kernel panics and system freezes when reading values from the monitor
+- Add special brightness implementation for **LED Cinema** monitors 
+
+## Fixes
+- Fixed a typo that was preventing smooth transition to be disabled for contrast
 # 2.9.9
 ## Fixes
 
