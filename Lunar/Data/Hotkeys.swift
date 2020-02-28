@@ -269,7 +269,7 @@ class Hotkey {
         }
     }
 
-    static func showOsd(osdImage: OSDImage, value: UInt32, displayID: CGDirectDisplayID) {
+    static func showOsd(osdImage: OSDImage, value: UInt32, displayID: CGDirectDisplayID, locked: Bool = false) {
         guard let manager = OSDManager.sharedManager() as? OSDManager else {
             log.warning("No OSDManager available")
             return
@@ -279,10 +279,10 @@ class Hotkey {
             osdImage.rawValue,
             onDisplayID: displayID,
             priority: 0x1F4,
-            msecUntilFade: 2000,
+            msecUntilFade: 1500,
             filledChiclets: value,
             totalChiclets: 100,
-            locked: false
+            locked: locked
         )
     }
 }
@@ -324,32 +324,63 @@ extension AppDelegate: MediaKeyTapDelegate {
             return
         }
 
+        var locked = false
+
         switch mediaKey {
         case .brightnessUp:
             if flags?.contains(.control) ?? false {
-                increaseContrast(currentDisplay: true)
-                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id)
+                locked = DDC.skipWritingPropertyById[display.id]?.contains(.CONTRAST) ?? false
+                if !locked {
+                    increaseContrast(currentDisplay: true)
+                }
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id, locked: locked)
             } else {
-                increaseBrightness(currentDisplay: true)
-                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id)
+                locked = DDC.skipWritingPropertyById[display.id]?.contains(.BRIGHTNESS) ?? false
+                if !locked {
+                    increaseBrightness(currentDisplay: true)
+                }
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id, locked: locked)
             }
         case .brightnessDown:
             if flags?.contains(.control) ?? false {
-                decreaseContrast(currentDisplay: true)
-                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id)
+                locked = DDC.skipWritingPropertyById[display.id]?.contains(.CONTRAST) ?? false
+                if !locked {
+                    decreaseContrast(currentDisplay: true)
+                }
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id, locked: locked)
             } else {
-                decreaseBrightness(currentDisplay: true)
-                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id)
+                locked = DDC.skipWritingPropertyById[display.id]?.contains(.BRIGHTNESS) ?? false
+                if !locked {
+                    decreaseBrightness(currentDisplay: true)
+                }
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id, locked: locked)
             }
         case .volumeUp:
-            increaseVolume(currentDisplay: true)
-            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
+            locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
+            if !locked {
+                increaseVolume(currentDisplay: true)
+                if display.audioMuted {
+                    toggleAudioMuted()
+                }
+            }
+
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id, locked: locked)
         case .volumeDown:
-            decreaseVolume(currentDisplay: true)
-            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
+            locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
+            if !locked {
+                decreaseVolume(currentDisplay: true)
+                if display.audioMuted {
+                    toggleAudioMuted()
+                }
+            }
+
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id, locked: locked)
         case .mute:
-            toggleAudioMuted()
-            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id)
+            locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
+            if !locked {
+                toggleAudioMuted()
+            }
+            Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id, locked: locked)
         default:
             log.info("Media key pressed")
         }
@@ -468,6 +499,9 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     @objc func volumeUpHotkeyHandler() {
         increaseVolume(currentDisplay: true)
+        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+            toggleAudioMuted()
+        }
 
         if let display = brightnessAdapter.currentDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
@@ -478,6 +512,9 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     @objc func volumeDownHotkeyHandler() {
         decreaseVolume(currentDisplay: true)
+        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+            toggleAudioMuted()
+        }
 
         if let display = brightnessAdapter.currentDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
