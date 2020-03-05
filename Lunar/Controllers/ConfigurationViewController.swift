@@ -12,7 +12,7 @@ let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
 let UI_NOTE_INFO = """
 []()
 
-**Note:** Manual adjustments through the UI won't take these limits into account.
+**Note:** Manual adjustments through the UI on the Display page of Lunar won't take these values into account.
 """
 let ADJUSTING_VALUES_INFO = """
 []()

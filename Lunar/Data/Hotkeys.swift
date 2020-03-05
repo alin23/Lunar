@@ -12,6 +12,7 @@ import Magnet
 import MediaKeyTap
 
 var mediaKeyTap: MediaKeyTap?
+let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
 
 enum HotkeyIdentifier: String, CaseIterable {
     case toggle,
@@ -27,6 +28,8 @@ enum HotkeyIdentifier: String, CaseIterable {
         preciseBrightnessDown,
         preciseContrastUp,
         preciseContrastDown,
+        preciseVolumeUp,
+        preciseVolumeDown,
         brightnessUp,
         brightnessDown,
         contrastUp,
@@ -35,6 +38,24 @@ enum HotkeyIdentifier: String, CaseIterable {
         volumeUp,
         volumeDown
 }
+
+let preciseHotkeys: Set<HotkeyIdentifier> = [.preciseBrightnessUp, .preciseBrightnessDown, .preciseContrastUp, .preciseContrastDown, .preciseVolumeUp, .preciseVolumeDown]
+let coarseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
+    .preciseBrightnessUp: .brightnessUp,
+    .preciseBrightnessDown: .brightnessDown,
+    .preciseContrastUp: .contrastUp,
+    .preciseContrastDown: .contrastDown,
+    .preciseVolumeUp: .volumeUp,
+    .preciseVolumeDown: .volumeDown,
+]
+let preciseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
+    .brightnessUp: .preciseBrightnessUp,
+    .brightnessDown: .preciseBrightnessDown,
+    .contrastUp: .preciseContrastUp,
+    .contrastDown: .preciseContrastDown,
+    .volumeUp: .preciseVolumeUp,
+    .volumeDown: .preciseVolumeDown,
+]
 
 enum HotkeyPart: String, CaseIterable {
     case modifiers, keyCode, enabled
@@ -119,24 +140,34 @@ class Hotkey {
             .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
         ],
         .preciseBrightnessUp: [
-            .enabled: 0,
-            .keyCode: kVK_UpArrow,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option]),
+            .enabled: 1,
+            .keyCode: kVK_F2,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
         ],
         .preciseBrightnessDown: [
-            .enabled: 0,
-            .keyCode: kVK_DownArrow,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option]),
+            .enabled: 1,
+            .keyCode: kVK_F1,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
         ],
         .preciseContrastUp: [
-            .enabled: 0,
-            .keyCode: kVK_UpArrow,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option, .shift]),
+            .enabled: 1,
+            .keyCode: kVK_F2,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift, .option]),
         ],
         .preciseContrastDown: [
-            .enabled: 0,
-            .keyCode: kVK_DownArrow,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option, .shift]),
+            .enabled: 1,
+            .keyCode: kVK_F1,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift, .option]),
+        ],
+        .preciseVolumeUp: [
+            .enabled: 1,
+            .keyCode: kVK_F12,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
+        ],
+        .preciseVolumeDown: [
+            .enabled: 1,
+            .keyCode: kVK_F11,
+            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
         ],
         .brightnessUp: [
             .enabled: 1,
@@ -234,6 +265,10 @@ class Hotkey {
             return #selector(AppDelegate.preciseContrastUpHotkeyHandler)
         case .preciseContrastDown:
             return #selector(AppDelegate.preciseContrastDownHotkeyHandler)
+        case .preciseVolumeUp:
+            return #selector(AppDelegate.preciseVolumeUpHotkeyHandler)
+        case .preciseVolumeDown:
+            return #selector(AppDelegate.preciseVolumeDownHotkeyHandler)
         case .brightnessUp:
             return #selector(AppDelegate.brightnessUpHotkeyHandler)
         case .brightnessDown:
@@ -328,37 +363,66 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .brightnessUp:
-            if flags?.contains(.control) ?? false {
+            if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
+            } else if let flags = flags, flags.contains(.control) {
                 locked = DDC.skipWritingPropertyById[display.id]?.contains(.CONTRAST) ?? false
                 if !locked {
-                    increaseContrast(currentDisplay: true)
+                    if flags.isSuperset(of: [.option, .shift]) {
+                        increaseContrast(by: 1, currentDisplay: true)
+                    } else {
+                        increaseContrast(currentDisplay: true)
+                    }
                 }
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id, locked: locked)
             } else {
                 locked = DDC.skipWritingPropertyById[display.id]?.contains(.BRIGHTNESS) ?? false
                 if !locked {
-                    increaseBrightness(currentDisplay: true)
+                    if flags?.isSuperset(of: [.option, .shift]) ?? false {
+                        increaseBrightness(by: 1, currentDisplay: true)
+                    } else {
+                        increaseBrightness(currentDisplay: true)
+                    }
                 }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id, locked: locked)
             }
         case .brightnessDown:
-            if flags?.contains(.control) ?? false {
+            if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
+            } else if let flags = flags, flags.contains(.control) {
                 locked = DDC.skipWritingPropertyById[display.id]?.contains(.CONTRAST) ?? false
                 if !locked {
-                    decreaseContrast(currentDisplay: true)
+                    if flags.isSuperset(of: [.option, .shift]) {
+                        decreaseContrast(by: 1, currentDisplay: true)
+                    } else {
+                        decreaseContrast(currentDisplay: true)
+                    }
                 }
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: display.id, locked: locked)
             } else {
                 locked = DDC.skipWritingPropertyById[display.id]?.contains(.BRIGHTNESS) ?? false
                 if !locked {
-                    decreaseBrightness(currentDisplay: true)
+                    if flags?.isSuperset(of: [.option, .shift]) ?? false {
+                        decreaseBrightness(by: 1, currentDisplay: true)
+                    } else {
+                        decreaseBrightness(currentDisplay: true)
+                    }
                 }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: display.id, locked: locked)
             }
         case .volumeUp:
+            if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Sound.prefPane"))
+                break
+            }
+
             locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
             if !locked {
-                increaseVolume(currentDisplay: true)
+                if flags?.isSuperset(of: [.option, .shift]) ?? false {
+                    increaseVolume(by: 1, currentDisplay: true)
+                } else {
+                    increaseVolume(currentDisplay: true)
+                }
                 if display.audioMuted {
                     toggleAudioMuted()
                 }
@@ -366,9 +430,18 @@ extension AppDelegate: MediaKeyTapDelegate {
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id, locked: locked)
         case .volumeDown:
+            if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Sound.prefPane"))
+                break
+            }
+
             locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
             if !locked {
-                decreaseVolume(currentDisplay: true)
+                if flags?.isSuperset(of: [.option, .shift]) ?? false {
+                    decreaseVolume(by: 1, currentDisplay: true)
+                } else {
+                    decreaseVolume(currentDisplay: true)
+                }
                 if display.audioMuted {
                     toggleAudioMuted()
                 }
@@ -376,6 +449,11 @@ extension AppDelegate: MediaKeyTapDelegate {
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, displayID: display.id, locked: locked)
         case .mute:
+            if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Sound.prefPane"))
+                break
+            }
+
             locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
             if !locked {
                 toggleAudioMuted()
@@ -431,60 +509,70 @@ extension AppDelegate: MediaKeyTapDelegate {
         log.debug("100% Hotkey pressed")
     }
 
-    @objc func brightnessUpHotkeyHandler() {
-        increaseBrightness()
+    func brightnessUpAction(offset: Int? = nil) {
+        increaseBrightness(by: offset)
 
         for (id, display) in brightnessAdapter.activeDisplays {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
-        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-        //     closeMenuPopover(after: 2500)
-        // }
         log.debug("Brightness Up Hotkey pressed")
     }
 
-    @objc func brightnessDownHotkeyHandler() {
-        decreaseBrightness()
+    func brightnessDownAction(offset: Int? = nil) {
+        decreaseBrightness(by: offset)
 
         for (id, display) in brightnessAdapter.activeDisplays {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
-        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-        //     closeMenuPopover(after: 2500)
-        // }
         log.debug("Brightness Down Hotkey pressed")
     }
 
-    @objc func contrastUpHotkeyHandler() {
-        increaseContrast()
+    func contrastUpAction(offset: Int? = nil) {
+        increaseContrast(by: offset)
 
         for (id, display) in brightnessAdapter.activeDisplays {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
-        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-        //     closeMenuPopover(after: 2500)
-        // }
         log.debug("Contrast Up Hotkey pressed")
     }
 
-    @objc func contrastDownHotkeyHandler() {
-        decreaseContrast()
+    func contrastDownAction(offset: Int? = nil) {
+        decreaseContrast(by: offset)
 
         for (id, display) in brightnessAdapter.activeDisplays {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
-        // if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1, let statusButton = statusItem.button {
-        //     menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-        //     closeMenuPopover(after: 2500)
-        // }
         log.debug("Contrast Down Hotkey pressed")
+    }
+
+    func volumeUpAction(offset: Int? = nil) {
+        increaseVolume(by: offset, currentDisplay: true)
+        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+            toggleAudioMuted()
+        }
+
+        if let display = brightnessAdapter.currentDisplay {
+            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
+        }
+
+        log.debug("Volume Up Hotkey pressed")
+    }
+
+    func volumeDownAction(offset: Int? = nil) {
+        decreaseVolume(by: offset, currentDisplay: true)
+        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+            toggleAudioMuted()
+        }
+
+        if let display = brightnessAdapter.currentDisplay {
+            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
+        }
+
+        log.debug("Volume Down Hotkey pressed")
     }
 
     @objc func muteAudioHotkeyHandler() {
@@ -497,50 +585,52 @@ extension AppDelegate: MediaKeyTapDelegate {
         log.debug("Audio Mute Hotkey pressed")
     }
 
+    @objc func brightnessUpHotkeyHandler() {
+        brightnessUpAction()
+    }
+
+    @objc func brightnessDownHotkeyHandler() {
+        brightnessDownAction()
+    }
+
+    @objc func contrastUpHotkeyHandler() {
+        contrastUpAction()
+    }
+
+    @objc func contrastDownHotkeyHandler() {
+        contrastDownAction()
+    }
+
     @objc func volumeUpHotkeyHandler() {
-        increaseVolume(currentDisplay: true)
-        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
-            toggleAudioMuted()
-        }
-
-        if let display = brightnessAdapter.currentDisplay {
-            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
-        }
-
-        log.debug("Volume Up Hotkey pressed")
+        volumeUpAction()
     }
 
     @objc func volumeDownHotkeyHandler() {
-        decreaseVolume(currentDisplay: true)
-        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
-            toggleAudioMuted()
-        }
-
-        if let display = brightnessAdapter.currentDisplay {
-            Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
-        }
-
-        log.debug("Volume Down Hotkey pressed")
+        volumeDownAction()
     }
 
     @objc func preciseBrightnessUpHotkeyHandler() {
-        increaseBrightness(by: 1)
-        log.debug("Precise Brightness Up Hotkey pressed")
+        brightnessUpAction(offset: 1)
     }
 
     @objc func preciseBrightnessDownHotkeyHandler() {
-        decreaseBrightness(by: 1)
-        log.debug("Precise Brightness Down Hotkey pressed")
+        brightnessDownAction(offset: 1)
     }
 
     @objc func preciseContrastUpHotkeyHandler() {
-        increaseContrast(by: 1)
-        log.debug("Precise Contrast Up Hotkey pressed")
+        contrastUpAction(offset: 1)
     }
 
     @objc func preciseContrastDownHotkeyHandler() {
-        decreaseContrast(by: 1)
-        log.debug("Precise Contrast Down Hotkey pressed")
+        contrastDownAction(offset: 1)
+    }
+
+    @objc func preciseVolumeUpHotkeyHandler() {
+        volumeUpAction(offset: 1)
+    }
+
+    @objc func preciseVolumeDownHotkeyHandler() {
+        volumeDownAction(offset: 1)
     }
 }
 

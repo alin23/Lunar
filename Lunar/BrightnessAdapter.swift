@@ -85,7 +85,19 @@ class BrightnessAdapter {
         }
     }
 
+    var mainDisplay: Display? {
+        guard let screen = getScreenWithMouse(),
+            let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
+        else { return nil }
+
+        return activeDisplays[id]
+    }
+
     var currentDisplay: Display? {
+        if let display = mainDisplay {
+            return display
+        }
+
         let displays = activeDisplays.values.map { $0 }
         if displays.count == 1 {
             return displays[0]

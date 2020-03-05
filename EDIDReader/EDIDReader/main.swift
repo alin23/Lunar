@@ -6,8 +6,8 @@
 //  Copyright © 2019 Alin. All rights reserved.
 //
 
+import Cocoa
 import Foundation
-
 let log = Logger.self
 
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0

@@ -137,8 +137,14 @@ class DDC {
     static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
     static var readFaults = [CGDirectDisplayID: [ControlID: Int]]()
     static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
+    static let semaphore = DispatchSemaphore(value: 1)
 
     static func reset() {
+        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        defer {
+            semaphore.signal()
+        }
+
         DDC.displayPortByUUID.removeAll()
         DDC.displayUUIDByEDID.removeAll()
         DDC.skipReadingPropertyById.removeAll()
@@ -177,6 +183,11 @@ class DDC {
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
+        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        defer {
+            semaphore.signal()
+        }
+
         if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
             log.debug("Skipping write for \(controlID)", context: displayID)
             return false
@@ -249,6 +260,11 @@ class DDC {
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
+        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        defer {
+            semaphore.signal()
+        }
+
         if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
             log.debug("Skipping read for \(controlID)", context: displayID)
             return nil
@@ -316,6 +332,11 @@ class DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
+        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        defer {
+            semaphore.signal()
+        }
+
         var edidData = [UInt8](repeating: 0, count: 256)
         var edid = EDID()
 
