@@ -1,3 +1,18 @@
+# 3.1.0
+## Fixes
+
+- Make active screen detection more reliable
+- Only allow one thread at a time to use DDC to avoid race conditions
+- Disable up/down value change hotkeys when Quick Actions disappear
+- Embed all used Swift libraries to avoid crashes on some systems
+
+## Improvements
+
+- Increase brightness/contrast/volume hotkey step to 6
+- Allow fine-adjustment hotkeys:
+    + Use Option + hotkey for hotkeys assigned from the Lunar hotkey page
+    + Use Option + Shift + hotkey for media keys
+- Open System Preferences for displays/sound when pressing Option + media key
 # 3.0.0
 ## Features
 - Add support for changing monitor volume and mute state
