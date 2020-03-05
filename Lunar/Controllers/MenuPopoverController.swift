@@ -222,6 +222,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 view.removeTrackingArea(area)
             }
             trackingArea = nil
+            if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                appDelegate.disableUpDownHotkeys()
+            }
         }
     }
 

@@ -61,7 +61,19 @@
                                                 <binding destination="3YV-ka-Eop" name="value" keyPath="values.mediaKeysEnabled" id="sle-64-2QR"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Pressing brightness keys changes brightness of active monitor" enabled="NO" indentationLevel="2" id="36q-pn-c3B">
+                                        <menuItem title="Active monitor: the monitor on which the cursor is" enabled="NO" indentationLevel="2" id="36q-pn-c3B">
+                                            <attributedString key="attributedTitle">
+                                                <fragment content="Active monitor: the monitor on which the cursor is">
+                                                    <attributes>
+                                                        <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        <font key="NSFont" metaFont="systemSemibold" size="13"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Pressing brightness keys changes brightness of the active monitor" enabled="NO" indentationLevel="2" id="EjF-yr-5dn">
                                             <attributedString key="attributedTitle">
                                                 <fragment content="Pressing brightness keys changes brightness of active monitor">
                                                     <attributes>
@@ -1375,7 +1387,7 @@
                                             <tableColumns>
                                                 <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1411,7 +1423,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="256" minWidth="256" maxWidth="256" id="Dt1-Ce-6Rl" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1451,7 +1463,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="DLe-P9-tVg" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1514,7 +1526,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="ZQc-qo-r6X" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -2182,6 +2194,81 @@ to view other displays</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="cbu-4B-iNu">
+                                <rect key="frame" x="616" y="543" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="gMi-FM-mm6">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="MZq-89-l65"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qnb-ds-MlX">
+                                <rect key="frame" x="559" y="573" width="143" height="39"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" alignment="center" title="Hold Option for fine adjustments" id="RXL-yL-KzR">
+                                    <font key="font" size="12" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="s97-rH-1bw">
+                                <rect key="frame" x="616" y="463" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="jOV-d4-Dt1">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="gI0-AS-3Zv"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="b9Y-tb-MvW">
+                                <rect key="frame" x="616" y="383" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="55U-Ew-nSS">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="QRR-pQ-bYZ"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="TCD-Wn-oty">
+                                <rect key="frame" x="616" y="303" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="Efi-TG-ecr">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="XPp-Zn-m3K"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="imC-3Y-Xhw">
+                                <rect key="frame" x="615" y="223" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="OWL-AI-BFH">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="Kmf-nr-0RF"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="3Qo-a9-prv">
+                                <rect key="frame" x="616" y="143" width="22" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="above" alignment="center" state="on" inset="2" id="lt1-VG-o4O">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="CsY-A3-xCn"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -2197,6 +2284,12 @@ to view other displays</string>
                         <outlet property="percent25HotkeyView" destination="rE2-oz-MBj" id="QQq-j6-cw2"/>
                         <outlet property="percent50HotkeyView" destination="QMg-N3-c8c" id="dKV-XK-207"/>
                         <outlet property="percent75HotkeyView" destination="pdK-Vf-9Uj" id="xDn-Gy-wMN"/>
+                        <outlet property="preciseBrightnessDownCheckbox" destination="cbu-4B-iNu" id="cH0-df-JMe"/>
+                        <outlet property="preciseBrightnessUpCheckbox" destination="s97-rH-1bw" id="kcd-zd-Kg4"/>
+                        <outlet property="preciseContrastDownCheckbox" destination="b9Y-tb-MvW" id="QKm-LS-MUg"/>
+                        <outlet property="preciseContrastUpCheckbox" destination="TCD-Wn-oty" id="ag1-5n-UPR"/>
+                        <outlet property="preciseVolumeDownCheckbox" destination="imC-3Y-Xhw" id="Zrl-rQ-5U6"/>
+                        <outlet property="preciseVolumeUpCheckbox" destination="3Qo-a9-prv" id="LMQ-WN-qHq"/>
                         <outlet property="startHotkeyView" destination="fS1-2j-dXP" id="zdm-RX-Zce"/>
                         <outlet property="toggleHotkeyView" destination="qSg-Ez-8IX" id="e3t-mX-Onx"/>
                         <outlet property="volumeDownHotkeyView" destination="Us2-PS-6r3" id="iZs-1E-kmf"/>
@@ -2231,7 +2324,7 @@ to view other displays</string>
                                             <tableColumns>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="KxF-Xb-zCR" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2295,7 +2388,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="140" minWidth="140" maxWidth="140" id="LOs-bc-sm1" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2376,7 +2469,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="xyt-ZY-Lle" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="controlContent" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
