@@ -1,3 +1,4 @@
+import Cocoa
 import CryptorECC
 import Foundation
 
@@ -69,4 +70,12 @@ func runInMainThreadAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
     DispatchQueue.main.asyncAfter(deadline: deadline, execute: action)
+}
+
+func getScreenWithMouse() -> NSScreen? {
+    let mouseLocation = NSEvent.mouseLocation
+    let screens = NSScreen.screens
+    let screenWithMouse = (screens.first { NSMouseInRect(mouseLocation, $0.frame, false) })
+
+    return screenWithMouse
 }

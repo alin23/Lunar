@@ -182,16 +182,54 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initHotkeys() {
-        guard let hotkeyConfig: [HotkeyIdentifier: [HotkeyPart: Int]] = datastore.hotkeys() else { return }
+        guard var hotkeyConfig: [HotkeyIdentifier: [HotkeyPart: Int]] = datastore.hotkeys() else { return }
+
         for identifier in HotkeyIdentifier.allCases {
-            guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier], let keyCode = hotkey[.keyCode], let enabled = hotkey[.enabled], let modifiers = hotkey[.modifiers] else { return }
-            if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
-                Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
-                if enabled == 1 {
-                    Hotkey.keys[identifier]??.register()
+            guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier],
+                let keyCode = hotkey[.keyCode],
+                var enabled = hotkey[.enabled],
+                let modifiers = hotkey[.modifiers]
+            else { continue }
+
+            if !preciseHotkeys.contains(identifier) {
+                if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
+                    Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
+                    if enabled == 1 {
+                        Hotkey.keys[identifier]??.register()
+                    }
+                }
+            } else {
+                guard let coarseIdentifier = coarseHotkeysMapping[identifier],
+                    let coarseHotkey = hotkeyConfig[coarseIdentifier] ?? Hotkey.defaults[coarseIdentifier],
+                    let coarseKeyCode = coarseHotkey[.keyCode],
+                    let coarseEnabled = coarseHotkey[.enabled],
+                    let coarseModifiers = coarseHotkey[.modifiers]
+                else { continue }
+
+                var flags = KeyTransformer.cocoaFlags(from: coarseModifiers)
+                if flags.contains(.option) {
+                    log.warning("Hotkey \(coarseIdentifier) already binds option. Fine adjustment will be disabled")
+                    enabled = 0
+                } else {
+                    if coarseEnabled == 0 {
+                        enabled = coarseEnabled
+                    }
+                    flags.insert(.option)
+                }
+
+                let newModifiers = KeyTransformer.carbonFlags(from: flags)
+                hotkeyConfig[identifier]?[.modifiers] = newModifiers
+                hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
+
+                if let keyCombo = KeyCombo(keyCode: coarseKeyCode, carbonModifiers: newModifiers) {
+                    Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
+                    if enabled == 1 {
+                        Hotkey.keys[identifier]??.register()
+                    }
                 }
             }
         }
+        datastore.defaults.set(Hotkey.toNSDictionary(hotkeyConfig), forKey: "hotkeys")
         setKeyEquivalents(hotkeyConfig)
         startOrRestartMediaKeyTap()
     }
@@ -278,9 +316,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func applicationDidResignActive(_: Notification) {
-        log.debug("applicationDidResignActive")
-
+    func disableUpDownHotkeys() {
         log.debug("Unregistering up/down hotkeys")
         HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
         HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
@@ -288,7 +324,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         downHotkey?.unregister()
         upHotkey = nil
         downHotkey = nil
+    }
 
+    func applicationDidResignActive(_: Notification) {
+        log.debug("applicationDidResignActive")
+
+        disableUpDownHotkeys()
         setupHotkeys(enable: false)
     }
 
@@ -736,7 +777,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + amount * 3, minVal: -100, maxVal: 90)
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + amount, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
@@ -749,7 +790,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + amount * 3, minVal: -100, maxVal: 90)
+            let newContrastOffset = cap(datastore.defaults.contrastOffset + amount, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
         }
     }
@@ -762,7 +803,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + -amount * 3, minVal: -100, maxVal: 90)
+            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset - amount, minVal: -100, maxVal: 90)
             datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
         }
     }
@@ -775,7 +816,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + -amount * 3, minVal: -100, maxVal: 90)
+            let newContrastOffset = cap(datastore.defaults.contrastOffset - amount, minVal: -100, maxVal: 90)
             datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
         }
     }

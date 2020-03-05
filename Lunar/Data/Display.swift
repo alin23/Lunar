@@ -140,12 +140,14 @@ enum ValueType {
         didSet {
             save()
             runBoolObservers(property: "active", newValue: active, oldValue: oldValue)
+            activeAndResponsive = active && responsive
         }
     }
 
     @objc dynamic var responsive: Bool = true {
         didSet {
             runBoolObservers(property: "responsive", newValue: responsive, oldValue: oldValue)
+            activeAndResponsive = active && responsive
         }
     }
 
@@ -473,16 +475,6 @@ enum ValueType {
         boolObservers["audioMuted"]!["self.audioMuted"] = { newAudioMuted, _ in
             if !DDC.setAudioMuted(for: self.id, audioMuted: newAudioMuted) {
                 log.warning("Error writing muted audio using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
-            }
-        }
-        boolObservers["active"]!["self.active"] = { newActive, _ in
-            runInMainThread {
-                self.activeAndResponsive = newActive && self.responsive
-            }
-        }
-        boolObservers["responsive"]!["self.responsive"] = { newResponsive, _ in
-            runInMainThread {
-                self.activeAndResponsive = newResponsive && self.active
             }
         }
         numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in

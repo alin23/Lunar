@@ -28,6 +28,21 @@ class HotkeyView: RecordView, RecordViewDelegate {
         }
     }
 
+    var preciseHotkeyCheckbox: NSButton? {
+        didSet {
+            guard let checkbox = preciseHotkeyCheckbox,
+                let identifier = HotkeyIdentifier(rawValue: hotkey.identifier)
+            else { return }
+
+            let hotkeys = datastore.hotkeys() ?? Hotkey.defaults
+            if let coarseHk = hotkeys[identifier], let preciseIdentifier = preciseHotkeysMapping[identifier], let hk = hotkeys[preciseIdentifier] {
+                checkbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[identifier]?[.enabled] ?? 0)
+                checkbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
+                checkbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
+            }
+        }
+    }
+
     var hotkeyEnabled: Bool {
         if let hotkeys = datastore.hotkeys(),
             let identifier = HotkeyIdentifier(rawValue: hotkey.identifier),
@@ -50,6 +65,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewDidClearShortcut(_: RecordView) {
         hotkey.unregister()
+        preciseHotkeyCheckbox?.isEnabled = false
         if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
             hotkeys[identifier]?[.enabled] = 0
             datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
@@ -62,6 +78,17 @@ class HotkeyView: RecordView, RecordViewDelegate {
         hotkey.unregister()
         hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
         hotkey.register()
+
+        if let checkbox = preciseHotkeyCheckbox {
+            if KeyTransformer.cocoaFlags(from: keyCombo.modifiers).contains(.option) {
+                checkbox.isEnabled = false
+                checkbox.toolTip = fineAdjustmentDisabledBecauseOfOptionKey
+            } else {
+                checkbox.isEnabled = true
+                checkbox.toolTip = nil
+            }
+        }
+
         if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
             Hotkey.keys[identifier] = hotkey
             hotkeys[identifier]?[.enabled] = 1
@@ -84,6 +111,18 @@ class HotkeyView: RecordView, RecordViewDelegate {
             } else if hotkeyEnabled {
                 hotkey.register()
             }
+        }
+    }
+
+    func isHotkeyCheckboxEnabled(_ hk: [HotkeyPart: Int]) -> Bool {
+        (hk[.enabled] ?? 1) == 1 && !KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option)
+    }
+
+    func hotkeyCheckboxTooltip(_ hk: [HotkeyPart: Int]) -> String? {
+        if KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option) {
+            return fineAdjustmentDisabledBecauseOfOptionKey
+        } else {
+            return nil
         }
     }
 
