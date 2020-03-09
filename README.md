@@ -2,13 +2,13 @@
 
 ### Intelligent adaptive brightness for your external display
 
-**Note: Lunar changes the actual (physical) brightness and contrast of the monitor. It doesn't use a software overlay.**
+*Note: Lunar changes the actual (physical) brightness and contrast of the monitor. It doesn't use a software overlay.*
 
 ## Table of Contents
 - [Installation methods](#installation-methods)
 - [Features](#features)
 - [Known to work list](#tested-and-known-to-work-with-the-following-types-of-connections)
-#- [Troubleshooting](#troubleshooting)
+- [Troubleshooting](#troubleshooting)
 - [Caveats](#caveats)
 - [Contributing](#contributing)
 
