@@ -4,8 +4,17 @@
 
 **Note: Lunar changes the actual (physical) brightness and contrast of the monitor. It doesn't use a software overlay.**
 
+## Table of Contents
+- [Installation methods](#installation-methods)
+- [Features](#features)
+- [Known to work list](#tested-and-known-to-work-with-the-following-types-of-connections)
+#- [Troubleshooting](#troubleshooting)
+- [Caveats](#caveats)
+- [Contributing](#contributing)
+
 ## Installation methods
 - Download DMG from [Official website](https://lunar.fyi)
+- Download DMG from the [Releases page](https://github.com/alin23/Lunar/releases)
 - `brew cask install lunar`
 
 ![Display page](Images/display.png)
