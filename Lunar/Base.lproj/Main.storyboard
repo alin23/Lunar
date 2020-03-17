@@ -73,7 +73,7 @@
                                             </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
-                                        <menuItem title="Pressing brightness keys changes brightness of the active monitor" enabled="NO" indentationLevel="2" id="EjF-yr-5dn">
+                                        <menuItem title="Pressing brightness keys changes brightness of active monitor" enabled="NO" indentationLevel="2" id="EjF-yr-5dn">
                                             <attributedString key="attributedTitle">
                                                 <fragment content="Pressing brightness keys changes brightness of active monitor">
                                                     <attributes>
@@ -1387,7 +1387,7 @@
                                             <tableColumns>
                                                 <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1423,7 +1423,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="256" minWidth="256" maxWidth="256" id="Dt1-Ce-6Rl" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1463,7 +1463,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="DLe-P9-tVg" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -1526,7 +1526,7 @@
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="ZQc-qo-r6X" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -1690,6 +1690,11 @@
                                 </buttonCell>
                                 <connections>
                                     <action selector="toggleAdaptive:" target="1Bn-Ca-ETm" id="lN7-m5-AxW"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="fEd-4C-dj9">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveDDCTextField" customModule="Lunar" customModuleProvider="target">
@@ -1956,6 +1961,13 @@ to view other displays</string>
                                     <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="NFO-zm-L9k">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
                             </button>
                         </subviews>
                     </view>
@@ -1967,6 +1979,7 @@ to view other displays</string>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>
                         <outlet property="lockContrastHelpButton" destination="09R-D2-mY8" id="qzo-9G-SQM"/>
+                        <outlet property="nonResponsiveDDCTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                         <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="gBY-gE-aP5"/>
@@ -2324,7 +2337,7 @@ to view other displays</string>
                                             <tableColumns>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="KxF-Xb-zCR" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2388,7 +2401,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="140" minWidth="140" maxWidth="140" id="LOs-bc-sm1" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -2469,7 +2482,7 @@ to view other displays</string>
                                                 </tableColumn>
                                                 <tableColumn editable="NO" width="130" minWidth="130" maxWidth="130" id="xyt-ZY-Lle" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
-                                                        <font key="font" metaFont="controlContent" size="11"/>
+                                                        <font key="font" metaFont="label" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>

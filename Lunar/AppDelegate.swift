@@ -29,8 +29,8 @@ private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChange
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
-let bgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.bg", qos: .background, attributes: .concurrent)
-let fgQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
+let concurrentQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
+let serialQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, target: .global())
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = false
@@ -151,7 +151,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager: Session?
     let valuesRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
-        fgQueue.async {
+        serialQueue.async {
             brightnessAdapter.fetchValues()
         }
         completion(NSBackgroundActivityScheduler.Result.finished)
@@ -391,7 +391,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         valuesReaderActivity.interval = 4
         valuesReaderActivity.tolerance = 2
 
-        fgQueue.async {
+        serialQueue.async {
             brightnessAdapter.fetchValues()
         }
 
@@ -544,8 +544,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.startOrRestartMediaKeyTap()
         })
 
-        fgQueue.async {
-            AMCoreAudio.NotificationCenter.defaultCenter.subscribe(AudioEventSubscriber(), eventType: AudioHardwareEvent.self, dispatchQueue: fgQueue)
+        concurrentQueue.async {
+            AMCoreAudio.NotificationCenter.defaultCenter.subscribe(AudioEventSubscriber(), eventType: AudioHardwareEvent.self, dispatchQueue: concurrentQueue)
         }
     }
 
@@ -906,7 +906,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         setDebugMode(1)
 
-        fgQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
+        concurrentQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
             let activeDisplays = brightnessAdapter.activeDisplays
             let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.brightness) })
             let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.contrast) })

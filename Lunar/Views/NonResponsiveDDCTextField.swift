@@ -4,6 +4,17 @@ class NonResponsiveDDCTextField: NSTextField {
     var hover: Bool = false
     var trackingArea: NSTrackingArea?
     var onClick: (() -> Void)?
+    override var isHidden: Bool {
+        didSet {
+            if let adaptiveButton = superview?.subviews.first(
+                where: { v in (v as? QuickAdaptiveButton) != nil }
+            ) as? QuickAdaptiveButton {
+                runInMainThread {
+                    adaptiveButton.isHidden = !self.isHidden
+                }
+            }
+        }
+    }
 
     func setup() {
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
@@ -12,12 +23,12 @@ class NonResponsiveDDCTextField: NSTextField {
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-        // setup()
+        setup()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        // setup()
+        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -31,8 +42,8 @@ class NonResponsiveDDCTextField: NSTextField {
         hover = true
 
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        stringValue = "Click to remove"
-        textColor = NSColor.labelColor
+        stringValue = "Click to reset"
+        textColor = NSColor.systemRed.blended(withFraction: 0.3, of: .systemOrange) ?? NSColor.systemRed
     }
 
     override func mouseExited(with _: NSEvent) {
@@ -43,7 +54,7 @@ class NonResponsiveDDCTextField: NSTextField {
 
         layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
         stringValue = "Non-responsive DDC"
-        textColor = NSColor.secondaryLabelColor
+        textColor = NSColor.systemRed
     }
 
     override func mouseDown(with _: NSEvent) {
