@@ -255,7 +255,9 @@ class DDC {
             DDC.skipWritingPropertyById[displayID] = Set([controlID])
         }
         if controlID == ControlID.BRIGHTNESS || controlID == ControlID.CONTRAST {
-            brightnessAdapter.displays[displayID]?.responsive = false
+            runInMainThread {
+                brightnessAdapter.displays[displayID]?.responsive = false
+            }
         }
     }
 
