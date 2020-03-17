@@ -39,8 +39,8 @@ class DisplayViewController: NSViewController {
     @IBOutlet var displayName: NSTextField!
     @IBOutlet var adaptiveButton: NSButton! {
         didSet {
-            if let button = adaptiveButton, let display = display, display.id != GENERIC_DISPLAY_ID {
-                button.isHidden = true
+            if let button = adaptiveButton, let display = display {
+                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive || brightnessAdapter.mode == .manual
             }
         }
     }
@@ -55,12 +55,13 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var adaptiveHelpButton: HelpButton! {
         didSet {
-            if let button = adaptiveHelpButton, let display = display, display.id != GENERIC_DISPLAY_ID {
-                button.isHidden = true
+            if let button = adaptiveHelpButton, let display = display {
+                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive || brightnessAdapter.mode == .manual
             }
         }
     }
 
+    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField!
     @IBOutlet var lockContrastHelpButton: HelpButton!
     @IBOutlet var lockBrightnessHelpButton: HelpButton!
 
@@ -83,6 +84,18 @@ class DisplayViewController: NSViewController {
             displayName?.stringValue = "No Display"
         } else {
             displayName?.stringValue = display.name
+            nonResponsiveDDCTextField?.onClick = {
+                runInMainThread {
+                    DDC.skipWritingPropertyById[self.display.id]?.removeAll()
+                    DDC.skipReadingPropertyById[self.display.id]?.removeAll()
+                    DDC.writeFaults[self.display.id]?.removeAll()
+                    DDC.readFaults[self.display.id]?.removeAll()
+                    self.display.responsive = true
+                    self.adaptiveButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
+                    self.adaptiveHelpButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
+                    self.view.setNeedsDisplay(self.view.visibleRect)
+                }
+            }
         }
 
         if display.adaptive {
@@ -176,6 +189,9 @@ class DisplayViewController: NSViewController {
             if brightnessAdapter.mode == .manual || !display.activeAndResponsive || display.id == GENERIC_DISPLAY_ID {
                 button.isHidden = true
                 adaptiveHelpButton?.isHidden = true
+            } else {
+                button.isHidden = false
+                adaptiveHelpButton?.isHidden = false
             }
 
             let buttonSize = button.frame
@@ -274,10 +290,14 @@ class DisplayViewController: NSViewController {
 
     func listenForActiveAndResponsiveChange() {
         activeAndResponsiveObserver = { newActiveAndResponsive, _ in
-            if let button = self.adaptiveButton, let display = self.display, let helpButton = self.adaptiveHelpButton {
+            if let button = self.adaptiveButton,
+                let display = self.display,
+                let helpButton = self.adaptiveHelpButton,
+                let textField = self.nonResponsiveDDCTextField {
                 runInMainThread {
                     button.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || brightnessAdapter.mode == .manual
                     helpButton.isHidden = button.isHidden
+                    textField.isHidden = !button.isHidden
                 }
             }
         }
@@ -364,6 +384,7 @@ class DisplayViewController: NSViewController {
         }
         listenForAdaptiveChange()
         listenForAdaptiveModeChange()
+        listenForActiveAndResponsiveChange()
         listenForShowNavigationHintsChange()
     }
 }

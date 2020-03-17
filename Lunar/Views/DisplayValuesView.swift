@@ -26,7 +26,9 @@ class DisplayValuesView: NSTableView {
                 let display = nameCell.objectValue as? Display,
                 let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
                 display.activeAndResponsive {
-                adaptiveButton.isHidden = hidden
+                runInMainThread {
+                    adaptiveButton.isHidden = hidden
+                }
             }
         }
     }
@@ -49,6 +51,19 @@ class DisplayValuesView: NSTableView {
                 return
             }
             notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
+        }
+    }
+
+    func getResetAction(displayID: CGDirectDisplayID) -> (() -> Void) {
+        return {
+            runInMainThread {
+                DDC.skipWritingPropertyById[displayID]?.removeAll()
+                DDC.skipReadingPropertyById[displayID]?.removeAll()
+                DDC.writeFaults[displayID]?.removeAll()
+                DDC.readFaults[displayID]?.removeAll()
+                brightnessAdapter.displays[displayID]?.responsive = true
+                self.setNeedsDisplay()
+            }
         }
     }
 
@@ -96,11 +111,15 @@ class DisplayValuesView: NSTableView {
             let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
                 where: { v in (v as? NotConnectedTextField) != nil }
             ) as? NotConnectedTextField,
+            let nonResponsiveDDCTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                where: { v in (v as? NonResponsiveDDCTextField) != nil }
+            ) as? NonResponsiveDDCTextField,
             let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
             let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
             let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
 
         notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
+        nonResponsiveDDCTextField.onClick = getResetAction(displayID: display.id)
         adaptiveButton.setup(displayID: display.id)
         if display.activeAndResponsive {
             if brightnessAdapter.mode == .manual {
@@ -108,6 +127,8 @@ class DisplayValuesView: NSTableView {
             } else {
                 adaptiveButton.isHidden = false
             }
+        } else {
+            adaptiveButton.isHidden = true
         }
 
         scrollableBrightness.textFieldColor = textFieldColor
