@@ -336,11 +336,11 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil) {
-        fgQueue.async {
+        concurrentQueue.async {
             var keys: [MediaKey]
 
             mediaKeyTap?.stop()
-            mediaKeyTap = nil
+//            mediaKeyTap = nil
             if mediaKeysEnabled ?? datastore.defaults.mediaKeysEnabled {
                 keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
 

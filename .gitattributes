@@ -138,3 +138,4 @@ PreBuiltFrameworks/AMCoreAudio.framework.zip filter=lfs diff=lfs merge=lfs -text
 /Users/alin/Projects/Lunar/Releases/Lunar-2.9.11.dmg filter=lfs diff=lfs merge=lfs -text
 /Users/alin/Projects/Lunar/Releases/Lunar-3.0.0.dmg filter=lfs diff=lfs merge=lfs -text
 /Users/alin/Projects/Lunar/Releases/Lunar-3.1.0.dmg filter=lfs diff=lfs merge=lfs -text
+/Users/alin/Projects/Lunar/Releases/Lunar-3.1.1.dmg filter=lfs diff=lfs merge=lfs -text

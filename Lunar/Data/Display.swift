@@ -140,14 +140,18 @@ enum ValueType {
         didSet {
             save()
             runBoolObservers(property: "active", newValue: active, oldValue: oldValue)
-            activeAndResponsive = active && responsive
+            runInMainThread {
+                activeAndResponsive = active && responsive
+            }
         }
     }
 
     @objc dynamic var responsive: Bool = true {
         didSet {
             runBoolObservers(property: "responsive", newValue: responsive, oldValue: oldValue)
-            activeAndResponsive = active && responsive
+            runInMainThread {
+                activeAndResponsive = active && responsive
+            }
         }
     }
 
@@ -339,7 +343,7 @@ enum ValueType {
         super.init()
 
         if id != GENERIC_DISPLAY_ID {
-            fgQueue.async {
+            serialQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
                 self.refreshVolume()
@@ -389,7 +393,7 @@ enum ValueType {
             minVal = currentValue
             maxVal = value
         }
-        fgQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) {
+        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) {
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: String
