@@ -1,3 +1,14 @@
+# 3.1.1
+## Fixes
+
+- Fix some memory corruption bugs by improving concurrency
+- Properly hide/show the `Non-responsive DDC` message
+- Fix diagnostics encryption key missing
+
+## Improvements
+
+- Add _reset on click_ action to the `Non-responsive DDC` message
+
 # 3.1.0
 ## Fixes
 
