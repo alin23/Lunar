@@ -17,6 +17,17 @@ This setting allows the user to **disable** the adaptive algorithm on a **per-mo
 - `ADAPTIVE` will **allow** Lunar to change the brightness and contrast automatically for this monitor
 - `MANUAL` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
 """
+let BRIGHTNESS_RANGE_HELP_TEXT = """
+## Description
+
+This setting allows the user to change the brightness range for the monitor.
+Some monitors will have an extended brightness range with values up to 255 instead of the standard 100.
+
+If you notice Lunar's 100% doesn't map to your monitor's 100% you might benefit from enabling the extended range by clicking on this button.
+
+- `Normal range` will map Lunar's 100% brightness value to the monitor's 100 value
+- `Extended range` will map Lunar's 100% brightness value to the monitor's 255 value and interpolate the value between 0 and 255
+"""
 let LOCK_BRIGHTNESS_HELP_TEXT = """
 ## Description
 
@@ -45,6 +56,14 @@ class DisplayViewController: NSViewController {
         }
     }
 
+    @IBOutlet var brightnessRangeButton: NSButton! {
+        didSet {
+            if let button = brightnessRangeButton, let display = display {
+                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive
+            }
+        }
+    }
+
     @IBOutlet var scrollableBrightness: ScrollableBrightness!
     @IBOutlet var scrollableContrast: ScrollableContrast!
 
@@ -57,6 +76,14 @@ class DisplayViewController: NSViewController {
         didSet {
             if let button = adaptiveHelpButton, let display = display {
                 button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive || brightnessAdapter.mode == .manual
+            }
+        }
+    }
+
+    @IBOutlet var brightnessRangeHelpButton: HelpButton! {
+        didSet {
+            if let button = brightnessRangeHelpButton, let display = display {
+                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive
             }
         }
     }
@@ -76,6 +103,7 @@ class DisplayViewController: NSViewController {
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
+    var brightnessRangeObserver: ((Bool, Bool) -> Void)?
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
     var showNavigationHintsObserver: NSKeyValueObservation?
 
@@ -93,6 +121,8 @@ class DisplayViewController: NSViewController {
                     self.display.responsive = true
                     self.adaptiveButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
                     self.adaptiveHelpButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
+                    self.brightnessRangeButton?.isHidden = display.id == GENERIC_DISPLAY_ID
+                    self.brightnessRangeHelpButton?.isHidden = display.id == GENERIC_DISPLAY_ID
                     self.view.setNeedsDisplay(self.view.visibleRect)
                 }
             }
@@ -102,6 +132,11 @@ class DisplayViewController: NSViewController {
             adaptiveButton?.state = .on
         } else {
             adaptiveButton?.state = .off
+        }
+        if display.extendedBrightnessRange {
+            brightnessRangeButton?.state = .on
+        } else {
+            brightnessRangeButton?.state = .off
         }
     }
 
@@ -165,18 +200,17 @@ class DisplayViewController: NSViewController {
             break
         }
 
-//        brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode, minBrightness: minBrightness != nil ? Double(minBrightness!) : nil)
         brightnessContrastChart.notifyDataSetChanged()
     }
 
     @IBAction func toggleAdaptive(_ sender: NSButton) {
         switch sender.state {
         case .on:
-            sender.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
+            sender.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
             display?.adaptive = true
             setValuesHidden(false)
         case .off:
-            sender.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
+            sender.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
             display?.adaptive = false
             setValuesHidden(true)
         default:
@@ -184,66 +218,85 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func initAdaptiveButton() {
-        if let button = adaptiveButton {
-            if brightnessAdapter.mode == .manual || !display.activeAndResponsive || display.id == GENERIC_DISPLAY_ID {
-                button.isHidden = true
-                adaptiveHelpButton?.isHidden = true
-            } else {
-                button.isHidden = false
-                adaptiveHelpButton?.isHidden = false
-            }
-
-            let buttonSize = button.frame
-            button.wantsLayer = true
-
-            let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-            activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: adaptiveButtonLabelOn, range: NSMakeRange(0, activeTitle.length))
-            let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
-            inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: adaptiveButtonLabelOff, range: NSMakeRange(0, inactiveTitle.length))
-
-            button.attributedTitle = inactiveTitle
-            button.attributedAlternateTitle = activeTitle
-
-            button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 10))
-            button.layer?.cornerRadius = button.frame.height / 2
-            if button.state == .on {
-                button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
-            } else {
-                button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
-            }
-            adaptiveButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-            button.addTrackingArea(adaptiveButtonTrackingArea)
+    @IBAction func toggleBrightnessRange(_ sender: NSButton) {
+        switch sender.state {
+        case .on:
+            sender.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
+            display?.extendedBrightnessRange = true
+        case .off:
+            sender.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
+            display?.extendedBrightnessRange = false
+        default:
+            return
         }
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        if let button = adaptiveButton, !button.isHidden {
-            button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+    func initToggleButton(_ button: NSButton?, helpButton: NSButton?, buttonColors: [ButtonColor: NSColor]) {
+        guard let button = button else { return }
+        if brightnessAdapter.mode == .manual || !display.activeAndResponsive || display.id == GENERIC_DISPLAY_ID {
+            button.isHidden = true
+            helpButton?.isHidden = true
+        } else {
+            button.isHidden = false
+            helpButton?.isHidden = false
+        }
 
-            if button.state == .on {
-                button.layer?.backgroundColor = adaptiveButtonBgOnHover.cgColor
-            } else {
-                button.layer?.backgroundColor = adaptiveButtonBgOffHover.cgColor
-            }
+        let buttonSize = button.frame
+        button.wantsLayer = true
+
+        let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
+        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonColors[.labelOn]!, range: NSMakeRange(0, activeTitle.length))
+        let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
+        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonColors[.labelOff]!, range: NSMakeRange(0, inactiveTitle.length))
+
+        button.attributedTitle = inactiveTitle
+        button.attributedAlternateTitle = activeTitle
+
+        button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 10))
+        button.layer?.cornerRadius = button.frame.height / 2
+        if button.state == .on {
+            button.layer?.backgroundColor = buttonColors[.bgOn]!.cgColor
+        } else {
+            button.layer?.backgroundColor = buttonColors[.bgOff]!.cgColor
+        }
+        button.addTrackingArea(NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: ["button": button, "colors": buttonColors]))
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        guard let data = event.trackingArea?.userInfo,
+            let button = data["button"] as? NSButton,
+            let colors = data["colors"] as? [ButtonColor: NSColor],
+            !button.isHidden else { return }
+
+        button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+
+        if button.state == .on {
+            button.layer?.backgroundColor = colors[.bgOnHover]!.cgColor
+        } else {
+            button.layer?.backgroundColor = colors[.bgOffHover]!.cgColor
         }
     }
 
-    override func mouseExited(with _: NSEvent) {
-        if let button = adaptiveButton, !button.isHidden {
-            button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+    override func mouseExited(with event: NSEvent) {
+        guard let data = event.trackingArea?.userInfo,
+            let button = data["button"] as? NSButton,
+            let colors = data["colors"] as? [ButtonColor: NSColor],
+            !button.isHidden else { return }
 
-            if button.state == .on {
-                button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
-            } else {
-                button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
-            }
+        button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+
+        if button.state == .on {
+            button.layer?.backgroundColor = colors[.bgOn]!.cgColor
+        } else {
+            button.layer?.backgroundColor = colors[.bgOff]!.cgColor
         }
     }
 
     func setIsHidden(_ value: Bool) {
         adaptiveHelpButton?.isHidden = value
         adaptiveButton.isHidden = value
+        brightnessRangeHelpButton.isHidden = value
+        brightnessRangeButton.isHidden = value
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
@@ -273,11 +326,11 @@ class DisplayViewController: NSViewController {
             if let button = self.adaptiveButton, let display = self.display {
                 runInMainThread {
                     if newAdaptive {
-                        button.layer?.backgroundColor = adaptiveButtonBgOn.cgColor
+                        button.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
                         self.setValuesHidden(false)
                         button.state = .on
                     } else {
-                        button.layer?.backgroundColor = adaptiveButtonBgOff.cgColor
+                        button.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
                         self.setValuesHidden(true)
                         button.state = .off
                     }
@@ -288,20 +341,43 @@ class DisplayViewController: NSViewController {
         display.boolObservers["adaptive"]?["displayViewController-\(view.accessibilityIdentifier())"] = adaptiveObserver!
     }
 
-    func listenForActiveAndResponsiveChange() {
-        activeAndResponsiveObserver = { newActiveAndResponsive, _ in
-            if let button = self.adaptiveButton,
-                let display = self.display,
-                let helpButton = self.adaptiveHelpButton,
-                let textField = self.nonResponsiveDDCTextField {
+    func listenForBrightnessRangeChange() {
+        brightnessRangeObserver = { newBrightnessRange, oldValue in
+            if let button = self.brightnessRangeButton, let display = self.display {
                 runInMainThread {
-                    button.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || brightnessAdapter.mode == .manual
-                    helpButton.isHidden = button.isHidden
-                    textField.isHidden = !button.isHidden
+                    if newBrightnessRange {
+                        button.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
+                        button.state = .on
+                    } else {
+                        button.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
+                        button.state = .off
+                    }
+                    display.readapt(newValue: newBrightnessRange, oldValue: oldValue)
                 }
             }
         }
-        display.boolObservers["activeAndResponsive"]?["displayViewController-\(view.accessibilityIdentifier())"] = adaptiveObserver!
+        display.boolObservers["extendedBrightnessRange"]?["displayViewController-\(view.accessibilityIdentifier())"] = brightnessRangeObserver!
+    }
+
+    func listenForActiveAndResponsiveChange() {
+        activeAndResponsiveObserver = { newActiveAndResponsive, _ in
+            if let display = self.display,
+                let adaptiveButton = self.adaptiveButton,
+                let adaptiveHelpButton = self.adaptiveHelpButton,
+                let brightnessRangeButton = self.brightnessRangeButton,
+                let brightnessRangeHelpButton = self.brightnessRangeHelpButton,
+                let textField = self.nonResponsiveDDCTextField {
+                runInMainThread {
+                    adaptiveButton.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || brightnessAdapter.mode == .manual
+                    adaptiveHelpButton.isHidden = adaptiveButton.isHidden
+                    textField.isHidden = !adaptiveButton.isHidden
+
+                    brightnessRangeButton.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive
+                    brightnessRangeHelpButton.isHidden = brightnessRangeButton.isHidden
+                }
+            }
+        }
+        display.boolObservers["activeAndResponsive"]?["displayViewController-\(view.accessibilityIdentifier())"] = activeAndResponsiveObserver!
     }
 
     func listenForAdaptiveModeChange() {
@@ -355,6 +431,7 @@ class DisplayViewController: NSViewController {
         swipeRightHint?.isHidden = true
 
         adaptiveHelpButton?.helpText = ADAPTIVE_HELP_TEXT
+        brightnessRangeHelpButton?.helpText = BRIGHTNESS_RANGE_HELP_TEXT
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
@@ -364,7 +441,8 @@ class DisplayViewController: NSViewController {
             scrollableBrightness.display = display
             scrollableContrast.display = display
 
-            initAdaptiveButton()
+            initToggleButton(adaptiveButton, helpButton: adaptiveHelpButton, buttonColors: adaptiveButtonColors)
+            initToggleButton(brightnessRangeButton, helpButton: brightnessRangeHelpButton, buttonColors: brightnessRangeButtonColors)
 
             scrollableBrightness.label.textColor = scrollableViewLabelColor
             scrollableContrast.label.textColor = scrollableViewLabelColor
@@ -383,6 +461,7 @@ class DisplayViewController: NSViewController {
             setIsHidden(true)
         }
         listenForAdaptiveChange()
+        listenForBrightnessRangeChange()
         listenForAdaptiveModeChange()
         listenForActiveAndResponsiveChange()
         listenForShowNavigationHintsChange()

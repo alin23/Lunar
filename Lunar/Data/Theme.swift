@@ -25,7 +25,6 @@ let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
 let scrollableTextFieldCaptionColor = mauve.withAlphaComponent(0.7)
-let adaptiveButtonLabelColor = mauve
 
 let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow
 let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow
@@ -39,12 +38,33 @@ let scrollableCaptionColorWhite = mauve.withAlphaComponent(0.5)
 
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
-let adaptiveButtonBgOn = lunarYellow.withAlphaComponent(0.8)
-let adaptiveButtonBgOnHover = adaptiveButtonBgOn.highlight(withLevel: 0.2) ?? adaptiveButtonBgOn
-let adaptiveButtonLabelOn = mauve
-let adaptiveButtonBgOff = gray.withAlphaComponent(0.8)
-let adaptiveButtonBgOffHover = adaptiveButtonBgOn
-let adaptiveButtonLabelOff = mauve.withAlphaComponent(0.25)
+enum ButtonColor: Int {
+    case bgOn
+    case bgOnHover
+    case bgOff
+    case bgOffHover
+    case labelOn
+    case labelOnHover
+    case labelOff
+    case labelOffHover
+}
+
+let adaptiveButtonColors: [ButtonColor: NSColor] = [
+    .bgOn: lunarYellow.withAlphaComponent(0.8),
+    .bgOnHover: red.withAlphaComponent(0.8),
+    .labelOn: mauve,
+    .bgOff: gray.withAlphaComponent(0.8),
+    .bgOffHover: lunarYellow.withAlphaComponent(0.8),
+    .labelOff: mauve.withAlphaComponent(0.25),
+]
+let brightnessRangeButtonColors: [ButtonColor: NSColor] = [
+    .bgOn: green.withAlphaComponent(0.8),
+    .bgOnHover: red.withAlphaComponent(0.8),
+    .labelOn: mauve,
+    .bgOff: gray.withAlphaComponent(0.8),
+    .bgOffHover: green.withAlphaComponent(0.8),
+    .labelOff: mauve.withAlphaComponent(0.25),
+]
 
 let lockButtonBgOn = red.withAlphaComponent(0.8)
 let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn

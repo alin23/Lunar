@@ -79,3 +79,17 @@ func getScreenWithMouse() -> NSScreen? {
 
     return screenWithMouse
 }
+
+func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
+    if number == fromHigh {
+        return toHigh
+    } else if toLow < toHigh {
+        let diff = (toHigh - toLow + 1)
+        let fromDiff = (fromHigh - fromLow)
+        return (number - fromLow) * diff / fromDiff + toLow
+    } else {
+        let diff = (toHigh - toLow - 1)
+        let fromDiff = (fromHigh - fromLow)
+        return (number - fromLow) * diff / fromDiff + toLow
+    }
+}
