@@ -34,6 +34,8 @@ let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
 let LED_CINEMA_NAME = "LED Cinema"
+let COLOR_LCD_NAME = "Color LCD"
+let APPLE_DISPLAY_VENDOR_ID = 0x05AC
 
 enum ValueType {
     case brightness
@@ -63,6 +65,18 @@ enum ValueType {
         didSet {
             save()
             runBoolObservers(property: "adaptive", newValue: adaptive, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var extendedBrightnessRange: Bool {
+        didSet {
+            save()
+
+            if brightnessAdapter.mode != .manual {
+                brightnessAdapter.adaptBrightness()
+            }
+
+            runBoolObservers(property: "extendedBrightnessRange", newValue: extendedBrightnessRange, oldValue: oldValue)
         }
     }
 
@@ -163,6 +177,7 @@ enum ValueType {
 
     var boolObservers: [String: [String: (Bool, Bool) -> Void]] = [
         "adaptive": [:],
+        "extendedBrightnessRange": [:],
         "lockedBrightness": [:],
         "lockedContrast": [:],
         "active": [:],
@@ -199,6 +214,7 @@ enum ValueType {
             minContrast: (config["minContrast"] as? UInt8) ?? DEFAULT_MIN_CONTRAST,
             maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
             adaptive: (config["adaptive"] as? Bool) ?? true,
+            extendedBrightnessRange: (config["extendedBrightnessRange"] as? Bool) ?? false,
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
             lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
             volume: (config["contrast"] as? UInt8) ?? 10,
@@ -257,6 +273,7 @@ enum ValueType {
             "name": name,
             "serial": serial,
             "adaptive": adaptive,
+            "extendedBrightnessRange": extendedBrightnessRange,
             "lockedBrightness": lockedBrightness,
             "lockedContrast": lockedContrast,
             "minContrast": minContrast.uint8Value,
@@ -297,8 +314,16 @@ enum ValueType {
         return name.contains(LED_CINEMA_NAME)
     }
 
+    func isColorLCD() -> Bool {
+        return name.contains(COLOR_LCD_NAME)
+    }
+
     func isAppleDisplay() -> Bool {
         return isUltraFine() || isThunderbolt() || isLEDCinema()
+    }
+
+    func isAppleVendorID() -> Bool {
+        return CGDisplayVendorNumber(id) == APPLE_DISPLAY_VENDOR_ID
     }
 
     init(
@@ -313,6 +338,7 @@ enum ValueType {
         minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
         maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
         adaptive: Bool = true,
+        extendedBrightnessRange: Bool = false,
         lockedBrightness: Bool = false,
         lockedContrast: Bool = false,
         volume: UInt8 = 10,
@@ -322,6 +348,7 @@ enum ValueType {
         self.active = active
         activeAndResponsive = active || id == GENERIC_DISPLAY_ID
         self.adaptive = adaptive
+        self.extendedBrightnessRange = extendedBrightnessRange
         self.lockedBrightness = lockedBrightness
         self.lockedContrast = lockedContrast
         self.audioMuted = audioMuted
@@ -492,13 +519,20 @@ enum ValueType {
                     brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
                 }
 
+                var oldBrightness: UInt8 = oldValue.uint8Value
+                let maxBrightness: Double = 100.0
+                if self.extendedBrightnessRange {
+                    oldBrightness = UInt8(mapNumber(Double(oldBrightness), fromLow: 0, fromHigh: 100, toLow: 0, toHigh: 255).rounded())
+                    brightness = UInt8(mapNumber(Double(brightness), fromLow: 0, fromHigh: 100, toLow: 0, toHigh: 255).rounded())
+                }
+
                 if var extraData = Client.shared?.extra?["\(id)"] as? [String: Any] {
                     extraData["brightness"] = brightness
                     Client.shared?.extra?["\(id)"] = extraData
                 }
                 if datastore.defaults.smoothTransition || appleDisplay {
                     var faults = 0
-                    self.smoothTransition(from: oldValue.uint8Value, to: brightness) { newValue in
+                    self.smoothTransition(from: oldBrightness, to: brightness) { newValue in
                         if faults > 5 {
                             return
                         }
@@ -510,7 +544,7 @@ enum ValueType {
                             }
                         } else {
                             log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
-                            CoreDisplay_Display_SetUserBrightness(id, Double(newValue) / 100.0)
+                            CoreDisplay_Display_SetUserBrightness(id, Double(newValue) / maxBrightness)
                         }
                     }
                 } else {
@@ -520,7 +554,7 @@ enum ValueType {
                         }
                     } else {
                         log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
-                        CoreDisplay_Display_SetUserBrightness(id, Double(brightness) / 100.0)
+                        CoreDisplay_Display_SetUserBrightness(id, Double(brightness) / maxBrightness)
                     }
                 }
 
