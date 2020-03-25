@@ -53,7 +53,7 @@ CHANGELOG_STYLE = H.style(
     }
 
     h2#improvements {
-        color: #3E3E70;
+        color: #515193;
     }
 
     h2#fixes {

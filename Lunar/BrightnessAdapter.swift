@@ -186,9 +186,9 @@ class BrightnessAdapter {
             serialsAndNames = zip(serialsAndNames, serials).map { d, serial in (serial, d.1) }
         }
 
-        let displaySerialIDMapping = Dictionary(uniqueKeysWithValues: zip(serials, displayIDs))
-        let displaySerialNameMapping = Dictionary(uniqueKeysWithValues: serialsAndNames)
-        let displayIDSerialNameMapping = Dictionary(uniqueKeysWithValues: zip(displayIDs, serialsAndNames))
+        let displaySerialIDMapping = Dictionary(zip(serials, displayIDs), uniquingKeysWith: { first, _ in first })
+        let displaySerialNameMapping = Dictionary(serialsAndNames, uniquingKeysWith: { first, _ in first })
+        let displayIDSerialNameMapping = Dictionary(zip(displayIDs, serialsAndNames), uniquingKeysWith: { first, _ in first })
 
         if let displayList = datastore.displays(serials: serials) {
             for display in displayList {
@@ -202,9 +202,9 @@ class BrightnessAdapter {
                 display.addObservers()
             }
 
-            displays = Dictionary(uniqueKeysWithValues: displayList.map {
+            displays = Dictionary(displayList.map {
                 (d) -> (CGDirectDisplayID, Display) in (d.id, d)
-            })
+            }, uniquingKeysWith: { first, _ in first })
 
             let loadedDisplayIDs = Set(displays.keys)
             for id in displayIDs.subtracting(loadedDisplayIDs) {
@@ -217,13 +217,13 @@ class BrightnessAdapter {
             }
 
             let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
-            return Dictionary(uniqueKeysWithValues: storedDisplays.map { d in (d.id, d) })
+            return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
         }
-        displays = Dictionary(uniqueKeysWithValues: displayIDs.map { id in (id, Display(id: id, active: true)) })
+        displays = Dictionary(displayIDs.map { id in (id, Display(id: id, active: true)) }, uniquingKeysWith: { first, _ in first })
         displays.values.forEach { $0.addObservers() }
 
         let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
-        return Dictionary(uniqueKeysWithValues: storedDisplays.map { d in (d.id, d) })
+        return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
     }
 
     func addSentryData() {
