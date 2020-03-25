@@ -16,7 +16,6 @@ PREBUILT_FRAMEWORK_FILES=$(patsubst Carthage/Build/Mac/%.framework,Frameworks/%.
 
 $(ARCHIVED_FRAMEWORK_FILES): PreBuiltFrameworks/%.framework.zip: Carthage/Build/Mac/%.framework
 	carthage archive $* --output PreBuiltFrameworks/
-	git lfs track $@
 
 Patches/%.patch: Carthage/Checkouts/%
 	patch -f -d Carthage/Checkouts/$* -p1 < Patches/$*.patch || true
@@ -48,14 +47,7 @@ carthage-build:
 	carthage build --cache-builds --platform macOS
 
 
-carthage-track:
-	git lfs track PreBuiltFrameworks/*.zip
-	git add .gitattributes
-	git commit -m "Track prebuilt frameworks"
-	git add PreBuiltFrameworks/*.zip
-	git commit -m "Add prebuilt frameworks"
-
-carthage: carthage-update carthage-patch carthage-replace carthage-build carthage-archive carthage-extract carthage-track
+carthage: carthage-update carthage-patch carthage-replace carthage-build carthage-archive carthage-extract
 carthage-dev: carthage-extract
 
 .git/hooks/pre-commit: pre-commit.sh

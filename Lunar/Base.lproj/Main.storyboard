@@ -1680,7 +1680,7 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q49-TR-BYd">
-                                <rect key="frame" x="434" y="223" width="83" height="16"/>
+                                <rect key="frame" x="349" y="203" width="83" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Manual" alternateTitle="Adaptive" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tss-e1-acf">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -1698,7 +1698,7 @@
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveDDCTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="390" y="221" width="170" height="18"/>
+                                <rect key="frame" x="390" y="216" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive DDC" id="dgU-DI-4YJ">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -1949,7 +1949,7 @@ to view other displays</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="nL9-e5-L5B" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="410" y="228" width="16" height="16"/>
+                                <rect key="frame" x="325" y="235" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1969,12 +1969,71 @@ to view other displays</string>
                                     </binding>
                                 </connections>
                             </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TYU-7C-ATm">
+                                <rect key="frame" x="496" y="203" width="83" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Normal" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Ihh-VK-idO">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemBold" size="12"/>
+                                    <string key="keyEquivalent">a</string>
+                                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleBrightnessRange:" target="1Bn-Ca-ETm" id="0JJ-xv-IgA"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="1Hb-x5-98a">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="qzW-e9-2LI" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="611" y="235" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="XK2-PV-E8M">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent">a</string>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="g4R-Ll-pfu">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hY5-kW-cR0">
+                                <rect key="frame" x="355" y="237" width="70" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="ALGORITHM" id="fQJ-oT-sai">
+                                    <font key="font" size="12" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.2008090574035839" green="0.20416015555701822" blue="0.27001700129533679" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d2r-ba-vhZ">
+                                <rect key="frame" x="477" y="237" width="120" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="BRIGHTNESS RANGE" id="mqD-LN-R3I">
+                                    <font key="font" size="12" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.2008090574035839" green="0.20416015555701822" blue="0.27001700129533679" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="adaptiveButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                         <outlet property="adaptiveHelpButton" destination="nL9-e5-L5B" id="wyI-Nu-1gr"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
+                        <outlet property="brightnessRangeButton" destination="TYU-7C-ATm" id="Lrs-So-t0P"/>
+                        <outlet property="brightnessRangeHelpButton" destination="qzW-e9-2LI" id="sLE-d5-3ZN"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>

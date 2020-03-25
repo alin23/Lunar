@@ -24,6 +24,8 @@ xcuserdata/
 *.xcscmblueprint
 Carthage
 Releases/.tmp
+Releases/*.dmg
+Releases/*.delta
 Lunar/Generated/
 .env.sh
 Frameworks/*.framework*
