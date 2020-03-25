@@ -54,6 +54,7 @@ rm -rf $TMP_DIR
 mkdir -p $TMP_DMG_DIR
 cp -R "$BUILD_DIR" "$APP_TMP"
 
+codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags "$APP_TMP/Contents/Frameworks/"*.framework
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags "$APP_TMP/Contents/Library/LoginItems/LunarService.app"
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags --deep "$APP_TMP"
 if not codesign -vvv --deep --strict "$APP_TMP"
@@ -68,7 +69,7 @@ end
 
 ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 
-notarize "$APP_ZIP_TMP" "$APP_TMP" "execute"
+# notarize "$APP_ZIP_TMP" "$APP_TMP" "execute"
 
 set -l APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist")
 set -l APP_LATEST_DMG "$RELEASE_DIR/../Lunar.dmg"
@@ -95,15 +96,12 @@ end
 create-dmg --identity="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_TMP" "$TMP_DMG_DIR"
 cp "$APP_TMP_DMG" "$APP_DMG"
 
-notarize "$APP_DMG" "$APP_DMG" "install"
+# notarize "$APP_DMG" "$APP_DMG" "install"
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
 "$WORK_DIR/bin/generate_appcast" -f "$PRIV_KEY" "$RELEASE_DIR"
 
 cp "$APP_DMG" "$APP_LATEST_DMG"
-git lfs track "$RELEASE_DIR/Lunar-$APP_VERSION.dmg"
-git lfs track "$RELEASE_DIR/Lunar-latest.dmg"
-git lfs track "$RELEASE_DIR/*.delta"
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
 "$WORK_DIR/update_appcast.py" "$PRIV_KEY" (cat "$ED_PRIV_KEY")

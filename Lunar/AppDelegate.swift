@@ -131,8 +131,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var windowController: ModernWindowController?
     var valuesReaderActivity: NSBackgroundActivityScheduler!
     var locationActivity: NSBackgroundActivityScheduler!
-    var syncQueue: OperationQueue!
-    var syncActivity: NSObjectProtocol!
+    var syncActivity: NSBackgroundActivityScheduler!
+    var syncPollingSeconds: Int = datastore.defaults.syncPollingSeconds
 
     var mediaKeysEnabledObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
@@ -146,6 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adaptiveModeObserver: NSKeyValueObservation?
     var hotkeyObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
+    var syncPollingSecondsObserver: NSKeyValueObservation?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
@@ -344,10 +345,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
-        locationActivity.invalidate()
-        if syncActivity != nil {
-            ProcessInfo.processInfo.endActivity(syncActivity)
-        }
+        locationActivity?.invalidate()
+        syncActivity?.invalidate()
 
         switch mode {
         case .location:
@@ -363,21 +362,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
             brightnessAdapter.adaptBrightness()
-            syncActivity = ProcessInfo.processInfo.beginActivity(options: .background, reason: "Built-in brightness synchronization")
-            syncQueue.addOperation {
-                while true {
-                    if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                        brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
-                        if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
-                            let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
-                            builtinBrightness = Double(lastBrightness)
-                        }
 
-                        brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                        brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+            syncActivity.interval = TimeInterval(syncPollingSeconds)
+            syncActivity.tolerance = 0
+            syncActivity.schedule { completion in
+                if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                    brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                    if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
+                        let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
+                        builtinBrightness = Double(lastBrightness)
                     }
-                    Thread.sleep(forTimeInterval: TimeInterval(datastore.defaults.syncPollingSeconds))
+
+                    brightnessAdapter.lastBuiltinBrightness = builtinBrightness
+                    brightnessAdapter.adaptBrightness(percent: builtinBrightness)
                 }
+                completion(NSBackgroundActivityScheduler.Result.finished)
             }
         case .manual:
             log.debug("BrightnessAdapter set to manual")
@@ -387,9 +386,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func initBrightnessAdapterActivity() {
         valuesReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshValues")
         valuesReaderActivity.repeats = true
-        valuesReaderActivity.qualityOfService = .userInitiated
-        valuesReaderActivity.interval = 4
-        valuesReaderActivity.tolerance = 2
+        valuesReaderActivity.qualityOfService = .background
+        valuesReaderActivity.interval = 10
+        valuesReaderActivity.tolerance = 5
 
         serialQueue.async {
             brightnessAdapter.fetchValues()
@@ -397,11 +396,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         valuesReaderActivity.schedule(valuesRefresher)
 
-        locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightness")
+        locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightnessByLocation")
         locationActivity.repeats = true
         locationActivity.qualityOfService = .userInitiated
 
-        syncQueue = OperationQueue()
+        syncActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.syncBrightness")
+        syncActivity.repeats = true
+        syncActivity.qualityOfService = .userInteractive
+
         manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
     }
 
@@ -530,6 +532,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, changeHandler: { _, _ in
             if brightnessAdapter.mode != .manual {
                 brightnessAdapter.adaptBrightness()
+            }
+        })
+
+        syncPollingSecondsObserver = datastore.defaults.observe(\.syncPollingSeconds, changeHandler: { _, change in
+            self.syncPollingSeconds = change.newValue ?? datastore.defaults.syncPollingSeconds
+            if let activity = self.syncActivity, brightnessAdapter.mode == .sync {
+                activity.interval = TimeInterval(self.syncPollingSeconds)
             }
         })
 
@@ -908,8 +917,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         concurrentQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
             let activeDisplays = brightnessAdapter.activeDisplays
-            let oldBrightness = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.brightness) })
-            let oldContrast = [CGDirectDisplayID: NSNumber](uniqueKeysWithValues: activeDisplays.map { ($0, $1.contrast) })
+            let oldBrightness = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.brightness) }, uniquingKeysWith: { first, _ in first })
+            let oldContrast = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.contrast) }, uniquingKeysWith: { first, _ in first })
 
             brightnessAdapter.resetDisplayList()
             for (id, display) in brightnessAdapter.activeDisplays {
