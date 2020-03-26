@@ -121,8 +121,8 @@ class SplitViewController: NSSplitViewController {
     @IBOutlet var logo: NSTextField?
     @IBOutlet var activeStateButton: ToggleButton?
     @IBOutlet var containerView: NSView?
-    @IBOutlet weak var helpButton: HelpButton!
-    @IBOutlet weak var navigationHelpButton: HelpButton!
+    @IBOutlet var helpButton: HelpButton!
+    @IBOutlet var navigationHelpButton: HelpButton!
 
     @IBAction func toggleBrightnessAdapter(sender _: NSButton?) {
         brightnessAdapter.toggle()
