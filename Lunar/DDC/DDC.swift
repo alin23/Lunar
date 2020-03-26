@@ -547,6 +547,8 @@ class DDC {
     }
 
     static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> Double? {
+        log.debug("DDC reading \(controlID) for \(displayID)")
+
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
             return nil
         }
@@ -584,7 +586,6 @@ class DDC {
     }
 
     static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
-        log.debug("DDC reading contrast for \(displayID)")
         return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 

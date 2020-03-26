@@ -30,7 +30,7 @@ private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let concurrentQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, attributes: .concurrent)
-let serialQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", qos: .userInitiated, target: .global())
+let serialQueue = DispatchQueue(label: "site.lunarapp.serial.queue.fg", qos: .userInitiated, target: .global())
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = false
@@ -129,10 +129,11 @@ class AudioEventSubscriber: EventSubscriber {
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager!
     var windowController: ModernWindowController?
-    var valuesReaderActivity: NSBackgroundActivityScheduler!
-    var locationActivity: NSBackgroundActivityScheduler!
-    var syncActivity: NSBackgroundActivityScheduler!
+    var valuesReaderThread: Foundation.Thread!
+    var locationThread: Foundation.Thread!
+    var syncThread: Foundation.Thread!
     var syncPollingSeconds: Int = datastore.defaults.syncPollingSeconds
+    var refreshValues: Bool = datastore.defaults.refreshValues
 
     var mediaKeysEnabledObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
@@ -147,16 +148,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var hotkeyObserver: NSKeyValueObservation?
     var loginItemObserver: NSKeyValueObservation?
     var syncPollingSecondsObserver: NSKeyValueObservation?
+    var refreshValuesObserver: NSKeyValueObservation?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager: Session?
-    let valuesRefresher: ((@escaping NSBackgroundActivityScheduler.CompletionHandler) -> Void) = { completion in
-        serialQueue.async {
-            brightnessAdapter.fetchValues()
-        }
-        completion(NSBackgroundActivityScheduler.Result.finished)
-    }
 
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
@@ -345,64 +341,71 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
-        locationActivity?.invalidate()
-        syncActivity?.invalidate()
+        locationThread?.cancel()
+        syncThread?.cancel()
 
         switch mode {
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
             brightnessAdapter.adaptBrightness()
 
-            locationActivity.interval = 60
-            locationActivity.tolerance = 10
-            locationActivity.schedule { completion in
-                brightnessAdapter.adaptBrightness()
-                completion(NSBackgroundActivityScheduler.Result.finished)
+            locationThread = Thread {
+                while true {
+                    brightnessAdapter.adaptBrightness()
+
+                    if Thread.current.isCancelled { return }
+                    Thread.sleep(forTimeInterval: 60)
+                    if Thread.current.isCancelled { return }
+                }
             }
+            locationThread.start()
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
             brightnessAdapter.adaptBrightness()
 
-            syncActivity.interval = TimeInterval(syncPollingSeconds)
-            syncActivity.tolerance = 0
-            syncActivity.schedule { completion in
-                if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                    brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
-                    if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
-                        let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
-                        builtinBrightness = Double(lastBrightness)
+            syncThread = Thread {
+                while true {
+                    if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
+                        brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                        if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
+                            let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
+                            builtinBrightness = Double(lastBrightness)
+                        }
+
+                        brightnessAdapter.lastBuiltinBrightness = builtinBrightness
+                        brightnessAdapter.adaptBrightness(percent: builtinBrightness)
                     }
 
-                    brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                    brightnessAdapter.adaptBrightness(percent: builtinBrightness)
+                    if Thread.current.isCancelled { return }
+                    Thread.sleep(forTimeInterval: TimeInterval(self.syncPollingSeconds))
+                    if Thread.current.isCancelled { return }
                 }
-                completion(NSBackgroundActivityScheduler.Result.finished)
             }
+            syncThread.start()
         case .manual:
             log.debug("BrightnessAdapter set to manual")
         }
     }
 
-    func initBrightnessAdapterActivity() {
-        valuesReaderActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.refreshValues")
-        valuesReaderActivity.repeats = true
-        valuesReaderActivity.qualityOfService = .background
-        valuesReaderActivity.interval = 10
-        valuesReaderActivity.tolerance = 5
+    func startValuesReaderThread() {
+        valuesReaderThread = Thread {
+            while true {
+                if self.refreshValues {
+                    brightnessAdapter.fetchValues()
+                }
 
-        serialQueue.async {
-            brightnessAdapter.fetchValues()
+                if Thread.current.isCancelled { return }
+                Thread.sleep(forTimeInterval: 10)
+                if Thread.current.isCancelled { return }
+            }
         }
+        valuesReaderThread.start()
+    }
 
-        valuesReaderActivity.schedule(valuesRefresher)
-
-        locationActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.adaptBrightnessByLocation")
-        locationActivity.repeats = true
-        locationActivity.qualityOfService = .userInitiated
-
-        syncActivity = NSBackgroundActivityScheduler(identifier: "site.lunarapp.Lunar.syncBrightness")
-        syncActivity.repeats = true
-        syncActivity.qualityOfService = .userInteractive
+    func initBrightnessAdapterActivity() {
+        if refreshValues {
+            startValuesReaderThread()
+        }
 
         manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
     }
@@ -537,8 +540,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         syncPollingSecondsObserver = datastore.defaults.observe(\.syncPollingSeconds, changeHandler: { _, change in
             self.syncPollingSeconds = change.newValue ?? datastore.defaults.syncPollingSeconds
-            if let activity = self.syncActivity, brightnessAdapter.mode == .sync {
-                activity.interval = TimeInterval(self.syncPollingSeconds)
+        })
+        refreshValuesObserver = datastore.defaults.observe(\.refreshValues, changeHandler: { _, change in
+            self.refreshValues = change.newValue ?? datastore.defaults.refreshValues
+
+            self.valuesReaderThread?.cancel()
+            if self.refreshValues {
+                self.startValuesReaderThread()
             }
         })
 
@@ -664,8 +672,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         datastore.defaults.set(false, forKey: "debug")
 
-        locationActivity.invalidate()
-        valuesReaderActivity.invalidate()
+        locationThread?.cancel()
+        syncThread?.cancel()
+        valuesReaderThread?.cancel()
     }
 
     func geolocationFallback() {
