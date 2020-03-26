@@ -369,7 +369,7 @@ enum ValueType {
         self.serial = (serial ?? Display.uuid(id: id))
         super.init()
 
-        if id != GENERIC_DISPLAY_ID {
+        if id != GENERIC_DISPLAY_ID, datastore.defaults.refreshValues {
             serialQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
@@ -629,10 +629,6 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        if !datastore.defaults.refreshValues, !isAppleDisplay() {
-            return
-        }
-
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
@@ -647,10 +643,6 @@ enum ValueType {
     }
 
     func refreshContrast() {
-        if !datastore.defaults.refreshValues {
-            return
-        }
-
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return
@@ -665,10 +657,6 @@ enum ValueType {
     }
 
     func refreshVolume() {
-        if !datastore.defaults.refreshValues {
-            return
-        }
-
         guard let newVolume = readVolume(), let newAudioMuted = readAudioMuted() else {
             log.warning("Can't read volume for \(name)")
             return

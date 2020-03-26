@@ -48,21 +48,11 @@ This setting allows the user to **restrict** changes on the contrast of this mon
 class DisplayViewController: NSViewController {
     @IBOutlet var displayView: DisplayView!
     @IBOutlet var displayName: NSTextField!
-    @IBOutlet var adaptiveButton: NSButton! {
-        didSet {
-            if let button = adaptiveButton, let display = display {
-                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive || brightnessAdapter.mode == .manual
-            }
-        }
-    }
+    @IBOutlet var adaptiveButton: NSButton!
 
-    @IBOutlet var brightnessRangeButton: NSButton! {
-        didSet {
-            if let button = brightnessRangeButton, let display = display {
-                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive
-            }
-        }
-    }
+    @IBOutlet var brightnessRangeButton: NSButton!
+    @IBOutlet var algorithmText: NSTextField!
+    @IBOutlet var brightnessRangeText: NSTextField!
 
     @IBOutlet var scrollableBrightness: ScrollableBrightness!
     @IBOutlet var scrollableContrast: ScrollableContrast!
@@ -72,21 +62,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var swipeLeftHint: NSTextField!
     @IBOutlet var swipeRightHint: NSTextField!
 
-    @IBOutlet var adaptiveHelpButton: HelpButton! {
-        didSet {
-            if let button = adaptiveHelpButton, let display = display {
-                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive || brightnessAdapter.mode == .manual
-            }
-        }
-    }
+    @IBOutlet var adaptiveHelpButton: HelpButton!
 
-    @IBOutlet var brightnessRangeHelpButton: HelpButton! {
-        didSet {
-            if let button = brightnessRangeHelpButton, let display = display {
-                button.isHidden = display.id == GENERIC_DISPLAY_ID || !display.activeAndResponsive
-            }
-        }
-    }
+    @IBOutlet var brightnessRangeHelpButton: HelpButton!
 
     @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField!
     @IBOutlet var lockContrastHelpButton: HelpButton!
@@ -107,6 +85,37 @@ class DisplayViewController: NSViewController {
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
     var showNavigationHintsObserver: NSKeyValueObservation?
 
+    func setAdaptiveButtonEnabled(_ enabled: Bool) {
+        guard let adaptiveButton = adaptiveButton else { return }
+
+        adaptiveButton.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        adaptiveButton.isEnabled = enabled
+        adaptiveHelpButton?.isEnabled = enabled
+
+        if enabled {
+            switch adaptiveButton.state {
+            case .on:
+                adaptiveButton.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
+            case .off:
+                adaptiveButton.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
+            default:
+                return
+            }
+        } else {
+            adaptiveButton.layer?.backgroundColor = darkMauve.cgColor
+        }
+    }
+
+    func setButtonsHidden(_ hidden: Bool) {
+        adaptiveButton?.isHidden = hidden
+        adaptiveHelpButton?.isHidden = hidden
+        algorithmText?.isHidden = hidden
+
+        brightnessRangeButton?.isHidden = hidden
+        brightnessRangeHelpButton?.isHidden = hidden
+        brightnessRangeText?.isHidden = hidden
+    }
+
     func update(from display: Display) {
         if display.id == GENERIC_DISPLAY_ID {
             displayName?.stringValue = "No Display"
@@ -119,10 +128,8 @@ class DisplayViewController: NSViewController {
                     DDC.writeFaults[self.display.id]?.removeAll()
                     DDC.readFaults[self.display.id]?.removeAll()
                     self.display.responsive = true
-                    self.adaptiveButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
-                    self.adaptiveHelpButton?.isHidden = display.id == GENERIC_DISPLAY_ID || brightnessAdapter.mode == .manual
-                    self.brightnessRangeButton?.isHidden = display.id == GENERIC_DISPLAY_ID
-                    self.brightnessRangeHelpButton?.isHidden = display.id == GENERIC_DISPLAY_ID
+                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+                    self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
                     self.view.setNeedsDisplay(self.view.visibleRect)
                 }
             }
@@ -138,6 +145,10 @@ class DisplayViewController: NSViewController {
         } else {
             brightnessRangeButton?.state = .off
         }
+
+        setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+        setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
+        view.setNeedsDisplay(view.visibleRect)
     }
 
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
@@ -266,7 +277,7 @@ class DisplayViewController: NSViewController {
         guard let data = event.trackingArea?.userInfo,
             let button = data["button"] as? NSButton,
             let colors = data["colors"] as? [ButtonColor: NSColor],
-            !button.isHidden else { return }
+            !button.isHidden, button.isEnabled else { return }
 
         button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
@@ -281,7 +292,7 @@ class DisplayViewController: NSViewController {
         guard let data = event.trackingArea?.userInfo,
             let button = data["button"] as? NSButton,
             let colors = data["colors"] as? [ButtonColor: NSColor],
-            !button.isHidden else { return }
+            !button.isHidden, button.isEnabled else { return }
 
         button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
 
@@ -293,10 +304,8 @@ class DisplayViewController: NSViewController {
     }
 
     func setIsHidden(_ value: Bool) {
-        adaptiveHelpButton?.isHidden = value
-        adaptiveButton.isHidden = value
-        brightnessRangeHelpButton.isHidden = value
-        brightnessRangeButton.isHidden = value
+        setButtonsHidden(value)
+
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
@@ -361,19 +370,12 @@ class DisplayViewController: NSViewController {
 
     func listenForActiveAndResponsiveChange() {
         activeAndResponsiveObserver = { newActiveAndResponsive, _ in
-            if let display = self.display,
-                let adaptiveButton = self.adaptiveButton,
-                let adaptiveHelpButton = self.adaptiveHelpButton,
-                let brightnessRangeButton = self.brightnessRangeButton,
-                let brightnessRangeHelpButton = self.brightnessRangeHelpButton,
-                let textField = self.nonResponsiveDDCTextField {
+            if let display = self.display, let textField = self.nonResponsiveDDCTextField {
                 runInMainThread {
-                    adaptiveButton.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || brightnessAdapter.mode == .manual
-                    adaptiveHelpButton.isHidden = adaptiveButton.isHidden
-                    textField.isHidden = !adaptiveButton.isHidden
+                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
+                    self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
 
-                    brightnessRangeButton.isHidden = display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive
-                    brightnessRangeHelpButton.isHidden = brightnessRangeButton.isHidden
+                    textField.isHidden = !(self.adaptiveButton?.isHidden ?? false)
                 }
             }
         }
@@ -394,14 +396,12 @@ class DisplayViewController: NSViewController {
                     self.scrollableBrightness.disabled = true
                     self.scrollableContrast.disabled = true
                     self.setValuesHidden(true, mode: adaptiveMode)
-                    self.adaptiveButton.isHidden = true
-                    self.adaptiveHelpButton.isHidden = true
+                    self.setAdaptiveButtonEnabled(false)
                 } else {
                     self.scrollableBrightness.disabled = false
                     self.scrollableContrast.disabled = false
                     self.setValuesHidden(false, mode: adaptiveMode)
-                    self.adaptiveButton.isHidden = !self.display.activeAndResponsive || self.display.id == GENERIC_DISPLAY_ID
-                    self.adaptiveHelpButton.isHidden = !self.display.activeAndResponsive || self.display.id == GENERIC_DISPLAY_ID
+                    self.setAdaptiveButtonEnabled(self.display.id != GENERIC_DISPLAY_ID)
                 }
             }
         })
