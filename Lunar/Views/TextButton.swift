@@ -64,4 +64,3 @@ class TextButton: NSButton {
         super.draw(dirtyRect)
     }
 }
-

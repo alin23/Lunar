@@ -1,3 +1,12 @@
+# 3.1.2
+## Fixes
+
+- Fix crash when there are displays with same UUID
+- Fix crash on MediaKeyTap deinit
+
+## Improvements
+
+- Add a way to extend brightness range up to 255 for monitors that support this
 # 3.1.1
 ## Fixes
 

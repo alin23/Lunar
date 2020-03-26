@@ -95,6 +95,9 @@ for item in appcast.iter("item"):
     enclosure.set("url", f"{LUNAR_SITE}/download/{version}")
 
     dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
+    if not dmg.exists():
+        continue
+
     if key_path and not sig:
         enclosure.set(sparkle("dsaSignature"), get_signature(dmg))
     if new_key and not sig:
