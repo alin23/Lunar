@@ -87,6 +87,8 @@ class HelpButton: NSButton {
     }
 
     override func mouseEntered(with _: NSEvent) {
+        if !isEnabled { return }
+
         layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
         alphaValue = 0.7
         shadow = buttonShadow
@@ -108,6 +110,8 @@ class HelpButton: NSButton {
     }
 
     override func mouseExited(with _: NSEvent) {
+        if !isEnabled { return }
+
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         alphaValue = 0.2
         shadow = nil
