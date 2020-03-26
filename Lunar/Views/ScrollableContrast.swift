@@ -115,7 +115,7 @@ class ScrollableContrast: NSView {
                 }
             }
         }
-        display.numberObservers["contrast"]?["scrollableContrast-\(self.accessibilityIdentifier())"] = contrastObserver!
+        display.numberObservers["contrast"]?["scrollableContrast-\(accessibilityIdentifier())"] = contrastObserver!
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {

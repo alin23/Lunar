@@ -64,7 +64,7 @@ class QuickAdaptiveButton: NSButton {
                 }
             }
         }
-        display?.boolObservers["adaptive"]?["quickAdaptiveButton-\(self.accessibilityIdentifier())"] = adaptiveObserver!
+        display?.boolObservers["adaptive"]?["quickAdaptiveButton-\(accessibilityIdentifier())"] = adaptiveObserver!
     }
 
     deinit {

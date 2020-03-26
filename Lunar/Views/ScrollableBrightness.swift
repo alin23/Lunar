@@ -115,7 +115,7 @@ class ScrollableBrightness: NSView {
                 }
             }
         }
-        display.numberObservers["brightness"]?["scrollableBrightness-\(self.accessibilityIdentifier())"] = brightnessObserver!
+        display.numberObservers["brightness"]?["scrollableBrightness-\(accessibilityIdentifier())"] = brightnessObserver!
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
