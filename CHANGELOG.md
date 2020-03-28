@@ -1,3 +1,11 @@
+# 3.1.3
+## Fixes
+
+- Fix Sync mode thread not running on some occasions
+
+## Improvements
+
+- Disable Adaptive button in Manual mode
 # 3.1.2
 ## Fixes
 
