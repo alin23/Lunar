@@ -154,6 +154,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager: Session?
 
+    @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
     @IBOutlet var stateMenuItem: NSMenuItem!
@@ -174,6 +175,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     func menuWillOpen(_: NSMenu) {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3"
+        versionMenuItem?.title = "Lunar v\(version)"
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
         stateMenuItem.title = AppDelegate.getStateMenuItemTitle()
     }
