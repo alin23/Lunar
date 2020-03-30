@@ -66,7 +66,12 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var brightnessRangeHelpButton: HelpButton!
 
-    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField!
+    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField! {
+        didSet {
+            nonResponsiveDDCTextField.isHidden = display.id == GENERIC_DISPLAY_ID
+        }
+    }
+
     @IBOutlet var lockContrastHelpButton: HelpButton!
     @IBOutlet var lockBrightnessHelpButton: HelpButton!
 
@@ -74,9 +79,12 @@ class DisplayViewController: NSViewController {
         didSet {
             if let display = display {
                 update(from: display)
+                noDisplay = display.id == GENERIC_DISPLAY_ID
             }
         }
     }
+
+    @objc dynamic var noDisplay: Bool = false
 
     var adaptiveButtonTrackingArea: NSTrackingArea!
     var adaptiveModeObserver: NSKeyValueObservation?
@@ -306,6 +314,7 @@ class DisplayViewController: NSViewController {
     func setIsHidden(_ value: Bool) {
         setButtonsHidden(value)
 
+        nonResponsiveDDCTextField.isHidden = value
         scrollableBrightness.isHidden = value
         scrollableContrast.isHidden = value
         brightnessContrastChart.isHidden = value
