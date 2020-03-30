@@ -346,7 +346,7 @@ enum ValueType {
     ) {
         self.id = id
         self.active = active
-        activeAndResponsive = active || id == GENERIC_DISPLAY_ID
+        activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
         self.extendedBrightnessRange = extendedBrightnessRange
         self.lockedBrightness = lockedBrightness
