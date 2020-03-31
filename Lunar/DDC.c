@@ -133,7 +133,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
             CFRelease(info);
             IOObjectRelease(iter);
             logToFile("Got EDID for display %d\n\n", displayPort);
-            return CFDataCreateCopy(kCFAllocatorDefault, edidData);
+            return edidData;
         }
         CFRelease(serviceClass);
         CFRelease(info);

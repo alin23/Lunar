@@ -96,50 +96,6 @@ class HotkeyViewController: NSViewController {
         volumeDownHotkeyView.preciseHotkeyCheckbox = preciseVolumeDownCheckbox
 
         muteAudioHotkeyView.hotkey = Hotkey.keys[.muteAudio] ?? nil
-
-        // let isHotkeyCheckboxEnabled = { (hk: [HotkeyPart: Int]) in
-        //     (hk[.enabled] ?? 1) == 1 && !KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option)
-        // }
-
-        // let hotkeyCheckboxTooltip = { (hk: [HotkeyPart: Int]) -> String? in
-        //     if KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option) {
-        //         return fineAdjustmentDisabledBecauseOfOptionKey
-        //     } else {
-        //         return nil
-        //     }
-        // }
-
-        // let hotkeys = datastore.hotkeys() ?? Hotkey.defaults
-        // if let hk = hotkeys[.preciseBrightnessUp], let coarseHk = hotkeys[.brightnessUp] {
-        //     preciseBrightnessUpCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseBrightnessUp]?[.enabled] ?? 0)
-        //     preciseBrightnessUpCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseBrightnessUpCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
-        // if let hk = hotkeys[.preciseBrightnessDown], let coarseHk = hotkeys[.brightnessDown] {
-        //     preciseBrightnessDownCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseBrightnessDown]?[.enabled] ?? 0)
-        //     preciseBrightnessDownCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseBrightnessDownCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
-        // if let hk = hotkeys[.preciseContrastUp], let coarseHk = hotkeys[.contrastUp] {
-        //     preciseContrastUpCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseContrastUp]?[.enabled] ?? 0)
-        //     preciseContrastUpCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseContrastUpCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
-        // if let hk = hotkeys[.preciseContrastDown], let coarseHk = hotkeys[.contrastDown] {
-        //     preciseContrastDownCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseContrastDown]?[.enabled] ?? 0)
-        //     preciseContrastDownCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseContrastDownCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
-        // if let hk = hotkeys[.preciseVolumeUp], let coarseHk = hotkeys[.volumeUp] {
-        //     preciseVolumeUpCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseVolumeUp]?[.enabled] ?? 0)
-        //     preciseVolumeUpCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseVolumeUpCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
-        // if let hk = hotkeys[.preciseVolumeDown], let coarseHk = hotkeys[.volumeDown] {
-        //     preciseVolumeDownCheckbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[.preciseVolumeDown]?[.enabled] ?? 0)
-        //     preciseVolumeDownCheckbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-        //     preciseVolumeDownCheckbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
-        // }
     }
 
     override func mouseDown(with event: NSEvent) {

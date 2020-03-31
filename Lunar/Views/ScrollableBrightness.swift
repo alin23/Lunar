@@ -115,7 +115,7 @@ class ScrollableBrightness: NSView {
                 }
             }
         }
-        display.numberObservers["brightness"]?["scrollableBrightness-\(accessibilityIdentifier())"] = brightnessObserver!
+        display.setObserver(prop: "brightness", key: "scrollableBrightness-\(accessibilityIdentifier())", action: brightnessObserver!)
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
@@ -206,7 +206,7 @@ class ScrollableBrightness: NSView {
     }
 
     deinit {
-        display.numberObservers["brightness"]?.removeValue(forKey: "scrollableBrightness-\(self.accessibilityIdentifier())")
+        display.resetObserver(prop: "brightness", key: "scrollableBrightness-\(self.accessibilityIdentifier())", type: NSNumber.self)
     }
 
     override init(frame frameRect: NSRect) {

@@ -11,7 +11,126 @@ import Cocoa
 import Foundation
 import Magnet
 
-class PageController: NSPageController, NSPageControllerDelegate {
+extension AppDelegate: NSPageControllerDelegate {
+    func pageControllerWillStartLiveTransition(_: NSPageController) {
+        helpPopover.close()
+    }
+
+    func pageControllerDidEndLiveTransition(_ c: NSPageController) {
+        guard let c = c as? PageController else { return }
+
+        if let splitViewController = c.parent as? SplitViewController {
+            let identifier = pageController(c, identifierFor: c.arrangedObjects[c.selectedIndex])
+            let viewController = pageController(c, viewControllerForIdentifier: identifier)
+            if c.selectedIndex == 0 {
+                hideSwipeToHotkeysHint()
+                hideSwipeLeftHint(c: c)
+                splitViewController.mauveBackground()
+            } else if c.selectedIndex == 1 {
+                hideSwipeLeftHint(c: c)
+                splitViewController.yellowBackground()
+                if let settingsController = viewController as? SettingsPageController {
+                    settingsController.initGraph(display: brightnessAdapter.firstDisplay)
+                }
+            } else {
+                if c.selectedIndex > 2 {
+                    hideSwipeRightHint(c: c)
+                }
+                splitViewController.whiteBackground()
+                if let displayController = viewController as? DisplayViewController {
+                    displayController.initGraph()
+                }
+            }
+            for object in c.arrangedObjects {
+                let otherIdentifier = pageController(c, identifierFor: object)
+                if identifier == otherIdentifier {
+                    continue
+                }
+                let viewController = pageController(c, viewControllerForIdentifier: otherIdentifier)
+                if (viewController as? HotkeyViewController) != nil {
+                    continue
+                } else if let viewController = viewController as? SettingsPageController {
+                    viewController.zeroGraph()
+                } else if let viewController = viewController as? DisplayViewController {
+                    viewController.zeroGraph()
+                }
+            }
+        }
+        c.pageControl?.currentPage = c.selectedIndex
+    }
+
+    func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
+        if let identifier = object as? NSPageController.ObjectIdentifier {
+            return identifier
+        }
+        return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
+    }
+
+    func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
+        let c = c as! PageController
+
+        if c.viewControllers[identifier] == nil {
+            if identifier == c.hotkeyViewControllerIdentifier {
+                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
+            } else if identifier == c.settingsPageControllerIdentifier {
+                let settingsPageController = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
+                settingsPageController.pageController = c
+                c.viewControllers[identifier] = settingsPageController
+            } else {
+                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
+            }
+        }
+
+        if let displayController = c.viewControllers[identifier] as? DisplayViewController,
+            let displayId = CGDirectDisplayID(identifier) {
+            if displayId == TEST_DISPLAY_ID {
+                displayController.display = TEST_DISPLAY()
+            } else if displayId != GENERIC_DISPLAY.id {
+                displayController.display = brightnessAdapter.displays[displayId]
+            } else {
+                displayController.display = GENERIC_DISPLAY
+            }
+            if let display = c.arrangedObjects[2] as? Display, display.id == displayId {
+                displayController.swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
+                displayController.swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || c.arrangedObjects.count <= 3
+            }
+        }
+
+        return c.viewControllers[identifier]!
+    }
+
+    func hideSwipeToHotkeysHint() {
+        if !datastore.defaults.didSwipeToHotkeys {
+            datastore.defaults.set(true, forKey: "didSwipeToHotkeys")
+        }
+    }
+
+    func hideSwipeLeftHint(c: NSPageController) {
+        if !datastore.defaults.didSwipeLeft {
+            datastore.defaults.set(true, forKey: "didSwipeLeft")
+            if let display = c.arrangedObjects[2] as? Display {
+                let identifier = pageController(c, identifierFor: display)
+                if let c = pageController(c, viewControllerForIdentifier: identifier) as? DisplayViewController {
+                    c.swipeLeftHint?.isHidden = true
+                }
+            }
+        }
+    }
+
+    func hideSwipeRightHint(c: NSPageController) {
+        if !datastore.defaults.didSwipeRight {
+            datastore.defaults.set(true, forKey: "didSwipeRight")
+            if let display = c.arrangedObjects[2] as? Display {
+                let identifier = pageController(c, identifierFor: display)
+                if let c = pageController(c, viewControllerForIdentifier: identifier) as? DisplayViewController {
+                    c.swipeRightHint?.isHidden = true
+                }
+            }
+        }
+    }
+}
+
+class PageController: NSPageController {
     var pageControl: PageControl!
 
     override var arrangedObjects: [Any] {
@@ -38,7 +157,7 @@ class PageController: NSPageController, NSPageControllerDelegate {
     }
 
     func setup() {
-        delegate = self
+        delegate = appDelegate()
 
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
         let activeDisplays = brightnessAdapter.activeDisplays
@@ -85,119 +204,6 @@ class PageController: NSPageController, NSPageControllerDelegate {
         super.viewDidLoad()
         setup()
         setupHotkeys(enable: true)
-    }
-
-    func hideSwipeToHotkeysHint() {
-        if !datastore.defaults.didSwipeToHotkeys {
-            datastore.defaults.set(true, forKey: "didSwipeToHotkeys")
-        }
-    }
-
-    func hideSwipeLeftHint() {
-        if !datastore.defaults.didSwipeLeft {
-            datastore.defaults.set(true, forKey: "didSwipeLeft")
-            if let display = arrangedObjects[2] as? Display {
-                let identifier = pageController(self, identifierFor: display)
-                if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
-                    controller.swipeLeftHint?.isHidden = true
-                }
-            }
-        }
-    }
-
-    func hideSwipeRightHint() {
-        if !datastore.defaults.didSwipeRight {
-            datastore.defaults.set(true, forKey: "didSwipeRight")
-            if let display = arrangedObjects[2] as? Display {
-                let identifier = pageController(self, identifierFor: display)
-                if let controller = pageController(self, viewControllerForIdentifier: identifier) as? DisplayViewController {
-                    controller.swipeRightHint?.isHidden = true
-                }
-            }
-        }
-    }
-
-    func pageControllerWillStartLiveTransition(_: NSPageController) {
-        helpPopover.close()
-    }
-
-    func pageControllerDidEndLiveTransition(_: NSPageController) {
-        if let splitViewController = parent as? SplitViewController {
-            let identifier = pageController(self, identifierFor: arrangedObjects[selectedIndex])
-            let viewController = pageController(self, viewControllerForIdentifier: identifier)
-            if selectedIndex == 0 {
-                hideSwipeToHotkeysHint()
-                hideSwipeLeftHint()
-                splitViewController.mauveBackground()
-            } else if selectedIndex == 1 {
-                hideSwipeLeftHint()
-                splitViewController.yellowBackground()
-                if let settingsController = viewController as? SettingsPageController {
-                    settingsController.initGraph(display: brightnessAdapter.firstDisplay)
-                }
-            } else {
-                if selectedIndex > 2 {
-                    hideSwipeRightHint()
-                }
-                splitViewController.whiteBackground()
-                if let displayController = viewController as? DisplayViewController {
-                    displayController.initGraph()
-                }
-            }
-            for object in arrangedObjects {
-                let otherIdentifier = pageController(self, identifierFor: object)
-                if identifier == otherIdentifier {
-                    continue
-                }
-                let controller = pageController(self, viewControllerForIdentifier: otherIdentifier)
-                if (controller as? HotkeyViewController) != nil {
-                    continue
-                } else if let c = controller as? SettingsPageController {
-                    c.zeroGraph()
-                } else if let c = controller as? DisplayViewController {
-                    c.zeroGraph()
-                }
-            }
-        }
-        pageControl?.currentPage = selectedIndex
-    }
-
-    func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
-        if let identifier = object as? NSPageController.ObjectIdentifier {
-            return identifier
-        }
-        return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
-    }
-
-    func pageController(_: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
-        if viewControllers[identifier] == nil {
-            if identifier == hotkeyViewControllerIdentifier {
-                viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
-            } else if identifier == settingsPageControllerIdentifier {
-                let settingsPageController = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
-                settingsPageController.pageController = self
-                viewControllers[identifier] = settingsPageController
-            } else {
-                viewControllers[identifier] = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
-            }
-        }
-
-        if let controller = viewControllers[identifier] as? DisplayViewController,
-            let displayId = CGDirectDisplayID(identifier) {
-            if displayId == TEST_DISPLAY_ID {
-                controller.display = TEST_DISPLAY()
-            } else if displayId != GENERIC_DISPLAY.id {
-                controller.display = brightnessAdapter.displays[displayId]
-            } else {
-                controller.display = GENERIC_DISPLAY
-            }
-            if let display = arrangedObjects[2] as? Display, display.id == displayId {
-                controller.swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
-                controller.swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || arrangedObjects.count <= 3
-            }
-        }
-
-        return viewControllers[identifier]!
     }
 
     override var representedObject: Any? {

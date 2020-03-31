@@ -328,6 +328,8 @@ class ConfigurationViewController: NSViewController {
     var locationLatObserver: NSKeyValueObservation?
     var locationLonObserver: NSKeyValueObservation?
 
+    weak var settingsController: SettingsPageController?
+
     func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
         noonDurationVisible = adaptiveMode == .location
         daylightExtensionVisible = adaptiveMode == .location
@@ -417,9 +419,7 @@ class ConfigurationViewController: NSViewController {
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            if let settingsController = self.parent?.parent as? SettingsPageController {
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
-            }
+            self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
         }
         sunriseObserver = datastore.defaults.observe(\.sunrise, options: [.old, .new], changeHandler: updateDataset)
         sunsetObserver = datastore.defaults.observe(\.sunset, options: [.old, .new], changeHandler: updateDataset)
@@ -571,10 +571,10 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
             },
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
             }
         )
     }
@@ -587,10 +587,10 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
             },
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
             }
         )
     }
@@ -604,10 +604,10 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "curveFactor", lowerLimit: 0.0, upperLimit: 10.0,
             onMouseEnter: { settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, factor: self.curveFactorField.doubleValue, withAnimation: true)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: self.curveFactorField.doubleValue, withAnimation: true)
             },
             onValueChangedInstantDouble: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, factor: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: value)
             }
         )
     }
@@ -618,7 +618,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value)
             }
         )
     }
@@ -629,7 +629,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
             }
         )
     }
@@ -683,13 +683,13 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.brightnessLimitMax - 1),
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
             }
         )
         setupScrollableTextField(
             maxField, caption: maxCaption, settingKey: "brightnessLimitMax", lowerLimit: Double(datastore.defaults.brightnessLimitMin + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
             }
         )
     }
@@ -703,13 +703,13 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.contrastLimitMax - 1),
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
             }
         )
         setupScrollableTextField(
             maxField, caption: maxCaption, settingKey: "contrastLimitMax", lowerLimit: Double(datastore.defaults.contrastLimitMin + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
             }
         )
     }
@@ -730,7 +730,7 @@ class ConfigurationViewController: NSViewController {
             onMouseEnter: { _ in },
             onValueChangedDouble: { _, settingsController in
                 datastore.defaults.set(true, forKey: "manualLocation")
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
             }
         )
         setupScrollableTextField(
@@ -738,19 +738,30 @@ class ConfigurationViewController: NSViewController {
             onMouseEnter: { _ in },
             onValueChangedDouble: { _, settingsController in
                 datastore.defaults.set(true, forKey: "manualLocation")
-                settingsController.updateDataset(display: brightnessAdapter.firstDisplay)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
             }
         )
+    }
+
+    func resetScrollableTextField(_ field: ScrollableTextField?) {
+        if let field = field {
+            field.onValueChanged = nil
+            field.onValueChangedDouble = nil
+            field.onValueChangedInstant = nil
+            field.onValueChangedInstantDouble = nil
+            field.onMouseEnter = nil
+            field.caption = nil
+        }
     }
 
     func setupScrollableTextField(
         _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
         lowerLimit: Double, upperLimit: Double,
-        onMouseEnter: ((SettingsPageController) -> Void)? = nil,
-        onValueChangedInstant: ((Int, SettingsPageController) -> Void)? = nil,
-        onValueChangedInstantDouble: ((Double, SettingsPageController) -> Void)? = nil,
-        onValueChanged: ((Int, SettingsPageController) -> Void)? = nil,
-        onValueChangedDouble: ((Double, SettingsPageController) -> Void)? = nil
+        onMouseEnter: ((SettingsPageController?) -> Void)? = nil,
+        onValueChangedInstant: ((Int, SettingsPageController?) -> Void)? = nil,
+        onValueChangedInstantDouble: ((Double, SettingsPageController?) -> Void)? = nil,
+        onValueChanged: ((Int, SettingsPageController?) -> Void)? = nil,
+        onValueChangedDouble: ((Double, SettingsPageController?) -> Void)? = nil
     ) {
         field.textFieldColor = scrollableTextFieldColorWhite
         field.textFieldColorHover = scrollableTextFieldColorHoverWhite
@@ -771,46 +782,42 @@ class ConfigurationViewController: NSViewController {
         }
         field.lowerLimit = lowerLimit
         field.upperLimit = upperLimit
-        if let settingsController = parent?.parent as? SettingsPageController {
-            if let handler = onValueChangedInstant {
-                field.onValueChangedInstant = { value in
-                    handler(value, settingsController)
-                }
+        if let handler = onValueChangedInstant {
+            field.onValueChangedInstant = { value in
+                handler(value, self.settingsController)
             }
-            if let handler = onValueChangedInstantDouble {
-                field.onValueChangedInstantDouble = { value in
-                    handler(value, settingsController)
-                }
+        }
+        if let handler = onValueChangedInstantDouble {
+            field.onValueChangedInstantDouble = { value in
+                handler(value, self.settingsController)
             }
-            if let handler = onValueChanged {
-                field.onValueChanged = { value in
-                    datastore.defaults.set(value, forKey: settingKey)
-                    handler(value, settingsController)
-                }
+        }
+        if let handler = onValueChanged {
+            field.onValueChanged = { value in
+                datastore.defaults.set(value, forKey: settingKey)
+                handler(value, self.settingsController)
             }
-            if let handler = onValueChangedDouble {
-                field.onValueChangedDouble = { value in
-                    datastore.defaults.set(value, forKey: settingKey)
-                    handler(value, settingsController)
-                }
+        }
+        if let handler = onValueChangedDouble {
+            field.onValueChangedDouble = { value in
+                datastore.defaults.set(value, forKey: settingKey)
+                handler(value, self.settingsController)
             }
-            if let handler = onMouseEnter {
-                field.onMouseEnter = {
-                    handler(settingsController)
-                }
-            } else {
-                field.onMouseEnter = {
-                    settingsController.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
-                }
+        }
+        if let handler = onMouseEnter {
+            field.onMouseEnter = {
+                handler(self.settingsController)
+            }
+        } else {
+            field.onMouseEnter = {
+                self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
             }
         }
     }
 
     @IBAction func resetLocation(_: Any?) {
         datastore.defaults.set(false, forKey: "manualLocation")
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-            appDelegate.startReceivingSignificantLocationChanges()
-        }
+        appDelegate().startReceivingSignificantLocationChanges()
     }
 
     func setup() {
@@ -854,6 +861,7 @@ class ConfigurationViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        settingsController = parent?.parent as? SettingsPageController
         setup()
     }
 }

@@ -175,6 +175,8 @@ enum ValueType {
         }
     }
 
+    let semaphore = DispatchSemaphore(value: 1)
+
     var boolObservers: [String: [String: (Bool, Bool) -> Void]] = [
         "adaptive": [:],
         "extendedBrightnessRange": [:],
@@ -227,7 +229,12 @@ enum ValueType {
     }
 
     func runNumberObservers(property: String, newValue: NSNumber, oldValue: NSNumber) {
-        guard let obs = numberObservers[property] else { return }
+        semaphore.wait()
+        guard let obs = numberObservers[property] else {
+            semaphore.signal()
+            return
+        }
+        semaphore.signal()
 
         for (_, observer) in obs {
             observer(newValue, oldValue)
@@ -235,7 +242,12 @@ enum ValueType {
     }
 
     func runBoolObservers(property: String, newValue: Bool, oldValue: Bool) {
-        guard let obs = boolObservers[property] else { return }
+        semaphore.wait()
+        guard let obs = boolObservers[property] else {
+            semaphore.signal()
+            return
+        }
+        semaphore.signal()
 
         for (_, observer) in obs {
             observer(newValue, oldValue)
@@ -470,6 +482,12 @@ enum ValueType {
                 self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
         ]
+
+        semaphore.wait()
+        defer {
+            semaphore.signal()
+        }
+
         numberObservers["minBrightness"]!["self.minBrightness"] = { newValue, oldValue in
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["minBrightness"] = newValue
@@ -686,7 +704,52 @@ enum ValueType {
         datastore.defaults.set(true, forKey: "smoothTransition")
     }
 
+    func setObserver<T>(prop: String, key: String, action: @escaping ((T, T) -> Void)) {
+        semaphore.wait()
+        defer {
+            semaphore.signal()
+        }
+
+        switch T.self {
+        case is NSNumber.Type:
+            if numberObservers[prop] != nil {
+                numberObservers[prop]![key] = (action as! ((NSNumber, NSNumber) -> Void))
+            }
+        case is Bool.Type:
+            if boolObservers[prop] != nil {
+                boolObservers[prop]![key] = (action as! ((Bool, Bool) -> Void))
+            }
+        default:
+            log.warning("Unknown observer type: \(T.self)")
+        }
+    }
+
+    func resetObserver<T>(prop: String, key: String, type: T.Type) {
+        semaphore.wait()
+        defer {
+            semaphore.signal()
+        }
+
+        switch type {
+        case is NSNumber.Type:
+            if numberObservers[prop] != nil {
+                numberObservers[prop]!.removeValue(forKey: key)
+            }
+        case is Bool.Type:
+            if boolObservers[prop] != nil {
+                boolObservers[prop]!.removeValue(forKey: key)
+            }
+        default:
+            log.warning("Unknown observer type: \(T.self)")
+        }
+    }
+
     func removeObservers() {
+        semaphore.wait()
+        defer {
+            semaphore.signal()
+        }
+
         boolObservers.removeAll(keepingCapacity: true)
         numberObservers.removeAll(keepingCapacity: true)
         datastoreObservers.removeAll(keepingCapacity: true)
