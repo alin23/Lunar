@@ -211,7 +211,10 @@ class Hotkey {
     static func toDictionary(_ hotkeys: [String: Any]) -> [HotkeyIdentifier: [HotkeyPart: Int]] {
         var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
         for (k, v) in hotkeys {
-            guard let identifier = HotkeyIdentifier(rawValue: k), let hotkeyDict = v as? [String: Int] else { continue }
+            guard let identifier = HotkeyIdentifier(rawValue: k), let hotkeyDict = v as? [String: Int] else {
+                log.warning("Unknown Hotkey identifier: \(k): \(v)")
+                continue
+            }
             var hotkey: [HotkeyPart: Int] = [:]
             for (hk, hv) in hotkeyDict {
                 guard let part = HotkeyPart(rawValue: hk) else { continue }
@@ -336,7 +339,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil) {
-        concurrentQueue.async {
+        let workItem = DispatchWorkItem {
             var keys: [MediaKey]
 
             mediaKeyTap?.stop()
@@ -351,6 +354,13 @@ extension AppDelegate: MediaKeyTapDelegate {
                 mediaKeyTap = MediaKeyTap(delegate: self, for: keys, observeBuiltIn: false)
                 mediaKeyTap?.start()
             }
+        }
+        concurrentQueue.async(execute: workItem)
+        switch workItem.wait(timeout: DispatchTime.now() + 5) {
+        case .timedOut:
+            workItem.cancel()
+        default:
+            return
         }
     }
 

@@ -36,8 +36,9 @@ class DisplayValuesView: NSTableView {
     deinit {
         enumerateAvailableRowViews { rowView, _ in
             if let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display {
-                display.numberObservers["brightness"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
-                display.numberObservers["contrast"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
+                let id = "displayValuesView-\(accessibilityIdentifier())"
+                display.resetObserver(prop: "brightness", key: id, type: NSNumber.self)
+                display.resetObserver(prop: "contrast", key: id, type: NSNumber.self)
             }
         }
     }
@@ -90,8 +91,10 @@ class DisplayValuesView: NSTableView {
         guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display else {
             return
         }
-        display.numberObservers["brightness"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
-        display.numberObservers["contrast"]?.removeValue(forKey: "displayValuesView-\(accessibilityIdentifier())")
+        let id = "displayValuesView-\(accessibilityIdentifier())"
+        display.resetObserver(prop: "brightness", key: id, type: NSNumber.self)
+        display.resetObserver(prop: "contrast", key: id, type: NSNumber.self)
+
         brightnessObservers.removeValue(forKey: display.id)
         contrastObservers.removeValue(forKey: display.id)
     }
@@ -182,8 +185,10 @@ class DisplayValuesView: NSTableView {
                 }
             }
         }
-        display.numberObservers["brightness"]?["displayValuesView-\(accessibilityIdentifier())"] = brightnessObservers[id]!
-        display.numberObservers["contrast"]?["displayValuesView-\(accessibilityIdentifier())"] = contrastObservers[id]!
+
+        let oid = "displayValuesView-\(accessibilityIdentifier())"
+        display.setObserver(prop: "brightness", key: oid, action: brightnessObservers[id]!)
+        display.setObserver(prop: "contrast", key: oid, action: contrastObservers[id]!)
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {
