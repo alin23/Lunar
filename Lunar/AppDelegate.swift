@@ -25,6 +25,19 @@ extension Collection where Index: Comparable {
     }
 }
 
+extension NSViewController {
+    func listenForWindowClose(window: NSWindow) {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillClose(notification:)),
+            name: NSWindow.willCloseNotification,
+            object: window
+        )
+    }
+
+    @objc func windowWillClose(notification _: Notification) {}
+}
+
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
@@ -113,9 +126,7 @@ class AudioEventSubscriber: EventSubscriber {
         switch hwEvent {
         case .defaultOutputDeviceChanged, .defaultSystemOutputDeviceChanged:
             runInMainThread {
-                if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-                    appDelegate.startOrRestartMediaKeyTap()
-                }
+                appDelegate().startOrRestartMediaKeyTap()
             }
         default:
             return
@@ -189,7 +200,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 let keyCode = hotkey[.keyCode],
                 var enabled = hotkey[.enabled],
                 let modifiers = hotkey[.modifiers]
-            else { continue }
+            else {
+                continue
+            }
+
+            if hotkeyConfig[identifier] == nil {
+                hotkeyConfig[identifier] = hotkey
+            }
 
             if !preciseHotkeys.contains(identifier) {
                 if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
@@ -204,7 +221,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     let coarseKeyCode = coarseHotkey[.keyCode],
                     let coarseEnabled = coarseHotkey[.enabled],
                     let coarseModifiers = coarseHotkey[.modifiers]
-                else { continue }
+                else {
+                    continue
+                }
 
                 var flags = KeyTransformer.cocoaFlags(from: coarseModifiers)
                 if flags.contains(.option) {
@@ -218,6 +237,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 let newModifiers = KeyTransformer.carbonFlags(from: flags)
+
                 hotkeyConfig[identifier]?[.modifiers] = newModifiers
                 hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
 
@@ -249,15 +269,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         })
     }
 
-    func listenForWindowClose(window: NSWindow) {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(windowWillClose(notification:)),
-            name: NSWindow.willCloseNotification,
-            object: window
-        )
-    }
-
     func listenForSettingsChange() {
         NotificationCenter.default.addObserver(
             self,
@@ -285,15 +296,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if windowController == nil {
             windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
-        } else if windowController?.window == nil {
-            windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
 
         if let wc = windowController {
-            wc.showWindow(nil)
-            if let window = wc.window {
+            wc.showWindow(self)
+            setupHotkeys(enable: true)
+            wc.initHelpPopover()
+
+            log.debug("Showing window")
+            if let window = wc.window as? ModernWindow {
+                log.debug("Sending window to frontmost")
                 window.orderFrontRegardless()
-                listenForWindowClose(window: window)
             }
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
@@ -334,6 +347,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func setupHotkeys(enable: Bool) {
+        if !enable {
+            leftHotkey?.unregister()
+            rightHotkey?.unregister()
+            return
+        }
+
         if let pageController = windowController?.window?.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
             pageController.setupHotkeys(enable: enable)
         }
@@ -479,11 +498,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
-    }
-
-    @objc func windowWillClose(notification _: Notification) {
-        windowController?.window = nil
-        windowController = nil
     }
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {

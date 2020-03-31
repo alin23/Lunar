@@ -68,7 +68,9 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField! {
         didSet {
-            nonResponsiveDDCTextField.isHidden = display.id == GENERIC_DISPLAY_ID
+            if let d = display {
+                nonResponsiveDDCTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
+            }
         }
     }
 
@@ -131,11 +133,11 @@ class DisplayViewController: NSViewController {
             displayName?.stringValue = display.name
             nonResponsiveDDCTextField?.onClick = {
                 runInMainThread {
-                    DDC.skipWritingPropertyById[self.display.id]?.removeAll()
-                    DDC.skipReadingPropertyById[self.display.id]?.removeAll()
-                    DDC.writeFaults[self.display.id]?.removeAll()
-                    DDC.readFaults[self.display.id]?.removeAll()
-                    self.display.responsive = true
+                    DDC.skipWritingPropertyById[display.id]?.removeAll()
+                    DDC.skipReadingPropertyById[display.id]?.removeAll()
+                    DDC.writeFaults[display.id]?.removeAll()
+                    DDC.readFaults[display.id]?.removeAll()
+                    display.responsive = true
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
                     self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
                     self.view.setNeedsDisplay(self.view.visibleRect)
@@ -252,7 +254,7 @@ class DisplayViewController: NSViewController {
 
     func initToggleButton(_ button: NSButton?, helpButton: NSButton?, buttonColors: [ButtonColor: NSColor]) {
         guard let button = button else { return }
-        if brightnessAdapter.mode == .manual || !display.activeAndResponsive || display.id == GENERIC_DISPLAY_ID {
+        if brightnessAdapter.mode == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID) {
             button.isHidden = true
             helpButton?.isHidden = true
         } else {
@@ -335,8 +337,9 @@ class DisplayViewController: NSViewController {
     }
 
     deinit {
-        display.boolObservers["adaptive"]?.removeValue(forKey: "displayViewController-\(self.view.accessibilityIdentifier())")
-        display.boolObservers["activeAndResponsive"]?.removeValue(forKey: "displayViewController-\(self.view.accessibilityIdentifier())")
+        let id = "displayViewController-\(self.view.accessibilityIdentifier())"
+        display?.resetObserver(prop: "adaptive", key: id, type: Bool.self)
+        display?.resetObserver(prop: "activeAndResponsive", key: id, type: Bool.self)
     }
 
     func listenForAdaptiveChange() {
@@ -356,7 +359,7 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
-        display.boolObservers["adaptive"]?["displayViewController-\(view.accessibilityIdentifier())"] = adaptiveObserver!
+        display?.setObserver(prop: "adaptive", key: "displayViewController-\(view.accessibilityIdentifier())", action: adaptiveObserver!)
     }
 
     func listenForBrightnessRangeChange() {
@@ -374,7 +377,7 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
-        display.boolObservers["extendedBrightnessRange"]?["displayViewController-\(view.accessibilityIdentifier())"] = brightnessRangeObserver!
+        display?.setObserver(prop: "extendedBrightnessRange", key: "displayViewController-\(view.accessibilityIdentifier())", action: brightnessRangeObserver!)
     }
 
     func listenForActiveAndResponsiveChange() {
@@ -388,7 +391,7 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
-        display.boolObservers["activeAndResponsive"]?["displayViewController-\(view.accessibilityIdentifier())"] = activeAndResponsiveObserver!
+        display?.setObserver(prop: "activeAndResponsive", key: "displayViewController-\(view.accessibilityIdentifier())", action: activeAndResponsiveObserver!)
     }
 
     func listenForAdaptiveModeChange() {
@@ -410,7 +413,7 @@ class DisplayViewController: NSViewController {
                     self.scrollableBrightness.disabled = false
                     self.scrollableContrast.disabled = false
                     self.setValuesHidden(false, mode: adaptiveMode)
-                    self.setAdaptiveButtonEnabled(self.display.id != GENERIC_DISPLAY_ID)
+                    self.setAdaptiveButtonEnabled((self.display?.id ?? GENERIC_DISPLAY_ID) != GENERIC_DISPLAY_ID)
                 }
             }
         })
