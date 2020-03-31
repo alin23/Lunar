@@ -1,3 +1,14 @@
+# 3.1.4
+## Fixes
+
+- Hide buttons and labels properly when no display is connected
+- Fix a ton of memory leaks
+- Fix volume keys not being able to be disabled
+
+## Improvements
+
+- Show Lunar version in the menu
+- Hide rarely used menu items under an `Advanced` submenu item
 # 3.1.3
 ## Fixes
 

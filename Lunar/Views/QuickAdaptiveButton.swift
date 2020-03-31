@@ -64,11 +64,11 @@ class QuickAdaptiveButton: NSButton {
                 }
             }
         }
-        display?.boolObservers["adaptive"]?["quickAdaptiveButton-\(accessibilityIdentifier())"] = adaptiveObserver!
+        display?.setObserver(prop: "adaptive", key: "quickAdaptiveButton-\(accessibilityIdentifier())", action: adaptiveObserver!)
     }
 
     deinit {
-        display?.boolObservers["adaptive"]?.removeValue(forKey: "quickAdaptiveButton-\(self.accessibilityIdentifier())")
+        display?.resetObserver(prop: "adaptive", key: "quickAdaptiveButton-\(self.accessibilityIdentifier())", type: Bool.self)
     }
 
     override func mouseDown(with _: NSEvent) {

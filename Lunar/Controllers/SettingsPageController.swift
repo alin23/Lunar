@@ -11,8 +11,8 @@ import Cocoa
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
+    weak var pageController: NSPageController?
     var adaptiveModeObserver: NSKeyValueObservation?
-    var pageController: NSPageController?
 
     func updateDataset(
         display: Display,

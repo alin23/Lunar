@@ -99,15 +99,11 @@ class ScrollableTextField: NSTextField {
 
     override func textDidBeginEditing(_: Notification) {
         log.debug("Editing text")
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-            appDelegate.setupHotkeys(enable: false)
-        }
+        appDelegate().setupHotkeys(enable: false)
     }
 
     override func textDidEndEditing(_: Notification) {
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-            appDelegate.setupHotkeys(enable: true)
-        }
+        appDelegate().setupHotkeys(enable: true)
         darken(color: textFieldColor)
     }
 

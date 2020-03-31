@@ -10,6 +10,10 @@ let publicKey =
     -----END PUBLIC KEY-----
     """
 
+func appDelegate() -> AppDelegate {
+    return NSApplication.shared.delegate as! AppDelegate
+}
+
 @available(OSX 10.13, *)
 func encrypt(message: Data) -> Data? {
     do {
@@ -38,14 +42,21 @@ func getSerialNumberHash() -> String? {
         return nil
     }
 
-    guard let serialNumber = (IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0).takeUnretainedValue() as? String)?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
-        return nil
+    if let serialNumberProp = IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0) {
+        guard let serialNumber = (serialNumberProp.takeRetainedValue() as? String)?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
+            serialNumberProp.release()
+            return nil
+        }
+
+        IOObjectRelease(platformExpert)
+        guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else {
+//            serialNumberProp.release()
+            return nil
+        }
+//        serialNumberProp.release()
+        return sha256(data: serialNumberData).str(hex: true, separator: "")
     }
-
-    IOObjectRelease(platformExpert)
-
-    guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else { return nil }
-    return sha256(data: serialNumberData).str(hex: true, separator: "")
+    return nil
 }
 
 func runInMainThread(_ action: () -> Void) {

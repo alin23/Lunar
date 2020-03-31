@@ -15,6 +15,5 @@ class SettingsViewController: NSSplitViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        splitView.delegate = self
     }
 }

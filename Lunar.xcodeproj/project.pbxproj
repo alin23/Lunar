@@ -730,7 +730,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n./gencode.sh\n\nif [[ $CONFIGURATION == \"Release\" ]]; then\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/XPCServices/*.xpc\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate\n    ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app/\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n./gencode.sh\n\nif [[ $CONFIGURATION == \"Release\" ]]; then\n    for xpc in Frameworks/XPCServices/*.xpc\n    do\n        codesign -vvv --deep --strict $xpc || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" $xpc\n    done \n    codesign -vvv --deep --strict Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate\n    codesign -vvv --deep --strict Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app\nfi\n";
 		};
 		C78B9223237ED34E0060DC7C /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

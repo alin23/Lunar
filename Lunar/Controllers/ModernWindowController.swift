@@ -9,33 +9,7 @@
 import Cocoa
 import Magnet
 
-class ModernWindowController: NSWindowController, NSWindowDelegate {
-    var observer: NSKeyValueObservation?
-
-    func setupWindow() {
-        if let w = window as? ModernWindow {
-            w.delegate = self
-            w.setup()
-        }
-    }
-
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        setupWindow()
-
-        if helpPopover.contentViewController == nil {
-            var storyboard: NSStoryboard?
-            if #available(OSX 10.13, *) {
-                storyboard = NSStoryboard.main
-            } else {
-                storyboard = NSStoryboard(name: "Main", bundle: nil)
-            }
-
-            helpPopover.contentViewController = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("HelpPopoverController")) as! HelpPopoverController
-            helpPopover.contentViewController!.loadView()
-        }
-    }
-
+extension AppDelegate: NSWindowDelegate {
     func windowWillClose(_: Notification) {
         log.info("Window closing")
 
@@ -47,9 +21,33 @@ class ModernWindowController: NSWindowController, NSWindowDelegate {
         upHotkey = nil
         downHotkey = nil
 
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-            appDelegate.setupHotkeys(enable: false)
+        setupHotkeys(enable: false)
+    }
+}
+
+class ModernWindowController: NSWindowController {
+    func initHelpPopover() {
+        if helpPopover.contentViewController == nil, let stb = storyboard,
+            let controller = stb.instantiateController(
+                withIdentifier: NSStoryboard.SceneIdentifier("HelpPopoverController")
+            ) as? HelpPopoverController {
+            helpPopover.contentViewController = controller
+            helpPopover.contentViewController!.loadView()
         }
-        helpPopover.contentViewController = nil
+    }
+
+    override func windowDidLoad() {
+        super.windowDidLoad()
+        setupWindow()
+        initHelpPopover()
+    }
+
+    func setupWindow() {
+        if let w = window as? ModernWindow {
+            w.delegate = appDelegate()
+            w.setup()
+        } else {
+            log.warning("No window found")
+        }
     }
 }

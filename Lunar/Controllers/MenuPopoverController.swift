@@ -222,9 +222,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 view.removeTrackingArea(area)
             }
             trackingArea = nil
-            if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-                appDelegate.disableUpDownHotkeys()
-            }
+            appDelegate().disableUpDownHotkeys()
         }
     }
 
@@ -275,8 +273,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
                     self.adaptViewSize()
                     if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1,
-                        let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-                        let statusButton = appDelegate.statusItem.button {
+                        let statusButton = appDelegate().statusItem.button {
                         menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
                         closeMenuPopover(after: 2500)
                     }

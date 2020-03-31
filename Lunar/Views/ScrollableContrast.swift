@@ -115,7 +115,7 @@ class ScrollableContrast: NSView {
                 }
             }
         }
-        display.numberObservers["contrast"]?["scrollableContrast-\(accessibilityIdentifier())"] = contrastObserver!
+        display.setObserver(prop: "contrast", key: "scrollableContrast-\(accessibilityIdentifier())", action: contrastObserver!)
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
@@ -206,7 +206,7 @@ class ScrollableContrast: NSView {
     }
 
     deinit {
-        display.numberObservers["contrast"]?.removeValue(forKey: "scrollableContrast-\(self.accessibilityIdentifier())")
+        display.resetObserver(prop: "contrast", key: "scrollableContrast-\(self.accessibilityIdentifier())", type: NSNumber.self)
     }
 
     override init(frame frameRect: NSRect) {
