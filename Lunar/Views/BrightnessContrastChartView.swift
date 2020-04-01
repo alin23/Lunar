@@ -62,14 +62,11 @@ class BrightnessContrastChartView: LineChartView {
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
 
-        var brightnessY: Double = 0
-        var contrastY: Double = 0
+//        var brightnessY: Double = 0
+//        var contrastY: Double = 0
 
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
-            switch adaptiveMode {
-            case .location:
-                let maxValues = maxValuesLocation
-            default:
+            if adaptiveMode != .location {
                 let maxValues = maxValuesSync
                 brightnessChartEntry = stride(from: 0, to: maxValues, by: 1).map { x in ChartDataEntry(x: Double(x), y: 0.0) }
                 contrastChartEntry = stride(from: 0, to: maxValues, by: 1).map { x in ChartDataEntry(x: Double(x), y: 0.0) }
@@ -79,7 +76,6 @@ class BrightnessContrastChartView: LineChartView {
             case .location:
                 brightnessChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
                 contrastChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
-                let step = 60 / interpolationValues
                 let steps = Double(interpolationValues)
                 let points = brightnessAdapter.getBrightnessContrastBatch(for: display, count: maxValuesLocation, minutesBetween: interpolationValues)
                 func computePoints(hour: Int) -> ([ChartDataEntry], [ChartDataEntry]) {
