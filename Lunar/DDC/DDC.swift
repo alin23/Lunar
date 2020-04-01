@@ -399,12 +399,6 @@ class DDC {
         return result
     }
 
-    static func printTextDescriptors(displayID: CGDirectDisplayID) {
-        for str in DDC.getTextDescriptors(displayID: displayID) {
-            print(str)
-        }
-    }
-
     static func getDisplayIdentificationData(displayID: CGDirectDisplayID) -> String {
         guard let edid = DDC.getEdid(displayID: displayID) else {
             return ""
@@ -412,37 +406,14 @@ class DDC {
         return "\(edid.eisaid.str())-\(edid.productcode.str())-\(edid.serial.str()) \(edid.week.str())/\(edid.year.str()) \(edid.versionmajor.str()).\(edid.versionminor.str())"
     }
 
-    static func getTextDescriptors(displayID: CGDirectDisplayID) -> [String] {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
-            return []
-        }
-        var descriptorStrings: [String] = []
-        var tmp = edid.descriptors
-        let descriptors = [descriptor](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-
-        for descriptor in descriptors {
-            let type = descriptor.text.type
-            var tmp = descriptor.text.data
-            let chars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
-            if type == EDIDTextType.name.rawValue, let data = NSString(
-                bytes: chars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue
-            ) as String? {
-                descriptorStrings.append("\(type) : \(data)")
-            } else {
-                let hexData = chars.map { String(format: "%02X", $0) }.joined(separator: " ")
-                descriptorStrings.append("\(type) : \(hexData)")
-            }
-        }
-        return descriptorStrings
-    }
-
-    static func getEdidTextData(displayID: CGDirectDisplayID) -> String {
-        return DDC.getTextDescriptors(displayID: displayID).joined(separator: "-")
-    }
-
     static func getTextData(_ descriptor: descriptor, hex: Bool = false) -> String? {
-        var tmp = descriptor.text.data
-        let nameChars = [Int8](UnsafeBufferPointer(start: &tmp.0, count: MemoryLayout.size(ofValue: tmp)))
+        let tmp = descriptor.text.data
+        let nameChars = [
+            tmp.0, tmp.1, tmp.2, tmp.3,
+            tmp.4, tmp.5, tmp.6, tmp.7,
+            tmp.8, tmp.9, tmp.10, tmp.11,
+            tmp.12,
+        ]
         if let name = NSString(bytes: nameChars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
             return name.trimmingCharacters(in: .whitespacesAndNewlines)
         } else if hex {

@@ -980,18 +980,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             let data: Data
-            let mimeType: String
             let fileName: String
             if #available(OSX 10.13, *) {
                 runInMainThread {
                     self.debugMenuItem.title = "Encrypting logs"
                 }
                 data = encrypt(message: sourceString) ?? sourceString
-                mimeType = "application/octet-stream"
                 fileName = "lunar.log.enc"
             } else {
                 data = sourceString
-                mimeType = "text/plain"
                 fileName = "lunar.log"
             }
 
