@@ -279,6 +279,8 @@
 		C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerConnection.xpc"; path = "XPCServices/org.sparkle-project.InstallerConnection.xpc"; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
+		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
+		C79B5A272434908400D62E52 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Surge.framework; sourceTree = "<group>"; };
 		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Charts.framework.dSYM; sourceTree = "<group>"; };
@@ -488,6 +490,7 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
+				C79B5A252434905900D62E52 /* Lunar.entitlements */,
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
 				C77CC75A1FEDB367009AA718 /* Views */,
 				C76545241FD8A10200DBACE9 /* Controllers */,
@@ -508,6 +511,7 @@
 		C7CFEA131FD376E6000AC4A6 /* LunarService */ = {
 			isa = PBXGroup;
 			children = (
+				C79B5A272434908400D62E52 /* LunarService.entitlements */,
 				C7574F762351FED100358397 /* LunarServiceRelease.entitlements */,
 				C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */,
 				C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */,
@@ -965,15 +969,16 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3.1.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -1014,14 +1019,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3.1.4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -1060,12 +1066,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -1090,12 +1097,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",

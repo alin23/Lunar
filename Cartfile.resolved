@@ -1,7 +1,7 @@
 github "Alamofire/Alamofire" "5.0.5"
 github "Clipy/KeyHolder" "v3.0.1"
 github "Clipy/Magnet" "v2.3.1"
-github "SwiftyBeaver/SwiftyBeaver" "1.8.4"
+github "SwiftyBeaver/SwiftyBeaver" "1.9.0"
 github "SwiftyJSON/SwiftyJSON" "5.0.0"
 github "alin23/MediaKeyTap" "b5a90446ec2f852563435336f47d863d36049fa7"
 github "alin23/Solar" "2.2.0"

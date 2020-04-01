@@ -21,13 +21,13 @@ function notarize
     end
     xcrun stapler staple "$argv[2]"
 
-    for i in (seq 10)
+    for i in (seq 20)
         echo "Checking if $argv[2] is notarized"
         if spctl --assess -vvvvv --no-cache --ignore-cache --type "$argv[3]" "$argv[2]" 2>&1 | grep -q 'source=Notarized Developer ID'
             echo "Notarization success for $argv[2]"
             return
         end
-        sleep 10
+        sleep 5
     end
 
     if spctl --assess -vvvvv --no-cache --ignore-cache "$argv[2]" 2>&1 | grep -q 'source=Unnotarized Developer ID'
@@ -47,7 +47,6 @@ set -l ED_PRIV_KEY "$WORK_DIR/Lunar/Resources/eddsa_priv"
 set -l APPCAST "$RELEASE_DIR/appcast.xml"
 
 set -l APP_TMP "$TMP_DIR/Lunar.app"
-set -l APP_ZIP_TMP "$TMP_DIR/Lunar.zip"
 
 mkdir -p $TMP_DIR
 rm -rf $TMP_DIR
@@ -57,19 +56,10 @@ cp -R "$BUILD_DIR" "$APP_TMP"
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags "$APP_TMP/Contents/Frameworks/"*.framework
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags "$APP_TMP/Contents/Library/LoginItems/LunarService.app"
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags --deep "$APP_TMP"
-if not codesign -vvv --deep --strict "$APP_TMP"
-    echo 'Bad signature'
-    exit 1
+
+if not set -q DISABLE_NOTARIZATION
+    xcnotary -d alin.p32@gmail.com -k altool -b $APP_TMP
 end
-
-if not spctl --assess -vvvvv --no-cache --ignore-cache "$APP_TMP" 2>&1 | grep -q 'source=Unnotarized Developer ID'
-    echo 'Bad signature'
-    exit 1
-end
-
-ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
-
-notarize "$APP_ZIP_TMP" "$APP_TMP" "execute"
 
 set -l APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist")
 set -l APP_LATEST_DMG "$RELEASE_DIR/../Lunar.dmg"
@@ -96,7 +86,9 @@ end
 create-dmg --identity="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$APP_TMP" "$TMP_DMG_DIR"
 cp "$APP_TMP_DMG" "$APP_DMG"
 
-notarize "$APP_DMG" "$APP_DMG" "install"
+if not set -q DISABLE_NOTARIZATION
+    notarize "$APP_DMG" "$APP_DMG" "install"
+end
 
 echo \n(set_color yellow)"Generating AppCast"(set_color normal)
 "$WORK_DIR/bin/generate_appcast" -f "$PRIV_KEY" "$RELEASE_DIR"
