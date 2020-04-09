@@ -117,6 +117,7 @@
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
+		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
 		C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */; };
 		C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */ = {isa = PBXBuildFile; productRef = C7FE72562391B3BC00EBA6DA /* CryptorECC */; };
@@ -332,6 +333,7 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
+		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
 		C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickAdaptiveButton.swift; sourceTree = "<group>"; };
 		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -403,6 +405,7 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C7EF9534243F4E2200839A62 /* Sysctl.swift */,
 				C7AB59762396C4A80028E573 /* Transformers.swift */,
 				C7CBEFFC238E81FF00031E93 /* Util.swift */,
 				C7C1F7081FD639970039507C /* DataStore.swift */,
@@ -775,6 +778,7 @@
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
 				C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
+				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
 				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,

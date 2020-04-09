@@ -612,14 +612,37 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return accessEnabled
     }
 
-    func sendUniqueVisitorHash() {
+    func sendAnalytics() {
         guard let serialNumberHash = getSerialNumberHash(),
-            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String),
-            let data = "\(serialNumberHash) \(appVersion)".data(using: .utf8, allowLossyConversion: true) else {
+            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
+        else {
+            // log warning
+            let serialNumberHash = getSerialNumberHash() ?? "no-serial-number"
+            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "no-version"
+
+            log.warning("Can't send analytics", context: [
+                serialNumberHash: serialNumberHash,
+                appVersion: appVersion,
+            ])
+
             return
         }
 
-        _ = AF.upload(data, to: "https://patchbay.pub/count-lunar-unique-users-anonymously")
+        let dataString = "id=\(serialNumberHash) version=\(appVersion) clamshell=\(IsLidClosed()) displays=\(brightnessAdapter.activeDisplays.count) mode=\(brightnessAdapter.mode) machine=\(Sysctl.model)"
+        let data = dataString.data(using: .utf8, allowLossyConversion: true) ?? "no-data".data(using: .utf8)!
+        log.info("Sending analytics", context: ["data": dataString])
+        AF.upload(data, to: "https://log.lunar.fyi/analytics")
+            .authenticate(username: "lunar", password: secrets.analyticsHash)
+            .validate()
+            .response(completionHandler: { resp in
+                if let err = resp.error {
+                    log.error("Error sending analytics", context: ["error": err.errorDescription ?? ""])
+                } else if let data = resp.data, let dataStr = String(data: data, encoding: .utf8) {
+                    log.debug("Analytics response", context: ["response": resp.debugDescription, "data": dataStr])
+                } else {
+                    log.debug("Analytics response", context: ["response": resp.debugDescription])
+                }
+        })
     }
 
     func configureAlamofire() {
@@ -664,7 +687,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         handleDaemon()
-        startReceivingSignificantLocationChanges()
 
         initBrightnessAdapterActivity()
         initMenubarIcon()
@@ -680,7 +702,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         configureAlamofire()
-        sendUniqueVisitorHash()
+        sendAnalytics()
+        startReceivingSignificantLocationChanges()
         log.debug("App finished launching")
     }
 
@@ -701,7 +724,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     internal func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             brightnessAdapter.geolocation = Geolocation(location: location)
-            locationManager.stopMonitoringSignificantLocationChanges()
             if brightnessAdapter.geolocation.latitude != 0, brightnessAdapter.geolocation.longitude != 0 {
                 log.debug("Zero LocationManager coordinates")
             } else {
@@ -720,13 +742,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func locationManager(_: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
-        case .notDetermined:
-            locationManager.startMonitoringSignificantLocationChanges()
+        case .notDetermined, .authorizedAlways:
+            locationManager.startUpdatingLocation()
         case .denied, .restricted:
-            log.warning("User has not authorized location services")
+            log.warning("User has not authorised location services")
             geolocationFallback()
-        case .authorizedAlways:
-            locationManager.startMonitoringSignificantLocationChanges()
         @unknown default:
             log.error("Unknown location manager status \(status)")
         }
@@ -739,13 +759,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         locationManager = CLLocationManager()
         locationManager.delegate = self
-        locationManager.startUpdatingLocation()
-        locationManager.stopUpdatingLocation()
+        locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+        locationManager.distanceFilter = 10000
+        locationManager.startMonitoringSignificantLocationChanges()
 
-        guard CLLocationManager.significantLocationChangeMonitoringAvailable() else {
-            log.warning("Location services are not available")
-            geolocationFallback()
-            return
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined, .restricted, .denied:
+            log.info("Location not authorised")
+        case .authorizedAlways:
+            log.info("Location authorised")
+        @unknown default:
+            log.info("Location status unknown")
+        }
+
+        if #available(OSX 10.15, *) {
+            locationManager.requestLocation()
+        } else {
+            locationManager.startUpdatingLocation()
         }
     }
 
