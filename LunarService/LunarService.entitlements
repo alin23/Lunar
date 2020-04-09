@@ -6,6 +6,8 @@
 	<array>
 		<string>$(TeamIdentifierPrefix)</string>
 	</array>
+	<key>com.apple.security.automation.apple-events</key>
+	<true/>
 	<key>com.apple.security.temporary-exception.sbpl</key>
 	<array>
 		<string>(allow iokit-open)</string>

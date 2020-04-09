@@ -14,3 +14,4 @@ args:
   appSecret: ${SB_APP_SECRET}
   encryptionKey: ${SB_ENCRYPTION_KEY}
   sentryDSN: ${SENTRY_DSN}
+  analyticsHash: ${ANALYTICS_HASH}

@@ -7,9 +7,24 @@
 //
 
 import Cocoa
+import CoreLocation
 import Magnet
 
 extension AppDelegate: NSWindowDelegate {
+    func windowDidBecomeMain(_: Notification) {
+        if #available(OSX 10.15, *) {
+            switch CLLocationManager.authorizationStatus() {
+            case .notDetermined, .restricted, .denied:
+                log.debug("Requesting location permissions")
+                locationManager.requestAlwaysAuthorization()
+            case .authorizedAlways:
+                log.debug("Location authorized")
+            @unknown default:
+                log.debug("Location status unknown")
+            }
+        }
+    }
+
     func windowWillClose(_: Notification) {
         log.info("Window closing")
 
