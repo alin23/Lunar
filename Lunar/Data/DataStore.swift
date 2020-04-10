@@ -12,6 +12,8 @@ let APP_SETTINGS = [
     "adaptiveBrightnessMode",
     "brightnessLimitMax",
     "brightnessLimitMin",
+    "brightnessClipMax",
+    "brightnessClipMin",
     "brightnessOffset",
     "volumeStep",
     "brightnessStep",
@@ -158,6 +160,14 @@ extension UserDefaults {
 
     @objc dynamic var brightnessLimitMin: Int {
         return integer(forKey: "brightnessLimitMin")
+    }
+
+    @objc dynamic var brightnessClipMax: Int {
+        return integer(forKey: "brightnessClipMax")
+    }
+
+    @objc dynamic var brightnessClipMin: Int {
+        return integer(forKey: "brightnessClipMin")
     }
 
     @objc dynamic var contrastLimitMin: Int {
@@ -385,6 +395,8 @@ class DataStore: NSObject {
         DataStore.setDefault(240, for: "noonDurationMinutes")
         DataStore.setDefault(5, for: "brightnessOffset")
         DataStore.setDefault(20, for: "contrastOffset")
+        DataStore.setDefault(100, for: "brightnessClipMax")
+        DataStore.setDefault(0, for: "brightnessClipMin")
         DataStore.setDefault(5, for: "brightnessLimitMin")
         DataStore.setDefault(20, for: "contrastLimitMin")
         DataStore.setDefault(90, for: "brightnessLimitMax")

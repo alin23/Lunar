@@ -9,6 +9,15 @@
           "revision": "73f362cb0d9c5f1fd0089240d7b293cd2bff18db",
           "version": "1.2.5"
         }
+      },
+      {
+        "package": "Surge",
+        "repositoryURL": "https://github.com/Jounce/Surge",
+        "state": {
+          "branch": null,
+          "revision": "b9777a8d0c1df1ed0a22d238fb987c60d13513ac",
+          "version": "2.3.0"
+        }
       }
     ]
   },
