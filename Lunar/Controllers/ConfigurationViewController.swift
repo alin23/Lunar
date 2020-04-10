@@ -59,20 +59,18 @@ The offset is transformed into a curve factor using the following rules:
 
 [How does the curve factor affect brightness?](\(CHART_LINK))
 """
-let CONTRAST_OFFSET_TOOLTIP = """
+let BRIGHTNESS_CLIP_TOOLTIP = """
 ## Description
-Offset for adjusting the contrast curve of the adaptive algorithm.
+Limits for mapping the high range of the built-in display brightness to a lower range monitor brightness.
 
 ## Effect
-The offset is transformed into a curve factor using the following rules:
-  - **if** ` offset > 0 ` **then** ` factor = 1 - (offset / 100) `
-      - the result will have a value between **0.0** and **1.0**
-  - **if** ` offset <= 0 ` **then** ` factor = 1 + (offset / -10) `
-      - the result will have a value between **1.0** and **1.9**
+When the built-in display brightness is within these limits, the monitor brightness is computed according to the usual rules.
+
+Otherwise:
+  - **if** ` builtinBrightness ≥ clipMax ` **then** ` monitorBrightness = clipMax `
+  - **if** ` builtinBrightness ≤ clipMin ` **then** ` monitorBrightness = clipMin `
 
 \(ADJUSTING_VALUES_INFO)
-
-[How does the curve factor affect contrast?](\(CHART_LINK))
 """
 let POLLING_INTERVAL_TOOLTIP = """
 ## Description
@@ -210,22 +208,30 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var brightnessOffsetField: ScrollableTextField!
     @IBOutlet var brightnessOffsetCaption: ScrollableTextFieldCaption!
     @IBOutlet var brightnessOffsetLabel: NSTextField!
+    @IBOutlet var contrastOffsetField: ScrollableTextField!
+    @IBOutlet var contrastOffsetCaption: ScrollableTextFieldCaption!
     var brightnessOffsetVisible: Bool = false {
         didSet {
             brightnessOffsetField?.isHidden = !brightnessOffsetVisible
             brightnessOffsetCaption?.isHidden = !brightnessOffsetVisible
+            contrastOffsetField?.isHidden = !brightnessOffsetVisible
+            contrastOffsetCaption?.isHidden = !brightnessOffsetVisible
             brightnessOffsetLabel?.isHidden = !brightnessOffsetVisible
         }
     }
 
-    @IBOutlet var contrastOffsetField: ScrollableTextField!
-    @IBOutlet var contrastOffsetCaption: ScrollableTextFieldCaption!
-    @IBOutlet var contrastOffsetLabel: NSTextField!
-    var contrastOffsetVisible: Bool = false {
+    @IBOutlet var brightnessClipMinField: ScrollableTextField!
+    @IBOutlet var brightnessClipMinCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessClipMaxField: ScrollableTextField!
+    @IBOutlet var brightnessClipMaxCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessClipLabel: NSTextField!
+    var brightnessClipVisible: Bool = false {
         didSet {
-            contrastOffsetField?.isHidden = !contrastOffsetVisible
-            contrastOffsetCaption?.isHidden = !contrastOffsetVisible
-            contrastOffsetLabel?.isHidden = !contrastOffsetVisible
+            brightnessClipMinField?.isHidden = !brightnessClipVisible
+            brightnessClipMinCaption?.isHidden = !brightnessClipVisible
+            brightnessClipMaxField?.isHidden = !brightnessClipVisible
+            brightnessClipMaxCaption?.isHidden = !brightnessClipVisible
+            brightnessClipLabel?.isHidden = !brightnessClipVisible
         }
     }
 
@@ -315,6 +321,8 @@ class ConfigurationViewController: NSViewController {
     var brightnessStepObserver: NSKeyValueObservation?
     var contrastStepObserver: NSKeyValueObservation?
     var volumeStepObserver: NSKeyValueObservation?
+    var brightnessClipMinObserver: NSKeyValueObservation?
+    var brightnessClipMaxObserver: NSKeyValueObservation?
     var brightnessLimitMinObserver: NSKeyValueObservation?
     var contrastLimitMinObserver: NSKeyValueObservation?
     var brightnessLimitMaxObserver: NSKeyValueObservation?
@@ -331,15 +339,19 @@ class ConfigurationViewController: NSViewController {
     weak var settingsController: SettingsPageController?
 
     func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
-        noonDurationVisible = adaptiveMode == .location
-        daylightExtensionVisible = adaptiveMode == .location
-        curveFactorVisible = adaptiveMode == .location
-        locationVisible = adaptiveMode == .location
-        brightnessOffsetVisible = adaptiveMode == .sync
-        contrastOffsetVisible = adaptiveMode == .sync
-        pollingIntervalVisible = adaptiveMode == .sync
-        brightnessLimitVisible = adaptiveMode == .manual
-        contrastLimitVisible = adaptiveMode == .manual
+        let locationMode = adaptiveMode == .location
+        let syncMode = adaptiveMode == .sync
+        let manualMode = adaptiveMode == .manual
+
+        noonDurationVisible = locationMode
+        daylightExtensionVisible = locationMode
+        curveFactorVisible = locationMode
+        locationVisible = locationMode
+        brightnessOffsetVisible = syncMode
+        brightnessClipVisible = syncMode
+        pollingIntervalVisible = syncMode
+        brightnessLimitVisible = manualMode
+        contrastLimitVisible = manualMode
         hotkeyStepVisible = true
 
         helpButtonStep.helpText = HOTKEY_STEP_TOOLTIP
@@ -370,12 +382,12 @@ class ConfigurationViewController: NSViewController {
             helpButton4.helpText = LOCATION_TOOLTIP
             helpButton4.link = nil
         case .sync:
-            let refFrame = contrastOffsetField.frame
+            let refFrame = brightnessOffsetField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
 
             helpButton1.helpText = BRIGHTNESS_OFFSET_TOOLTIP
             helpButton1.link = CHART_LINK
-            helpButton2.helpText = CONTRAST_OFFSET_TOOLTIP
+            helpButton2.helpText = BRIGHTNESS_CLIP_TOOLTIP
             helpButton2.link = CHART_LINK
             helpButton3.helpText = POLLING_INTERVAL_TOOLTIP
             helpButton3.link = nil
@@ -387,7 +399,7 @@ class ConfigurationViewController: NSViewController {
         ))
 
         helpButton1.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
-        helpButton2.isHidden = !contrastOffsetVisible && !contrastLimitVisible && !daylightExtensionVisible
+        helpButton2.isHidden = !brightnessClipVisible && !contrastLimitVisible && !daylightExtensionVisible
         helpButton3.isHidden = !curveFactorVisible && !pollingIntervalVisible
         helpButton4.isHidden = !locationVisible
     }
@@ -508,6 +520,27 @@ class ConfigurationViewController: NSViewController {
         })
     }
 
+    func listenForBrightnessClipChange() {
+        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            runInMainThread {
+                self.brightnessClipMinField?.stringValue = String(brightness)
+                self.brightnessClipMaxField?.lowerLimit = Double(brightness + 1)
+            }
+        })
+        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, options: [.old, .new], changeHandler: { _, change in
+            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+                return
+            }
+            runInMainThread {
+                self.brightnessClipMaxField?.stringValue = String(brightness)
+                self.brightnessClipMinField?.upperLimit = Double(brightness - 1)
+            }
+        })
+    }
+
     func listenForBrightnessLimitChange() {
         brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
@@ -618,7 +651,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
             }
         )
     }
@@ -629,7 +662,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value)
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
             }
         )
     }
@@ -639,6 +672,8 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "brightnessStep", lowerLimit: 1, upperLimit: 99,
+            onMouseEnter: { _ in
+            },
             onValueChangedInstant: { _, _ in
             }
         )
@@ -649,6 +684,8 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "syncPollingSeconds", lowerLimit: 1, upperLimit: 300,
+            onMouseEnter: { _ in
+            },
             onValueChangedInstant: { _, _ in
             }
         )
@@ -659,6 +696,8 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "contrastStep", lowerLimit: 1, upperLimit: 99,
+            onMouseEnter: { _ in
+            },
             onValueChangedInstant: { _, _ in
             }
         )
@@ -669,7 +708,29 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "volumeStep", lowerLimit: 1, upperLimit: 99,
+            onMouseEnter: { _ in
+            },
             onValueChangedInstant: { _, _ in
+            }
+        )
+    }
+
+    func setupBrightnessClip() {
+        guard let minField = brightnessClipMinField,
+            let maxField = brightnessClipMaxField,
+            let minCaption = brightnessClipMinCaption,
+            let maxCaption = brightnessClipMaxCaption else { return }
+
+        setupScrollableTextField(
+            minField, caption: minCaption, settingKey: "brightnessClipMin", lowerLimit: 0, upperLimit: brightnessAdapter.brightnessClipMax - 1,
+            onValueChangedInstant: { value, settingsController in
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: Double(value), brightnessClipMax: brightnessAdapter.brightnessClipMax)
+            }
+        )
+        setupScrollableTextField(
+            maxField, caption: maxCaption, settingKey: "brightnessClipMax", lowerLimit: brightnessAdapter.brightnessClipMin + 1, upperLimit: 100,
+            onValueChangedInstant: { value, settingsController in
+                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: Double(value))
             }
         )
     }
@@ -810,7 +871,11 @@ class ConfigurationViewController: NSViewController {
             }
         } else {
             field.onMouseEnter = {
-                self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
+                if brightnessAdapter.mode == .sync {
+                    self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax, withAnimation: true)
+                } else {
+                    self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
+                }
             }
         }
     }
@@ -835,6 +900,7 @@ class ConfigurationViewController: NSViewController {
         setupPollingInterval()
         setupContrastStep()
         setupVolumeStep()
+        setupBrightnessClip()
         setupBrightnessLimit()
         setupContrastLimit()
         setupLocation()
@@ -853,6 +919,7 @@ class ConfigurationViewController: NSViewController {
         listenForPollingIntervalChange()
         listenForContrastStepChange()
         listenForVolumeStepChange()
+        listenForBrightnessClipChange()
         listenForBrightnessLimitChange()
         listenForContrastLimitChange()
         listenForAdaptiveModeChange()

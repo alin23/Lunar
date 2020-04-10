@@ -695,6 +695,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         listenForAdaptiveModeChange()
         listenForScreenConfigurationChanged()
         brightnessAdapter.listenForRunningApps()
+        brightnessAdapter.listenForBrightnessClipChange()
 
         addObservers()
         if thisIsFirstRun || TEST_MODE {
@@ -746,6 +747,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             locationManager.startUpdatingLocation()
         case .denied, .restricted:
             log.warning("User has not authorised location services")
+            locationManager.stopUpdatingLocation()
             geolocationFallback()
         @unknown default:
             log.error("Unknown location manager status \(status)")
@@ -761,22 +763,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
         locationManager.distanceFilter = 10000
-        locationManager.startMonitoringSignificantLocationChanges()
 
         switch CLLocationManager.authorizationStatus() {
         case .notDetermined, .restricted, .denied:
-            log.info("Location not authorised")
+            log.debug("Location not authorised")
         case .authorizedAlways:
-            log.info("Location authorised")
+            log.debug("Location authorised")
         @unknown default:
-            log.info("Location status unknown")
+            log.debug("Location status unknown")
         }
 
-        if #available(OSX 10.15, *) {
-            locationManager.requestLocation()
-        } else {
-            locationManager.startUpdatingLocation()
-        }
+        locationManager.startUpdatingLocation()
     }
 
     static func getToggleMenuItemTitle() -> String {

@@ -25,6 +25,8 @@ class SettingsPageController: NSViewController {
         contrastLimitMin: Int? = nil,
         brightnessLimitMax: Int? = nil,
         contrastLimitMax: Int? = nil,
+        brightnessClipMin: Double? = nil,
+        brightnessClipMax: Double? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false,
@@ -92,10 +94,10 @@ class SettingsPageController: NSViewController {
             let maxValues = brightnessContrastChart.maxValuesSync
             let xs = stride(from: 0, to: maxValues - 1, by: 1)
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, offset: brightnessOffset, appOffset: appBrightnessOffset)) {
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, offset: brightnessOffset, appOffset: appBrightnessOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
                 brightnessChartEntry[x].y = b.doubleValue
             }
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, offset: contrastOffset, appOffset: appContrastOffset)) {
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, offset: contrastOffset, appOffset: appContrastOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
                 contrastChartEntry[x].y = b.doubleValue
             }
         case .manual:

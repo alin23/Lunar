@@ -105,14 +105,18 @@ class BrightnessContrastChartView: LineChartView {
                 let percents = Array(stride(from: 0.0, to: Double(maxValuesSync - 1) / 100.0, by: 0.01))
                 brightnessChartEntry.reserveCapacity(maxValuesSync)
                 contrastChartEntry.reserveCapacity(maxValuesSync)
+
+                let clipMin = brightnessAdapter.brightnessClipMin
+                let clipMax = brightnessAdapter.brightnessClipMax
+
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, display.computeSIMDValue(from: percents, type: .brightness)
+                        xs, display.computeSIMDValue(from: percents, type: .brightness, brightnessClipMin: clipMin, brightnessClipMax: clipMax)
                     ).map { ChartDataEntry(x: $0, y: $1.doubleValue) }
                 )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, display.computeSIMDValue(from: percents, type: .contrast)
+                        xs, display.computeSIMDValue(from: percents, type: .contrast, brightnessClipMin: clipMin, brightnessClipMax: clipMax)
                     ).map { ChartDataEntry(x: $0, y: $1.doubleValue) }
                 )
             case .manual:
