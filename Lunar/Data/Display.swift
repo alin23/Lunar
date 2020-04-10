@@ -406,7 +406,9 @@ enum ValueType {
                 case .sync:
                     if let brightness = brightnessAdapter.getBuiltinDisplayBrightness() {
                         log.verbose("Builtin Display Brightness: \(brightness)")
-                        adapt(percent: Double(brightness))
+                        let clipMin = brightnessAdapter.brightnessClipMin
+                        let clipMax = brightnessAdapter.brightnessClipMax
+                        adapt(percent: Double(brightness), brightnessClipMin: clipMin, brightnessClipMax: clipMax)
                     } else {
                         log.verbose("Can't get Builtin Display Brightness")
                     }
@@ -469,6 +471,12 @@ enum ValueType {
 
     func addObservers() {
         datastoreObservers = [
+            datastore.defaults.observe(\.brightnessClipMin, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            }),
+            datastore.defaults.observe(\.brightnessClipMax, options: [.new, .old], changeHandler: { _, change in
+                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            }),
             datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
                 self.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
@@ -576,7 +584,7 @@ enum ValueType {
                     }
                 }
 
-                log.debug("\(self.name): Set brightness to \(brightness) for \(self.serial):\(id)")
+                log.verbose("Set BRIGHTNESS to \(brightness)", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
         numberObservers["contrast"]!["self.contrast"] = { newContrast, oldValue in
@@ -609,8 +617,7 @@ enum ValueType {
                         log.warning("Error writing contrast using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
                     }
                 }
-
-                log.debug("\(self.name): Set contrast to \(contrast)")
+                log.verbose("Set CONTRAST to \(contrast)", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
     }
@@ -781,11 +788,23 @@ enum ValueType {
         return (minValue, maxValue, factor)
     }
 
-    func computeValue(from percent: Double, type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> NSNumber {
+    func computeValue(from percent: Double, type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) -> NSNumber {
         let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
 
-        var value = pow((percent * (maxValue - minValue) + minValue) / 100.0, factor) * 100.0
-        value = cap(value, minVal: minValue, maxVal: maxValue)
+        var percent = percent
+        if let clipMin = brightnessClipMin, let clipMax = brightnessClipMax {
+            percent = mapNumber(percent, fromLow: clipMin / 100.0, fromHigh: clipMax / 100.0, toLow: 0.0, toHigh: 1.0)
+        }
+
+        var value: Double
+        if percent == 1.0 {
+            value = maxValue
+        } else if percent == 0.0 {
+            value = minValue
+        } else {
+            value = pow((percent * (maxValue - minValue) + minValue) / 100.0, factor) * 100.0
+            value = cap(value, minVal: minValue, maxVal: maxValue)
+        }
 
         if appOffset > 0 {
             value = cap(value + Double(appOffset), minVal: minValue, maxVal: maxValue)
@@ -793,8 +812,13 @@ enum ValueType {
         return NSNumber(value: value.rounded())
     }
 
-    func computeSIMDValue(from percent: [Double], type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil) -> [NSNumber] {
+    func computeSIMDValue(from percent: [Double], type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) -> [NSNumber] {
         let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
+
+        var percent = percent
+        if let clipMin = brightnessClipMin, let clipMax = brightnessClipMax {
+            percent = mapNumberSIMD(percent, fromLow: clipMin / 100.0, fromHigh: clipMax / 100.0, toLow: 0.0, toHigh: 1.0)
+        }
 
         var value = (percent * (maxValue - minValue) + minValue)
         value /= 100.0
@@ -1000,7 +1024,7 @@ enum ValueType {
         return brightnessContrast
     }
 
-    func adapt(moment: Moment? = nil, app: AppException? = nil, percent: Double? = nil) {
+    func adapt(moment: Moment? = nil, app: AppException? = nil, percent: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) {
         if !adaptive {
             return
         }
@@ -1011,8 +1035,8 @@ enum ValueType {
             (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: app?.brightness.intValue ?? 0, appContrastOffset: app?.contrast.intValue ?? 0)
         } else if let percent = percent {
             let percent = percent / 100.0
-            newBrightness = computeValue(from: percent, type: .brightness, appOffset: app?.brightness.intValue ?? 0)
-            newContrast = computeValue(from: percent, type: .contrast, appOffset: app?.contrast.intValue ?? 0)
+            newBrightness = computeValue(from: percent, type: .brightness, appOffset: app?.brightness.intValue ?? 0, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
+            newContrast = computeValue(from: percent, type: .contrast, appOffset: app?.contrast.intValue ?? 0, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
         }
 
         var changed = false

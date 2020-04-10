@@ -42,39 +42,81 @@ class ExceptionsView: NSTableView {
         if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
             if let controller = exceptionsController.parent?.parent as? SettingsPageController {
                 scrollableBrightness.onValueChangedInstant = { value in
-                    controller.updateDataset(
-                        display: brightnessAdapter.firstDisplay,
-                        appBrightnessOffset: Int(value),
-                        appContrastOffset: scrollableContrast.integerValue
-                    )
+                    if brightnessAdapter.mode != .sync {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            appBrightnessOffset: Int(value),
+                            appContrastOffset: scrollableContrast.integerValue
+                        )
+                    } else {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            appBrightnessOffset: Int(value),
+                            appContrastOffset: scrollableContrast.integerValue
+                        )
+                    }
                 }
                 scrollableContrast.onValueChangedInstant = { value in
-                    controller.updateDataset(
-                        display: brightnessAdapter.firstDisplay,
-                        appBrightnessOffset: scrollableBrightness.integerValue,
-                        appContrastOffset: Int(value)
-                    )
+                    if brightnessAdapter.mode != .sync {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            appBrightnessOffset: scrollableBrightness.integerValue,
+                            appContrastOffset: Int(value)
+                        )
+                    } else {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            appBrightnessOffset: scrollableBrightness.integerValue,
+                            appContrastOffset: Int(value)
+                        )
+                    }
                 }
 
                 scrollableBrightness.onMouseEnter = {
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
-                    controller.updateDataset(
-                        display: brightnessAdapter.firstDisplay,
-                        appBrightnessOffset: brightnessOffset,
-                        appContrastOffset: contrastOffset,
-                        withAnimation: true
-                    )
+                    if brightnessAdapter.mode != .sync {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            appBrightnessOffset: brightnessOffset,
+                            appContrastOffset: contrastOffset,
+                            withAnimation: true
+                        )
+                    } else {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            appBrightnessOffset: brightnessOffset,
+                            appContrastOffset: contrastOffset,
+                            withAnimation: true
+                        )
+                    }
                 }
                 scrollableContrast.onMouseEnter = {
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
-                    controller.updateDataset(
-                        display: brightnessAdapter.firstDisplay,
-                        appBrightnessOffset: brightnessOffset,
-                        appContrastOffset: contrastOffset,
-                        withAnimation: true
-                    )
+                    if brightnessAdapter.mode != .sync {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            appBrightnessOffset: brightnessOffset,
+                            appContrastOffset: contrastOffset,
+                            withAnimation: true
+                        )
+                    } else {
+                        controller.updateDataset(
+                            display: brightnessAdapter.firstDisplay,
+                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            appBrightnessOffset: brightnessOffset,
+                            appContrastOffset: contrastOffset,
+                            withAnimation: true
+                        )
+                    }
                 }
             }
         }

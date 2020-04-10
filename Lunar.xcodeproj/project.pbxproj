@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
+		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
@@ -67,8 +68,6 @@
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
-		C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; };
-		C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7A2BDD9223FC8D100C910E3 /* Surge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */; };
 		C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */; };
 		C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */; };
@@ -147,7 +146,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C7A2BDDB223FC8D100C910E3 /* Surge.framework in Embed Frameworks */,
 				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
 				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
 				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
@@ -227,6 +225,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C7045DAC2440883D002289E5 /* LunarPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = LunarPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EDIDReader.xcodeproj; path = EDIDReader/EDIDReader.xcodeproj; sourceTree = "<group>"; };
 		C7151941224E34BA0024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -343,6 +342,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */,
 				C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */,
@@ -359,7 +359,6 @@
 				C78B9220237ECDDA0060DC7C /* Sentry.framework in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
-				C7A2BDDA223FC8D100C910E3 /* Surge.framework in Frameworks */,
 				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
 				C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */,
@@ -471,6 +470,7 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
+				C7045DAC2440883D002289E5 /* LunarPlayground.playground */,
 				C7574F7F235468EE00358397 /* Scripts */,
 				C7A2574120EA249B003B3A84 /* dsa_pub.pem */,
 				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
@@ -604,6 +604,7 @@
 			name = Lunar;
 			packageProductDependencies = (
 				C7FE72562391B3BC00EBA6DA /* CryptorECC */,
+				C7045DA924407CBC002289E5 /* Surge */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -668,6 +669,7 @@
 			mainGroup = C7AEC7EC1FD0B4350039B562;
 			packageReferences = (
 				C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */,
+				C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -978,7 +980,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.1.4;
+				CURRENT_PROJECT_VERSION = 3.1.5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1002,7 +1004,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.1.4;
+				MARKETING_VERSION = 3.1.5;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1028,7 +1030,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.1.4;
+				CURRENT_PROJECT_VERSION = 3.1.5;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1051,7 +1053,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.1.4;
+				MARKETING_VERSION = 3.1.5;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1161,6 +1163,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Jounce/Surge";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/IBM-Swift/BlueECC.git";
@@ -1172,6 +1182,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C7045DA924407CBC002289E5 /* Surge */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */;
+			productName = Surge;
+		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */;
