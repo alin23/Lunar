@@ -211,10 +211,14 @@ class DisplayViewController: NSViewController {
             let maxContrast = maxContrast != nil ? Double(maxContrast!) : nil
             let xs = stride(from: 0, to: maxValues - 1, by: 1)
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, minVal: minBrightness, maxVal: maxBrightness)) {
+
+            let clipMin = brightnessAdapter.brightnessClipMin
+            let clipMax = brightnessAdapter.brightnessClipMax
+
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, minVal: minBrightness, maxVal: maxBrightness, brightnessClipMin: clipMin, brightnessClipMax: clipMax)) {
                 brightnessChartEntry[x].y = b.doubleValue
             }
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, minVal: minContrast, maxVal: maxContrast)) {
+            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, minVal: minContrast, maxVal: maxContrast, brightnessClipMin: clipMin, brightnessClipMax: clipMax)) {
                 contrastChartEntry[x].y = b.doubleValue
             }
         default:

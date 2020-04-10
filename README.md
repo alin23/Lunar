@@ -56,6 +56,11 @@ It doesn't interfere at all with the native adaptive brightness that macOS imple
 4. If you get system lag or occasional UI freeze, this might be caused by a slow DDC response from the monitor
     - Make sure *Smooth Transition* is turned off in Lunar preferences
     - If you are using *Sync* mode, set the *Polling Interval* to a bigger value like 5 seconds to avoid making DDC requests too often
+5. If you don't get the Location Permissions prompt, run the following commands in a terminal and restart Lunar:
+    ```shell
+    sudo defaults delete /var/db/locationd/clients.plist site.lunarapp.Lunar
+    sudo pkill -9 locationd
+    ```
 
 ## Caveats
 - Lunar *usually* doesn't work with monitors connected through USB hubs/docks/adapters **because a lot of them don't forward DDC messages properly**

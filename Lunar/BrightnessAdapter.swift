@@ -75,6 +75,11 @@ class BrightnessAdapter {
     var lastBuiltinBrightness = 0.0
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
+    var brightnessClipMin: Double = Double(datastore.defaults.brightnessClipMin)
+    var brightnessClipMax: Double = Double(datastore.defaults.brightnessClipMax)
+    var brightnessClipMinObserver: NSKeyValueObservation?
+    var brightnessClipMaxObserver: NSKeyValueObservation?
+
     var firstDisplay: Display {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
@@ -349,6 +354,15 @@ class BrightnessAdapter {
         }
     }
 
+    func listenForBrightnessClipChange() {
+        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, changeHandler: { _, change in
+            self.brightnessClipMax = Double(change.newValue ?? datastore.defaults.brightnessClipMax)
+        })
+        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, changeHandler: { _, change in
+            self.brightnessClipMin = Double(change.newValue ?? datastore.defaults.brightnessClipMin)
+        })
+    }
+
     func listenForRunningApps() {
         let appIdentifiers = NSWorkspace.shared.runningApplications.map { app in app.bundleIdentifier }.compactMap { $0 }
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
@@ -393,7 +407,7 @@ class BrightnessAdapter {
                 log.warning("There's no builtin display to sync with")
                 return
             }
-            adapt = { display in display.adapt(moment: nil, app: self.runningAppExceptions?.last, percent: builtinBrightness) }
+            adapt = { display in display.adapt(moment: nil, app: self.runningAppExceptions?.last, percent: builtinBrightness, brightnessClipMin: self.brightnessClipMin, brightnessClipMax: self.brightnessClipMax) }
         case .location:
             if moment == nil {
                 log.warning("Day moments aren't fetched yet")

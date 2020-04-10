@@ -1,6 +1,7 @@
 import Cocoa
 import CryptorECC
 import Foundation
+import Surge
 
 let publicKey =
     """
@@ -92,15 +93,61 @@ func getScreenWithMouse() -> NSScreen? {
 }
 
 func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
-    if number == fromHigh {
+    if fromLow == fromHigh {
+        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
+        return number
+    }
+
+    if number >= fromHigh {
         return toHigh
+    } else if number <= fromLow {
+        return toLow
     } else if toLow < toHigh {
-        let diff = (toHigh - toLow + 1)
-        let fromDiff = (fromHigh - fromLow)
+        let diff = toHigh - toLow
+        let fromDiff = fromHigh - fromLow
         return (number - fromLow) * diff / fromDiff + toLow
     } else {
-        let diff = (toHigh - toLow - 1)
-        let fromDiff = (fromHigh - fromLow)
+        let diff = toHigh - toLow
+        let fromDiff = fromHigh - fromLow
         return (number - fromLow) * diff / fromDiff + toLow
     }
+}
+
+func mapNumberSIMD(_ number: [Double], fromLow: Double, fromHigh: Double, toLow: Double, toHigh: Double) -> [Double] {
+    if fromLow == fromHigh {
+        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
+        return number
+    }
+
+    let resultLow = number.firstIndex(where: { $0 > fromLow }) ?? 0
+    let resultHigh = number.lastIndex(where: { $0 < fromHigh }) ?? (number.count - 1)
+
+    if resultLow >= resultHigh {
+        var result = [Double](repeating: toLow, count: number.count)
+        if resultHigh != (number.count - 1) {
+            result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - resultHigh))
+        }
+        return result
+    }
+
+    let numbers = Array(number[resultLow ... resultHigh])
+
+    var value: [Double]
+    if toLow == 0.0, fromLow == 0.0, toHigh == 1.0 {
+        value = numbers / fromHigh
+    } else {
+        let diff = toHigh - toLow
+        let fromDiff = fromHigh - fromLow
+        value = numbers - fromLow
+        value = value * diff
+        value = value / fromDiff
+        value = value + toLow
+    }
+
+    var result = [Double](repeating: toLow, count: number.count)
+    result.replaceSubrange(resultLow ... resultHigh, with: value)
+    if resultHigh != (number.count - 1) {
+        result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - (resultHigh + 1)))
+    }
+    return result
 }
