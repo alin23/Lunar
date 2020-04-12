@@ -8,6 +8,7 @@
 
 import Charts
 import Cocoa
+import SwiftDate
 
 class BrightnessContrastChartView: LineChartView {
     let brightnessGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Brightness")
@@ -48,6 +49,21 @@ class BrightnessContrastChartView: LineChartView {
         }
     }
 
+    func computePoints(hour: Int, points: [(NSNumber, NSNumber)], steps: Double) -> ([ChartDataEntry], [ChartDataEntry]) {
+        let xx = Double(hour)
+        let startIndex = hour * interpolationValues
+        let points = points[startIndex ..< (startIndex + interpolationValues)]
+        let brightnessPoints = points.enumerated().map { arg -> ChartDataEntry in
+            let (i, y) = arg
+            return ChartDataEntry(x: xx + (Double(i) / steps), y: y.0.doubleValue)
+        }
+        let contrastPoints = points.enumerated().map { arg -> ChartDataEntry in
+            let (i, y) = arg
+            return ChartDataEntry(x: xx + (Double(i) / steps), y: y.1.doubleValue)
+        }
+        return (brightnessPoints, contrastPoints)
+    }
+
     func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             isHidden = true
@@ -62,9 +78,6 @@ class BrightnessContrastChartView: LineChartView {
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
 
-//        var brightnessY: Double = 0
-//        var contrastY: Double = 0
-
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             if adaptiveMode != .location {
                 let maxValues = maxValuesSync
@@ -78,23 +91,9 @@ class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
                 let steps = Double(interpolationValues)
                 let points = brightnessAdapter.getBrightnessContrastBatch(for: display, count: maxValuesLocation, minutesBetween: interpolationValues)
-                func computePoints(hour: Int) -> ([ChartDataEntry], [ChartDataEntry]) {
-                    let xx = Double(hour)
-                    let startIndex = hour * interpolationValues
-                    let points = points[startIndex ..< (startIndex + interpolationValues)]
-                    let brightnessPoints = points.enumerated().map { arg -> ChartDataEntry in
-                        let (i, y) = arg
-                        return ChartDataEntry(x: xx + (Double(i) / steps), y: y.0.doubleValue)
-                    }
-                    let contrastPoints = points.enumerated().map { arg -> ChartDataEntry in
-                        let (i, y) = arg
-                        return ChartDataEntry(x: xx + (Double(i) / steps), y: y.1.doubleValue)
-                    }
-                    return (brightnessPoints, contrastPoints)
-                }
 
                 for x in 0 ..< (maxValuesLocation - 1) {
-                    let (brightnessPoints, contrastPoints) = computePoints(hour: x)
+                    let (brightnessPoints, contrastPoints) = computePoints(hour: x, points: points, steps: steps)
                     brightnessChartEntry.append(contentsOf: brightnessPoints)
                     contrastChartEntry.append(contentsOf: contrastPoints)
                 }
@@ -143,7 +142,6 @@ class BrightnessContrastChartView: LineChartView {
             }
             graphData.addDataSet(brightnessGraph)
             graphData.addDataSet(contrastGraph)
-            // clampDataset(display: display, mode: adaptiveMode)
         }
 
         brightnessGraph.colors = [NSColor.clear]
@@ -176,9 +174,9 @@ class BrightnessContrastChartView: LineChartView {
         case .location:
             guard let m = brightnessAdapter.moment else { return }
 
-            let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise (\(m.sunrise.toRelative()))")
-            let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon     (\(m.solarNoon.toRelative()))")
-            let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset (\(m.sunset.toRelative()))")
+            let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise")
+            let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon")
+            let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset")
 
             if m.sunset.hour <= 12 {
                 sunsetLine.labelPosition = .bottomRight

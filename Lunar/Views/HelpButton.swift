@@ -54,21 +54,22 @@ class HelpButton: NSButton {
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!
 
-    var parsedHelpText: NSAttributedString {
-        let down = Down(markdownString: helpText)
-
-        do {
-            return try down.toAttributedString(.default, stylesheet: helpPopover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET)
-        } catch {
-            log.error("Markdown error: \(error)")
-            return NSAttributedString(string: "")
-        }
-    }
-
     @IBInspectable var helpText: String = ""
 
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
+
+    func getParsedHelpText() -> NSAttributedString? {
+        guard let popover = helpPopover else { return nil }
+        let down = Down(markdownString: helpText)
+
+        do {
+            return try down.toAttributedString(.default, stylesheet: popover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET)
+        } catch {
+            log.error("Markdown error: \(error)")
+            return nil
+        }
+    }
 
     func setup() {
         let buttonSize = frame
@@ -93,7 +94,9 @@ class HelpButton: NSButton {
         alphaValue = 0.7
         shadow = buttonShadow
 
-        if let c = helpPopover.contentViewController as? HelpPopoverController, !helpText.isEmpty {
+        guard let popover = helpPopover else { return }
+
+        if let c = popover.contentViewController as? HelpPopoverController, !helpText.isEmpty, let parsedHelpText = getParsedHelpText() {
             c.helpTextField?.attributedStringValue = parsedHelpText
             if let link = self.link {
                 c.onClick = {
@@ -102,8 +105,8 @@ class HelpButton: NSButton {
                     }
                 }
             }
-            helpPopover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
-            helpPopover.becomeFirstResponder()
+            popover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
+            popover.becomeFirstResponder()
         }
 
         onMouseEnter?()

@@ -13,7 +13,7 @@ import Magnet
 
 extension AppDelegate: NSPageControllerDelegate {
     func pageControllerWillStartLiveTransition(_: NSPageController) {
-        helpPopover.close()
+        helpPopover?.close()
     }
 
     func pageControllerDidEndLiveTransition(_ c: NSPageController) {
@@ -67,15 +67,13 @@ extension AppDelegate: NSPageControllerDelegate {
     }
 
     func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
-        let c = c as! PageController
+        unowned let c = c as! PageController
 
         if c.viewControllers[identifier] == nil {
             if identifier == c.hotkeyViewControllerIdentifier {
                 c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
             } else if identifier == c.settingsPageControllerIdentifier {
-                let settingsPageController = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
-                settingsPageController.pageController = c
-                c.viewControllers[identifier] = settingsPageController
+                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
             } else {
                 c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
@@ -179,31 +177,24 @@ class PageController: NSPageController {
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
-    func setupHotkeys(enable: Bool) {
+    func setupHotkeys() {
         log.debug("Setting up left and right arrow keys")
 
-        if enable {
-            leftHotkey?.unregister()
-            rightHotkey?.unregister()
+        disableLeftRightHotkeys()
+        if let leftKeyCombo = KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0),
+            let rightKeyCombo = KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0) {
+            leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
+            rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
 
-            if let leftKeyCombo = KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0),
-                let rightKeyCombo = KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0) {
-                leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
-                rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
-
-                leftHotkey?.register()
-                rightHotkey?.register()
-            }
-        } else {
-            leftHotkey?.unregister()
-            rightHotkey?.unregister()
+            leftHotkey?.register()
+            rightHotkey?.register()
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        setupHotkeys(enable: true)
+        setupHotkeys()
     }
 
     override var representedObject: Any? {

@@ -434,7 +434,7 @@ enum ValueType {
             minVal = currentValue
             maxVal = value
         }
-        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) {
+        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { [unowned self] in
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: String
@@ -471,23 +471,23 @@ enum ValueType {
 
     func addObservers() {
         datastoreObservers = [
-            datastore.defaults.observe(\.brightnessClipMin, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.brightnessClipMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
-            datastore.defaults.observe(\.brightnessClipMax, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.brightnessClipMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
-            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
-            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
-            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
-            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
-                self.readapt(newValue: change.newValue, oldValue: change.oldValue)
+            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+                self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
             }),
         ]
 
@@ -496,45 +496,45 @@ enum ValueType {
             semaphore.signal()
         }
 
-        numberObservers["minBrightness"]!["self.minBrightness"] = { newValue, oldValue in
+        numberObservers["minBrightness"]!["self.minBrightness"] = { [unowned self] newValue, oldValue in
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["minBrightness"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["maxBrightness"]!["self.maxBrightness"] = { newValue, oldValue in
+        numberObservers["maxBrightness"]!["self.maxBrightness"] = { [unowned self] newValue, oldValue in
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["maxBrightness"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["minContrast"]!["self.minContrast"] = { newValue, oldValue in
+        numberObservers["minContrast"]!["self.minContrast"] = { [unowned self] newValue, oldValue in
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["minContrast"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["maxContrast"]!["self.maxContrast"] = { newValue, oldValue in
+        numberObservers["maxContrast"]!["self.maxContrast"] = { [unowned self] newValue, oldValue in
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["maxContrast"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["volume"]!["self.volume"] = { newVolume, _ in
+        numberObservers["volume"]!["self.volume"] = { [unowned self] newVolume, _ in
             if !DDC.setAudioSpeakerVolume(for: self.id, audioSpeakerVolume: newVolume.uint8Value) {
                 log.warning("Error writing volume using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        boolObservers["audioMuted"]!["self.audioMuted"] = { newAudioMuted, _ in
+        boolObservers["audioMuted"]!["self.audioMuted"] = { [unowned self] newAudioMuted, _ in
             if !DDC.setAudioMuted(for: self.id, audioMuted: newAudioMuted) {
                 log.warning("Error writing muted audio using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        numberObservers["brightness"]!["self.brightness"] = { newBrightness, oldValue in
+        numberObservers["brightness"]!["self.brightness"] = { [unowned self] newBrightness, oldValue in
             let appleDisplay = self.isAppleDisplay()
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
@@ -558,7 +558,7 @@ enum ValueType {
                 }
                 if datastore.defaults.smoothTransition || appleDisplay {
                     var faults = 0
-                    self.smoothTransition(from: oldBrightness, to: brightness) { newValue in
+                    self.smoothTransition(from: oldBrightness, to: brightness) { [unowned self] newValue in
                         if faults > 5 {
                             return
                         }
@@ -587,7 +587,7 @@ enum ValueType {
                 log.verbose("Set BRIGHTNESS to \(brightness)", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        numberObservers["contrast"]!["self.contrast"] = { newContrast, oldValue in
+        numberObservers["contrast"]!["self.contrast"] = { [unowned self] newContrast, oldValue in
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
                 var contrast: UInt8
@@ -602,7 +602,7 @@ enum ValueType {
                 }
                 if datastore.defaults.smoothTransition {
                     var faults = 0
-                    self.smoothTransition(from: oldValue.uint8Value, to: contrast) { newValue in
+                    self.smoothTransition(from: oldValue.uint8Value, to: contrast) { [unowned self] newValue in
                         if faults > 5 {
                             return
                         }
@@ -831,7 +831,7 @@ enum ValueType {
     }
 
     func getBrightnessContrast(
-        moment: Moment,
+        moment: Moment?,
         hour: Int? = nil,
         minute: Int = 0,
         factor: Double? = nil,
@@ -844,6 +844,7 @@ enum ValueType {
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0
     ) -> (NSNumber, NSNumber) {
+        guard let moment = moment else { return (NSNumber(value: minBrightness ?? 0), NSNumber(value: minContrast ?? 0)) }
         var now = DateInRegion().convertTo(region: Region.local)
         if let hour = hour {
             now = (now.dateBySet(hour: hour, min: minute, secs: 0) ??
@@ -912,7 +913,7 @@ enum ValueType {
     }
 
     func getBrightnessContrastBatch(
-        moment: Moment,
+        moment: Moment?,
         minutesBetween: Int = 0,
         factor: Double? = nil,
         minBrightness: UInt8? = nil,
@@ -924,6 +925,7 @@ enum ValueType {
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0
     ) -> [(NSNumber, NSNumber)] {
+        guard let moment = moment else { return [(NSNumber(value: minBrightness ?? 0), NSNumber(value: minContrast ?? 0))] }
         let step = 60 / minutesBetween
         var times = [Double]()
         times.reserveCapacity(24 * minutesBetween)

@@ -58,7 +58,7 @@ codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags --deep "$APP_TMP"
 
 if not set -q DISABLE_NOTARIZATION
-    xcnotary -d alin.p32@gmail.com -k altool -b $APP_TMP
+    /usr/local/bin/xcnotary notarize "$APP_TMP" --developer-account 'alin.p32@gmail.com' --developer-password-keychain-item 'altool'
 end
 
 set -l APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist")

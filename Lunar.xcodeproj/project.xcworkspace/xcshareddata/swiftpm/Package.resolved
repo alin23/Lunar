@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire",
+        "state": {
+          "branch": null,
+          "revision": "fca036f7aeca07124067cb6e0c12b0ad6359e3d4",
+          "version": "5.1.0"
+        }
+      },
+      {
         "package": "CryptorECC",
         "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
         "state": {
@@ -11,12 +20,48 @@
         }
       },
       {
+        "package": "Solar",
+        "repositoryURL": "https://github.com/alin23/Solar",
+        "state": {
+          "branch": null,
+          "revision": "939f125badb2bc5012c5a8f651a7dbab96868a13",
+          "version": "2.3.3"
+        }
+      },
+      {
         "package": "Surge",
         "repositoryURL": "https://github.com/Jounce/Surge",
         "state": {
           "branch": null,
           "revision": "b9777a8d0c1df1ed0a22d238fb987c60d13513ac",
           "version": "2.3.0"
+        }
+      },
+      {
+        "package": "SwiftDate",
+        "repositoryURL": "https://github.com/malcommac/SwiftDate",
+        "state": {
+          "branch": null,
+          "revision": "700dde1b3417fd4a7fd2bec9f5bc8ab2de1b96b4",
+          "version": "6.1.0"
+        }
+      },
+      {
+        "package": "SwiftyBeaver",
+        "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver",
+        "state": {
+          "branch": null,
+          "revision": "97477264cd683a387e80fc2f9b0f0e8db8070ed2",
+          "version": "1.9.0"
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "2b6054efa051565954e1d2b9da831680026cd768",
+          "version": "5.0.0"
         }
       }
     ]

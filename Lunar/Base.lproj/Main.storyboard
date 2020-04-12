@@ -333,8 +333,8 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <windowController storyboardIdentifier="windowController" id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
+                <windowController storyboardIdentifier="windowController" showSeguePresentationStyle="single" id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
                         <rect key="contentRect" x="561" y="439" width="950" height="700"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
@@ -353,12 +353,8 @@
                             <userDefinedRuntimeAttribute type="boolean" keyPath="hidesTitle" value="YES"/>
                             <userDefinedRuntimeAttribute type="boolean" keyPath="verticalTrafficLightButtons" value="NO"/>
                         </userDefinedRuntimeAttributes>
-                        <connections>
-                            <outlet property="delegate" destination="B8D-0N-5wS" id="J7h-ef-IWy"/>
-                        </connections>
                     </window>
                     <connections>
-                        <outlet property="window" destination="IQv-IB-iLA" id="kBQ-Ew-vMy"/>
                         <segue destination="cu7-9X-1cE" kind="relationship" relationship="window.shadowedContentViewController" id="qtt-sk-mJb"/>
                     </connections>
                 </windowController>
@@ -390,7 +386,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="u5l-gE-arP">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -400,8 +395,6 @@
                                 <buttonCell key="cell" type="inline" title="Start      ⚫︎" alternateTitle="Pause    ⚫︎" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
-                                    <string key="keyEquivalent">d</string>
-                                    <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="zyO-27-aZX"/>
@@ -426,7 +419,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="4Gy-XK-Ehj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -478,7 +470,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <connections>
-                                    <segue destination="VFu-z9-UHh" kind="embed" id="ikv-IJ-MZ2"/>
+                                    <segue destination="VFu-z9-UHh" kind="embed" id="Gqx-7X-Xsf"/>
                                 </connections>
                             </containerView>
                         </subviews>
@@ -1136,7 +1128,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h9o-wr-i7V">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1150,7 +1141,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Niy-1J-QA6">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1164,7 +1154,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="c4r-te-ssb">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1178,7 +1167,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="RDO-l8-5lx">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1192,7 +1180,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="fVs-td-JD6">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1241,7 +1228,6 @@
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0Jn-zP-b3y">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
@@ -1885,7 +1871,6 @@
                                         <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="76E-sq-sm6">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent">a</string>
                                         </buttonCell>
                                         <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                     </button>
@@ -1989,7 +1974,6 @@
                                         <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OfU-Pn-GBK">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent">a</string>
                                         </buttonCell>
                                         <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                     </button>
@@ -2046,7 +2030,6 @@ to view other displays</string>
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ZUR-Uw-BJ0">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -2083,7 +2066,6 @@ to view other displays</string>
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="XK2-PV-E8M">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent">a</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
