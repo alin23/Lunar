@@ -9,8 +9,8 @@ class NonResponsiveDDCTextField: NSTextField {
             if let adaptiveButton = superview?.subviews.first(
                 where: { v in (v as? QuickAdaptiveButton) != nil }
             ) as? QuickAdaptiveButton {
-                runInMainThread {
-                    adaptiveButton.isHidden = !self.isHidden
+                runInMainThread { [weak adaptiveButton] in
+                    adaptiveButton?.isHidden = !self.isHidden
                 }
             }
         }

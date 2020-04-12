@@ -28,14 +28,14 @@ class BrightnessAdapter {
 
     var appObserver: NSKeyValueObservation?
     var runningAppExceptions: [AppException]!
-    var geolocation: Geolocation! {
+    var geolocation: Geolocation? {
         didSet {
             fetchMoments()
         }
     }
 
-    var _moment: Moment!
-    var moment: Moment! {
+    var _moment: Moment?
+    var moment: Moment? {
         get {
             if let m = _moment, !m.solarNoon.isToday {
                 fetchMoments()
@@ -44,9 +44,7 @@ class BrightnessAdapter {
         }
         set {
             _moment = newValue
-            if _moment != nil {
-                _moment.store()
-            }
+            _moment?.store()
         }
     }
 
@@ -307,7 +305,7 @@ class BrightnessAdapter {
         var date = now.date
         date += TimeInterval(Region.local.timeZone.secondsFromGMT())
         log.debug("Getting moments for \(date)")
-        if let solar = Solar(for: date, coordinate: geolocation.coordinate) {
+        if let geolocation = geolocation, let solar = Solar(for: date, coordinate: geolocation.coordinate) {
             moment = Moment(solar)
             log.debug("Computed moment from Solar")
             return
@@ -321,17 +319,19 @@ class BrightnessAdapter {
             log.debug("Computed moment is not today, not storing it")
         }
 
-        AF.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { response in
-            switch response.result {
-            case let .success(value):
-                let json = JSON(value)
-                if json["status"].string == "OK" {
-                    self.moment = Moment(result: json["results"].dictionaryValue)
-                } else {
-                    log.error("Sunrise API status: \(json["status"].string ?? "null")")
+        if let geolocation = geolocation {
+            AF.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { [weak self] response in
+                switch response.result {
+                case let .success(value):
+                    let json = JSON(value)
+                    if json["status"].string == "OK" {
+                        self?.moment = Moment(result: json["results"].dictionaryValue)
+                    } else {
+                        log.error("Sunrise API status: \(json["status"].string ?? "null")")
+                    }
+                case let .failure(error):
+                    log.error("Sunrise API error: \(error)")
                 }
-            case let .failure(error):
-                log.error("Sunrise API error: \(error)")
             }
         }
     }
@@ -355,10 +355,10 @@ class BrightnessAdapter {
     }
 
     func listenForBrightnessClipChange() {
-        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, changeHandler: { _, change in
+        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, changeHandler: { [unowned self] _, change in
             self.brightnessClipMax = Double(change.newValue ?? datastore.defaults.brightnessClipMax)
         })
-        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, changeHandler: { _, change in
+        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, changeHandler: { [unowned self] _, change in
             self.brightnessClipMin = Double(change.newValue ?? datastore.defaults.brightnessClipMin)
         })
     }
@@ -368,7 +368,7 @@ class BrightnessAdapter {
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
-        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { _, change in
+        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { [unowned self] _, change in
             let oldAppIdentifiers = change.oldValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
             let newAppIdentifiers = change.newValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
             if let identifiers = newAppIdentifiers, let newApps = datastore.appExceptions(identifiers: identifiers) {

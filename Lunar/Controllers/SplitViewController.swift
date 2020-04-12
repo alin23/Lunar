@@ -164,7 +164,7 @@ class SplitViewController: NSSplitViewController {
         }
         activeStateButton?.page = .display
         activeStateButton?.fade()
-        helpPopover.appearance = NSAppearance(named: .vibrantLight)
+        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
     }
 
     func yellowBackground() {
@@ -176,7 +176,7 @@ class SplitViewController: NSSplitViewController {
         }
         activeStateButton?.page = .settings
         activeStateButton?.fade()
-        helpPopover.appearance = NSAppearance(named: .vibrantLight)
+        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
     }
 
     func mauveBackground() {
@@ -188,7 +188,7 @@ class SplitViewController: NSSplitViewController {
         }
         activeStateButton?.page = .hotkeys
         activeStateButton?.fade()
-        helpPopover.appearance = NSAppearance(named: .vibrantDark)
+        helpPopover?.appearance = NSAppearance(named: .vibrantDark)
     }
 
     override func viewDidLoad() {

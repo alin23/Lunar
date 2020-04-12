@@ -12,7 +12,7 @@ class QuickAdaptiveButton: NSButton {
     var adaptiveButtonTrackingArea: NSTrackingArea?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var displayID: CGDirectDisplayID?
-    var display: Display? {
+    weak var display: Display? {
         guard let id = displayID else { return nil }
         return brightnessAdapter.displays[id]
     }
@@ -50,7 +50,7 @@ class QuickAdaptiveButton: NSButton {
         adaptiveButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        adaptiveObserver = { newAdaptive, oldValue in
+        adaptiveObserver = { [unowned self] newAdaptive, oldValue in
             if let display = self.display {
                 runInMainThread {
                     if newAdaptive {

@@ -13,7 +13,7 @@ class SettingsViewController: NSSplitViewController {
         return NSRect()
     }
 
-    override func viewDidLoad() {
+    @IBAction func viewDidLoad(_: Any?) {
         super.viewDidLoad()
     }
 }

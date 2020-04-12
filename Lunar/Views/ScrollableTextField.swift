@@ -64,7 +64,7 @@ class ScrollableTextField: NSTextField {
 
     var trackingArea: NSTrackingArea?
     var captionTrackingArea: NSTrackingArea?
-    var caption: ScrollableTextFieldCaption! {
+    unowned var caption: ScrollableTextFieldCaption? {
         didSet {
             if didScrollTextField {
                 return
@@ -98,12 +98,12 @@ class ScrollableTextField: NSTextField {
     }
 
     override func textDidBeginEditing(_: Notification) {
-        log.debug("Editing text")
-        appDelegate().setupHotkeys(enable: false)
+        log.verbose("Editing text \(stringValue)")
+        disableLeftRightHotkeys()
     }
 
     override func textDidEndEditing(_: Notification) {
-        appDelegate().setupHotkeys(enable: true)
+        log.verbose("Finished editing text \(stringValue)")
         darken(color: textFieldColor)
     }
 
@@ -140,19 +140,18 @@ class ScrollableTextField: NSTextField {
         hover = true
         lightenUp(color: textFieldColorHover)
 
-        log.debug("Unregistering up/down hotkeys")
-        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
-        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
-
+        disableUpDownHotkeys()
         log.debug("Registering up/down hotkeys")
         if let upKeyCombo = KeyCombo(keyCode: kVK_UpArrow, carbonModifiers: 0),
             let downKeyCombo = KeyCombo(keyCode: kVK_DownArrow, carbonModifiers: 0) {
-            upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: upKeyCombo) { _ in
+            upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: upKeyCombo) { [weak self] _ in
+                guard let self = self else { return }
                 self.increaseValue()
                 self.onValueChanged?(self.integerValue)
                 self.onValueChangedDouble?(self.doubleValue)
             }
-            downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: downKeyCombo) { _ in
+            downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: downKeyCombo) { [weak self] _ in
+                guard let self = self else { return }
                 self.decreaseValue()
                 self.onValueChanged?(self.integerValue)
                 self.onValueChangedDouble?(self.doubleValue)
@@ -165,6 +164,7 @@ class ScrollableTextField: NSTextField {
     }
 
     override func mouseExited(with _: NSEvent) {
+        disableUpDownHotkeys()
         if !isEnabled {
             return
         }
@@ -173,14 +173,6 @@ class ScrollableTextField: NSTextField {
 
         hover = false
         darken(color: textFieldColor)
-
-        log.debug("Unregistering up/down hotkeys")
-        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
-        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
-        upHotkey?.unregister()
-        downHotkey?.unregister()
-        upHotkey = nil
-        downHotkey = nil
 
         onMouseExit?()
     }
@@ -236,7 +228,7 @@ class ScrollableTextField: NSTextField {
 
     func finishScrolling(after ms: Int) {
         adaptToScrollingFinished?.cancel()
-        adaptToScrollingFinished = DispatchWorkItem {
+        adaptToScrollingFinished = DispatchWorkItem { [unowned self] in
             self.finishScrolling()
             self.adaptToScrollingFinished = nil
         }
