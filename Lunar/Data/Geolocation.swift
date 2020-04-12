@@ -84,15 +84,15 @@ class Geolocation: NSObject, NSCoding {
     }
 
     func initObservers() {
-        latitudeObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { _, change in
-            guard let lat = change.newValue, let oldLat = change.oldValue, lat != oldLat else {
+        latitudeObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { [weak self] _, change in
+            guard let self = self, let lat = change.newValue, let oldLat = change.oldValue, lat != oldLat else {
                 return
             }
             self.latitude = lat
             brightnessAdapter.fetchMoments()
         })
-        longitudeObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { _, change in
-            guard let lon = change.newValue, let oldLon = change.oldValue, lon != oldLon else {
+        longitudeObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { [weak self] _, change in
+            guard let self = self, let lon = change.newValue, let oldLon = change.oldValue, lon != oldLon else {
                 return
             }
             self.longitude = lon

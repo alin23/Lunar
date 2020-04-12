@@ -11,12 +11,13 @@ import WAYWindow
 
 class ModernWindow: WAYWindow {
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        log.verbose("Creating window")
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
     }
 
     override func mouseDown(with event: NSEvent) {
-        helpPopover.close()
-        if let c = helpPopover.contentViewController as? HelpPopoverController {
+        helpPopover?.close()
+        if let c = helpPopover?.contentViewController as? HelpPopoverController {
             c.onClick = nil
         }
         super.mouseDown(with: event)
@@ -30,11 +31,12 @@ class ModernWindow: WAYWindow {
         trafficLightButtonsLeftMargin = 20
         trafficLightButtonsTopMargin = 0
         hideTitleBarInFullScreen = false
+
         setContentBorderThickness(0.0, for: NSRectEdge.minY)
         setAutorecalculatesContentBorderThickness(false, for: NSRectEdge.minY)
         isOpaque = false
         backgroundColor = NSColor.clear
-        makeKeyAndOrderFront(nil)
+        makeKeyAndOrderFront(self)
         orderFrontRegardless()
     }
 }

@@ -9,64 +9,64 @@
 import Charts
 import Cocoa
 
-let ADAPTIVE_HELP_TEXT = """
-## Description
-
-This setting allows the user to **disable** the adaptive algorithm on a **per-monitor** basis.
-
-- `ADAPTIVE` will **allow** Lunar to change the brightness and contrast automatically for this monitor
-- `MANUAL` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
-"""
-let BRIGHTNESS_RANGE_HELP_TEXT = """
-## Description
-
-This setting allows the user to change the brightness range for the monitor.
-Some monitors will have an extended brightness range with values up to 255 instead of the standard 100.
-
-If you notice Lunar's 100% doesn't map to your monitor's 100% you might benefit from enabling the extended range by clicking on this button.
-
-- `Normal range` will map Lunar's 100% brightness value to the monitor's 100 value
-- `Extended range` will map Lunar's 100% brightness value to the monitor's 255 value and interpolate the value between 0 and 255
-"""
-let LOCK_BRIGHTNESS_HELP_TEXT = """
-## Description
-
-This setting allows the user to **restrict** changes on the brightness of this monitor.
-
-- `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
-- `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
-"""
-let LOCK_CONTRAST_HELP_TEXT = """
-## Description
-
-This setting allows the user to **restrict** changes on the contrast of this monitor.
-
-- `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
-- `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
-"""
-
 class DisplayViewController: NSViewController {
-    @IBOutlet var displayView: DisplayView!
-    @IBOutlet var displayName: NSTextField!
-    @IBOutlet var adaptiveButton: NSButton!
+    let ADAPTIVE_HELP_TEXT = """
+    ## Description
 
-    @IBOutlet var brightnessRangeButton: NSButton!
-    @IBOutlet var algorithmText: NSTextField!
-    @IBOutlet var brightnessRangeText: NSTextField!
+    This setting allows the user to **disable** the adaptive algorithm on a **per-monitor** basis.
 
-    @IBOutlet var scrollableBrightness: ScrollableBrightness!
-    @IBOutlet var scrollableContrast: ScrollableContrast!
+    - `ADAPTIVE` will **allow** Lunar to change the brightness and contrast automatically for this monitor
+    - `MANUAL` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
+    """
+    let BRIGHTNESS_RANGE_HELP_TEXT = """
+    ## Description
 
-    @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
+    This setting allows the user to change the brightness range for the monitor.
+    Some monitors will have an extended brightness range with values up to 255 instead of the standard 100.
 
-    @IBOutlet var swipeLeftHint: NSTextField!
-    @IBOutlet var swipeRightHint: NSTextField!
+    If you notice Lunar's 100% doesn't map to your monitor's 100% you might benefit from enabling the extended range by clicking on this button.
 
-    @IBOutlet var adaptiveHelpButton: HelpButton!
+    - `Normal range` will map Lunar's 100% brightness value to the monitor's 100 value
+    - `Extended range` will map Lunar's 100% brightness value to the monitor's 255 value and interpolate the value between 0 and 255
+    """
+    let LOCK_BRIGHTNESS_HELP_TEXT = """
+    ## Description
 
-    @IBOutlet var brightnessRangeHelpButton: HelpButton!
+    This setting allows the user to **restrict** changes on the brightness of this monitor.
 
-    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField! {
+    - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
+    - `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
+    """
+    let LOCK_CONTRAST_HELP_TEXT = """
+    ## Description
+
+    This setting allows the user to **restrict** changes on the contrast of this monitor.
+
+    - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
+    - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
+    """
+
+    @IBOutlet var displayView: DisplayView?
+    @IBOutlet var displayName: NSTextField?
+    @IBOutlet var adaptiveButton: NSButton?
+
+    @IBOutlet var brightnessRangeButton: NSButton?
+    @IBOutlet var algorithmText: NSTextField?
+    @IBOutlet var brightnessRangeText: NSTextField?
+
+    @IBOutlet var scrollableBrightness: ScrollableBrightness?
+    @IBOutlet var scrollableContrast: ScrollableContrast?
+
+    @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
+
+    @IBOutlet var swipeLeftHint: NSTextField?
+    @IBOutlet var swipeRightHint: NSTextField?
+
+    @IBOutlet var adaptiveHelpButton: HelpButton?
+
+    @IBOutlet var brightnessRangeHelpButton: HelpButton?
+
+    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField? {
         didSet {
             if let d = display {
                 nonResponsiveDDCTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
@@ -74,10 +74,10 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @IBOutlet var lockContrastHelpButton: HelpButton!
-    @IBOutlet var lockBrightnessHelpButton: HelpButton!
+    @IBOutlet var lockContrastHelpButton: HelpButton?
+    @IBOutlet var lockBrightnessHelpButton: HelpButton?
 
-    @objc dynamic var display: Display! {
+    @objc dynamic weak var display: Display? {
         didSet {
             if let display = display {
                 update(from: display)
@@ -88,12 +88,13 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic var noDisplay: Bool = false
 
-    var adaptiveButtonTrackingArea: NSTrackingArea!
+    var adaptiveButtonTrackingArea: NSTrackingArea?
     var adaptiveModeObserver: NSKeyValueObservation?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var brightnessRangeObserver: ((Bool, Bool) -> Void)?
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
     var showNavigationHintsObserver: NSKeyValueObservation?
+    var viewID: String?
 
     func setAdaptiveButtonEnabled(_ enabled: Bool) {
         guard let adaptiveButton = adaptiveButton else { return }
@@ -126,21 +127,25 @@ class DisplayViewController: NSViewController {
         brightnessRangeText?.isHidden = hidden
     }
 
+    func refreshView() {
+        view.setNeedsDisplay(view.visibleRect)
+    }
+
     func update(from display: Display) {
         if display.id == GENERIC_DISPLAY_ID {
             displayName?.stringValue = "No Display"
         } else {
             displayName?.stringValue = display.name
-            nonResponsiveDDCTextField?.onClick = {
-                runInMainThread {
+            nonResponsiveDDCTextField?.onClick = { [weak self] in
+                runInMainThread { [weak self] in
                     DDC.skipWritingPropertyById[display.id]?.removeAll()
                     DDC.skipReadingPropertyById[display.id]?.removeAll()
                     DDC.writeFaults[display.id]?.removeAll()
                     DDC.readFaults[display.id]?.removeAll()
                     display.responsive = true
-                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
-                    self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
-                    self.view.setNeedsDisplay(self.view.visibleRect)
+                    self?.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+                    self?.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
+                    self?.refreshView()
                 }
             }
         }
@@ -158,11 +163,11 @@ class DisplayViewController: NSViewController {
 
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
         setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
-        view.setNeedsDisplay(view.visibleRect)
+        refreshView()
     }
 
     func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
-        guard let display = display, display.id != GENERIC_DISPLAY_ID else { return }
+        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID else { return }
 
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
@@ -320,20 +325,21 @@ class DisplayViewController: NSViewController {
     func setIsHidden(_ value: Bool) {
         setButtonsHidden(value)
 
-        nonResponsiveDDCTextField.isHidden = value
-        scrollableBrightness.isHidden = value
-        scrollableContrast.isHidden = value
-        brightnessContrastChart.isHidden = value
-        swipeLeftHint.isHidden = value
-        swipeRightHint.isHidden = value
+        nonResponsiveDDCTextField?.isHidden = value
+        scrollableBrightness?.isHidden = value
+        scrollableContrast?.isHidden = value
+        brightnessContrastChart?.isHidden = value
+        swipeLeftHint?.isHidden = value
+        swipeRightHint?.isHidden = value
     }
 
     func listenForShowNavigationHintsChange() {
-        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }
-            runInMainThread {
+            runInMainThread { [weak self] in
+                guard let self = self else { return }
                 self.swipeLeftHint?.isHidden = !show
                 self.swipeRightHint?.isHidden = !show
             }
@@ -341,15 +347,16 @@ class DisplayViewController: NSViewController {
     }
 
     deinit {
-        let id = "displayViewController-\(self.view.accessibilityIdentifier())"
+        let id = "displayViewController-\(self.viewID ?? "")"
         display?.resetObserver(prop: "adaptive", key: id, type: Bool.self)
         display?.resetObserver(prop: "activeAndResponsive", key: id, type: Bool.self)
     }
 
     func listenForAdaptiveChange() {
-        adaptiveObserver = { newAdaptive, oldValue in
-            if let button = self.adaptiveButton, let display = self.display {
-                runInMainThread {
+        adaptiveObserver = { [weak self] newAdaptive, oldValue in
+            if let self = self, let button = self.adaptiveButton, let display = self.display {
+                runInMainThread { [weak self] in
+                    guard let self = self else { return }
                     if newAdaptive {
                         button.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
                         self.setValuesHidden(false)
@@ -363,31 +370,32 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
-        display?.setObserver(prop: "adaptive", key: "displayViewController-\(view.accessibilityIdentifier())", action: adaptiveObserver!)
+        display?.setObserver(prop: "adaptive", key: "displayViewController-\(viewID ?? "")", action: adaptiveObserver!)
     }
 
     func listenForBrightnessRangeChange() {
-        brightnessRangeObserver = { newBrightnessRange, oldValue in
-            if let button = self.brightnessRangeButton, let display = self.display {
-                runInMainThread {
+        brightnessRangeObserver = { [weak self] newBrightnessRange, oldValue in
+            if let self = self, let button = self.brightnessRangeButton, let display = self.display {
+                runInMainThread { [weak display, weak button] in
                     if newBrightnessRange {
-                        button.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
-                        button.state = .on
+                        button?.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
+                        button?.state = .on
                     } else {
-                        button.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
-                        button.state = .off
+                        button?.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
+                        button?.state = .off
                     }
-                    display.readapt(newValue: newBrightnessRange, oldValue: oldValue)
+                    display?.readapt(newValue: newBrightnessRange, oldValue: oldValue)
                 }
             }
         }
-        display?.setObserver(prop: "extendedBrightnessRange", key: "displayViewController-\(view.accessibilityIdentifier())", action: brightnessRangeObserver!)
+        display?.setObserver(prop: "extendedBrightnessRange", key: "displayViewController-\(viewID ?? "")", action: brightnessRangeObserver!)
     }
 
     func listenForActiveAndResponsiveChange() {
-        activeAndResponsiveObserver = { newActiveAndResponsive, _ in
-            if let display = self.display, let textField = self.nonResponsiveDDCTextField {
-                runInMainThread {
+        activeAndResponsiveObserver = { [weak self] newActiveAndResponsive, _ in
+            if let self = self, let display = self.display, let textField = self.nonResponsiveDDCTextField {
+                runInMainThread { [weak self] in
+                    guard let self = self else { return }
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
                     self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
 
@@ -395,27 +403,27 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
-        display?.setObserver(prop: "activeAndResponsive", key: "displayViewController-\(view.accessibilityIdentifier())", action: activeAndResponsiveObserver!)
+        display?.setObserver(prop: "activeAndResponsive", key: "displayViewController-\(viewID ?? "")", action: activeAndResponsiveObserver!)
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            runInMainThread {
-                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self] _, change in
+            runInMainThread { [weak self, weak brightnessContrastChart = self?.brightnessContrastChart] in
+                guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                     return
                 }
                 let adaptiveMode = AdaptiveMode(rawValue: mode)
-                if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
                     self.initGraph(mode: adaptiveMode)
                 }
                 if adaptiveMode == .manual {
-                    self.scrollableBrightness.disabled = true
-                    self.scrollableContrast.disabled = true
+                    self.scrollableBrightness?.disabled = true
+                    self.scrollableContrast?.disabled = true
                     self.setValuesHidden(true, mode: adaptiveMode)
                     self.setAdaptiveButtonEnabled(false)
                 } else {
-                    self.scrollableBrightness.disabled = false
-                    self.scrollableContrast.disabled = false
+                    self.scrollableBrightness?.disabled = false
+                    self.scrollableContrast?.disabled = false
                     self.setValuesHidden(false, mode: adaptiveMode)
                     self.setAdaptiveButtonEnabled((self.display?.id ?? GENERIC_DISPLAY_ID) != GENERIC_DISPLAY_ID)
                 }
@@ -436,12 +444,13 @@ class DisplayViewController: NSViewController {
     }
 
     func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
-        scrollableBrightness.setValuesHidden(hidden, mode: mode)
-        scrollableContrast.setValuesHidden(hidden, mode: mode)
+        scrollableBrightness?.setValuesHidden(hidden, mode: mode)
+        scrollableContrast?.setValuesHidden(hidden, mode: mode)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewID = view.accessibilityIdentifier()
 
         swipeLeftHint?.isHidden = true
         swipeRightHint?.isHidden = true
@@ -454,19 +463,19 @@ class DisplayViewController: NSViewController {
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update(from: display)
 
-            scrollableBrightness.display = display
-            scrollableContrast.display = display
+            scrollableBrightness?.display = display
+            scrollableContrast?.display = display
 
             initToggleButton(adaptiveButton, helpButton: adaptiveHelpButton, buttonColors: adaptiveButtonColors)
             initToggleButton(brightnessRangeButton, helpButton: brightnessRangeHelpButton, buttonColors: brightnessRangeButtonColors)
 
-            scrollableBrightness.label.textColor = scrollableViewLabelColor
-            scrollableContrast.label.textColor = scrollableViewLabelColor
+            scrollableBrightness?.label.textColor = scrollableViewLabelColor
+            scrollableContrast?.label.textColor = scrollableViewLabelColor
 
-            scrollableBrightness.onMinValueChanged = { (value: Int) in self.updateDataset(minBrightness: UInt8(value)) }
-            scrollableBrightness.onMaxValueChanged = { (value: Int) in self.updateDataset(maxBrightness: UInt8(value)) }
-            scrollableContrast.onMinValueChanged = { (value: Int) in self.updateDataset(minContrast: UInt8(value)) }
-            scrollableContrast.onMaxValueChanged = { (value: Int) in self.updateDataset(maxContrast: UInt8(value)) }
+            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: UInt8(value)) }
+            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: UInt8(value)) }
+            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: UInt8(value)) }
+            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: UInt8(value)) }
 
             initGraph()
 

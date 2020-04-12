@@ -31,7 +31,8 @@ class HotkeyView: RecordView, RecordViewDelegate {
     var preciseHotkeyCheckbox: NSButton? {
         didSet {
             guard let checkbox = preciseHotkeyCheckbox,
-                let identifier = HotkeyIdentifier(rawValue: hotkey.identifier)
+                let hk = hotkey,
+                let identifier = HotkeyIdentifier(rawValue: hk.identifier)
             else { return }
 
             let hotkeys = datastore.hotkeys() ?? Hotkey.defaults
@@ -45,7 +46,8 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     var hotkeyEnabled: Bool {
         if let hotkeys = datastore.hotkeys(),
-            let identifier = HotkeyIdentifier(rawValue: hotkey.identifier),
+            let hk = hotkey,
+            let identifier = HotkeyIdentifier(rawValue: hk.identifier),
             let hotkey = (hotkeys[identifier] ?? Hotkey.defaults[identifier]) {
             return (hotkey[.enabled] ?? 0) == 1
         }

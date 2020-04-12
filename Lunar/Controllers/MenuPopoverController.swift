@@ -222,7 +222,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 view.removeTrackingArea(area)
             }
             trackingArea = nil
-            appDelegate().disableUpDownHotkeys()
+            disableUpDownHotkeys()
         }
     }
 
@@ -244,8 +244,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForDisplaysChange() {
-        displaysObserver = datastore.defaults.observe(\.displays, options: [.new], changeHandler: { _, _ in
-            runInMainThreadAsyncAfter(ms: 2000) {
+        displaysObserver = datastore.defaults.observe(\.displays, options: [.new], changeHandler: { [unowned self] _, _ in
+            runInMainThreadAsyncAfter(ms: 2000) { [weak self] in
+                guard let self = self else { return }
                 if !self.sameDisplays() {
                     self.tableView.beginUpdates()
                     self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
@@ -263,8 +264,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     func listenForResponsiveDDCChange() {
         responsiveDDCObservers.removeAll()
         for (id, display) in brightnessAdapter.activeDisplays {
-            responsiveDDCObservers[id] = display.observe(\.responsive, options: [.new], changeHandler: { _, _ in
-                runInMainThreadAsyncAfter(ms: 1000) {
+            responsiveDDCObservers[id] = display.observe(\.responsive, options: [.new], changeHandler: { [unowned self] _, _ in
+                runInMainThreadAsyncAfter(ms: 1000) { [weak self] in
+                    guard let self = self else { return }
                     self.tableView.beginUpdates()
                     self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
                     self.tableView.reloadData()
@@ -283,9 +285,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            runInMainThread {
-                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [unowned self] _, change in
+            runInMainThread { [weak self] in
+                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode, let self = self else {
                     return
                 }
                 let adaptiveMode = AdaptiveMode(rawValue: mode)!

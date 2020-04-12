@@ -26,8 +26,8 @@ class DisplayValuesView: NSTableView {
                 let display = nameCell.objectValue as? Display,
                 let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
                 display.activeAndResponsive {
-                runInMainThread {
-                    adaptiveButton.isHidden = hidden
+                runInMainThread { [weak adaptiveButton] in
+                    adaptiveButton?.isHidden = hidden
                 }
             }
         }
@@ -57,20 +57,21 @@ class DisplayValuesView: NSTableView {
 
     func getResetAction(displayID: CGDirectDisplayID) -> (() -> Void) {
         return {
-            runInMainThread {
+            runInMainThread { [weak self] in
                 DDC.skipWritingPropertyById[displayID]?.removeAll()
                 DDC.skipReadingPropertyById[displayID]?.removeAll()
                 DDC.writeFaults[displayID]?.removeAll()
                 DDC.readFaults[displayID]?.removeAll()
                 brightnessAdapter.displays[displayID]?.responsive = true
-                self.setNeedsDisplay()
+                self?.setNeedsDisplay()
             }
         }
     }
 
     func getDeleteAction(displayID: CGDirectDisplayID, row: Int) -> (() -> Void) {
         return {
-            runInMainThread {
+            runInMainThread { [weak self] in
+                guard let self = self else { return }
                 self.beginUpdates()
                 self.removeRows(at: [row], withAnimation: .effectFade)
                 self.endUpdates()
@@ -100,8 +101,8 @@ class DisplayValuesView: NSTableView {
     }
 
     override func didRemove(_ rowView: NSTableRowView, forRow row: Int) {
-        runInMainThread {
-            removeRow(rowView, forRow: row)
+        runInMainThread { [weak self] in
+            self?.removeRow(rowView, forRow: row)
         }
     }
 
@@ -192,8 +193,8 @@ class DisplayValuesView: NSTableView {
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {
-        runInMainThread {
-            addRow(rowView, forRow: row)
+        runInMainThread { [weak self] in
+            self?.addRow(rowView, forRow: row)
         }
     }
 }

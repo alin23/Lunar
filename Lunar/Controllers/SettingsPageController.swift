@@ -11,7 +11,6 @@ import Cocoa
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
-    weak var pageController: NSPageController?
     var adaptiveModeObserver: NSKeyValueObservation?
 
     func updateDataset(
@@ -44,13 +43,13 @@ class SettingsPageController: NSViewController {
             return
         }
 
-        runInMainThread {
+        runInMainThread { [weak brightnessContrastChart] in
             if updateLegend {
-                brightnessContrastChart.setupLegend()
+                brightnessContrastChart?.setupLegend()
             }
 
             if updateLimitLines {
-                brightnessContrastChart.setupLimitLines(mode: brightnessAdapter.mode)
+                brightnessContrastChart?.setupLimitLines(mode: brightnessAdapter.mode)
             }
         }
 
@@ -113,29 +112,29 @@ class SettingsPageController: NSViewController {
         }
 
         // brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode)
-        runInMainThread {
+        runInMainThread { [weak brightnessContrastChart] in
             if withAnimation {
-                brightnessContrastChart.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
+                brightnessContrastChart?.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
             } else {
-                brightnessContrastChart.notifyDataSetChanged()
+                brightnessContrastChart?.notifyDataSetChanged()
             }
         }
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] _, change in
+            guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
             }
             let adaptiveMode = AdaptiveMode(rawValue: mode)
-            if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+            if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
                 self.initGraph(display: brightnessAdapter.firstDisplay, mode: adaptiveMode)
             }
         })
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
-        runInMainThread {
+        runInMainThread { [weak brightnessContrastChart] in
             brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
         }
     }

@@ -22,7 +22,7 @@ class StatusItemButtonController: NSView {
             return
         }
 
-        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem {
+        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem { [unowned self] in
             if let area = event.trackingArea, let button = self.statusButton {
                 menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
                 menuPopover.becomeFirstResponder()

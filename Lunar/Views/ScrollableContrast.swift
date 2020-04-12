@@ -32,9 +32,11 @@ class ScrollableContrast: NSView {
         }
     }
 
-    var display: Display! {
+    weak var display: Display? {
         didSet {
-            update(from: display)
+            if let d = display {
+                update(from: d)
+            }
         }
     }
 
@@ -46,36 +48,36 @@ class ScrollableContrast: NSView {
 
     var displayMinValue: Int {
         get {
-            return display.minContrast.intValue
+            return display?.minContrast.intValue ?? 0
         }
         set {
-            display.minContrast = NSNumber(value: newValue)
+            display?.minContrast = NSNumber(value: newValue)
         }
     }
 
     var displayMaxValue: Int {
         get {
-            return display.maxContrast.intValue
+            return display?.maxContrast.intValue ?? 100
         }
         set {
-            display.maxContrast = NSNumber(value: newValue)
+            display?.maxContrast = NSNumber(value: newValue)
         }
     }
 
     var displayValue: Int {
         get {
-            return display.contrast.intValue
+            return display?.contrast.intValue ?? 50
         }
         set {
-            display.contrast = NSNumber(value: newValue)
+            display?.contrast = NSNumber(value: newValue)
         }
     }
 
     var contrastObserver: ((NSNumber, NSNumber) -> Void)?
 
     func addObserver(_ display: Display) {
-        minObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { _, change in
-            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+        minObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.lowerLimit = Double(val)
                 let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
@@ -85,8 +87,8 @@ class ScrollableContrast: NSView {
                 }
             }
         })
-        maxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { _, change in
-            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+        maxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.upperLimit = Double(val)
                 let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
@@ -96,8 +98,8 @@ class ScrollableContrast: NSView {
                 }
             }
         })
-        contrastObserver = { newContrast, _ in
-            if let display = self.display, display.id != GENERIC_DISPLAY_ID {
+        contrastObserver = { [weak self] newContrast, _ in
+            if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
                 let minContrast: UInt8
                 let maxContrast: UInt8
 
@@ -111,7 +113,7 @@ class ScrollableContrast: NSView {
 
                 let newContrast = cap(newContrast.uint8Value, minVal: minContrast, maxVal: maxContrast)
                 runInMainThread {
-                    self.currentValue?.stringValue = String(newContrast)
+                    self?.currentValue?.stringValue = String(newContrast)
                 }
             }
         }
@@ -155,7 +157,8 @@ class ScrollableContrast: NSView {
 
             currentValue?.isHidden = !hidden
             currentValueCaption?.isHidden = !hidden
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
+            DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+                guard let self = self else { return }
                 self.currentValue?.alphaValue = currentAlpha
                 self.currentValueCaption?.alphaValue = currentAlpha
                 self.minValue?.isHidden = hidden
@@ -171,7 +174,8 @@ class ScrollableContrast: NSView {
 
             currentValue?.alphaValue = currentAlpha
             currentValueCaption?.alphaValue = currentAlpha
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
+            DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+                guard let self = self else { return }
                 self.minValue?.alphaValue = limitsAlpha
                 self.minValueCaption?.alphaValue = limitsAlpha
                 self.maxValue?.alphaValue = limitsAlpha
@@ -206,7 +210,7 @@ class ScrollableContrast: NSView {
     }
 
     deinit {
-        display.resetObserver(prop: "contrast", key: "scrollableContrast-\(self.accessibilityIdentifier())", type: NSNumber.self)
+        display?.resetObserver(prop: "contrast", key: "scrollableContrast-\(self.accessibilityIdentifier())", type: NSNumber.self)
     }
 
     override init(frame frameRect: NSRect) {
@@ -237,23 +241,23 @@ class ScrollableContrast: NSView {
 
     func setup() {
         minValue?.onValueChangedInstant = onMinValueChanged
-        minValue?.onValueChanged = { (value: Int) in
-            self.maxValue?.lowerLimit = Double(value + 1)
-            if self.display != nil {
-                self.displayMinValue = value
+        minValue?.onValueChanged = { [weak self] (value: Int) in
+            self?.maxValue?.lowerLimit = Double(value + 1)
+            if self?.display != nil {
+                self?.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = onMaxValueChanged
-        maxValue?.onValueChanged = { (value: Int) in
-            self.minValue?.upperLimit = Double(value - 1)
-            if self.display != nil {
-                self.displayMaxValue = value
+        maxValue?.onValueChanged = { [weak self] (value: Int) in
+            self?.minValue?.upperLimit = Double(value - 1)
+            if self?.display != nil {
+                self?.displayMaxValue = value
             }
         }
 
-        currentValue?.onValueChanged = { (value: Int) in
-            if self.display != nil {
-                self.displayValue = value
+        currentValue?.onValueChanged = { [weak self] (value: Int) in
+            if self?.display != nil {
+                self?.displayValue = value
             }
         }
 
@@ -267,23 +271,23 @@ class ScrollableContrast: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
-        minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
-            self.maxValue?.lowerLimit = Double(value + 1)
-            if self.display != nil {
-                self.displayMinValue = value
+        minValue?.onValueChanged = minValue?.onValueChanged ?? { [weak self] (value: Int) in
+            self?.maxValue?.lowerLimit = Double(value + 1)
+            if self?.display != nil {
+                self?.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
-        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
-            self.minValue?.upperLimit = Double(value - 1)
-            if self.display != nil {
-                self.displayMaxValue = value
+        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { [weak self] (value: Int) in
+            self?.minValue?.upperLimit = Double(value - 1)
+            if self?.display != nil {
+                self?.displayMaxValue = value
             }
         }
 
-        currentValue?.onValueChanged = currentValue?.onValueChanged ?? { (value: Int) in
-            if self.display != nil {
-                self.displayValue = value
+        currentValue?.onValueChanged = currentValue?.onValueChanged ?? { [weak self] (value: Int) in
+            if self?.display != nil {
+                self?.displayValue = value
             }
         }
 
