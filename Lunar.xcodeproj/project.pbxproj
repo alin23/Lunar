@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
+		C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DAE2440DBB0002289E5 /* Alamofire */; };
+		C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB12440DC5E002289E5 /* SwiftyBeaver */; };
+		C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB72440DEEE002289E5 /* SwiftyJSON */; };
+		C7045DBB2440ECA8002289E5 /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DBA2440ECA8002289E5 /* Solar */; };
+		C7045DC12441015C002289E5 /* SwiftDate in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DC02441015C002289E5 /* SwiftDate */; };
 		C72776E7201F02140055934F /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E6201F02140055934F /* PageControl.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
@@ -25,18 +30,8 @@
 		C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083422222865F0020270E /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; };
 		C75083432222865F0020270E /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083442222865F0020270E /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083362222865D0020270E /* Alamofire.framework */; };
-		C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083362222865D0020270E /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083462222865F0020270E /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; };
-		C75083472222865F0020270E /* Solar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083372222865E0020270E /* Solar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; };
-		C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083392222865E0020270E /* SwiftDate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833A2222865E0020270E /* SwiftyJSON.framework */; };
-		C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833A2222865E0020270E /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; };
 		C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833C2222865E0020270E /* SwiftyBeaver.framework */; };
-		C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833C2222865E0020270E /* SwiftyBeaver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083522222865F0020270E /* Magnet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; };
 		C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083542222865F0020270E /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; };
@@ -146,17 +141,12 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C75083472222865F0020270E /* Solar.framework in Embed Frameworks */,
 				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
 				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
 				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
-				C75083452222865F0020270E /* Alamofire.framework in Embed Frameworks */,
-				C75083512222865F0020270E /* SwiftyBeaver.framework in Embed Frameworks */,
-				C750834D2222865F0020270E /* SwiftyJSON.framework in Embed Frameworks */,
 				C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */,
 				C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */,
 				C7B9E48E2401C39F00A48347 /* AMCoreAudio.framework in Embed Frameworks */,
-				C750834B2222865F0020270E /* SwiftDate.framework in Embed Frameworks */,
 				C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */,
 				C78B9221237ECDDA0060DC7C /* Sentry.framework in Embed Frameworks */,
 				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
@@ -344,22 +334,22 @@
 			files = (
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
+				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
 				C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */,
 				C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */,
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
-				C75083502222865F0020270E /* SwiftyBeaver.framework in Frameworks */,
 				C75083422222865F0020270E /* Charts.framework in Frameworks */,
+				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
-				C750834C2222865F0020270E /* SwiftyJSON.framework in Frameworks */,
 				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
-				C750834A2222865F0020270E /* SwiftDate.framework in Frameworks */,
 				C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */,
-				C75083442222865F0020270E /* Alamofire.framework in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
+				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C78B9220237ECDDA0060DC7C /* Sentry.framework in Frameworks */,
+				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
+				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
-				C75083462222865F0020270E /* Solar.framework in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
 				C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */,
 			);
@@ -605,6 +595,11 @@
 			packageProductDependencies = (
 				C7FE72562391B3BC00EBA6DA /* CryptorECC */,
 				C7045DA924407CBC002289E5 /* Surge */,
+				C7045DAE2440DBB0002289E5 /* Alamofire */,
+				C7045DB12440DC5E002289E5 /* SwiftyBeaver */,
+				C7045DB72440DEEE002289E5 /* SwiftyJSON */,
+				C7045DBA2440ECA8002289E5 /* Solar */,
+				C7045DC02441015C002289E5 /* SwiftDate */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -670,6 +665,11 @@
 			packageReferences = (
 				C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */,
 				C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */,
+				C7045DAD2440DBB0002289E5 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
+				C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				C7045DB92440ECA8002289E5 /* XCRemoteSwiftPackageReference "Solar" */,
+				C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -908,7 +908,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -961,7 +961,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1171,6 +1171,46 @@
 				minimumVersion = 2.3.0;
 			};
 		};
+		C7045DAD2440DBB0002289E5 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+		C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.0;
+			};
+		};
+		C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		C7045DB92440ECA8002289E5 /* XCRemoteSwiftPackageReference "Solar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/Solar";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.3;
+			};
+		};
+		C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/malcommac/SwiftDate";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.0;
+			};
+		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/IBM-Swift/BlueECC.git";
@@ -1186,6 +1226,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */;
 			productName = Surge;
+		};
+		C7045DAE2440DBB0002289E5 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DAD2440DBB0002289E5 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		C7045DB12440DC5E002289E5 /* SwiftyBeaver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
+			productName = SwiftyBeaver;
+		};
+		C7045DB72440DEEE002289E5 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+		C7045DBA2440ECA8002289E5 /* Solar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DB92440ECA8002289E5 /* XCRemoteSwiftPackageReference "Solar" */;
+			productName = Solar;
+		};
+		C7045DC02441015C002289E5 /* SwiftDate */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */;
+			productName = SwiftDate;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;

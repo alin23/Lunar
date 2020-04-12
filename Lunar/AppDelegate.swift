@@ -49,6 +49,8 @@ let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar
 let TEST_MODE = false
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
 let TRANSFER_URL = "https://transfer.sh"
+let LOG_UPLOAD_URL = "https://log.lunar.fyi/upload"
+let ANALYTICS_URL = "https://log.lunar.fyi/analytics"
 let DEBUG_DATA_HEADERS: HTTPHeaders = [
     "Content-type": "application/octet-stream",
     "Max-Downloads": "50",
@@ -73,7 +75,7 @@ let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
 var activeDisplay: Display?
-var helpPopover = NSPopover()
+var helpPopover: NSPopover?
 var menuPopover = NSPopover()
 var menuPopoverCloser = DispatchWorkItem {
     menuPopover.close()
@@ -101,6 +103,32 @@ var upHotkey: Magnet.HotKey?
 var downHotkey: Magnet.HotKey?
 var leftHotkey: Magnet.HotKey?
 var rightHotkey: Magnet.HotKey?
+
+func disableUpDownHotkeys() {
+    log.debug("Unregistering up/down hotkeys")
+    HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+    HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
+    upHotkey?.unregister()
+    downHotkey?.unregister()
+    upHotkey = nil
+    downHotkey = nil
+}
+
+func disableLeftRightHotkeys() {
+    log.debug("Unregistering left/right hotkeys")
+    HotKeyCenter.shared.unregisterHotKey(with: "navigateBack")
+    HotKeyCenter.shared.unregisterHotKey(with: "navigateForward")
+    leftHotkey?.unregister()
+    rightHotkey?.unregister()
+    leftHotkey = nil
+    rightHotkey = nil
+}
+
+func disableUIHotkeys() {
+    disableUpDownHotkeys()
+    disableLeftRightHotkeys()
+}
+
 var thisIsFirstRun = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
@@ -138,7 +166,7 @@ class AudioEventSubscriber: EventSubscriber {
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
-    var locationManager: CLLocationManager!
+    var locationManager: CLLocationManager?
     var windowController: ModernWindowController?
     var valuesReaderThread: Foundation.Thread!
     var locationThread: Foundation.Thread!
@@ -300,7 +328,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if let wc = windowController {
             wc.showWindow(self)
-            setupHotkeys(enable: true)
+            setupHotkeys()
             wc.initHelpPopover()
 
             log.debug("Showing window")
@@ -310,6 +338,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
         }
+    }
+
+    @objc private func activate() {
+        NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
 
     func handleDaemon() {
@@ -329,37 +361,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func disableUpDownHotkeys() {
-        log.debug("Unregistering up/down hotkeys")
-        HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
-        HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
-        upHotkey?.unregister()
-        downHotkey?.unregister()
-        upHotkey = nil
-        downHotkey = nil
-    }
-
     func applicationDidResignActive(_: Notification) {
         log.debug("applicationDidResignActive")
 
-        disableUpDownHotkeys()
-        setupHotkeys(enable: false)
+        disableUIHotkeys()
     }
 
-    func setupHotkeys(enable: Bool) {
-        if !enable {
-            leftHotkey?.unregister()
-            rightHotkey?.unregister()
-            return
-        }
-
-        if let pageController = windowController?.window?.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
-            pageController.setupHotkeys(enable: enable)
+    func setupHotkeys() {
+        if windowController != nil, windowController!.window != nil,
+            let pageController = windowController!.window!.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
+            pageController.setupHotkeys()
         }
     }
 
     func applicationDidBecomeActive(_: Notification) {
-        setupHotkeys(enable: true)
+        setupHotkeys()
     }
 
     func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
@@ -473,7 +489,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adaptAppearance() {
-        runInMainThread {
+        runInMainThread { [weak menuPopover] in
+            guard let menuPopover = menuPopover else { return }
             menuPopover.appearance = NSAppearance(named: .vibrantLight)
             if #available(OSX 10.15, *) {
                 let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
@@ -631,17 +648,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let dataString = "id=\(serialNumberHash) version=\(appVersion) clamshell=\(IsLidClosed()) displays=\(brightnessAdapter.activeDisplays.count) mode=\(brightnessAdapter.mode) machine=\(Sysctl.model)"
         let data = dataString.data(using: .utf8, allowLossyConversion: true) ?? "no-data".data(using: .utf8)!
         log.info("Sending analytics", context: ["data": dataString])
-        AF.upload(data, to: "https://log.lunar.fyi/analytics")
+        let req = AF.upload(data, to: ANALYTICS_URL)
             .authenticate(username: "lunar", password: secrets.analyticsHash)
             .validate()
-            .response(completionHandler: { resp in
-                if let err = resp.error {
-                    log.error("Error sending analytics", context: ["error": err.errorDescription ?? ""])
-                } else if let data = resp.data, let dataStr = String(data: data, encoding: .utf8) {
-                    log.debug("Analytics response", context: ["response": resp.debugDescription, "data": dataStr])
-                } else {
-                    log.debug("Analytics response", context: ["response": resp.debugDescription])
-                }
+
+        req.response(completionHandler: { resp in
+            if let err = resp.error {
+                log.error("Error sending analytics", context: ["error": err.errorDescription ?? ""])
+            } else if let data = resp.data, let dataStr = String(data: data, encoding: .utf8) {
+                log.debug("Analytics response", context: ["response": resp.debugDescription, "data": dataStr])
+            } else {
+                log.debug("Analytics response", context: ["response": resp.debugDescription])
+            }
         })
     }
 
@@ -725,7 +743,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     internal func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             brightnessAdapter.geolocation = Geolocation(location: location)
-            if brightnessAdapter.geolocation.latitude != 0, brightnessAdapter.geolocation.longitude != 0 {
+            if brightnessAdapter.geolocation!.latitude != 0, brightnessAdapter.geolocation!.longitude != 0 {
                 log.debug("Zero LocationManager coordinates")
             } else {
                 log.debug("Got LocationManager coordinates")
@@ -741,13 +759,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         geolocationFallback()
     }
 
-    func locationManager(_: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    func locationManager(_ lm: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined, .authorizedAlways:
-            locationManager.startUpdatingLocation()
+            lm.startUpdatingLocation()
         case .denied, .restricted:
             log.warning("User has not authorised location services")
-            locationManager.stopUpdatingLocation()
+            lm.stopUpdatingLocation()
             geolocationFallback()
         @unknown default:
             log.error("Unknown location manager status \(status)")
@@ -760,9 +778,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
         locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
-        locationManager.distanceFilter = 10000
+        locationManager?.delegate = self
+        locationManager?.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+        locationManager?.distanceFilter = 10000
 
         switch CLLocationManager.authorizationStatus() {
         case .notDetermined, .restricted, .denied:
@@ -773,7 +791,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.debug("Location status unknown")
         }
 
-        locationManager.startUpdatingLocation()
+        locationManager?.startUpdatingLocation()
     }
 
     static func getToggleMenuItemTitle() -> String {
@@ -942,10 +960,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func failDebugData() {
         runInMainThread {
             if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to open a Github issue?") {
+                guard let serialNumberHash = getSerialNumberHash(),
+                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                    NSWorkspace.shared.open(
+                        URL(
+                            string:
+                            "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D"
+                    )!)
+                    return
+                }
                 NSWorkspace.shared.open(
                     URL(
                         string:
-                        "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D"
+                        "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D"
                     )!)
             }
         }
@@ -969,6 +996,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         setDebugMode(1)
 
         concurrentQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
+            guard let serialNumberHash = getSerialNumberHash() else { return }
+
             let activeDisplays = brightnessAdapter.activeDisplays
             let oldBrightness = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.brightness) }, uniquingKeysWith: { first, _ in first })
             let oldContrast = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.contrast) }, uniquingKeysWith: { first, _ in first })
@@ -1013,38 +1042,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     self.debugMenuItem.title = "Encrypting logs"
                 }
                 data = encrypt(message: sourceString) ?? sourceString
-                fileName = "lunar.log.enc"
+                fileName = "\(serialNumberHash).log.enc"
             } else {
                 data = sourceString
-                fileName = "lunar.log"
+                fileName = "\(serialNumberHash).log"
             }
 
-            let debugData = data
-
-            _ = AF.upload(debugData, to: "\(TRANSFER_URL)/\(fileName)", method: .put, headers: DEBUG_DATA_HEADERS).validate(statusCode: 200 ..< 300).responseString(completionHandler: {
+            let req = AF.upload(data, to: LOG_UPLOAD_URL, headers: ["X-Filename": fileName])
+                .authenticate(username: "lunar", password: secrets.analyticsHash)
+                .validate(statusCode: 200 ..< 300)
+            req.response(completionHandler: { [unowned self]
                 response in
                 defer {
                     self.menu.autoenablesItems = true
                     self.debugMenuItem.title = oldTitle
                     self.debugMenuItem.isEnabled = true
                 }
-                log.info("Got response from transfer.sh", context: response.response)
+                log.info("Got response from \(LOG_UPLOAD_URL)", context: response.response)
                 if let err = response.error {
                     log.error("Debug data upload response error: \(err)")
                     self.failDebugData()
                     return
                 }
 
-                guard let url = response.value, !url.isEmpty,
-                    let urlEncoded = url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
-                    let serialNumberHash = getSerialNumberHash(),
-                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
-                    log.error("Debug data upload response empty")
-                    self.failDebugData()
-                    return
-                }
-                log.info("Uploaded logs to \(url)")
-                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(urlEncoded)%5D+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D") {
+                let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "NOVERSION"
+                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D") {
                     NSWorkspace.shared.open(url)
                 }
             })

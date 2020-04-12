@@ -33,15 +33,16 @@ class ExceptionsView: NSTableView {
         scrollableBrightnessCaption.textColor = scrollableCaptionColorWhite
         scrollableContrastCaption.textColor = scrollableCaptionColorWhite
 
-        scrollableBrightness.onValueChanged = { value in
-            app.brightness = NSNumber(value: value)
+        scrollableBrightness.onValueChanged = { [weak app] value in
+            app?.brightness = NSNumber(value: value)
         }
-        scrollableContrast.onValueChanged = { value in
-            app.contrast = NSNumber(value: value)
+        scrollableContrast.onValueChanged = { [weak app] value in
+            app?.contrast = NSNumber(value: value)
         }
         if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
             if let controller = exceptionsController.parent?.parent as? SettingsPageController {
-                scrollableBrightness.onValueChangedInstant = { value in
+                scrollableBrightness.onValueChangedInstant = { [weak controller, weak scrollableContrast] value in
+                    guard let scrollableContrast = scrollableContrast, let controller = controller else { return }
                     if brightnessAdapter.mode != .sync {
                         controller.updateDataset(
                             display: brightnessAdapter.firstDisplay,
@@ -58,7 +59,8 @@ class ExceptionsView: NSTableView {
                         )
                     }
                 }
-                scrollableContrast.onValueChangedInstant = { value in
+                scrollableContrast.onValueChangedInstant = { [weak controller, weak scrollableBrightness] value in
+                    guard let scrollableBrightness = scrollableBrightness, let controller = controller else { return }
                     if brightnessAdapter.mode != .sync {
                         controller.updateDataset(
                             display: brightnessAdapter.firstDisplay,
@@ -76,7 +78,8 @@ class ExceptionsView: NSTableView {
                     }
                 }
 
-                scrollableBrightness.onMouseEnter = {
+                scrollableBrightness.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
+                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast, let controller = controller else { return }
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
                     if brightnessAdapter.mode != .sync {
@@ -97,7 +100,8 @@ class ExceptionsView: NSTableView {
                         )
                     }
                 }
-                scrollableContrast.onMouseEnter = {
+                scrollableContrast.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
+                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast, let controller = controller else { return }
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
                     if brightnessAdapter.mode != .sync {

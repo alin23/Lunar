@@ -51,11 +51,11 @@ func getSerialNumberHash() -> String? {
 
         IOObjectRelease(platformExpert)
         guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else {
-//            serialNumberProp.release()
             return nil
         }
-//        serialNumberProp.release()
-        return sha256(data: serialNumberData).str(hex: true, separator: "")
+        let hash = sha256(data: serialNumberData).str(hex: true, separator: "")
+        log.info(hash)
+        return hash
     }
     return nil
 }

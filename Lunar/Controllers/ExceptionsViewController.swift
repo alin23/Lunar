@@ -91,9 +91,9 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         super.viewDidLoad()
         tableView.headerView = nil
         initAddAppButton()
-        observer = datastore.defaults.observe(\.appExceptions, options: [.new], changeHandler: { _, change in
-            if let newVal = change.newValue, (newVal?.count ?? 0) != self.appExceptions.count {
-                self.setValue(datastore.appExceptions(), forKey: "appExceptions")
+        observer = datastore.defaults.observe(\.appExceptions, options: [.new], changeHandler: { [weak self] _, change in
+            if let newVal = change.newValue, (newVal?.count ?? 0) != self?.appExceptions.count {
+                self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
             }
         })
     }

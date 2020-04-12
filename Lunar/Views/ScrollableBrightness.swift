@@ -31,9 +31,11 @@ class ScrollableBrightness: NSView {
         }
     }
 
-    var display: Display! {
+    weak var display: Display? {
         didSet {
-            update(from: display)
+            if let d = display {
+                update(from: d)
+            }
         }
     }
 
@@ -45,36 +47,36 @@ class ScrollableBrightness: NSView {
 
     var displayMinValue: Int {
         get {
-            return display.minBrightness.intValue
+            return display?.minBrightness.intValue ?? 0
         }
         set {
-            display.minBrightness = NSNumber(value: newValue)
+            display?.minBrightness = NSNumber(value: newValue)
         }
     }
 
     var displayMaxValue: Int {
         get {
-            return display.maxBrightness.intValue
+            return display?.maxBrightness.intValue ?? 100
         }
         set {
-            display.maxBrightness = NSNumber(value: newValue)
+            display?.maxBrightness = NSNumber(value: newValue)
         }
     }
 
     var displayValue: Int {
         get {
-            return display.brightness.intValue
+            return display?.brightness.intValue ?? 50
         }
         set {
-            display.brightness = NSNumber(value: newValue)
+            display?.brightness = NSNumber(value: newValue)
         }
     }
 
     var brightnessObserver: ((NSNumber, NSNumber) -> Void)?
 
     func addObserver(_ display: Display) {
-        minObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { _, change in
-            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+        minObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.lowerLimit = Double(val)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
@@ -84,8 +86,8 @@ class ScrollableBrightness: NSView {
                 }
             }
         })
-        maxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { _, change in
-            guard let val = change.newValue, let currentValue = self.currentValue else { return }
+        maxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.upperLimit = Double(val)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
@@ -96,8 +98,8 @@ class ScrollableBrightness: NSView {
             }
         })
 
-        brightnessObserver = { newBrightness, _ in
-            if let display = self.display, display.id != GENERIC_DISPLAY_ID {
+        brightnessObserver = { [weak self] newBrightness, _ in
+            if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
                 let minBrightness: UInt8
                 let maxBrightness: UInt8
 
@@ -111,7 +113,7 @@ class ScrollableBrightness: NSView {
 
                 let newBrightness = cap(newBrightness.uint8Value, minVal: minBrightness, maxVal: maxBrightness)
                 runInMainThread {
-                    self.currentValue?.stringValue = String(newBrightness)
+                    self?.currentValue?.stringValue = String(newBrightness)
                 }
             }
         }
@@ -155,7 +157,8 @@ class ScrollableBrightness: NSView {
 
             currentValue?.isHidden = !hidden
             currentValueCaption?.isHidden = !hidden
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
+            DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+                guard let self = self else { return }
                 self.currentValue?.alphaValue = currentAlpha
                 self.currentValueCaption?.alphaValue = currentAlpha
                 self.minValue?.isHidden = hidden
@@ -171,7 +174,8 @@ class ScrollableBrightness: NSView {
 
             currentValue?.alphaValue = currentAlpha
             currentValueCaption?.alphaValue = currentAlpha
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
+            DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+                guard let self = self else { return }
                 self.minValue?.alphaValue = limitsAlpha
                 self.minValueCaption?.alphaValue = limitsAlpha
                 self.maxValue?.alphaValue = limitsAlpha
@@ -206,7 +210,7 @@ class ScrollableBrightness: NSView {
     }
 
     deinit {
-        display.resetObserver(prop: "brightness", key: "scrollableBrightness-\(self.accessibilityIdentifier())", type: NSNumber.self)
+        display?.resetObserver(prop: "brightness", key: "scrollableBrightness-\(self.accessibilityIdentifier())", type: NSNumber.self)
     }
 
     override init(frame frameRect: NSRect) {
@@ -237,23 +241,23 @@ class ScrollableBrightness: NSView {
 
     func setup() {
         minValue?.onValueChangedInstant = onMinValueChanged
-        minValue?.onValueChanged = { (value: Int) in
-            self.maxValue?.lowerLimit = Double(value + 1)
-            if self.display != nil {
-                self.displayMinValue = value
+        minValue?.onValueChanged = { [weak self] (value: Int) in
+            self?.maxValue?.lowerLimit = Double(value + 1)
+            if self?.display != nil {
+                self?.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = onMaxValueChanged
-        maxValue?.onValueChanged = { (value: Int) in
-            self.minValue?.upperLimit = Double(value - 1)
-            if self.display != nil {
-                self.displayMaxValue = value
+        maxValue?.onValueChanged = { [weak self] (value: Int) in
+            self?.minValue?.upperLimit = Double(value - 1)
+            if self?.display != nil {
+                self?.displayMaxValue = value
             }
         }
 
-        currentValue?.onValueChanged = { (value: Int) in
-            if self.display != nil {
-                self.displayValue = value
+        currentValue?.onValueChanged = { [weak self] (value: Int) in
+            if self?.display != nil {
+                self?.displayValue = value
             }
         }
 
@@ -267,23 +271,23 @@ class ScrollableBrightness: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
-        minValue?.onValueChanged = minValue?.onValueChanged ?? { (value: Int) in
-            self.maxValue?.lowerLimit = Double(value + 1)
-            if self.display != nil {
-                self.displayMinValue = value
+        minValue?.onValueChanged = minValue?.onValueChanged ?? { [weak self] (value: Int) in
+            self?.maxValue?.lowerLimit = Double(value + 1)
+            if self?.display != nil {
+                self?.displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
-        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { (value: Int) in
-            self.minValue?.upperLimit = Double(value - 1)
-            if self.display != nil {
-                self.displayMaxValue = value
+        maxValue?.onValueChanged = maxValue?.onValueChanged ?? { [weak self] (value: Int) in
+            self?.minValue?.upperLimit = Double(value - 1)
+            if self?.display != nil {
+                self?.displayMaxValue = value
             }
         }
 
-        currentValue?.onValueChanged = currentValue?.onValueChanged ?? { (value: Int) in
-            if self.display != nil {
-                self.displayValue = value
+        currentValue?.onValueChanged = currentValue?.onValueChanged ?? { [weak self] (value: Int) in
+            if self?.display != nil {
+                self?.displayValue = value
             }
         }
 

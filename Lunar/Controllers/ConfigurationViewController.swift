@@ -8,160 +8,160 @@
 
 import Cocoa
 
-let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
-let UI_NOTE_INFO = """
-[]()
-
-**Note:** Manual adjustments through the UI on the Display page of Lunar won't take these values into account.
-"""
-let ADJUSTING_VALUES_INFO = """
-[]()
-
-## Adjusting values
-Use one of the following gestures **while hovering on the value with your mouse or trackpad**
-- Scroll vertically using the mouse or trackpad
-- Press the up/down arrow keys on your keyboard
-"""
-let NOON_DURATION_TOOLTIP = """
-## Description
-The number of minutes for which the daylight in your area is very high.
-
-## Effect
-This keeps the brightness/contrast at its highest value for as much as needed.
-\(ADJUSTING_VALUES_INFO)
-"""
-let DAYLIGHT_EXTENSION_TOOLTIP = """
-## Description
-The number of minutes for which the daylight in your area is still visible before sunrise and after sunset.
-
-## Effect
-This keeps the brightness/contrast from going to its lowest value too soon.
-\(ADJUSTING_VALUES_INFO)
-"""
-let CURVE_FACTOR_TOOLTIP = """
-## Description
-Value for adjusting the brightness/contrast curve.
-
-[How does the curve factor affect brightness?](\(CHART_LINK))
-"""
-let BRIGHTNESS_OFFSET_TOOLTIP = """
-## Description
-Offset for adjusting the brightness curve of the adaptive algorithm.
-
-## Effect
-The offset is transformed into a curve factor using the following rules:
-  - **if** ` offset > 0 ` **then** ` factor = 1 - (offset / 100) `
-      - the result will have a value between **0.0** and **1.0**
-  - **if** ` offset <= 0 ` **then** ` factor = 1 + (offset / -10) `
-      - the result will have a value between **1.0** and **1.9**
-
-\(ADJUSTING_VALUES_INFO)
-
-[How does the curve factor affect brightness?](\(CHART_LINK))
-"""
-let BRIGHTNESS_CLIP_TOOLTIP = """
-## Description
-Limits for mapping the high range of the built-in display brightness to a lower range monitor brightness.
-
-## Effect
-When the built-in display brightness is within these limits, the monitor brightness is computed according to the usual rules.
-
-Otherwise:
-  - **if** ` builtinBrightness ≥ clipMax ` **then** ` monitorBrightness = clipMax `
-  - **if** ` builtinBrightness ≤ clipMin ` **then** ` monitorBrightness = clipMin `
-
-\(ADJUSTING_VALUES_INFO)
-"""
-let POLLING_INTERVAL_TOOLTIP = """
-## Description
-Value that describes how often Lunar should check for changes in the built-in display brightness.
-
-## Effect
-The adaptive algorithm synchronizes the monitors with the built-in display brightness
-using the following steps:
-    - Read built-in display brightness
-    - Compute each monitor's brightness by taking into account the configured offsets
-    - Apply the brightness for each monitor
-    - *Sleep for `x` seconds*
-
-The last step uses this value to know how much to sleep.
-If you experience lags and system freeze in Sync mode,
-your monitor might have slow DDC response time.
-
-In this case, you might benefit from a larger polling interval like 10 seconds.
-
-\(ADJUSTING_VALUES_INFO)
-"""
-let HOTKEY_STEP_TOOLTIP = """
-## Description
-Value for adjusting how much to increase/decrease the brightness/contrast/volume when using hotkeys.
-
-## Effect
-When using the Brightness/Contrast/Volume Up/Down actions, the values will be computed using the following formulas:
-* Brightness Up: ` brightness = oldValue + step `
-* Brightness Down: ` brightness = oldValue - step `
-* Contrast Up: ` contrast = oldValue + step `
-* Contrast Down: ` contrast = oldValue - step `
-* Volume Up: ` volume = oldValue + step `
-* Volume Down: ` volume = oldValue - step `
-
-\(ADJUSTING_VALUES_INFO)
-
-\(UI_NOTE_INFO)
-"""
-let BRIGHTNESS_LIMIT_TOOLTIP = """
-## Description
-Hard limits for brightness percentage adjustments through **hotkeys** or **menu items**.
-
-## Effect
-When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the brightness will be computed using the following formula:
-```
-percent / 100 * (max - min) + min
-```
-
-\(ADJUSTING_VALUES_INFO)
-
-\(UI_NOTE_INFO)
-"""
-let CONTRAST_LIMIT_TOOLTIP = """
-## Description
-Hard limits for contrast percentage adjustments through **hotkeys** or **menu items**.
-
-## Effect
-When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the contrast will be computed using the following formula:
-```
-percent / 100 * (max - min) + min
-```
-
-\(ADJUSTING_VALUES_INFO)
-
-\(UI_NOTE_INFO)
-"""
-let LOCATION_TOOLTIP = """
-## Description
-Adjustable location coordinates.
-
-## Effect
-The sunrise, noon and sunset times will be computed based on these coordinates.
-
-## Adjusting values
-- Click to edit then press enter to set custom values.
-- Press reset to use the last location stored by the system.
-"""
-let SMOOTH_TRANSITION_TOOLTIP = """
-## Description
-Allows brightness/contrast to change smoothly from a value to another.
-
-## Effect
-A custom algorithm is used to auto-adapt the smoothing logic based on each monitor's response time.
-
-If the monitor isn't fast enough, changing the brightness/contrast may look jaggy or cause flashes.
-[]()
-
-**Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
-"""
-
 class ConfigurationViewController: NSViewController {
+    let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
+    let UI_NOTE_INFO = """
+    []()
+
+    **Note:** Manual adjustments through the UI on the Display page of Lunar won't take these values into account.
+    """
+    let ADJUSTING_VALUES_INFO = """
+    []()
+
+    ## Adjusting values
+    Use one of the following gestures **while hovering on the value with your mouse or trackpad**
+    - Scroll vertically using the mouse or trackpad
+    - Press the up/down arrow keys on your keyboard
+    """
+    lazy var NOON_DURATION_TOOLTIP = """
+    ## Description
+    The number of minutes for which the daylight in your area is very high.
+
+    ## Effect
+    This keeps the brightness/contrast at its highest value for as much as needed.
+    \(ADJUSTING_VALUES_INFO)
+    """
+    lazy var DAYLIGHT_EXTENSION_TOOLTIP = """
+    ## Description
+    The number of minutes for which the daylight in your area is still visible before sunrise and after sunset.
+
+    ## Effect
+    This keeps the brightness/contrast from going to its lowest value too soon.
+    \(ADJUSTING_VALUES_INFO)
+    """
+    lazy var CURVE_FACTOR_TOOLTIP = """
+    ## Description
+    Value for adjusting the brightness/contrast curve.
+
+    [How does the curve factor affect brightness?](\(CHART_LINK))
+    """
+    lazy var BRIGHTNESS_OFFSET_TOOLTIP = """
+    ## Description
+    Offset for adjusting the brightness curve of the adaptive algorithm.
+
+    ## Effect
+    The offset is transformed into a curve factor using the following rules:
+      - **if** ` offset > 0 ` **then** ` factor = 1 - (offset / 100) `
+          - the result will have a value between **0.0** and **1.0**
+      - **if** ` offset <= 0 ` **then** ` factor = 1 + (offset / -10) `
+          - the result will have a value between **1.0** and **1.9**
+
+    \(ADJUSTING_VALUES_INFO)
+
+    [How does the curve factor affect brightness?](\(CHART_LINK))
+    """
+    lazy var BRIGHTNESS_CLIP_TOOLTIP = """
+    ## Description
+    Limits for mapping the high range of the built-in display brightness to a lower range monitor brightness.
+
+    ## Effect
+    When the built-in display brightness is within these limits, the monitor brightness is computed according to the usual rules.
+
+    Otherwise:
+      - **if** ` builtinBrightness ≥ clipMax ` **then** ` monitorBrightness = clipMax `
+      - **if** ` builtinBrightness ≤ clipMin ` **then** ` monitorBrightness = clipMin `
+
+    \(ADJUSTING_VALUES_INFO)
+    """
+    lazy var POLLING_INTERVAL_TOOLTIP = """
+    ## Description
+    Value that describes how often Lunar should check for changes in the built-in display brightness.
+
+    ## Effect
+    The adaptive algorithm synchronizes the monitors with the built-in display brightness
+    using the following steps:
+        - Read built-in display brightness
+        - Compute each monitor's brightness by taking into account the configured offsets
+        - Apply the brightness for each monitor
+        - *Sleep for `x` seconds*
+
+    The last step uses this value to know how much to sleep.
+    If you experience lags and system freeze in Sync mode,
+    your monitor might have slow DDC response time.
+
+    In this case, you might benefit from a larger polling interval like 10 seconds.
+
+    \(ADJUSTING_VALUES_INFO)
+    """
+    lazy var HOTKEY_STEP_TOOLTIP = """
+    ## Description
+    Value for adjusting how much to increase/decrease the brightness/contrast/volume when using hotkeys.
+
+    ## Effect
+    When using the Brightness/Contrast/Volume Up/Down actions, the values will be computed using the following formulas:
+    * Brightness Up: ` brightness = oldValue + step `
+    * Brightness Down: ` brightness = oldValue - step `
+    * Contrast Up: ` contrast = oldValue + step `
+    * Contrast Down: ` contrast = oldValue - step `
+    * Volume Up: ` volume = oldValue + step `
+    * Volume Down: ` volume = oldValue - step `
+
+    \(ADJUSTING_VALUES_INFO)
+
+    \(UI_NOTE_INFO)
+    """
+    lazy var BRIGHTNESS_LIMIT_TOOLTIP = """
+    ## Description
+    Hard limits for brightness percentage adjustments through **hotkeys** or **menu items**.
+
+    ## Effect
+    When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the brightness will be computed using the following formula:
+    ```
+    percent / 100 * (max - min) + min
+    ```
+
+    \(ADJUSTING_VALUES_INFO)
+
+    \(UI_NOTE_INFO)
+    """
+    lazy var CONTRAST_LIMIT_TOOLTIP = """
+    ## Description
+    Hard limits for contrast percentage adjustments through **hotkeys** or **menu items**.
+
+    ## Effect
+    When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the contrast will be computed using the following formula:
+    ```
+    percent / 100 * (max - min) + min
+    ```
+
+    \(ADJUSTING_VALUES_INFO)
+
+    \(UI_NOTE_INFO)
+    """
+    let LOCATION_TOOLTIP = """
+    ## Description
+    Adjustable location coordinates.
+
+    ## Effect
+    The sunrise, noon and sunset times will be computed based on these coordinates.
+
+    ## Adjusting values
+    - Click to edit then press enter to set custom values.
+    - Press reset to use the last location stored by the system.
+    """
+    let SMOOTH_TRANSITION_TOOLTIP = """
+    ## Description
+    Allows brightness/contrast to change smoothly from a value to another.
+
+    ## Effect
+    A custom algorithm is used to auto-adapt the smoothing logic based on each monitor's response time.
+
+    If the monitor isn't fast enough, changing the brightness/contrast may look jaggy or cause flashes.
+    []()
+
+    **Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
+    """
+
     @IBOutlet var smoothTransitionLabel: NSTextField!
     @IBOutlet var smoothTransitionCheckbox: NSButton!
 
@@ -405,192 +405,192 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForShowNavigationHintsChange() {
-        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { _, change in
+        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
                 return
             }
-            runInMainThread {
-                self.swipeLeftHint?.isHidden = !show
+            runInMainThread { [weak self] in
+                self?.swipeLeftHint?.isHidden = !show
             }
         })
     }
 
     func listenForCurveFactorChange() {
-        curveFactorObserver = datastore.defaults.observe(\.curveFactor, options: [.old, .new], changeHandler: { _, change in
+        curveFactorObserver = datastore.defaults.observe(\.curveFactor, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            runInMainThread {
-                self.curveFactorField?.doubleValue = value
+            runInMainThread { [weak self] in
+                self?.curveFactorField?.doubleValue = value
             }
         })
     }
 
     func listenForLocationChange() {
-        let updateDataset = { (_: UserDefaults, change: NSKeyValueObservedChange<String>) -> Void in
+        let updateDataset = { [weak self] (_: UserDefaults, change: NSKeyValueObservedChange<String>) -> Void in
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
+            self?.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
         }
         sunriseObserver = datastore.defaults.observe(\.sunrise, options: [.old, .new], changeHandler: updateDataset)
         sunsetObserver = datastore.defaults.observe(\.sunset, options: [.old, .new], changeHandler: updateDataset)
         solarNoonObserver = datastore.defaults.observe(\.solarNoon, options: [.old, .new], changeHandler: updateDataset)
-        locationLatObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { _, change in
+        locationLatObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            runInMainThread {
-                self.locationLatField?.doubleValue = value
+            runInMainThread { [weak self] in
+                self?.locationLatField?.doubleValue = value
             }
         })
-        locationLonObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { _, change in
+        locationLonObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
                 return
             }
-            runInMainThread {
-                self.locationLonField?.doubleValue = value
+            runInMainThread { [weak self] in
+                self?.locationLonField?.doubleValue = value
             }
         })
     }
 
     func listenForBrightnessOffsetChange() {
-        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { _, change in
+        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessOffsetField?.stringValue = String(brightness)
+            runInMainThread { [weak self] in
+                self?.brightnessOffsetField?.stringValue = String(brightness)
             }
         })
     }
 
     func listenForContrastOffsetChange() {
-        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, options: [.old, .new], changeHandler: { _, change in
+        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            runInMainThread {
-                self.contrastOffsetField?.stringValue = String(contrast)
+            runInMainThread { [weak self] in
+                self?.contrastOffsetField?.stringValue = String(contrast)
             }
         })
     }
 
     func listenForBrightnessStepChange() {
-        brightnessStepObserver = datastore.defaults.observe(\.brightnessStep, options: [.old, .new], changeHandler: { _, change in
+        brightnessStepObserver = datastore.defaults.observe(\.brightnessStep, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessStepField?.stringValue = String(brightness)
+            runInMainThread { [weak self] in
+                self?.brightnessStepField?.stringValue = String(brightness)
             }
         })
     }
 
     func listenForPollingIntervalChange() {
-        pollingIntervalObserver = datastore.defaults.observe(\.syncPollingSeconds, options: [.old, .new], changeHandler: { _, change in
+        pollingIntervalObserver = datastore.defaults.observe(\.syncPollingSeconds, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let seconds = change.newValue, let oldSeconds = change.oldValue, seconds != oldSeconds else {
                 return
             }
-            runInMainThread {
-                self.pollingIntervalField?.stringValue = String(seconds)
+            runInMainThread { [weak self] in
+                self?.pollingIntervalField?.stringValue = String(seconds)
             }
         })
     }
 
     func listenForContrastStepChange() {
-        contrastStepObserver = datastore.defaults.observe(\.contrastStep, options: [.old, .new], changeHandler: { _, change in
+        contrastStepObserver = datastore.defaults.observe(\.contrastStep, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            runInMainThread {
-                self.contrastStepField?.stringValue = String(contrast)
+            runInMainThread { [weak self] in
+                self?.contrastStepField?.stringValue = String(contrast)
             }
         })
     }
 
     func listenForVolumeStepChange() {
-        volumeStepObserver = datastore.defaults.observe(\.volumeStep, options: [.old, .new], changeHandler: { _, change in
+        volumeStepObserver = datastore.defaults.observe(\.volumeStep, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let volume = change.newValue, let oldVolume = change.oldValue, volume != oldVolume else {
                 return
             }
-            runInMainThread {
-                self.volumeStepField?.stringValue = String(volume)
+            runInMainThread { [weak self] in
+                self?.volumeStepField?.stringValue = String(volume)
             }
         })
     }
 
     func listenForBrightnessClipChange() {
-        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, options: [.old, .new], changeHandler: { _, change in
+        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessClipMinField?.stringValue = String(brightness)
-                self.brightnessClipMaxField?.lowerLimit = Double(brightness + 1)
+            runInMainThread { [weak self] in
+                self?.brightnessClipMinField?.stringValue = String(brightness)
+                self?.brightnessClipMaxField?.lowerLimit = Double(brightness + 1)
             }
         })
-        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, options: [.old, .new], changeHandler: { _, change in
+        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessClipMaxField?.stringValue = String(brightness)
-                self.brightnessClipMinField?.upperLimit = Double(brightness - 1)
+            runInMainThread { [weak self] in
+                self?.brightnessClipMaxField?.stringValue = String(brightness)
+                self?.brightnessClipMinField?.upperLimit = Double(brightness - 1)
             }
         })
     }
 
     func listenForBrightnessLimitChange() {
-        brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { _, change in
+        brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessLimitMinField?.stringValue = String(brightness)
-                self.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
+            runInMainThread { [weak self] in
+                self?.brightnessLimitMinField?.stringValue = String(brightness)
+                self?.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
             }
         })
-        brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { _, change in
+        brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
                 return
             }
-            runInMainThread {
-                self.brightnessLimitMaxField?.stringValue = String(brightness)
-                self.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
+            runInMainThread { [weak self] in
+                self?.brightnessLimitMaxField?.stringValue = String(brightness)
+                self?.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
             }
         })
     }
 
     func listenForContrastLimitChange() {
-        contrastLimitMinObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.old, .new], changeHandler: { _, change in
+        contrastLimitMinObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            runInMainThread {
-                self.contrastLimitMinField?.stringValue = String(contrast)
-                self.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
+            runInMainThread { [weak self] in
+                self?.contrastLimitMinField?.stringValue = String(contrast)
+                self?.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
             }
         })
-        contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { _, change in
+        contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
                 return
             }
-            runInMainThread {
-                self.contrastLimitMaxField?.stringValue = String(contrast)
-                self.contrastLimitMinField?.upperLimit = Double(contrast - 1)
+            runInMainThread { [weak self] in
+                self?.contrastLimitMaxField?.stringValue = String(contrast)
+                self?.contrastLimitMinField?.upperLimit = Double(contrast - 1)
             }
         })
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
+        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self] _, change in
             guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
                 return
             }
             if let adaptiveMode = AdaptiveMode(rawValue: mode) {
-                runInMainThread {
-                    self.showRelevantSettings(adaptiveMode)
+                runInMainThread { [weak self] in
+                    self?.showRelevantSettings(adaptiveMode)
                 }
             }
         })
@@ -598,8 +598,6 @@ class ConfigurationViewController: NSViewController {
 
     func setupNoonDuration() {
         guard let field = noonDurationField, let caption = noonDurationCaption else { return }
-
-        // noonDurationLabel?.toolTip = NOON_DURATION_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 300,
@@ -614,8 +612,6 @@ class ConfigurationViewController: NSViewController {
 
     func setupDaylightExtension() {
         guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
-
-        // daylightExtensionLabel?.toolTip = DAYLIGHT_EXTENSION_TOOLTIP
 
         setupScrollableTextField(
             field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 300,
@@ -788,7 +784,8 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             latField, caption: latCaption, settingKey: "locationLat", lowerLimit: -90.00, upperLimit: 90.00,
-            onMouseEnter: { _ in },
+            onMouseEnter: { _ in disableLeftRightHotkeys() },
+            onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
                 datastore.defaults.set(true, forKey: "manualLocation")
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
@@ -796,7 +793,8 @@ class ConfigurationViewController: NSViewController {
         )
         setupScrollableTextField(
             lonField, caption: lonCaption, settingKey: "locationLon", lowerLimit: -180.00, upperLimit: 180.00,
-            onMouseEnter: { _ in },
+            onMouseEnter: { _ in disableLeftRightHotkeys() },
+            onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
                 datastore.defaults.set(true, forKey: "manualLocation")
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
@@ -819,6 +817,7 @@ class ConfigurationViewController: NSViewController {
         _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
         lowerLimit: Double, upperLimit: Double,
         onMouseEnter: ((SettingsPageController?) -> Void)? = nil,
+        onMouseExit: ((SettingsPageController?) -> Void)? = nil,
         onValueChangedInstant: ((Int, SettingsPageController?) -> Void)? = nil,
         onValueChangedInstantDouble: ((Double, SettingsPageController?) -> Void)? = nil,
         onValueChanged: ((Int, SettingsPageController?) -> Void)? = nil,
@@ -844,37 +843,43 @@ class ConfigurationViewController: NSViewController {
         field.lowerLimit = lowerLimit
         field.upperLimit = upperLimit
         if let handler = onValueChangedInstant {
-            field.onValueChangedInstant = { value in
-                handler(value, self.settingsController)
+            field.onValueChangedInstant = { [weak settingsController = self.settingsController] value in
+                handler(value, settingsController)
             }
         }
         if let handler = onValueChangedInstantDouble {
-            field.onValueChangedInstantDouble = { value in
-                handler(value, self.settingsController)
+            field.onValueChangedInstantDouble = { [weak settingsController = self.settingsController] value in
+                handler(value, settingsController)
             }
         }
         if let handler = onValueChanged {
-            field.onValueChanged = { value in
+            field.onValueChanged = { [weak settingsController = self.settingsController] value in
                 datastore.defaults.set(value, forKey: settingKey)
-                handler(value, self.settingsController)
+                handler(value, settingsController)
             }
         }
         if let handler = onValueChangedDouble {
-            field.onValueChangedDouble = { value in
+            field.onValueChangedDouble = { [weak settingsController = self.settingsController] value in
                 datastore.defaults.set(value, forKey: settingKey)
-                handler(value, self.settingsController)
+                handler(value, settingsController)
             }
         }
+        if let handler = onMouseExit {
+            field.onMouseExit = { [weak settingsController = self.settingsController] in
+                handler(settingsController)
+            }
+        }
+
         if let handler = onMouseEnter {
-            field.onMouseEnter = {
-                handler(self.settingsController)
+            field.onMouseEnter = { [weak settingsController = self.settingsController] in
+                handler(settingsController)
             }
         } else {
-            field.onMouseEnter = {
+            field.onMouseEnter = { [weak settingsController = self.settingsController] in
                 if brightnessAdapter.mode == .sync {
-                    self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax, withAnimation: true)
+                    settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax, withAnimation: true)
                 } else {
-                    self.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
+                    settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
                 }
             }
         }
@@ -887,8 +892,8 @@ class ConfigurationViewController: NSViewController {
 
     func setup() {
         swipeLeftHint?.isHidden = datastore.defaults.didSwipeToHotkeys
-        didSwipeToHotkeysObserver = datastore.defaults.observe(\.didSwipeToHotkeys, options: [.new], changeHandler: { _, change in
-            self.swipeLeftHint?.isHidden = change.newValue ?? true
+        didSwipeToHotkeysObserver = datastore.defaults.observe(\.didSwipeToHotkeys, options: [.new], changeHandler: { [weak self] _, change in
+            self?.swipeLeftHint?.isHidden = change.newValue ?? true
         })
 
         setupNoonDuration()
