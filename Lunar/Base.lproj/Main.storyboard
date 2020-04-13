@@ -62,11 +62,19 @@
                                                             <binding destination="3YV-ka-Eop" name="value" keyPath="values.showQuickActions" id="O07-8q-0Vv"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Use media keys as hotkeys" id="sxQ-LN-C9Q">
+                                                    <menuItem title="Use media keys as hotkeys" id="JX8-ut-4Ov">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.mediaKeysEnabled" id="sle-64-2QR"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.mediaKeysEnabled" id="nFm-Ol-t1O"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Change monitor volume with volume keys" indentationLevel="1" id="sxQ-LN-C9Q">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.mediaKeysEnabled" id="LZN-qy-tsJ"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.volumeKeysEnabled" id="pti-d6-vK9"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Active monitor: the monitor on which the cursor is" enabled="NO" indentationLevel="2" id="36q-pn-c3B">
