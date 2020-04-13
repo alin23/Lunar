@@ -43,6 +43,7 @@ let APP_SETTINGS = [
     "syncPollingSeconds",
     "clamshellModeDetection",
     "mediaKeysEnabled",
+    "volumeKeysEnabled",
 ]
 
 extension UserDefaults {
@@ -80,6 +81,10 @@ extension UserDefaults {
 
     @objc dynamic var mediaKeysEnabled: Bool {
         return bool(forKey: "mediaKeysEnabled")
+    }
+
+    @objc dynamic var volumeKeysEnabled: Bool {
+        return bool(forKey: "volumeKeysEnabled")
     }
 
     @objc dynamic var manualLocation: Bool {
@@ -379,6 +384,7 @@ class DataStore: NSObject {
 
         DataStore.setDefault(0.5, for: "curveFactor")
         DataStore.setDefault(true, for: "mediaKeysEnabled")
+        DataStore.setDefault(true, for: "volumeKeysEnabled")
         DataStore.setDefault(false, for: "didScrollTextField")
         DataStore.setDefault(false, for: "didSwipeToHotkeys")
         DataStore.setDefault(false, for: "didSwipeLeft")
