@@ -1,3 +1,19 @@
+# 3.1.5
+## Features
+
+- Implement built-in brightness clipping limits for monitors with lower range of brightness/contrast
+- Add a menu item to allow disabling volume key listener
+
+## Fixes
+
+- Fix Location Permissions prompt not showing up on macOS Catalina
+
+## Improvements
+
+- Add a bit more analytics data and route the requests through my own server
+- Upload diagnostics to my own server instead of transfer.sh
+- Reduce memory usage by manually deallocating unused views
+
 # 3.1.4
 ## Fixes
 
@@ -8,7 +24,7 @@
 ## Improvements
 
 - Show Lunar version in the menu
-- Hide rarely used menu items under an `Advanced` submenu item
+- Hide rarely used menu items under an **Advanced** submenu item
 # 3.1.3
 ## Fixes
 
