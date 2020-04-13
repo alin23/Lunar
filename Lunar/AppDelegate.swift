@@ -175,6 +175,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var refreshValues: Bool = datastore.defaults.refreshValues
 
     var mediaKeysEnabledObserver: NSKeyValueObservation?
+    var volumeKeysEnabledObserver: NSKeyValueObservation?
     var daylightObserver: NSKeyValueObservation?
     var curveFactorObserver: NSKeyValueObservation?
     var noonObserver: NSKeyValueObservation?
@@ -592,6 +593,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         })
         mediaKeysEnabledObserver = datastore.defaults.observe(\.mediaKeysEnabled, changeHandler: { _, _ in
+            self.startOrRestartMediaKeyTap()
+        })
+        volumeKeysEnabledObserver = datastore.defaults.observe(\.volumeKeysEnabled, changeHandler: { _, _ in
             self.startOrRestartMediaKeyTap()
         })
 

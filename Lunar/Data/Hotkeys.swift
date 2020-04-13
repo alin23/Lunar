@@ -338,14 +338,18 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil) {
+    func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
         let workItem = DispatchWorkItem {
             var keys: [MediaKey]
 
             mediaKeyTap?.stop()
             mediaKeyTap = nil
             if mediaKeysEnabled ?? datastore.defaults.mediaKeysEnabled {
-                keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
+                if volumeKeysEnabled ?? datastore.defaults.volumeKeysEnabled {
+                    keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
+                } else {
+                    keys = [.brightnessUp, .brightnessDown]
+                }
 
                 if let audioDevice = AudioDevice.defaultOutputDevice(), audioDevice.canSetVirtualMasterVolume(direction: .playback) {
                     let keysToDelete: [MediaKey] = [.volumeUp, .volumeDown, .mute]
