@@ -47,6 +47,7 @@ set -l ED_PRIV_KEY "$WORK_DIR/Lunar/Resources/eddsa_priv"
 set -l APPCAST "$RELEASE_DIR/appcast.xml"
 
 set -l APP_TMP "$TMP_DIR/Lunar.app"
+set -l APP_ZIP_TMP "$TMP_DIR/Lunar.zip"
 
 mkdir -p $TMP_DIR
 rm -rf $TMP_DIR
@@ -58,7 +59,21 @@ codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=
 codesign -fs "$EXPANDED_CODE_SIGN_IDENTITY_NAME" -o runtime --preserve-metadata=identifier,flags --deep "$APP_TMP"
 
 if not set -q DISABLE_NOTARIZATION
-    /usr/local/bin/xcnotary notarize "$APP_TMP" --developer-account 'alin.p32@gmail.com' --developer-password-keychain-item 'altool'
+    if not codesign -vvv --deep --strict "$APP_TMP"
+        echo 'Bad signature'
+        exit 1
+    end
+
+    set spctlOut (spctl --assess -vvvvv --no-cache --ignore-cache "$APP_TMP" 2>&1)
+    if not echo $spctlOut | grep -q 'source=Notarized Developer ID'
+        if not echo $spctlOut | grep -q 'source=Unnotarized Developer ID'
+            echo 'Bad signature'
+            exit 1
+        end
+
+        ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
+        notarize "$APP_ZIP_TMP" "$APP_TMP" "execute"
+    end
 end
 
 set -l APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist")
