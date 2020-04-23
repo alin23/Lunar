@@ -219,7 +219,7 @@ enum ValueType {
             extendedBrightnessRange: (config["extendedBrightnessRange"] as? Bool) ?? false,
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
             lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
-            volume: (config["contrast"] as? UInt8) ?? 10,
+            volume: (config["volume"] as? UInt8) ?? 10,
             audioMuted: (config["audioMuted"] as? Bool) ?? false
         )
     }
@@ -434,7 +434,9 @@ enum ValueType {
             minVal = currentValue
             maxVal = value
         }
-        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { [unowned self] in
+        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { [weak self] in
+            guard let self = self else { return }
+
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: String
@@ -496,45 +498,52 @@ enum ValueType {
             semaphore.signal()
         }
 
-        numberObservers["minBrightness"]!["self.minBrightness"] = { [unowned self] newValue, oldValue in
+        numberObservers["minBrightness"]!["self.minBrightness"] = { [weak self] newValue, oldValue in
+            guard let self = self else { return }
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["minBrightness"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["maxBrightness"]!["self.maxBrightness"] = { [unowned self] newValue, oldValue in
+        numberObservers["maxBrightness"]!["self.maxBrightness"] = { [weak self] newValue, oldValue in
+            guard let self = self else { return }
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["maxBrightness"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["minContrast"]!["self.minContrast"] = { [unowned self] newValue, oldValue in
+        numberObservers["minContrast"]!["self.minContrast"] = { [weak self] newValue, oldValue in
+            guard let self = self else { return }
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["minContrast"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["maxContrast"]!["self.maxContrast"] = { [unowned self] newValue, oldValue in
+        numberObservers["maxContrast"]!["self.maxContrast"] = { [weak self] newValue, oldValue in
+            guard let self = self else { return }
             if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
                 extraData["maxContrast"] = newValue
                 Client.shared?.extra?["\(self.id)"] = extraData
             }
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
-        numberObservers["volume"]!["self.volume"] = { [unowned self] newVolume, _ in
+        numberObservers["volume"]!["self.volume"] = { [weak self] newVolume, _ in
+            guard let self = self else { return }
             if !DDC.setAudioSpeakerVolume(for: self.id, audioSpeakerVolume: newVolume.uint8Value) {
                 log.warning("Error writing volume using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        boolObservers["audioMuted"]!["self.audioMuted"] = { [unowned self] newAudioMuted, _ in
+        boolObservers["audioMuted"]!["self.audioMuted"] = { [weak self] newAudioMuted, _ in
+            guard let self = self else { return }
             if !DDC.setAudioMuted(for: self.id, audioMuted: newAudioMuted) {
                 log.warning("Error writing muted audio using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        numberObservers["brightness"]!["self.brightness"] = { [unowned self] newBrightness, oldValue in
+        numberObservers["brightness"]!["self.brightness"] = { [weak self] newBrightness, oldValue in
+            guard let self = self else { return }
             let appleDisplay = self.isAppleDisplay()
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
@@ -558,7 +567,8 @@ enum ValueType {
                 }
                 if datastore.defaults.smoothTransition || appleDisplay {
                     var faults = 0
-                    self.smoothTransition(from: oldBrightness, to: brightness) { [unowned self] newValue in
+                    self.smoothTransition(from: oldBrightness, to: brightness) { [weak self] newValue in
+                        guard let self = self else { return }
                         if faults > 5 {
                             return
                         }
@@ -587,7 +597,8 @@ enum ValueType {
                 log.verbose("Set BRIGHTNESS to \(brightness)", context: ["name": self.name, "id": self.id, "serial": self.serial])
             }
         }
-        numberObservers["contrast"]!["self.contrast"] = { [unowned self] newContrast, oldValue in
+        numberObservers["contrast"]!["self.contrast"] = { [weak self] newContrast, oldValue in
+            guard let self = self else { return }
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
                 var contrast: UInt8
@@ -602,7 +613,8 @@ enum ValueType {
                 }
                 if datastore.defaults.smoothTransition {
                     var faults = 0
-                    self.smoothTransition(from: oldValue.uint8Value, to: contrast) { [unowned self] newValue in
+                    self.smoothTransition(from: oldValue.uint8Value, to: contrast) { [weak self] newValue in
+                        guard let self = self else { return }
                         if faults > 5 {
                             return
                         }
@@ -773,6 +785,7 @@ enum ValueType {
         } else {
             maxValue = maxVal ?? maxContrast.doubleValue
             minValue = minVal ?? minContrast.doubleValue
+
             offsetValue = offset ?? datastore.defaults.contrastOffset
         }
 
