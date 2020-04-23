@@ -1,3 +1,9 @@
+# 3.2.0
+## Fixes
+
+- Fix monitor volume restore
+- Fix crashes because of using deallocated self
+
 # 3.1.5
 ## Features
 

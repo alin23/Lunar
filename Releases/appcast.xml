@@ -245,5 +245,14 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Implement built-in brightness clipping limits for monitors with lower range of brightness/contrast</li><li>Add a menu item to allow disabling volume key listener</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix Location Permissions prompt not showing up on macOS Catalina</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add a bit more analytics data and route the requests through my own server</li><li>Upload diagnostics to my own server instead of transfer.sh</li><li>Reduce memory usage by manually deallocating unused views</li></ul></div></div>]]>
             </description>
         </item>
+        <item>
+            <title>3.2.0</title>
+            <pubDate>Thu, 23 Apr 2020 14:08:19 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="16286076" sparkle:dsaSignature="MEUCIHY/wOISxYFVv4tePSCQLAp3AlMLjWBEyeI7ddzg2UKiAiEAn2uRrDuy81gVwD/Ffd6MXo5PgJtbXtmXcYFdM47w/Sw=" sparkle:edSignature="gCH1saIZC92oOK2ovAR4E+hA5V8K9oFQx6bXwou35XJv8axpiTkdZriABpvbDX2v+/gDqnNfCWD6TqhdZJBzDQ==" sparkle:shortVersionString="3.2.0" sparkle:version="3.2.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix monitor volume restore</li><li>Fix crashes because of using deallocated self</li></ul></div></div>]]>
+            </description>
+        </item>
     </channel>
 </rss>
