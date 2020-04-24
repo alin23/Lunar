@@ -43,6 +43,7 @@
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */; };
 		C7574F7A2352081500358397 /* LunarService.app in Copy Files */ = {isa = PBXBuildFile; fileRef = C7CFEA121FD376E6000AC4A6 /* LunarService.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
@@ -251,6 +252,7 @@
 		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = gencode.sh; sourceTree = "<group>"; };
 		C7574F812354691700358397 /* buildscript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = buildscript.sh; sourceTree = "<group>"; };
+		C7683424245227290087946C /* DisplayName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayName.swift; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
@@ -453,6 +455,7 @@
 				C75083632222DC9F0020270E /* HotKeyView.swift */,
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
 				C731260B22B38899001ED199 /* HelpButton.swift */,
+				C7683424245227290087946C /* DisplayName.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -790,6 +793,7 @@
 				C7816BD82406A17200C30975 /* NonResponsiveDDCTextField.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
+				C7683425245227290087946C /* DisplayName.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
 				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
 				C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */,
@@ -980,7 +984,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.2.0;
+				CURRENT_PROJECT_VERSION = 3.2.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1004,7 +1008,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1030,7 +1034,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.2.0;
+				CURRENT_PROJECT_VERSION = 3.2.1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1053,7 +1057,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";

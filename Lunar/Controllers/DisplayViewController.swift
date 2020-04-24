@@ -47,7 +47,7 @@ class DisplayViewController: NSViewController {
     """
 
     @IBOutlet var displayView: DisplayView?
-    @IBOutlet var displayName: NSTextField?
+    @IBOutlet var displayName: DisplayName?
     @IBOutlet var adaptiveButton: NSButton?
 
     @IBOutlet var brightnessRangeButton: NSButton?
@@ -117,6 +117,13 @@ class DisplayViewController: NSViewController {
         }
     }
 
+    override func mouseDown(with _: NSEvent) {
+        if let editor = displayName?.currentEditor() {
+            editor.selectedRange = NSMakeRange(0, 0)
+            displayName?.abortEditing()
+        }
+    }
+
     func setButtonsHidden(_ hidden: Bool) {
         adaptiveButton?.isHidden = hidden
         adaptiveHelpButton?.isHidden = hidden
@@ -134,8 +141,10 @@ class DisplayViewController: NSViewController {
     func update(from display: Display) {
         if display.id == GENERIC_DISPLAY_ID {
             displayName?.stringValue = "No Display"
+            displayName?.display = nil
         } else {
             displayName?.stringValue = display.name
+            displayName?.display = display
             nonResponsiveDDCTextField?.onClick = { [weak self] in
                 runInMainThread { [weak self] in
                     DDC.skipWritingPropertyById[display.id]?.removeAll()
