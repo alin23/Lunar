@@ -55,6 +55,7 @@ enum ValueType {
         }
     }
 
+    var edidName: String
     @objc dynamic var name: String {
         didSet {
             save()
@@ -283,6 +284,7 @@ enum ValueType {
         return [
             "id": id,
             "name": name,
+            "edidName": edidName,
             "serial": serial,
             "adaptive": adaptive,
             "extendedBrightnessRange": extendedBrightnessRange,
@@ -315,19 +317,19 @@ enum ValueType {
     }
 
     func isUltraFine() -> Bool {
-        return name.contains(ULTRAFINE_NAME)
+        return name.contains(ULTRAFINE_NAME) || edidName.contains(ULTRAFINE_NAME)
     }
 
     func isThunderbolt() -> Bool {
-        return name.contains(THUNDERBOLT_NAME)
+        return name.contains(THUNDERBOLT_NAME) || edidName.contains(THUNDERBOLT_NAME)
     }
 
     func isLEDCinema() -> Bool {
-        return name.contains(LED_CINEMA_NAME)
+        return name.contains(LED_CINEMA_NAME) || edidName.contains(LED_CINEMA_NAME)
     }
 
     func isColorLCD() -> Bool {
-        return name.contains(COLOR_LCD_NAME)
+        return name.contains(COLOR_LCD_NAME) || edidName.contains(COLOR_LCD_NAME)
     }
 
     func isAppleDisplay() -> Bool {
@@ -373,10 +375,11 @@ enum ValueType {
         self.minContrast = NSNumber(value: minContrast)
         self.maxContrast = NSNumber(value: maxContrast)
 
+        edidName = Display.printableName(id: id)
         if let n = name, !n.isEmpty {
             self.name = n
         } else {
-            self.name = Display.printableName(id: id)
+            self.name = edidName
         }
         self.serial = (serial ?? Display.uuid(id: id))
         super.init()
