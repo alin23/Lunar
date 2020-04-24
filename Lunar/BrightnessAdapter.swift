@@ -199,7 +199,10 @@ class BrightnessAdapter {
                     display.id = newID
                 }
                 if let newName = displaySerialNameMapping[display.serial] {
-                    display.name = newName
+                    display.edidName = newName
+                    if display.name.isEmpty {
+                        display.name = newName
+                    }
                 }
                 display.active = true
                 display.addObservers()

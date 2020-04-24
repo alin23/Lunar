@@ -254,5 +254,14 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix monitor volume restore</li><li>Fix crashes because of using deallocated self</li></ul></div></div>]]>
             </description>
         </item>
+        <item>
+            <title>3.2.1</title>
+            <pubDate>Fri, 24 Apr 2020 14:07:50 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13049255" sparkle:dsaSignature="MEUCIQCcpevbkXqdjxxUVtL+9jwBWgcEYUvq1xLvasD+aoG94QIgaDX7RTUpSnBgRdVNoNj9wCYkjPCdy9sgsYuMz5asKvM=" sparkle:edSignature="g6NG/WpH3Vy8GOOqRH5ePXM3KXdmL5oVslbuKvg6SFb8WkjHV5zuStqGiG28iRJ0tL58qnDHTSS2LdnU5oSlDg==" sparkle:shortVersionString="3.2.1" sparkle:version="3.2.1" type="application/octet-stream" url="https://lunar.fyi/download/3.2.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Make display name editable</li></ul></div></div>]]>
+            </description>
+        </item>
     </channel>
 </rss>

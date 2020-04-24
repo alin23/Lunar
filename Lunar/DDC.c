@@ -274,17 +274,27 @@ dispatch_semaphore_t DisplayQueue(CGDirectDisplayID displayID)
     }* queues = NULL;
     dispatch_semaphore_t queue = NULL;
     if (!queues)
-        queues = calloc(50, sizeof(*queues)); //FIXME: specify
+        queues = calloc(100, sizeof(*queues));
     UInt64 i = 0;
-    while (i < queueCount)
-        if (queues[i].id == displayID)
+    while (i < queueCount) {
+        if (queues[i].id == displayID) {
             break;
-        else
+        } else {
             i++;
-    if (queues[i].id == displayID)
+        }
+    }
+    if (i >= (queueCount - 1)) {
+        i = 0;
+    }
+    
+    if (queues[i].id == displayID) {
+        if (!(queues[i].queue)) {
+            queues[i].queue = dispatch_semaphore_create(1);
+        }
         queue = queues[i].queue;
-    else
+    } else {
         queues[queueCount++] = (struct DDCQueue) { displayID, (queue = dispatch_semaphore_create(1)) };
+    }
     return queue;
 }
 
