@@ -1,3 +1,8 @@
+# 3.2.1
+## Improvements
+
+- Make display name editable
+
 # 3.2.0
 ## Fixes
 
