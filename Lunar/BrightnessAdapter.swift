@@ -276,7 +276,7 @@ class BrightnessAdapter {
     }
 
     func activateClamshellMode() {
-        if mode != .manual {
+        if mode == .sync {
             clamshellMode = true
             disable()
         }
