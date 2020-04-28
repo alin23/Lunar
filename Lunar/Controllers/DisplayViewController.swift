@@ -117,11 +117,12 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    override func mouseDown(with _: NSEvent) {
+    override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
             editor.selectedRange = NSMakeRange(0, 0)
             displayName?.abortEditing()
         }
+        super.mouseDown(with: ev)
     }
 
     func setButtonsHidden(_ hidden: Bool) {
