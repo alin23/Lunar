@@ -44,6 +44,7 @@ class StatusItemButtonController: NSView {
 
     override func mouseDown(with event: NSEvent) {
         menuPopover.close()
+        closeMenuPopover(after: 1500)
         if let button = statusButton {
             button.mouseDown(with: event)
         }
