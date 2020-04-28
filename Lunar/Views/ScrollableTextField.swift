@@ -228,15 +228,14 @@ class ScrollableTextField: NSTextField {
 
     func finishScrolling(after ms: Int) {
         adaptToScrollingFinished?.cancel()
-        adaptToScrollingFinished = DispatchWorkItem { [unowned self] in
-            self.finishScrolling()
-            self.adaptToScrollingFinished = nil
+        adaptToScrollingFinished = DispatchWorkItem { [weak self] in
+            self?.finishScrolling()
+            self?.adaptToScrollingFinished = nil
         }
         runInMainThreadAsyncAfter(ms: ms, adaptToScrollingFinished!)
     }
 
     override func scrollWheel(with event: NSEvent) {
-//        log.debug(event.scrollingDeltaY)
         if abs(event.scrollingDeltaX) <= 3.0 {
             if !isEnabled {
                 return
@@ -247,7 +246,11 @@ class ScrollableTextField: NSTextField {
                     scrolling = true
                     lightenUp(color: textFieldColorLight)
                 }
-                increaseValue()
+                if event.isDirectionInvertedFromDevice {
+                    increaseValue()
+                } else {
+                    decreaseValue()
+                }
                 finishScrolling(after: 1000)
             } else if event.scrollingDeltaY > 0.0 {
                 disableScrollHint()
@@ -255,7 +258,11 @@ class ScrollableTextField: NSTextField {
                     scrolling = true
                     lightenUp(color: textFieldColorLight)
                 }
-                decreaseValue()
+                if event.isDirectionInvertedFromDevice {
+                    decreaseValue()
+                } else {
+                    increaseValue()
+                }
                 finishScrolling(after: 1000)
             } else {
                 finishScrolling()
