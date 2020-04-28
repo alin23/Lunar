@@ -1,3 +1,11 @@
+# 3.2.2
+## Fixes
+
+- Fix tooltip not closing when clicking on the display page
+
+## Improvements
+
+- Detect scrolling direction so that scrolling up always increases value
 # 3.2.1
 ## Improvements
 

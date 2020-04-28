@@ -84,7 +84,7 @@ release: changelog
 	echo "" >> /tmp/release_file_$(VERSION).md
 	cat ReleaseNotes/$(VERSION).md >> /tmp/release_file_$(VERSION).md
 	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
-	rsync -avz -e ssh Releases/*.dmg Releases/appcast.xml Lunar.dmg noiseblend:/static/Lunar
+	rsync -avz -e ssh Releases/Lunar-$(VERSION).dmg Releases/appcast.xml Lunar.dmg noiseblend:/static/Lunar
 sentry-release:
 	./release.sh
 
