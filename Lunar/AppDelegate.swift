@@ -200,6 +200,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var stateMenuItem: NSMenuItem!
     @IBOutlet var toggleMenuItem: NSMenuItem!
     @IBOutlet var debugMenuItem: NSMenuItem!
+    @IBOutlet var builtinBrightnessMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -386,6 +387,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         switch mode {
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
+            builtinBrightnessMenuItem.isHidden = true
             brightnessAdapter.adaptBrightness()
 
             locationThread = Thread {
@@ -400,12 +402,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             locationThread.start()
         case .sync:
             log.debug("Started BrightnessAdapter in Sync mode")
+            builtinBrightnessMenuItem.isHidden = false
+
+            let builtinBrightness = ((brightnessAdapter.getBuiltinDisplayBrightness() ?? 0.0) * 100).rounded(.toNearestOrAwayFromZero) / 100
+            runInMainThread {
+                builtinBrightnessMenuItem.title = "Built-in display brightness: \(builtinBrightness)"
+            }
+
             brightnessAdapter.adaptBrightness()
 
-            syncThread = Thread {
+            syncThread = Thread { [weak self] in
                 while true {
                     if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                        runInMainThread {
+                            self?.builtinBrightnessMenuItem?.title = "Built-in display brightness: \((builtinBrightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
+                        }
+
                         if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
                             let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
                             builtinBrightness = Double(lastBrightness)
@@ -416,13 +429,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     }
 
                     if Thread.current.isCancelled { return }
-                    Thread.sleep(forTimeInterval: TimeInterval(self.syncPollingSeconds))
+                    Thread.sleep(forTimeInterval: TimeInterval(self?.syncPollingSeconds ?? 1))
                     if Thread.current.isCancelled { return }
                 }
             }
             syncThread.start()
         case .manual:
             log.debug("BrightnessAdapter set to manual")
+            builtinBrightnessMenuItem.isHidden = true
         }
     }
 
