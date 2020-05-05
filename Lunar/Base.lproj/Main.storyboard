@@ -19,6 +19,9 @@
                                         <menuItem title="State" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="YMI-RQ-F1Z">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
+                                        <menuItem title="Built-in brightness" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="B7F-Wk-7dh">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="INI-Sl-rYJ"/>
                                         <menuItem title="Version" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="chG-l1-mZY">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -315,6 +318,7 @@
                     <connections>
                         <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
                         <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
+                        <outlet property="builtinBrightnessMenuItem" destination="B7F-Wk-7dh" id="hAc-7p-LLZ"/>
                         <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
                         <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
                         <outlet property="debugMenuItem" destination="kSD-gy-XkR" id="NKJ-Lt-QFN"/>
