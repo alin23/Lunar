@@ -76,26 +76,19 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
     }
 
     func addSentryData() {
-        if let client = Client.shared {
-            if client.extra == nil {
-                brightnessAdapter.addSentryData()
-                return
-            }
-
-            if var appExtra = client.extra?["apps"] as? [String: Any] {
-                appExtra[name] = [
-                    "brightness": brightness,
-                    "contrast": contrast,
-                ]
-                client.extra!["apps"] = appExtra
-            }
+        SentrySDK.configureScope { [weak self] scope in
+            guard let self = self else { return }
+            scope.setExtra(value: [
+                "brightness": self.brightness,
+                "contrast": self.contrast,
+            ], key: "app-\(self.name)")
         }
     }
 
     func removeSentryData() {
-        if let client = Client.shared, let extra = client.extra, var appExtra = extra["apps"] as? [String: Any] {
-            appExtra.removeValue(forKey: name)
-            client.extra!["apps"] = appExtra
+        SentrySDK.configureScope { [weak self] scope in
+            guard let self = self else { return }
+            scope.setExtra(value: "DELETED", key: "app-\(self.name)")
         }
     }
 
