@@ -12,9 +12,10 @@ import Carbon.HIToolbox
 import Cocoa
 import Compression
 import CoreLocation
+import LaunchAtLogin
 import Magnet
+import Sauce
 import Sentry
-import ServiceManagement
 import SwiftDate
 import WAYWindow
 
@@ -70,7 +71,6 @@ var lunarDisplayNames = [
     "Luna",
 ]
 
-let launcherAppId = "site.lunarapp.LunarService"
 let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 let datastore = DataStore()
@@ -239,7 +239,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             if !preciseHotkeys.contains(identifier) {
-                if let keyCombo = KeyCombo(keyCode: keyCode, carbonModifiers: modifiers) {
+                if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
                     Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
                     if enabled == 1 {
                         Hotkey.keys[identifier]??.register()
@@ -255,7 +255,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     continue
                 }
 
-                var flags = KeyTransformer.cocoaFlags(from: coarseModifiers)
+                var flags = coarseModifiers.convertSupportCocoaModifiers()
                 if flags.contains(.option) {
                     log.warning("Hotkey \(coarseIdentifier) already binds option. Fine adjustment will be disabled")
                     enabled = 0
@@ -266,12 +266,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     flags.insert(.option)
                 }
 
-                let newModifiers = KeyTransformer.carbonFlags(from: flags)
+                let newModifiers = flags.carbonModifiers()
 
                 hotkeyConfig[identifier]?[.modifiers] = newModifiers
                 hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
 
-                if let keyCombo = KeyCombo(keyCode: coarseKeyCode, carbonModifiers: newModifiers) {
+                if let keyCombo = KeyCombo(QWERTYKeyCode: coarseKeyCode, carbonModifiers: newModifiers) {
                     Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
                     if enabled == 1 {
                         Hotkey.keys[identifier]??.register()
@@ -290,8 +290,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 return
             }
             brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .sync
-            Client.shared?.tags?["adaptiveMode"] = brightnessAdapter.adaptiveModeString()
-            Client.shared?.tags?["lastAdaptiveMode"] = brightnessAdapter.adaptiveModeString(last: true)
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: brightnessAdapter.adaptiveModeString(), key: "adaptiveMode")
+                scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+            }
             runInMainThread {
                 self.resetElements()
             }
@@ -309,11 +311,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToSettingsChange(notification _: Notification) {
-        if Client.shared?.extra != nil {
-            Client.shared?.extra?["settings"] = datastore.settingsDictionary()
-        } else {
-            brightnessAdapter.addSentryData()
-        }
+        brightnessAdapter.addSentryData()
     }
 
     func showWindow() {
@@ -347,20 +345,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func handleDaemon() {
-        let runningApps = NSWorkspace.shared.runningApplications
-        let isRunning = runningApps.contains(where: { app in app.bundleIdentifier == launcherAppId })
-
-        SMLoginItemSetEnabled(launcherAppId as CFString, datastore.defaults.startAtLogin)
-        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, change in
-            SMLoginItemSetEnabled(launcherAppId as CFString, change.newValue ?? false)
+        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, _ in
+            LaunchAtLogin.isEnabled = datastore.defaults.startAtLogin
         })
-
-        if isRunning {
-            DistributedNotificationCenter.default().post(
-                name: .killLauncher,
-                object: Bundle.main.bundleIdentifier!
-            )
-        }
     }
 
     func applicationDidResignActive(_: Notification) {
@@ -694,28 +681,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
 
         log.initLogger()
-        do {
-            let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
-            Client.shared = try Client(options: [
-                "dsn": secrets.sentryDSN,
-                "enabled": true,
-                "release": "v\(release)",
-                "dist": release,
-                "environment": "production",
-            ])
+        let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
+        SentrySDK.start(options: [
+            "dsn": secrets.sentryDSN,
+            "enabled": true,
+            "release": "v\(release)",
+            "dist": release,
+            "environment": "production",
+        ])
 
-            let user = User(userId: getSerialNumberHash() ?? "NOID")
-            Client.shared?.user = user
-            Client.shared?.tags = [
-                "adaptiveMode": brightnessAdapter.adaptiveModeString(),
-                "lastAdaptiveMode": brightnessAdapter.adaptiveModeString(last: true),
-            ]
-            brightnessAdapter.addSentryData()
-
-            try Client.shared?.startCrashHandler()
-        } catch {
-            print("\(error)")
+        let user = User(userId: getSerialNumberHash() ?? "NOID")
+        SentrySDK.configureScope { scope in
+            scope.setUser(user)
+            scope.setTag(value: brightnessAdapter.adaptiveModeString(), key: "adaptiveMode")
+            scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
         }
+
+        brightnessAdapter.addSentryData()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {
             log.info("Setting log path to \(LOG_URL?.path ?? "")")

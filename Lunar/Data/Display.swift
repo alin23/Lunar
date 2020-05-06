@@ -304,15 +304,9 @@ enum ValueType {
     }
 
     func addSentryData() {
-        if let client = Client.shared {
-            if client.extra == nil {
-                brightnessAdapter.addSentryData()
-                return
-            }
-            if var displayExtra = client.extra?["displays"] as? [String: Any] {
-                displayExtra["\(serial)"] = dictionaryRepresentation()
-                client.extra!["displays"] = displayExtra
-            }
+        SentrySDK.configureScope { [weak self] scope in
+            guard let self = self else { return }
+            scope.setExtra(value: self.dictionaryRepresentation(), key: "display-\(self.serial)")
         }
     }
 
@@ -474,6 +468,13 @@ enum ValueType {
         }
     }
 
+    func setSentryExtra(value: Any, key: String) {
+        SentrySDK.configureScope { [weak self] scope in
+            guard let self = self else { return }
+            scope.setExtra(value: value, key: "display-\(self.id)-\(key)")
+        }
+    }
+
     func addObservers() {
         datastoreObservers = [
             datastore.defaults.observe(\.brightnessClipMin, options: [.new, .old], changeHandler: { [weak self] _, change in
@@ -503,34 +504,22 @@ enum ValueType {
 
         numberObservers["minBrightness"]!["self.minBrightness"] = { [weak self] newValue, oldValue in
             guard let self = self else { return }
-            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                extraData["minBrightness"] = newValue
-                Client.shared?.extra?["\(self.id)"] = extraData
-            }
+            self.setSentryExtra(value: newValue, key: "minBrightness")
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
         numberObservers["maxBrightness"]!["self.maxBrightness"] = { [weak self] newValue, oldValue in
             guard let self = self else { return }
-            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                extraData["maxBrightness"] = newValue
-                Client.shared?.extra?["\(self.id)"] = extraData
-            }
+            self.setSentryExtra(value: newValue, key: "maxBrightness")
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
         numberObservers["minContrast"]!["self.minContrast"] = { [weak self] newValue, oldValue in
             guard let self = self else { return }
-            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                extraData["minContrast"] = newValue
-                Client.shared?.extra?["\(self.id)"] = extraData
-            }
+            self.setSentryExtra(value: newValue, key: "minContrast")
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
         numberObservers["maxContrast"]!["self.maxContrast"] = { [weak self] newValue, oldValue in
             guard let self = self else { return }
-            if var extraData = Client.shared?.extra?["\(self.id)"] as? [String: Any] {
-                extraData["maxContrast"] = newValue
-                Client.shared?.extra?["\(self.id)"] = extraData
-            }
+            self.setSentryExtra(value: newValue, key: "maxContrast")
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
         numberObservers["volume"]!["self.volume"] = { [weak self] newVolume, _ in
@@ -564,10 +553,7 @@ enum ValueType {
                     brightness = UInt8(mapNumber(Double(brightness), fromLow: 0, fromHigh: 100, toLow: 0, toHigh: 255).rounded())
                 }
 
-                if var extraData = Client.shared?.extra?["\(id)"] as? [String: Any] {
-                    extraData["brightness"] = brightness
-                    Client.shared?.extra?["\(id)"] = extraData
-                }
+                self.setSentryExtra(value: brightness, key: "brightness")
                 if datastore.defaults.smoothTransition || appleDisplay {
                     var faults = 0
                     self.smoothTransition(from: oldBrightness, to: brightness) { [weak self] newValue in
@@ -610,10 +596,9 @@ enum ValueType {
                 } else {
                     contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
                 }
-                if var extraData = Client.shared?.extra?["\(id)"] as? [String: Any] {
-                    extraData["contrast"] = contrast
-                    Client.shared?.extra?["\(id)"] = extraData
-                }
+
+                self.setSentryExtra(value: contrast, key: "contrast")
+
                 if datastore.defaults.smoothTransition {
                     var faults = 0
                     self.smoothTransition(from: oldValue.uint8Value, to: contrast) { [weak self] newValue in

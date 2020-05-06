@@ -233,24 +233,21 @@ class BrightnessAdapter {
     }
 
     func addSentryData() {
-        if let client = Client.shared {
+        SentrySDK.configureScope { [weak self] scope in
             log.info("Creating Sentry extra context")
-            client.extra = [
-                "settings": datastore.settingsDictionary(),
-                "displays": datastore.defaults.displays ?? [:],
-                "apps": datastore.defaults.appExceptions ?? [:],
-            ]
-            for display in displays.values {
+            scope.setExtra(value: datastore.settingsDictionary(), key: "settings")
+            guard let self = self else { return }
+            for display in self.displays.values {
                 if display.isUltraFine() {
-                    client.tags?["ultrafine"] = "true"
+                    scope.setTag(value: true, key: "ultrafine")
                     continue
                 }
                 if display.isThunderbolt() {
-                    client.tags?["thunderbolt"] = "true"
+                    scope.setTag(value: true, key: "thunderbolt")
                     continue
                 }
                 if display.isLEDCinema() {
-                    client.tags?["ledcinema"] = "true"
+                    scope.setTag(value: true, key: "ledcinema")
                     continue
                 }
             }
@@ -292,7 +289,10 @@ class BrightnessAdapter {
     func manageClamshellMode() {
         lidClosed = IsLidClosed()
         log.info("Lid closed: \(lidClosed)")
-        Client.shared?.tags?["clamshellMode"] = String(lidClosed)
+        SentrySDK.configureScope { [weak self] scope in
+            guard let self = self else { return }
+            scope.setTag(value: self.lidClosed, key: "clamshellMode")
+        }
 
         if datastore.defaults.clamshellModeDetection {
             if lidClosed {
