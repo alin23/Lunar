@@ -22,18 +22,20 @@
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
-		C731261322B3DF0A001ED199 /* Down.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C731261222B3DF0A001ED199 /* Down.framework */; };
-		C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C731261222B3DF0A001ED199 /* Down.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
+		C73CC69F24615E9D003B2658 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC69E24615E9D003B2658 /* Sentry */; };
+		C73CC6A224615F3C003B2658 /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A124615F3C003B2658 /* Down */; };
+		C73CC6A5246161E6003B2658 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A4246161E6003B2658 /* Charts */; };
+		C73CC6A824616359003B2658 /* AMCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A724616359003B2658 /* AMCoreAudio */; };
+		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
+		C73CC6B024616748003B2658 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */; };
+		C73CC6B124616748003B2658 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C73CC6B42461879A003B2658 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */; };
+		C73CC6B5246187A9003B2658 /* MediaKeyTap.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */; };
+		C73CC6BB24618988003B2658 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6BA24618988003B2658 /* KeyHolder */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C75083402222865F0020270E /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
 		C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083422222865F0020270E /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; };
-		C75083432222865F0020270E /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083352222865D0020270E /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; };
-		C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833B2222865E0020270E /* KeyHolder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C75083522222865F0020270E /* Magnet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; };
-		C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833D2222865E0020270E /* Magnet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083542222865F0020270E /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; };
 		C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
@@ -41,8 +43,6 @@
 		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
-		C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */; };
-		C7574F7A2352081500358397 /* LunarService.app in Copy Files */ = {isa = PBXBuildFile; fileRef = C7CFEA121FD376E6000AC4A6 /* LunarService.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
@@ -54,8 +54,6 @@
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C7816BD82406A17200C30975 /* NonResponsiveDDCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
-		C78B9220237ECDDA0060DC7C /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C78B921D237ECDCC0060DC7C /* Sentry.framework */; };
-		C78B9221237ECDDA0060DC7C /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C78B921D237ECDCC0060DC7C /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C79224182360BA030037B559 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C79224172360BA030037B559 /* Sparkle.framework */; };
 		C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C79224172360BA030037B559 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C792241D2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -64,17 +62,8 @@
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
-		C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */; };
-		C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */; };
-		C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */; };
-		C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */; };
 		C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */; };
-		C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */; };
-		C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */; };
-		C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */; };
-		C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */; };
 		C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */; };
-		C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */; };
 		C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* MenuPopoverController.swift */; };
 		C7AB59782396C4A90028E573 /* Transformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB59762396C4A80028E573 /* Transformers.swift */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
@@ -83,10 +72,6 @@
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
-		C7B9E4892401C35800A48347 /* AMCoreAudio.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */; };
-		C7B9E48C2401C35800A48347 /* MediaKeyTap.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */; };
-		C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4872401C35800A48347 /* AMCoreAudio.framework */; };
-		C7B9E48E2401C39F00A48347 /* AMCoreAudio.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4872401C35800A48347 /* AMCoreAudio.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; };
 		C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
@@ -99,16 +84,11 @@
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
+		C7C6A7A32461C23F00048D7B /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C7C6A7A22461C23F00048D7B /* Magnet */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
-		C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */; };
-		C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C731261522B3DF1E001ED199 /* Down.framework.dSYM */; };
-		C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
 		C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
-		C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */; };
-		C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */; };
-		C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
@@ -126,13 +106,6 @@
 			remoteGlobalIDString = C715192B224E33590024C6F6;
 			remoteInfo = EDIDReader;
 		};
-		C7574F7C2352175700358397 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C7AEC7ED1FD0B4350039B562 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C7CFEA111FD376E6000AC4A6;
-			remoteInfo = LunarService;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -144,13 +117,8 @@
 			files = (
 				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
 				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
+				C73CC6B124616748003B2658 /* LaunchAtLogin.framework in Embed Frameworks */,
 				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
-				C75083532222865F0020270E /* Magnet.framework in Embed Frameworks */,
-				C731261422B3DF0A001ED199 /* Down.framework in Embed Frameworks */,
-				C7B9E48E2401C39F00A48347 /* AMCoreAudio.framework in Embed Frameworks */,
-				C750834F2222865F0020270E /* KeyHolder.framework in Embed Frameworks */,
-				C78B9221237ECDDA0060DC7C /* Sentry.framework in Embed Frameworks */,
-				C75083432222865F0020270E /* Charts.framework in Embed Frameworks */,
 				C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -175,42 +143,12 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				C7CBF007238EC8A400031E93 /* Sentry.framework.dSYM in CopyFiles */,
-				C7CBF008238EC8A400031E93 /* Down.framework.dSYM in CopyFiles */,
-				C7A2BDF822411E9500C910E3 /* Alamofire.framework.dSYM in CopyFiles */,
-				C7A2BDEC22411E9500C910E3 /* Charts.framework.dSYM in CopyFiles */,
-				C7A2BDEE22411E9500C910E3 /* KeyHolder.framework.dSYM in CopyFiles */,
-				C7A2BDF322411E9500C910E3 /* Magnet.framework.dSYM in CopyFiles */,
+				C73CC6B42461879A003B2658 /* LaunchAtLogin.framework.dSYM in CopyFiles */,
 				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
-				C7A2BDEF22411E9500C910E3 /* Solar.framework.dSYM in CopyFiles */,
-				C7A2BDF122411E9500C910E3 /* Surge.framework.dSYM in CopyFiles */,
-				C7A2BDF422411E9500C910E3 /* SwiftDate.framework.dSYM in CopyFiles */,
-				C7A2BDF522411E9500C910E3 /* SwiftyBeaver.framework.dSYM in CopyFiles */,
+				C73CC6B5246187A9003B2658 /* MediaKeyTap.framework.dSYM in CopyFiles */,
 				C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */,
-				C7A2BDED22411E9500C910E3 /* SwiftyJSON.framework.dSYM in CopyFiles */,
 				C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C7CFEA221FD37836000AC4A6 /* Copy Files */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
-			files = (
-				C7574F7A2352081500358397 /* LunarService.app in Copy Files */,
-			);
-			name = "Copy Files";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C7CFEA291FD37AF3000AC4A6 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -229,20 +167,12 @@
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
-		C731261222B3DF0A001ED199 /* Down.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Down.framework; sourceTree = "<group>"; };
-		C731261522B3DF1E001ED199 /* Down.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Down.framework.dSYM; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
+		C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LaunchAtLogin.framework; sourceTree = "<group>"; };
+		C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WAYWindow.framework; sourceTree = "<group>"; };
-		C75083352222865D0020270E /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Charts.framework; sourceTree = "<group>"; };
-		C75083362222865D0020270E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Alamofire.framework; sourceTree = "<group>"; };
-		C75083372222865E0020270E /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Solar.framework; sourceTree = "<group>"; };
-		C75083392222865E0020270E /* SwiftDate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftDate.framework; sourceTree = "<group>"; };
-		C750833A2222865E0020270E /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyJSON.framework; sourceTree = "<group>"; };
-		C750833B2222865E0020270E /* KeyHolder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeyHolder.framework; sourceTree = "<group>"; };
-		C750833C2222865E0020270E /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyBeaver.framework; sourceTree = "<group>"; };
-		C750833D2222865E0020270E /* Magnet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Magnet.framework; sourceTree = "<group>"; };
 		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NSPageControl.framework; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
@@ -263,8 +193,6 @@
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonResponsiveDDCTextField.swift; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		C78B921D237ECDCC0060DC7C /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sentry.framework; sourceTree = "<group>"; };
-		C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sentry.framework.dSYM; sourceTree = "<group>"; };
 		C79224172360BA030037B559 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerLauncher.xpc"; path = "XPCServices/org.sparkle-project.InstallerLauncher.xpc"; sourceTree = "<group>"; };
 		C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerStatus.xpc"; path = "XPCServices/org.sparkle-project.InstallerStatus.xpc"; sourceTree = "<group>"; };
@@ -274,18 +202,8 @@
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C79B5A272434908400D62E52 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
-		C7A2BDD9223FC8D100C910E3 /* Surge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Surge.framework; sourceTree = "<group>"; };
-		C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Charts.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = KeyHolder.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Solar.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = WAYWindow.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Surge.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Magnet.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftDate.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyBeaver.framework.dSYM; sourceTree = "<group>"; };
 		C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = NSPageControl.framework.dSYM; sourceTree = "<group>"; };
-		C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Alamofire.framework.dSYM; sourceTree = "<group>"; };
 		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
 		C7AB59762396C4A80028E573 /* Transformers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transformers.swift; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -296,9 +214,7 @@
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
-		C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = AMCoreAudio.framework.dSYM; sourceTree = "<group>"; };
 		C7B9E4862401C35800A48347 /* MediaKeyTap.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MediaKeyTap.framework; sourceTree = "<group>"; };
-		C7B9E4872401C35800A48347 /* AMCoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMCoreAudio.framework; sourceTree = "<group>"; };
 		C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = MediaKeyTap.framework.dSYM; sourceTree = "<group>"; };
 		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
@@ -315,12 +231,10 @@
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
-		C7CFEA121FD376E6000AC4A6 /* LunarService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7CFEA1B1FD376E6000AC4A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
@@ -334,33 +248,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
+				C73CC6B024616748003B2658 /* LaunchAtLogin.framework in Frameworks */,
+				C7C6A7A32461C23F00048D7B /* Magnet in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
-				C7574F782352019700358397 /* ServiceManagement.framework in Frameworks */,
-				C7B9E48D2401C39F00A48347 /* AMCoreAudio.framework in Frameworks */,
+				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
-				C75083422222865F0020270E /* Charts.framework in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
-				C731261322B3DF0A001ED199 /* Down.framework in Frameworks */,
-				C75083522222865F0020270E /* Magnet.framework in Frameworks */,
-				C750834E2222865F0020270E /* KeyHolder.framework in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
-				C78B9220237ECDDA0060DC7C /* Sentry.framework in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
+				C73CC6A824616359003B2658 /* AMCoreAudio in Frameworks */,
+				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
+				C73CC6BB24618988003B2658 /* KeyHolder in Frameworks */,
 				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
 				C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C7CFEA0F1FD376E6000AC4A6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				C73CC6A224615F3C003B2658 /* Down in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,18 +304,18 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C72776EC201F26CB0055934F /* AppException.swift */,
+				C7C1F7081FD639970039507C /* DataStore.swift */,
+				C7C1F7021FD5FD390039507C /* Display.swift */,
+				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
+				C73AAC4A22241B690063AD2A /* Hotkeys.swift */,
+				C78AB66620F0C73900863CB1 /* Logger.swift */,
+				C7C1F7041FD635360039507C /* Moment.swift */,
+				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
 				C7EF9534243F4E2200839A62 /* Sysctl.swift */,
+				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
 				C7AB59762396C4A80028E573 /* Transformers.swift */,
 				C7CBEFFC238E81FF00031E93 /* Util.swift */,
-				C7C1F7081FD639970039507C /* DataStore.swift */,
-				C7C1F7041FD635360039507C /* Moment.swift */,
-				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
-				C7C1F7021FD5FD390039507C /* Display.swift */,
-				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
-				C72776EC201F26CB0055934F /* AppException.swift */,
-				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
-				C78AB66620F0C73900863CB1 /* Logger.swift */,
-				C73AAC4A22241B690063AD2A /* Hotkeys.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -415,18 +323,18 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */,
-				C7AEC7FA1FD0B4350039B562 /* PageController.swift */,
-				C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */,
-				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
-				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
-				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
-				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
-				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
-				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
+				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
+				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 				C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */,
+				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
 				C7A63204238C04C10005D792 /* MenuPopoverController.swift */,
+				C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */,
+				C7AEC7FA1FD0B4350039B562 /* PageController.swift */,
+				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
+				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
+				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
+				C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -434,28 +342,28 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
+				C7C68F08201B75C700F49A2B /* DeleteButton.swift */,
+				C7683424245227290087946C /* DisplayName.swift */,
+				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
+				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
+				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
+				C731260B22B38899001ED199 /* HelpButton.swift */,
+				C75083632222DC9F0020270E /* HotKeyView.swift */,
+				C7E242642119A65B0020326C /* LockButton.swift */,
+				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
 				C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */,
 				C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */,
-				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
-				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
 				C72776E6201F02140055934F /* PageControl.swift */,
-				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
-				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
-				C794E1731FEFE31A00549462 /* ScrollableTextField.swift */,
+				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
+				C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */,
 				C77200021FF072CB0078E155 /* ScrollableBrightness.swift */,
 				C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */,
+				C794E1731FEFE31A00549462 /* ScrollableTextField.swift */,
 				C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */,
-				C7C68F08201B75C700F49A2B /* DeleteButton.swift */,
 				C7C68F0C201D3D9800F49A2B /* SettingsView.swift */,
-				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
-				C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */,
-				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
-				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
-				C7E242642119A65B0020326C /* LockButton.swift */,
-				C75083632222DC9F0020270E /* HotKeyView.swift */,
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
-				C731260B22B38899001ED199 /* HelpButton.swift */,
-				C7683424245227290087946C /* DisplayName.swift */,
+				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -478,7 +386,6 @@
 			isa = PBXGroup;
 			children = (
 				C7AEC7F51FD0B4350039B562 /* Lunar.app */,
-				C7CFEA121FD376E6000AC4A6 /* LunarService.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -486,20 +393,20 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
+				C7521D32226C762A0062EC81 /* DDC.c */,
 				C79B5A252434905900D62E52 /* Lunar.entitlements */,
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
-				C77CC75A1FEDB367009AA718 /* Views */,
-				C76545241FD8A10200DBACE9 /* Controllers */,
-				C7151945224E34BA0024C6F6 /* DDC */,
 				C7151941224E34BA0024C6F6 /* DDC.h */,
-				C7521D32226C762A0062EC81 /* DDC.c */,
-				C76545231FD8A0E000DBACE9 /* Data */,
-				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
-				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
 				C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */,
+				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
+				C76545241FD8A10200DBACE9 /* Controllers */,
+				C76545231FD8A0E000DBACE9 /* Data */,
+				C7151945224E34BA0024C6F6 /* DDC */,
 				G_5197027794336 /* Generated */,
+				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
+				C77CC75A1FEDB367009AA718 /* Views */,
 			);
 			path = Lunar;
 			sourceTree = "<group>";
@@ -521,45 +428,22 @@
 			isa = PBXGroup;
 			children = (
 				C730421E2407E92C0016E591 /* Headers */,
-				C7B9E47F2401767E00A48347 /* OSD.framework */,
+				C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */,
+				C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */,
+				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
+				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
+				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
+				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
+				C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */,
+				C7B9E4862401C35800A48347 /* MediaKeyTap.framework */,
+				C750833E2222865E0020270E /* NSPageControl.framework */,
+				C7B9E47F2401767E00A48347 /* OSD.framework */,
+				C79224172360BA030037B559 /* Sparkle.framework */,
+				C75083342222865D0020270E /* WAYWindow.framework */,
 				C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */,
 				C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */,
 				C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */,
-				C79224172360BA030037B559 /* Sparkle.framework */,
-				C731261522B3DF1E001ED199 /* Down.framework.dSYM */,
-				C78B921F237ECDCD0060DC7C /* Sentry.framework.dSYM */,
-				C7A2BDEB22411E9500C910E3 /* Alamofire.framework.dSYM */,
-				C7A2BDDF22411E9300C910E3 /* Charts.framework.dSYM */,
-				C7A2BDE122411E9400C910E3 /* KeyHolder.framework.dSYM */,
-				C7A2BDE622411E9400C910E3 /* Magnet.framework.dSYM */,
-				C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */,
-				C7B9E4852401C35800A48347 /* AMCoreAudio.framework.dSYM */,
-				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
-				C7A2BDE222411E9400C910E3 /* Solar.framework.dSYM */,
-				C7A2BDE422411E9400C910E3 /* Surge.framework.dSYM */,
-				C7A2BDE722411E9400C910E3 /* SwiftDate.framework.dSYM */,
-				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
-				C7A2BDE822411E9500C910E3 /* SwiftyBeaver.framework.dSYM */,
-				C7A2BDE022411E9300C910E3 /* SwiftyJSON.framework.dSYM */,
-				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
-				C78B921D237ECDCC0060DC7C /* Sentry.framework */,
-				C7B9E4862401C35800A48347 /* MediaKeyTap.framework */,
-				C7B9E4872401C35800A48347 /* AMCoreAudio.framework */,
-				C731261222B3DF0A001ED199 /* Down.framework */,
-				C75083362222865D0020270E /* Alamofire.framework */,
-				C75083352222865D0020270E /* Charts.framework */,
-				C750833B2222865E0020270E /* KeyHolder.framework */,
-				C750833D2222865E0020270E /* Magnet.framework */,
-				C750833E2222865E0020270E /* NSPageControl.framework */,
-				C75083372222865E0020270E /* Solar.framework */,
-				C7A2BDD9223FC8D100C910E3 /* Surge.framework */,
-				C75083392222865E0020270E /* SwiftDate.framework */,
-				C750833C2222865E0020270E /* SwiftyBeaver.framework */,
-				C750833A2222865E0020270E /* SwiftyJSON.framework */,
-				C75083342222865D0020270E /* WAYWindow.framework */,
-				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
-				C7CFEA251FD3787C000AC4A6 /* ServiceManagement.framework */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -583,8 +467,8 @@
 				C7AEC7F11FD0B4350039B562 /* Sources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C7AEC7F31FD0B4350039B562 /* Resources */,
-				C7CFEA221FD37836000AC4A6 /* Copy Files */,
 				C75083582222865F0020270E /* Embed Frameworks */,
+				C73CC69C24615915003B2658 /* ShellScript */,
 				C7A2BDDE22411E2400C910E3 /* CopyFiles */,
 				C79224202360BA120037B559 /* Embed XPC Services */,
 				C78B9223237ED34E0060DC7C /* Run Script */,
@@ -592,7 +476,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C7574F7D2352175700358397 /* PBXTargetDependency */,
 			);
 			name = Lunar;
 			packageProductDependencies = (
@@ -603,27 +486,16 @@
 				C7045DB72440DEEE002289E5 /* SwiftyJSON */,
 				C7045DBA2440ECA8002289E5 /* Solar */,
 				C7045DC02441015C002289E5 /* SwiftDate */,
+				C73CC69E24615E9D003B2658 /* Sentry */,
+				C73CC6A124615F3C003B2658 /* Down */,
+				C73CC6A4246161E6003B2658 /* Charts */,
+				C73CC6A724616359003B2658 /* AMCoreAudio */,
+				C73CC6AD24616462003B2658 /* Sauce */,
+				C73CC6BA24618988003B2658 /* KeyHolder */,
+				C7C6A7A22461C23F00048D7B /* Magnet */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
-			productType = "com.apple.product-type.application";
-		};
-		C7CFEA111FD376E6000AC4A6 /* LunarService */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C7CFEA211FD376E6000AC4A6 /* Build configuration list for PBXNativeTarget "LunarService" */;
-			buildPhases = (
-				C7CFEA0E1FD376E6000AC4A6 /* Sources */,
-				C7CFEA0F1FD376E6000AC4A6 /* Frameworks */,
-				C7CFEA101FD376E6000AC4A6 /* Resources */,
-				C7CFEA291FD37AF3000AC4A6 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = LunarService;
-			productName = LunarService;
-			productReference = C7CFEA121FD376E6000AC4A6 /* LunarService.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -637,15 +509,6 @@
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
-						CreatedOnToolsVersion = 9.1;
-						LastSwiftMigration = 1020;
-						SystemCapabilities = {
-							com.apple.Sandbox = {
-								enabled = 0;
-							};
-						};
-					};
-					C7CFEA111FD376E6000AC4A6 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 1020;
 						SystemCapabilities = {
@@ -673,6 +536,13 @@
 				C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				C7045DB92440ECA8002289E5 /* XCRemoteSwiftPackageReference "Solar" */,
 				C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */,
+				C73CC69D24615E9D003B2658 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				C73CC6A024615F3B003B2658 /* XCRemoteSwiftPackageReference "Down" */,
+				C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */,
+				C73CC6A624616359003B2658 /* XCRemoteSwiftPackageReference "AMCoreAudio" */,
+				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
+				C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */,
+				C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -685,7 +555,6 @@
 			projectRoot = "";
 			targets = (
 				C7AEC7F41FD0B4350039B562 /* Lunar */,
-				C7CFEA111FD376E6000AC4A6 /* LunarService */,
 			);
 		};
 /* End PBXProject section */
@@ -707,26 +576,31 @@
 			files = (
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
-				C7B9E4892401C35800A48347 /* AMCoreAudio.framework.dSYM in Resources */,
-				C7CBF00A238EC8DC00031E93 /* Sparkle.framework.dSYM in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 				C730421F2407E92C0016E591 /* Headers in Resources */,
-				C7B9E48C2401C35800A48347 /* MediaKeyTap.framework.dSYM in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C7CFEA101FD376E6000AC4A6 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C7CFEA191FD376E6000AC4A6 /* Assets.xcassets in Resources */,
-				C7CFEA1C1FD376E6000AC4A6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C73CC69C24615915003B2658 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/Carthage/Build/Mac/LaunchAtLogin.framework/Resources/copy-helper.sh\"\n";
+		};
 		C7574F84235469D600358397 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -824,23 +698,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C7CFEA0E1FD376E6000AC4A6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C7CFEA151FD376E6000AC4A6 /* AppDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		C7574F7D2352175700358397 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C7CFEA111FD376E6000AC4A6 /* LunarService */;
-			targetProxy = C7574F7C2352175700358397 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		C7AEC7FE1FD0B4350039B562 /* Main.storyboard */ = {
@@ -976,7 +834,6 @@
 		C7AEC81C1FD0B4350039B562 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
@@ -1026,7 +883,6 @@
 		C7AEC81D1FD0B4350039B562 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
@@ -1072,68 +928,6 @@
 			};
 			name = Release;
 		};
-		C7CFEA1F1FD376E6000AC4A6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Frameworks",
-				);
-				INFOPLIST_FILE = LunarService/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_CODE_SIGN_FLAGS = "--deep";
-				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		C7CFEA201FD376E6000AC4A6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = LunarService/LunarService.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RDDXV84A73;
-				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Frameworks",
-				);
-				INFOPLIST_FILE = LunarService/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_CODE_SIGN_FLAGS = "--timestamp --deep";
-				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.LunarService;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1151,15 +945,6 @@
 			buildConfigurations = (
 				C7AEC81C1FD0B4350039B562 /* Debug */,
 				C7AEC81D1FD0B4350039B562 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C7CFEA211FD376E6000AC4A6 /* Build configuration list for PBXNativeTarget "LunarService" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C7CFEA1F1FD376E6000AC4A6 /* Debug */,
-				C7CFEA201FD376E6000AC4A6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1215,6 +1000,62 @@
 				minimumVersion = 6.1.0;
 			};
 		};
+		C73CC69D24615E9D003B2658 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		C73CC6A024615F3B003B2658 /* XCRemoteSwiftPackageReference "Down" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/iwasrobbed/Down";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.2;
+			};
+		};
+		C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielgindi/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.5.0;
+			};
+		};
+		C73CC6A624616359003B2658 /* XCRemoteSwiftPackageReference "AMCoreAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rnine/AMCoreAudio";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Clipy/Sauce";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.2;
+			};
+		};
+		C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/KeyHolder";
+			requirement = {
+				kind = revision;
+				revision = 5c0f1c32c9e7a1f53d6b9d079e0ae2fa40ec79fc;
+			};
+		};
+		C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/Magnet";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/IBM-Swift/BlueECC.git";
@@ -1255,6 +1096,41 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */;
 			productName = SwiftDate;
+		};
+		C73CC69E24615E9D003B2658 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC69D24615E9D003B2658 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		C73CC6A124615F3C003B2658 /* Down */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC6A024615F3B003B2658 /* XCRemoteSwiftPackageReference "Down" */;
+			productName = Down;
+		};
+		C73CC6A4246161E6003B2658 /* Charts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = Charts;
+		};
+		C73CC6A724616359003B2658 /* AMCoreAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC6A624616359003B2658 /* XCRemoteSwiftPackageReference "AMCoreAudio" */;
+			productName = AMCoreAudio;
+		};
+		C73CC6AD24616462003B2658 /* Sauce */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */;
+			productName = Sauce;
+		};
+		C73CC6BA24618988003B2658 /* KeyHolder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */;
+			productName = KeyHolder;
+		};
+		C7C6A7A22461C23F00048D7B /* Magnet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */;
+			productName = Magnet;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;

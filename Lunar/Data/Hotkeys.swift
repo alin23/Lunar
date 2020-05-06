@@ -10,6 +10,7 @@ import AMCoreAudio
 import Carbon.HIToolbox
 import Magnet
 import MediaKeyTap
+import Sauce
 
 var mediaKeyTap: MediaKeyTap?
 let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
@@ -97,112 +98,112 @@ class Hotkey {
         .toggle: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .start: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option]).carbonModifiers(),
         ],
         .pause: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control, .option, .shift]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option, .shift]).carbonModifiers(),
         ],
         .lunar: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .option, .shift]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift]).carbonModifiers(),
         ],
         .percent0: [
             .enabled: 1,
             .keyCode: kVK_ANSI_0,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .percent25: [
             .enabled: 1,
             .keyCode: kVK_ANSI_1,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .percent50: [
             .enabled: 1,
             .keyCode: kVK_ANSI_2,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .percent75: [
             .enabled: 1,
             .keyCode: kVK_ANSI_3,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .percent100: [
             .enabled: 1,
             .keyCode: kVK_ANSI_4,
-            .modifiers: KeyTransformer.carbonFlags(from: [.command, .control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
         .preciseBrightnessUp: [
             .enabled: 1,
             .keyCode: kVK_F2,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
         .preciseBrightnessDown: [
             .enabled: 1,
             .keyCode: kVK_F1,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
         .preciseContrastUp: [
             .enabled: 1,
             .keyCode: kVK_F2,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
         ],
         .preciseContrastDown: [
             .enabled: 1,
             .keyCode: kVK_F1,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
         ],
         .preciseVolumeUp: [
             .enabled: 1,
             .keyCode: kVK_F12,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
         .preciseVolumeDown: [
             .enabled: 1,
             .keyCode: kVK_F11,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .option]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
         .brightnessUp: [
             .enabled: 1,
             .keyCode: kVK_F2,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
         .brightnessDown: [
             .enabled: 1,
             .keyCode: kVK_F1,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
         .contrastUp: [
             .enabled: 1,
             .keyCode: kVK_F2,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
         ],
         .contrastDown: [
             .enabled: 1,
             .keyCode: kVK_F1,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control, .shift]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
         ],
         .muteAudio: [
             .enabled: 1,
             .keyCode: kVK_F10,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
         .volumeUp: [
             .enabled: 1,
             .keyCode: kVK_F12,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
         .volumeDown: [
             .enabled: 1,
             .keyCode: kVK_F11,
-            .modifiers: KeyTransformer.carbonFlags(from: [.control]),
+            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
     ]
 
@@ -295,10 +296,11 @@ class Hotkey {
             if enabled == 1 {
                 if let keyEquivalent = Hotkey.functionKeyMapping[keyCode] {
                     menuItem.keyEquivalent = keyEquivalent
-                } else {
-                    menuItem.keyEquivalent = KeyCodeTransformer.shared.transformValue(keyCode, carbonModifiers: 0)
+                } else if let key = Key(QWERTYKeyCode: keyCode) {
+                    let keyChar = (Sauce.shared.character(by: Int(Sauce.shared.keyCode(by: key)), carbonModifiers: 0) ?? "").uppercased()
+                    menuItem.keyEquivalent = keyChar
                 }
-                menuItem.keyEquivalentModifierMask = KeyTransformer.cocoaFlags(from: modifiers)
+                menuItem.keyEquivalentModifierMask = modifiers.convertSupportCocoaModifiers()
             } else {
                 menuItem.keyEquivalent = ""
             }
