@@ -6,9 +6,10 @@
 //  Copyright © 2019 Alin. All rights reserved.
 //
 
-import Carbon.HIToolbox
+import Cocoa
 import KeyHolder
 import Magnet
+import Sauce
 
 class HotkeyView: RecordView, RecordViewDelegate {
     var hoverState: HoverState = .noHover
@@ -59,7 +60,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     func recordView(_: RecordView, canRecordKeyCombo combo: KeyCombo) -> Bool {
-        if combo.keyCode == kVK_Space {
+        if combo.QWERTYKeyCode == Key.space.QWERTYKeyCode {
             return false
         }
         return !combo.doubledModifiers
@@ -82,7 +83,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
         hotkey.register()
 
         if let checkbox = preciseHotkeyCheckbox {
-            if KeyTransformer.cocoaFlags(from: keyCombo.modifiers).contains(.option) {
+            if keyCombo.modifiers.convertSupportCocoaModifiers().contains(.option) {
                 checkbox.isEnabled = false
                 checkbox.toolTip = fineAdjustmentDisabledBecauseOfOptionKey
             } else {
@@ -95,12 +96,12 @@ class HotkeyView: RecordView, RecordViewDelegate {
             Hotkey.keys[identifier] = hotkey
             hotkeys[identifier]?[.enabled] = 1
             hotkeys[identifier]?[.modifiers] = keyCombo.modifiers
-            hotkeys[identifier]?[.keyCode] = keyCombo.keyCode
+            hotkeys[identifier]?[.keyCode] = keyCombo.QWERTYKeyCode
             datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
         }
     }
 
-    open override func mouseDown(with theEvent: NSEvent) {
+    override open func mouseDown(with theEvent: NSEvent) {
         window?.makeFirstResponder(self)
         super.mouseDown(with: theEvent)
     }
@@ -117,11 +118,11 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     func isHotkeyCheckboxEnabled(_ hk: [HotkeyPart: Int]) -> Bool {
-        (hk[.enabled] ?? 1) == 1 && !KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option)
+        (hk[.enabled] ?? 1) == 1 && !(hk[.modifiers] ?? 0).convertSupportCocoaModifiers().contains(.option)
     }
 
     func hotkeyCheckboxTooltip(_ hk: [HotkeyPart: Int]) -> String? {
-        if KeyTransformer.cocoaFlags(from: hk[.modifiers] ?? 0).contains(.option) {
+        if (hk[.modifiers] ?? 0).convertSupportCocoaModifiers().contains(.option) {
             return fineAdjustmentDisabledBecauseOfOptionKey
         } else {
             return nil

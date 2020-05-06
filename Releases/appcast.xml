@@ -267,9 +267,18 @@
             <title>3.2.2</title>
             <pubDate>Tue, 28 Apr 2020 22:12:39 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
-            <enclosure length="16300358" sparkle:dsaSignature="MEQCIGAAe3TEg+FAi8Fqz4f1CGrgsybMVLESPDB8MUre+A0KAiBj5phy7H8J2Y+Yi9vp/px87zBAQR7QsdFEt8GIcAr4hQ==" sparkle:edSignature="vkLh4a+Bdqg+uP9XDE4y8j0T1Zo43foMM5PbFvXFrrO86LiUykJv0epd2TmEXIOt/6Nw3i7rAKPSWqHjfTn3Dg==" sparkle:shortVersionString="3.2.2" sparkle:version="3.2.2" type="application/octet-stream" url="https://lunar.fyi/download/3.2.2"/>
+            <enclosure length="16300358" sparkle:dsaSignature="MEUCIQCjme2DBQb24JesBRTlVminoj+rJi4YeGmU4ALfrUochwIgV2JytoujKIalihU282KN0+ytEfYoi7uZzqW4DxcwWDY=" sparkle:edSignature="vkLh4a+Bdqg+uP9XDE4y8j0T1Zo43foMM5PbFvXFrrO86LiUykJv0epd2TmEXIOt/6Nw3i7rAKPSWqHjfTn3Dg==" sparkle:shortVersionString="3.2.2" sparkle:version="3.2.2" type="application/octet-stream" url="https://lunar.fyi/download/3.2.2"/>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix tooltip not closing when clicking on the display page</li></ul><h2 id="improvements">Improvements</h2><ul><li>Detect scrolling direction so that scrolling up always increases value</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.2.3</title>
+            <pubDate>Tue, 05 May 2020 20:48:53 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="3.2.3" sparkle:version="3.2.3" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Show built-in brightness in menu</li><li>Update hotkey libraries</li><li>Use Swift Package Manager for most of the frameworks</li><li>Use LaunchAtLogin framework to fix start at login</li></ul></div></div>]]>
             </description>
         </item>
     </channel>

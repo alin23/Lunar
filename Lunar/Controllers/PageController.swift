@@ -181,8 +181,8 @@ class PageController: NSPageController {
         log.debug("Setting up left and right arrow keys")
 
         disableLeftRightHotkeys()
-        if let leftKeyCombo = KeyCombo(keyCode: kVK_LeftArrow, carbonModifiers: 0),
-            let rightKeyCombo = KeyCombo(keyCode: kVK_RightArrow, carbonModifiers: 0) {
+        if let leftKeyCombo = KeyCombo(key: .leftArrow, carbonModifiers: 0),
+            let rightKeyCombo = KeyCombo(key: .rightArrow, carbonModifiers: 0) {
             leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
             rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
 
