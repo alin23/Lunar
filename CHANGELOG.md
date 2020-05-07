@@ -1,3 +1,10 @@
+# 3.2.3
+## Improvements
+
+- Show built-in brightness in menu
+- Update hotkey libraries
+- Use Swift Package Manager for most of the frameworks
+- Use LaunchAtLogin framework to fix start at login
 # 3.2.2
 ## Fixes
 
