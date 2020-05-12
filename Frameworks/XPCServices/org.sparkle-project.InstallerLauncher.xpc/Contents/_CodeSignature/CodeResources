@@ -10,19 +10,19 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			3FB7A4HIgHLWdOBpuKJvQCfHzDU=
+			AwhXEl1VGfjJDar2XTXjCj46k+A=
 			</data>
 			<key>requirement</key>
-			<string>identifier Autoupdate and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = RDDXV84A73</string>
+			<string>cdhash H"70b51fe921895c6af72118b66beb75885e3e47e9" or cdhash H"030857125d5519f8c90daaf65d35e30a3e3a93e0"</string>
 		</dict>
 		<key>MacOS/Updater.app</key>
 		<dict>
 			<key>cdhash</key>
 			<data>
-			q9oTW1JNd7j0PpW5z2H6Lr+jxcc=
+			d3WIUJ68PB6k9ONB8f7XBkiDNlQ=
 			</data>
 			<key>requirement</key>
-			<string>identifier "org.sparkle-project.Sparkle.Updater" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = RDDXV84A73</string>
+			<string>cdhash H"62fe6ddd1b67258d3d554fe834d34e97bf9717d1" or cdhash H"777588509ebc3c1ea4f4e341f1fed70648833654"</string>
 		</dict>
 	</dict>
 	<key>rules</key>
