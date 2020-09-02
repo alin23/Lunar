@@ -721,7 +721,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         configureAlamofire()
-        sendAnalytics()
+        // sendAnalytics()
         startReceivingSignificantLocationChanges()
         log.debug("App finished launching")
     }
@@ -973,7 +973,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     URL(
                         string:
                         "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D"
-                    )!)
+                )!)
             }
         }
     }
