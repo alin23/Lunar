@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire",
         "state": {
           "branch": null,
-          "revision": "fca036f7aeca07124067cb6e0c12b0ad6359e3d4",
-          "version": "5.1.0"
+          "revision": "becd9a729a37bdbef5bc39dc3c702b99f9e3d046",
+          "version": "5.2.2"
         }
       },
       {
@@ -42,26 +42,44 @@
         "repositoryURL": "https://github.com/iwasrobbed/Down",
         "state": {
           "branch": null,
-          "revision": "2aada56e6a0a5593a58e1ad583bd605b6d0b58dd",
-          "version": "0.9.2"
+          "revision": "427aec0a0ab342246ec02369dea398597b61174a",
+          "version": "0.9.3"
         }
       },
       {
         "package": "KeyHolder",
-        "repositoryURL": "https://github.com/alin23/KeyHolder",
+        "repositoryURL": "https://github.com/Clipy/KeyHolder",
         "state": {
           "branch": null,
-          "revision": "5c0f1c32c9e7a1f53d6b9d079e0ae2fa40ec79fc",
-          "version": null
+          "revision": "cef9049e47ab9b038e23c2c41e70726d25a97875",
+          "version": "4.0.0"
+        }
+      },
+      {
+        "package": "LaunchAtLogin",
+        "repositoryURL": "https://github.com/sindresorhus/LaunchAtLogin",
+        "state": {
+          "branch": null,
+          "revision": "0f39982b9d6993eef253b81219d3c39ba1e680f3",
+          "version": "4.0.0"
         }
       },
       {
         "package": "Magnet",
-        "repositoryURL": "https://github.com/alin23/Magnet",
+        "repositoryURL": "https://github.com/Clipy/Magnet",
         "state": {
-          "branch": "master",
-          "revision": "127a19b47f5f5e9f421c3a5f821582ea00f15b82",
-          "version": null
+          "branch": null,
+          "revision": "fbf67cebb2ab6b99786f2b046fbad8fba8524889",
+          "version": "3.2.0"
+        }
+      },
+      {
+        "package": "MediaKeyTap",
+        "repositoryURL": "https://github.com/alin23/MediaKeyTap",
+        "state": {
+          "branch": null,
+          "revision": "65d019d17de3e37c52ba22945fc45858688774c3",
+          "version": "3.1.1"
         }
       },
       {
@@ -69,8 +87,8 @@
         "repositoryURL": "https://github.com/Clipy/Sauce",
         "state": {
           "branch": null,
-          "revision": "a06f28c6246c0c8a0835c5427f6b169484955a1a",
-          "version": "2.0.2"
+          "revision": "60508229cecbb915866151ebe9a0bf060a454c84",
+          "version": "2.1.0"
         }
       },
       {
@@ -78,8 +96,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "7ec74a730bf7c39376df9055151704041ea55cfa",
-          "version": "5.0.0"
+          "revision": "80928b7e19a713fea798ba45c8bfda38096d7f30",
+          "version": "5.2.2"
         }
       },
       {
@@ -89,6 +107,15 @@
           "branch": null,
           "revision": "939f125badb2bc5012c5a8f651a7dbab96868a13",
           "version": "2.3.3"
+        }
+      },
+      {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/alin23/Sparkle",
+        "state": {
+          "branch": null,
+          "revision": "9f55cb29c8ca131906bcc0fe12e8b1996001d2a7",
+          "version": "1.24.0"
         }
       },
       {

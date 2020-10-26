@@ -77,8 +77,11 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewDidEndRecording(_: RecordView) {}
 
-    func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo) {
+    func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
         hotkey.unregister()
+        guard let keyCombo = keyCombo else {
+            return
+        }
         hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
         hotkey.register()
 

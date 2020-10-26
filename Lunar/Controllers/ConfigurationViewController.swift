@@ -359,6 +359,12 @@ class ConfigurationViewController: NSViewController {
 
         var refX: CGFloat
         switch adaptiveMode {
+        case .sensor:
+            log.info("Sensor mode")
+            let refFrame1 = contrastLimitMinField.frame
+            let refFrame2 = contrastLimitMaxField.frame
+            let width = refFrame2.maxX - refFrame1.minX
+            refX = refFrame2.maxX - (width / 2)
         case .manual:
             let refFrame1 = contrastLimitMinField.frame
             let refFrame2 = contrastLimitMaxField.frame

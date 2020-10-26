@@ -87,14 +87,13 @@ class HelpButton: NSButton {
         addTrackingArea(trackingArea)
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        if !isEnabled { return }
-
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-        alphaValue = 0.7
-        shadow = buttonShadow
-
+    override func mouseDown(with _: NSEvent) {
         guard let popover = helpPopover else { return }
+
+        if popover.isShown {
+            popover.close()
+            return
+        }
 
         if let c = popover.contentViewController as? HelpPopoverController, !helpText.isEmpty, let parsedHelpText = getParsedHelpText() {
             c.helpTextField?.attributedStringValue = parsedHelpText
@@ -108,6 +107,14 @@ class HelpButton: NSButton {
             popover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
             popover.becomeFirstResponder()
         }
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        if !isEnabled { return }
+
+        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        alphaValue = 0.7
+        shadow = buttonShadow
 
         onMouseEnter?()
     }

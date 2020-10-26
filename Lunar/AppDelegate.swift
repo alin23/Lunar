@@ -47,7 +47,7 @@ let concurrentQueue = DispatchQueue(label: "site.lunarapp.concurrent.queue.fg", 
 let serialQueue = DispatchQueue(label: "site.lunarapp.serial.queue.fg", qos: .userInitiated, target: .global())
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
-let TEST_MODE = false
+let TEST_MODE = true
 let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
 let TRANSFER_URL = "https://transfer.sh"
 let LOG_UPLOAD_URL = "https://log.lunar.fyi/upload"
@@ -372,6 +372,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         syncThread?.cancel()
 
         switch mode {
+        case .sensor:
+            log.info("Sensor mode")
         case .location:
             log.debug("Started BrightnessAdapter in Location mode")
             builtinBrightnessMenuItem.isHidden = true
@@ -796,6 +798,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     static func getToggleMenuItemTitle() -> String {
         switch brightnessAdapter.mode {
+        case .sensor:
+            log.info("Sensor mode")
+            return "Sensor mode"
         case .location:
             return "Adapt brightness based on built-in display"
         case .sync:
@@ -807,6 +812,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     static func getStateMenuItemTitle() -> String {
         switch brightnessAdapter.mode {
+        case .sensor:
+            log.info("Sensor mode")
+            return "Sensor Mode"
         case .location:
             return "☀️ Location Mode"
         case .sync:
@@ -819,8 +827,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func resetElements() {
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
         if let splitView = windowController?.window?.contentViewController as? SplitViewController {
-            splitView.activeStateButton?.setNeedsDisplay()
-            splitView.setHelpButtonText()
+            for button in splitView.buttons {
+                button?.setNeedsDisplay()
+            }
         }
     }
 

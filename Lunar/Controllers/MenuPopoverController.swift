@@ -293,6 +293,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 let adaptiveMode = AdaptiveMode(rawValue: mode)!
                 self.grayAllButtons()
                 switch adaptiveMode {
+                case .sensor:
+                    log.info("Sensor mode")
                 case .sync:
                     self.syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
                     self.syncModeButton.state = .on

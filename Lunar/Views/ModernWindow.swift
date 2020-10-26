@@ -31,6 +31,9 @@ class ModernWindow: WAYWindow {
         trafficLightButtonsLeftMargin = 20
         trafficLightButtonsTopMargin = 0
         hideTitleBarInFullScreen = false
+        if let v = titlebarAccessoryViewControllers[0].parent?.view.subviews[3] {
+            v.frame = NSRect(x: 0, y: 0, width: 100, height: v.frame.height)
+        }
 
         setContentBorderThickness(0.0, for: NSRectEdge.minY)
         setAutorecalculatesContentBorderThickness(false, for: NSRectEdge.minY)

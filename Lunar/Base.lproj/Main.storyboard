@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -402,12 +402,17 @@
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="843" y="654" width="90" height="14"/>
+                                <rect key="frame" x="718" y="660" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Start      ⚫︎" alternateTitle="Pause    ⚫︎" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
+                                <buttonCell key="cell" type="inline" title="Sync" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
+                                        <integer key="value" value="-1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="zyO-27-aZX"/>
                                 </connections>
@@ -422,7 +427,7 @@
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Q7P-1h-Rui" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="819" y="658" width="16" height="16"/>
+                                <rect key="frame" x="694" y="663" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -434,14 +439,107 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-Kc-CPS" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="718" y="630" width="90" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Location" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0VI-cN-HOF">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
+                                        <integer key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="ORM-cW-q26"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XHf-be-ftM" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="818" y="660" width="90" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Manual" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0wA-nk-IcH">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="FWI-7z-j0H"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cwA-Ed-SH4" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="818" y="630" width="90" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Sensor" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="jh5-zX-fak">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="D20-mH-b99"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Ljd-VW-9qI" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="694" y="633" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="2Po-LR-RUW">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="xzi-j7-mze" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="914" y="663" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="MFj-wl-fsF">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EUE-bb-uAi" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="914" y="633" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="mMH-jh-2aZ">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="activeStateButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
-                        <outlet property="helpButton" destination="Q7P-1h-Rui" id="GHD-xb-1me"/>
+                        <outlet property="locationHelpButton" destination="Ljd-VW-9qI" id="bJ1-PE-vDW"/>
+                        <outlet property="locationModeButton" destination="mb8-Kc-CPS" id="wJg-Rg-8s3"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
+                        <outlet property="manualHelpButton" destination="xzi-j7-mze" id="x2m-RD-jqB"/>
+                        <outlet property="manualModeButton" destination="XHf-be-ftM" id="uvA-dD-VRP"/>
                         <outlet property="navigationHelpButton" destination="uR5-yb-Ejb" id="Ydl-kz-EaV"/>
+                        <outlet property="sensorHelpButton" destination="EUE-bb-uAi" id="7rs-Vd-iG6"/>
+                        <outlet property="sensorModeButton" destination="cwA-Ed-SH4" id="Gy5-t8-2Y6"/>
+                        <outlet property="syncHelpButton" destination="Q7P-1h-Rui" id="GHD-xb-1me"/>
+                        <outlet property="syncModeButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
                     </connections>
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1463,7 +1561,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="50" headerView="cFY-MQ-0nz" viewBased="YES" id="fw1-Tz-zwm" customClass="ExceptionsView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="442" height="299"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="466" height="299"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -1482,7 +1580,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="02C-la-JmE">
-                                                            <rect key="frame" x="0.0" y="10" width="18" height="50"/>
+                                                            <rect key="frame" x="10" y="10" width="24" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="GDa-lA-NYA" customClass="RemoveAppButton" customModule="Lunar" customModuleProvider="target">
@@ -1517,7 +1615,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="RB2-V9-vwF">
-                                                            <rect key="frame" x="18" y="10" width="256" height="50"/>
+                                                            <rect key="frame" x="34" y="10" width="256" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bPk-JH-iHh">
@@ -1556,7 +1654,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="WvX-GE-Jy3">
-                                                            <rect key="frame" x="274" y="10" width="80" height="50"/>
+                                                            <rect key="frame" x="290" y="10" width="80" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbm-hq-sAY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -1618,11 +1716,11 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="AbE-RR-q5I">
-                                                            <rect key="frame" x="354" y="10" width="80" height="50"/>
+                                                            <rect key="frame" x="370" y="10" width="86" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuS-ce-rej" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="9" width="80" height="40"/>
+                                                                    <rect key="frame" x="0.0" y="9" width="86" height="40"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="JvL-0T-le7">
                                                                         <font key="font" metaFont="systemHeavy" size="34"/>
@@ -1683,8 +1781,8 @@
                                     <rect key="frame" x="-100" y="-100" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <tableHeaderView key="headerView" hidden="YES" id="cFY-MQ-0nz">
-                                    <rect key="frame" x="0.0" y="0.0" width="442" height="25"/>
+                                <tableHeaderView key="headerView" hidden="YES" wantsLayer="YES" id="cFY-MQ-0nz">
+                                    <rect key="frame" x="0.0" y="0.0" width="466" height="25"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
@@ -1707,7 +1805,7 @@
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="eal-ql-8ai">
-                                <rect key="frame" x="222" y="185" width="30" height="30"/>
+                                <rect key="frame" x="222" y="185.5" width="30.5" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2130,7 +2228,6 @@ to view other displays</string>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="adaptiveButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                         <outlet property="adaptiveHelpButton" destination="nL9-e5-L5B" id="wyI-Nu-1gr"/>
                         <outlet property="algorithmText" destination="hY5-kW-cR0" id="4Po-MT-wYv"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
@@ -2146,6 +2243,7 @@ to view other displays</string>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                         <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="gBY-gE-aP5"/>
                         <outlet property="swipeRightHint" destination="0WE-QT-onu" id="ULx-5C-kkg"/>
+                        <outlet property="syncModeButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                     </connections>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -2491,7 +2589,7 @@ to view other displays</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="50" headerView="CaJ-7q-1E4" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="95"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="432" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -2510,7 +2608,7 @@ to view other displays</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="HbC-w6-tw4">
-                                                            <rect key="frame" x="0.0" y="10" width="130" height="75"/>
+                                                            <rect key="frame" x="10" y="10" width="136" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbk-Gm-ehs" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -2573,7 +2671,7 @@ to view other displays</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="sUH-3g-BTj">
-                                                            <rect key="frame" x="130" y="10" width="140" height="75"/>
+                                                            <rect key="frame" x="146" y="10" width="140" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">
@@ -2653,11 +2751,11 @@ to view other displays</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="hLc-sr-Ed2">
-                                                            <rect key="frame" x="270" y="10" width="130" height="75"/>
+                                                            <rect key="frame" x="286" y="10" width="136" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PGj-3n-v5y" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="45" width="120" height="40"/>
+                                                                    <rect key="frame" x="0.0" y="45" width="126" height="40"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="yp6-jZ-5G7">
                                                                         <font key="font" metaFont="systemHeavy" size="40"/>
@@ -2719,8 +2817,8 @@ to view other displays</string>
                                     <rect key="frame" x="-100" y="-100" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <tableHeaderView key="headerView" hidden="YES" id="CaJ-7q-1E4">
-                                    <rect key="frame" x="0.0" y="0.0" width="400" height="25"/>
+                                <tableHeaderView key="headerView" hidden="YES" wantsLayer="YES" id="CaJ-7q-1E4">
+                                    <rect key="frame" x="0.0" y="0.0" width="432" height="25"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
@@ -2783,7 +2881,7 @@ to view other displays</string>
     <resources>
         <image name="Display" width="250" height="211"/>
         <image name="Moon" width="391" height="390"/>
-        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSAddTemplate" width="14" height="13"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>
     </resources>

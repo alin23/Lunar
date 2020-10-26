@@ -48,7 +48,10 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var displayView: DisplayView?
     @IBOutlet var displayName: DisplayName?
-    @IBOutlet var adaptiveButton: NSButton?
+    @IBOutlet var syncModeButton: NSButton?
+    @IBOutlet var locationModeButton: NSButton?
+    @IBOutlet var manualModeButton: NSButton?
+    @IBOutlet var sensorModeButton: NSButton?
 
     @IBOutlet var brightnessRangeButton: NSButton?
     @IBOutlet var algorithmText: NSTextField?
@@ -97,7 +100,7 @@ class DisplayViewController: NSViewController {
     var viewID: String?
 
     func setAdaptiveButtonEnabled(_ enabled: Bool) {
-        guard let adaptiveButton = adaptiveButton else { return }
+        guard let adaptiveButton = syncModeButton else { return }
 
         adaptiveButton.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
         adaptiveButton.isEnabled = enabled
@@ -113,7 +116,7 @@ class DisplayViewController: NSViewController {
                 return
             }
         } else {
-            adaptiveButton.layer?.backgroundColor = darkMauve.cgColor
+            adaptiveButton.layer?.backgroundColor = darkMauve.withAlphaComponent(0.2).cgColor
         }
     }
 
@@ -126,7 +129,7 @@ class DisplayViewController: NSViewController {
     }
 
     func setButtonsHidden(_ hidden: Bool) {
-        adaptiveButton?.isHidden = hidden
+        syncModeButton?.isHidden = hidden
         adaptiveHelpButton?.isHidden = hidden
         algorithmText?.isHidden = hidden
 
@@ -161,9 +164,9 @@ class DisplayViewController: NSViewController {
         }
 
         if display.adaptive {
-            adaptiveButton?.state = .on
+            syncModeButton?.state = .on
         } else {
-            adaptiveButton?.state = .off
+            syncModeButton?.state = .off
         }
         if display.extendedBrightnessRange {
             brightnessRangeButton?.state = .on
@@ -364,7 +367,7 @@ class DisplayViewController: NSViewController {
 
     func listenForAdaptiveChange() {
         adaptiveObserver = { [weak self] newAdaptive, oldValue in
-            if let self = self, let button = self.adaptiveButton, let display = self.display {
+            if let self = self, let button = self.syncModeButton, let display = self.display {
                 runInMainThread { [weak self] in
                     guard let self = self else { return }
                     if newAdaptive {
@@ -409,7 +412,7 @@ class DisplayViewController: NSViewController {
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
                     self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
 
-                    textField.isHidden = !(self.adaptiveButton?.isHidden ?? false)
+                    textField.isHidden = !(self.syncModeButton?.isHidden ?? false)
                 }
             }
         }
@@ -476,7 +479,7 @@ class DisplayViewController: NSViewController {
             scrollableBrightness?.display = display
             scrollableContrast?.display = display
 
-            initToggleButton(adaptiveButton, helpButton: adaptiveHelpButton, buttonColors: adaptiveButtonColors)
+            initToggleButton(syncModeButton, helpButton: adaptiveHelpButton, buttonColors: adaptiveButtonColors)
             initToggleButton(brightnessRangeButton, helpButton: brightnessRangeHelpButton, buttonColors: brightnessRangeButtonColors)
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor

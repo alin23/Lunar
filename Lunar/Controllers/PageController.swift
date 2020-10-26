@@ -166,7 +166,7 @@ class PageController: NSPageController {
             arrangedObjects.append(contentsOf: displays)
         } else {
             if TEST_MODE {
-                arrangedObjects.append(TEST_DISPLAY)
+                arrangedObjects.append(TEST_DISPLAY())
             }
             arrangedObjects.append(GENERIC_DISPLAY)
         }

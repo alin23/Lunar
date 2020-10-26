@@ -86,6 +86,8 @@ class BrightnessContrastChartView: LineChartView {
             }
         } else if let display = display {
             switch adaptiveMode {
+            case .sensor:
+                log.info("Sensor mode")
             case .location:
                 brightnessChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
                 contrastChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)

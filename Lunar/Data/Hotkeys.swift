@@ -7,6 +7,7 @@
 //
 
 import AMCoreAudio
+import AppKit
 import Carbon.HIToolbox
 import Magnet
 import MediaKeyTap

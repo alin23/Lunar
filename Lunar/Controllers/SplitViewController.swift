@@ -13,6 +13,13 @@ let NOTE_TEXT = """
 
 **Note:** The same logic applies for both brightness and contrast
 """
+let SENSOR_HELP_TEXT = """
+# Sensor Mode
+
+To do..
+
+\(NOTE_TEXT)
+"""
 let LOCATION_HELP_TEXT = """
 # Location Mode
 
@@ -119,35 +126,45 @@ class SplitViewController: NSSplitViewController {
     var activeTitleHover: NSMutableAttributedString?
 
     @IBOutlet var logo: NSTextField?
-    @IBOutlet var activeStateButton: ToggleButton?
+    @IBOutlet var syncModeButton: ToggleButton?
+    @IBOutlet var locationModeButton: ToggleButton?
+    @IBOutlet var manualModeButton: ToggleButton?
+    @IBOutlet var sensorModeButton: ToggleButton?
+
     @IBOutlet var containerView: NSView?
-    @IBOutlet var helpButton: HelpButton!
+
+    @IBOutlet var syncHelpButton: HelpButton!
+    @IBOutlet var locationHelpButton: HelpButton!
+    @IBOutlet var manualHelpButton: HelpButton!
+    @IBOutlet var sensorHelpButton: HelpButton!
     @IBOutlet var navigationHelpButton: HelpButton!
 
-    @IBAction func toggleBrightnessAdapter(sender _: NSButton?) {
-        brightnessAdapter.toggle()
+    var buttons: [ToggleButton?] {
+        return [syncModeButton, locationModeButton, manualModeButton, sensorModeButton]
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        activeStateButton?.hover()
-    }
+    @IBAction func toggleBrightnessAdapter(sender button: ToggleButton?) {
+        if let button = button, let mode = AdaptiveMode(rawValue: button.mode) {
+            brightnessAdapter.mode = mode
 
-    override func mouseExited(with _: NSEvent) {
-        activeStateButton?.defocus()
+            for button in buttons {
+                button?.fade(mode)
+            }
+        }
     }
 
     func setHelpButtonText() {
-        switch brightnessAdapter.mode {
-        case .location:
-            helpButton?.helpText = LOCATION_HELP_TEXT
-            helpButton?.link = "https://ipstack.com"
-        case .sync:
-            helpButton?.helpText = SYNC_HELP_TEXT
-            helpButton?.link = nil
-        case .manual:
-            helpButton?.helpText = MANUAL_HELP_TEXT
-            helpButton?.link = nil
-        }
+        sensorHelpButton?.helpText = SENSOR_HELP_TEXT
+        sensorHelpButton?.link = nil
+
+        locationHelpButton?.helpText = LOCATION_HELP_TEXT
+        locationHelpButton?.link = "https://ipstack.com"
+
+        syncHelpButton?.helpText = SYNC_HELP_TEXT
+        syncHelpButton?.link = nil
+
+        manualHelpButton?.helpText = MANUAL_HELP_TEXT
+        manualHelpButton?.link = nil
     }
 
     func hasWhiteBackground() -> Bool {
@@ -162,8 +179,10 @@ class SplitViewController: NSSplitViewController {
             logo.textColor = logoColor
             logo.stringValue = "LUNAR"
         }
-        activeStateButton?.page = .display
-        activeStateButton?.fade()
+        for button in buttons {
+            button?.page = .display
+            button?.fade()
+        }
         helpPopover?.appearance = NSAppearance(named: .vibrantLight)
     }
 
@@ -174,8 +193,11 @@ class SplitViewController: NSSplitViewController {
             logo.textColor = bgColor
             logo.stringValue = "LUNAR"
         }
-        activeStateButton?.page = .settings
-        activeStateButton?.fade()
+
+        for button in buttons {
+            button?.page = .settings
+            button?.fade()
+        }
         helpPopover?.appearance = NSAppearance(named: .vibrantLight)
     }
 
@@ -186,8 +208,10 @@ class SplitViewController: NSSplitViewController {
             logo.textColor = logoColor
             logo.stringValue = "HOTKEYS"
         }
-        activeStateButton?.page = .hotkeys
-        activeStateButton?.fade()
+        for button in buttons {
+            button?.page = .hotkeys
+            button?.fade()
+        }
         helpPopover?.appearance = NSAppearance(named: .vibrantDark)
     }
 

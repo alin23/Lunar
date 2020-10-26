@@ -54,6 +54,8 @@ class SettingsPageController: NSViewController {
         }
 
         switch brightnessAdapter.mode {
+        case .sensor:
+            log.info("Sensor mode")
         case .location:
             let maxValues = brightnessContrastChart.maxValuesLocation
             let steps = brightnessContrastChart.interpolationValues

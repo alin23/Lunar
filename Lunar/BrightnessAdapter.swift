@@ -20,6 +20,7 @@ enum AdaptiveMode: Int {
     case location = 1
     case sync = -1
     case manual = 0
+    case sensor = 2
 }
 
 class BrightnessAdapter {
@@ -130,6 +131,8 @@ class BrightnessAdapter {
 
     func toggle() {
         switch mode {
+        case .sensor:
+            log.info("Sensor mode")
         case .location:
             if builtinDisplay != nil, !IsLidClosed() {
                 datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
@@ -239,15 +242,15 @@ class BrightnessAdapter {
             guard let self = self else { return }
             for display in self.displays.values {
                 if display.isUltraFine() {
-                    scope.setTag(value: true, key: "ultrafine")
+                    scope.setTag(value: "true", key: "ultrafine")
                     continue
                 }
                 if display.isThunderbolt() {
-                    scope.setTag(value: true, key: "thunderbolt")
+                    scope.setTag(value: "true", key: "thunderbolt")
                     continue
                 }
                 if display.isLEDCinema() {
-                    scope.setTag(value: true, key: "ledcinema")
+                    scope.setTag(value: "true", key: "ledcinema")
                     continue
                 }
             }
@@ -263,6 +266,9 @@ class BrightnessAdapter {
         }
 
         switch mode {
+        case .sensor:
+            log.info("Sensor mode")
+            return "Sensor"
         case .manual:
             return "Manual"
         case .location:
@@ -291,7 +297,7 @@ class BrightnessAdapter {
         log.info("Lid closed: \(lidClosed)")
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self else { return }
-            scope.setTag(value: self.lidClosed, key: "clamshellMode")
+            scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
         }
 
         if datastore.defaults.clamshellModeDetection {

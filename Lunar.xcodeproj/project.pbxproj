@@ -3,11 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
+		C701A2342546B9F4004747B5 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = C701A2332546B9F4004747B5 /* LaunchAtLogin */; };
+		C701A2392546BA3A004747B5 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C701A2382546BA3A004747B5 /* KeyHolder */; };
+		C701A23C2546BA41004747B5 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23B2546BA41004747B5 /* Magnet */; };
+		C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23E2546C8BF004747B5 /* MediaKeyTap */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
 		C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DAE2440DBB0002289E5 /* Alamofire */; };
 		C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB12440DC5E002289E5 /* SwiftyBeaver */; };
@@ -28,14 +32,7 @@
 		C73CC6A5246161E6003B2658 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A4246161E6003B2658 /* Charts */; };
 		C73CC6A824616359003B2658 /* AMCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A724616359003B2658 /* AMCoreAudio */; };
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
-		C73CC6B024616748003B2658 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */; };
-		C73CC6B124616748003B2658 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C73CC6B42461879A003B2658 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */; };
-		C73CC6B5246187A9003B2658 /* MediaKeyTap.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */; };
-		C73CC6BB24618988003B2658 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6BA24618988003B2658 /* KeyHolder */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
-		C75083402222865F0020270E /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
-		C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083542222865F0020270E /* NSPageControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; };
 		C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750833E2222865E0020270E /* NSPageControl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
@@ -47,6 +44,9 @@
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
+		C77000122546E5C1005131FB /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C77000112546E5C1005131FB /* Sparkle */; };
+		C77000142546E8E4005131FB /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; };
+		C77000152546E8E4005131FB /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C75083342222865D0020270E /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
@@ -54,11 +54,6 @@
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C7816BD82406A17200C30975 /* NonResponsiveDDCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
-		C79224182360BA030037B559 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C79224172360BA030037B559 /* Sparkle.framework */; };
-		C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C79224172360BA030037B559 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C792241D2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C792241E2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C792241F2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
@@ -72,8 +67,6 @@
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
-		C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; };
-		C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E4862401C35800A48347 /* MediaKeyTap.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
 		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
@@ -84,11 +77,9 @@
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
-		C7C6A7A32461C23F00048D7B /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C7C6A7A22461C23F00048D7B /* Magnet */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
-		C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
@@ -115,26 +106,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C79224192360BA030037B559 /* Sparkle.framework in Embed Frameworks */,
-				C75083412222865F0020270E /* WAYWindow.framework in Embed Frameworks */,
-				C73CC6B124616748003B2658 /* LaunchAtLogin.framework in Embed Frameworks */,
+				C77000152546E8E4005131FB /* WAYWindow.framework in Embed Frameworks */,
 				C75083552222865F0020270E /* NSPageControl.framework in Embed Frameworks */,
-				C7B9E4902401C3A400A48347 /* MediaKeyTap.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C79224202360BA120037B559 /* Embed XPC Services */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
-			dstSubfolderSpec = 16;
-			files = (
-				C792241E2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc in Embed XPC Services */,
-				C792241F2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc in Embed XPC Services */,
-				C792241D2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */,
-			);
-			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C7A2BDDE22411E2400C910E3 /* CopyFiles */ = {
@@ -143,10 +118,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				C73CC6B42461879A003B2658 /* LaunchAtLogin.framework.dSYM in CopyFiles */,
 				C7A2BDF722411E9500C910E3 /* NSPageControl.framework.dSYM in CopyFiles */,
-				C73CC6B5246187A9003B2658 /* MediaKeyTap.framework.dSYM in CopyFiles */,
-				C7CBF00B238EC8F700031E93 /* Sparkle.framework.dSYM in CopyFiles */,
 				C7A2BDF022411E9500C910E3 /* WAYWindow.framework.dSYM in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -169,8 +141,6 @@
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
-		C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LaunchAtLogin.framework; sourceTree = "<group>"; };
-		C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75083342222865D0020270E /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WAYWindow.framework; sourceTree = "<group>"; };
 		C750833E2222865E0020270E /* NSPageControl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NSPageControl.framework; sourceTree = "<group>"; };
@@ -193,10 +163,6 @@
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonResponsiveDDCTextField.swift; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		C79224172360BA030037B559 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerLauncher.xpc"; path = "XPCServices/org.sparkle-project.InstallerLauncher.xpc"; sourceTree = "<group>"; };
-		C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerStatus.xpc"; path = "XPCServices/org.sparkle-project.InstallerStatus.xpc"; sourceTree = "<group>"; };
-		C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.xpc-service"; name = "org.sparkle-project.InstallerConnection.xpc"; path = "XPCServices/org.sparkle-project.InstallerConnection.xpc"; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
@@ -214,8 +180,6 @@
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
-		C7B9E4862401C35800A48347 /* MediaKeyTap.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MediaKeyTap.framework; sourceTree = "<group>"; };
-		C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = MediaKeyTap.framework.dSYM; sourceTree = "<group>"; };
 		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
@@ -229,7 +193,6 @@
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
-		C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Sparkle.framework.dSYM; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
 		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -248,27 +211,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C77000122546E5C1005131FB /* Sparkle in Frameworks */,
 				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
-				C73CC6B024616748003B2658 /* LaunchAtLogin.framework in Frameworks */,
-				C7C6A7A32461C23F00048D7B /* Magnet in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
-				C79224182360BA030037B559 /* Sparkle.framework in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
+				C701A23C2546BA41004747B5 /* Magnet in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
+				C701A2342546B9F4004747B5 /* LaunchAtLogin in Frameworks */,
 				C73CC6A824616359003B2658 /* AMCoreAudio in Frameworks */,
+				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
+				C77000142546E8E4005131FB /* WAYWindow.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
-				C73CC6BB24618988003B2658 /* KeyHolder in Frameworks */,
-				C75083402222865F0020270E /* WAYWindow.framework in Frameworks */,
-				C7B9E48F2401C3A400A48347 /* MediaKeyTap.framework in Frameworks */,
 				C73CC6A224615F3C003B2658 /* Down in Frameworks */,
+				C701A2392546BA3A004747B5 /* KeyHolder in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,22 +391,13 @@
 			isa = PBXGroup;
 			children = (
 				C730421E2407E92C0016E591 /* Headers */,
-				C73CC6B224616786003B2658 /* LaunchAtLogin.framework.dSYM */,
-				C7B9E4882401C35800A48347 /* MediaKeyTap.framework.dSYM */,
 				C7A2BDEA22411E9500C910E3 /* NSPageControl.framework.dSYM */,
-				C7CBF009238EC8DC00031E93 /* Sparkle.framework.dSYM */,
 				C7A2BDE322411E9400C910E3 /* WAYWindow.framework.dSYM */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
-				C73CC6AF24616748003B2658 /* LaunchAtLogin.framework */,
-				C7B9E4862401C35800A48347 /* MediaKeyTap.framework */,
 				C750833E2222865E0020270E /* NSPageControl.framework */,
 				C7B9E47F2401767E00A48347 /* OSD.framework */,
-				C79224172360BA030037B559 /* Sparkle.framework */,
 				C75083342222865D0020270E /* WAYWindow.framework */,
-				C792241C2360BA120037B559 /* org.sparkle-project.InstallerConnection.xpc */,
-				C792241A2360BA120037B559 /* org.sparkle-project.InstallerLauncher.xpc */,
-				C792241B2360BA120037B559 /* org.sparkle-project.InstallerStatus.xpc */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -470,7 +424,6 @@
 				C75083582222865F0020270E /* Embed Frameworks */,
 				C73CC69C24615915003B2658 /* ShellScript */,
 				C7A2BDDE22411E2400C910E3 /* CopyFiles */,
-				C79224202360BA120037B559 /* Embed XPC Services */,
 				C78B9223237ED34E0060DC7C /* Run Script */,
 			);
 			buildRules = (
@@ -491,8 +444,11 @@
 				C73CC6A4246161E6003B2658 /* Charts */,
 				C73CC6A724616359003B2658 /* AMCoreAudio */,
 				C73CC6AD24616462003B2658 /* Sauce */,
-				C73CC6BA24618988003B2658 /* KeyHolder */,
-				C7C6A7A22461C23F00048D7B /* Magnet */,
+				C701A2332546B9F4004747B5 /* LaunchAtLogin */,
+				C701A2382546BA3A004747B5 /* KeyHolder */,
+				C701A23B2546BA41004747B5 /* Magnet */,
+				C701A23E2546C8BF004747B5 /* MediaKeyTap */,
+				C77000112546E5C1005131FB /* Sparkle */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -505,7 +461,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1210;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -541,8 +497,11 @@
 				C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */,
 				C73CC6A624616359003B2658 /* XCRemoteSwiftPackageReference "AMCoreAudio" */,
 				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
-				C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */,
-				C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */,
+				C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
+				C701A2372546BA3A004747B5 /* XCRemoteSwiftPackageReference "KeyHolder" */,
+				C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */,
+				C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */,
+				C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -586,6 +545,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		C73CC69C24615915003B2658 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -599,7 +559,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/Carthage/Build/Mac/LaunchAtLogin.framework/Resources/copy-helper.sh\"\n";
+			shellScript = "\"${BUILT_PRODUCTS_DIR}/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh\"\n";
 		};
 		C7574F84235469D600358397 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -745,6 +705,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -804,6 +765,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -841,7 +803,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.2.3;
+				CURRENT_PROJECT_VERSION = 4.0.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -865,7 +827,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.2.3;
+				MARKETING_VERSION = 4.0.0;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -890,7 +852,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3.2.3;
+				CURRENT_PROJECT_VERSION = 4.0.0;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -913,7 +875,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.2.3;
+				MARKETING_VERSION = 4.0.0;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = site.lunarapp.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -952,6 +914,38 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		C701A2372546BA3A004747B5 /* XCRemoteSwiftPackageReference "KeyHolder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Clipy/KeyHolder";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Clipy/Magnet";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
+		C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/MediaKeyTap";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
 		C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Jounce/Surge";
@@ -1040,20 +1034,12 @@
 				minimumVersion = 2.0.2;
 			};
 		};
-		C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */ = {
+		C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/KeyHolder";
+			repositoryURL = "https://github.com/alin23/Sparkle";
 			requirement = {
-				kind = revision;
-				revision = 5c0f1c32c9e7a1f53d6b9d079e0ae2fa40ec79fc;
-			};
-		};
-		C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/Magnet";
-			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.24.0;
 			};
 		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
@@ -1067,6 +1053,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C701A2332546B9F4004747B5 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
+			productName = LaunchAtLogin;
+		};
+		C701A2382546BA3A004747B5 /* KeyHolder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C701A2372546BA3A004747B5 /* XCRemoteSwiftPackageReference "KeyHolder" */;
+			productName = KeyHolder;
+		};
+		C701A23B2546BA41004747B5 /* Magnet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */;
+			productName = Magnet;
+		};
+		C701A23E2546C8BF004747B5 /* MediaKeyTap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */;
+			productName = MediaKeyTap;
+		};
 		C7045DA924407CBC002289E5 /* Surge */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */;
@@ -1122,15 +1128,10 @@
 			package = C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */;
 			productName = Sauce;
 		};
-		C73CC6BA24618988003B2658 /* KeyHolder */ = {
+		C77000112546E5C1005131FB /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C73CC6B924618988003B2658 /* XCRemoteSwiftPackageReference "KeyHolder" */;
-			productName = KeyHolder;
-		};
-		C7C6A7A22461C23F00048D7B /* Magnet */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7C6A7A12461C23E00048D7B /* XCRemoteSwiftPackageReference "Magnet" */;
-			productName = Magnet;
+			package = C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;
