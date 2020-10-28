@@ -15,7 +15,7 @@ class AppExceptionTransformer: ValueTransformer {
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        return (value as? AppException)?.dictionaryRepresentation()
+        return (value as? AppException)?.dictionary
     }
 }
 
@@ -34,7 +34,7 @@ class DisplayTransformer: ValueTransformer {
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        return (value as? Display)?.dictionaryRepresentation()
+        return (value as? Display)?.dictionary
     }
 }
 

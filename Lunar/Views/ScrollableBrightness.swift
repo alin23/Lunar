@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 class ScrollableBrightness: NSView {
     @IBOutlet var label: NSTextField!
@@ -20,8 +21,8 @@ class ScrollableBrightness: NSView {
 
     @IBOutlet var lockButton: LockButton!
 
-    var minObserver: NSKeyValueObservation?
-    var maxObserver: NSKeyValueObservation?
+    var minObserver: DefaultsObservation?
+    var maxObserver: DefaultsObservation?
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var disabled = false {
@@ -75,28 +76,28 @@ class ScrollableBrightness: NSView {
     var brightnessObserver: ((NSNumber, NSNumber) -> Void)?
 
     func addObserver(_ display: Display) {
-        minObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
-            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
+        minObserver = Defaults.observe(.brightnessLimitMin) { [weak self] change in
+            guard let currentValue = self?.currentValue else { return }
             runInMainThread {
-                currentValue.lowerLimit = Double(val)
+                currentValue.lowerLimit = Double(change.newValue)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
                 if brightnessAdapter.mode == .manual {
                     currentValue.onValueChanged?(newBrightness)
                 }
             }
-        })
-        maxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
-            guard let val = change.newValue, let currentValue = self?.currentValue else { return }
+        }
+        maxObserver = Defaults.observe(.brightnessLimitMax) { [weak self] change in
+            guard let currentValue = self?.currentValue else { return }
             runInMainThread {
-                currentValue.upperLimit = Double(val)
+                currentValue.upperLimit = Double(change.newValue)
                 let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
                 if brightnessAdapter.mode == .manual {
                     currentValue.onValueChanged?(newBrightness)
                 }
             }
-        })
+        }
 
         brightnessObserver = { [weak self] newBrightness, _ in
             if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
@@ -107,8 +108,8 @@ class ScrollableBrightness: NSView {
                     minBrightness = display.minBrightness.uint8Value
                     maxBrightness = display.maxBrightness.uint8Value
                 } else {
-                    minBrightness = UInt8(datastore.defaults.brightnessLimitMin)
-                    maxBrightness = UInt8(datastore.defaults.brightnessLimitMax)
+                    minBrightness = UInt8(Defaults[.brightnessLimitMin])
+                    maxBrightness = UInt8(Defaults[.brightnessLimitMax])
                 }
 
                 let newBrightness = cap(newBrightness.uint8Value, minVal: minBrightness, maxVal: maxBrightness)
@@ -192,8 +193,8 @@ class ScrollableBrightness: NSView {
         maxValue?.intValue = Int32(displayMaxValue)
         maxValue?.lowerLimit = Double(displayMinValue + 1)
         currentValue?.intValue = Int32(displayValue)
-        currentValue?.lowerLimit = Double(datastore.defaults.brightnessLimitMin)
-        currentValue?.upperLimit = Double(datastore.defaults.brightnessLimitMax)
+        currentValue?.lowerLimit = Double(Defaults[.brightnessLimitMin])
+        currentValue?.upperLimit = Double(Defaults[.brightnessLimitMax])
 
         if let button = lockButton {
             button.setup(display.lockedBrightness)

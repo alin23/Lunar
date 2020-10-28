@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 let NOTE_TEXT = """
 []()
@@ -145,7 +146,8 @@ class SplitViewController: NSSplitViewController {
 
     @IBAction func toggleBrightnessAdapter(sender button: ToggleButton?) {
         if let button = button, let mode = AdaptiveMode(rawValue: button.mode) {
-            brightnessAdapter.mode = mode
+            log.debug("Changed mode to \(mode)")
+            Defaults[.adaptiveBrightnessMode] = mode
 
             for button in buttons {
                 button?.fade(mode)
@@ -221,10 +223,10 @@ class SplitViewController: NSSplitViewController {
         whiteBackground()
         setHelpButtonText()
         navigationHelpButton?.onMouseEnter = {
-            datastore.defaults.set(true, forKey: "showNavigationHints")
+            Defaults[.showNavigationHints] = true
         }
         navigationHelpButton?.onMouseExit = {
-            datastore.defaults.set(false, forKey: "showNavigationHints")
+            Defaults[.showNavigationHints] = false
         }
         super.viewDidLoad()
     }

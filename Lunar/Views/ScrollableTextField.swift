@@ -8,6 +8,7 @@
 
 import Carbon.HIToolbox
 import Cocoa
+import Defaults
 import Magnet
 
 class ScrollableTextField: NSTextField {
@@ -57,7 +58,7 @@ class ScrollableTextField: NSTextField {
     var onMouseExit: (() -> Void)?
 
     var centerAlign: NSParagraphStyle?
-    var didScrollTextField: Bool = datastore.defaults.didScrollTextField
+    var didScrollTextField: Bool = Defaults[.didScrollTextField]
 
     var normalSize: CGSize?
     var activeSize: CGSize?
@@ -190,7 +191,7 @@ class ScrollableTextField: NSTextField {
     func disableScrollHint() {
         if !didScrollTextField {
             didScrollTextField = true
-            datastore.defaults.set(true, forKey: "didScrollTextField")
+            Defaults[.didScrollTextField] = true
             if let area = captionTrackingArea {
                 removeTrackingArea(area)
             }

@@ -12,6 +12,7 @@ import Carbon.HIToolbox
 import Cocoa
 import Compression
 import CoreLocation
+import Defaults
 import LaunchAtLogin
 import Magnet
 import Sauce
@@ -23,6 +24,13 @@ extension Collection where Index: Comparable {
     subscript(back i: Int) -> Iterator.Element {
         let backBy = i + 1
         return self[index(endIndex, offsetBy: -backBy)]
+    }
+}
+
+extension Encodable {
+    var dictionary: [String: Any]? {
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
     }
 }
 
@@ -171,24 +179,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var valuesReaderThread: Foundation.Thread!
     var locationThread: Foundation.Thread!
     var syncThread: Foundation.Thread!
-    var syncPollingSeconds: Int = datastore.defaults.syncPollingSeconds
-    var refreshValues: Bool = datastore.defaults.refreshValues
+    var syncPollingSeconds: Int = Defaults[.syncPollingSeconds]
+    var refreshValues: Bool = Defaults[.refreshValues]
 
-    var mediaKeysEnabledObserver: NSKeyValueObservation?
-    var volumeKeysEnabledObserver: NSKeyValueObservation?
-    var daylightObserver: NSKeyValueObservation?
-    var curveFactorObserver: NSKeyValueObservation?
-    var noonObserver: NSKeyValueObservation?
-    var sunsetObserver: NSKeyValueObservation?
-    var sunriseObserver: NSKeyValueObservation?
-    var solarNoonObserver: NSKeyValueObservation?
-    var brightnessOffsetObserver: NSKeyValueObservation?
-    var contrastOffsetObserver: NSKeyValueObservation?
-    var adaptiveModeObserver: NSKeyValueObservation?
-    var hotkeyObserver: NSKeyValueObservation?
-    var loginItemObserver: NSKeyValueObservation?
-    var syncPollingSecondsObserver: NSKeyValueObservation?
-    var refreshValuesObserver: NSKeyValueObservation?
+    var mediaKeysEnabledObserver: DefaultsObservation?
+    var volumeKeysEnabledObserver: DefaultsObservation?
+    var daylightObserver: DefaultsObservation?
+    var curveFactorObserver: DefaultsObservation?
+    var noonObserver: DefaultsObservation?
+    var sunsetObserver: DefaultsObservation?
+    var sunriseObserver: DefaultsObservation?
+    var solarNoonObserver: DefaultsObservation?
+    var brightnessOffsetObserver: DefaultsObservation?
+    var contrastOffsetObserver: DefaultsObservation?
+    var adaptiveModeObserver: DefaultsObservation?
+    var hotkeyObserver: DefaultsObservation?
+    var loginItemObserver: DefaultsObservation?
+    var syncPollingSecondsObserver: DefaultsObservation?
+    var refreshValuesObserver: DefaultsObservation?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
@@ -223,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initHotkeys() {
-        guard var hotkeyConfig: [HotkeyIdentifier: [HotkeyPart: Int]] = datastore.hotkeys() else { return }
+        var hotkeyConfig = Defaults[.hotkeys]
 
         for identifier in HotkeyIdentifier.allCases {
             guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier],
@@ -279,17 +287,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
         }
-        datastore.defaults.set(Hotkey.toNSDictionary(hotkeyConfig), forKey: "hotkeys")
+        Defaults[.hotkeys] = hotkeyConfig
         setKeyEquivalents(hotkeyConfig)
         startOrRestartMediaKeyTap()
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { change in
+            if change.newValue == change.oldValue {
                 return
             }
-            brightnessAdapter.mode = AdaptiveMode(rawValue: mode) ?? .sync
+            brightnessAdapter.mode = change.newValue
             SentrySDK.configureScope { scope in
                 scope.setTag(value: brightnessAdapter.adaptiveModeString(), key: "adaptiveMode")
                 scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
@@ -298,7 +306,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.resetElements()
             }
             self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
-        })
+        }
     }
 
     func listenForSettingsChange() {
@@ -306,7 +314,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self,
             selector: #selector(adaptToSettingsChange(notification:)),
             name: UserDefaults.didChangeNotification,
-            object: datastore.defaults
+            object: UserDefaults.standard
         )
     }
 
@@ -345,9 +353,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func handleDaemon() {
-        loginItemObserver = datastore.defaults.observe(\.startAtLogin, options: [.new], changeHandler: { _, _ in
-            LaunchAtLogin.isEnabled = datastore.defaults.startAtLogin
-        })
+        loginItemObserver = Defaults.observe(.startAtLogin) { change in
+            if change.newValue == change.oldValue {
+                return
+            }
+            LaunchAtLogin.isEnabled = change.newValue
+        }
     }
 
     func applicationDidResignActive(_: Notification) {
@@ -535,72 +546,70 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
-        sunsetObserver = datastore.defaults.observe(\.sunset, changeHandler: { _, _ in
+        sunsetObserver = Defaults.observe(.sunset) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        sunriseObserver = datastore.defaults.observe(\.sunrise, changeHandler: { _, _ in
+        }
+        sunriseObserver = Defaults.observe(.sunrise) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        solarNoonObserver = datastore.defaults.observe(\.solarNoon, changeHandler: { _, _ in
+        }
+        solarNoonObserver = Defaults.observe(.solarNoon) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        curveFactorObserver = datastore.defaults.observe(\.curveFactor, changeHandler: { _, _ in
+        }
+        curveFactorObserver = Defaults.observe(.curveFactor) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        daylightObserver = datastore.defaults.observe(\.daylightExtensionMinutes, changeHandler: { _, _ in
+        }
+        daylightObserver = Defaults.observe(.daylightExtensionMinutes) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        noonObserver = datastore.defaults.observe(\.noonDurationMinutes, changeHandler: { _, _ in
+        }
+        noonObserver = Defaults.observe(.noonDurationMinutes) { _ in
             if brightnessAdapter.mode == .location {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, changeHandler: { _, _ in
+        }
+        brightnessOffsetObserver = Defaults.observe(.brightnessOffset) { _ in
             if brightnessAdapter.mode != .manual {
                 brightnessAdapter.adaptBrightness()
             }
-        })
-        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, changeHandler: { _, _ in
+        }
+        contrastOffsetObserver = Defaults.observe(.contrastOffset) { _ in
             if brightnessAdapter.mode != .manual {
                 brightnessAdapter.adaptBrightness()
             }
-        })
+        }
 
-        syncPollingSecondsObserver = datastore.defaults.observe(\.syncPollingSeconds, changeHandler: { _, change in
-            self.syncPollingSeconds = change.newValue ?? datastore.defaults.syncPollingSeconds
-        })
-        refreshValuesObserver = datastore.defaults.observe(\.refreshValues, changeHandler: { _, change in
-            self.refreshValues = change.newValue ?? datastore.defaults.refreshValues
+        syncPollingSecondsObserver = Defaults.observe(.syncPollingSeconds) { change in
+            self.syncPollingSeconds = change.newValue
+        }
+        refreshValuesObserver = Defaults.observe(.refreshValues) { change in
+            self.refreshValues = change.newValue
 
             self.valuesReaderThread?.cancel()
             if self.refreshValues {
                 self.startValuesReaderThread()
             }
-        })
+        }
 
-        hotkeyObserver = datastore.defaults.observe(\.hotkeys, changeHandler: { _, _ in
-            if let hotkeys = datastore.hotkeys() {
-                runInMainThread {
-                    self.setKeyEquivalents(hotkeys)
-                }
+        hotkeyObserver = Defaults.observe(.hotkeys) { _ in
+            runInMainThread {
+                self.setKeyEquivalents(Defaults[.hotkeys])
             }
-        })
-        mediaKeysEnabledObserver = datastore.defaults.observe(\.mediaKeysEnabled, changeHandler: { _, _ in
+        }
+        mediaKeysEnabledObserver = Defaults.observe(.mediaKeysEnabled) { _ in
             self.startOrRestartMediaKeyTap()
-        })
-        volumeKeysEnabledObserver = datastore.defaults.observe(\.volumeKeysEnabled, changeHandler: { _, _ in
+        }
+        volumeKeysEnabledObserver = Defaults.observe(.volumeKeysEnabled) { _ in
             self.startOrRestartMediaKeyTap()
-        })
+        }
 
         concurrentQueue.async {
             AMCoreAudio.NotificationCenter.defaultCenter.subscribe(AudioEventSubscriber(), eventType: AudioHardwareEvent.self, dispatchQueue: concurrentQueue)
@@ -731,7 +740,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
 
-        datastore.defaults.set(false, forKey: "debug")
+        Defaults[.debug] = false
 
         locationThread?.cancel()
         syncThread?.cancel()
@@ -775,7 +784,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func startReceivingSignificantLocationChanges() {
-        if datastore.defaults.manualLocation {
+        if Defaults[.manualLocation] {
             brightnessAdapter.geolocation = Geolocation()
             return
         }
@@ -849,64 +858,64 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func increaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.volumeStep
+        let amount = amount ?? Defaults[.volumeStep]
         brightnessAdapter.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func decreaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.volumeStep
+        let amount = amount ?? Defaults[.volumeStep]
         brightnessAdapter.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.brightnessStep
+        let amount = amount ?? Defaults[.brightnessStep]
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
-            let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
-            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
+            let newCurveFactor = cap(Defaults[.curveFactor] - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            Defaults[.curveFactor] = newCurveFactor
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset + amount, minVal: -100, maxVal: 90)
-            datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
+            let newBrightnessOffset = cap(Defaults[.brightnessOffset] + amount, minVal: -100, maxVal: 90)
+            Defaults[.brightnessOffset] = newBrightnessOffset
         }
     }
 
     func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.contrastStep
+        let amount = amount ?? Defaults[.contrastStep]
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
-            let newCurveFactor = cap(datastore.defaults.curveFactor - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
-            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
+            let newCurveFactor = cap(Defaults[.curveFactor] - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            Defaults[.curveFactor] = newCurveFactor
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset + amount, minVal: -100, maxVal: 90)
-            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+            let newContrastOffset = cap(Defaults[.contrastOffset] + amount, minVal: -100, maxVal: 90)
+            Defaults[.contrastOffset] = newContrastOffset
         }
     }
 
     func decreaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.brightnessStep
+        let amount = amount ?? Defaults[.brightnessStep]
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
-            let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
-            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
+            let newCurveFactor = cap(Defaults[.curveFactor] + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            Defaults[.curveFactor] = newCurveFactor
         } else {
-            let newBrightnessOffset = cap(datastore.defaults.brightnessOffset - amount, minVal: -100, maxVal: 90)
-            datastore.defaults.set(newBrightnessOffset, forKey: "brightnessOffset")
+            let newBrightnessOffset = cap(Defaults[.brightnessOffset] - amount, minVal: -100, maxVal: 90)
+            Defaults[.brightnessOffset] = newBrightnessOffset
         }
     }
 
     func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? datastore.defaults.contrastStep
+        let amount = amount ?? Defaults[.contrastStep]
         if brightnessAdapter.mode == .manual {
             brightnessAdapter.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
         } else if brightnessAdapter.mode == .location {
-            let newCurveFactor = cap(datastore.defaults.curveFactor + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
-            datastore.defaults.set(newCurveFactor, forKey: "curveFactor")
+            let newCurveFactor = cap(Defaults[.curveFactor] + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
+            Defaults[.curveFactor] = newCurveFactor
         } else {
-            let newContrastOffset = cap(datastore.defaults.contrastOffset - amount, minVal: -100, maxVal: 90)
-            datastore.defaults.set(newContrastOffset, forKey: "contrastOffset")
+            let newContrastOffset = cap(Defaults[.contrastOffset] - amount, minVal: -100, maxVal: 90)
+            Defaults[.contrastOffset] = newContrastOffset
         }
     }
 
@@ -997,10 +1006,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         debugMenuItem.isEnabled = false
         debugMenuItem.title = "Diagnosing displays"
 
-        let oldDebugState = datastore.defaults.debug
-        let oldSmoothTransitionState = datastore.defaults.smoothTransition
-        datastore.defaults.set(true, forKey: "debug")
-        datastore.defaults.set(false, forKey: "smoothTransition")
+        let oldDebugState = Defaults[.debug]
+        let oldSmoothTransitionState = Defaults[.smoothTransition]
+        Defaults[.debug] = true
+        Defaults[.smoothTransition] = false
 
         setDebugMode(1)
 
@@ -1030,8 +1039,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             runInMainThread {
-                datastore.defaults.set(oldDebugState, forKey: "debug")
-                datastore.defaults.set(oldSmoothTransitionState, forKey: "smoothTransition")
+                Defaults[.debug] = oldDebugState
+                Defaults[.smoothTransition] = oldSmoothTransitionState
             }
 
             setDebugMode(0)

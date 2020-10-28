@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 import Magnet
 
 class HotkeyViewController: NSViewController {
@@ -61,9 +62,10 @@ class HotkeyViewController: NSViewController {
         } else {
             hk.unregister()
         }
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hk.identifier) {
+        if let identifier = HotkeyIdentifier(rawValue: hk.identifier) {
+            var hotkeys = Defaults[.hotkeys]
             hotkeys[identifier]?[.enabled] = sender.state.rawValue
-            datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
+            Defaults[.hotkeys] = hotkeys
         }
     }
 

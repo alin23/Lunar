@@ -48,7 +48,7 @@ public class PageControl: NSView {
 
     // MARK: - lifecycle
 
-    public override func draw(_ dirtyRect: NSRect) {
+    override public func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
         let dotWidthSum: CGFloat = dotLength * CGFloat(numberOfPages)

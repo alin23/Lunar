@@ -6,256 +6,78 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import AnyCodable
 import Cocoa
+import Defaults
 
 let APP_SETTINGS = [
-    "adaptiveBrightnessMode",
-    "brightnessLimitMax",
-    "brightnessLimitMin",
-    "brightnessClipMax",
-    "brightnessClipMin",
-    "brightnessOffset",
-    "volumeStep",
-    "brightnessStep",
-    "contrastLimitMax",
-    "contrastLimitMin",
-    "contrastOffset",
-    "contrastStep",
-    "curveFactor",
-    "daylightExtensionMinutes",
-    "debug",
-    "didScrollTextField",
-    "didSwipeLeft",
-    "didSwipeRight",
-    "didSwipeToHotkeys",
-    "firstRun",
-    "hotkeys",
-    "manualLocation",
-    "noonDurationMinutes",
-    "refreshValues",
-    "showNavigationHints",
-    "showQuickActions",
-    "smoothTransition",
-    "solarNoon",
-    "startAtLogin",
-    "sunrise",
-    "sunset",
-    "syncPollingSeconds",
-    "clamshellModeDetection",
-    "mediaKeysEnabled",
-    "volumeKeysEnabled",
+    Defaults.Keys.adaptiveBrightnessMode,
+    .brightnessLimitMax,
+    .brightnessLimitMin,
+    .brightnessClipMax,
+    .brightnessClipMin,
+    .brightnessOffset,
+    .volumeStep,
+    .brightnessStep,
+    .contrastLimitMax,
+    .contrastLimitMin,
+    .contrastOffset,
+    .contrastStep,
+    .curveFactor,
+    .daylightExtensionMinutes,
+    .debug,
+    .didScrollTextField,
+    .didSwipeLeft,
+    .didSwipeRight,
+    .didSwipeToHotkeys,
+    .firstRun,
+    .hotkeys,
+    .manualLocation,
+    .noonDurationMinutes,
+    .refreshValues,
+    .showNavigationHints,
+    .showQuickActions,
+    .smoothTransition,
+    .solarNoon,
+    .startAtLogin,
+    .sunrise,
+    .sunset,
+    .syncPollingSeconds,
+    .clamshellModeDetection,
+    .mediaKeysEnabled,
+    .volumeKeysEnabled,
+    .useCoreDisplay,
 ]
 
-extension UserDefaults {
-    @objc dynamic var sunrise: String {
-        return string(forKey: "sunrise") ?? ""
-    }
-
-    @objc dynamic var sunset: String {
-        return string(forKey: "sunset") ?? ""
-    }
-
-    @objc dynamic var solarNoon: String {
-        return string(forKey: "solarNoon") ?? ""
-    }
-
-    @objc dynamic var noonDurationMinutes: Int {
-        return integer(forKey: "noonDurationMinutes")
-    }
-
-    @objc dynamic var daylightExtensionMinutes: Int {
-        return integer(forKey: "daylightExtensionMinutes")
-    }
-
-    @objc dynamic var curveFactor: Double {
-        return double(forKey: "curveFactor")
-    }
-
-    @objc dynamic var locationLat: Double {
-        return double(forKey: "locationLat")
-    }
-
-    @objc dynamic var locationLon: Double {
-        return double(forKey: "locationLon")
-    }
-
-    @objc dynamic var mediaKeysEnabled: Bool {
-        return bool(forKey: "mediaKeysEnabled")
-    }
-
-    @objc dynamic var volumeKeysEnabled: Bool {
-        return bool(forKey: "volumeKeysEnabled")
-    }
-
-    @objc dynamic var manualLocation: Bool {
-        return bool(forKey: "manualLocation")
-    }
-
-    @objc dynamic var showNavigationHints: Bool {
-        return bool(forKey: "showNavigationHints")
-    }
-
-    @objc dynamic var startAtLogin: Bool {
-        return bool(forKey: "startAtLogin")
-    }
-
-    @objc dynamic var clamshellModeDetection: Bool {
-        return bool(forKey: "clamshellModeDetection")
-    }
-
-    @objc dynamic var didScrollTextField: Bool {
-        return bool(forKey: "didScrollTextField")
-    }
-
-    @objc dynamic var didSwipeLeft: Bool {
-        return bool(forKey: "didSwipeLeft")
-    }
-
-    @objc dynamic var didSwipeToHotkeys: Bool {
-        return bool(forKey: "didSwipeToHotkeys")
-    }
-
-    @objc dynamic var didSwipeRight: Bool {
-        return bool(forKey: "didSwipeRight")
-    }
-
-    @objc dynamic var smoothTransition: Bool {
-        return bool(forKey: "smoothTransition")
-    }
-
-    @objc dynamic var refreshValues: Bool {
-        return bool(forKey: "refreshValues")
-    }
-
-    @objc dynamic var debug: Bool {
-        return bool(forKey: "debug")
-    }
-
-    @objc dynamic var showQuickActions: Bool {
-        return bool(forKey: "showQuickActions")
-    }
-
-    @objc dynamic var syncPollingSeconds: Int {
-        return integer(forKey: "syncPollingSeconds")
-    }
-
-    @objc dynamic var adaptiveBrightnessMode: Int {
-        return integer(forKey: "adaptiveBrightnessMode")
-    }
-
-    @objc dynamic var volumeStep: Int {
-        return integer(forKey: "volumeStep")
-    }
-
-    @objc dynamic var brightnessStep: Int {
-        return integer(forKey: "brightnessStep")
-    }
-
-    @objc dynamic var contrastStep: Int {
-        return integer(forKey: "contrastStep")
-    }
-
-    @objc dynamic var brightnessOffset: Int {
-        return integer(forKey: "brightnessOffset")
-    }
-
-    @objc dynamic var contrastOffset: Int {
-        return integer(forKey: "contrastOffset")
-    }
-
-    @objc dynamic var brightnessLimitMin: Int {
-        return integer(forKey: "brightnessLimitMin")
-    }
-
-    @objc dynamic var brightnessClipMax: Int {
-        return integer(forKey: "brightnessClipMax")
-    }
-
-    @objc dynamic var brightnessClipMin: Int {
-        return integer(forKey: "brightnessClipMin")
-    }
-
-    @objc dynamic var contrastLimitMin: Int {
-        return integer(forKey: "contrastLimitMin")
-    }
-
-    @objc dynamic var brightnessLimitMax: Int {
-        return integer(forKey: "brightnessLimitMax")
-    }
-
-    @objc dynamic var contrastLimitMax: Int {
-        return integer(forKey: "contrastLimitMax")
-    }
-
-    @objc dynamic var hotkeys: [String: Any]? {
-        return dictionary(forKey: "hotkeys")
-    }
-
-    @objc dynamic var displays: [Any]? {
-        return array(forKey: "displays")
-    }
-
-    @objc dynamic var appExceptions: [Any]? {
-        return array(forKey: "appExceptions")
-    }
-}
-
 class DataStore: NSObject {
-    static let defaults: UserDefaults = NSUserDefaultsController.shared.defaults
-    let defaults: UserDefaults = DataStore.defaults
-
-    func hotkeys() -> [HotkeyIdentifier: [HotkeyPart: Int]]? {
-        guard let hotkeyConfig = defaults.hotkeys else { return nil }
-        return Hotkey.toDictionary(hotkeyConfig)
+    func displays(serials _: [String]? = nil) -> [Display]? {
+        return Defaults[.displays]
     }
 
-    func displays(serials: [String]? = nil) -> [Display]? {
-        guard let displayConfig = defaults.displays else { return nil }
-        return displayConfig.map { config in
-            guard let config = config as? [String: Any],
-                let serial = config["serial"] as? String else { return nil }
-
-            if let serials = serials, !serials.contains(serial) {
-                return nil
-            }
-            return Display.fromDictionary(config)
-        }.compactMap { $0 }
+    func appExceptions(identifiers _: [String]? = nil) -> [AppException]? {
+        return Defaults[.appExceptions]
     }
 
-    func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
-        guard let appConfig = defaults.appExceptions else { return nil }
-        return appConfig.map { config in
-            guard let config = config as? [String: Any],
-                let identifier = config["identifier"] as? String else { return nil }
-
-            if let identifiers = identifiers, !identifiers.contains(identifier) {
-                return nil
-            }
-            return AppException.fromDictionary(config)
-        }.compactMap { $0 }
-    }
-
-    func settingsDictionary() -> [String: Any] {
-        return defaults.dictionaryRepresentation().filter { elem in
-            APP_SETTINGS.contains(elem.key)
-        }
+    func settingsDictionary() -> [String: Any]? {
+        let settings = [String: AnyCodable](APP_SETTINGS.map { key in
+            (key.name, Defaults[Defaults.Key<AnyCodable>(key.name, default: nil)])
+        }, uniquingKeysWith: { v1, _ in v1 })
+        return settings.dictionary
     }
 
     static func storeAppException(app: AppException) {
-        guard var appExceptions = DataStore.defaults.appExceptions else {
-            DataStore.defaults.set([
-                app.dictionaryRepresentation(),
-            ] as NSArray, forKey: "appExceptions")
+        guard var appExceptions = Defaults[.appExceptions] else {
+            Defaults[.appExceptions] = [app]
             return
         }
 
-        if let appIndex = appExceptions.firstIndex(where: appByIdentifier(app.identifier)) {
-            appExceptions[appIndex] = app.dictionaryRepresentation()
+        if let appIndex = appExceptions.firstIndex(where: { $0.identifier == app.identifier }) {
+            appExceptions[appIndex] = app
         } else {
-            appExceptions.append(app.dictionaryRepresentation())
+            appExceptions.append(app)
         }
 
-        DataStore.defaults.set(appExceptions as NSArray, forKey: "appExceptions")
+        Defaults[.appExceptions] = appExceptions
     }
 
     func storeDisplays(_ displays: [Display]) -> [Display] {
@@ -264,10 +86,7 @@ class DataStore: NSObject {
         }
 
         guard let storedDisplays = self.displays() else {
-            let nsDisplays = displays.map {
-                $0.dictionaryRepresentation()
-            } as NSArray
-            defaults.set(nsDisplays, forKey: "displays")
+            Defaults[.displays] = displays
             return displays
         }
         let newDisplaySerials = displays.map { $0.serial }
@@ -284,10 +103,7 @@ class DataStore: NSObject {
         let allDisplays = (inactiveDisplays + displays).filter {
             display in !BrightnessAdapter.isBuiltinDisplay(display.id)
         }
-        let nsDisplays = allDisplays.map {
-            $0.dictionaryRepresentation()
-        } as NSArray
-        defaults.set(nsDisplays, forKey: "displays")
+        Defaults[.displays] = allDisplays
 
         return allDisplays
     }
@@ -297,34 +113,18 @@ class DataStore: NSObject {
             return
         }
 
-        guard var displays = DataStore.defaults.displays else {
-            DataStore.defaults.set([
-                display.dictionaryRepresentation(),
-            ] as NSArray, forKey: "displays")
+        guard var displays = Defaults[.displays] else {
+            Defaults[.displays] = [display]
             return
         }
 
-        if let displayIndex = displays.firstIndex(where: displayBySerial(display.serial)) {
-            displays[displayIndex] = display.dictionaryRepresentation()
+        if let displayIndex = displays.firstIndex(where: { $0.serial == display.serial }) {
+            displays[displayIndex] = display
         } else {
-            displays.append(display.dictionaryRepresentation())
+            displays.append(display)
         }
 
-        DataStore.defaults.set(displays as NSArray, forKey: "displays")
-    }
-
-    static func appByIdentifier(_ identifier: String) -> ((Any) -> Bool) {
-        return { app in
-            guard let id = (app as? [String: Any])?["identifier"] as? String else { return false }
-            return id == identifier
-        }
-    }
-
-    static func displayBySerial(_ serial: String) -> ((Any) -> Bool) {
-        return { display in
-            guard let displaySerial = (display as? [String: Any])?["serial"] as? String else { return false }
-            return serial == displaySerial
-        }
+        Defaults[.displays] = displays
     }
 
     static func firstRun() {
@@ -338,36 +138,12 @@ class DataStore: NSObject {
                     let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
                     continue
                 }
-                if let exc = defaults.appExceptions?.first(where: appByIdentifier(id)) {
+                if let exc = Defaults[.appExceptions]?.first(where: { $0.identifier == id }) {
                     log.debug("Existing app for \(app): \(String(describing: exc))")
                     continue
                 }
                 storeAppException(app: AppException(identifier: id, name: name))
             }
-        }
-    }
-
-    static func setDefault(_ value: Int, for key: String) {
-        if DataStore.defaults.object(forKey: key) == nil {
-            DataStore.defaults.set(value, forKey: key)
-        }
-    }
-
-    static func setDefault(_ value: Double, for key: String) {
-        if DataStore.defaults.object(forKey: key) == nil {
-            DataStore.defaults.set(value, forKey: key)
-        }
-    }
-
-    static func setDefault(_ value: Bool, for key: String) {
-        if DataStore.defaults.object(forKey: key) == nil {
-            DataStore.defaults.set(value, forKey: key)
-        }
-    }
-
-    static func setDefault(_ value: NSDictionary, for key: String) {
-        if DataStore.defaults.object(forKey: key) == nil {
-            DataStore.defaults.set(value, forKey: key)
         }
     }
 
@@ -377,41 +153,59 @@ class DataStore: NSObject {
         NSUserDefaultsController.shared.appliesImmediately = true
 
         log.debug("Checking First Run")
-        if DataStore.defaults.object(forKey: "firstRun") == nil {
+        if Defaults[.firstRun] == nil {
             DataStore.firstRun()
-            DataStore.defaults.set(true, forKey: "firstRun")
+            Defaults[.firstRun] = true
         }
-
-        DataStore.setDefault(0.5, for: "curveFactor")
-        DataStore.setDefault(true, for: "mediaKeysEnabled")
-        DataStore.setDefault(true, for: "volumeKeysEnabled")
-        DataStore.setDefault(false, for: "didScrollTextField")
-        DataStore.setDefault(false, for: "didSwipeToHotkeys")
-        DataStore.setDefault(false, for: "didSwipeLeft")
-        DataStore.setDefault(false, for: "didSwipeRight")
-        DataStore.setDefault(false, for: "smoothTransition")
-        DataStore.setDefault(DataStore.defaults.bool(forKey: "refreshBrightness"), for: "refreshValues")
-        DataStore.setDefault(false, for: "debug")
-        DataStore.setDefault(true, for: "showQuickActions")
-        DataStore.setDefault(false, for: "manualLocation")
-        DataStore.setDefault(false, for: "showNavigationHints")
-        DataStore.setDefault(true, for: "startAtLogin")
-        DataStore.setDefault(true, for: "clamshellModeDetection")
-        DataStore.setDefault(180, for: "daylightExtensionMinutes")
-        DataStore.setDefault(240, for: "noonDurationMinutes")
-        DataStore.setDefault(5, for: "brightnessOffset")
-        DataStore.setDefault(20, for: "contrastOffset")
-        DataStore.setDefault(100, for: "brightnessClipMax")
-        DataStore.setDefault(0, for: "brightnessClipMin")
-        DataStore.setDefault(5, for: "brightnessLimitMin")
-        DataStore.setDefault(20, for: "contrastLimitMin")
-        DataStore.setDefault(90, for: "brightnessLimitMax")
-        DataStore.setDefault(70, for: "contrastLimitMax")
-        DataStore.setDefault(6, for: "brightnessStep")
-        DataStore.setDefault(6, for: "contrastStep")
-        DataStore.setDefault(6, for: "volumeStep")
-        DataStore.setDefault(2, for: "syncPollingSeconds")
-        DataStore.setDefault(AdaptiveMode.sync.rawValue, for: "adaptiveBrightnessMode")
-        DataStore.setDefault(Hotkey.defaultHotkeys, for: "hotkeys")
     }
+}
+
+extension Defaults.Keys {
+    static let firstRun = Key<Bool?>("firstRun", default: nil)
+    static let curveFactor = Key<Double>("curveFactor", default: 0.5)
+    static let mediaKeysEnabled = Key<Bool>("mediaKeysEnabled", default: true)
+    static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
+    static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
+    static let didSwipeToHotkeys = Key<Bool>("didSwipeToHotkeys", default: false)
+    static let didSwipeLeft = Key<Bool>("didSwipeLeft", default: false)
+    static let didSwipeRight = Key<Bool>("didSwipeRight", default: false)
+    static let smoothTransition = Key<Bool>("smoothTransition", default: false)
+    static let refreshValues = Key<Bool>("refreshValues", default: false)
+    static let useCoreDisplay = Key<Bool>("useCoreDisplay", default: true)
+    static let debug = Key<Bool>("debug", default: false)
+    static let showQuickActions = Key<Bool>("showQuickActions", default: true)
+    static let manualLocation = Key<Bool>("manualLocation", default: false)
+    static let showNavigationHints = Key<Bool>("showNavigationHints", default: false)
+    static let startAtLogin = Key<Bool>("startAtLogin", default: true)
+    static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
+    static let daylightExtensionMinutes = Key<Int>("daylightExtensionMinutes", default: 180)
+    static let noonDurationMinutes = Key<Int>("noonDurationMinutes", default: 240)
+    static let brightnessOffset = Key<Int>("brightnessOffset", default: 5)
+    static let contrastOffset = Key<Int>("contrastOffset", default: 20)
+    static let brightnessClipMax = Key<Int>("brightnessClipMax", default: 100)
+    static let brightnessClipMin = Key<Int>("brightnessClipMin", default: 0)
+    static let brightnessLimitMin = Key<Int>("brightnessLimitMin", default: 5)
+    static let contrastLimitMin = Key<Int>("contrastLimitMin", default: 20)
+    static let brightnessLimitMax = Key<Int>("brightnessLimitMax", default: 90)
+    static let contrastLimitMax = Key<Int>("contrastLimitMax", default: 70)
+    static let brightnessStep = Key<Int>("brightnessStep", default: 6)
+    static let contrastStep = Key<Int>("contrastStep", default: 6)
+    static let volumeStep = Key<Int>("volumeStep", default: 6)
+    static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 2)
+    static let adaptiveBrightnessMode = Key<AdaptiveMode>("adaptiveBrightnessMode", default: .sync)
+    static let hotkeys = Key<[HotkeyIdentifier: [HotkeyPart: Int]]>("hotkeys", default: Hotkey.defaults)
+    static let displays = Key<[Display]?>("displays", default: nil)
+    static let appExceptions = Key<[AppException]?>("appExceptions", default: nil)
+    static let sunrise = Key<String?>("sunrise", default: nil)
+    static let sunset = Key<String?>("sunset", default: nil)
+    static let solarNoon = Key<String?>("solarNoon", default: nil)
+    static let locationLat = Key<Double>("locationLat", default: 0.0)
+    static let locationLon = Key<Double>("locationLon", default: 0.0)
+    static let civilTwilightBegin = Key<String?>("civilTwilightBegin", default: nil)
+    static let civilTwilightEnd = Key<String?>("civilTwilightEnd", default: nil)
+    static let nauticalTwilightBegin = Key<String?>("nauticalTwilightBegin", default: nil)
+    static let nauticalTwilightEnd = Key<String?>("nauticalTwilightEnd", default: nil)
+    static let astronomicalTwilightBegin = Key<String?>("astronomicalTwilightBegin", default: nil)
+    static let astronomicalTwilightEnd = Key<String?>("astronomicalTwilightEnd", default: nil)
+    static let dayLength = Key<UInt64>("dayLength", default: 0)
 }

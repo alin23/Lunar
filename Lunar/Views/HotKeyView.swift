@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 import KeyHolder
 import Magnet
 import Sauce
@@ -36,7 +37,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
                 let identifier = HotkeyIdentifier(rawValue: hk.identifier)
             else { return }
 
-            let hotkeys = datastore.hotkeys() ?? Hotkey.defaults
+            let hotkeys = Defaults[.hotkeys]
             if let coarseHk = hotkeys[identifier], let preciseIdentifier = preciseHotkeysMapping[identifier], let hk = hotkeys[preciseIdentifier] {
                 checkbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[identifier]?[.enabled] ?? 0)
                 checkbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
@@ -46,8 +47,8 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     var hotkeyEnabled: Bool {
-        if let hotkeys = datastore.hotkeys(),
-            let hk = hotkey,
+        let hotkeys = Defaults[.hotkeys]
+        if let hk = hotkey,
             let identifier = HotkeyIdentifier(rawValue: hk.identifier),
             let hotkey = (hotkeys[identifier] ?? Hotkey.defaults[identifier]) {
             return (hotkey[.enabled] ?? 0) == 1
@@ -56,30 +57,34 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
+        log.debug("Begin hotkey recording: \(hotkey?.identifier ?? "")")
         return true
     }
 
     func recordView(_: RecordView, canRecordKeyCombo combo: KeyCombo) -> Bool {
+        log.debug("Can record combo: \(combo.QWERTYKeyCode) doubledMod: \(combo.doubledModifiers)")
         if combo.QWERTYKeyCode == Key.space.QWERTYKeyCode {
             return false
         }
         return !combo.doubledModifiers
     }
 
-    func recordViewDidClearShortcut(_: RecordView) {
-        hotkey.unregister()
-        preciseHotkeyCheckbox?.isEnabled = false
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
-            hotkeys[identifier]?[.enabled] = 0
-            datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
-        }
+    func recordViewDidEndRecording(_: RecordView) {
+        log.debug("End hotkey recording: \(hotkey?.identifier ?? "")")
     }
 
-    func recordViewDidEndRecording(_: RecordView) {}
-
     func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
+        log.debug("Changed hotkey for \(hotkey?.identifier ?? "") with \(keyCombo?.keyEquivalent ?? "no hotkey")")
+
         hotkey.unregister()
         guard let keyCombo = keyCombo else {
+            hotkey.unregister()
+            preciseHotkeyCheckbox?.isEnabled = false
+            if let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
+                var hotkeys = Defaults[.hotkeys]
+                hotkeys[identifier]?[.enabled] = 0
+                Defaults[.hotkeys] = hotkeys
+            }
             return
         }
         hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
@@ -95,18 +100,19 @@ class HotkeyView: RecordView, RecordViewDelegate {
             }
         }
 
-        if var hotkeys = datastore.hotkeys(), let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
+        if let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
+            var hotkeys = Defaults[.hotkeys]
             Hotkey.keys[identifier] = hotkey
             hotkeys[identifier]?[.enabled] = 1
             hotkeys[identifier]?[.modifiers] = keyCombo.modifiers
             hotkeys[identifier]?[.keyCode] = keyCombo.QWERTYKeyCode
-            datastore.defaults.set(Hotkey.toNSDictionary(hotkeys), forKey: "hotkeys")
+            Defaults[.hotkeys] = hotkeys
         }
     }
 
-    override open func mouseDown(with theEvent: NSEvent) {
-        window?.makeFirstResponder(self)
-        super.mouseDown(with: theEvent)
+    override open func mouseDown(with _: NSEvent) {
+        log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
+        beginRecording()
     }
 
     override func didChangeValue(forKey key: String) {
@@ -171,5 +177,10 @@ class HotkeyView: RecordView, RecordViewDelegate {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        layer?.cornerRadius = 8
+        super.draw(dirtyRect)
     }
 }

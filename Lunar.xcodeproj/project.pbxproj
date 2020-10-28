@@ -65,6 +65,8 @@
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
+		C7B5E8592548B3F900530B47 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = C7B5E8582548B3F900530B47 /* Defaults */; };
+		C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = C7B5E85C2548B5AC00530B47 /* AnyCodable */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
@@ -215,6 +217,7 @@
 				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
+				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
 				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
@@ -227,6 +230,7 @@
 				C701A2342546B9F4004747B5 /* LaunchAtLogin in Frameworks */,
 				C73CC6A824616359003B2658 /* AMCoreAudio in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
+				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
 				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
 				C77000142546E8E4005131FB /* WAYWindow.framework in Frameworks */,
 				C75083542222865F0020270E /* NSPageControl.framework in Frameworks */,
@@ -449,6 +453,8 @@
 				C701A23B2546BA41004747B5 /* Magnet */,
 				C701A23E2546C8BF004747B5 /* MediaKeyTap */,
 				C77000112546E5C1005131FB /* Sparkle */,
+				C7B5E8582548B3F900530B47 /* Defaults */,
+				C7B5E85C2548B5AC00530B47 /* AnyCodable */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -502,6 +508,8 @@
 				C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */,
 				C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */,
 				C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */,
+				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
+				C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1042,6 +1050,22 @@
 				minimumVersion = 1.24.0;
 			};
 		};
+		C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.1.0;
+			};
+		};
+		C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Flight-School/AnyCodable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/IBM-Swift/BlueECC.git";
@@ -1132,6 +1156,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		C7B5E8582548B3F900530B47 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		C7B5E85C2548B5AC00530B47 /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;

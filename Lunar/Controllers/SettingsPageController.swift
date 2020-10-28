@@ -8,10 +8,11 @@
 
 import Charts
 import Cocoa
+import Defaults
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
-    var adaptiveModeObserver: NSKeyValueObservation?
+    var adaptiveModeObserver: DefaultsObservation?
 
     func updateDataset(
         display: Display,
@@ -124,15 +125,14 @@ class SettingsPageController: NSViewController {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] _, change in
-            guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] change in
+            guard let self = self, change.newValue != change.oldValue else {
                 return
             }
-            let adaptiveMode = AdaptiveMode(rawValue: mode)
             if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
-                self.initGraph(display: brightnessAdapter.firstDisplay, mode: adaptiveMode)
+                self.initGraph(display: brightnessAdapter.firstDisplay, mode: change.newValue)
             }
-        })
+        }
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {

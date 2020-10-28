@@ -6,7 +6,9 @@
 //  Copyright © 2018 Alin. All rights reserved.
 //
 
+import AnyCodable
 import Cocoa
+import Defaults
 
 class ConfigurationViewController: NSViewController {
     let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
@@ -314,27 +316,27 @@ class ConfigurationViewController: NSViewController {
 
     @IBOutlet var swipeLeftHint: NSTextField!
 
-    var curveFactorObserver: NSKeyValueObservation?
-    var brightnessOffsetObserver: NSKeyValueObservation?
-    var contrastOffsetObserver: NSKeyValueObservation?
-    var pollingIntervalObserver: NSKeyValueObservation?
-    var brightnessStepObserver: NSKeyValueObservation?
-    var contrastStepObserver: NSKeyValueObservation?
-    var volumeStepObserver: NSKeyValueObservation?
-    var brightnessClipMinObserver: NSKeyValueObservation?
-    var brightnessClipMaxObserver: NSKeyValueObservation?
-    var brightnessLimitMinObserver: NSKeyValueObservation?
-    var contrastLimitMinObserver: NSKeyValueObservation?
-    var brightnessLimitMaxObserver: NSKeyValueObservation?
-    var contrastLimitMaxObserver: NSKeyValueObservation?
-    var didSwipeToHotkeysObserver: NSKeyValueObservation?
-    var adaptiveModeObserver: NSKeyValueObservation?
-    var showNavigationHintsObserver: NSKeyValueObservation?
-    var sunriseObserver: NSKeyValueObservation?
-    var sunsetObserver: NSKeyValueObservation?
-    var solarNoonObserver: NSKeyValueObservation?
-    var locationLatObserver: NSKeyValueObservation?
-    var locationLonObserver: NSKeyValueObservation?
+    var curveFactorObserver: DefaultsObservation?
+    var brightnessOffsetObserver: DefaultsObservation?
+    var contrastOffsetObserver: DefaultsObservation?
+    var pollingIntervalObserver: DefaultsObservation?
+    var brightnessStepObserver: DefaultsObservation?
+    var contrastStepObserver: DefaultsObservation?
+    var volumeStepObserver: DefaultsObservation?
+    var brightnessClipMinObserver: DefaultsObservation?
+    var brightnessClipMaxObserver: DefaultsObservation?
+    var brightnessLimitMinObserver: DefaultsObservation?
+    var contrastLimitMinObserver: DefaultsObservation?
+    var brightnessLimitMaxObserver: DefaultsObservation?
+    var contrastLimitMaxObserver: DefaultsObservation?
+    var didSwipeToHotkeysObserver: DefaultsObservation?
+    var adaptiveModeObserver: DefaultsObservation?
+    var showNavigationHintsObserver: DefaultsObservation?
+    var sunriseObserver: DefaultsObservation?
+    var sunsetObserver: DefaultsObservation?
+    var solarNoonObserver: DefaultsObservation?
+    var locationLatObserver: DefaultsObservation?
+    var locationLonObserver: DefaultsObservation?
 
     weak var settingsController: SettingsPageController?
 
@@ -411,202 +413,202 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForShowNavigationHintsChange() {
-        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
+        showNavigationHintsObserver = Defaults.observe(.showNavigationHints) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.swipeLeftHint?.isHidden = !show
+                self?.swipeLeftHint?.isHidden = !change.newValue
             }
-        })
+        }
     }
 
     func listenForCurveFactorChange() {
-        curveFactorObserver = datastore.defaults.observe(\.curveFactor, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+        curveFactorObserver = Defaults.observe(.curveFactor) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.curveFactorField?.doubleValue = value
+                self?.curveFactorField?.doubleValue = change.newValue
             }
-        })
+        }
     }
 
     func listenForLocationChange() {
-        let updateDataset = { [weak self] (_: UserDefaults, change: NSKeyValueObservedChange<String>) -> Void in
-            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+        let updateDataset = { [weak self] (change: Defaults.KeyChange<String?>) -> Void in
+            if change.newValue == change.oldValue {
                 return
             }
             self?.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
         }
-        sunriseObserver = datastore.defaults.observe(\.sunrise, options: [.old, .new], changeHandler: updateDataset)
-        sunsetObserver = datastore.defaults.observe(\.sunset, options: [.old, .new], changeHandler: updateDataset)
-        solarNoonObserver = datastore.defaults.observe(\.solarNoon, options: [.old, .new], changeHandler: updateDataset)
-        locationLatObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+        sunriseObserver = Defaults.observe(.sunrise, handler: updateDataset)
+        sunsetObserver = Defaults.observe(.sunset, handler: updateDataset)
+        solarNoonObserver = Defaults.observe(.solarNoon, handler: updateDataset)
+        locationLatObserver = Defaults.observe(.locationLat) { [weak self] change in
+            guard change.newValue != change.oldValue else {
                 return
             }
             runInMainThread { [weak self] in
-                self?.locationLatField?.doubleValue = value
+                self?.locationLatField?.doubleValue = change.newValue
             }
-        })
-        locationLonObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let value = change.newValue, let oldValue = change.oldValue, value != oldValue else {
+        }
+        locationLonObserver = Defaults.observe(.locationLon) { [weak self] change in
+            guard change.newValue != change.oldValue else {
                 return
             }
             runInMainThread { [weak self] in
-                self?.locationLonField?.doubleValue = value
+                self?.locationLonField?.doubleValue = change.newValue
             }
-        })
+        }
     }
 
     func listenForBrightnessOffsetChange() {
-        brightnessOffsetObserver = datastore.defaults.observe(\.brightnessOffset, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        brightnessOffsetObserver = Defaults.observe(.brightnessOffset) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessOffsetField?.stringValue = String(brightness)
+                self?.brightnessOffsetField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForContrastOffsetChange() {
-        contrastOffsetObserver = datastore.defaults.observe(\.contrastOffset, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+        contrastOffsetObserver = Defaults.observe(.contrastOffset) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.contrastOffsetField?.stringValue = String(contrast)
+                self?.contrastOffsetField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForBrightnessStepChange() {
-        brightnessStepObserver = datastore.defaults.observe(\.brightnessStep, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        brightnessStepObserver = Defaults.observe(.brightnessStep) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessStepField?.stringValue = String(brightness)
+                self?.brightnessStepField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForPollingIntervalChange() {
-        pollingIntervalObserver = datastore.defaults.observe(\.syncPollingSeconds, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let seconds = change.newValue, let oldSeconds = change.oldValue, seconds != oldSeconds else {
+        pollingIntervalObserver = Defaults.observe(.syncPollingSeconds) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.pollingIntervalField?.stringValue = String(seconds)
+                self?.pollingIntervalField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForContrastStepChange() {
-        contrastStepObserver = datastore.defaults.observe(\.contrastStep, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+        contrastStepObserver = Defaults.observe(.contrastStep) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.contrastStepField?.stringValue = String(contrast)
+                self?.contrastStepField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForVolumeStepChange() {
-        volumeStepObserver = datastore.defaults.observe(\.volumeStep, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let volume = change.newValue, let oldVolume = change.oldValue, volume != oldVolume else {
+        volumeStepObserver = Defaults.observe(.volumeStep) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.volumeStepField?.stringValue = String(volume)
+                self?.volumeStepField?.stringValue = String(change.newValue)
             }
-        })
+        }
     }
 
     func listenForBrightnessClipChange() {
-        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        brightnessClipMinObserver = Defaults.observe(.brightnessClipMin) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessClipMinField?.stringValue = String(brightness)
-                self?.brightnessClipMaxField?.lowerLimit = Double(brightness + 1)
+                self?.brightnessClipMinField?.stringValue = String(change.newValue)
+                self?.brightnessClipMaxField?.lowerLimit = Double(change.newValue + 1)
             }
-        })
-        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        }
+        brightnessClipMaxObserver = Defaults.observe(.brightnessClipMax) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessClipMaxField?.stringValue = String(brightness)
-                self?.brightnessClipMinField?.upperLimit = Double(brightness - 1)
+                self?.brightnessClipMaxField?.stringValue = String(change.newValue)
+                self?.brightnessClipMinField?.upperLimit = Double(change.newValue - 1)
             }
-        })
+        }
     }
 
     func listenForBrightnessLimitChange() {
-        brightnessLimitMinObserver = datastore.defaults.observe(\.brightnessLimitMin, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        brightnessLimitMinObserver = Defaults.observe(.brightnessLimitMin) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessLimitMinField?.stringValue = String(brightness)
-                self?.brightnessLimitMaxField?.lowerLimit = Double(brightness + 1)
+                self?.brightnessLimitMinField?.stringValue = String(change.newValue)
+                self?.brightnessLimitMaxField?.lowerLimit = Double(change.newValue + 1)
             }
-        })
-        brightnessLimitMaxObserver = datastore.defaults.observe(\.brightnessLimitMax, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let brightness = change.newValue, let oldBrightness = change.oldValue, brightness != oldBrightness else {
+        }
+        brightnessLimitMaxObserver = Defaults.observe(.brightnessLimitMax) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.brightnessLimitMaxField?.stringValue = String(brightness)
-                self?.brightnessLimitMinField?.upperLimit = Double(brightness - 1)
+                self?.brightnessLimitMaxField?.stringValue = String(change.newValue)
+                self?.brightnessLimitMinField?.upperLimit = Double(change.newValue - 1)
             }
-        })
+        }
     }
 
     func listenForContrastLimitChange() {
-        contrastLimitMinObserver = datastore.defaults.observe(\.contrastLimitMin, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+        contrastLimitMinObserver = Defaults.observe(.contrastLimitMin) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.contrastLimitMinField?.stringValue = String(contrast)
-                self?.contrastLimitMaxField?.lowerLimit = Double(contrast + 1)
+                self?.contrastLimitMinField?.stringValue = String(change.newValue)
+                self?.contrastLimitMaxField?.lowerLimit = Double(change.newValue + 1)
             }
-        })
-        contrastLimitMaxObserver = datastore.defaults.observe(\.contrastLimitMax, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let contrast = change.newValue, let oldContrast = change.oldValue, contrast != oldContrast else {
+        }
+        contrastLimitMaxObserver = Defaults.observe(.contrastLimitMax) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
-                self?.contrastLimitMaxField?.stringValue = String(contrast)
-                self?.contrastLimitMinField?.upperLimit = Double(contrast - 1)
+                self?.contrastLimitMaxField?.stringValue = String(change.newValue)
+                self?.contrastLimitMinField?.upperLimit = Double(change.newValue - 1)
             }
-        })
+        }
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
-            if let adaptiveMode = AdaptiveMode(rawValue: mode) {
-                runInMainThread { [weak self] in
-                    self?.showRelevantSettings(adaptiveMode)
-                }
+            runInMainThread { [weak self] in
+                self?.showRelevantSettings(change.newValue)
             }
-        })
+        }
     }
 
     func setupNoonDuration() {
         guard let field = noonDurationField, let caption = noonDurationCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "noonDurationMinutes", lowerLimit: 0, upperLimit: 300,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.noonDurationMinutes,
+            lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
             },
@@ -620,7 +622,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = daylightExtensionField, let caption = daylightExtensionCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "daylightExtensionMinutes", lowerLimit: 0, upperLimit: 300,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.daylightExtensionMinutes,
+            lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
             },
@@ -637,7 +641,9 @@ class ConfigurationViewController: NSViewController {
         curveFactorField.step = 0.1
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "curveFactor", lowerLimit: 0.0, upperLimit: 10.0,
+            field, caption: caption,
+            settingKeyDouble: Defaults.Keys.curveFactor,
+            lowerLimit: 0.0, upperLimit: 10.0,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: self.curveFactorField.doubleValue, withAnimation: true)
             },
@@ -651,7 +657,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = brightnessOffsetField, let caption = brightnessOffsetCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "brightnessOffset", lowerLimit: -100, upperLimit: 90,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.brightnessOffset,
+            lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
             }
@@ -662,7 +670,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = contrastOffsetField, let caption = contrastOffsetCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "contrastOffset", lowerLimit: -100, upperLimit: 90,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.contrastOffset,
+            lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
             }
@@ -673,7 +683,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = brightnessStepField, let caption = brightnessStepCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "brightnessStep", lowerLimit: 1, upperLimit: 99,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.brightnessStep,
+            lowerLimit: 1, upperLimit: 99,
             onMouseEnter: { _ in
             },
             onValueChangedInstant: { _, _ in
@@ -685,7 +697,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = pollingIntervalField, let caption = pollingIntervalCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "syncPollingSeconds", lowerLimit: 1, upperLimit: 300,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.syncPollingSeconds,
+            lowerLimit: 1, upperLimit: 300,
             onMouseEnter: { _ in
             },
             onValueChangedInstant: { _, _ in
@@ -697,7 +711,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = contrastStepField, let caption = contrastStepCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "contrastStep", lowerLimit: 1, upperLimit: 99,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.contrastStep,
+            lowerLimit: 1, upperLimit: 99,
             onMouseEnter: { _ in
             },
             onValueChangedInstant: { _, _ in
@@ -709,7 +725,9 @@ class ConfigurationViewController: NSViewController {
         guard let field = volumeStepField, let caption = volumeStepCaption else { return }
 
         setupScrollableTextField(
-            field, caption: caption, settingKey: "volumeStep", lowerLimit: 1, upperLimit: 99,
+            field, caption: caption,
+            settingKeyInt: Defaults.Keys.volumeStep,
+            lowerLimit: 1, upperLimit: 99,
             onMouseEnter: { _ in
             },
             onValueChangedInstant: { _, _ in
@@ -724,13 +742,17 @@ class ConfigurationViewController: NSViewController {
             let maxCaption = brightnessClipMaxCaption else { return }
 
         setupScrollableTextField(
-            minField, caption: minCaption, settingKey: "brightnessClipMin", lowerLimit: 0, upperLimit: brightnessAdapter.brightnessClipMax - 1,
+            minField, caption: minCaption,
+            settingKeyInt: Defaults.Keys.brightnessClipMin,
+            lowerLimit: 0, upperLimit: brightnessAdapter.brightnessClipMax - 1,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: Double(value), brightnessClipMax: brightnessAdapter.brightnessClipMax)
             }
         )
         setupScrollableTextField(
-            maxField, caption: maxCaption, settingKey: "brightnessClipMax", lowerLimit: brightnessAdapter.brightnessClipMin + 1, upperLimit: 100,
+            maxField, caption: maxCaption,
+            settingKeyInt: Defaults.Keys.brightnessClipMax,
+            lowerLimit: brightnessAdapter.brightnessClipMin + 1, upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: Double(value))
             }
@@ -744,13 +766,17 @@ class ConfigurationViewController: NSViewController {
             let maxCaption = brightnessLimitMaxCaption else { return }
 
         setupScrollableTextField(
-            minField, caption: minCaption, settingKey: "brightnessLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.brightnessLimitMax - 1),
+            minField, caption: minCaption,
+            settingKeyInt: Defaults.Keys.brightnessLimitMin,
+            lowerLimit: 0, upperLimit: Double(Defaults[.brightnessLimitMax] - 1),
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
             }
         )
         setupScrollableTextField(
-            maxField, caption: maxCaption, settingKey: "brightnessLimitMax", lowerLimit: Double(datastore.defaults.brightnessLimitMin + 1), upperLimit: 100,
+            maxField, caption: maxCaption,
+            settingKeyInt: Defaults.Keys.brightnessLimitMax,
+            lowerLimit: Double(Defaults[.brightnessLimitMin] + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
             }
@@ -764,13 +790,17 @@ class ConfigurationViewController: NSViewController {
             let maxCaption = contrastLimitMaxCaption else { return }
 
         setupScrollableTextField(
-            minField, caption: minCaption, settingKey: "contrastLimitMin", lowerLimit: 0, upperLimit: Double(datastore.defaults.contrastLimitMax - 1),
+            minField, caption: minCaption,
+            settingKeyInt: Defaults.Keys.contrastLimitMin,
+            lowerLimit: 0, upperLimit: Double(Defaults[.contrastLimitMax] - 1),
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
             }
         )
         setupScrollableTextField(
-            maxField, caption: maxCaption, settingKey: "contrastLimitMax", lowerLimit: Double(datastore.defaults.contrastLimitMin + 1), upperLimit: 100,
+            maxField, caption: maxCaption,
+            settingKeyInt: Defaults.Keys.contrastLimitMax,
+            lowerLimit: Double(Defaults[.contrastLimitMin] + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
             }
@@ -789,20 +819,20 @@ class ConfigurationViewController: NSViewController {
         lonField.step = 0.01
 
         setupScrollableTextField(
-            latField, caption: latCaption, settingKey: "locationLat", lowerLimit: -90.00, upperLimit: 90.00,
+            latField, caption: latCaption, settingKeyDouble: Defaults.Keys.locationLat, lowerLimit: -90.00, upperLimit: 90.00,
             onMouseEnter: { _ in disableLeftRightHotkeys() },
             onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
-                datastore.defaults.set(true, forKey: "manualLocation")
+                Defaults[.manualLocation] = true
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
             }
         )
         setupScrollableTextField(
-            lonField, caption: lonCaption, settingKey: "locationLon", lowerLimit: -180.00, upperLimit: 180.00,
+            lonField, caption: lonCaption, settingKeyDouble: Defaults.Keys.locationLon, lowerLimit: -180.00, upperLimit: 180.00,
             onMouseEnter: { _ in disableLeftRightHotkeys() },
             onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
-                datastore.defaults.set(true, forKey: "manualLocation")
+                Defaults[.manualLocation] = true
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
             }
         )
@@ -820,7 +850,9 @@ class ConfigurationViewController: NSViewController {
     }
 
     func setupScrollableTextField(
-        _ field: ScrollableTextField, caption: ScrollableTextFieldCaption, settingKey: String,
+        _ field: ScrollableTextField, caption: ScrollableTextFieldCaption,
+        settingKeyInt: Defaults.Key<Int>? = nil,
+        settingKeyDouble: Defaults.Key<Double>? = nil,
         lowerLimit: Double, upperLimit: Double,
         onMouseEnter: ((SettingsPageController?) -> Void)? = nil,
         onMouseExit: ((SettingsPageController?) -> Void)? = nil,
@@ -836,14 +868,14 @@ class ConfigurationViewController: NSViewController {
         field.caption = caption
 
         if field.decimalPoints > 0 {
-            field.doubleValue = datastore.defaults.double(forKey: settingKey)
+            field.doubleValue = Defaults[settingKeyDouble!]
             field.onValueChangedDouble = { (value: Double) in
-                datastore.defaults.set(value, forKey: settingKey)
+                Defaults[settingKeyDouble!] = value
             }
         } else {
-            field.integerValue = datastore.defaults.integer(forKey: settingKey)
+            field.integerValue = Defaults[settingKeyInt!]
             field.onValueChanged = { (value: Int) in
-                datastore.defaults.set(value, forKey: settingKey)
+                Defaults[settingKeyInt!] = value
             }
         }
         field.lowerLimit = lowerLimit
@@ -860,13 +892,13 @@ class ConfigurationViewController: NSViewController {
         }
         if let handler = onValueChanged {
             field.onValueChanged = { [weak settingsController = self.settingsController] value in
-                datastore.defaults.set(value, forKey: settingKey)
+                Defaults[settingKeyInt!] = value
                 handler(value, settingsController)
             }
         }
         if let handler = onValueChangedDouble {
             field.onValueChangedDouble = { [weak settingsController = self.settingsController] value in
-                datastore.defaults.set(value, forKey: settingKey)
+                Defaults[settingKeyDouble!] = value
                 handler(value, settingsController)
             }
         }
@@ -892,15 +924,15 @@ class ConfigurationViewController: NSViewController {
     }
 
     @IBAction func resetLocation(_: Any?) {
-        datastore.defaults.set(false, forKey: "manualLocation")
+        Defaults[.manualLocation] = false
         appDelegate().startReceivingSignificantLocationChanges()
     }
 
     func setup() {
-        swipeLeftHint?.isHidden = datastore.defaults.didSwipeToHotkeys
-        didSwipeToHotkeysObserver = datastore.defaults.observe(\.didSwipeToHotkeys, options: [.new], changeHandler: { [weak self] _, change in
-            self?.swipeLeftHint?.isHidden = change.newValue ?? true
-        })
+        swipeLeftHint?.isHidden = Defaults[.didSwipeToHotkeys]
+        didSwipeToHotkeysObserver = Defaults.observe(.didSwipeToHotkeys) { [weak self] change in
+            self?.swipeLeftHint?.isHidden = change.newValue
+        }
 
         setupNoonDuration()
         setupDaylightExtension()
@@ -918,9 +950,7 @@ class ConfigurationViewController: NSViewController {
 
         smoothTransitionCheckbox.setNeedsDisplay()
 
-        if let mode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) {
-            showRelevantSettings(mode)
-        }
+        showRelevantSettings(Defaults[.adaptiveBrightnessMode])
 
         listenForLocationChange()
         listenForCurveFactorChange()

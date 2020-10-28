@@ -6,7 +6,9 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import AnyCodable
 import Cocoa
+import Defaults
 import Sentry
 import Surge
 import SwiftDate
@@ -42,7 +44,7 @@ enum ValueType {
     case contrast
 }
 
-@objc class Display: NSObject {
+@objc class Display: NSObject, Codable {
     @objc dynamic var id: CGDirectDisplayID {
         didSet {
             save()
@@ -197,9 +199,31 @@ enum ValueType {
         "contrast": [:],
         "volume": [:],
     ]
-    var datastoreObservers: [NSKeyValueObservation] = []
+    var datastoreObservers: [DefaultsObservation] = []
     var onReadapt: (() -> Void)?
     var smoothStep = 1
+
+    required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(CGDirectDisplayID.self, forKey: .id)
+        serial = try values.decode(String.self, forKey: .serial)
+
+        brightness = NSNumber(value: try values.decode(UInt8.self, forKey: .brightness))
+        contrast = NSNumber(value: try values.decode(UInt8.self, forKey: .contrast))
+        name = try values.decode(String.self, forKey: .name)
+        edidName = try values.decode(String.self, forKey: .edidName)
+        active = try values.decode(Bool.self, forKey: .active)
+        minBrightness = NSNumber(value: try values.decode(UInt8.self, forKey: .minBrightness))
+        maxBrightness = NSNumber(value: try values.decode(UInt8.self, forKey: .maxBrightness))
+        minContrast = NSNumber(value: try values.decode(UInt8.self, forKey: .minContrast))
+        maxContrast = NSNumber(value: try values.decode(UInt8.self, forKey: .maxContrast))
+        adaptive = try values.decode(Bool.self, forKey: .adaptive)
+        extendedBrightnessRange = try values.decode(Bool.self, forKey: .extendedBrightnessRange)
+        lockedBrightness = try values.decode(Bool.self, forKey: .lockedBrightness)
+        lockedContrast = try values.decode(Bool.self, forKey: .lockedContrast)
+        volume = NSNumber(value: try values.decode(UInt8.self, forKey: .volume))
+        audioMuted = try values.decode(Bool.self, forKey: .audioMuted)
+    }
 
     static func fromDictionary(_ config: [String: Any]) -> Display? {
         guard let id = config["id"] as? CGDirectDisplayID,
@@ -280,33 +304,53 @@ enum ValueType {
         return DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
 
-    func dictionaryRepresentation() -> [String: Any] {
-        return [
-            "id": id,
-            "name": name,
-            "edidName": edidName,
-            "serial": serial,
-            "adaptive": adaptive,
-            "extendedBrightnessRange": extendedBrightnessRange,
-            "lockedBrightness": lockedBrightness,
-            "lockedContrast": lockedContrast,
-            "minContrast": minContrast.uint8Value,
-            "minBrightness": minBrightness.uint8Value,
-            "maxContrast": maxContrast.uint8Value,
-            "maxBrightness": maxBrightness.uint8Value,
-            "contrast": contrast.uint8Value,
-            "brightness": brightness.uint8Value,
-            "volume": volume.uint8Value,
-            "audioMuted": audioMuted,
-            "active": active,
-            "responsive": responsive,
-        ]
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case edidName
+        case serial
+        case adaptive
+        case extendedBrightnessRange
+        case lockedBrightness
+        case lockedContrast
+        case minContrast
+        case minBrightness
+        case maxContrast
+        case maxBrightness
+        case contrast
+        case brightness
+        case volume
+        case audioMuted
+        case active
+        case responsive
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(active, forKey: .active)
+        try container.encode(adaptive, forKey: .adaptive)
+        try container.encode(audioMuted, forKey: .audioMuted)
+        try container.encode(brightness.uint8Value, forKey: .brightness)
+        try container.encode(contrast.uint8Value, forKey: .contrast)
+        try container.encode(edidName, forKey: .edidName)
+        try container.encode(extendedBrightnessRange, forKey: .extendedBrightnessRange)
+        try container.encode(id, forKey: .id)
+        try container.encode(lockedBrightness, forKey: .lockedBrightness)
+        try container.encode(lockedContrast, forKey: .lockedContrast)
+        try container.encode(maxBrightness.uint8Value, forKey: .maxBrightness)
+        try container.encode(maxContrast.uint8Value, forKey: .maxContrast)
+        try container.encode(minBrightness.uint8Value, forKey: .minBrightness)
+        try container.encode(minContrast.uint8Value, forKey: .minContrast)
+        try container.encode(name, forKey: .name)
+        try container.encode(responsive, forKey: .responsive)
+        try container.encode(serial, forKey: .serial)
+        try container.encode(volume.uint8Value, forKey: .volume)
     }
 
     func addSentryData() {
         SentrySDK.configureScope { [weak self] scope in
-            guard let self = self else { return }
-            scope.setExtra(value: self.dictionaryRepresentation(), key: "display-\(self.serial)")
+            guard let self = self, let dict = self.dictionary else { return }
+            scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
     }
 
@@ -327,7 +371,7 @@ enum ValueType {
     }
 
     func isAppleDisplay() -> Bool {
-        return isUltraFine() || isThunderbolt() || isLEDCinema()
+        return Defaults[.useCoreDisplay] && (isUltraFine() || isThunderbolt() || isLEDCinema())
     }
 
     func isAppleVendorID() -> Bool {
@@ -378,7 +422,7 @@ enum ValueType {
         self.serial = (serial ?? Display.uuid(id: id))
         super.init()
 
-        if id != GENERIC_DISPLAY_ID, datastore.defaults.refreshValues {
+        if id != GENERIC_DISPLAY_ID, Defaults[.refreshValues] {
             serialQueue.async {
                 self.refreshBrightness()
                 self.refreshContrast()
@@ -477,24 +521,24 @@ enum ValueType {
 
     func addObservers() {
         datastoreObservers = [
-            datastore.defaults.observe(\.brightnessClipMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+            Defaults.observe(.brightnessClipMin) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
-            datastore.defaults.observe(\.brightnessClipMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+            },
+            Defaults.observe(.brightnessClipMax) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
-            datastore.defaults.observe(\.brightnessLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+            },
+            Defaults.observe(.brightnessLimitMin) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
-            datastore.defaults.observe(\.brightnessLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+            },
+            Defaults.observe(.brightnessLimitMax) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
-            datastore.defaults.observe(\.contrastLimitMin, options: [.new, .old], changeHandler: { [weak self] _, change in
+            },
+            Defaults.observe(.contrastLimitMin) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
-            datastore.defaults.observe(\.contrastLimitMax, options: [.new, .old], changeHandler: { [weak self] _, change in
+            },
+            Defaults.observe(.contrastLimitMax) { [weak self] change in
                 self?.readapt(newValue: change.newValue, oldValue: change.oldValue)
-            }),
+            },
         ]
 
         semaphore.wait()
@@ -554,7 +598,7 @@ enum ValueType {
                 }
 
                 self.setSentryExtra(value: brightness, key: "brightness")
-                if datastore.defaults.smoothTransition || appleDisplay {
+                if Defaults[.smoothTransition] || appleDisplay {
                     var faults = 0
                     self.smoothTransition(from: oldBrightness, to: brightness) { [weak self] newValue in
                         guard let self = self else { return }
@@ -599,7 +643,7 @@ enum ValueType {
 
                 self.setSentryExtra(value: contrast, key: "contrast")
 
-                if datastore.defaults.smoothTransition {
+                if Defaults[.smoothTransition] {
                     var faults = 0
                     self.smoothTransition(from: oldValue.uint8Value, to: contrast) { [weak self] newValue in
                         guard let self = self else { return }
@@ -701,14 +745,14 @@ enum ValueType {
     }
 
     func withoutSmoothTransition(_ block: () -> Void) {
-        if !datastore.defaults.smoothTransition {
+        if !Defaults[.smoothTransition] {
             block()
             return
         }
 
-        datastore.defaults.set(false, forKey: "smoothTransition")
+        Defaults[.smoothTransition] = false
         block()
-        datastore.defaults.set(true, forKey: "smoothTransition")
+        Defaults[.smoothTransition] = true
     }
 
     func setObserver<T>(prop: String, key: String, action: @escaping ((T, T) -> Void)) {
@@ -769,12 +813,12 @@ enum ValueType {
         if type == .brightness {
             maxValue = maxVal ?? maxBrightness.doubleValue
             minValue = minVal ?? minBrightness.doubleValue
-            offsetValue = offset ?? datastore.defaults.brightnessOffset
+            offsetValue = offset ?? Defaults[.brightnessOffset]
         } else {
             maxValue = maxVal ?? maxContrast.doubleValue
             minValue = minVal ?? minContrast.doubleValue
 
-            offsetValue = offset ?? datastore.defaults.contrastOffset
+            offsetValue = offset ?? Defaults[.contrastOffset]
         }
 
         guard let factor = factor else {
@@ -858,8 +902,8 @@ enum ValueType {
         let maxContrast = maxContrast ?? self.maxContrast.uint8Value
         var newBrightness = NSNumber(value: minBrightness)
         var newContrast = NSNumber(value: minContrast)
-        let daylightExtension = daylightExtension ?? datastore.defaults.daylightExtensionMinutes
-        let noonDuration = noonDuration ?? datastore.defaults.noonDurationMinutes
+        let daylightExtension = daylightExtension ?? Defaults[.daylightExtensionMinutes]
+        let noonDuration = noonDuration ?? Defaults[.noonDurationMinutes]
 
         let daylightStart = moment.sunrise - daylightExtension.minutes
         let daylightEnd = moment.sunset + daylightExtension.minutes
@@ -874,12 +918,12 @@ enum ValueType {
             let percent = (minutesSinceSunrise / firstHalfDayMinutes)
             newBrightness = computeValue(
                 from: percent, type: .brightness,
-                factor: factor ?? datastore.defaults.curveFactor, appOffset: appBrightnessOffset,
+                factor: factor ?? Defaults[.curveFactor], appOffset: appBrightnessOffset,
                 minVal: Double(minBrightness), maxVal: Double(maxBrightness)
             )
             newContrast = computeValue(
                 from: percent, type: .contrast,
-                factor: factor ?? datastore.defaults.curveFactor, appOffset: appContrastOffset,
+                factor: factor ?? Defaults[.curveFactor], appOffset: appContrastOffset,
                 minVal: Double(minContrast), maxVal: Double(maxContrast)
             )
         case noonEnd ... daylightEnd:
@@ -888,12 +932,12 @@ enum ValueType {
             let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes)
             newBrightness = computeValue(
                 from: percent, type: .brightness,
-                factor: factor ?? datastore.defaults.curveFactor, appOffset: appBrightnessOffset,
+                factor: factor ?? Defaults[.curveFactor], appOffset: appBrightnessOffset,
                 minVal: Double(minBrightness), maxVal: Double(maxBrightness)
             )
             newContrast = computeValue(
                 from: percent, type: .contrast,
-                factor: factor ?? datastore.defaults.curveFactor, appOffset: appContrastOffset,
+                factor: factor ?? Defaults[.curveFactor], appOffset: appContrastOffset,
                 minVal: Double(minContrast), maxVal: Double(maxContrast)
             )
         case noonStart ... noonEnd:
@@ -947,8 +991,8 @@ enum ValueType {
         let maxBrightness = maxBrightness ?? self.maxBrightness.uint8Value
         let minContrast = minContrast ?? self.minContrast.uint8Value
         let maxContrast = maxContrast ?? self.maxContrast.uint8Value
-        let daylightExtension = daylightExtension ?? datastore.defaults.daylightExtensionMinutes
-        let noonDuration = noonDuration ?? datastore.defaults.noonDurationMinutes
+        let daylightExtension = daylightExtension ?? Defaults[.daylightExtensionMinutes]
+        let noonDuration = noonDuration ?? Defaults[.noonDurationMinutes]
 
         let daylightStart = moment.sunrise - daylightExtension.minutes
         let daylightEnd = moment.sunset + daylightExtension.minutes
@@ -995,11 +1039,11 @@ enum ValueType {
             firstHalf,
             with: zip(
                 computeSIMDValue(
-                    from: percent, type: .brightness, factor: factor ?? datastore.defaults.curveFactor,
+                    from: percent, type: .brightness, factor: factor ?? Defaults[.curveFactor],
                     appOffset: appBrightnessOffset, minVal: minBrightnessDouble, maxVal: maxBrightnessDouble
                 ),
                 computeSIMDValue(
-                    from: percent, type: .contrast, factor: factor ?? datastore.defaults.curveFactor,
+                    from: percent, type: .contrast, factor: factor ?? Defaults[.curveFactor],
                     appOffset: appContrastOffset, minVal: minContrastDouble, maxVal: maxContrastDouble
                 )
             ).map { ($0, $1) }
@@ -1014,11 +1058,11 @@ enum ValueType {
             secondHalf,
             with: zip(
                 computeSIMDValue(
-                    from: percent, type: .brightness, factor: factor ?? datastore.defaults.curveFactor,
+                    from: percent, type: .brightness, factor: factor ?? Defaults[.curveFactor],
                     appOffset: appBrightnessOffset, minVal: minBrightnessDouble, maxVal: maxBrightnessDouble
                 ),
                 computeSIMDValue(
-                    from: percent, type: .contrast, factor: factor ?? datastore.defaults.curveFactor,
+                    from: percent, type: .contrast, factor: factor ?? Defaults[.curveFactor],
                     appOffset: appContrastOffset, minVal: minContrastDouble, maxVal: maxContrastDouble
                 )
             ).map { ($0, $1) }
@@ -1035,11 +1079,11 @@ enum ValueType {
         var newBrightness: NSNumber = 0
         var newContrast: NSNumber = 0
         if let moment = moment {
-            (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: app?.brightness.intValue ?? 0, appContrastOffset: app?.contrast.intValue ?? 0)
+            (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: Int(app?.brightness ?? 0), appContrastOffset: Int(app?.contrast ?? 0))
         } else if let percent = percent {
             let percent = percent / 100.0
-            newBrightness = computeValue(from: percent, type: .brightness, appOffset: app?.brightness.intValue ?? 0, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
-            newContrast = computeValue(from: percent, type: .contrast, appOffset: app?.contrast.intValue ?? 0, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
+            newBrightness = computeValue(from: percent, type: .brightness, appOffset: Int(app?.brightness ?? 0), brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
+            newContrast = computeValue(from: percent, type: .contrast, appOffset: Int(app?.contrast ?? 0), brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
         }
 
         var changed = false

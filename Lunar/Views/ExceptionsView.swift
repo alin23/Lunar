@@ -34,10 +34,10 @@ class ExceptionsView: NSTableView {
         scrollableContrastCaption.textColor = scrollableCaptionColorWhite
 
         scrollableBrightness.onValueChanged = { [weak app] value in
-            app?.brightness = NSNumber(value: value)
+            app?.brightness = UInt8(value)
         }
         scrollableContrast.onValueChanged = { [weak app] value in
-            app?.contrast = NSNumber(value: value)
+            app?.contrast = UInt8(value)
         }
         if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
             if let controller = exceptionsController.parent?.parent as? SettingsPageController {

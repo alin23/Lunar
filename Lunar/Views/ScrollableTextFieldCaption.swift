@@ -7,9 +7,10 @@
 //
 
 import Cocoa
+import Defaults
 
 class ScrollableTextFieldCaption: NSTextField {
-    var didScrollTextField: Bool = datastore.defaults.didScrollTextField
+    var didScrollTextField: Bool = Defaults[.didScrollTextField]
 
     var initialText: String!
     var initialAlphaValue: CGFloat!

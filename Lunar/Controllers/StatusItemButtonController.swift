@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 class StatusItemButtonController: NSView {
     var statusButton: NSStatusBarButton?
@@ -18,7 +19,7 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if !datastore.defaults.showQuickActions || brightnessAdapter.displays.count == 0 {
+        if !Defaults[.showQuickActions] || brightnessAdapter.displays.count == 0 {
             return
         }
 

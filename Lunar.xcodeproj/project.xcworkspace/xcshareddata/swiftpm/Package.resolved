@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "79b05a5da89557a4fa50647cc92488a3d9c3f478",
+          "version": "0.3.0"
+        }
+      },
+      {
         "package": "CryptorECC",
         "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
         "state": {
@@ -35,6 +44,15 @@
           "branch": null,
           "revision": "7ac4a05e83d279bac305a472af9128c2a0eca3d7",
           "version": "3.5.0"
+        }
+      },
+      {
+        "package": "Defaults",
+        "repositoryURL": "https://github.com/sindresorhus/Defaults",
+        "state": {
+          "branch": null,
+          "revision": "d98119fee49c893fae553103a8659ffe003b6cfe",
+          "version": "4.1.0"
         }
       },
       {

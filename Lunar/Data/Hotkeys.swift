@@ -7,16 +7,19 @@
 //
 
 import AMCoreAudio
+import AnyCodable
 import AppKit
 import Carbon.HIToolbox
+import Defaults
 import Magnet
 import MediaKeyTap
 import Sauce
 
-var mediaKeyTap: MediaKeyTap?
+var mediaKeyTapBrightness: MediaKeyTap?
+var mediaKeyTapAudio: MediaKeyTap?
 let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
 
-enum HotkeyIdentifier: String, CaseIterable {
+enum HotkeyIdentifier: String, CaseIterable, Codable {
     case toggle,
         start,
         pause,
@@ -59,7 +62,7 @@ let preciseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
     .volumeDown: .preciseVolumeDown,
 ]
 
-enum HotkeyPart: String, CaseIterable {
+enum HotkeyPart: String, CaseIterable, Codable {
     case modifiers, keyCode, enabled
 }
 
@@ -208,8 +211,6 @@ class Hotkey {
         ],
     ]
 
-    static var defaultHotkeys: NSDictionary = Hotkey.toNSDictionary(Hotkey.defaults)
-
     static func toDictionary(_ hotkeys: [String: Any]) -> [HotkeyIdentifier: [HotkeyPart: Int]] {
         var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
         for (k, v) in hotkeys {
@@ -228,18 +229,6 @@ class Hotkey {
         }
 
         return hotkeySettings
-    }
-
-    static func toNSDictionary(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) -> NSDictionary {
-        let keyDict: NSMutableDictionary = [:]
-        for (identifier, hotkey) in hotkeys {
-            let key: NSMutableDictionary = [:]
-            for (part, value) in hotkey {
-                key[part.rawValue] = value
-            }
-            keyDict[identifier.rawValue] = key
-        }
-        return keyDict
     }
 
     static func handler(identifier: HotkeyIdentifier) -> Selector {
@@ -343,23 +332,20 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
         let workItem = DispatchWorkItem {
-            var keys: [MediaKey]
+            mediaKeyTapBrightness?.stop()
+            mediaKeyTapBrightness = nil
 
-            mediaKeyTap?.stop()
-            mediaKeyTap = nil
-            if mediaKeysEnabled ?? datastore.defaults.mediaKeysEnabled {
-                if volumeKeysEnabled ?? datastore.defaults.volumeKeysEnabled {
-                    keys = [.brightnessUp, .brightnessDown, .mute, .volumeUp, .volumeDown]
-                } else {
-                    keys = [.brightnessUp, .brightnessDown]
-                }
+            mediaKeyTapAudio?.stop()
+            mediaKeyTapAudio = nil
 
-                if let audioDevice = AudioDevice.defaultOutputDevice(), audioDevice.canSetVirtualMasterVolume(direction: .playback) {
-                    let keysToDelete: [MediaKey] = [.volumeUp, .volumeDown, .mute]
-                    keys.removeAll { keysToDelete.contains($0) }
+            if mediaKeysEnabled ?? Defaults[.mediaKeysEnabled] {
+                mediaKeyTapBrightness = MediaKeyTap(delegate: self, for: [.brightnessUp, .brightnessDown], observeBuiltIn: false)
+                mediaKeyTapBrightness?.start()
+
+                if volumeKeysEnabled ?? Defaults[.volumeKeysEnabled], let audioDevice = AudioDevice.defaultOutputDevice(), !audioDevice.canSetVirtualMasterVolume(direction: .playback) {
+                    mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
+                    mediaKeyTapAudio?.start()
                 }
-                mediaKeyTap = MediaKeyTap(delegate: self, for: keys, observeBuiltIn: false)
-                mediaKeyTap?.start()
             }
         }
         concurrentQueue.async(execute: workItem)
@@ -433,6 +419,10 @@ extension AppDelegate: MediaKeyTapDelegate {
                 break
             }
 
+            guard let display = brightnessAdapter.currentAudioDisplay else {
+                break
+            }
+
             locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
             if !locked {
                 if flags?.isSuperset(of: [.option, .shift]) ?? false {
@@ -452,6 +442,10 @@ extension AppDelegate: MediaKeyTapDelegate {
                 break
             }
 
+            guard let display = brightnessAdapter.currentAudioDisplay else {
+                break
+            }
+
             locked = DDC.skipWritingPropertyById[display.id]?.isSuperset(of: [.AUDIO_SPEAKER_VOLUME, .AUDIO_MUTE]) ?? false
             if !locked {
                 if flags?.isSuperset(of: [.option, .shift]) ?? false {
@@ -468,6 +462,10 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .mute:
             if let flags = flags, flags.contains(.option), flags.intersection([.control, .command, .shift]).isEmpty {
                 NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Sound.prefPane"))
+                break
+            }
+
+            guard let display = brightnessAdapter.currentAudioDisplay else {
                 break
             }
 

@@ -7,8 +7,10 @@
 //
 
 import Alamofire
+import AMCoreAudio
 import Cocoa
 import CoreLocation
+import Defaults
 import Foundation
 import Sentry
 import Solar
@@ -16,7 +18,7 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
-enum AdaptiveMode: Int {
+enum AdaptiveMode: Int, Codable {
     case location = 1
     case sync = -1
     case manual = 0
@@ -60,7 +62,7 @@ class BrightnessAdapter {
         displays.filter { $1.active }
     }
 
-    var mode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync {
+    var mode: AdaptiveMode = Defaults[.adaptiveBrightnessMode] {
         didSet {
             if oldValue != .manual {
                 lastMode = oldValue
@@ -68,16 +70,16 @@ class BrightnessAdapter {
         }
     }
 
-    var lastMode: AdaptiveMode = AdaptiveMode(rawValue: datastore.defaults.adaptiveBrightnessMode) ?? .sync
+    var lastMode: AdaptiveMode = Defaults[.adaptiveBrightnessMode]
 
     var builtinBrightnessHistory: UInt64 = 0
     var lastBuiltinBrightness = 0.0
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
-    var brightnessClipMin: Double = Double(datastore.defaults.brightnessClipMin)
-    var brightnessClipMax: Double = Double(datastore.defaults.brightnessClipMax)
-    var brightnessClipMinObserver: NSKeyValueObservation?
-    var brightnessClipMaxObserver: NSKeyValueObservation?
+    var brightnessClipMin: Double = Double(Defaults[.brightnessClipMin])
+    var brightnessClipMax: Double = Double(Defaults[.brightnessClipMax])
+    var brightnessClipMinObserver: DefaultsObservation?
+    var brightnessClipMaxObserver: DefaultsObservation?
 
     var firstDisplay: Display {
         if !displays.isEmpty {
@@ -95,6 +97,15 @@ class BrightnessAdapter {
         else { return nil }
 
         return activeDisplays[id]
+    }
+
+    var currentAudioDisplay: Display? {
+        guard let audioDevice = AudioDevice.defaultOutputDevice(), !audioDevice.canSetVirtualMasterVolume(direction: .playback) else {
+            return nil
+        }
+        return activeDisplays.values.map { $0 }.sorted(by: { d1, d2 in
+            d1.name.levenshtein(audioDevice.name) < d2.name.levenshtein(audioDevice.name)
+        }).first ?? currentDisplay
     }
 
     var currentDisplay: Display? {
@@ -123,10 +134,8 @@ class BrightnessAdapter {
         if let display = displays.removeValue(forKey: id) {
             display.removeObservers()
         }
-        let nsDisplays = displays.values.map {
-            $0.dictionaryRepresentation()
-        } as NSArray
-        datastore.defaults.set(nsDisplays, forKey: "displays")
+        let nsDisplays = displays.values.map { $0 }
+        Defaults[.displays] = nsDisplays
     }
 
     func toggle() {
@@ -135,14 +144,14 @@ class BrightnessAdapter {
             log.info("Sensor mode")
         case .location:
             if builtinDisplay != nil, !IsLidClosed() {
-                datastore.defaults.set(AdaptiveMode.sync.rawValue, forKey: "adaptiveBrightnessMode")
+                Defaults[.adaptiveBrightnessMode] = AdaptiveMode.sync
             } else {
-                datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
+                Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
             }
         case .sync:
-            datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
+            Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
         case .manual:
-            datastore.defaults.set(AdaptiveMode.location.rawValue, forKey: "adaptiveBrightnessMode")
+            Defaults[.adaptiveBrightnessMode] = AdaptiveMode.location
         }
     }
 
@@ -151,13 +160,13 @@ class BrightnessAdapter {
             lastMode = mode
             mode = .manual
         }
-        datastore.defaults.set(AdaptiveMode.manual.rawValue, forKey: "adaptiveBrightnessMode")
+        Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
     }
 
     func enable(mode: AdaptiveMode? = nil) {
         if let newMode = mode {
             self.mode = newMode
-            datastore.defaults.set(newMode.rawValue, forKey: "adaptiveBrightnessMode")
+            Defaults[.adaptiveBrightnessMode] = newMode
         } else {
             if IsLidClosed(), self.mode == .manual {
                 self.mode = .location
@@ -165,7 +174,7 @@ class BrightnessAdapter {
                 self.mode = lastMode
             }
 
-            datastore.defaults.set(self.mode.rawValue, forKey: "adaptiveBrightnessMode")
+            Defaults[.adaptiveBrightnessMode] = self.mode
         }
     }
 
@@ -238,7 +247,7 @@ class BrightnessAdapter {
     func addSentryData() {
         SentrySDK.configureScope { [weak self] scope in
             log.info("Creating Sentry extra context")
-            scope.setExtra(value: datastore.settingsDictionary(), key: "settings")
+            scope.setExtra(value: datastore.settingsDictionary() ?? [:], key: "settings")
             guard let self = self else { return }
             for display in self.displays.values {
                 if display.isUltraFine() {
@@ -300,7 +309,7 @@ class BrightnessAdapter {
             scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
         }
 
-        if datastore.defaults.clamshellModeDetection {
+        if Defaults[.clamshellModeDetection] {
             if lidClosed {
                 activateClamshellMode()
             } else if clamshellMode {
@@ -364,12 +373,12 @@ class BrightnessAdapter {
     }
 
     func listenForBrightnessClipChange() {
-        brightnessClipMaxObserver = datastore.defaults.observe(\.brightnessClipMax, changeHandler: { [unowned self] _, change in
-            self.brightnessClipMax = Double(change.newValue ?? datastore.defaults.brightnessClipMax)
-        })
-        brightnessClipMinObserver = datastore.defaults.observe(\.brightnessClipMin, changeHandler: { [unowned self] _, change in
-            self.brightnessClipMin = Double(change.newValue ?? datastore.defaults.brightnessClipMin)
-        })
+        brightnessClipMaxObserver = Defaults.observe(.brightnessClipMax) { [unowned self] change in
+            self.brightnessClipMax = Double(change.newValue)
+        }
+        brightnessClipMinObserver = Defaults.observe(.brightnessClipMin) { [unowned self] change in
+            self.brightnessClipMin = Double(change.newValue)
+        }
     }
 
     func listenForRunningApps() {
@@ -527,15 +536,15 @@ class BrightnessAdapter {
 
     func computeManualValueFromPercent(percent: Int8, key: String, minVal: Int? = nil, maxVal: Int? = nil) -> NSNumber {
         let percent = Double(cap(percent, minVal: 0, maxVal: 100)) / 100.0
-        let minVal = minVal ?? datastore.defaults.integer(forKey: "\(key)LimitMin")
-        let maxVal = maxVal ?? datastore.defaults.integer(forKey: "\(key)LimitMax")
+        let minVal = minVal ?? Defaults[Defaults.Key<Int>("\(key)LimitMin", default: 0)]
+        let maxVal = maxVal ?? Defaults[Defaults.Key<Int>("\(key)LimitMax", default: 100)]
         let value = Int(round(percent * Double(maxVal - minVal))) + minVal
         return NSNumber(value: cap(value, minVal: minVal, maxVal: maxVal))
     }
 
     func computeSIMDManualValueFromPercent(from percent: [Double], key: String, minVal: Int? = nil, maxVal: Int? = nil) -> [Double] {
-        let minVal = minVal ?? datastore.defaults.integer(forKey: "\(key)LimitMin")
-        let maxVal = maxVal ?? datastore.defaults.integer(forKey: "\(key)LimitMax")
+        let minVal = minVal ?? Defaults[Defaults.Key<Int>("\(key)LimitMin", default: 0)]
+        let maxVal = maxVal ?? Defaults[Defaults.Key<Int>("\(key)LimitMax", default: 100)]
         return percent * Double(maxVal - minVal) + Double(minVal)
     }
 
@@ -589,14 +598,14 @@ class BrightnessAdapter {
 
     func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
-            let value = cap(display.brightness.intValue + offset, minVal: datastore.defaults.brightnessLimitMin, maxVal: datastore.defaults.brightnessLimitMax)
+            let value = cap(display.brightness.intValue + offset, minVal: Defaults[.brightnessLimitMin], maxVal: Defaults[.brightnessLimitMax])
             display.brightness = NSNumber(value: value)
         }
     }
 
     func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
-            let value = cap(display.contrast.intValue + offset, minVal: datastore.defaults.contrastLimitMin, maxVal: datastore.defaults.contrastLimitMax)
+            let value = cap(display.contrast.intValue + offset, minVal: Defaults[.contrastLimitMin], maxVal: Defaults[.contrastLimitMax])
             display.contrast = NSNumber(value: value)
         }
     }

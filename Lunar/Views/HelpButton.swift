@@ -87,6 +87,11 @@ class HelpButton: NSButton {
         addTrackingArea(trackingArea)
     }
 
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        addCursorRect(bounds, cursor: .pointingHand)
+    }
+
     override func mouseDown(with _: NSEvent) {
         guard let popover = helpPopover else { return }
 

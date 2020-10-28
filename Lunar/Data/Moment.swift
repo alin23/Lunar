@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 import Solar
 import SwiftDate
 import SwiftyJSON
@@ -92,22 +93,22 @@ class Moment: NSObject, NSCoding {
 
     // MARK: UserDefaults
 
-    init?(defaults: UserDefaults = datastore.defaults) {
+    init?(defaults _: Bool = true) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMoments()
 
         let localTime = { (iso: String) -> DateInRegion? in
             iso.toDate()?.convertTo(region: Region.local)
         }
 
-        guard let sunrise = defaults.string(forKey: "sunrise"),
-            let sunset = defaults.string(forKey: "sunset"),
-            let solarNoon = defaults.string(forKey: "solarNoon"),
-            let civilTwilightBegin = defaults.string(forKey: "civilTwilightBegin"),
-            let civilTwilightEnd = defaults.string(forKey: "civilTwilightEnd"),
-            let nauticalTwilightBegin = defaults.string(forKey: "nauticalTwilightBegin"),
-            let nauticalTwilightEnd = defaults.string(forKey: "nauticalTwilightEnd"),
-            let astronomicalTwilightBegin = defaults.string(forKey: "astronomicalTwilightBegin"),
-            let astronomicalTwilightEnd = defaults.string(forKey: "astronomicalTwilightEnd") else {
+        guard let sunrise = Defaults[.sunrise],
+            let sunset = Defaults[.sunset],
+            let solarNoon = Defaults[.solarNoon],
+            let civilTwilightBegin = Defaults[.civilTwilightBegin],
+            let civilTwilightEnd = Defaults[.civilTwilightEnd],
+            let nauticalTwilightBegin = Defaults[.nauticalTwilightBegin],
+            let nauticalTwilightEnd = Defaults[.nauticalTwilightEnd],
+            let astronomicalTwilightBegin = Defaults[.astronomicalTwilightBegin],
+            let astronomicalTwilightEnd = Defaults[.astronomicalTwilightEnd] else {
             log.error("Unable to decode moment.")
             return nil
         }
@@ -115,7 +116,7 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        let length = UInt64(defaults.integer(forKey: "dayLength"))
+        let length = UInt64(Defaults[.dayLength])
         if length == 0 {
             dayLength = UInt64(self.sunset - self.sunrise)
         } else {
@@ -130,16 +131,16 @@ class Moment: NSObject, NSCoding {
     }
 
     func store() {
-        datastore.defaults.set(sunrise.toISO(), forKey: "sunrise")
-        datastore.defaults.set(sunset.toISO(), forKey: "sunset")
-        datastore.defaults.set(solarNoon.toISO(), forKey: "solarNoon")
-        datastore.defaults.set(dayLength, forKey: "dayLength")
-        datastore.defaults.set(civilSunrise.toISO(), forKey: "civilTwilightBegin")
-        datastore.defaults.set(civilSunset.toISO(), forKey: "civilTwilightEnd")
-        datastore.defaults.set(nauticalSunrise.toISO(), forKey: "nauticalTwilightBegin")
-        datastore.defaults.set(nauticalSunset.toISO(), forKey: "nauticalTwilightEnd")
-        datastore.defaults.set(astronomicalSunrise.toISO(), forKey: "astronomicalTwilightBegin")
-        datastore.defaults.set(astronomicalSunset.toISO(), forKey: "astronomicalTwilightEnd")
+        Defaults[.sunrise] = sunrise.toISO()
+        Defaults[.sunset] = sunset.toISO()
+        Defaults[.solarNoon] = solarNoon.toISO()
+        Defaults[.dayLength] = dayLength
+        Defaults[.civilTwilightBegin] = civilSunrise.toISO()
+        Defaults[.civilTwilightEnd] = civilSunset.toISO()
+        Defaults[.nauticalTwilightBegin] = nauticalSunrise.toISO()
+        Defaults[.nauticalTwilightEnd] = nauticalSunset.toISO()
+        Defaults[.astronomicalTwilightBegin] = astronomicalSunrise.toISO()
+        Defaults[.astronomicalTwilightEnd] = astronomicalSunset.toISO()
     }
 
     // MARK: NSCoding

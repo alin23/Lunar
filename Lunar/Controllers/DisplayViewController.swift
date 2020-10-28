@@ -8,6 +8,7 @@
 
 import Charts
 import Cocoa
+import Defaults
 
 class DisplayViewController: NSViewController {
     let ADAPTIVE_HELP_TEXT = """
@@ -92,11 +93,11 @@ class DisplayViewController: NSViewController {
     @objc dynamic var noDisplay: Bool = false
 
     var adaptiveButtonTrackingArea: NSTrackingArea?
-    var adaptiveModeObserver: NSKeyValueObservation?
+    var adaptiveModeObserver: DefaultsObservation?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var brightnessRangeObserver: ((Bool, Bool) -> Void)?
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
-    var showNavigationHintsObserver: NSKeyValueObservation?
+    var showNavigationHintsObserver: DefaultsObservation?
     var viewID: String?
 
     func setAdaptiveButtonEnabled(_ enabled: Bool) {
@@ -347,16 +348,16 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForShowNavigationHintsChange() {
-        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
+        showNavigationHintsObserver = Defaults.observe(.showNavigationHints) { [weak self] change in
+            if change.newValue == change.oldValue {
                 return
             }
             runInMainThread { [weak self] in
                 guard let self = self else { return }
-                self.swipeLeftHint?.isHidden = !show
-                self.swipeRightHint?.isHidden = !show
+                self.swipeLeftHint?.isHidden = !change.newValue
+                self.swipeRightHint?.isHidden = !change.newValue
             }
-        })
+        }
     }
 
     deinit {
@@ -420,12 +421,12 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self] _, change in
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
             runInMainThread { [weak self, weak brightnessContrastChart = self?.brightnessContrastChart] in
-                guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+                guard let self = self, change.newValue != change.oldValue else {
                     return
                 }
-                let adaptiveMode = AdaptiveMode(rawValue: mode)
+                let adaptiveMode = change.newValue
                 if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
                     self.initGraph(mode: adaptiveMode)
                 }
@@ -441,7 +442,7 @@ class DisplayViewController: NSViewController {
                     self.setAdaptiveButtonEnabled((self.display?.id ?? GENERIC_DISPLAY_ID) != GENERIC_DISPLAY_ID)
                 }
             }
-        })
+        }
     }
 
     func initGraph(mode: AdaptiveMode? = nil) {

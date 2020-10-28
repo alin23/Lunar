@@ -8,6 +8,7 @@
 
 import Carbon.HIToolbox
 import Cocoa
+import Defaults
 import Foundation
 import Magnet
 
@@ -89,8 +90,8 @@ extension AppDelegate: NSPageControllerDelegate {
                 displayController.display = GENERIC_DISPLAY
             }
             if let display = c.arrangedObjects[2] as? Display, display.id == displayId {
-                displayController.swipeLeftHint?.isHidden = datastore.defaults.didSwipeLeft
-                displayController.swipeRightHint?.isHidden = datastore.defaults.didSwipeRight || c.arrangedObjects.count <= 3
+                displayController.swipeLeftHint?.isHidden = Defaults[.didSwipeLeft]
+                displayController.swipeRightHint?.isHidden = Defaults[.didSwipeRight] || c.arrangedObjects.count <= 3
             }
         }
 
@@ -98,14 +99,14 @@ extension AppDelegate: NSPageControllerDelegate {
     }
 
     func hideSwipeToHotkeysHint() {
-        if !datastore.defaults.didSwipeToHotkeys {
-            datastore.defaults.set(true, forKey: "didSwipeToHotkeys")
+        if !Defaults[.didSwipeToHotkeys] {
+            Defaults[.didSwipeToHotkeys] = true
         }
     }
 
     func hideSwipeLeftHint(c: NSPageController) {
-        if !datastore.defaults.didSwipeLeft {
-            datastore.defaults.set(true, forKey: "didSwipeLeft")
+        if !Defaults[.didSwipeLeft] {
+            Defaults[.didSwipeLeft] = true
             if let display = c.arrangedObjects[2] as? Display {
                 let identifier = pageController(c, identifierFor: display)
                 if let c = pageController(c, viewControllerForIdentifier: identifier) as? DisplayViewController {
@@ -116,8 +117,8 @@ extension AppDelegate: NSPageControllerDelegate {
     }
 
     func hideSwipeRightHint(c: NSPageController) {
-        if !datastore.defaults.didSwipeRight {
-            datastore.defaults.set(true, forKey: "didSwipeRight")
+        if !Defaults[.didSwipeRight] {
+            Defaults[.didSwipeRight] = true
             if let display = c.arrangedObjects[2] as? Display {
                 let identifier = pageController(c, identifierFor: display)
                 if let c = pageController(c, viewControllerForIdentifier: identifier) as? DisplayViewController {

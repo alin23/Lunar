@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 enum HoverState: Int {
     case hover
@@ -27,7 +28,7 @@ let titleString: [AdaptiveMode: String] = [
 ]
 
 class ToggleButton: NSButton {
-    var adaptiveModeObserver: NSKeyValueObservation?
+    var adaptiveModeObserver: DefaultsObservation?
 
     @IBInspectable var mode: NSInteger = AdaptiveMode.manual.rawValue
 
@@ -72,12 +73,12 @@ class ToggleButton: NSButton {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { _, change in
-            guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { change in
+            if change.newValue == change.oldValue {
                 return
             }
-            self.fade(AdaptiveMode(rawValue: mode) ?? .sync)
-        })
+            self.fade(change.newValue)
+        }
     }
 
     func titleWithAttributes(title: String, mode: AdaptiveMode, hoverState: HoverState, page: Page) -> NSMutableAttributedString {

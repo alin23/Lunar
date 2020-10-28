@@ -8,6 +8,7 @@
 
 import Cocoa
 import CoreLocation
+import Defaults
 import SwiftyJSON
 
 class Geolocation: NSObject, NSCoding {
@@ -24,8 +25,8 @@ class Geolocation: NSObject, NSCoding {
     }
 
     var coordinate: CLLocationCoordinate2D
-    var latitudeObserver: NSKeyValueObservation?
-    var longitudeObserver: NSKeyValueObservation?
+    var latitudeObserver: DefaultsObservation?
+    var longitudeObserver: DefaultsObservation?
 
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
     static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("geolocation")
@@ -62,9 +63,9 @@ class Geolocation: NSObject, NSCoding {
 
     // MARK: UserDefaults
 
-    init?(defaults: UserDefaults = datastore.defaults) {
-        let latitude = defaults.double(forKey: "locationLat")
-        let longitude = defaults.double(forKey: "locationLon")
+    init?(_: Defaults? = nil) {
+        let latitude = Defaults[.locationLat]
+        let longitude = Defaults[.locationLat]
         if latitude == 0.0, longitude == 0.0 {
             return nil
         }
@@ -79,25 +80,25 @@ class Geolocation: NSObject, NSCoding {
     }
 
     func store() {
-        datastore.defaults.set(latitude, forKey: "locationLat")
-        datastore.defaults.set(longitude, forKey: "locationLon")
+        Defaults[.locationLat] = latitude
+        Defaults[.locationLon] = longitude
     }
 
     func initObservers() {
-        latitudeObserver = datastore.defaults.observe(\.locationLat, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let self = self, let lat = change.newValue, let oldLat = change.oldValue, lat != oldLat else {
+        latitudeObserver = Defaults.observe(.locationLat) { [weak self] change in
+            guard let self = self, change.newValue != change.oldValue else {
                 return
             }
-            self.latitude = lat
+            self.latitude = change.newValue
             brightnessAdapter.fetchMoments()
-        })
-        longitudeObserver = datastore.defaults.observe(\.locationLon, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let self = self, let lon = change.newValue, let oldLon = change.oldValue, lon != oldLon else {
+        }
+        longitudeObserver = Defaults.observe(.locationLon) { [weak self] change in
+            guard let self = self, change.newValue != change.oldValue else {
                 return
             }
-            self.longitude = lon
+            self.longitude = change.newValue
             brightnessAdapter.fetchMoments()
-        })
+        }
     }
 
     // MARK: NSCoding

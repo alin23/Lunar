@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 let offColor = gray.withAlphaComponent(0.5).cgColor
 let disabledColor = gray.withAlphaComponent(0.25).cgColor
@@ -104,9 +105,9 @@ class ModeButtonResponder: NSResponder {
 }
 
 class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
-    @IBOutlet var syncModeButton: NSButton!
-    @IBOutlet var locationModeButton: NSButton!
-    @IBOutlet var manualModeButton: NSButton!
+    @IBOutlet var syncModeButton: NSButton?
+    @IBOutlet var locationModeButton: NSButton?
+    @IBOutlet var manualModeButton: NSButton?
 
     @IBOutlet var tableView: DisplayValuesView!
     @IBOutlet var scrollView: NSScrollView!
@@ -121,8 +122,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var manualModeButtonResponder: ModeButtonResponder!
 
     var trackingArea: NSTrackingArea?
-    var adaptiveModeObserver: NSKeyValueObservation?
-    var displaysObserver: NSKeyValueObservation!
+    var adaptiveModeObserver: DefaultsObservation?
+    var displaysObserver: DefaultsObservation!
     var responsiveDDCObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
 
     func listenForPopoverEvents() {
@@ -198,6 +199,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     @objc func popoverDidShow(notification _: Notification) {
         runInMainThread {
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+                return
+            }
             if let area = trackingArea {
                 view.removeTrackingArea(area)
             }
@@ -228,6 +232,10 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func grayAllButtons() {
         runInMainThread {
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+                return
+            }
+
             syncModeButton.layer?.backgroundColor = getOffColor(syncModeButton)
             locationModeButton.layer?.backgroundColor = getOffColor(locationModeButton)
             manualModeButton.layer?.backgroundColor = getOffColor(manualModeButton)
@@ -244,7 +252,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForDisplaysChange() {
-        displaysObserver = datastore.defaults.observe(\.displays, options: [.new], changeHandler: { [unowned self] _, _ in
+        displaysObserver = Defaults.observe(.displays) { [unowned self] _ in
             runInMainThreadAsyncAfter(ms: 2000) { [weak self] in
                 guard let self = self else { return }
                 if !self.sameDisplays() {
@@ -258,7 +266,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     self.listenForResponsiveDDCChange()
                 }
             }
-        })
+        }
     }
 
     func listenForResponsiveDDCChange() {
@@ -274,7 +282,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     self.tableView.endUpdates()
 
                     self.adaptViewSize()
-                    if datastore.defaults.showQuickActions, brightnessAdapter.displays.count > 1,
+                    if Defaults[.showQuickActions], brightnessAdapter.displays.count > 1,
                         let statusButton = appDelegate().statusItem.button {
                         menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
                         closeMenuPopover(after: 2500)
@@ -285,31 +293,34 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [unowned self] _, change in
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [unowned self] change in
             runInMainThread { [weak self] in
-                guard let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode, let self = self else {
+                guard change.newValue != change.oldValue, let self = self else {
                     return
                 }
-                let adaptiveMode = AdaptiveMode(rawValue: mode)!
+                guard let syncModeButton = self.syncModeButton, let locationModeButton = self.locationModeButton, let manualModeButton = self.manualModeButton else {
+                    return
+                }
+                let adaptiveMode = change.newValue
                 self.grayAllButtons()
                 switch adaptiveMode {
                 case .sensor:
                     log.info("Sensor mode")
                 case .sync:
-                    self.syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                    self.syncModeButton.state = .on
+                    syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    syncModeButton.state = .on
                     self.tableView.setAdaptiveButtonHidden(false)
                 case .location:
-                    self.locationModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                    self.locationModeButton.state = .on
+                    locationModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    locationModeButton.state = .on
                     self.tableView.setAdaptiveButtonHidden(false)
                 case .manual:
-                    self.manualModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
-                    self.manualModeButton.state = .on
+                    manualModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: adaptiveMode).cgColor
+                    manualModeButton.state = .on
                     self.tableView.setAdaptiveButtonHidden(true)
                 }
             }
-        })
+        }
     }
 
     @IBAction func toggleMode(_ sender: NSButton) {
@@ -333,6 +344,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 brightnessAdapter.enable(mode: .manual)
             }
         case .off:
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+                return
+            }
             sender.layer?.backgroundColor = getOffColor(sender)
             if sender == manualModeButton {
                 brightnessAdapter.enable()

@@ -65,6 +65,13 @@
                                                             <binding destination="3YV-ka-Eop" name="value" keyPath="values.showQuickActions" id="O07-8q-0Vv"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Use CoreDisplay for Apple monitors" id="e52-MQ-o4j">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.useCoreDisplay" id="0Fi-hH-rqu"/>
+                                                        </connections>
+                                                    </menuItem>
                                                     <menuItem title="Use media keys as hotkeys" id="JX8-ut-4Ov">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -334,7 +341,7 @@
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
                     </connections>
                 </customObject>
-                <customObject id="JCY-9H-EwC" customClass="SPUStandardUpdaterController"/>
+                <customObject id="JCY-9H-EwC" customClass="SUUpdater"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="3YV-ka-Eop"/>
@@ -2262,6 +2269,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qSg-Ez-8IX" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="35" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vw7-rh-88K">
                                 <rect key="frame" x="35" y="575" width="220" height="19"/>
@@ -2275,6 +2287,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NFS-Qe-xXa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iJ1-yY-kOt">
                                 <rect key="frame" x="697" y="575" width="220" height="19"/>
@@ -2288,6 +2305,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rE2-oz-MBj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mQ5-GB-kAw">
                                 <rect key="frame" x="697" y="495" width="220" height="19"/>
@@ -2301,6 +2323,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMg-N3-c8c" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9mU-Sj-Sma">
                                 <rect key="frame" x="697" y="415" width="220" height="19"/>
@@ -2314,6 +2341,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pdK-Vf-9Uj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UOh-D1-P9g">
                                 <rect key="frame" x="697" y="335" width="220" height="19"/>
@@ -2327,6 +2359,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xwH-nW-wyC" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="213" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="efg-HE-aLk">
                                 <rect key="frame" x="697" y="255" width="220" height="19"/>
@@ -2340,6 +2377,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qpQ-sn-PDN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="35" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJl-1a-wCR">
                                 <rect key="frame" x="35" y="495" width="220" height="19"/>
@@ -2353,6 +2395,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fS1-2j-dXP" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="35" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q2B-JF-iLj">
                                 <rect key="frame" x="35" y="415" width="220" height="19"/>
@@ -2366,6 +2413,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQS-7I-I6a" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="35" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mRo-oA-SEK">
                                 <rect key="frame" x="35" y="335" width="220" height="19"/>
@@ -2379,6 +2431,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v3W-ni-TYa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Qf-Fh-CXU">
                                 <rect key="frame" x="365" y="575" width="220" height="19"/>
@@ -2392,6 +2449,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fJo-VM-XnY" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="453" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ddz-Ba-c0d">
                                 <rect key="frame" x="365" y="495" width="220" height="19"/>
@@ -2405,6 +2467,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F4a-Ib-syq" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="373" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S9L-Dx-ksA">
                                 <rect key="frame" x="365" y="415" width="220" height="19"/>
@@ -2418,6 +2485,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TJV-V1-URJ" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="293" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Obv-oP-JEe">
                                 <rect key="frame" x="365" y="335" width="220" height="19"/>
@@ -2431,6 +2503,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Us2-PS-6r3" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="213" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q8C-C9-9hd">
                                 <rect key="frame" x="365" y="255" width="220" height="19"/>
@@ -2444,6 +2521,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0AC-Li-Jzu" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="133" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3B8-H3-sE9">
                                 <rect key="frame" x="365" y="175" width="220" height="19"/>
@@ -2457,6 +2539,11 @@ to view other displays</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ucS-rK-pL2" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="365" y="53" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZXp-8n-lcU">
                                 <rect key="frame" x="365" y="95" width="220" height="19"/>

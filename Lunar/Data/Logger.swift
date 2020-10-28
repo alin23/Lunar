@@ -6,29 +6,30 @@
 //  Copyright © 2018 Alin. All rights reserved.
 //
 
+import Defaults
 import Foundation
 import SwiftyBeaver
 
 class Logger: SwiftyBeaver {
     static let console = ConsoleDestination()
     static let file = FileDestination()
-    static var debugModeObserver: NSKeyValueObservation?
+    static var debugModeObserver: DefaultsObservation?
 
     class func initLogger() {
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n$X"
 
-        setMinLevel(debug: datastore.defaults.debug)
-        debugModeObserver = datastore.defaults.observe(\.debug, options: [.new], changeHandler: { _, change in
-            self.setMinLevel(debug: change.newValue ?? false)
-        })
+        setMinLevel(debug: Defaults[.debug])
+        debugModeObserver = Defaults.observe(.debug) { change in
+            self.setMinLevel(debug: change.newValue)
+        }
 
         Logger.addDestination(console)
         Logger.addDestination(file)
     }
 
     class func setMinLevel(debug _: Bool) {
-        if !datastore.defaults.debug {
+        if !Defaults[.debug] {
             console.minLevel = .info
             file.minLevel = .info
         } else {
@@ -37,10 +38,10 @@ class Logger: SwiftyBeaver {
         }
     }
 
-    open override class func verbose(
+    override open class func verbose(
         _ message: @autoclosure () -> Any,
-        _
-        file: String = #file,
+        _ file: String = #file,
+
         _ function: String = #function,
         line: Int = #line,
         context: Any? = nil
@@ -48,10 +49,10 @@ class Logger: SwiftyBeaver {
         super.verbose(message(), file, function, line: line, context: context)
     }
 
-    open override class func debug(
+    override open class func debug(
         _ message: @autoclosure () -> Any,
-        _
-        file: String = #file,
+        _ file: String = #file,
+
         _ function: String = #function,
         line: Int = #line,
         context: Any? = nil
@@ -59,10 +60,10 @@ class Logger: SwiftyBeaver {
         super.debug(message(), file, function, line: line, context: context)
     }
 
-    open override class func info(
+    override open class func info(
         _ message: @autoclosure () -> Any,
-        _
-        file: String = #file,
+        _ file: String = #file,
+
         _ function: String = #function,
         line: Int = #line,
         context: Any? = nil
@@ -70,10 +71,10 @@ class Logger: SwiftyBeaver {
         super.info(message(), file, function, line: line, context: context)
     }
 
-    open override class func warning(
+    override open class func warning(
         _ message: @autoclosure () -> Any,
-        _
-        file: String = #file,
+        _ file: String = #file,
+
         _ function: String = #function,
         line: Int = #line,
         context: Any? = nil
@@ -81,10 +82,10 @@ class Logger: SwiftyBeaver {
         super.warning(message(), file, function, line: line, context: context)
     }
 
-    open override class func error(
+    override open class func error(
         _ message: @autoclosure () -> Any,
-        _
-        file: String = #file,
+        _ file: String = #file,
+
         _ function: String = #function,
         line: Int = #line,
         context: Any? = nil
