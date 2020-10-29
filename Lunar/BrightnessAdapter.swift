@@ -51,7 +51,7 @@ class BrightnessAdapter {
         }
     }
 
-    var displays: [CGDirectDisplayID: Display] = BrightnessAdapter.getDisplays()
+    var displays: [CGDirectDisplayID: Display] = [:]
     var builtinDisplay = DDC.getBuiltinDisplay() {
         didSet {
             BrightnessAdapter.lastKnownBuiltinDisplayID = builtinDisplay ?? GENERIC_DISPLAY_ID
@@ -187,7 +187,7 @@ class BrightnessAdapter {
         addSentryData()
     }
 
-    private static func getDisplays() -> [CGDirectDisplayID: Display] {
+    static func getDisplays() -> [CGDirectDisplayID: Display] {
         var displays: [CGDirectDisplayID: Display]
         let displayIDs = Set(DDC.findExternalDisplays())
 

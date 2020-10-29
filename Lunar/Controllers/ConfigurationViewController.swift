@@ -23,7 +23,7 @@ class ConfigurationViewController: NSViewController {
     ## Adjusting values
     Use one of the following gestures **while hovering on the value with your mouse or trackpad**
     - Scroll vertically using the mouse or trackpad
-    - Press the up/down arrow keys on your keyboard
+    - Hold Shift and press the up/down arrow keys on your keyboard
     """
     lazy var NOON_DURATION_TOOLTIP = """
     ## Description

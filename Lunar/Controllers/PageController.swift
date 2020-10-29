@@ -37,7 +37,12 @@ extension AppDelegate: NSPageControllerDelegate {
                 if c.selectedIndex > 2 {
                     hideSwipeRightHint(c: c)
                 }
+
                 splitViewController.whiteBackground()
+                if c.selectedIndex == c.pageControl.numberOfPages - 1 {
+                    splitViewController.lastPage()
+                }
+
                 if let displayController = viewController as? DisplayViewController {
                     displayController.initGraph()
                 }
@@ -173,7 +178,20 @@ class PageController: NSPageController {
         }
 
         setupPageControl(size: arrangedObjects.count)
+        if let splitViewController = parent as? SplitViewController {
+            splitViewController.onLeftButtonPress = { [weak self] in
+                self?.navigateBack(nil)
+            }
+            splitViewController.onRightButtonPress = { [weak self] in
+                self?.navigateForward(nil)
+            }
+            if pageControl.numberOfPages == 3 {
+                splitViewController.lastPage()
+            }
+        }
+
         selectedIndex = 2
+
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
@@ -182,8 +200,8 @@ class PageController: NSPageController {
         log.debug("Setting up left and right arrow keys")
 
         disableLeftRightHotkeys()
-        if let leftKeyCombo = KeyCombo(key: .leftArrow, carbonModifiers: 0),
-            let rightKeyCombo = KeyCombo(key: .rightArrow, carbonModifiers: 0) {
+        if let leftKeyCombo = KeyCombo(key: .leftArrow, cocoaModifiers: .shift),
+            let rightKeyCombo = KeyCombo(key: .rightArrow, cocoaModifiers: .shift) {
             leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
             rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
 

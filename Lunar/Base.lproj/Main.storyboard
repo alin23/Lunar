@@ -533,10 +533,38 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
+                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTp-EE-gEX" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="20" y="39" width="48" height="53"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" name="keyboardFocusIndicatorColor" catalog="System" colorSpace="catalog"/>
+                                </shadow>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSGoLeftTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="4Bd-TL-5QE">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="goLeft:" target="cu7-9X-1cE" id="G0T-l9-3xh"/>
+                                </connections>
+                            </button>
+                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DOd-ks-yiz" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="882" y="39" width="48" height="53"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSGoRightTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="z5e-EA-nMd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="goRight:" target="cu7-9X-1cE" id="ack-5y-UBj"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
+                        <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
+                        <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
                         <outlet property="locationHelpButton" destination="Ljd-VW-9qI" id="bJ1-PE-vDW"/>
                         <outlet property="locationModeButton" destination="mb8-Kc-CPS" id="wJg-Rg-8s3"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
@@ -1225,12 +1253,12 @@
                                 </connections>
                             </button>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUN-Fw-jrZ">
-                                <rect key="frame" x="-2" y="28" width="182" height="38"/>
+                                <rect key="frame" x="-2" y="28" width="224" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="ljB-tR-ECu">
                                     <font key="font" size="13" name="Menlo-Bold"/>
-                                    <string key="title">Swipe left or press
-← to view Hotkeys</string>
+                                    <string key="title">Swipe right or press
+Shift + ← to view Hotkeys</string>
                                     <color key="textColor" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -2107,22 +2135,22 @@
                                 </connections>
                             </customView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="54O-dg-1WQ">
-                                <rect key="frame" x="34" y="588" width="182" height="38"/>
+                                <rect key="frame" x="34" y="588" width="248" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="79O-SG-Ogd">
                                     <font key="font" size="13" name="Menlo-Bold"/>
-                                    <string key="title">Swipe left or press ←
+                                    <string key="title">Swipe right or press Shift + ←
 to view Settings</string>
                                     <color key="textColor" red="1" green="0.36862745098039218" blue="0.52549019607843139" alpha="0.90459947183098588" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0WE-QT-onu">
-                                <rect key="frame" x="734" y="588" width="182" height="38"/>
+                                <rect key="frame" x="673" y="588" width="243" height="38"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" focusRingType="none" alignment="center" id="Xhe-mJ-6JY">
                                     <font key="font" size="13" name="Menlo-Bold"/>
-                                    <string key="title">Swipe right or press →
+                                    <string key="title">Swipe left or press Shift + →
 to view other displays</string>
                                     <color key="textColor" red="1" green="0.36862745098039218" blue="0.52549019607843139" alpha="0.89951034330985913" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2969,6 +2997,8 @@ to view other displays</string>
         <image name="Display" width="250" height="211"/>
         <image name="Moon" width="391" height="390"/>
         <image name="NSAddTemplate" width="14" height="13"/>
+        <image name="NSGoLeftTemplate" width="10" height="14"/>
+        <image name="NSGoRightTemplate" width="10" height="14"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>
     </resources>

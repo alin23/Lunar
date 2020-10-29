@@ -81,6 +81,7 @@ var lunarDisplayNames = [
 
 let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
+
 let datastore = DataStore()
 var activeDisplay: Display?
 var helpPopover: NSPopover?
@@ -708,6 +709,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
         }
 
+        brightnessAdapter.displays = BrightnessAdapter.getDisplays()
         brightnessAdapter.addSentryData()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {

@@ -139,9 +139,22 @@ class SplitViewController: NSSplitViewController {
     @IBOutlet var manualHelpButton: HelpButton!
     @IBOutlet var sensorHelpButton: HelpButton!
     @IBOutlet var navigationHelpButton: HelpButton!
+    @IBOutlet var goLeftButton: PageButton!
+    @IBOutlet var goRightButton: PageButton!
+
+    var onLeftButtonPress: (() -> Void)?
+    var onRightButtonPress: (() -> Void)?
 
     var buttons: [ToggleButton?] {
         return [syncModeButton, locationModeButton, manualModeButton, sensorModeButton]
+    }
+
+    @IBAction func goRight(_: Any) {
+        onRightButtonPress?()
+    }
+
+    @IBAction func goLeft(_: Any) {
+        onLeftButtonPress?()
     }
 
     @IBAction func toggleBrightnessAdapter(sender button: ToggleButton?) {
@@ -173,6 +186,11 @@ class SplitViewController: NSSplitViewController {
         return view.layer?.backgroundColor == white.cgColor
     }
 
+    func lastPage() {
+        goLeftButton.enable()
+        goRightButton.disable()
+    }
+
     func whiteBackground() {
         view.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
         view.layer?.backgroundColor = white.cgColor
@@ -186,6 +204,9 @@ class SplitViewController: NSSplitViewController {
             button?.fade()
         }
         helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+
+        goLeftButton.enable()
+        goRightButton.enable()
     }
 
     func yellowBackground() {
@@ -201,6 +222,9 @@ class SplitViewController: NSSplitViewController {
             button?.fade()
         }
         helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+
+        goLeftButton.enable()
+        goRightButton.enable()
     }
 
     func mauveBackground() {
@@ -215,6 +239,9 @@ class SplitViewController: NSSplitViewController {
             button?.fade()
         }
         helpPopover?.appearance = NSAppearance(named: .vibrantDark)
+
+        goLeftButton.disable()
+        goRightButton.enable(color: logoColor)
     }
 
     override func viewDidLoad() {

@@ -82,6 +82,7 @@
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
+		C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D6C720254ADAEB007E91B6 /* PageButton.swift */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
@@ -200,6 +201,7 @@
 		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7CFEA1B1FD376E6000AC4A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7D6C720254ADAEB007E91B6 /* PageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageButton.swift; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				C7C68F0C201D3D9800F49A2B /* SettingsView.swift */,
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
 				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
+				C7D6C720254ADAEB007E91B6 /* PageButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -620,6 +623,7 @@
 				C72776E7201F02140055934F /* PageControl.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
+				C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,

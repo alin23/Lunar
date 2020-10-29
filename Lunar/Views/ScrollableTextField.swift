@@ -143,8 +143,8 @@ class ScrollableTextField: NSTextField {
 
         disableUpDownHotkeys()
         log.debug("Registering up/down hotkeys")
-        if let upKeyCombo = KeyCombo(key: .upArrow, carbonModifiers: 0),
-            let downKeyCombo = KeyCombo(key: .downArrow, carbonModifiers: 0) {
+        if let upKeyCombo = KeyCombo(key: .upArrow, cocoaModifiers: .shift),
+            let downKeyCombo = KeyCombo(key: .downArrow, cocoaModifiers: .shift) {
             upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: upKeyCombo) { [weak self] _ in
                 guard let self = self else { return }
                 self.increaseValue()
