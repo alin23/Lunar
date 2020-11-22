@@ -127,7 +127,8 @@ class BrightnessAdapter {
     }
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
-        return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
+        return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID &&
+            (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
     }
 
     func removeDisplay(id: CGDirectDisplayID) {
@@ -338,19 +339,23 @@ class BrightnessAdapter {
         }
 
         if let geolocation = geolocation {
-            AF.request("https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0").validate().responseJSON { [weak self] response in
-                switch response.result {
-                case let .success(value):
-                    let json = JSON(value)
-                    if json["status"].string == "OK" {
-                        self?.moment = Moment(result: json["results"].dictionaryValue)
-                    } else {
-                        log.error("Sunrise API status: \(json["status"].string ?? "null")")
+            AF
+                .request(
+                    "https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0"
+                )
+                .validate().responseJSON { [weak self] response in
+                    switch response.result {
+                    case let .success(value):
+                        let json = JSON(value)
+                        if json["status"].string == "OK" {
+                            self?.moment = Moment(result: json["results"].dictionaryValue)
+                        } else {
+                            log.error("Sunrise API status: \(json["status"].string ?? "null")")
+                        }
+                    case let .failure(error):
+                        log.error("Sunrise API error: \(error)")
                     }
-                case let .failure(error):
-                    log.error("Sunrise API error: \(error)")
                 }
-            }
         }
     }
 
@@ -425,7 +430,13 @@ class BrightnessAdapter {
                 log.warning("There's no builtin display to sync with")
                 return
             }
-            adapt = { display in display.adapt(moment: nil, app: self.runningAppExceptions?.last, percent: builtinBrightness, brightnessClipMin: self.brightnessClipMin, brightnessClipMax: self.brightnessClipMax) }
+            adapt = { display in display.adapt(
+                moment: nil,
+                app: self.runningAppExceptions?.last,
+                percent: builtinBrightness,
+                brightnessClipMin: self.brightnessClipMin,
+                brightnessClipMax: self.brightnessClipMax
+            ) }
         case .location:
             if moment == nil {
                 log.warning("Day moments aren't fetched yet")
@@ -457,7 +468,8 @@ class BrightnessAdapter {
     }
 
     func getBuiltinDisplayBrightness() -> Double? {
-        if builtinDisplay != nil, !IsLidClosed(), let brightness = DDC.getBrightness() {
+//        if builtinDisplay != nil, !IsLidClosed(), let brightness = DDC.getBrightness() {
+        if !IsLidClosed(), let brightness = DDC.getBrightness() {
             if brightness >= 0.0, brightness <= 1.0 {
                 let percentBrightness = brightness * 100.0
                 builtinBrightnessHistory = (builtinBrightnessHistory << 8) | UInt64(UInt8(round(percentBrightness)))
@@ -598,7 +610,11 @@ class BrightnessAdapter {
 
     func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
-            let value = cap(display.brightness.intValue + offset, minVal: Defaults[.brightnessLimitMin], maxVal: Defaults[.brightnessLimitMax])
+            let value = cap(
+                display.brightness.intValue + offset,
+                minVal: Defaults[.brightnessLimitMin],
+                maxVal: Defaults[.brightnessLimitMax]
+            )
             display.brightness = NSNumber(value: value)
         }
     }

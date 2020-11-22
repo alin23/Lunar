@@ -127,10 +127,10 @@ class SplitViewController: NSSplitViewController {
     var activeTitleHover: NSMutableAttributedString?
 
     @IBOutlet var logo: NSTextField?
-    @IBOutlet var syncModeButton: ToggleButton?
-    @IBOutlet var locationModeButton: ToggleButton?
-    @IBOutlet var manualModeButton: ToggleButton?
-    @IBOutlet var sensorModeButton: ToggleButton?
+    @IBOutlet var syncModeButton: AdaptiveModeButton?
+    @IBOutlet var locationModeButton: AdaptiveModeButton?
+    @IBOutlet var manualModeButton: AdaptiveModeButton?
+    @IBOutlet var sensorModeButton: AdaptiveModeButton?
 
     @IBOutlet var containerView: NSView?
 
@@ -145,7 +145,7 @@ class SplitViewController: NSSplitViewController {
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
 
-    var buttons: [ToggleButton?] {
+    var buttons: [AdaptiveModeButton?] {
         return [syncModeButton, locationModeButton, manualModeButton, sensorModeButton]
     }
 
@@ -157,7 +157,7 @@ class SplitViewController: NSSplitViewController {
         onLeftButtonPress?()
     }
 
-    @IBAction func toggleBrightnessAdapter(sender button: ToggleButton?) {
+    @IBAction func toggleBrightnessAdapter(sender button: AdaptiveModeButton?) {
         if let button = button, let mode = AdaptiveMode(rawValue: button.mode) {
             log.debug("Changed mode to \(mode)")
             Defaults[.adaptiveBrightnessMode] = mode
@@ -214,7 +214,7 @@ class SplitViewController: NSSplitViewController {
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = bgColor
-            logo.stringValue = "LUNAR"
+            logo.stringValue = "SETTINGS"
         }
 
         for button in buttons {
@@ -255,6 +255,7 @@ class SplitViewController: NSSplitViewController {
         navigationHelpButton?.onMouseExit = {
             Defaults[.showNavigationHints] = false
         }
+
         super.viewDidLoad()
     }
 }

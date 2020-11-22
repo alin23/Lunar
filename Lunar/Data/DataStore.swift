@@ -50,12 +50,20 @@ let APP_SETTINGS = [
 ]
 
 class DataStore: NSObject {
-    func displays(serials _: [String]? = nil) -> [Display]? {
-        return Defaults[.displays]
+    func displays(serials: [String]? = nil) -> [Display]? {
+        guard let displays = Defaults[.displays] else { return nil }
+        if let ids = serials {
+            return displays.filter { display in ids.contains(display.serial) }
+        }
+        return displays
     }
 
-    func appExceptions(identifiers _: [String]? = nil) -> [AppException]? {
-        return Defaults[.appExceptions]
+    func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
+        guard let apps = Defaults[.appExceptions] else { return nil }
+        if let ids = identifiers {
+            return apps.filter { app in ids.contains(app.identifier) }
+        }
+        return apps
     }
 
     func settingsDictionary() -> [String: Any]? {
@@ -208,4 +216,5 @@ extension Defaults.Keys {
     static let astronomicalTwilightBegin = Key<String?>("astronomicalTwilightBegin", default: nil)
     static let astronomicalTwilightEnd = Key<String?>("astronomicalTwilightEnd", default: nil)
     static let dayLength = Key<UInt64>("dayLength", default: 0)
+    static let hideMenuBarIcon = Key<Bool>("hideMenuBarIcon", default: false)
 }

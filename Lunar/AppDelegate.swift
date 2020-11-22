@@ -56,7 +56,8 @@ let serialQueue = DispatchQueue(label: "site.lunarapp.serial.queue.fg", qos: .us
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = true
-let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true).appendingPathComponent("swiftybeaver.log", isDirectory: false)
+let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
+    .appendingPathComponent("swiftybeaver.log", isDirectory: false)
 let TRANSFER_URL = "https://transfer.sh"
 let LOG_UPLOAD_URL = "https://log.lunar.fyi/upload"
 let ANALYTICS_URL = "https://log.lunar.fyi/analytics"
@@ -198,6 +199,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var loginItemObserver: DefaultsObservation?
     var syncPollingSecondsObserver: DefaultsObservation?
     var refreshValuesObserver: DefaultsObservation?
+    var hideMenuBarIconObserver: DefaultsObservation?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
@@ -249,7 +251,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             if !preciseHotkeys.contains(identifier) {
                 if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                    Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
+                    Hotkey.keys[identifier] = Magnet.HotKey(
+                        identifier: identifier.rawValue,
+                        keyCombo: keyCombo,
+                        target: self,
+                        action: Hotkey.handler(identifier: identifier)
+                    )
                     if enabled == 1 {
                         Hotkey.keys[identifier]??.register()
                     }
@@ -281,7 +288,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
 
                 if let keyCombo = KeyCombo(QWERTYKeyCode: coarseKeyCode, carbonModifiers: newModifiers) {
-                    Hotkey.keys[identifier] = Magnet.HotKey(identifier: identifier.rawValue, keyCombo: keyCombo, target: self, action: Hotkey.handler(identifier: identifier))
+                    Hotkey.keys[identifier] = Magnet.HotKey(
+                        identifier: identifier.rawValue,
+                        keyCombo: keyCombo,
+                        target: self,
+                        action: Hotkey.handler(identifier: identifier)
+                    )
                     if enabled == 1 {
                         Hotkey.keys[identifier]??.register()
                     }
@@ -332,7 +344,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         if windowController == nil {
-            windowController = mainStoryboard?.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
+            windowController = mainStoryboard?
+                .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("windowController")) as? ModernWindowController
         }
 
         if let wc = windowController {
@@ -417,7 +430,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
                         brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
                         runInMainThread {
-                            self?.builtinBrightnessMenuItem?.title = "Built-in display brightness: \((builtinBrightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
+                            self?.builtinBrightnessMenuItem?
+                                .title = "Built-in display brightness: \((builtinBrightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
                         }
 
                         if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
@@ -453,6 +467,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 if Thread.current.isCancelled { return }
             }
         }
+        valuesReaderThread.qualityOfService = .background
         valuesReaderThread.start()
     }
 
@@ -470,7 +485,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             button.image?.isTemplate = true
 
             statusItemButtonController = StatusItemButtonController(button: button)
-            statusButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: statusItemButtonController, userInfo: nil)
+            statusButtonTrackingArea = NSTrackingArea(
+                rect: button.visibleRect,
+                options: [.mouseEnteredAndExited, .activeAlways],
+                owner: statusItemButtonController,
+                userInfo: nil
+            )
             if let trackingArea = statusButtonTrackingArea {
                 button.addTrackingArea(trackingArea)
             }
@@ -487,7 +507,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 storyboard = NSStoryboard(name: "Main", bundle: nil)
             }
 
-            menuPopover.contentViewController = storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
+            menuPopover.contentViewController = storyboard!
+                .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
             menuPopover.contentViewController!.loadView()
 
             DistributedNotificationCenter.default().addObserver(
@@ -611,9 +632,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         volumeKeysEnabledObserver = Defaults.observe(.volumeKeysEnabled) { _ in
             self.startOrRestartMediaKeyTap()
         }
+        hideMenuBarIconObserver = Defaults.observe(.hideMenuBarIcon) { change in
+            log.info("Hiding menu bar icon: \(change.newValue)")
+            self.statusItem.isVisible = !change.newValue
+        }
 
         concurrentQueue.async {
-            AMCoreAudio.NotificationCenter.defaultCenter.subscribe(AudioEventSubscriber(), eventType: AudioHardwareEvent.self, dispatchQueue: concurrentQueue)
+            AMCoreAudio.NotificationCenter.defaultCenter.subscribe(
+                AudioEventSubscriber(),
+                eventType: AudioHardwareEvent.self,
+                dispatchQueue: concurrentQueue
+            )
         }
     }
 
@@ -662,7 +691,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
 
-        let dataString = "id=\(serialNumberHash) version=\(appVersion) clamshell=\(IsLidClosed()) displays=\(brightnessAdapter.activeDisplays.count) mode=\(brightnessAdapter.mode) machine=\(Sysctl.model)"
+        let dataString =
+            "id=\(serialNumberHash) version=\(appVersion) clamshell=\(IsLidClosed()) displays=\(brightnessAdapter.activeDisplays.count) mode=\(brightnessAdapter.mode) machine=\(Sysctl.model)"
         let data = dataString.data(using: .utf8, allowLossyConversion: true) ?? "no-data".data(using: .utf8)!
         log.info("Sending analytics", context: ["data": dataString])
         let req = AF.upload(data, to: ANALYTICS_URL)
@@ -981,25 +1011,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         runInMainThread {
             if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to open a Github issue?") {
                 guard let serialNumberHash = getSerialNumberHash(),
-                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?
+                    .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
                     NSWorkspace.shared.open(
                         URL(
                             string:
                             "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D"
-                    )!)
+                        )!
+                    )
                     return
                 }
                 NSWorkspace.shared.open(
                     URL(
                         string:
                         "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5BNO+LOGS%5D+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D"
-                )!)
+                    )!
+                )
             }
         }
     }
 
     @IBAction func sendDebugData(_: Any) {
-        guard dialog(message: "This will run a few diagnostic tests by trying to change the brightness and contrast of all of your external displays", info: "Do you want to continue?") else {
+        guard dialog(
+            message: "This will run a few diagnostic tests by trying to change the brightness and contrast of all of your external displays",
+            info: "Do you want to continue?"
+        ) else {
             return
         }
 
@@ -1019,8 +1055,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             guard let serialNumberHash = getSerialNumberHash() else { return }
 
             let activeDisplays = brightnessAdapter.activeDisplays
-            let oldBrightness = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.brightness) }, uniquingKeysWith: { first, _ in first })
-            let oldContrast = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.contrast) }, uniquingKeysWith: { first, _ in first })
+            let oldBrightness = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.brightness) }, uniquingKeysWith: { first, _ in
+                first
+            })
+            let oldContrast = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.contrast) }, uniquingKeysWith: { first, _ in
+                first
+            })
 
             brightnessAdapter.resetDisplayList()
             for (id, display) in brightnessAdapter.activeDisplays {
@@ -1085,8 +1125,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     return
                 }
 
-                let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "NOVERSION"
-                if let url = URL(string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D") {
+                let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?
+                    .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "NOVERSION"
+                if let url =
+                    URL(
+                        string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D"
+                    ) {
                     NSWorkspace.shared.open(url)
                 }
             })

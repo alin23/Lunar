@@ -70,6 +70,8 @@
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
+		C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */; };
+		C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */ = {isa = PBXBuildFile; productRef = C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
 		C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */; };
 		C7C1F7031FD5FD390039507C /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7021FD5FD390039507C /* Display.swift */; };
@@ -184,6 +186,7 @@
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
 		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
+		C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveModeButton.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
 		C7C1F7021FD5FD390039507C /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
@@ -220,6 +223,7 @@
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
+				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
 				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
@@ -334,6 +338,7 @@
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
 				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
 				C7D6C720254ADAEB007E91B6 /* PageButton.swift */,
+				C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -458,6 +463,7 @@
 				C77000112546E5C1005131FB /* Sparkle */,
 				C7B5E8582548B3F900530B47 /* Defaults */,
 				C7B5E85C2548B5AC00530B47 /* AnyCodable */,
+				C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -513,6 +519,7 @@
 				C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */,
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
 				C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */,
+				C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -660,6 +667,7 @@
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
+				C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
@@ -1070,6 +1078,14 @@
 				minimumVersion = 0.3.0;
 			};
 		};
+		C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/eddiekaiger/SwiftyAttributes";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.0;
+			};
+		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/IBM-Swift/BlueECC.git";
@@ -1170,6 +1186,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */;
 			productName = AnyCodable;
+		};
+		C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */;
+			productName = SwiftyAttributes;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;

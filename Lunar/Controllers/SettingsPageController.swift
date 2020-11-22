@@ -12,7 +12,16 @@ import Defaults
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
+    @IBOutlet var settingsContainerView: NSView!
+    @IBOutlet var advancedSettingsContainerView: NSView!
+    @IBOutlet var advancedSettingsButton: ToggleButton!
+    @objc dynamic var advancedSettingsShown = false
+
     var adaptiveModeObserver: DefaultsObservation?
+
+    @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
+        advancedSettingsShown = sender.state == .on
+    }
 
     func updateDataset(
         display: Display,
@@ -96,20 +105,55 @@ class SettingsPageController: NSViewController {
             let maxValues = brightnessContrastChart.maxValuesSync
             let xs = stride(from: 0, to: maxValues - 1, by: 1)
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, offset: brightnessOffset, appOffset: appBrightnessOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
+            for (x, b) in zip(
+                xs,
+                display
+                    .computeSIMDValue(
+                        from: percents,
+                        type: .brightness,
+                        offset: brightnessOffset,
+                        appOffset: appBrightnessOffset,
+                        brightnessClipMin: brightnessClipMin,
+                        brightnessClipMax: brightnessClipMax
+                    )
+            ) {
                 brightnessChartEntry[x].y = b.doubleValue
             }
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, offset: contrastOffset, appOffset: appContrastOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
+            for (x, b) in zip(
+                xs,
+                display
+                    .computeSIMDValue(
+                        from: percents,
+                        type: .contrast,
+                        offset: contrastOffset,
+                        appOffset: appContrastOffset,
+                        brightnessClipMin: brightnessClipMin,
+                        brightnessClipMax: brightnessClipMax
+                    )
+            ) {
                 contrastChartEntry[x].y = b.doubleValue
             }
         case .manual:
             let maxValues = brightnessContrastChart.maxValuesSync
             let xs = stride(from: 0, to: maxValues - 1, by: 1)
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "brightness", minVal: brightnessLimitMin, maxVal: brightnessLimitMax)) {
+            for (x, b) in zip(
+                xs,
+                brightnessAdapter
+                    .computeSIMDManualValueFromPercent(
+                        from: percents,
+                        key: "brightness",
+                        minVal: brightnessLimitMin,
+                        maxVal: brightnessLimitMax
+                    )
+            ) {
                 brightnessChartEntry[x].y = b
             }
-            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax)) {
+            for (x, b) in zip(
+                xs,
+                brightnessAdapter
+                    .computeSIMDManualValueFromPercent(from: percents, key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax)
+            ) {
                 contrastChartEntry[x].y = b
             }
         }
@@ -125,19 +169,26 @@ class SettingsPageController: NSViewController {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] change in
-            guard let self = self, change.newValue != change.oldValue else {
-                return
+        adaptiveModeObserver = Defaults
+            .observe(.adaptiveBrightnessMode) { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] change in
+                guard let self = self, change.newValue != change.oldValue else {
+                    return
+                }
+                if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
+                    self.initGraph(display: brightnessAdapter.firstDisplay, mode: change.newValue)
+                }
             }
-            if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
-                self.initGraph(display: brightnessAdapter.firstDisplay, mode: change.newValue)
-            }
-        }
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
         runInMainThread { [weak brightnessContrastChart] in
-            brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
+            brightnessContrastChart?.initGraph(
+                display: display,
+                brightnessColor: brightnessGraphColorYellow,
+                contrastColor: contrastGraphColorYellow,
+                labelColor: xAxisLabelColorYellow,
+                mode: mode
+            )
         }
     }
 
@@ -151,5 +202,7 @@ class SettingsPageController: NSViewController {
         view.layer?.backgroundColor = settingsBgColor.cgColor
         initGraph(display: nil)
         listenForAdaptiveModeChange()
+        advancedSettingsButton.page = .settings
+        advancedSettingsButton.isHidden = false
     }
 }

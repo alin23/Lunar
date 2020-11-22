@@ -91,7 +91,7 @@ let hotkeyColor: [HoverState: [String: NSColor]] = [
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
 ]
-let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
+let offStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
     .hover: [
         .hotkeys: mauve,
         .settings: lunarYellow,
@@ -103,7 +103,20 @@ let stateButtonLabelColor: [HoverState: [Page: NSColor]] = [
         .display: mauve.withAlphaComponent(0.35),
     ],
 ]
-let stateButtonColor: [HoverState: [Page: NSColor]] = [
+let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
+    .hover: [
+        .hotkeys: mauve,
+        .settings: lunarYellow,
+        .display: mauve,
+    ],
+    .noHover: [
+        .hotkeys: white,
+        .settings: white,
+        .display: mauve.withAlphaComponent(0.35),
+    ],
+]
+
+let offStateButtonColor: [HoverState: [Page: NSColor]] = [
     .hover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.9),
         .settings: mauve.withAlphaComponent(0.5),
@@ -112,6 +125,19 @@ let stateButtonColor: [HoverState: [Page: NSColor]] = [
     .noHover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.3),
         .settings: white.withAlphaComponent(0.3),
+        .display: gray,
+    ],
+]
+
+let onStateButtonColor: [HoverState: [Page: NSColor]] = [
+    .hover: [
+        .hotkeys: lunarYellow.withAlphaComponent(0.9),
+        .settings: mauve,
+        .display: lunarYellow,
+    ],
+    .noHover: [
+        .hotkeys: lunarYellow.withAlphaComponent(0.3),
+        .settings: mauve.withAlphaComponent(0.6),
         .display: gray,
     ],
 ]

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -408,7 +408,7 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="718" y="660" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Sync" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
@@ -425,7 +425,7 @@
                                 </connections>
                             </button>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="385" y="640" width="179" height="42"/>
+                                <rect key="frame" x="385" y="640" width="180" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -446,7 +446,7 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-Kc-CPS" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-Kc-CPS" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="718" y="630" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Location" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0VI-cN-HOF">
@@ -462,7 +462,7 @@
                                     <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="ORM-cW-q26"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XHf-be-ftM" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XHf-be-ftM" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="818" y="660" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Manual" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0wA-nk-IcH">
@@ -478,7 +478,7 @@
                                     <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="FWI-7z-j0H"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cwA-Ed-SH4" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cwA-Ed-SH4" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="818" y="630" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Sensor" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="jh5-zX-fak">
@@ -562,6 +562,7 @@
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
                         <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
@@ -579,7 +580,7 @@
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="96" y="1270"/>
+            <point key="canvasLocation" x="96" y="1227"/>
         </scene>
         <!--Page Controller-->
         <scene sceneID="fpi-QH-es0">
@@ -592,7 +593,56 @@
                 </pagecontroller>
                 <customObject id="H0s-9S-08j" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="96" y="2082"/>
+            <point key="canvasLocation" x="96" y="2007"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="TTU-we-rHZ">
+            <objects>
+                <viewController storyboardIdentifier="advancedSettingsViewController" id="dda-PO-nVZ" sceneMemberID="viewController">
+                    <view key="view" id="MRh-YX-LaJ">
+                        <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fbm-VT-kqX">
+                                <rect key="frame" x="43" y="571" width="300" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Hide menubar icon" id="tHN-CR-ilq">
+                                    <font key="font" size="19" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Qof-Xa-v4v">
+                                <rect key="frame" x="397" y="571" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="cja-oR-yaU">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.hideMenuBarIcon" id="XaE-IN-vZZ"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="XgM-tz-14f" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="20" y="578" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="zTy-A9-sUn">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="1Xr-ze-Y7B" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="DNB-4H-88e"/>
+            </objects>
+            <point key="canvasLocation" x="-1933" y="2007"/>
         </scene>
         <!--Settings Page Controller-->
         <scene sceneID="hgz-Zl-vw0">
@@ -610,21 +660,52 @@
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zJT-GX-NnT" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-25" y="-10" width="1000" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <binding destination="Whm-7P-QYV" name="hidden" keyPath="advancedSettingsShown" id="xSe-Bb-dkC"/>
+                                </connections>
                             </customView>
                             <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fR4-tr-Hez">
                                 <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <connections>
+                                    <binding destination="Whm-7P-QYV" name="hidden" keyPath="advancedSettingsShown" id="U6e-hh-6Tj"/>
                                     <segue destination="VFu-z9-UHh" kind="embed" id="Gqx-7X-Xsf"/>
                                 </connections>
                             </containerView>
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZPL-Mq-SYD">
+                                <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <connections>
+                                    <binding destination="Whm-7P-QYV" name="hidden" keyPath="advancedSettingsShown" id="YTJ-tc-eE3">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <segue destination="dda-PO-nVZ" kind="embed" id="4ZI-sw-jFt"/>
+                                </connections>
+                            </containerView>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YP9-Eb-WEN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="430" y="623" width="90" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Advanced" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gCp-ah-VHk">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleAdvancedSettings:" target="Whm-7P-QYV" id="aUN-yy-vgx"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="wNa-Gn-SW1"/>
+                        <outlet property="advancedSettingsContainerView" destination="ZPL-Mq-SYD" id="6mf-7X-NEZ"/>
                         <outlet property="brightnessContrastChart" destination="zJT-GX-NnT" id="bAP-fG-mvF"/>
+                        <outlet property="settingsContainerView" destination="fR4-tr-Hez" id="SeA-T4-PVi"/>
                     </connections>
                 </viewController>
                 <customObject id="teY-QZ-vXN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="vRr-wr-SBM"/>
             </objects>
             <point key="canvasLocation" x="-900" y="2007"/>
         </scene>
@@ -2284,7 +2365,7 @@ to view other displays</string>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="rew-Tm-BHz"/>
             </objects>
-            <point key="canvasLocation" x="159" y="2861"/>
+            <point key="canvasLocation" x="96" y="2861"/>
         </scene>
         <!--Hotkey View Controller-->
         <scene sceneID="JMM-DS-vfd">
@@ -2686,7 +2767,7 @@ to view other displays</string>
                 </viewController>
                 <customObject id="r0V-Yr-EMT" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1952" y="2861"/>
+            <point key="canvasLocation" x="-1933" y="2861"/>
         </scene>
         <!--Menu Popover Controller-->
         <scene sceneID="v1o-hJ-gsC">

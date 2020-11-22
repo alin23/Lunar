@@ -155,6 +155,15 @@
         }
       },
       {
+        "package": "SwiftyAttributes",
+        "repositoryURL": "https://github.com/eddiekaiger/SwiftyAttributes",
+        "state": {
+          "branch": null,
+          "revision": "0fbf992e6e4e1b98954f3d48f8523a67dfa5c8f3",
+          "version": "5.2.0"
+        }
+      },
+      {
         "package": "SwiftyBeaver",
         "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver",
         "state": {
