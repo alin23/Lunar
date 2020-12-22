@@ -184,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var syncPollingSeconds: Int = Defaults[.syncPollingSeconds]
     var refreshValues: Bool = Defaults[.refreshValues]
 
-    var mediaKeysEnabledObserver: DefaultsObservation?
+    var brightnessKeysEnabledObserver: DefaultsObservation?
     var volumeKeysEnabledObserver: DefaultsObservation?
     var daylightObserver: DefaultsObservation?
     var curveFactorObserver: DefaultsObservation?
@@ -238,9 +238,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         for identifier in HotkeyIdentifier.allCases {
             guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier],
-                let keyCode = hotkey[.keyCode],
-                var enabled = hotkey[.enabled],
-                let modifiers = hotkey[.modifiers]
+                  let keyCode = hotkey[.keyCode],
+                  var enabled = hotkey[.enabled],
+                  let modifiers = hotkey[.modifiers]
             else {
                 continue
             }
@@ -263,10 +263,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             } else {
                 guard let coarseIdentifier = coarseHotkeysMapping[identifier],
-                    let coarseHotkey = hotkeyConfig[coarseIdentifier] ?? Hotkey.defaults[coarseIdentifier],
-                    let coarseKeyCode = coarseHotkey[.keyCode],
-                    let coarseEnabled = coarseHotkey[.enabled],
-                    let coarseModifiers = coarseHotkey[.modifiers]
+                      let coarseHotkey = hotkeyConfig[coarseIdentifier] ?? Hotkey.defaults[coarseIdentifier],
+                      let coarseKeyCode = coarseHotkey[.keyCode],
+                      let coarseEnabled = coarseHotkey[.enabled],
+                      let coarseModifiers = coarseHotkey[.modifiers]
                 else {
                     continue
                 }
@@ -383,7 +383,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func setupHotkeys() {
         if windowController != nil, windowController!.window != nil,
-            let pageController = windowController!.window!.contentView?.subviews[0].subviews[0].nextResponder as? PageController {
+           let pageController = windowController!.window!.contentView?.subviews[0].subviews[0].nextResponder as? PageController
+        {
             pageController.setupHotkeys()
         }
     }
@@ -428,14 +429,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             syncThread = Thread { [weak self] in
                 while true {
                     if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                        brightnessAdapter.lastBuiltinBrightness != builtinBrightness {
+                       brightnessAdapter.lastBuiltinBrightness != builtinBrightness
+                    {
                         runInMainThread {
                             self?.builtinBrightnessMenuItem?
                                 .title = "Built-in display brightness: \((builtinBrightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
                         }
 
                         if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
-                            let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 }) {
+                           let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 })
+                        {
                             builtinBrightness = Double(lastBrightness)
                         }
 
@@ -626,7 +629,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.setKeyEquivalents(Defaults[.hotkeys])
             }
         }
-        mediaKeysEnabledObserver = Defaults.observe(.mediaKeysEnabled) { _ in
+        brightnessKeysEnabledObserver = Defaults.observe(.brightnessKeysEnabled) { _ in
             self.startOrRestartMediaKeyTap()
         }
         volumeKeysEnabledObserver = Defaults.observe(.volumeKeysEnabled) { _ in
@@ -677,7 +680,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func sendAnalytics() {
         guard let serialNumberHash = getSerialNumberHash(),
-            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
+              let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
         else {
             // log warning
             let serialNumberHash = getSerialNumberHash() ?? "no-serial-number"
@@ -1011,8 +1014,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         runInMainThread {
             if dialog(message: "There's no debug data stored for Lunar", info: "Do you want to open a Github issue?") {
                 guard let serialNumberHash = getSerialNumberHash(),
-                    let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?
-                    .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+                      let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)?
+                      .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+                else {
                     NSWorkspace.shared.open(
                         URL(
                             string:
@@ -1130,7 +1134,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 if let url =
                     URL(
                         string: "https://github.com/alin23/Lunar/issues/new?assignees=alin23&labels=diagnostics&template=lunar-diagnostics-report.md&title=Lunar+Diagnostics+Report+%5B\(serialNumberHash)%5D+%5B\(appVersion)%5D"
-                    ) {
+                    )
+                {
                     NSWorkspace.shared.open(url)
                 }
             })

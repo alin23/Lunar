@@ -44,7 +44,7 @@ let APP_SETTINGS = [
     .sunset,
     .syncPollingSeconds,
     .clamshellModeDetection,
-    .mediaKeysEnabled,
+    .brightnessKeysEnabled,
     .volumeKeysEnabled,
     .useCoreDisplay,
 ]
@@ -143,7 +143,8 @@ class DataStore: NSObject {
             if FileManager.default.fileExists(atPath: appPath) {
                 let bundle = Bundle(path: appPath)
                 guard let id = bundle?.bundleIdentifier,
-                    let name = bundle?.infoDictionary?["CFBundleName"] as? String else {
+                      let name = bundle?.infoDictionary?["CFBundleName"] as? String
+                else {
                     continue
                 }
                 if let exc = Defaults[.appExceptions]?.first(where: { $0.identifier == id }) {
@@ -171,7 +172,7 @@ class DataStore: NSObject {
 extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
     static let curveFactor = Key<Double>("curveFactor", default: 0.5)
-    static let mediaKeysEnabled = Key<Bool>("mediaKeysEnabled", default: true)
+    static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
     static let didSwipeToHotkeys = Key<Bool>("didSwipeToHotkeys", default: false)

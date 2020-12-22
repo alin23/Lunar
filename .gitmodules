@@ -1,0 +1,6 @@
+[submodule "Frameworks/WAYWindow"]
+	path = Frameworks/WAYWindow
+	url = git@github.com:alin23/WAYWindow
+[submodule "Frameworks/NSPageControl"]
+	path = Frameworks/NSPageControl
+	url = git@github.com:nerd0geek1/NSPageControl

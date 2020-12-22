@@ -21,30 +21,37 @@ let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled
 
 enum HotkeyIdentifier: String, CaseIterable, Codable {
     case toggle,
-        start,
-        pause,
-        lunar,
-        percent0,
-        percent25,
-        percent50,
-        percent75,
-        percent100,
-        preciseBrightnessUp,
-        preciseBrightnessDown,
-        preciseContrastUp,
-        preciseContrastDown,
-        preciseVolumeUp,
-        preciseVolumeDown,
-        brightnessUp,
-        brightnessDown,
-        contrastUp,
-        contrastDown,
-        muteAudio,
-        volumeUp,
-        volumeDown
+         start,
+         pause,
+         lunar,
+         percent0,
+         percent25,
+         percent50,
+         percent75,
+         percent100,
+         preciseBrightnessUp,
+         preciseBrightnessDown,
+         preciseContrastUp,
+         preciseContrastDown,
+         preciseVolumeUp,
+         preciseVolumeDown,
+         brightnessUp,
+         brightnessDown,
+         contrastUp,
+         contrastDown,
+         muteAudio,
+         volumeUp,
+         volumeDown
 }
 
-let preciseHotkeys: Set<HotkeyIdentifier> = [.preciseBrightnessUp, .preciseBrightnessDown, .preciseContrastUp, .preciseContrastDown, .preciseVolumeUp, .preciseVolumeDown]
+let preciseHotkeys: Set<HotkeyIdentifier> = [
+    .preciseBrightnessUp,
+    .preciseBrightnessDown,
+    .preciseContrastUp,
+    .preciseContrastDown,
+    .preciseVolumeUp,
+    .preciseVolumeDown,
+]
 let coarseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
     .preciseBrightnessUp: .brightnessUp,
     .preciseBrightnessDown: .brightnessDown,
@@ -73,7 +80,7 @@ enum OSDImage: Int64 {
     case muted = 4
 }
 
-class Hotkey {
+enum Hotkey {
     static let functionKeyMapping: [Int: String] = [
         kVK_F1: String(Unicode.Scalar(NSF1FunctionKey)!),
         kVK_F2: String(Unicode.Scalar(NSF2FunctionKey)!),
@@ -330,7 +337,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func startOrRestartMediaKeyTap(_ mediaKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
+    func startOrRestartMediaKeyTap(_ brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
         let workItem = DispatchWorkItem {
             mediaKeyTapBrightness?.stop()
             mediaKeyTapBrightness = nil
@@ -338,14 +345,16 @@ extension AppDelegate: MediaKeyTapDelegate {
             mediaKeyTapAudio?.stop()
             mediaKeyTapAudio = nil
 
-            if mediaKeysEnabled ?? Defaults[.mediaKeysEnabled] {
+            if brightnessKeysEnabled ?? Defaults[.brightnessKeysEnabled] {
                 mediaKeyTapBrightness = MediaKeyTap(delegate: self, for: [.brightnessUp, .brightnessDown], observeBuiltIn: false)
                 mediaKeyTapBrightness?.start()
+            }
 
-                if volumeKeysEnabled ?? Defaults[.volumeKeysEnabled], let audioDevice = AudioDevice.defaultOutputDevice(), !audioDevice.canSetVirtualMasterVolume(direction: .playback) {
-                    mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
-                    mediaKeyTapAudio?.start()
-                }
+            if volumeKeysEnabled ?? Defaults[.volumeKeysEnabled], let audioDevice = AudioDevice.defaultOutputDevice(),
+               !audioDevice.canSetVirtualMasterVolume(direction: .playback)
+            {
+                mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
+                mediaKeyTapAudio?.start()
             }
         }
         concurrentQueue.async(execute: workItem)
