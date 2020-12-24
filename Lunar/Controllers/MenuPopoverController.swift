@@ -61,9 +61,17 @@ class ModeButtonResponder: NSResponder {
         }
 
         let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.black.withAlphaComponent(0.8), range: NSMakeRange(0, activeTitle.length))
+        activeTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: NSColor.black.withAlphaComponent(0.8),
+            range: NSMakeRange(0, activeTitle.length)
+        )
         let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.black.withAlphaComponent(0.8), range: NSMakeRange(0, inactiveTitle.length))
+        inactiveTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: NSColor.black.withAlphaComponent(0.8),
+            range: NSMakeRange(0, inactiveTitle.length)
+        )
 
         button.attributedTitle = inactiveTitle
         button.attributedAlternateTitle = activeTitle
@@ -71,7 +79,12 @@ class ModeButtonResponder: NSResponder {
         button.setFrameSize(NSSize(width: buttonSize.width, height: 20))
         button.layer?.cornerRadius = button.frame.height / 2
 
-        trackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        trackingArea = NSTrackingArea(
+            rect: button.visibleRect,
+            options: [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: self,
+            userInfo: nil
+        )
         button.addTrackingArea(trackingArea)
     }
 
@@ -83,7 +96,9 @@ class ModeButtonResponder: NSResponder {
         button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
         if button.state == .on {
-            button.layer?.backgroundColor = (buttonBackgroundColor(mode: mode).highlight(withLevel: 0.2) ?? buttonBackgroundColor(mode: mode)).cgColor
+            button.layer?
+                .backgroundColor = (buttonBackgroundColor(mode: mode).highlight(withLevel: 0.2) ?? buttonBackgroundColor(mode: mode))
+                .cgColor
         } else {
             button.layer?.backgroundColor = buttonBackgroundColor(mode: mode).cgColor
         }
@@ -114,7 +129,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
-    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active })
+    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }
+        .sorted(by: { d1, d2 in !d1.active && d2.active })
 
     var viewHeight: CGFloat?
     var syncModeButtonResponder: ModeButtonResponder!
@@ -131,19 +147,19 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             self,
             selector: #selector(popoverDidShow(notification:)),
             name: NSPopover.didShowNotification,
-            object: menuPopover
+            object: POPOVERS[.menu]!!
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(popoverWillShow(notification:)),
             name: NSPopover.willShowNotification,
-            object: menuPopover
+            object: POPOVERS[.menu]!!
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(popoverDidClose(notification:)),
             name: NSPopover.didCloseNotification,
-            object: menuPopover
+            object: POPOVERS[.menu]!!
         )
     }
 
@@ -170,7 +186,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func adaptViewSize() {
-        menuPopover.animates = false
+        POPOVERS[.menu]!!.animates = false
 
         let scrollFrame = scrollView.frame
         viewHeight = viewHeight ?? view.frame.size.height
@@ -180,7 +196,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         } else if view.frame.size.height != neededHeight {
             view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
         }
-        menuPopover.contentSize = view.frame.size
+        POPOVERS[.menu]!!.contentSize = view.frame.size
 
         scrollView.setFrameSize(NSSize(width: scrollFrame.size.width, height: tableView.fittingSize.height))
         scrollView.setFrameOrigin(scrollFrame.origin)
@@ -188,7 +204,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         scrollView.setNeedsDisplay(scrollView.frame)
         view.setNeedsDisplay(view.frame)
 
-        menuPopover.animates = true
+        POPOVERS[.menu]!!.animates = true
     }
 
     @objc func popoverWillShow(notification _: Notification) {
@@ -199,13 +215,20 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     @objc func popoverDidShow(notification _: Notification) {
         runInMainThread {
-            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton,
+                  let manualModeButton = manualModeButton
+            else {
                 return
             }
             if let area = trackingArea {
                 view.removeTrackingArea(area)
             }
-            trackingArea = NSTrackingArea(rect: view.visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
+            trackingArea = NSTrackingArea(
+                rect: view.visibleRect,
+                options: [.mouseEnteredAndExited, .activeAlways],
+                owner: self,
+                userInfo: nil
+            )
             view.addTrackingArea(trackingArea!)
 
             syncModeButtonResponder = syncModeButtonResponder ?? ModeButtonResponder(button: syncModeButton, mode: .sync)
@@ -232,7 +255,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func grayAllButtons() {
         runInMainThread {
-            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton,
+                  let manualModeButton = manualModeButton
+            else {
                 return
             }
 
@@ -257,7 +282,10 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 guard let self = self else { return }
                 if !self.sameDisplays() {
                     self.tableView.beginUpdates()
-                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
+                    self.setValue(
+                        brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
+                        forKey: "displays"
+                    )
                     self.tableView.reloadData()
                     self.view.setNeedsDisplay(self.view.visibleRect)
                     self.tableView.endUpdates()
@@ -276,15 +304,19 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 runInMainThreadAsyncAfter(ms: 1000) { [weak self] in
                     guard let self = self else { return }
                     self.tableView.beginUpdates()
-                    self.setValue(brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }), forKey: "displays")
+                    self.setValue(
+                        brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
+                        forKey: "displays"
+                    )
                     self.tableView.reloadData()
                     self.view.setNeedsDisplay(self.view.visibleRect)
                     self.tableView.endUpdates()
 
                     self.adaptViewSize()
                     if Defaults[.showQuickActions], brightnessAdapter.displays.count > 1,
-                        let statusButton = appDelegate().statusItem.button {
-                        menuPopover.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+                       let statusButton = appDelegate().statusItem.button
+                    {
+                        POPOVERS[.menu]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
                         closeMenuPopover(after: 2500)
                     }
                 }
@@ -298,7 +330,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 guard change.newValue != change.oldValue, let self = self else {
                     return
                 }
-                guard let syncModeButton = self.syncModeButton, let locationModeButton = self.locationModeButton, let manualModeButton = self.manualModeButton else {
+                guard let syncModeButton = self.syncModeButton, let locationModeButton = self.locationModeButton,
+                      let manualModeButton = self.manualModeButton
+                else {
                     return
                 }
                 let adaptiveMode = change.newValue
@@ -344,7 +378,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 brightnessAdapter.enable(mode: .manual)
             }
         case .off:
-            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton, let manualModeButton = manualModeButton else {
+            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton,
+                  let manualModeButton = manualModeButton
+            else {
                 return
             }
             sender.layer?.backgroundColor = getOffColor(sender)
@@ -374,6 +410,6 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     override func mouseExited(with _: NSEvent) {
         log.debug("Mouse exited menu popover")
-        menuPopover.close()
+        POPOVERS[.menu]!!.close()
     }
 }

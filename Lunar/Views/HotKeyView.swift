@@ -14,7 +14,7 @@ import Sauce
 
 class HotkeyView: RecordView, RecordViewDelegate {
     var hoverState: HoverState = .noHover
-    var hotkey: HotKey! {
+    var hotkey: PersistentHotkey! {
         didSet {
             if let h = hotkey {
                 keyCombo = h.keyCombo
@@ -33,13 +33,14 @@ class HotkeyView: RecordView, RecordViewDelegate {
     var preciseHotkeyCheckbox: NSButton? {
         didSet {
             guard let checkbox = preciseHotkeyCheckbox,
-                let hk = hotkey,
-                let identifier = HotkeyIdentifier(rawValue: hk.identifier)
+                  let hk = hotkey
             else { return }
 
             let hotkeys = Defaults[.hotkeys]
-            if let coarseHk = hotkeys[identifier], let preciseIdentifier = preciseHotkeysMapping[identifier], let hk = hotkeys[preciseIdentifier] {
-                checkbox.state = NSControl.StateValue(rawValue: hk[.enabled] ?? Hotkey.defaults[identifier]?[.enabled] ?? 0)
+            if let coarseHk = hotkeys[hk.identifier], let preciseIdentifier = preciseHotkeysMapping[hk.identifier],
+               let preciseHk = hotkeys[preciseIdentifier]
+            {
+                checkbox.state = NSControl.StateValue(rawValue: preciseHk[.enabled] ?? Hotkey.defaults[hk.identifier]?[.enabled] ?? 0)
                 checkbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
                 checkbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
             }
@@ -49,8 +50,8 @@ class HotkeyView: RecordView, RecordViewDelegate {
     var hotkeyEnabled: Bool {
         let hotkeys = Defaults[.hotkeys]
         if let hk = hotkey,
-            let identifier = HotkeyIdentifier(rawValue: hk.identifier),
-            let hotkey = (hotkeys[identifier] ?? Hotkey.defaults[identifier]) {
+           let hotkey = (hotkeys[hk.identifier] ?? Hotkey.defaults[hk.identifier])
+        {
             return (hotkey[.enabled] ?? 0) == 1
         }
         return false
@@ -78,17 +79,17 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
         hotkey.unregister()
         guard let keyCombo = keyCombo else {
-            hotkey.unregister()
+            hotkey.isEnabled = false
             preciseHotkeyCheckbox?.isEnabled = false
-            if let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
-                var hotkeys = Defaults[.hotkeys]
-                hotkeys[identifier]?[.enabled] = 0
-                Defaults[.hotkeys] = hotkeys
-            }
+
             return
         }
-        hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: hotkey.target!, action: hotkey.action!)
-        hotkey.register()
+        if let target = hotkey.target, let action = hotkey.action {
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action)
+        } else {
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, handler: hotkey.handler!)
+        }
+        hotkey.isEnabled = true
 
         if let checkbox = preciseHotkeyCheckbox {
             if keyCombo.modifiers.convertSupportCocoaModifiers().contains(.option) {
@@ -98,15 +99,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
                 checkbox.isEnabled = true
                 checkbox.toolTip = nil
             }
-        }
-
-        if let identifier = HotkeyIdentifier(rawValue: hotkey.identifier) {
-            var hotkeys = Defaults[.hotkeys]
-            Hotkey.keys[identifier] = hotkey
-            hotkeys[identifier]?[.enabled] = 1
-            hotkeys[identifier]?[.modifiers] = keyCombo.modifiers
-            hotkeys[identifier]?[.keyCode] = keyCombo.QWERTYKeyCode
-            Defaults[.hotkeys] = hotkeys
         }
     }
 

@@ -33,11 +33,11 @@ extension AppDelegate: NSWindowDelegate {
         if let window = n.object as? ModernWindow {
             log.debug("Got window while closing: \(window)")
             guard let pageController = window.contentView?.subviews[0].subviews[0].nextResponder as? PageController,
-                let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
-                let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
-                let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
-                let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
-                let tableView = exceptionsViewController.tableView
+                  let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
+                  let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
+                  let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
+                  let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
+                  let tableView = exceptionsViewController.tableView
             else {
                 log.debug("No window found while closing")
                 return
@@ -71,25 +71,37 @@ extension AppDelegate: NSWindowDelegate {
 }
 
 class ModernWindowController: NSWindowController {
-    func initHelpPopover() {
-        if helpPopover == nil {
-            helpPopover = NSPopover()
+    func initPopover<T: NSViewController>(
+        _ popoverKey: PopoverKey,
+        identifier: String,
+        controllerType _: T.Type,
+        appearance: NSAppearance.Name = .vibrantLight
+    ) {
+        if POPOVERS[popoverKey]! == nil {
+            POPOVERS[popoverKey] = NSPopover()
         }
 
-        if helpPopover!.contentViewController == nil, let stb = storyboard,
-            let controller = stb.instantiateController(
-                withIdentifier: NSStoryboard.SceneIdentifier("HelpPopoverController")
-            ) as? HelpPopoverController {
-            helpPopover!.contentViewController = controller
-            helpPopover!.contentViewController!.loadView()
-            helpPopover!.appearance = NSAppearance(named: .vibrantLight)
+        guard let popover = POPOVERS[popoverKey]! else { return }
+
+        if popover.contentViewController == nil, let stb = storyboard,
+           let controller = stb.instantiateController(
+               withIdentifier: NSStoryboard.SceneIdentifier(identifier)
+           ) as? T
+        {
+            popover.contentViewController = controller
+            popover.contentViewController!.loadView()
+            popover.appearance = NSAppearance(named: appearance)
         }
+    }
+
+    func initPopovers() {
+        initPopover(.help, identifier: "HelpPopoverController", controllerType: HelpPopoverController.self)
+        initPopover(.hotkey, identifier: "HotkeyPopoverController", controllerType: HotkeyPopoverController.self, appearance: .vibrantDark)
     }
 
     override func windowDidLoad() {
         super.windowDidLoad()
         setupWindow()
-        initHelpPopover()
     }
 
     func setupWindow() {

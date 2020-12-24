@@ -31,6 +31,58 @@ enum EDIDTextType: UInt8 {
     case serial = 0xFF
 }
 
+enum InputSource: UInt8, CaseIterable {
+    case vga1 = 1
+    case vga2 = 2
+    case dvi1 = 3
+    case dvi2 = 4
+    case compositeVideo1 = 5
+    case compositeVideo2 = 6
+    case sVideo1 = 7
+    case sVideo2 = 8
+    case tuner1 = 9
+    case tuner2 = 10
+    case tuner3 = 11
+    case componentVideoYPrPbYCrCb1 = 12
+    case componentVideoYPrPbYCrCb2 = 13
+    case componentVideoYPrPbYCrCb3 = 14
+    case displayPort1 = 15
+    case displayPort2 = 16
+    case hdmi1 = 17
+    case hdmi2 = 18
+    case usbC = 27
+    case unknown = 246
+
+    func displayName() -> String {
+        switch self {
+        case .vga1: return "VGA 1"
+        case .vga2: return "VGA 2"
+        case .dvi1: return "DVI 1"
+        case .dvi2: return "DVI 2"
+        case .compositeVideo1: return "Composite video 1"
+        case .compositeVideo2: return "Composite video 2"
+        case .sVideo1: return "S-Video 1"
+        case .sVideo2: return "S-Video 2"
+        case .tuner1: return "Tuner 1"
+        case .tuner2: return "Tuner 2"
+        case .tuner3: return "Tuner 3"
+        case .componentVideoYPrPbYCrCb1: return "Component video (YPrPb/YCrCb) 1"
+        case .componentVideoYPrPbYCrCb2: return "Component video (YPrPb/YCrCb) 2"
+        case .componentVideoYPrPbYCrCb3: return "Component video (YPrPb/YCrCb) 3"
+        case .displayPort1: return "DisplayPort 1"
+        case .displayPort2: return "DisplayPort 2"
+        case .hdmi1: return "HDMI 1"
+        case .hdmi2: return "HDMI 2"
+        case .usbC: return "USB-C"
+        case .unknown: return "Unknown"
+        }
+    }
+}
+
+let inputSourceMapping: [String: InputSource] = Dictionary(uniqueKeysWithValues: InputSource.allCases.map { input in
+    (input.displayName(), input)
+})
+
 enum ControlID: UInt8 {
     case RESET = 0x04
     case RESET_BRIGHTNESS_AND_CONTRAST = 0x05
@@ -90,7 +142,8 @@ extension Data {
 extension Array where Element == UInt8 {
     func str(hex: Bool = false, separator: String = " ") -> String {
         if !hex, !contains(where: { n in !(0x20 ... 0x7E).contains(n) }),
-            let value = NSString(bytes: self, length: count, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
+           let value = NSString(bytes: self, length: count, encoding: String.Encoding.nonLossyASCII.rawValue) as String?
+        {
             return value
         } else {
             return map { n in String(format: "%02X", n) }.joined(separator: separator)
@@ -120,7 +173,9 @@ extension UInt16 {
 
 extension UInt8 {
     func str() -> String {
-        if (0x20 ... 0x7E).contains(self), let value = NSString(bytes: [self], length: 1, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
+        if (0x20 ... 0x7E).contains(self),
+           let value = NSString(bytes: [self], length: 1, encoding: String.Encoding.nonLossyASCII.rawValue) as String?
+        {
             return value
         } else {
             return String(format: "%02X", self)
@@ -128,7 +183,7 @@ extension UInt8 {
     }
 }
 
-class DDC {
+enum DDC {
     static let requestDelay: useconds_t = 20000
     static let recoveryDelay: useconds_t = 40000
     static var displayPortByUUID = [CFUUID: io_service_t]()
@@ -156,7 +211,9 @@ class DDC {
     static func findExternalDisplays() -> [CGDirectDisplayID] {
         var displayIDs = [CGDirectDisplayID]()
         for screen in NSScreen.screens {
-            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String, isScreenStr == "YES" {
+            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String,
+               isScreenStr == "YES"
+            {
                 if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
                     let screenID = CGDirectDisplayID(truncating: screenNumber)
                     if BrightnessAdapter.isBuiltinDisplay(screenID) {
@@ -172,7 +229,8 @@ class DDC {
     static func getBuiltinDisplay() -> CGDirectDisplayID? {
         for screen in NSScreen.screens {
             if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen] as? String, isScreen == "YES",
-                let nsScreenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
+               let nsScreenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
+            {
                 let screenNumber = CGDirectDisplayID(truncating: nsScreenNumber)
                 if BrightnessAdapter.isBuiltinDisplay(screenNumber) {
                     return screenNumber
@@ -473,6 +531,17 @@ class DDC {
         return ("\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)", name)
     }
 
+    static func setInput(for displayID: CGDirectDisplayID, input: InputSource) -> Bool {
+        if input == .unknown {
+            return false
+        }
+        return write(displayID: displayID, controlID: ControlID.INPUT_SOURCE, newValue: input.rawValue)
+    }
+
+    static func readInput(for displayID: CGDirectDisplayID) -> DDCReadResult? {
+        return read(displayID: displayID, controlID: ControlID.INPUT_SOURCE)
+    }
+
     static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt8) -> Bool {
         return write(displayID: displayID, controlID: ControlID.BRIGHTNESS, newValue: brightness)
     }
@@ -558,6 +627,10 @@ class DDC {
 
     static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
         return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
+    }
+
+    static func getInput(for displayID: CGDirectDisplayID) -> UInt8? {
+        return DDC.readInput(for: displayID)?.currentValue
     }
 
     static func getBrightness(for displayID: CGDirectDisplayID? = nil) -> Double? {

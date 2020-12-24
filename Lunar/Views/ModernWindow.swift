@@ -10,15 +10,22 @@ import Cocoa
 import WAYWindow
 
 class ModernWindow: WAYWindow {
-    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+    override init(
+        contentRect: NSRect,
+        styleMask style: NSWindow.StyleMask,
+        backing backingStoreType: NSWindow.BackingStoreType,
+        defer flag: Bool
+    ) {
         log.verbose("Creating window")
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
     }
 
     override func mouseDown(with event: NSEvent) {
-        helpPopover?.close()
-        if let c = helpPopover?.contentViewController as? HelpPopoverController {
-            c.onClick = nil
+        for popover in POPOVERS.values {
+            popover?.close()
+            if let c = popover?.contentViewController as? HelpPopoverController {
+                c.onClick = nil
+            }
         }
         super.mouseDown(with: event)
     }

@@ -23,9 +23,10 @@ class DisplayValuesView: NSTableView {
     func setAdaptiveButtonHidden(_ hidden: Bool) {
         enumerateAvailableRowViews { rowView, _ in
             if let nameCell = rowView.view(atColumn: 1) as? NSTableCellView,
-                let display = nameCell.objectValue as? Display,
-                let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
-                display.activeAndResponsive {
+               let display = nameCell.objectValue as? Display,
+               let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
+               display.activeAndResponsive
+            {
                 runInMainThread { [weak adaptiveButton] in
                     adaptiveButton?.isHidden = hidden
                 }
@@ -46,9 +47,10 @@ class DisplayValuesView: NSTableView {
     func resetDeleteButtons() {
         enumerateAvailableRowViews { rowView, row in
             guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
-                let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                    where: { v in (v as? NotConnectedTextField) != nil }
-                ) as? NotConnectedTextField else {
+                  let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                      where: { v in (v as? NotConnectedTextField) != nil }
+                  ) as? NotConnectedTextField
+            else {
                 return
             }
             notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
@@ -77,9 +79,9 @@ class DisplayValuesView: NSTableView {
                 self.endUpdates()
                 if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
                     runInMainThreadAsyncAfter(ms: 200) {
-                        menuPopover.animates = false
+                        POPOVERS[.menu]!!.animates = false
                         controller.adaptViewSize()
-                        menuPopover.animates = true
+                        POPOVERS[.menu]!!.animates = true
                         self.resetDeleteButtons()
                     }
                 }
@@ -108,19 +110,20 @@ class DisplayValuesView: NSTableView {
 
     func addRow(_ rowView: NSTableRowView, forRow row: Int) {
         guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-            let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
-            let adaptiveButton = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                where: { v in (v as? QuickAdaptiveButton) != nil }
-            ) as? QuickAdaptiveButton,
-            let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                where: { v in (v as? NotConnectedTextField) != nil }
-            ) as? NotConnectedTextField,
-            let nonResponsiveDDCTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                where: { v in (v as? NonResponsiveDDCTextField) != nil }
-            ) as? NonResponsiveDDCTextField,
-            let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-            let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
-            let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
+              let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
+              let adaptiveButton = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                  where: { v in (v as? QuickAdaptiveButton) != nil }
+              ) as? QuickAdaptiveButton,
+              let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                  where: { v in (v as? NotConnectedTextField) != nil }
+              ) as? NotConnectedTextField,
+              let nonResponsiveDDCTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                  where: { v in (v as? NonResponsiveDDCTextField) != nil }
+              ) as? NonResponsiveDDCTextField,
+              let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+              let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
+              let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption
+        else { return }
 
         notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
         nonResponsiveDDCTextField.onClick = getResetAction(displayID: display.id)
@@ -141,7 +144,8 @@ class DisplayValuesView: NSTableView {
         scrollableBrightness.doubleValue = display.brightness.doubleValue.rounded()
         scrollableBrightness.caption = scrollableBrightnessCaption
         if !display.activeAndResponsive {
-            scrollableBrightness.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?.shadow(withLevel: 0.3) ?? textFieldColor
+            scrollableBrightness.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?
+                .shadow(withLevel: 0.3) ?? textFieldColor
         }
 
         scrollableContrast.textFieldColor = textFieldColor
@@ -150,7 +154,8 @@ class DisplayValuesView: NSTableView {
         scrollableContrast.doubleValue = display.contrast.doubleValue.rounded()
         scrollableContrast.caption = scrollableContrastCaption
         if !display.activeAndResponsive {
-            scrollableContrast.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?.shadow(withLevel: 0.3) ?? textFieldColor
+            scrollableContrast.textColor = textFieldColorLight.blended(withFraction: 0.7, of: gray)?
+                .shadow(withLevel: 0.3) ?? textFieldColor
         }
 
         scrollableBrightnessCaption.textColor = NSColor.textColor

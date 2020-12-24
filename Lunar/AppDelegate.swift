@@ -68,33 +68,31 @@ let DEBUG_DATA_HEADERS: HTTPHeaders = [
 ]
 let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
 
-var lunarDisplayNames = [
-    "Moony",
-    "Celestial",
-    "Lunatic",
-    "Solar",
-    "Stellar",
-    "Apollo",
-    "Selene",
-    "Auroral",
-    "Luna",
-]
-
 let log = Logger.self
 let brightnessAdapter = BrightnessAdapter()
 
 let datastore = DataStore()
 var activeDisplay: Display?
-var helpPopover: NSPopover?
-var menuPopover = NSPopover()
+
+enum PopoverKey {
+    case help
+    case hotkey
+    case menu
+}
+
+var POPOVERS: [PopoverKey: NSPopover?] = [
+    .help: nil,
+    .hotkey: nil,
+    .menu: NSPopover(),
+]
 var menuPopoverCloser = DispatchWorkItem {
-    menuPopover.close()
+    POPOVERS[.menu]!!.close()
 }
 
 func closeMenuPopover(after ms: Int) {
     menuPopoverCloser.cancel()
     menuPopoverCloser = DispatchWorkItem {
-        menuPopover.close()
+        POPOVERS[.menu]!!.close()
     }
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
@@ -236,7 +234,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func initHotkeys() {
         var hotkeyConfig = Defaults[.hotkeys]
 
-        for identifier in HotkeyIdentifier.allCases {
+        for identifierCase in HotkeyIdentifier.allCases {
+            let identifier = identifierCase.rawValue
             guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier],
                   let keyCode = hotkey[.keyCode],
                   var enabled = hotkey[.enabled],
@@ -251,15 +250,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             if !preciseHotkeys.contains(identifier) {
                 if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                    Hotkey.keys[identifier] = Magnet.HotKey(
-                        identifier: identifier.rawValue,
+                    Hotkey.keys[identifier] = PersistentHotkey(hotkey: Magnet.HotKey(
+                        identifier: identifier,
                         keyCombo: keyCombo,
                         target: self,
-                        action: Hotkey.handler(identifier: identifier)
-                    )
-                    if enabled == 1 {
-                        Hotkey.keys[identifier]??.register()
-                    }
+                        action: Hotkey.handler(identifier: identifierCase)
+                    ), isEnabled: enabled == 1)
                 }
             } else {
                 guard let coarseIdentifier = coarseHotkeysMapping[identifier],
@@ -288,15 +284,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
 
                 if let keyCombo = KeyCombo(QWERTYKeyCode: coarseKeyCode, carbonModifiers: newModifiers) {
-                    Hotkey.keys[identifier] = Magnet.HotKey(
-                        identifier: identifier.rawValue,
+                    Hotkey.keys[identifier] = PersistentHotkey(hotkey: Magnet.HotKey(
+                        identifier: identifier,
                         keyCombo: keyCombo,
                         target: self,
-                        action: Hotkey.handler(identifier: identifier)
-                    )
-                    if enabled == 1 {
-                        Hotkey.keys[identifier]??.register()
-                    }
+                        action: Hotkey.handler(identifier: identifierCase)
+                    ), isEnabled: enabled == 1)
                 }
             }
         }
@@ -349,9 +342,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         if let wc = windowController {
+            wc.initPopovers()
             wc.showWindow(self)
             setupHotkeys()
-            wc.initHelpPopover()
 
             log.debug("Showing window")
             if let window = wc.window as? ModernWindow {
@@ -502,7 +495,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         statusItem.menu = menu
         toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
 
-        if menuPopover.contentViewController == nil {
+        if POPOVERS[.menu]!!.contentViewController == nil {
             var storyboard: NSStoryboard?
             if #available(OSX 10.13, *) {
                 storyboard = NSStoryboard.main
@@ -510,9 +503,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 storyboard = NSStoryboard(name: "Main", bundle: nil)
             }
 
-            menuPopover.contentViewController = storyboard!
+            POPOVERS[.menu]!!.contentViewController = storyboard!
                 .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
-            menuPopover.contentViewController!.loadView()
+            POPOVERS[.menu]!!.contentViewController!.loadView()
 
             DistributedNotificationCenter.default().addObserver(
                 self,
@@ -529,8 +522,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func adaptAppearance() {
-        runInMainThread { [weak menuPopover] in
-            guard let menuPopover = menuPopover else { return }
+        runInMainThread {
+            guard let menuPopover = POPOVERS[.menu]! else { return }
             menuPopover.appearance = NSAppearance(named: .vibrantLight)
             if #available(OSX 10.15, *) {
                 let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
@@ -558,7 +551,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
-        menuPopover.close()
+        POPOVERS[.menu]!!.close()
         brightnessAdapter.manageClamshellMode()
         brightnessAdapter.resetDisplayList()
         brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
@@ -649,20 +642,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func setKeyEquivalents(_ hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
-        Hotkey.setKeyEquivalent(.lunar, menuItem: preferencesMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.toggle, menuItem: toggleMenuItem, hotkeys: hotkeys)
+    func setKeyEquivalents(_ hotkeys: [String: [HotkeyPart: Int]]) {
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.lunar.rawValue, menuItem: preferencesMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.toggle.rawValue, menuItem: toggleMenuItem, hotkeys: hotkeys)
 
-        Hotkey.setKeyEquivalent(.percent0, menuItem: percent0MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent25, menuItem: percent25MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent50, menuItem: percent50MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent75, menuItem: percent75MenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.percent100, menuItem: percent100MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.percent0.rawValue, menuItem: percent0MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.percent25.rawValue, menuItem: percent25MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.percent50.rawValue, menuItem: percent50MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.percent75.rawValue, menuItem: percent75MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.percent100.rawValue, menuItem: percent100MenuItem, hotkeys: hotkeys)
 
-        Hotkey.setKeyEquivalent(.brightnessUp, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.brightnessDown, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.contrastUp, menuItem: contrastUpMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(.contrastDown, menuItem: contrastDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessUp.rawValue, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessDown.rawValue, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.contrastUp.rawValue, menuItem: contrastUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.contrastDown.rawValue, menuItem: contrastDownMenuItem, hotkeys: hotkeys)
 
         menu?.update()
     }

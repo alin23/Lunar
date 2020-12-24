@@ -14,7 +14,9 @@ import Magnet
 
 extension AppDelegate: NSPageControllerDelegate {
     func pageControllerWillStartLiveTransition(_: NSPageController) {
-        helpPopover?.close()
+        for popover in POPOVERS.values {
+            popover?.close()
+        }
     }
 
     func pageControllerDidEndLiveTransition(_ c: NSPageController) {
@@ -72,21 +74,31 @@ extension AppDelegate: NSPageControllerDelegate {
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
     }
 
-    func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
+    func pageController(
+        _ c: NSPageController,
+        viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier
+    ) -> NSViewController {
         unowned let c = c as! PageController
 
         if c.viewControllers[identifier] == nil {
             if identifier == c.hotkeyViewControllerIdentifier {
-                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
+                c.viewControllers[identifier] = c.storyboard!
+                    .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
             } else if identifier == c.settingsPageControllerIdentifier {
-                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")) as! SettingsPageController
+                c.viewControllers[identifier] = c.storyboard!
+                    .instantiateController(
+                        withIdentifier: NSStoryboard
+                            .SceneIdentifier("settingsPageController")
+                    ) as! SettingsPageController
             } else {
-                c.viewControllers[identifier] = c.storyboard!.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
+                c.viewControllers[identifier] = c.storyboard!
+                    .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
         }
 
         if let displayController = c.viewControllers[identifier] as? DisplayViewController,
-            let displayId = CGDirectDisplayID(identifier) {
+           let displayId = CGDirectDisplayID(identifier)
+        {
             if displayId == TEST_DISPLAY_ID {
                 displayController.display = TEST_DISPLAY()
             } else if displayId != GENERIC_DISPLAY.id {
@@ -143,8 +155,8 @@ class PageController: NSPageController {
         }
     }
 
-    let hotkeyViewControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("hotkey")
-    let settingsPageControllerIdentifier: NSPageController.ObjectIdentifier = NSPageController.ObjectIdentifier("settings")
+    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("hotkey")
+    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("settings")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
     private func setupPageControl(size: Int) {
@@ -152,7 +164,13 @@ class PageController: NSPageController {
         let x: CGFloat = (view.frame.width - width) / 2
 
         let frame = NSRect(x: x, y: 20, width: width, height: 20)
-        pageControl = PageControl(frame: frame, numberOfPages: size, hidesForSinglePage: true, tintColor: pageIndicatorTintColor, currentTintColor: currentPageIndicatorTintColor)
+        pageControl = PageControl(
+            frame: frame,
+            numberOfPages: size,
+            hidesForSinglePage: true,
+            tintColor: pageIndicatorTintColor,
+            currentTintColor: currentPageIndicatorTintColor
+        )
         if !view.subviews.contains(pageControl) {
             view.addSubview(pageControl)
         }
@@ -201,9 +219,20 @@ class PageController: NSPageController {
 
         disableLeftRightHotkeys()
         if let leftKeyCombo = KeyCombo(key: .leftArrow, cocoaModifiers: .shift),
-            let rightKeyCombo = KeyCombo(key: .rightArrow, cocoaModifiers: .shift) {
-            leftHotkey = Magnet.HotKey(identifier: "navigateBack", keyCombo: leftKeyCombo, target: self, action: #selector(navigateBack(_:)))
-            rightHotkey = Magnet.HotKey(identifier: "navigateForward", keyCombo: rightKeyCombo, target: self, action: #selector(navigateForward(_:)))
+           let rightKeyCombo = KeyCombo(key: .rightArrow, cocoaModifiers: .shift)
+        {
+            leftHotkey = Magnet.HotKey(
+                identifier: "navigateBack",
+                keyCombo: leftKeyCombo,
+                target: self,
+                action: #selector(navigateBack(_:))
+            )
+            rightHotkey = Magnet.HotKey(
+                identifier: "navigateForward",
+                keyCombo: rightKeyCombo,
+                target: self,
+                action: #selector(navigateForward(_:))
+            )
 
             leftHotkey?.register()
             rightHotkey?.register()

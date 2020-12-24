@@ -25,8 +25,8 @@ class StatusItemButtonController: NSView {
 
         menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem { [unowned self] in
             if let area = event.trackingArea, let button = self.statusButton {
-                menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
-                menuPopover.becomeFirstResponder()
+                POPOVERS[.menu]!!.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
+                POPOVERS[.menu]!!.becomeFirstResponder()
             }
             self.menuPopoverOpener = nil
         }
@@ -44,7 +44,7 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        menuPopover.close()
+        POPOVERS[.menu]!!.close()
         closeMenuPopover(after: 1500)
         if let button = statusButton {
             button.mouseDown(with: event)

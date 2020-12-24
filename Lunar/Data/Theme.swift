@@ -9,12 +9,12 @@
 import Cocoa
 
 let mauve = #colorLiteral(red: 0.1921568627, green: 0.1647058824, blue: 0.2980392157, alpha: 1)
-let darkMauve = #colorLiteral(red: 0.1512770126, green: 0.14105705, blue: 0.1921568627, alpha: 1)
+let darkMauve = #colorLiteral(red: 0.1529411765, green: 0.1411764706, blue: 0.1921568627, alpha: 1)
 let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
-let sunYellow = #colorLiteral(red: 0.991425693, green: 0.7912780643, blue: 0.2255264819, alpha: 1)
+let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
-let blue = #colorLiteral(red: 0.0876589492, green: 0.4822645783, blue: 1, alpha: 1)
+let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
 let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
@@ -49,23 +49,6 @@ enum ButtonColor: Int {
     case labelOff
     case labelOffHover
 }
-
-let adaptiveButtonColors: [ButtonColor: NSColor] = [
-    .bgOn: lunarYellow.withAlphaComponent(0.8),
-    .bgOnHover: red.withAlphaComponent(0.8),
-    .labelOn: mauve,
-    .bgOff: gray.withAlphaComponent(0.8),
-    .bgOffHover: lunarYellow.withAlphaComponent(0.8),
-    .labelOff: mauve.withAlphaComponent(0.25),
-]
-let brightnessRangeButtonColors: [ButtonColor: NSColor] = [
-    .bgOn: green.withAlphaComponent(0.8),
-    .bgOnHover: red.withAlphaComponent(0.8),
-    .labelOn: mauve,
-    .bgOff: gray.withAlphaComponent(0.8),
-    .bgOffHover: green.withAlphaComponent(0.8),
-    .labelOff: mauve.withAlphaComponent(0.25),
-]
 
 let lockButtonBgOn = red.withAlphaComponent(0.8)
 let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn
@@ -113,6 +96,8 @@ let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
         .hotkeys: white,
         .settings: white,
         .display: mauve.withAlphaComponent(0.35),
+        .displayBrightnessRange: mauve,
+        .displayAlgorithm: mauve,
     ],
 ]
 
@@ -121,11 +106,15 @@ let offStateButtonColor: [HoverState: [Page: NSColor]] = [
         .hotkeys: lunarYellow.withAlphaComponent(0.9),
         .settings: mauve.withAlphaComponent(0.5),
         .display: lunarYellow,
+        .displayBrightnessRange: green.withAlphaComponent(0.8),
+        .displayAlgorithm: lunarYellow.withAlphaComponent(0.8),
     ],
     .noHover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.3),
         .settings: white.withAlphaComponent(0.3),
         .display: gray,
+        .displayBrightnessRange: gray.withAlphaComponent(0.8),
+        .displayAlgorithm: gray.withAlphaComponent(0.8),
     ],
 ]
 
@@ -134,11 +123,15 @@ let onStateButtonColor: [HoverState: [Page: NSColor]] = [
         .hotkeys: lunarYellow.withAlphaComponent(0.9),
         .settings: mauve,
         .display: lunarYellow,
+        .displayBrightnessRange: red.withAlphaComponent(0.8),
+        .displayAlgorithm: red.withAlphaComponent(0.8),
     ],
     .noHover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.3),
         .settings: mauve.withAlphaComponent(0.6),
         .display: gray,
+        .displayBrightnessRange: green.withAlphaComponent(0.8),
+        .displayAlgorithm: lunarYellow.withAlphaComponent(0.8),
     ],
 ]
 

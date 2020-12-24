@@ -134,11 +134,31 @@ class SplitViewController: NSSplitViewController {
 
     @IBOutlet var containerView: NSView?
 
-    @IBOutlet var syncHelpButton: HelpButton!
-    @IBOutlet var locationHelpButton: HelpButton!
-    @IBOutlet var manualHelpButton: HelpButton!
-    @IBOutlet var sensorHelpButton: HelpButton!
-    @IBOutlet var navigationHelpButton: HelpButton!
+    @IBOutlet var _syncHelpButton: NSButton?
+    var syncHelpButton: HelpButton? {
+        _syncHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _locationHelpButton: NSButton?
+    var locationHelpButton: HelpButton? {
+        _locationHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _manualHelpButton: NSButton?
+    var manualHelpButton: HelpButton? {
+        _manualHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _sensorHelpButton: NSButton?
+    var sensorHelpButton: HelpButton? {
+        _sensorHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _navigationHelpButton: NSButton?
+    var navigationHelpButton: HelpButton? {
+        _navigationHelpButton as? HelpButton
+    }
+
     @IBOutlet var goLeftButton: PageButton!
     @IBOutlet var goRightButton: PageButton!
 
@@ -203,7 +223,7 @@ class SplitViewController: NSSplitViewController {
             button?.page = .display
             button?.fade()
         }
-        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
         goRightButton.enable()
@@ -221,7 +241,7 @@ class SplitViewController: NSSplitViewController {
             button?.page = .settings
             button?.fade()
         }
-        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
         goRightButton.enable()
@@ -238,7 +258,7 @@ class SplitViewController: NSSplitViewController {
             button?.page = .hotkeys
             button?.fade()
         }
-        helpPopover?.appearance = NSAppearance(named: .vibrantDark)
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantDark)
 
         goLeftButton.disable()
         goRightButton.enable(color: logoColor)

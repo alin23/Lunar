@@ -44,29 +44,29 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          volumeDown
 }
 
-let preciseHotkeys: Set<HotkeyIdentifier> = [
-    .preciseBrightnessUp,
-    .preciseBrightnessDown,
-    .preciseContrastUp,
-    .preciseContrastDown,
-    .preciseVolumeUp,
-    .preciseVolumeDown,
+let preciseHotkeys: Set<String> = [
+    HotkeyIdentifier.preciseBrightnessUp.rawValue,
+    HotkeyIdentifier.preciseBrightnessDown.rawValue,
+    HotkeyIdentifier.preciseContrastUp.rawValue,
+    HotkeyIdentifier.preciseContrastDown.rawValue,
+    HotkeyIdentifier.preciseVolumeUp.rawValue,
+    HotkeyIdentifier.preciseVolumeDown.rawValue,
 ]
-let coarseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
-    .preciseBrightnessUp: .brightnessUp,
-    .preciseBrightnessDown: .brightnessDown,
-    .preciseContrastUp: .contrastUp,
-    .preciseContrastDown: .contrastDown,
-    .preciseVolumeUp: .volumeUp,
-    .preciseVolumeDown: .volumeDown,
+let coarseHotkeysMapping: [String: String] = [
+    HotkeyIdentifier.preciseBrightnessUp.rawValue: HotkeyIdentifier.brightnessUp.rawValue,
+    HotkeyIdentifier.preciseBrightnessDown.rawValue: HotkeyIdentifier.brightnessDown.rawValue,
+    HotkeyIdentifier.preciseContrastUp.rawValue: HotkeyIdentifier.contrastUp.rawValue,
+    HotkeyIdentifier.preciseContrastDown.rawValue: HotkeyIdentifier.contrastDown.rawValue,
+    HotkeyIdentifier.preciseVolumeUp.rawValue: HotkeyIdentifier.volumeUp.rawValue,
+    HotkeyIdentifier.preciseVolumeDown.rawValue: HotkeyIdentifier.volumeDown.rawValue,
 ]
-let preciseHotkeysMapping: [HotkeyIdentifier: HotkeyIdentifier] = [
-    .brightnessUp: .preciseBrightnessUp,
-    .brightnessDown: .preciseBrightnessDown,
-    .contrastUp: .preciseContrastUp,
-    .contrastDown: .preciseContrastDown,
-    .volumeUp: .preciseVolumeUp,
-    .volumeDown: .preciseVolumeDown,
+let preciseHotkeysMapping: [String: String] = [
+    HotkeyIdentifier.brightnessUp.rawValue: HotkeyIdentifier.preciseBrightnessUp.rawValue,
+    HotkeyIdentifier.brightnessDown.rawValue: HotkeyIdentifier.preciseBrightnessDown.rawValue,
+    HotkeyIdentifier.contrastUp.rawValue: HotkeyIdentifier.preciseContrastUp.rawValue,
+    HotkeyIdentifier.contrastDown.rawValue: HotkeyIdentifier.preciseContrastDown.rawValue,
+    HotkeyIdentifier.volumeUp.rawValue: HotkeyIdentifier.preciseVolumeUp.rawValue,
+    HotkeyIdentifier.volumeDown.rawValue: HotkeyIdentifier.preciseVolumeDown.rawValue,
 ]
 
 enum HotkeyPart: String, CaseIterable, Codable {
@@ -78,6 +78,62 @@ enum OSDImage: Int64 {
     case contrast = 11
     case volume = 3
     case muted = 4
+}
+
+struct PersistentHotkey {
+    var hotkey: HotKey {
+        didSet {
+            Defaults[.hotkeys][hotkey.identifier] = dict()
+        }
+    }
+
+    var isEnabled: Bool {
+        didSet {
+            Defaults[.hotkeys][hotkey.identifier]?[.enabled] = isEnabled ? 1 : 0
+
+            if isEnabled {
+                hotkey.register()
+            } else {
+                hotkey.unregister()
+            }
+        }
+    }
+
+    var keyCombo: KeyCombo {
+        return hotkey.keyCombo
+    }
+
+    var identifier: String {
+        return hotkey.identifier
+    }
+
+    var target: AnyObject? {
+        return hotkey.target
+    }
+
+    var action: Selector? {
+        return hotkey.action
+    }
+
+    var handler: ((HotKey) -> Void)? {
+        return hotkey.callback
+    }
+
+    func unregister() {
+        hotkey.unregister()
+    }
+
+    func register() {
+        hotkey.register()
+    }
+
+    func dict() -> [HotkeyPart: Int] {
+        [
+            .enabled: isEnabled ? 1 : 0,
+            .keyCode: hotkey.keyCombo.QWERTYKeyCode,
+            .modifiers: hotkey.keyCombo.modifiers,
+        ]
+    }
 }
 
 enum Hotkey {
@@ -103,115 +159,115 @@ enum Hotkey {
         kVK_F19: String(Unicode.Scalar(NSF19FunctionKey)!),
         kVK_F20: String(Unicode.Scalar(NSF20FunctionKey)!),
     ]
-    static var keys: [HotkeyIdentifier: Magnet.HotKey?] = [:]
+    static var keys: [String: PersistentHotkey?] = [:]
 
-    static let defaults: [HotkeyIdentifier: [HotkeyPart: Int]] = [
-        .toggle: [
+    static let defaults: [String: [HotkeyPart: Int]] = [
+        HotkeyIdentifier.toggle.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .start: [
+        HotkeyIdentifier.start.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option]).carbonModifiers(),
         ],
-        .pause: [
+        HotkeyIdentifier.pause.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option, .shift]).carbonModifiers(),
         ],
-        .lunar: [
+        HotkeyIdentifier.lunar.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift]).carbonModifiers(),
         ],
-        .percent0: [
+        HotkeyIdentifier.percent0.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_0,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .percent25: [
+        HotkeyIdentifier.percent25.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_1,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .percent50: [
+        HotkeyIdentifier.percent50.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_2,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .percent75: [
+        HotkeyIdentifier.percent75.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_3,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .percent100: [
+        HotkeyIdentifier.percent100.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_4,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
         ],
-        .preciseBrightnessUp: [
+        HotkeyIdentifier.preciseBrightnessUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F2,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
-        .preciseBrightnessDown: [
+        HotkeyIdentifier.preciseBrightnessDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F1,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
-        .preciseContrastUp: [
+        HotkeyIdentifier.preciseContrastUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F2,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
         ],
-        .preciseContrastDown: [
+        HotkeyIdentifier.preciseContrastDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F1,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
         ],
-        .preciseVolumeUp: [
+        HotkeyIdentifier.preciseVolumeUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F12,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
-        .preciseVolumeDown: [
+        HotkeyIdentifier.preciseVolumeDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F11,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
         ],
-        .brightnessUp: [
+        HotkeyIdentifier.brightnessUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F2,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
-        .brightnessDown: [
+        HotkeyIdentifier.brightnessDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F1,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
-        .contrastUp: [
+        HotkeyIdentifier.contrastUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F2,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
         ],
-        .contrastDown: [
+        HotkeyIdentifier.contrastDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F1,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
         ],
-        .muteAudio: [
+        HotkeyIdentifier.muteAudio.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F10,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
-        .volumeUp: [
+        HotkeyIdentifier.volumeUp.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F12,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
         ],
-        .volumeDown: [
+        HotkeyIdentifier.volumeDown.rawValue: [
             .enabled: 1,
             .keyCode: kVK_F11,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
@@ -287,7 +343,7 @@ enum Hotkey {
         }
     }
 
-    static func setKeyEquivalent(_ identifier: HotkeyIdentifier, menuItem: NSMenuItem?, hotkeys: [HotkeyIdentifier: [HotkeyPart: Int]]) {
+    static func setKeyEquivalent(_ identifier: String, menuItem: NSMenuItem?, hotkeys: [String: [HotkeyPart: Int]]) {
         guard let menuItem = menuItem else { return }
         if let hk = hotkeys[identifier], let keyCode = hk[.keyCode], let enabled = hk[.enabled], let modifiers = hk[.modifiers] {
             if enabled == 1 {

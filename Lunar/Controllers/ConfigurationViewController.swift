@@ -167,12 +167,35 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var smoothTransitionLabel: NSTextField!
     @IBOutlet var smoothTransitionCheckbox: NSButton!
 
-    @IBOutlet var helpButton1: HelpButton!
-    @IBOutlet var helpButton2: HelpButton!
-    @IBOutlet var helpButton3: HelpButton!
-    @IBOutlet var helpButton4: HelpButton!
-    @IBOutlet var helpButtonStep: HelpButton!
-    @IBOutlet var helpButtonBottom: HelpButton!
+    @IBOutlet var _helpButton1: NSButton?
+    var helpButton1: HelpButton? {
+        _helpButton1 as? HelpButton
+    }
+
+    @IBOutlet var _helpButton2: NSButton?
+    var helpButton2: HelpButton? {
+        _helpButton2 as? HelpButton
+    }
+
+    @IBOutlet var _helpButton3: NSButton?
+    var helpButton3: HelpButton? {
+        _helpButton3 as? HelpButton
+    }
+
+    @IBOutlet var _helpButton4: NSButton?
+    var helpButton4: HelpButton? {
+        _helpButton4 as? HelpButton
+    }
+
+    @IBOutlet var _helpButtonStep: NSButton?
+    var helpButtonStep: HelpButton? {
+        _helpButtonStep as? HelpButton
+    }
+
+    @IBOutlet var _helpButtonBottom: NSButton?
+    var helpButtonBottom: HelpButton? {
+        _helpButtonBottom as? HelpButton
+    }
 
     @IBOutlet var noonDurationField: ScrollableTextField!
     @IBOutlet var noonDurationCaption: ScrollableTextFieldCaption!
@@ -356,8 +379,8 @@ class ConfigurationViewController: NSViewController {
         contrastLimitVisible = manualMode
         hotkeyStepVisible = true
 
-        helpButtonStep.helpText = HOTKEY_STEP_TOOLTIP
-        helpButtonBottom.helpText = SMOOTH_TRANSITION_TOOLTIP
+        helpButtonStep?.helpText = HOTKEY_STEP_TOOLTIP
+        helpButtonBottom?.helpText = SMOOTH_TRANSITION_TOOLTIP
 
         var refX: CGFloat
         switch adaptiveMode {
@@ -373,32 +396,32 @@ class ConfigurationViewController: NSViewController {
             let width = refFrame2.maxX - refFrame1.minX
             refX = refFrame2.maxX - (width / 2)
 
-            helpButton1.helpText = BRIGHTNESS_LIMIT_TOOLTIP
-            helpButton1.link = nil
-            helpButton2.helpText = CONTRAST_LIMIT_TOOLTIP
-            helpButton2.link = CHART_LINK
+            helpButton1?.helpText = BRIGHTNESS_LIMIT_TOOLTIP
+            helpButton1?.link = nil
+            helpButton2?.helpText = CONTRAST_LIMIT_TOOLTIP
+            helpButton2?.link = CHART_LINK
         case .location:
             let refFrame = daylightExtensionField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
 
-            helpButton1.helpText = NOON_DURATION_TOOLTIP
-            helpButton1.link = nil
-            helpButton2.helpText = DAYLIGHT_EXTENSION_TOOLTIP
-            helpButton2.link = nil
-            helpButton3.helpText = CURVE_FACTOR_TOOLTIP
-            helpButton3.link = CHART_LINK
-            helpButton4.helpText = LOCATION_TOOLTIP
-            helpButton4.link = nil
+            helpButton1?.helpText = NOON_DURATION_TOOLTIP
+            helpButton1?.link = nil
+            helpButton2?.helpText = DAYLIGHT_EXTENSION_TOOLTIP
+            helpButton2?.link = nil
+            helpButton3?.helpText = CURVE_FACTOR_TOOLTIP
+            helpButton3?.link = CHART_LINK
+            helpButton4?.helpText = LOCATION_TOOLTIP
+            helpButton4?.link = nil
         case .sync:
             let refFrame = brightnessOffsetField.frame
             refX = refFrame.maxX - (refFrame.width / 2)
 
-            helpButton1.helpText = BRIGHTNESS_OFFSET_TOOLTIP
-            helpButton1.link = CHART_LINK
-            helpButton2.helpText = BRIGHTNESS_CLIP_TOOLTIP
-            helpButton2.link = CHART_LINK
-            helpButton3.helpText = POLLING_INTERVAL_TOOLTIP
-            helpButton3.link = nil
+            helpButton1?.helpText = BRIGHTNESS_OFFSET_TOOLTIP
+            helpButton1?.link = CHART_LINK
+            helpButton2?.helpText = BRIGHTNESS_CLIP_TOOLTIP
+            helpButton2?.link = CHART_LINK
+            helpButton3?.helpText = POLLING_INTERVAL_TOOLTIP
+            helpButton3?.link = nil
         }
 
         smoothTransitionCheckbox.setFrameOrigin(NSPoint(
@@ -406,10 +429,10 @@ class ConfigurationViewController: NSViewController {
             y: smoothTransitionCheckbox.frame.origin.y
         ))
 
-        helpButton1.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
-        helpButton2.isHidden = !brightnessClipVisible && !contrastLimitVisible && !daylightExtensionVisible
-        helpButton3.isHidden = !curveFactorVisible && !pollingIntervalVisible
-        helpButton4.isHidden = !locationVisible
+        helpButton1?.isHidden = !brightnessOffsetVisible && !brightnessLimitVisible && !noonDurationVisible
+        helpButton2?.isHidden = !brightnessClipVisible && !contrastLimitVisible && !daylightExtensionVisible
+        helpButton3?.isHidden = !curveFactorVisible && !pollingIntervalVisible
+        helpButton4?.isHidden = !locationVisible
     }
 
     func listenForShowNavigationHintsChange() {
@@ -610,7 +633,11 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.noonDurationMinutes,
             lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: self.noonDurationField.integerValue, withAnimation: true)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    noonDuration: self.noonDurationField.integerValue,
+                    withAnimation: true
+                )
             },
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
@@ -626,7 +653,11 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.daylightExtensionMinutes,
             lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: self.daylightExtensionField.integerValue, withAnimation: true)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    daylightExtension: self.daylightExtensionField.integerValue,
+                    withAnimation: true
+                )
             },
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
@@ -645,7 +676,11 @@ class ConfigurationViewController: NSViewController {
             settingKeyDouble: Defaults.Keys.curveFactor,
             lowerLimit: 0.0, upperLimit: 10.0,
             onMouseEnter: { settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: self.curveFactorField.doubleValue, withAnimation: true)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    factor: self.curveFactorField.doubleValue,
+                    withAnimation: true
+                )
             },
             onValueChangedInstantDouble: { value, settingsController in
                 settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: value)
@@ -661,7 +696,12 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.brightnessOffset,
             lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    brightnessOffset: value,
+                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                )
             }
         )
     }
@@ -674,7 +714,12 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.contrastOffset,
             lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastOffset: value, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    contrastOffset: value,
+                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                )
             }
         )
     }
@@ -737,16 +782,20 @@ class ConfigurationViewController: NSViewController {
 
     func setupBrightnessClip() {
         guard let minField = brightnessClipMinField,
-            let maxField = brightnessClipMaxField,
-            let minCaption = brightnessClipMinCaption,
-            let maxCaption = brightnessClipMaxCaption else { return }
+              let maxField = brightnessClipMaxField,
+              let minCaption = brightnessClipMinCaption,
+              let maxCaption = brightnessClipMaxCaption else { return }
 
         setupScrollableTextField(
             minField, caption: minCaption,
             settingKeyInt: Defaults.Keys.brightnessClipMin,
             lowerLimit: 0, upperLimit: brightnessAdapter.brightnessClipMax - 1,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: Double(value), brightnessClipMax: brightnessAdapter.brightnessClipMax)
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    brightnessClipMin: Double(value),
+                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                )
             }
         )
         setupScrollableTextField(
@@ -754,16 +803,20 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.brightnessClipMax,
             lowerLimit: brightnessAdapter.brightnessClipMin + 1, upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: Double(value))
+                settingsController?.updateDataset(
+                    display: brightnessAdapter.firstDisplay,
+                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                    brightnessClipMax: Double(value)
+                )
             }
         )
     }
 
     func setupBrightnessLimit() {
         guard let minField = brightnessLimitMinField,
-            let maxField = brightnessLimitMaxField,
-            let minCaption = brightnessLimitMinCaption,
-            let maxCaption = brightnessLimitMaxCaption else { return }
+              let maxField = brightnessLimitMaxField,
+              let minCaption = brightnessLimitMinCaption,
+              let maxCaption = brightnessLimitMaxCaption else { return }
 
         setupScrollableTextField(
             minField, caption: minCaption,
@@ -785,9 +838,9 @@ class ConfigurationViewController: NSViewController {
 
     func setupContrastLimit() {
         guard let minField = contrastLimitMinField,
-            let maxField = contrastLimitMaxField,
-            let minCaption = contrastLimitMinCaption,
-            let maxCaption = contrastLimitMaxCaption else { return }
+              let maxField = contrastLimitMaxField,
+              let minCaption = contrastLimitMinCaption,
+              let maxCaption = contrastLimitMaxCaption else { return }
 
         setupScrollableTextField(
             minField, caption: minCaption,
@@ -809,9 +862,9 @@ class ConfigurationViewController: NSViewController {
 
     func setupLocation() {
         guard let latField = locationLatField,
-            let lonField = locationLonField,
-            let latCaption = locationLatCaption,
-            let lonCaption = locationLonCaption else { return }
+              let lonField = locationLonField,
+              let latCaption = locationLatCaption,
+              let lonCaption = locationLonCaption else { return }
 
         latField.decimalPoints = 2
         latField.step = 0.01
@@ -915,7 +968,12 @@ class ConfigurationViewController: NSViewController {
         } else {
             field.onMouseEnter = { [weak settingsController = self.settingsController] in
                 if brightnessAdapter.mode == .sync {
-                    settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessClipMin: brightnessAdapter.brightnessClipMin, brightnessClipMax: brightnessAdapter.brightnessClipMax, withAnimation: true)
+                    settingsController?.updateDataset(
+                        display: brightnessAdapter.firstDisplay,
+                        brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                        brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                        withAnimation: true
+                    )
                 } else {
                     settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
                 }

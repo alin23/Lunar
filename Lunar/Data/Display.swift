@@ -28,8 +28,26 @@ let DEFAULT_MAX_CONTRAST: UInt8 = 70
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = 0
 let TEST_DISPLAY_ID: CGDirectDisplayID = 2
 
-let GENERIC_DISPLAY: Display = Display(id: GENERIC_DISPLAY_ID, serial: "GENERIC_SERIAL", name: "No Display", minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100)
-let TEST_DISPLAY = { Display(id: TEST_DISPLAY_ID, serial: "TEST_SERIAL", name: "Test Display", active: true, minBrightness: 0, maxBrightness: 100, minContrast: 0, maxContrast: 100, adaptive: true) }
+let GENERIC_DISPLAY = Display(
+    id: GENERIC_DISPLAY_ID,
+    serial: "GENERIC_SERIAL",
+    name: "No Display",
+    minBrightness: 0,
+    maxBrightness: 100,
+    minContrast: 0,
+    maxContrast: 100
+)
+let TEST_DISPLAY = { Display(
+    id: TEST_DISPLAY_ID,
+    serial: "TEST_SERIAL",
+    name: "Test Display",
+    active: true,
+    minBrightness: 0,
+    maxBrightness: 100,
+    minContrast: 0,
+    maxContrast: 100,
+    adaptive: true
+) }
 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
@@ -146,6 +164,20 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var input: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "input", newValue: input, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var hotkeyInput: NSNumber {
+        didSet {
+            save()
+            runNumberObservers(property: "hotkeyInput", newValue: hotkeyInput, oldValue: oldValue)
+        }
+    }
+
     @objc dynamic var audioMuted: Bool {
         didSet {
             save()
@@ -198,6 +230,8 @@ enum ValueType {
         "brightness": [:],
         "contrast": [:],
         "volume": [:],
+        "input": [:],
+        "hotkeyInput": [:],
     ]
     var datastoreObservers: [DefaultsObservation] = []
     var onReadapt: (() -> Void)?
@@ -223,11 +257,13 @@ enum ValueType {
         lockedContrast = try values.decode(Bool.self, forKey: .lockedContrast)
         volume = NSNumber(value: try values.decode(UInt8.self, forKey: .volume))
         audioMuted = try values.decode(Bool.self, forKey: .audioMuted)
+        input = NSNumber(value: try values.decode(UInt8.self, forKey: .input))
+        hotkeyInput = NSNumber(value: try values.decode(UInt8.self, forKey: .hotkeyInput))
     }
 
     static func fromDictionary(_ config: [String: Any]) -> Display? {
         guard let id = config["id"] as? CGDirectDisplayID,
-            let serial = config["serial"] as? String else { return nil }
+              let serial = config["serial"] as? String else { return nil }
 
         return Display(
             id: id,
@@ -245,7 +281,9 @@ enum ValueType {
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
             lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
             volume: (config["volume"] as? UInt8) ?? 10,
-            audioMuted: (config["audioMuted"] as? Bool) ?? false
+            audioMuted: (config["audioMuted"] as? Bool) ?? false,
+            input: (config["input"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput: (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue
         )
     }
 
@@ -287,7 +325,7 @@ enum ValueType {
                 return name
             }
         }
-        return lunarDisplayNames[Int(CGDisplayUnitNumber(id)) % lunarDisplayNames.count]
+        return "Unknown"
     }
 
     static func uuid(id: CGDirectDisplayID) -> String {
@@ -323,6 +361,8 @@ enum ValueType {
         case audioMuted
         case active
         case responsive
+        case input
+        case hotkeyInput
     }
 
     func encode(to encoder: Encoder) throws {
@@ -345,6 +385,8 @@ enum ValueType {
         try container.encode(responsive, forKey: .responsive)
         try container.encode(serial, forKey: .serial)
         try container.encode(volume.uint8Value, forKey: .volume)
+        try container.encode(input.uint8Value, forKey: .input)
+        try container.encode(hotkeyInput.uint8Value, forKey: .hotkeyInput)
     }
 
     func addSentryData() {
@@ -394,7 +436,9 @@ enum ValueType {
         lockedBrightness: Bool = false,
         lockedContrast: Bool = false,
         volume: UInt8 = 10,
-        audioMuted: Bool = false
+        audioMuted: Bool = false,
+        input: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput: UInt8 = InputSource.unknown.rawValue
     ) {
         self.id = id
         self.active = active
@@ -412,6 +456,8 @@ enum ValueType {
         self.maxBrightness = NSNumber(value: maxBrightness)
         self.minContrast = NSNumber(value: minContrast)
         self.maxContrast = NSNumber(value: maxContrast)
+        self.input = NSNumber(value: input)
+        self.hotkeyInput = NSNumber(value: hotkeyInput)
 
         edidName = Display.printableName(id: id)
         if let n = name, !n.isEmpty {
@@ -427,6 +473,7 @@ enum ValueType {
                 self.refreshBrightness()
                 self.refreshContrast()
                 self.refreshVolume()
+                self.refreshInput()
             }
         }
     }
@@ -566,6 +613,12 @@ enum ValueType {
             self.setSentryExtra(value: newValue, key: "maxContrast")
             self.readapt(newValue: newValue, oldValue: oldValue)
         }
+        numberObservers["input"]!["self.input"] = { [weak self] newInput, _ in
+            guard let self = self, let input = InputSource(rawValue: newInput.uint8Value), input != .unknown else { return }
+            if !DDC.setInput(for: self.id, input: input) {
+                log.warning("Error writing input using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+            }
+        }
         numberObservers["volume"]!["self.volume"] = { [weak self] newVolume, _ in
             guard let self = self else { return }
             if !DDC.setAudioSpeakerVolume(for: self.id, audioSpeakerVolume: newVolume.uint8Value) {
@@ -609,20 +662,32 @@ enum ValueType {
                         if !appleDisplay {
                             if !DDC.setBrightness(for: id, brightness: newValue) {
                                 faults += 1
-                                log.warning("Error writing brightness using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults])
+                                log.warning(
+                                    "Error writing brightness using DDC",
+                                    context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults]
+                                )
                             }
                         } else {
-                            log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
+                            log.debug(
+                                "Writing brightness using CoreDisplay",
+                                context: ["name": self.name, "id": self.id, "serial": self.serial]
+                            )
                             CoreDisplay_Display_SetUserBrightness(id, Double(newValue) / maxBrightness)
                         }
                     }
                 } else {
                     if !appleDisplay {
                         if !DDC.setBrightness(for: id, brightness: brightness) {
-                            log.warning("Error writing brightness using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial])
+                            log.warning(
+                                "Error writing brightness using DDC",
+                                context: ["name": self.name, "id": self.id, "serial": self.serial]
+                            )
                         }
                     } else {
-                        log.debug("Writing brightness using CoreDisplay", context: ["name": self.name, "id": self.id, "serial": self.serial])
+                        log.debug(
+                            "Writing brightness using CoreDisplay",
+                            context: ["name": self.name, "id": self.id, "serial": self.serial]
+                        )
                         CoreDisplay_Display_SetUserBrightness(id, Double(brightness) / maxBrightness)
                     }
                 }
@@ -653,7 +718,10 @@ enum ValueType {
 
                         if !DDC.setContrast(for: id, contrast: newValue) {
                             faults += 1
-                            log.warning("Error writing contrast using DDC", context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults])
+                            log.warning(
+                                "Error writing contrast using DDC",
+                                context: ["name": self.name, "id": self.id, "serial": self.serial, "faults": faults]
+                            )
                         }
                     }
                 } else {
@@ -679,6 +747,13 @@ enum ValueType {
 
     func readContrast() -> UInt8? {
         if let c = DDC.getContrast(for: id) {
+            return UInt8(c)
+        }
+        return nil
+    }
+
+    func readInput() -> UInt8? {
+        if let c = DDC.getInput(for: id) {
             return UInt8(c)
         }
         return nil
@@ -721,6 +796,20 @@ enum ValueType {
 
             withoutSmoothTransition {
                 contrast = NSNumber(value: newContrast)
+            }
+        }
+    }
+
+    func refreshInput() {
+        guard let newInput = readInput() else {
+            log.warning("Can't read input for \(name)")
+            return
+        }
+        if newInput != input.uint8Value {
+            log.info("Refreshing input: \(input.uint8Value) <> \(newInput)")
+
+            withoutSmoothTransition {
+                input = NSNumber(value: newInput)
             }
         }
     }
@@ -806,7 +895,13 @@ enum ValueType {
         datastoreObservers.removeAll(keepingCapacity: true)
     }
 
-    func getMinMaxFactor(type: ValueType, offset: Int? = nil, factor: Double? = nil, minVal: Double? = nil, maxVal: Double? = nil) -> (Double, Double, Double) {
+    func getMinMaxFactor(
+        type: ValueType,
+        offset: Int? = nil,
+        factor: Double? = nil,
+        minVal: Double? = nil,
+        maxVal: Double? = nil
+    ) -> (Double, Double, Double) {
         let minValue: Double
         let maxValue: Double
         let offsetValue: Int
@@ -833,7 +928,17 @@ enum ValueType {
         return (minValue, maxValue, factor)
     }
 
-    func computeValue(from percent: Double, type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) -> NSNumber {
+    func computeValue(
+        from percent: Double,
+        type: ValueType,
+        offset: Int? = nil,
+        factor: Double? = nil,
+        appOffset: Int = 0,
+        minVal: Double? = nil,
+        maxVal: Double? = nil,
+        brightnessClipMin: Double? = nil,
+        brightnessClipMax: Double? = nil
+    ) -> NSNumber {
         let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
 
         var percent = percent
@@ -857,7 +962,17 @@ enum ValueType {
         return NSNumber(value: value.rounded())
     }
 
-    func computeSIMDValue(from percent: [Double], type: ValueType, offset: Int? = nil, factor: Double? = nil, appOffset: Int = 0, minVal: Double? = nil, maxVal: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) -> [NSNumber] {
+    func computeSIMDValue(
+        from percent: [Double],
+        type: ValueType,
+        offset: Int? = nil,
+        factor: Double? = nil,
+        appOffset: Int = 0,
+        minVal: Double? = nil,
+        maxVal: Double? = nil,
+        brightnessClipMin: Double? = nil,
+        brightnessClipMax: Double? = nil
+    ) -> [NSNumber] {
         let (minValue, maxValue, factor) = getMinMaxFactor(type: type, offset: offset, factor: factor, minVal: minVal, maxVal: maxVal)
 
         var percent = percent
@@ -892,8 +1007,19 @@ enum ValueType {
         guard let moment = moment else { return (NSNumber(value: minBrightness ?? 0), NSNumber(value: minContrast ?? 0)) }
         var now = DateInRegion().convertTo(region: Region.local)
         if let hour = hour {
-            now = (now.dateBySet(hour: hour, min: minute, secs: 0) ??
-                DateInRegion(year: now.year, month: now.month, day: now.day, hour: hour, minute: minute, second: 0, nanosecond: 0, region: now.region))
+            now = (
+                now.dateBySet(hour: hour, min: minute, secs: 0) ??
+                    DateInRegion(
+                        year: now.year,
+                        month: now.month,
+                        day: now.day,
+                        hour: hour,
+                        minute: minute,
+                        second: 0,
+                        nanosecond: 0,
+                        region: now.region
+                    )
+            )
         }
         let seconds = 60.0
         let minBrightness = minBrightness ?? self.minBrightness.uint8Value
@@ -978,8 +1104,19 @@ enum ValueType {
         let now = DateInRegion().convertTo(region: Region.local)
         for hour in 0 ..< 24 {
             times.append(contentsOf: stride(from: 0, through: 59, by: step).map { minute in
-                let newNow = (now.dateBySet(hour: hour, min: minute, secs: 0) ??
-                    DateInRegion(year: now.year, month: now.month, day: now.day, hour: hour, minute: minute, second: 0, nanosecond: 0, region: now.region))
+                let newNow = (
+                    now.dateBySet(hour: hour, min: minute, secs: 0) ??
+                        DateInRegion(
+                            year: now.year,
+                            month: now.month,
+                            day: now.day,
+                            hour: hour,
+                            minute: minute,
+                            second: 0,
+                            nanosecond: 0,
+                            region: now.region
+                        )
+                )
 
                 return newNow.timeIntervalSince1970
             })
@@ -1071,7 +1208,13 @@ enum ValueType {
         return brightnessContrast
     }
 
-    func adapt(moment: Moment? = nil, app: AppException? = nil, percent: Double? = nil, brightnessClipMin: Double? = nil, brightnessClipMax: Double? = nil) {
+    func adapt(
+        moment: Moment? = nil,
+        app: AppException? = nil,
+        percent: Double? = nil,
+        brightnessClipMin: Double? = nil,
+        brightnessClipMax: Double? = nil
+    ) {
         if !adaptive {
             return
         }
@@ -1079,11 +1222,27 @@ enum ValueType {
         var newBrightness: NSNumber = 0
         var newContrast: NSNumber = 0
         if let moment = moment {
-            (newBrightness, newContrast) = getBrightnessContrast(moment: moment, appBrightnessOffset: Int(app?.brightness ?? 0), appContrastOffset: Int(app?.contrast ?? 0))
+            (newBrightness, newContrast) = getBrightnessContrast(
+                moment: moment,
+                appBrightnessOffset: Int(app?.brightness ?? 0),
+                appContrastOffset: Int(app?.contrast ?? 0)
+            )
         } else if let percent = percent {
             let percent = percent / 100.0
-            newBrightness = computeValue(from: percent, type: .brightness, appOffset: Int(app?.brightness ?? 0), brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
-            newContrast = computeValue(from: percent, type: .contrast, appOffset: Int(app?.contrast ?? 0), brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)
+            newBrightness = computeValue(
+                from: percent,
+                type: .brightness,
+                appOffset: Int(app?.brightness ?? 0),
+                brightnessClipMin: brightnessClipMin,
+                brightnessClipMax: brightnessClipMax
+            )
+            newContrast = computeValue(
+                from: percent,
+                type: .contrast,
+                appOffset: Int(app?.contrast ?? 0),
+                brightnessClipMin: brightnessClipMin,
+                brightnessClipMax: brightnessClipMax
+            )
         }
 
         var changed = false

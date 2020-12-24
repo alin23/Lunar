@@ -550,19 +550,19 @@
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="_locationHelpButton" destination="Ljd-VW-9qI" id="bJ1-PE-vDW"/>
+                        <outlet property="_manualHelpButton" destination="xzi-j7-mze" id="x2m-RD-jqB"/>
+                        <outlet property="_navigationHelpButton" destination="uR5-yb-Ejb" id="Ydl-kz-EaV"/>
+                        <outlet property="_sensorHelpButton" destination="EUE-bb-uAi" id="7rs-Vd-iG6"/>
+                        <outlet property="_syncHelpButton" destination="Q7P-1h-Rui" id="GHD-xb-1me"/>
                         <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
                         <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
-                        <outlet property="locationHelpButton" destination="Ljd-VW-9qI" id="bJ1-PE-vDW"/>
                         <outlet property="locationModeButton" destination="mb8-Kc-CPS" id="wJg-Rg-8s3"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
-                        <outlet property="manualHelpButton" destination="xzi-j7-mze" id="x2m-RD-jqB"/>
                         <outlet property="manualModeButton" destination="XHf-be-ftM" id="uvA-dD-VRP"/>
-                        <outlet property="navigationHelpButton" destination="uR5-yb-Ejb" id="Ydl-kz-EaV"/>
-                        <outlet property="sensorHelpButton" destination="EUE-bb-uAi" id="7rs-Vd-iG6"/>
                         <outlet property="sensorModeButton" destination="cwA-Ed-SH4" id="Gy5-t8-2Y6"/>
-                        <outlet property="syncHelpButton" destination="Q7P-1h-Rui" id="GHD-xb-1me"/>
                         <outlet property="syncModeButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
                     </connections>
                 </viewController>
@@ -1804,6 +1804,12 @@ Shift + ← to view Hotkeys</string>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="_helpButton1" destination="h3b-zL-1U3" id="Y3T-m7-L5c"/>
+                        <outlet property="_helpButton2" destination="3mT-HK-iGJ" id="Hba-JY-bLx"/>
+                        <outlet property="_helpButton3" destination="MiW-AX-iOY" id="B6a-4J-4qc"/>
+                        <outlet property="_helpButton4" destination="aSp-kK-Lh9" id="xLg-PE-ebT"/>
+                        <outlet property="_helpButtonBottom" destination="mGr-rx-1N2" id="TZg-Ke-zia"/>
+                        <outlet property="_helpButtonStep" destination="Ttq-LW-8du" id="Nga-CD-AgV"/>
                         <outlet property="brightnessClipLabel" destination="TIh-L1-JfW" id="6Ed-N8-Fvd"/>
                         <outlet property="brightnessClipMaxCaption" destination="awU-oB-96X" id="DVD-GN-YU1"/>
                         <outlet property="brightnessClipMaxField" destination="x9a-QN-dh4" id="OO3-40-C0K"/>
@@ -1834,12 +1840,6 @@ Shift + ← to view Hotkeys</string>
                         <outlet property="daylightExtensionCaption" destination="7xo-Ez-g9m" id="n58-8w-jt4"/>
                         <outlet property="daylightExtensionField" destination="H5y-th-bQ1" id="Wq8-z4-DGd"/>
                         <outlet property="daylightExtensionLabel" destination="gmb-rW-1Qy" id="iwP-Ic-Qjn"/>
-                        <outlet property="helpButton1" destination="h3b-zL-1U3" id="Y3T-m7-L5c"/>
-                        <outlet property="helpButton2" destination="3mT-HK-iGJ" id="Hba-JY-bLx"/>
-                        <outlet property="helpButton3" destination="MiW-AX-iOY" id="B6a-4J-4qc"/>
-                        <outlet property="helpButton4" destination="aSp-kK-Lh9" id="xLg-PE-ebT"/>
-                        <outlet property="helpButtonBottom" destination="mGr-rx-1N2" id="TZg-Ke-zia"/>
-                        <outlet property="helpButtonStep" destination="Ttq-LW-8du" id="Nga-CD-AgV"/>
                         <outlet property="hotkeyStepLabel" destination="bUO-Qi-56O" id="60j-XX-GDF"/>
                         <outlet property="locationLabel" destination="J3H-YT-CPY" id="e5a-d8-r6D"/>
                         <outlet property="locationLatCaption" destination="cnu-VZ-hsX" id="YeK-oe-gcL"/>
@@ -2173,16 +2173,16 @@ Shift + ← to view Hotkeys</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="325" y="274" width="300" height="300"/>
+                                <rect key="frame" x="326" y="274" width="300" height="300"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <imageCell key="cell" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q49-TR-BYd">
-                                <rect key="frame" x="349" y="203" width="83" height="16"/>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" tag="11" translatesAutoresizingMaskIntoConstraints="NO" id="q49-TR-BYd" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="296" y="203" width="82" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Manual" alternateTitle="Adaptive" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tss-e1-acf">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="systemBold" size="12"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="toggleAdaptive:" target="1Bn-Ca-ETm" id="lN7-m5-AxW"/>
@@ -2236,7 +2236,7 @@ Shift + ← to view Hotkeys</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AFf-yC-bHu" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="-1" y="57" width="250" height="17"/>
+                                        <rect key="frame" x="-1" y="56" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="yxN-eN-fTW">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2263,7 +2263,7 @@ Shift + ← to view Hotkeys</string>
                                         </textFieldCell>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="53f-Gg-bId" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="83" y="14" width="83" height="16"/>
+                                        <rect key="frame" x="83" y="13" width="83" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OEK-mm-GWN">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2274,7 +2274,7 @@ Shift + ← to view Hotkeys</string>
                                         </connections>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="uf6-qo-xQA" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="1" y="114" width="250" height="17"/>
+                                        <rect key="frame" x="1" y="113" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="5n9-6p-6QJ">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2339,7 +2339,7 @@ Shift + ← to view Hotkeys</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hND-EE-xno" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="1" y="57" width="250" height="17"/>
+                                        <rect key="frame" x="1" y="56" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="j1k-jz-zl9">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2366,7 +2366,7 @@ Shift + ← to view Hotkeys</string>
                                         </textFieldCell>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ffG-pW-9dT" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="83" y="14" width="83" height="16"/>
+                                        <rect key="frame" x="83" y="13" width="83" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="eST-GN-uHq">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2377,7 +2377,7 @@ Shift + ← to view Hotkeys</string>
                                         </connections>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="fG4-L8-tRQ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="-1" y="114" width="250" height="17"/>
+                                        <rect key="frame" x="-1" y="113" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="NfU-rj-V9L">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2458,7 +2458,7 @@ to view other displays</string>
                                 </connections>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="nL9-e5-L5B" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="325" y="235" width="16" height="16"/>
+                                <rect key="frame" x="273" y="235" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2477,12 +2477,12 @@ to view other displays</string>
                                     </binding>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TYU-7C-ATm">
-                                <rect key="frame" x="496" y="203" width="83" height="16"/>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TYU-7C-ATm" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="574" y="203" width="82" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Normal" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Ihh-VK-idO">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="systemBold" size="12"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="toggleBrightnessRange:" target="1Bn-Ca-ETm" id="0JJ-xv-IgA"/>
@@ -2494,7 +2494,7 @@ to view other displays</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="qzW-e9-2LI" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="611" y="235" width="16" height="16"/>
+                                <rect key="frame" x="656" y="235" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2514,9 +2514,9 @@ to view other displays</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hY5-kW-cR0">
-                                <rect key="frame" x="355" y="237" width="70" height="16"/>
+                                <rect key="frame" x="303" y="237" width="70" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="ALGORITHM" id="fQJ-oT-sai">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="ALGORITHM" id="fQJ-oT-sai">
                                     <font key="font" size="12" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.2008090574035839" green="0.20416015555701822" blue="0.27001700129533679" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2530,9 +2530,9 @@ to view other displays</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d2r-ba-vhZ">
-                                <rect key="frame" x="477" y="237" width="120" height="16"/>
+                                <rect key="frame" x="595" y="237" width="41" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="BRIGHTNESS RANGE" id="mqD-LN-R3I">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="RANGE" id="mqD-LN-R3I">
                                     <font key="font" size="12" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.2008090574035839" green="0.20416015555701822" blue="0.27001700129533679" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2545,25 +2545,143 @@ to view other displays</string>
                                     </binding>
                                 </connections>
                             </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT">
+                                <rect key="frame" x="426" y="200" width="119" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="USB-C" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="mmT-ta-ING">
+                                        <items>
+                                            <menuItem title="USB-C" state="on" tag="27" id="Ap5-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 1" tag="15" id="Ap1-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 2" tag="16" id="Ap2-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="HDMI 1" tag="17" id="Ap3-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="HDMI 2" tag="18" id="Ap4-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="bOa-6b-iAf"/>
+                                            <menuItem title="VGA 1" tag="1" id="Ap6-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="VGA 2" tag="2" id="Ap7-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="DVI 1" tag="3" id="Ap8-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="DVI 2" tag="4" id="Ap9-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Composite video 1" tag="5" id="Ah0-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Composite video 2" tag="6" id="Ah1-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="S-Video 1" tag="7" id="Ah2-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="S-Video 2" tag="8" id="Ah3-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Tuner 1" tag="9" id="Ah4-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Tuner 2" tag="10" id="Ah5-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Tuner 3" tag="11" id="Ah6-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Component video (YPrPb/YCrCb) 1" tag="12" id="Ah7-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Component video (YPrPb/YCrCb) 2" tag="13" id="Ah8-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="Ah9-ua-jqI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Unknown" tag="246" hidden="YES" enabled="NO" id="IdB-fg-Bb3">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="setInput:" target="1Bn-Ca-ETm" id="CPa-dk-uc9"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2b6-lZ-Lev">
+                                <rect key="frame" x="442" y="237" width="70" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="INPUT" id="l85-dr-D9N">
+                                    <font key="font" size="12" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.20080905739999999" green="0.2041601556" blue="0.2700170013" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="VHB-au-fPD">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="409" y="204" width="20" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="1" green="0.83529411764705885" blue="0.52549019607843139" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" title="⌘" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" controlSize="large" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="a7q-Lw-rXF">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemSemibold" size="15"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="label" value="Change monitor input"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="oHB-ej-BFN">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="adaptiveHelpButton" destination="nL9-e5-L5B" id="wyI-Nu-1gr"/>
+                        <outlet property="_adaptiveHelpButton" destination="nL9-e5-L5B" id="wyI-Nu-1gr"/>
+                        <outlet property="_brightnessRangeHelpButton" destination="qzW-e9-2LI" id="sLE-d5-3ZN"/>
+                        <outlet property="_inputDropdownHotkeyButton" destination="s4q-W2-ta1" id="sIR-FG-rPK"/>
+                        <outlet property="_lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>
+                        <outlet property="_lockContrastHelpButton" destination="09R-D2-mY8" id="qzo-9G-SQM"/>
+                        <outlet property="algorithmButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                         <outlet property="algorithmText" destination="hY5-kW-cR0" id="4Po-MT-wYv"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="brightnessRangeButton" destination="TYU-7C-ATm" id="Lrs-So-t0P"/>
-                        <outlet property="brightnessRangeHelpButton" destination="qzW-e9-2LI" id="sLE-d5-3ZN"/>
                         <outlet property="brightnessRangeText" destination="d2r-ba-vhZ" id="miQ-pZ-m2J"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
-                        <outlet property="lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>
-                        <outlet property="lockContrastHelpButton" destination="09R-D2-mY8" id="qzo-9G-SQM"/>
+                        <outlet property="inputDropdown" destination="brT-Q5-NwT" id="QQa-4u-t0q"/>
+                        <outlet property="inputDropdownText" destination="2b6-lZ-Lev" id="uY5-Px-jj5"/>
                         <outlet property="nonResponsiveDDCTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                         <outlet property="swipeLeftHint" destination="54O-dg-1WQ" id="gBY-gE-aP5"/>
                         <outlet property="swipeRightHint" destination="0WE-QT-onu" id="ULx-5C-kkg"/>
-                        <outlet property="syncModeButton" destination="q49-TR-BYd" id="P73-FO-ysQ"/>
                     </connections>
                 </viewController>
                 <customObject id="VHF-j1-HoW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -3223,7 +3341,7 @@ to view other displays</string>
                                 </tableHeaderView>
                             </scrollView>
                             <button focusRingType="none" verticalHuggingPriority="750" id="48L-lL-9Vz">
-                                <rect key="frame" x="35" y="20" width="90" height="16"/>
+                                <rect key="frame" x="34" y="20" width="90" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Sync Mode" alternateTitle="Sync Mode" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="psQ-2u-YUl">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3276,6 +3394,62 @@ to view other displays</string>
                 </arrayController>
             </objects>
             <point key="canvasLocation" x="-1602" y="3680.5"/>
+        </scene>
+        <!--Hotkey Popover Controller-->
+        <scene sceneID="u59-et-bo6">
+            <objects>
+                <viewController storyboardIdentifier="HotkeyPopoverController" id="VkT-77-mId" customClass="HotkeyPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="yV4-LC-kwE">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="138"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hvo-Ym-RZd">
+                                <rect key="frame" x="89.5" y="106" width="220" height="19"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Hotkey Label" id="IXT-tc-HgO">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB">
+                                <rect key="frame" x="140" y="31" width="119" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="fWr-J1-2iU">
+                                        <items>
+                                            <menuItem title="Item" state="on" tag="246" hidden="YES" enabled="NO" id="IQZ-su-vEj">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="selectItem:" target="VkT-77-mId" id="p2H-73-sMs"/>
+                                </connections>
+                            </popUpButton>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dgm-ya-85K" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="89" y="68" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="dropdown" destination="TCb-EV-tNB" id="cT7-o9-BhC"/>
+                        <outlet property="hotkeyLabel" destination="hvo-Ym-RZd" id="hPa-AN-Z9d"/>
+                        <outlet property="hotkeyView" destination="dgm-ya-85K" id="twg-oy-b2M"/>
+                    </connections>
+                </viewController>
+                <customObject id="fTt-dS-Pne" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1602" y="3863"/>
         </scene>
     </scenes>
     <resources>

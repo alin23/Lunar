@@ -19,6 +19,8 @@ enum Page: Int {
     case hotkeys
     case settings
     case display
+    case displayBrightnessRange
+    case displayAlgorithm
 }
 
 class ToggleButton: NSButton {
@@ -30,18 +32,20 @@ class ToggleButton: NSButton {
 
     var hoverState = HoverState.noHover
     var bgColor: NSColor {
-        if state == .on {
-            return onStateButtonColor[hoverState]![page]!
+        if !isEnabled {
+            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!).shadow(withLevel: 0.3)!
+        } else if state == .on {
+            return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
         } else {
-            return offStateButtonColor[hoverState]![page]!
+            return offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!
         }
     }
 
     var labelColor: NSColor {
         if state == .on {
-            return onStateButtonLabelColor[hoverState]![page]!
+            return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
-            return offStateButtonLabelColor[hoverState]![page]!
+            return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         }
     }
 
@@ -56,7 +60,9 @@ class ToggleButton: NSButton {
     }
 
     override func mouseEntered(with _: NSEvent) {
-        hover()
+        if isEnabled {
+            hover()
+        }
     }
 
     override func mouseExited(with _: NSEvent) {
@@ -67,6 +73,7 @@ class ToggleButton: NSButton {
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         layer?.backgroundColor = bgColor.cgColor
         attributedTitle = attributedTitle.string.withAttribute(.textColor(labelColor))
+        attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
     }
 
     func fade() {

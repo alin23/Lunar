@@ -57,7 +57,10 @@
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
+		C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A517A02593C11C00F6CC83 /* PopoverButon.swift */; };
 		C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* MenuPopoverController.swift */; };
+		C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C247259391C200745637 /* HotkeyPopoverController.swift */; };
+		C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C2492593B5EA00745637 /* HotkeyButton.swift */; };
 		C7AB59782396C4A90028E573 /* Transformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB59762396C4A80028E573 /* Transformers.swift */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
@@ -190,7 +193,10 @@
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C79B5A272434908400D62E52 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
+		C7A517A02593C11C00F6CC83 /* PopoverButon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverButon.swift; sourceTree = "<group>"; };
 		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
+		C7A7C247259391C200745637 /* HotkeyPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyPopoverController.swift; sourceTree = "<group>"; };
+		C7A7C2492593B5EA00745637 /* HotkeyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyButton.swift; sourceTree = "<group>"; };
 		C7AB59762396C4A80028E573 /* Transformers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transformers.swift; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -340,6 +346,7 @@
 				C7C68F0A201D356800F49A2B /* SettingsViewController.swift */,
 				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
 				C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */,
+				C7A7C247259391C200745637 /* HotkeyPopoverController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -371,6 +378,8 @@
 				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
 				C7D6C720254ADAEB007E91B6 /* PageButton.swift */,
 				C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */,
+				C7A7C2492593B5EA00745637 /* HotkeyButton.swift */,
+				C7A517A02593C11C00F6CC83 /* PopoverButon.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -705,6 +714,7 @@
 				C7816BD82406A17200C30975 /* NonResponsiveDDCTextField.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
+				C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */,
 				C7683425245227290087946C /* DisplayName.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
 				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
@@ -712,12 +722,14 @@
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
+				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
+				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,

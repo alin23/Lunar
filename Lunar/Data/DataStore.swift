@@ -202,7 +202,7 @@ extension Defaults.Keys {
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveMode>("adaptiveBrightnessMode", default: .sync)
-    static let hotkeys = Key<[HotkeyIdentifier: [HotkeyPart: Int]]>("hotkeys", default: Hotkey.defaults)
+    static let hotkeys = Key<[String: [HotkeyPart: Int]]>("hotkeys", default: Hotkey.defaults)
     static let displays = Key<[Display]?>("displays", default: nil)
     static let appExceptions = Key<[AppException]?>("appExceptions", default: nil)
     static let sunrise = Key<String?>("sunrise", default: nil)
