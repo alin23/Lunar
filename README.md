@@ -17,7 +17,7 @@
 ## Installation methods
 - Download DMG from [Official website](https://lunar.fyi)
 - Download DMG from the [Releases page](https://github.com/alin23/Lunar/releases)
-- `brew cask install lunar`
+- `brew install --cask lunar`
 
 ![Display page](Images/display.png)
 ![Settings page](Images/settings.png)
