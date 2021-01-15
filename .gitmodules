@@ -4,3 +4,6 @@
 [submodule "Frameworks/NSPageControl"]
 	path = Frameworks/NSPageControl
 	url = git@github.com:nerd0geek1/NSPageControl
+[submodule "Frameworks/Sparkle"]
+	path = Frameworks/Sparkle
+	url = git@github.com:sparkle-project/Sparkle

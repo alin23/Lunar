@@ -12,8 +12,6 @@ import Magnet
 
 class HotkeyViewController: NSViewController {
     @IBOutlet var toggleHotkeyView: HotkeyView!
-    @IBOutlet var startHotkeyView: HotkeyView!
-    @IBOutlet var pauseHotkeyView: HotkeyView!
     @IBOutlet var lunarHotkeyView: HotkeyView!
     @IBOutlet var percent0HotkeyView: HotkeyView!
     @IBOutlet var percent25HotkeyView: HotkeyView!
@@ -72,9 +70,8 @@ class HotkeyViewController: NSViewController {
         super.viewDidLoad()
         view.wantsLayer = true
         view.layer?.backgroundColor = hotkeysBgColor.cgColor
+
         toggleHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.toggle.rawValue] ?? nil
-        startHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.start.rawValue] ?? nil
-        pauseHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.pause.rawValue] ?? nil
         lunarHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.lunar.rawValue] ?? nil
         percent0HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent0.rawValue] ?? nil
         percent25HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent25.rawValue] ?? nil

@@ -17,14 +17,14 @@ class Display {
     var responsive = true
 }
 
-class BrightnessAdapter {
+class DisplayController {
     var displays: [CGDirectDisplayID: Display] = [:]
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID && (CGDisplayIsBuiltin(id) == 1)
     }
 }
 
-let brightnessAdapter = BrightnessAdapter()
+let displayController = DisplayController()
 
 func sha256(data: Data) -> Data {
     var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
@@ -41,7 +41,12 @@ func getSerialNumberHash() -> String? {
         return nil
     }
 
-    guard let serialNumber = (IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0).takeUnretainedValue() as? String)?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
+    guard let serialNumber =
+        (
+            IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0)
+                .takeUnretainedValue() as? String
+        )?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+    else {
         return nil
     }
 

@@ -363,7 +363,7 @@ class ConfigurationViewController: NSViewController {
 
     weak var settingsController: SettingsPageController?
 
-    func showRelevantSettings(_ adaptiveMode: AdaptiveMode) {
+    func showRelevantSettings(_ adaptiveMode: AdaptiveModeKey) {
         let locationMode = adaptiveMode == .location
         let syncMode = adaptiveMode == .sync
         let manualMode = adaptiveMode == .manual
@@ -462,7 +462,7 @@ class ConfigurationViewController: NSViewController {
             if change.newValue == change.oldValue {
                 return
             }
-            self?.settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, updateLimitLines: true)
+            self?.settingsController?.updateDataset(display: displayController.firstDisplay, updateLimitLines: true)
         }
         sunriseObserver = Defaults.observe(.sunrise, handler: updateDataset)
         sunsetObserver = Defaults.observe(.sunset, handler: updateDataset)
@@ -634,13 +634,13 @@ class ConfigurationViewController: NSViewController {
             lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     noonDuration: self.noonDurationField.integerValue,
                     withAnimation: true
                 )
             },
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, noonDuration: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, noonDuration: value)
             }
         )
     }
@@ -654,13 +654,13 @@ class ConfigurationViewController: NSViewController {
             lowerLimit: 0, upperLimit: 300,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     daylightExtension: self.daylightExtensionField.integerValue,
                     withAnimation: true
                 )
             },
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, daylightExtension: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, daylightExtension: value)
             }
         )
     }
@@ -677,13 +677,13 @@ class ConfigurationViewController: NSViewController {
             lowerLimit: 0.0, upperLimit: 10.0,
             onMouseEnter: { settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     factor: self.curveFactorField.doubleValue,
                     withAnimation: true
                 )
             },
             onValueChangedInstantDouble: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, factor: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, factor: value)
             }
         )
     }
@@ -697,10 +697,10 @@ class ConfigurationViewController: NSViewController {
             lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     brightnessOffset: value,
-                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                    brightnessClipMin: displayController.brightnessClipMin,
+                    brightnessClipMax: displayController.brightnessClipMax
                 )
             }
         )
@@ -715,10 +715,10 @@ class ConfigurationViewController: NSViewController {
             lowerLimit: -100, upperLimit: 90,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     contrastOffset: value,
-                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                    brightnessClipMin: displayController.brightnessClipMin,
+                    brightnessClipMax: displayController.brightnessClipMax
                 )
             }
         )
@@ -789,23 +789,23 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             minField, caption: minCaption,
             settingKeyInt: Defaults.Keys.brightnessClipMin,
-            lowerLimit: 0, upperLimit: brightnessAdapter.brightnessClipMax - 1,
+            lowerLimit: 0, upperLimit: displayController.brightnessClipMax - 1,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
+                    display: displayController.firstDisplay,
                     brightnessClipMin: Double(value),
-                    brightnessClipMax: brightnessAdapter.brightnessClipMax
+                    brightnessClipMax: displayController.brightnessClipMax
                 )
             }
         )
         setupScrollableTextField(
             maxField, caption: maxCaption,
             settingKeyInt: Defaults.Keys.brightnessClipMax,
-            lowerLimit: brightnessAdapter.brightnessClipMin + 1, upperLimit: 100,
+            lowerLimit: displayController.brightnessClipMin + 1, upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
                 settingsController?.updateDataset(
-                    display: brightnessAdapter.firstDisplay,
-                    brightnessClipMin: brightnessAdapter.brightnessClipMin,
+                    display: displayController.firstDisplay,
+                    brightnessClipMin: displayController.brightnessClipMin,
                     brightnessClipMax: Double(value)
                 )
             }
@@ -823,7 +823,7 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.brightnessLimitMin,
             lowerLimit: 0, upperLimit: Double(Defaults[.brightnessLimitMax] - 1),
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMin: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, brightnessLimitMin: value)
             }
         )
         setupScrollableTextField(
@@ -831,7 +831,7 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.brightnessLimitMax,
             lowerLimit: Double(Defaults[.brightnessLimitMin] + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, brightnessLimitMax: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, brightnessLimitMax: value)
             }
         )
     }
@@ -847,7 +847,7 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.contrastLimitMin,
             lowerLimit: 0, upperLimit: Double(Defaults[.contrastLimitMax] - 1),
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMin: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, contrastLimitMin: value)
             }
         )
         setupScrollableTextField(
@@ -855,7 +855,7 @@ class ConfigurationViewController: NSViewController {
             settingKeyInt: Defaults.Keys.contrastLimitMax,
             lowerLimit: Double(Defaults[.contrastLimitMin] + 1), upperLimit: 100,
             onValueChangedInstant: { value, settingsController in
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, contrastLimitMax: value)
+                settingsController?.updateDataset(display: displayController.firstDisplay, contrastLimitMax: value)
             }
         )
     }
@@ -877,7 +877,7 @@ class ConfigurationViewController: NSViewController {
             onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
                 Defaults[.manualLocation] = true
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
+                settingsController?.updateDataset(display: displayController.firstDisplay)
             }
         )
         setupScrollableTextField(
@@ -886,7 +886,7 @@ class ConfigurationViewController: NSViewController {
             onMouseExit: { _ in appDelegate().setupHotkeys() },
             onValueChangedDouble: { _, settingsController in
                 Defaults[.manualLocation] = true
-                settingsController?.updateDataset(display: brightnessAdapter.firstDisplay)
+                settingsController?.updateDataset(display: displayController.firstDisplay)
             }
         )
     }
@@ -967,15 +967,15 @@ class ConfigurationViewController: NSViewController {
             }
         } else {
             field.onMouseEnter = { [weak settingsController = self.settingsController] in
-                if brightnessAdapter.mode == .sync {
+                if displayController.adaptiveModeKey == .sync {
                     settingsController?.updateDataset(
-                        display: brightnessAdapter.firstDisplay,
-                        brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                        brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                        display: displayController.firstDisplay,
+                        brightnessClipMin: displayController.brightnessClipMin,
+                        brightnessClipMax: displayController.brightnessClipMax,
                         withAnimation: true
                     )
                 } else {
-                    settingsController?.updateDataset(display: brightnessAdapter.firstDisplay, withAnimation: true)
+                    settingsController?.updateDataset(display: displayController.firstDisplay, withAnimation: true)
                 }
             }
         }

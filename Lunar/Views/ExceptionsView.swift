@@ -15,10 +15,11 @@ class ExceptionsView: NSTableView {
 
     override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
         guard let app = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? AppException,
-            let scrollableBrightness = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-            let scrollableContrast = (rowView.view(atColumn: 3) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-            let scrollableBrightnessCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
-            let scrollableContrastCaption = (rowView.view(atColumn: 3) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption else { return }
+              let scrollableBrightness = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+              let scrollableContrast = (rowView.view(atColumn: 3) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+              let scrollableBrightnessCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
+              let scrollableContrastCaption = (rowView.view(atColumn: 3) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption
+        else { return }
 
         scrollableBrightness.textFieldColor = scrollableTextFieldColorWhite
         scrollableBrightness.textFieldColorHover = scrollableTextFieldColorHoverWhite
@@ -43,17 +44,17 @@ class ExceptionsView: NSTableView {
             if let controller = exceptionsController.parent?.parent as? SettingsPageController {
                 scrollableBrightness.onValueChangedInstant = { [weak controller, weak scrollableContrast] value in
                     guard let scrollableContrast = scrollableContrast, let controller = controller else { return }
-                    if brightnessAdapter.mode != .sync {
+                    if displayController.adaptiveModeKey != .sync {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
+                            display: displayController.firstDisplay,
                             appBrightnessOffset: Int(value),
                             appContrastOffset: scrollableContrast.integerValue
                         )
                     } else {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
-                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            display: displayController.firstDisplay,
+                            brightnessClipMin: displayController.brightnessClipMin,
+                            brightnessClipMax: displayController.brightnessClipMax,
                             appBrightnessOffset: Int(value),
                             appContrastOffset: scrollableContrast.integerValue
                         )
@@ -61,17 +62,17 @@ class ExceptionsView: NSTableView {
                 }
                 scrollableContrast.onValueChangedInstant = { [weak controller, weak scrollableBrightness] value in
                     guard let scrollableBrightness = scrollableBrightness, let controller = controller else { return }
-                    if brightnessAdapter.mode != .sync {
+                    if displayController.adaptiveModeKey != .sync {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
+                            display: displayController.firstDisplay,
                             appBrightnessOffset: scrollableBrightness.integerValue,
                             appContrastOffset: Int(value)
                         )
                     } else {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
-                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            display: displayController.firstDisplay,
+                            brightnessClipMin: displayController.brightnessClipMin,
+                            brightnessClipMax: displayController.brightnessClipMax,
                             appBrightnessOffset: scrollableBrightness.integerValue,
                             appContrastOffset: Int(value)
                         )
@@ -79,21 +80,22 @@ class ExceptionsView: NSTableView {
                 }
 
                 scrollableBrightness.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast, let controller = controller else { return }
+                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
+                          let controller = controller else { return }
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
-                    if brightnessAdapter.mode != .sync {
+                    if displayController.adaptiveModeKey != .sync {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
+                            display: displayController.firstDisplay,
                             appBrightnessOffset: brightnessOffset,
                             appContrastOffset: contrastOffset,
                             withAnimation: true
                         )
                     } else {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
-                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            display: displayController.firstDisplay,
+                            brightnessClipMin: displayController.brightnessClipMin,
+                            brightnessClipMax: displayController.brightnessClipMax,
                             appBrightnessOffset: brightnessOffset,
                             appContrastOffset: contrastOffset,
                             withAnimation: true
@@ -101,21 +103,22 @@ class ExceptionsView: NSTableView {
                     }
                 }
                 scrollableContrast.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast, let controller = controller else { return }
+                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
+                          let controller = controller else { return }
                     let brightnessOffset = scrollableBrightness.integerValue
                     let contrastOffset = scrollableContrast.integerValue
-                    if brightnessAdapter.mode != .sync {
+                    if displayController.adaptiveModeKey != .sync {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
+                            display: displayController.firstDisplay,
                             appBrightnessOffset: brightnessOffset,
                             appContrastOffset: contrastOffset,
                             withAnimation: true
                         )
                     } else {
                         controller.updateDataset(
-                            display: brightnessAdapter.firstDisplay,
-                            brightnessClipMin: brightnessAdapter.brightnessClipMin,
-                            brightnessClipMax: brightnessAdapter.brightnessClipMax,
+                            display: displayController.firstDisplay,
+                            brightnessClipMin: displayController.brightnessClipMin,
+                            brightnessClipMax: displayController.brightnessClipMax,
                             appBrightnessOffset: brightnessOffset,
                             appContrastOffset: contrastOffset,
                             withAnimation: true

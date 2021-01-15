@@ -90,14 +90,14 @@ class Geolocation: NSObject, NSCoding {
                 return
             }
             self.latitude = change.newValue
-            brightnessAdapter.fetchMoments()
+            LocationMode.fetchMoments()
         }
         longitudeObserver = Defaults.observe(.locationLon) { [weak self] change in
             guard let self = self, change.newValue != change.oldValue else {
                 return
             }
             self.longitude = change.newValue
-            brightnessAdapter.fetchMoments()
+            LocationMode.fetchMoments()
         }
     }
 

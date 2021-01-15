@@ -64,7 +64,7 @@ class DisplayValuesView: NSTableView {
                 DDC.skipReadingPropertyById[displayID]?.removeAll()
                 DDC.writeFaults[displayID]?.removeAll()
                 DDC.readFaults[displayID]?.removeAll()
-                brightnessAdapter.displays[displayID]?.responsive = true
+                displayController.displays[displayID]?.responsive = true
                 self?.setNeedsDisplay()
             }
         }
@@ -86,7 +86,7 @@ class DisplayValuesView: NSTableView {
                     }
                 }
             }
-            brightnessAdapter.removeDisplay(id: displayID)
+            displayController.removeDisplay(id: displayID)
         }
     }
 
@@ -129,7 +129,7 @@ class DisplayValuesView: NSTableView {
         nonResponsiveDDCTextField.onClick = getResetAction(displayID: display.id)
         adaptiveButton.setup(displayID: display.id)
         if display.activeAndResponsive {
-            if brightnessAdapter.mode == .manual {
+            if displayController.adaptiveModeKey == .manual {
                 adaptiveButton.isHidden = true
             } else {
                 adaptiveButton.isHidden = false
@@ -163,13 +163,13 @@ class DisplayValuesView: NSTableView {
 
         scrollableBrightness.onValueChanged = { value in
             display.brightness = NSNumber(value: value)
-            if brightnessAdapter.mode != .manual {
+            if displayController.adaptiveModeKey != .manual {
                 display.adaptive = false
             }
         }
         scrollableContrast.onValueChanged = { value in
             display.contrast = NSNumber(value: value)
-            if brightnessAdapter.mode != .manual {
+            if displayController.adaptiveModeKey != .manual {
                 display.adaptive = false
             }
         }

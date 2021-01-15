@@ -80,9 +80,10 @@ class ScrollableBrightness: NSView {
             guard let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.lowerLimit = Double(change.newValue)
-                let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                let newBrightness =
+                    Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
-                if brightnessAdapter.mode == .manual {
+                if displayController.adaptiveModeKey == .manual {
                     currentValue.onValueChanged?(newBrightness)
                 }
             }
@@ -91,9 +92,10 @@ class ScrollableBrightness: NSView {
             guard let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.upperLimit = Double(change.newValue)
-                let newBrightness = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                let newBrightness =
+                    Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newBrightness)
-                if brightnessAdapter.mode == .manual {
+                if displayController.adaptiveModeKey == .manual {
                     currentValue.onValueChanged?(newBrightness)
                 }
             }
@@ -104,7 +106,7 @@ class ScrollableBrightness: NSView {
                 let minBrightness: UInt8
                 let maxBrightness: UInt8
 
-                if brightnessAdapter.mode != .manual {
+                if displayController.adaptiveModeKey != .manual {
                     minBrightness = display.minBrightness.uint8Value
                     maxBrightness = display.maxBrightness.uint8Value
                 } else {
@@ -121,13 +123,14 @@ class ScrollableBrightness: NSView {
         display.setObserver(prop: "brightness", key: "scrollableBrightness-\(accessibilityIdentifier())", action: brightnessObserver!)
     }
 
-    func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
+    func setValuesHidden(_ hidden: Bool, mode: AdaptiveModeKey? = nil) {
         if currentValue.isHidden == !hidden, minValue.isHidden == hidden, maxValue.isHidden == hidden {
             return
         }
         if let display = display,
-            !hidden,
-            !display.adaptive || (mode ?? brightnessAdapter.mode) == .manual {
+           !hidden,
+           !display.adaptive || (mode ?? displayController.adaptiveModeKey) == .manual
+        {
             return
         }
 
@@ -237,7 +240,7 @@ class ScrollableBrightness: NSView {
         default:
             return
         }
-        brightnessAdapter.adaptBrightness()
+        displayController.adaptBrightness()
     }
 
     func setup() {

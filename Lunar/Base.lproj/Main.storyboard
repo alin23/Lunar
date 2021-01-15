@@ -16,9 +16,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="State" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="YMI-RQ-F1Z">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
                                         <menuItem title="Built-in brightness" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="B7F-Wk-7dh">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
@@ -31,13 +28,6 @@
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showPreferencesWindowWithSender:" target="Voe-Tx-rLC" id="qbP-Ur-gqG"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Toggle" keyEquivalent="l" id="cb4-qT-5Fw">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="toggleBrightnessAdapterWithSender:" target="Voe-Tx-rLC" id="WZa-gt-6uZ"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Start at Login" state="on" id="HeU-1X-veM">
@@ -313,10 +303,10 @@
                     <connections>
                         <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
                         <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
-                        <outlet property="builtinBrightnessMenuItem" destination="B7F-Wk-7dh" id="hAc-7p-LLZ"/>
                         <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
                         <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
                         <outlet property="debugMenuItem" destination="kSD-gy-XkR" id="NKJ-Lt-QFN"/>
+                        <outlet property="infoMenuItem" destination="B7F-Wk-7dh" id="Ygz-Xr-3e0"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
                         <outlet property="percent0MenuItem" destination="9Jm-7d-C6T" id="f9t-jn-RIA"/>
                         <outlet property="percent100MenuItem" destination="UL7-qh-pTF" id="9lg-G5-OdX"/>
@@ -324,8 +314,6 @@
                         <outlet property="percent50MenuItem" destination="O0t-Fi-WJU" id="NIq-hG-J6p"/>
                         <outlet property="percent75MenuItem" destination="rXC-7i-Z75" id="rln-kM-6lF"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
-                        <outlet property="stateMenuItem" destination="YMI-RQ-F1Z" id="cCj-Nl-eqb"/>
-                        <outlet property="toggleMenuItem" destination="cb4-qT-5Fw" id="aWt-SV-OwO"/>
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
                     </connections>
                 </customObject>
@@ -396,22 +384,6 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YOS-jj-Tq9" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="718" y="660" width="90" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Sync" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ObY-i4-ylP">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
-                                        <integer key="value" value="-1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="zyO-27-aZX"/>
-                                </connections>
-                            </button>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
                                 <rect key="frame" x="385" y="640" width="180" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -421,106 +393,6 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Q7P-1h-Rui" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="694" y="663" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="4Gy-XK-Ehj">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-Kc-CPS" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="718" y="630" width="90" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Location" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0VI-cN-HOF">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
-                                        <integer key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="ORM-cW-q26"/>
-                                </connections>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XHf-be-ftM" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="818" y="660" width="90" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Manual" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="0wA-nk-IcH">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
-                                        <integer key="value" value="0"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="FWI-7z-j0H"/>
-                                </connections>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cwA-Ed-SH4" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="818" y="630" width="90" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Sensor" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="jh5-zX-fak">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
-                                        <integer key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="toggleBrightnessAdapterWithSender:" target="cu7-9X-1cE" id="D20-mH-b99"/>
-                                </connections>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Ljd-VW-9qI" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="694" y="633" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="2Po-LR-RUW">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="xzi-j7-mze" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="914" y="663" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="MFj-wl-fsF">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EUE-bb-uAi" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="914" y="633" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="mMH-jh-2aZ">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTp-EE-gEX" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="20" y="39" width="48" height="53"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -547,23 +419,190 @@
                                     </connections>
                                 </buttonCell>
                             </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="7bV-H8-X8t" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="770" y="655" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="iOa-UN-BLP">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <popUpButton fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="xGE-aF-MVx" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="790" y="650" width="125" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="⚫︎  Sensor Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" tag="2" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="7Tn-b9-Cdk" id="Kyh-RR-mh5">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="8hR-Pz-G9R">
+                                        <items>
+                                            <menuItem title="⚫︎  Sensor Mode" state="on" tag="2" id="7Tn-b9-Cdk">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.086269999999999999" green="0.48235" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" size="11" name=".HiraKakuInterface-W5"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  ">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.086269999999999999" green="0.48235" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="Sensor Mode">
+                                                        <attributes>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="⚫︎  Sync Mode" tag="-1" id="YYQ-6O-Ldf">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.32940999999999998" green="0.82745000000000002" blue="0.50588" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" size="11" name=".HiraKakuInterface-W5"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  ">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.32940999999999998" green="0.82745000000000002" blue="0.50588" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="Sync Mode">
+                                                        <attributes>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="⚫︎  Location Mode" tag="1" id="4Pr-nT-3EU">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" size="11" name=".HiraKakuInterface-W5"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  ">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="Location Mode">
+                                                        <attributes>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="⚫︎  Manual Mode" id="rh0-mE-71Z">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSBackgroundColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <color key="NSColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" size="11" name=".HiraKakuInterface-W5"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                                <tabStops>
+                                                                    <textTab alignment="left" location="27.149999618530273">
+                                                                        <options/>
+                                                                    </textTab>
+                                                                </tabStops>
+                                                            </paragraphStyle>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  ">
+                                                        <attributes>
+                                                            <color key="NSBackgroundColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <color key="NSColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                                <tabStops>
+                                                                    <textTab alignment="left" location="27.149999618530273">
+                                                                        <options/>
+                                                                    </textTab>
+                                                                </tabStops>
+                                                            </paragraphStyle>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="Manual Mode">
+                                                        <attributes>
+                                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                                <tabStops>
+                                                                    <textTab alignment="left" location="27.149999618530273">
+                                                                        <options/>
+                                                                    </textTab>
+                                                                </tabStops>
+                                                            </paragraphStyle>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="Daz-qe-g48"/>
+                                            <menuItem title="⚫︎  Auto Mode" tag="99" id="A93-Hb-19F">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.15791728887452053" green="0.10222347583866889" blue="0.37273628201280512" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" size="11" name=".HiraKakuInterface-W5"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  Auto Mode">
+                                                        <attributes>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="mode">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="toggleDisplayControllerWithSender:" target="cu7-9X-1cE" id="abb-Bk-daA"/>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="_locationHelpButton" destination="Ljd-VW-9qI" id="bJ1-PE-vDW"/>
-                        <outlet property="_manualHelpButton" destination="xzi-j7-mze" id="x2m-RD-jqB"/>
+                        <outlet property="_activeHelpButton" destination="7bV-H8-X8t" id="0BA-Ee-O1R"/>
                         <outlet property="_navigationHelpButton" destination="uR5-yb-Ejb" id="Ydl-kz-EaV"/>
-                        <outlet property="_sensorHelpButton" destination="EUE-bb-uAi" id="7rs-Vd-iG6"/>
-                        <outlet property="_syncHelpButton" destination="Q7P-1h-Rui" id="GHD-xb-1me"/>
+                        <outlet property="activeModeButton" destination="xGE-aF-MVx" id="qKC-k3-Y0n"/>
                         <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
                         <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
-                        <outlet property="locationModeButton" destination="mb8-Kc-CPS" id="wJg-Rg-8s3"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
-                        <outlet property="manualModeButton" destination="XHf-be-ftM" id="uvA-dD-VRP"/>
-                        <outlet property="sensorModeButton" destination="cwA-Ed-SH4" id="Gy5-t8-2Y6"/>
-                        <outlet property="syncModeButton" destination="YOS-jj-Tq9" id="Gmt-lx-GxI"/>
                     </connections>
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1887,8 +1926,8 @@ Shift + ← to view Hotkeys</string>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
                                             <color key="gridColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
                                             <tableColumns>
-                                                <tableColumn width="18" minWidth="18" maxWidth="18" id="CdZ-ki-J4O" userLabel="Delete">
-                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                <tableColumn width="20" minWidth="20" maxWidth="20" id="CdZ-ki-J4O" userLabel="Delete">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </tableHeaderCell>
@@ -2697,24 +2736,6 @@ to view other displays</string>
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qSg-Ez-8IX" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="533" width="220" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="8"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vw7-rh-88K">
-                                <rect key="frame" x="35" y="575" width="220" height="19"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Change Adaptive Mode" id="fsL-v4-7G3">
-                                    <font key="font" size="13" name="Menlo-Regular"/>
-                                    <color key="textColor" white="1" alpha="0.84903169014084512" colorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NFS-Qe-xXa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="695" y="533" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
@@ -2802,60 +2823,6 @@ to view other displays</string>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="100% Brightness/Contrast" id="7iI-aM-1Xk">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169014084512" colorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qpQ-sn-PDN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="453" width="220" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="8"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJl-1a-wCR">
-                                <rect key="frame" x="35" y="495" width="220" height="19"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Pause Adaptive Mode" id="VKy-Y3-qLI">
-                                    <font key="font" size="13" name="Menlo-Regular"/>
-                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fS1-2j-dXP" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="373" width="220" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="8"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q2B-JF-iLj">
-                                <rect key="frame" x="35" y="415" width="220" height="19"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Unpause Adaptive Mode" id="TTb-1A-cWv">
-                                    <font key="font" size="13" name="Menlo-Regular"/>
-                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQS-7I-I6a" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="35" y="293" width="220" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="8"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mRo-oA-SEK">
-                                <rect key="frame" x="35" y="335" width="220" height="19"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Show Lunar" id="clw-eG-154">
-                                    <font key="font" size="13" name="Menlo-Regular"/>
-                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -3060,6 +3027,42 @@ to view other displays</string>
                                     <action selector="toggleFineAdjustments:" target="Zhy-oG-VK1" id="CsY-A3-xCn"/>
                                 </connections>
                             </button>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qpQ-sn-PDN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="37" y="533" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJl-1a-wCR">
+                                <rect key="frame" x="37" y="575" width="220" height="19"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Toggle Adaptive Mode" id="VKy-Y3-qLI">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQS-7I-I6a" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="37" y="453" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mRo-oA-SEK">
+                                <rect key="frame" x="37" y="495" width="220" height="19"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Show Lunar" id="clw-eG-154">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -3069,7 +3072,6 @@ to view other displays</string>
                         <outlet property="contrastUpHotkeyView" destination="TJV-V1-URJ" id="JqT-rI-nTy"/>
                         <outlet property="lunarHotkeyView" destination="MQS-7I-I6a" id="PLl-7v-ffj"/>
                         <outlet property="muteAudioHotkeyView" destination="ucS-rK-pL2" id="57B-QM-1zQ"/>
-                        <outlet property="pauseHotkeyView" destination="qpQ-sn-PDN" id="tl0-Xc-UFi"/>
                         <outlet property="percent0HotkeyView" destination="NFS-Qe-xXa" id="OsE-nj-Eu3"/>
                         <outlet property="percent100HotkeyView" destination="xwH-nW-wyC" id="i1i-Wx-0KX"/>
                         <outlet property="percent25HotkeyView" destination="rE2-oz-MBj" id="QQq-j6-cw2"/>
@@ -3081,8 +3083,7 @@ to view other displays</string>
                         <outlet property="preciseContrastUpCheckbox" destination="TCD-Wn-oty" id="ag1-5n-UPR"/>
                         <outlet property="preciseVolumeDownCheckbox" destination="imC-3Y-Xhw" id="Zrl-rQ-5U6"/>
                         <outlet property="preciseVolumeUpCheckbox" destination="3Qo-a9-prv" id="LMQ-WN-qHq"/>
-                        <outlet property="startHotkeyView" destination="fS1-2j-dXP" id="zdm-RX-Zce"/>
-                        <outlet property="toggleHotkeyView" destination="qSg-Ez-8IX" id="e3t-mX-Onx"/>
+                        <outlet property="toggleHotkeyView" destination="qpQ-sn-PDN" id="tl0-Xc-UFi"/>
                         <outlet property="volumeDownHotkeyView" destination="Us2-PS-6r3" id="iZs-1E-kmf"/>
                         <outlet property="volumeUpHotkeyView" destination="0AC-Li-Jzu" id="LqA-rc-K17"/>
                     </connections>

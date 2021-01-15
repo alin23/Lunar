@@ -81,9 +81,10 @@ class ScrollableContrast: NSView {
             guard let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.lowerLimit = Double(change.newValue)
-                let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                let newContrast =
+                    Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newContrast)
-                if brightnessAdapter.mode == .manual {
+                if displayController.adaptiveModeKey == .manual {
                     currentValue.onValueChanged?(newContrast)
                 }
             }
@@ -92,9 +93,10 @@ class ScrollableContrast: NSView {
             guard let currentValue = self?.currentValue else { return }
             runInMainThread {
                 currentValue.upperLimit = Double(change.newValue)
-                let newContrast = Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
+                let newContrast =
+                    Int(round(cap(currentValue.doubleValue, minVal: currentValue.lowerLimit, maxVal: currentValue.upperLimit)))
                 currentValue.stringValue = String(newContrast)
-                if brightnessAdapter.mode == .manual {
+                if displayController.adaptiveModeKey == .manual {
                     currentValue.onValueChanged?(newContrast)
                 }
             }
@@ -104,7 +106,7 @@ class ScrollableContrast: NSView {
                 let minContrast: UInt8
                 let maxContrast: UInt8
 
-                if brightnessAdapter.mode != .manual {
+                if displayController.adaptiveModeKey != .manual {
                     minContrast = display.minContrast.uint8Value
                     maxContrast = display.maxContrast.uint8Value
                 } else {
@@ -121,13 +123,14 @@ class ScrollableContrast: NSView {
         display.setObserver(prop: "contrast", key: "scrollableContrast-\(accessibilityIdentifier())", action: contrastObserver!)
     }
 
-    func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
+    func setValuesHidden(_ hidden: Bool, mode: AdaptiveModeKey? = nil) {
         if currentValue.isHidden == !hidden, minValue.isHidden == hidden, maxValue.isHidden == hidden {
             return
         }
         if let display = display,
-            !hidden,
-            !display.adaptive || (mode ?? brightnessAdapter.mode) == .manual {
+           !hidden,
+           !display.adaptive || (mode ?? displayController.adaptiveModeKey) == .manual
+        {
             return
         }
 
@@ -237,7 +240,7 @@ class ScrollableContrast: NSView {
         default:
             return
         }
-        brightnessAdapter.adaptBrightness()
+        displayController.adaptBrightness()
     }
 
     func setup() {

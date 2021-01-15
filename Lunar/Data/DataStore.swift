@@ -90,7 +90,7 @@ class DataStore: NSObject {
 
     func storeDisplays(_ displays: [Display]) -> [Display] {
         let displays = displays.filter {
-            display in !BrightnessAdapter.isBuiltinDisplay(display.id)
+            display in !SyncMode.isBuiltinDisplay(display.id)
         }
 
         guard let storedDisplays = self.displays() else {
@@ -109,7 +109,7 @@ class DataStore: NSObject {
         }
 
         let allDisplays = (inactiveDisplays + displays).filter {
-            display in !BrightnessAdapter.isBuiltinDisplay(display.id)
+            display in !SyncMode.isBuiltinDisplay(display.id)
         }
         Defaults[.displays] = allDisplays
 
@@ -201,7 +201,8 @@ extension Defaults.Keys {
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 2)
-    static let adaptiveBrightnessMode = Key<AdaptiveMode>("adaptiveBrightnessMode", default: .sync)
+    static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
+    static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let hotkeys = Key<[String: [HotkeyPart: Int]]>("hotkeys", default: Hotkey.defaults)
     static let displays = Key<[Display]?>("displays", default: nil)
     static let appExceptions = Key<[AppException]?>("appExceptions", default: nil)
@@ -219,3 +220,5 @@ extension Defaults.Keys {
     static let dayLength = Key<UInt64>("dayLength", default: 0)
     static let hideMenuBarIcon = Key<Bool>("hideMenuBarIcon", default: false)
 }
+
+let datastore = DataStore()

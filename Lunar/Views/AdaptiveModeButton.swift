@@ -10,27 +10,27 @@ import Cocoa
 import Defaults
 import Foundation
 
-let titleString: [AdaptiveMode: String] = [
+let titleString: [AdaptiveModeKey: String] = [
     .sync: "Sync       ⚫︎",
     .location: "Location ⚫︎",
     .manual: "Manual   ⚫︎",
     .sensor: "Sensor   ⚫︎",
 ]
 
-class AdaptiveModeButton: ToggleButton {
+class AdaptiveModeButton: PopUpButton {
     var adaptiveModeObserver: DefaultsObservation?
-    @IBInspectable var mode: NSInteger = AdaptiveMode.manual.rawValue
+    @IBInspectable var mode: NSInteger = AdaptiveModeKey.manual.rawValue
 
-    func getStateTitle(adaptiveMode: AdaptiveMode, hoverState: HoverState, page: Page) -> NSMutableAttributedString {
+    func getStateTitle(adaptiveMode: AdaptiveModeKey, hoverState: HoverState, page: Page) -> NSMutableAttributedString {
         return titleWithAttributes(title: titleString[self.adaptiveMode]!, mode: adaptiveMode, hoverState: hoverState, page: page)
     }
 
-    var adaptiveMode: AdaptiveMode {
-        return AdaptiveMode(rawValue: mode)!
+    var adaptiveMode: AdaptiveModeKey {
+        return AdaptiveModeKey(rawValue: mode)!
     }
 
-    func buttonState(_ mode: AdaptiveMode? = nil) -> NSControl.StateValue {
-        return NSControl.StateValue(rawValue: ((mode ?? brightnessAdapter.mode) == adaptiveMode) ? 1 : 0)
+    func buttonState(_ mode: AdaptiveModeKey? = nil) -> NSControl.StateValue {
+        return NSControl.StateValue(rawValue: ((mode ?? displayController.adaptiveModeKey) == adaptiveMode) ? 1 : 0)
     }
 
     func listenForAdaptiveModeChange() {
@@ -42,7 +42,7 @@ class AdaptiveModeButton: ToggleButton {
         }
     }
 
-    func titleWithAttributes(title: String, mode: AdaptiveMode, hoverState _: HoverState, page _: Page) -> NSMutableAttributedString {
+    func titleWithAttributes(title: String, mode: AdaptiveModeKey, hoverState _: HoverState, page _: Page) -> NSMutableAttributedString {
         let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))
         mutableTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: labelColor, range: NSMakeRange(0, mutableTitle.length - 2))
         mutableTitle.addAttribute(
@@ -54,13 +54,13 @@ class AdaptiveModeButton: ToggleButton {
         return mutableTitle
     }
 
-    func setTitle(_ mode: AdaptiveMode? = nil) {
-        let buttonTitle = getStateTitle(adaptiveMode: mode ?? brightnessAdapter.mode, hoverState: hoverState, page: page)
+    func setTitle(_ mode: AdaptiveModeKey? = nil) {
+        let buttonTitle = getStateTitle(adaptiveMode: mode ?? displayController.adaptiveModeKey, hoverState: hoverState, page: page)
         attributedTitle = buttonTitle
         attributedAlternateTitle = buttonTitle
     }
 
-    func fade(_ mode: AdaptiveMode? = nil) {
+    func fade(_ mode: AdaptiveModeKey? = nil) {
         state = buttonState(mode)
         setTitle(mode)
         super.fade()

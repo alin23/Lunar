@@ -15,14 +15,61 @@ import Magnet
 import MediaKeyTap
 import Sauce
 
+var upHotkey: Magnet.HotKey?
+var downHotkey: Magnet.HotKey?
+var leftHotkey: Magnet.HotKey?
+var rightHotkey: Magnet.HotKey?
+
+func disableUpDownHotkeys() {
+    log.debug("Unregistering up/down hotkeys")
+    HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
+    HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
+    upHotkey?.unregister()
+    downHotkey?.unregister()
+    upHotkey = nil
+    downHotkey = nil
+}
+
+func disableLeftRightHotkeys() {
+    log.debug("Unregistering left/right hotkeys")
+    HotKeyCenter.shared.unregisterHotKey(with: "navigateBack")
+    HotKeyCenter.shared.unregisterHotKey(with: "navigateForward")
+    leftHotkey?.unregister()
+    rightHotkey?.unregister()
+    leftHotkey = nil
+    rightHotkey = nil
+}
+
+func disableUIHotkeys() {
+    disableUpDownHotkeys()
+    disableLeftRightHotkeys()
+}
+
+class AudioEventSubscriber: EventSubscriber {
+    func eventReceiver(_ event: AMCoreAudio.Event) {
+        guard let hwEvent = event as? AudioHardwareEvent else {
+            return
+        }
+
+        switch hwEvent {
+        case .defaultOutputDeviceChanged, .defaultSystemOutputDeviceChanged:
+            runInMainThread {
+                appDelegate().startOrRestartMediaKeyTap()
+            }
+        default:
+            return
+        }
+    }
+
+    var hashValue: Int = 100
+}
+
 var mediaKeyTapBrightness: MediaKeyTap?
 var mediaKeyTapAudio: MediaKeyTap?
 let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
 
 enum HotkeyIdentifier: String, CaseIterable, Codable {
     case toggle,
-         start,
-         pause,
          lunar,
          percent0,
          percent25,
@@ -165,17 +212,7 @@ enum Hotkey {
         HotkeyIdentifier.toggle.rawValue: [
             .enabled: 1,
             .keyCode: kVK_ANSI_L,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.start.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_L,
             .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.pause.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_L,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option, .shift]).carbonModifiers(),
         ],
         HotkeyIdentifier.lunar.rawValue: [
             .enabled: 1,
@@ -298,10 +335,6 @@ enum Hotkey {
         switch identifier {
         case .toggle:
             return #selector(AppDelegate.toggleHotkeyHandler)
-        case .start:
-            return #selector(AppDelegate.startHotkeyHandler)
-        case .pause:
-            return #selector(AppDelegate.pauseHotkeyHandler)
         case .lunar:
             return #selector(AppDelegate.lunarHotkeyHandler)
         case .percent0:
@@ -382,7 +415,7 @@ enum Hotkey {
 
 extension AppDelegate: MediaKeyTapDelegate {
     func volumeOsdImage(display: Display? = nil) -> OSDImage {
-        guard let display = (display ?? brightnessAdapter.currentDisplay) else {
+        guard let display = (display ?? displayController.currentDisplay) else {
             return .volume
         }
 
@@ -423,7 +456,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func handle(mediaKey: MediaKey, event _: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?) {
-        guard let display = brightnessAdapter.currentDisplay else {
+        guard let display = displayController.currentDisplay else {
             return
         }
 
@@ -484,7 +517,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 break
             }
 
-            guard let display = brightnessAdapter.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay else {
                 break
             }
 
@@ -507,7 +540,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 break
             }
 
-            guard let display = brightnessAdapter.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay else {
                 break
             }
 
@@ -530,7 +563,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 break
             }
 
-            guard let display = brightnessAdapter.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay else {
                 break
             }
 
@@ -545,18 +578,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func toggleHotkeyHandler() {
-        brightnessAdapter.toggle()
+        displayController.toggle()
         log.debug("Toggle Hotkey pressed")
-    }
-
-    @objc func pauseHotkeyHandler() {
-        brightnessAdapter.disable()
-        log.debug("Pause Hotkey pressed")
-    }
-
-    @objc func startHotkeyHandler() {
-        brightnessAdapter.enable()
-        log.debug("Start Hotkey pressed")
     }
 
     @objc func lunarHotkeyHandler() {
@@ -592,7 +615,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     func brightnessUpAction(offset: Int? = nil) {
         increaseBrightness(by: offset)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
+        for (id, display) in displayController.activeDisplays {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
@@ -602,7 +625,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     func brightnessDownAction(offset: Int? = nil) {
         decreaseBrightness(by: offset)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
+        for (id, display) in displayController.activeDisplays {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, displayID: id)
         }
 
@@ -612,7 +635,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     func contrastUpAction(offset: Int? = nil) {
         increaseContrast(by: offset)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
+        for (id, display) in displayController.activeDisplays {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
@@ -622,7 +645,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     func contrastDownAction(offset: Int? = nil) {
         decreaseContrast(by: offset)
 
-        for (id, display) in brightnessAdapter.activeDisplays {
+        for (id, display) in displayController.activeDisplays {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, displayID: id)
         }
 
@@ -631,11 +654,11 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     func volumeUpAction(offset: Int? = nil) {
         increaseVolume(by: offset, currentDisplay: true)
-        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+        if let display = displayController.currentDisplay, display.audioMuted {
             toggleAudioMuted()
         }
 
-        if let display = brightnessAdapter.currentDisplay {
+        if let display = displayController.currentDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 
@@ -644,11 +667,11 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     func volumeDownAction(offset: Int? = nil) {
         decreaseVolume(by: offset, currentDisplay: true)
-        if let display = brightnessAdapter.currentDisplay, display.audioMuted {
+        if let display = displayController.currentDisplay, display.audioMuted {
             toggleAudioMuted()
         }
 
-        if let display = brightnessAdapter.currentDisplay {
+        if let display = displayController.currentDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 
@@ -658,7 +681,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func muteAudioHotkeyHandler() {
         toggleAudioMuted()
 
-        if let display = brightnessAdapter.currentDisplay {
+        if let display = displayController.currentDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, displayID: display.id)
         }
 

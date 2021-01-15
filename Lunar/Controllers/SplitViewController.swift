@@ -122,36 +122,20 @@ This mode is the last resort for people that:
 \(NOTE_TEXT)
 """
 
+let AUTO_MODE_TAG = 99
+
 class SplitViewController: NSSplitViewController {
-    var activeTitle: NSMutableAttributedString?
-    var activeTitleHover: NSMutableAttributedString?
+    var adaptiveModeObserver: DefaultsObservation?
+    var defaultAutoModeTitle: NSAttributedString?
 
     @IBOutlet var logo: NSTextField?
-    @IBOutlet var syncModeButton: AdaptiveModeButton?
-    @IBOutlet var locationModeButton: AdaptiveModeButton?
-    @IBOutlet var manualModeButton: AdaptiveModeButton?
-    @IBOutlet var sensorModeButton: AdaptiveModeButton?
 
     @IBOutlet var containerView: NSView?
 
-    @IBOutlet var _syncHelpButton: NSButton?
-    var syncHelpButton: HelpButton? {
-        _syncHelpButton as? HelpButton
-    }
-
-    @IBOutlet var _locationHelpButton: NSButton?
-    var locationHelpButton: HelpButton? {
-        _locationHelpButton as? HelpButton
-    }
-
-    @IBOutlet var _manualHelpButton: NSButton?
-    var manualHelpButton: HelpButton? {
-        _manualHelpButton as? HelpButton
-    }
-
-    @IBOutlet var _sensorHelpButton: NSButton?
-    var sensorHelpButton: HelpButton? {
-        _sensorHelpButton as? HelpButton
+    @IBOutlet var activeModeButton: PopUpButton!
+    @IBOutlet var _activeHelpButton: NSButton!
+    var activeHelpButton: HelpButton? {
+        _activeHelpButton as? HelpButton
     }
 
     @IBOutlet var _navigationHelpButton: NSButton?
@@ -165,10 +149,6 @@ class SplitViewController: NSSplitViewController {
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
 
-    var buttons: [AdaptiveModeButton?] {
-        return [syncModeButton, locationModeButton, manualModeButton, sensorModeButton]
-    }
-
     @IBAction func goRight(_: Any) {
         onRightButtonPress?()
     }
@@ -177,29 +157,62 @@ class SplitViewController: NSSplitViewController {
         onLeftButtonPress?()
     }
 
-    @IBAction func toggleBrightnessAdapter(sender button: AdaptiveModeButton?) {
-        if let button = button, let mode = AdaptiveMode(rawValue: button.mode) {
+    @IBAction func toggleDisplayController(sender button: PopUpButton?) {
+        guard let button = button else { return }
+        if let mode = AdaptiveModeKey(rawValue: button.selectedTag()) {
             log.debug("Changed mode to \(mode)")
+            Defaults[.overrideAdaptiveMode] = true
             Defaults[.adaptiveBrightnessMode] = mode
 
-            for button in buttons {
-                button?.fade(mode)
+            setHelpButtonText(modeKey: mode)
+            button.lastItem?.attributedTitle = defaultAutoModeTitle
+        } else if button.selectedTag() == AUTO_MODE_TAG {
+            Defaults[.overrideAdaptiveMode] = false
+
+            let mode = DisplayController.getAdaptiveMode()
+            log.debug("Changed mode to Auto: \(mode)")
+            Defaults[.adaptiveBrightnessMode] = mode.key
+
+            setHelpButtonText(modeKey: mode.key)
+            if let buttonTitle = defaultAutoModeTitle, let item = button.lastItem {
+                item.attributedTitle = buttonTitle.string.replacingOccurrences(of: " Mode", with: ": \(mode.str) Mode").attributedString
             }
+        }
+        activeModeButton.fade()
+    }
+
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { change in
+            if change.newValue == change.oldValue {
+                return
+            }
+            self.setupModeButton()
         }
     }
 
-    func setHelpButtonText() {
-        sensorHelpButton?.helpText = SENSOR_HELP_TEXT
-        sensorHelpButton?.link = nil
+    func setupModeButton() {
+        guard let button = activeModeButton else { return }
 
-        locationHelpButton?.helpText = LOCATION_HELP_TEXT
-        locationHelpButton?.link = "https://ipstack.com"
+        if Defaults[.overrideAdaptiveMode] {
+            button.selectItem(withTag: Defaults[.adaptiveBrightnessMode].rawValue)
+            setHelpButtonText()
+            if let buttonTitle = defaultAutoModeTitle, let item = button.lastItem {
+                item.attributedTitle = buttonTitle
+            }
+        } else {
+            let mode = DisplayController.getAdaptiveMode()
+            setHelpButtonText(modeKey: mode.key)
+            if let buttonTitle = defaultAutoModeTitle, let item = button.lastItem {
+                item.attributedTitle = buttonTitle.string.replacingOccurrences(of: " Mode", with: ": \(mode.str) Mode").attributedString
+            }
+            button.selectItem(withTag: AUTO_MODE_TAG)
+        }
+        button.fade()
+    }
 
-        syncHelpButton?.helpText = SYNC_HELP_TEXT
-        syncHelpButton?.link = nil
-
-        manualHelpButton?.helpText = MANUAL_HELP_TEXT
-        manualHelpButton?.link = nil
+    func setHelpButtonText(modeKey: AdaptiveModeKey? = nil) {
+        activeHelpButton?.helpText = (modeKey ?? displayController.adaptiveModeKey).helpText
+        activeHelpButton?.link = (modeKey ?? displayController.adaptiveModeKey).helpLink
     }
 
     func hasWhiteBackground() -> Bool {
@@ -219,10 +232,10 @@ class SplitViewController: NSSplitViewController {
             logo.textColor = logoColor
             logo.stringValue = "LUNAR"
         }
-        for button in buttons {
-            button?.page = .display
-            button?.fade()
-        }
+
+        activeModeButton?.page = .display
+        activeModeButton?.fade()
+
         POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
@@ -237,10 +250,9 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "SETTINGS"
         }
 
-        for button in buttons {
-            button?.page = .settings
-            button?.fade()
-        }
+        activeModeButton?.page = .settings
+        activeModeButton?.fade()
+
         POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
@@ -254,10 +266,10 @@ class SplitViewController: NSSplitViewController {
             logo.textColor = logoColor
             logo.stringValue = "HOTKEYS"
         }
-        for button in buttons {
-            button?.page = .hotkeys
-            button?.fade()
-        }
+
+        activeModeButton?.page = .hotkeys
+        activeModeButton?.fade()
+
         POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantDark)
 
         goLeftButton.disable()
@@ -275,6 +287,10 @@ class SplitViewController: NSSplitViewController {
         navigationHelpButton?.onMouseExit = {
             Defaults[.showNavigationHints] = false
         }
+
+        defaultAutoModeTitle = activeModeButton?.lastItem?.attributedTitle
+        setupModeButton()
+        listenForAdaptiveModeChange()
 
         super.viewDidLoad()
     }

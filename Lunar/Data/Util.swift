@@ -9,8 +9,8 @@ extension String {
     }
 }
 
-extension String {
-    public func levenshtein(_ other: String) -> Int {
+public extension String {
+    func levenshtein(_ other: String) -> Int {
         let sCount = count
         let oCount = other.count
 
@@ -83,6 +83,11 @@ func sha256(data: Data) -> Data {
     return Data(hash)
 }
 
+func shortHash(string: String, length: Int = 8) -> String {
+    guard let data = string.data(using: .utf8, allowLossyConversion: true) else { return string }
+    return String(sha256(data: data).str(hex: true, separator: "").prefix(length))
+}
+
 func getSerialNumberHash() -> String? {
     let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
@@ -90,8 +95,15 @@ func getSerialNumberHash() -> String? {
         return nil
     }
 
-    if let serialNumberProp = IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0) {
-        guard let serialNumber = (serialNumberProp.takeRetainedValue() as? String)?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) else {
+    if let serialNumberProp = IORegistryEntryCreateCFProperty(
+        platformExpert,
+        kIOPlatformSerialNumberKey as CFString,
+        kCFAllocatorDefault,
+        0
+    ) {
+        guard let serialNumber = (serialNumberProp.takeRetainedValue() as? String)?
+            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        else {
             serialNumberProp.release()
             return nil
         }

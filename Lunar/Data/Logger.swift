@@ -93,3 +93,5 @@ class Logger: SwiftyBeaver {
         super.error(message(), file, function, line: line, context: context)
     }
 }
+
+let log = Logger.self

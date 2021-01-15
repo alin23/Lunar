@@ -14,7 +14,7 @@ class QuickAdaptiveButton: NSButton {
     var displayID: CGDirectDisplayID?
     weak var display: Display? {
         guard let id = displayID else { return nil }
-        return brightnessAdapter.displays[id]
+        return displayController.displays[id]
     }
 
     func setup(displayID: CGDirectDisplayID) {
@@ -26,7 +26,11 @@ class QuickAdaptiveButton: NSButton {
         let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
         activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonLabelOn, range: NSMakeRange(0, activeTitle.length))
         let inactiveTitle = NSMutableAttributedString(attributedString: attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonLabelOff, range: NSMakeRange(0, inactiveTitle.length))
+        inactiveTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: buttonLabelOff,
+            range: NSMakeRange(0, inactiveTitle.length)
+        )
 
         attributedTitle = inactiveTitle
         attributedAlternateTitle = activeTitle
@@ -47,7 +51,12 @@ class QuickAdaptiveButton: NSButton {
         } else {
             layer?.backgroundColor = buttonBgOff.cgColor
         }
-        adaptiveButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        adaptiveButtonTrackingArea = NSTrackingArea(
+            rect: visibleRect,
+            options: [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: self,
+            userInfo: nil
+        )
         addTrackingArea(adaptiveButtonTrackingArea!)
 
         adaptiveObserver = { [unowned self] newAdaptive, oldValue in

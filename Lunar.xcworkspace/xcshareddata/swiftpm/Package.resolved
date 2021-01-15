@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire",
         "state": {
           "branch": null,
-          "revision": "9e0328127dfb801cefe8ac53a13c0c90a7770448",
-          "version": "5.4.0"
+          "revision": "eaf6e622dd41b07b251d8f01752eab31bc811493",
+          "version": "5.4.1"
         }
       },
       {
@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "EonilFSEvents",
+        "repositoryURL": "https://github.com/eonil/FSEvents",
+        "state": {
+          "branch": null,
+          "revision": "e6b7cdfa2754454e194a45ee6c2004d0f630fe88",
+          "version": "0.1.7"
+        }
+      },
+      {
         "package": "KeyHolder",
         "repositoryURL": "https://github.com/Clipy/KeyHolder",
         "state": {
@@ -101,6 +110,24 @@
         }
       },
       {
+        "package": "Path.swift",
+        "repositoryURL": "https://github.com/mxcl/Path.swift",
+        "state": {
+          "branch": null,
+          "revision": "142d4bc1118602f3679c777d2e0da89c227cd918",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "Regex",
+        "repositoryURL": "https://github.com/crossroadlabs/Regex",
+        "state": {
+          "branch": null,
+          "revision": "166728756082a9cac6e4aed3ebbce8e41cb3a945",
+          "version": "1.2.0"
+        }
+      },
+      {
         "package": "Sauce",
         "repositoryURL": "https://github.com/Clipy/Sauce",
         "state": {
@@ -114,8 +141,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "80928b7e19a713fea798ba45c8bfda38096d7f30",
-          "version": "5.2.2"
+          "revision": "42053c353556d2b67dd9b471b474884a731c51b7",
+          "version": "6.1.0"
         }
       },
       {
@@ -141,8 +168,8 @@
         "repositoryURL": "https://github.com/Jounce/Surge",
         "state": {
           "branch": null,
-          "revision": "b9777a8d0c1df1ed0a22d238fb987c60d13513ac",
-          "version": "2.3.0"
+          "revision": "372ba2830c2cee1981966b480eb1a3593206d7fc",
+          "version": "2.3.1"
         }
       },
       {

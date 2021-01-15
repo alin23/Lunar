@@ -19,7 +19,7 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if !Defaults[.showQuickActions] || brightnessAdapter.displays.count == 0 {
+        if !Defaults[.showQuickActions] || displayController.displays.count == 0 {
             return
         }
 

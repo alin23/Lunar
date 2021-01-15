@@ -26,7 +26,7 @@ class BrightnessContrastChartView: LineChartView {
         notifyDataSetChanged()
     }
 
-    func clampDataset(display: Display, mode: AdaptiveMode, minBrightness: Double? = nil) {
+    func clampDataset(display: Display, mode: AdaptiveModeKey, minBrightness: Double? = nil) {
         switch mode {
         case .location:
             let brightnessChartEntry = brightnessGraph.entries
@@ -64,7 +64,7 @@ class BrightnessContrastChartView: LineChartView {
         return (brightnessPoints, contrastPoints)
     }
 
-    func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
+    func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveModeKey? = nil) {
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             isHidden = true
         } else {
@@ -73,7 +73,7 @@ class BrightnessContrastChartView: LineChartView {
 
         var brightnessChartEntry = brightnessGraph.entries
         var contrastChartEntry = contrastGraph.entries
-        let adaptiveMode = mode ?? brightnessAdapter.mode
+        let adaptiveMode = mode ?? displayController.adaptiveModeKey
 
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
@@ -92,7 +92,11 @@ class BrightnessContrastChartView: LineChartView {
                 brightnessChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
                 contrastChartEntry.reserveCapacity(maxValuesLocation * interpolationValues)
                 let steps = Double(interpolationValues)
-                let points = brightnessAdapter.getBrightnessContrastBatch(for: display, count: maxValuesLocation, minutesBetween: interpolationValues)
+                let points = displayController.getBrightnessContrastBatch(
+                    for: display,
+                    count: maxValuesLocation,
+                    minutesBetween: interpolationValues
+                )
 
                 for x in 0 ..< (maxValuesLocation - 1) {
                     let (brightnessPoints, contrastPoints) = computePoints(hour: x, points: points, steps: steps)
@@ -107,17 +111,27 @@ class BrightnessContrastChartView: LineChartView {
                 brightnessChartEntry.reserveCapacity(maxValuesSync)
                 contrastChartEntry.reserveCapacity(maxValuesSync)
 
-                let clipMin = brightnessAdapter.brightnessClipMin
-                let clipMax = brightnessAdapter.brightnessClipMax
+                let clipMin = displayController.brightnessClipMin
+                let clipMax = displayController.brightnessClipMax
 
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, display.computeSIMDValue(from: percents, type: .brightness, brightnessClipMin: clipMin, brightnessClipMax: clipMax)
+                        xs, display.computeSIMDValue(
+                            from: percents,
+                            type: .brightness,
+                            brightnessClipMin: clipMin,
+                            brightnessClipMax: clipMax
+                        )
                     ).map { ChartDataEntry(x: $0, y: $1.doubleValue) }
                 )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, display.computeSIMDValue(from: percents, type: .contrast, brightnessClipMin: clipMin, brightnessClipMax: clipMax)
+                        xs, display.computeSIMDValue(
+                            from: percents,
+                            type: .contrast,
+                            brightnessClipMin: clipMin,
+                            brightnessClipMax: clipMax
+                        )
                     ).map { ChartDataEntry(x: $0, y: $1.doubleValue) }
                 )
             case .manual:
@@ -127,12 +141,12 @@ class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.reserveCapacity(maxValuesSync)
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "brightness")
+                        xs, displayController.computeSIMDManualValueFromPercent(from: percents, key: "brightness")
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "contrast")
+                        xs, displayController.computeSIMDManualValueFromPercent(from: percents, key: "contrast")
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             }
@@ -169,16 +183,25 @@ class BrightnessContrastChartView: LineChartView {
         setup(mode: adaptiveMode)
     }
 
-    func setupLimitLines(mode: AdaptiveMode) {
+    func setupLimitLines(mode: AdaptiveModeKey) {
         xAxis.removeAllLimitLines()
 
         switch mode {
         case .location:
-            guard let m = brightnessAdapter.moment else { return }
+            guard let m = LocationMode.moment else { return }
 
-            let sunriseLine = ChartLimitLine(limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunrise")
-            let solarNoonLine = ChartLimitLine(limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Noon")
-            let sunsetLine = ChartLimitLine(limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation), label: "Sunset")
+            let sunriseLine = ChartLimitLine(
+                limit: (m.sunrise.timeIntervalSince(m.sunrise.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation),
+                label: "Sunrise"
+            )
+            let solarNoonLine = ChartLimitLine(
+                limit: (m.solarNoon.timeIntervalSince(m.solarNoon.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation),
+                label: "Noon"
+            )
+            let sunsetLine = ChartLimitLine(
+                limit: (m.sunset.timeIntervalSince(m.sunset.dateAtStartOf(.day)) / 1.days.timeInterval) * Double(maxValuesLocation),
+                label: "Sunset"
+            )
 
             if m.sunset.hour <= 12 {
                 sunsetLine.labelPosition = .bottomRight
@@ -228,12 +251,28 @@ class BrightnessContrastChartView: LineChartView {
         legend.orientation = .vertical
 
         legend.setCustom(entries: [
-            LegendEntry(label: "Brightness", form: .square, formSize: 14.0, formLineWidth: 10.0, formLineDashPhase: 10.0, formLineDashLengths: nil, formColor: brightnessGraph.fillColor.withAlphaComponent(0.4)),
-            LegendEntry(label: "Contrast", form: .square, formSize: 14.0, formLineWidth: 10.0, formLineDashPhase: 10.0, formLineDashLengths: nil, formColor: contrastGraph.fillColor.withAlphaComponent(0.4)),
+            LegendEntry(
+                label: "Brightness",
+                form: .square,
+                formSize: 14.0,
+                formLineWidth: 10.0,
+                formLineDashPhase: 10.0,
+                formLineDashLengths: nil,
+                formColor: brightnessGraph.fillColor.withAlphaComponent(0.4)
+            ),
+            LegendEntry(
+                label: "Contrast",
+                form: .square,
+                formSize: 14.0,
+                formLineWidth: 10.0,
+                formLineDashPhase: 10.0,
+                formLineDashLengths: nil,
+                formColor: contrastGraph.fillColor.withAlphaComponent(0.4)
+            ),
         ])
     }
 
-    func setup(mode: AdaptiveMode? = nil) {
+    func setup(mode: AdaptiveModeKey? = nil) {
         gridBackgroundColor = NSColor.clear
         drawGridBackgroundEnabled = false
         drawBordersEnabled = false
@@ -263,7 +302,7 @@ class BrightnessContrastChartView: LineChartView {
         xAxis.drawAxisLineEnabled = false
         xAxis.gridColor = white.withAlphaComponent(0.3)
 
-        let mode = mode ?? brightnessAdapter.mode
+        let mode = mode ?? displayController.adaptiveModeKey
         if mode == .location {
             xAxis.valueFormatter = HourValueFormatter()
             xAxis.drawLabelsEnabled = true

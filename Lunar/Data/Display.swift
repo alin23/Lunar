@@ -93,8 +93,8 @@ enum ValueType {
         didSet {
             save()
 
-            if brightnessAdapter.mode != .manual {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey != .manual {
+                displayController.adaptBrightness()
             }
 
             runBoolObservers(property: "extendedBrightnessRange", newValue: extendedBrightnessRange, oldValue: oldValue)
@@ -236,6 +236,13 @@ enum ValueType {
     var datastoreObservers: [DefaultsObservation] = []
     var onReadapt: (() -> Void)?
     var smoothStep = 1
+    var readableID: String {
+        if name.isEmpty || name == "Unknown" {
+            return shortHash(string: serial)
+        }
+        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
+        return "\(safeName)-\(shortHash(string: serial))"
+    }
 
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -486,24 +493,24 @@ enum ValueType {
         if let readaptListener = onReadapt {
             readaptListener()
         }
-        if let newVal = newValue, let oldVal = oldValue {
-            if adaptive, newVal != oldVal {
-                switch brightnessAdapter.mode {
-                case .location:
-                    adapt(moment: brightnessAdapter.moment)
-                case .sync:
-                    if let brightness = brightnessAdapter.getBuiltinDisplayBrightness() {
-                        log.verbose("Builtin Display Brightness: \(brightness)")
-                        let clipMin = brightnessAdapter.brightnessClipMin
-                        let clipMax = brightnessAdapter.brightnessClipMax
-                        adapt(percent: Double(brightness), brightnessClipMin: clipMin, brightnessClipMax: clipMax)
-                    } else {
-                        log.verbose("Can't get Builtin Display Brightness")
-                    }
-                default:
-                    return
-                }
-            }
+        if adaptive, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
+            displayController.adaptBrightness(for: self)
+//                switch displayController.adaptiveModeKey {
+//                case .location:
+//                    adapt(moment: LocationMode.moment)
+//                case .sync:
+//                    if let brightness = SyncMode.getBuiltinDisplayBrightness() {
+//                        log.verbose("Builtin Display Brightness: \(brightness)")
+//                        let clipMin = displayController.brightnessClipMin
+//                        let clipMax = displayController.brightnessClipMax
+//                        adapt(percent: Double(brightness), brightnessClipMin: clipMin, brightnessClipMax: clipMax)
+//                    } else {
+//                        log.verbose("Can't get Builtin Display Brightness")
+//                    }
+//                default:
+//                    return
+//                }
+//            }
         }
     }
 
@@ -632,12 +639,13 @@ enum ValueType {
             }
         }
         numberObservers["brightness"]!["self.brightness"] = { [weak self] newBrightness, oldValue in
-            guard let self = self else { return }
+            guard let self = self, !self.lockedBrightness, oldValue != newBrightness else { return }
+
             let appleDisplay = self.isAppleDisplay()
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
                 var brightness: UInt8
-                if brightnessAdapter.mode == AdaptiveMode.manual {
+                if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
                     brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
                 } else {
                     brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
@@ -696,11 +704,12 @@ enum ValueType {
             }
         }
         numberObservers["contrast"]!["self.contrast"] = { [weak self] newContrast, oldValue in
-            guard let self = self else { return }
+            guard let self = self, !self.lockedContrast, oldValue != newContrast else { return }
+
             let id = self.id
             if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
                 var contrast: UInt8
-                if brightnessAdapter.mode == AdaptiveMode.manual {
+                if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
                     contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
                 } else {
                     contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
@@ -781,7 +790,9 @@ enum ValueType {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
             withoutSmoothTransition {
-                brightness = NSNumber(value: newBrightness)
+                withoutDDC {
+                    brightness = NSNumber(value: newBrightness)
+                }
             }
         }
     }
@@ -795,7 +806,9 @@ enum ValueType {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
             withoutSmoothTransition {
-                contrast = NSNumber(value: newContrast)
+                withoutDDC {
+                    contrast = NSNumber(value: newContrast)
+                }
             }
         }
     }
@@ -809,7 +822,9 @@ enum ValueType {
             log.info("Refreshing input: \(input.uint8Value) <> \(newInput)")
 
             withoutSmoothTransition {
-                input = NSNumber(value: newInput)
+                withoutDDC {
+                    input = NSNumber(value: newInput)
+                }
             }
         }
     }
@@ -828,8 +843,18 @@ enum ValueType {
             log.info("Refreshing volume: \(volume.uint8Value) <> \(newVolume)")
 
             withoutSmoothTransition {
-                volume = NSNumber(value: newVolume)
+                withoutDDC {
+                    volume = NSNumber(value: newVolume)
+                }
             }
+        }
+    }
+
+    func withoutDDC(_ block: () -> Void) {
+        DDC.queue.sync {
+            DDC.apply = false
+            block()
+            DDC.apply = true
         }
     }
 
@@ -990,99 +1015,6 @@ enum ValueType {
         }
     }
 
-    func getBrightnessContrast(
-        moment: Moment?,
-        hour: Int? = nil,
-        minute: Int = 0,
-        factor: Double? = nil,
-        minBrightness: UInt8? = nil,
-        maxBrightness: UInt8? = nil,
-        minContrast: UInt8? = nil,
-        maxContrast: UInt8? = nil,
-        daylightExtension: Int? = nil,
-        noonDuration: Int? = nil,
-        appBrightnessOffset: Int = 0,
-        appContrastOffset: Int = 0
-    ) -> (NSNumber, NSNumber) {
-        guard let moment = moment else { return (NSNumber(value: minBrightness ?? 0), NSNumber(value: minContrast ?? 0)) }
-        var now = DateInRegion().convertTo(region: Region.local)
-        if let hour = hour {
-            now = (
-                now.dateBySet(hour: hour, min: minute, secs: 0) ??
-                    DateInRegion(
-                        year: now.year,
-                        month: now.month,
-                        day: now.day,
-                        hour: hour,
-                        minute: minute,
-                        second: 0,
-                        nanosecond: 0,
-                        region: now.region
-                    )
-            )
-        }
-        let seconds = 60.0
-        let minBrightness = minBrightness ?? self.minBrightness.uint8Value
-        let maxBrightness = maxBrightness ?? self.maxBrightness.uint8Value
-        let minContrast = minContrast ?? self.minContrast.uint8Value
-        let maxContrast = maxContrast ?? self.maxContrast.uint8Value
-        var newBrightness = NSNumber(value: minBrightness)
-        var newContrast = NSNumber(value: minContrast)
-        let daylightExtension = daylightExtension ?? Defaults[.daylightExtensionMinutes]
-        let noonDuration = noonDuration ?? Defaults[.noonDurationMinutes]
-
-        let daylightStart = moment.sunrise - daylightExtension.minutes
-        let daylightEnd = moment.sunset + daylightExtension.minutes
-
-        let noonStart = moment.solarNoon - (noonDuration / 2).minutes
-        let noonEnd = moment.solarNoon + (noonDuration / 2).minutes
-
-        switch now {
-        case daylightStart ... noonStart:
-            let firstHalfDayMinutes = ((noonStart - daylightStart) / seconds)
-            let minutesSinceSunrise = ((now - daylightStart) / seconds)
-            let percent = (minutesSinceSunrise / firstHalfDayMinutes)
-            newBrightness = computeValue(
-                from: percent, type: .brightness,
-                factor: factor ?? Defaults[.curveFactor], appOffset: appBrightnessOffset,
-                minVal: Double(minBrightness), maxVal: Double(maxBrightness)
-            )
-            newContrast = computeValue(
-                from: percent, type: .contrast,
-                factor: factor ?? Defaults[.curveFactor], appOffset: appContrastOffset,
-                minVal: Double(minContrast), maxVal: Double(maxContrast)
-            )
-        case noonEnd ... daylightEnd:
-            let secondHalfDayMinutes = ((daylightEnd - noonEnd) / seconds)
-            let minutesSinceNoon = ((now - noonEnd) / seconds)
-            let percent = ((secondHalfDayMinutes - minutesSinceNoon) / secondHalfDayMinutes)
-            newBrightness = computeValue(
-                from: percent, type: .brightness,
-                factor: factor ?? Defaults[.curveFactor], appOffset: appBrightnessOffset,
-                minVal: Double(minBrightness), maxVal: Double(maxBrightness)
-            )
-            newContrast = computeValue(
-                from: percent, type: .contrast,
-                factor: factor ?? Defaults[.curveFactor], appOffset: appContrastOffset,
-                minVal: Double(minContrast), maxVal: Double(maxContrast)
-            )
-        case noonStart ... noonEnd:
-            newBrightness = NSNumber(value: maxBrightness)
-            newContrast = NSNumber(value: maxContrast)
-        default:
-            newBrightness = NSNumber(value: minBrightness)
-            newContrast = NSNumber(value: minContrast)
-        }
-
-        if appBrightnessOffset > 0 {
-            newBrightness = NSNumber(value: min(newBrightness.doubleValue + Double(appBrightnessOffset), Double(MAX_BRIGHTNESS)).rounded())
-        }
-        if appContrastOffset > 0 {
-            newContrast = NSNumber(value: min(newContrast.doubleValue + Double(appContrastOffset), Double(MAX_CONTRAST)).rounded())
-        }
-        return (newBrightness, newContrast)
-    }
-
     func getBrightnessContrastBatch(
         moment: Moment?,
         minutesBetween: Int = 0,
@@ -1206,57 +1138,5 @@ enum ValueType {
         )
 
         return brightnessContrast
-    }
-
-    func adapt(
-        moment: Moment? = nil,
-        app: AppException? = nil,
-        percent: Double? = nil,
-        brightnessClipMin: Double? = nil,
-        brightnessClipMax: Double? = nil
-    ) {
-        if !adaptive {
-            return
-        }
-
-        var newBrightness: NSNumber = 0
-        var newContrast: NSNumber = 0
-        if let moment = moment {
-            (newBrightness, newContrast) = getBrightnessContrast(
-                moment: moment,
-                appBrightnessOffset: Int(app?.brightness ?? 0),
-                appContrastOffset: Int(app?.contrast ?? 0)
-            )
-        } else if let percent = percent {
-            let percent = percent / 100.0
-            newBrightness = computeValue(
-                from: percent,
-                type: .brightness,
-                appOffset: Int(app?.brightness ?? 0),
-                brightnessClipMin: brightnessClipMin,
-                brightnessClipMax: brightnessClipMax
-            )
-            newContrast = computeValue(
-                from: percent,
-                type: .contrast,
-                appOffset: Int(app?.contrast ?? 0),
-                brightnessClipMin: brightnessClipMin,
-                brightnessClipMax: brightnessClipMax
-            )
-        }
-
-        var changed = false
-        if !lockedBrightness, brightness != newBrightness {
-            brightness = newBrightness
-            changed = true
-        }
-
-        if !lockedContrast, contrast != newContrast {
-            contrast = newContrast
-            changed = true
-        }
-        if changed {
-            log.info("\n\(name):\n\tBrightness: \(newBrightness.uint8Value)\n\tContrast: \(newContrast.uint8Value)")
-        }
     }
 }

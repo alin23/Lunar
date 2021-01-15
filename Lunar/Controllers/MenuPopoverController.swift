@@ -20,16 +20,16 @@ func getOffColor(_ button: NSButton) -> CGColor {
     }
 }
 
-func buttonBackgroundColor(mode: AdaptiveMode) -> NSColor {
+func buttonBackgroundColor(mode: AdaptiveModeKey) -> NSColor {
     return buttonDotColor[mode]!.withAlphaComponent(0.9)
 }
 
 class ModeButtonResponder: NSResponder {
-    var mode: AdaptiveMode!
+    var mode: AdaptiveModeKey!
     var button: NSButton!
     var trackingArea: NSTrackingArea!
 
-    convenience init(button: NSButton, mode: AdaptiveMode) {
+    convenience init(button: NSButton, mode: AdaptiveModeKey) {
         self.init()
         self.button = button
         self.mode = mode
@@ -52,7 +52,7 @@ class ModeButtonResponder: NSResponder {
         let buttonSize = button.frame
         button.wantsLayer = true
 
-        if brightnessAdapter.mode == mode {
+        if displayController.adaptiveModeKey == mode {
             button.state = .on
             button.layer?.backgroundColor = buttonBackgroundColor(mode: mode).cgColor
         } else {
@@ -129,7 +129,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
-    @IBInspectable dynamic var displays: [Display] = brightnessAdapter.displays.values.map { $0 }
+    @IBInspectable dynamic var displays: [Display] = displayController.displays.values.map { $0 }
         .sorted(by: { d1, d2 in !d1.active && d2.active })
 
     var viewHeight: CGFloat?
@@ -235,7 +235,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             locationModeButtonResponder = locationModeButtonResponder ?? ModeButtonResponder(button: locationModeButton, mode: .location)
             manualModeButtonResponder = manualModeButtonResponder ?? ModeButtonResponder(button: manualModeButton, mode: .manual)
 
-            if brightnessAdapter.clamshellMode {
+            if displayController.clamshellMode {
                 syncModeButtonResponder?.disable(tooltipMessage: "Sync mode can't be activated in clamshell mode")
             } else {
                 syncModeButtonResponder?.enable()
@@ -272,7 +272,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func sameDisplays() -> Bool {
-        let newDisplays = brightnessAdapter.displays.values.map { $0 }
+        let newDisplays = displayController.displays.values.map { $0 }
         return newDisplays.count == displays.count && zip(displays, newDisplays).allSatisfy { d1, d2 in d1 === d2 }
     }
 
@@ -283,7 +283,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 if !self.sameDisplays() {
                     self.tableView.beginUpdates()
                     self.setValue(
-                        brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
+                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
                         forKey: "displays"
                     )
                     self.tableView.reloadData()
@@ -299,13 +299,13 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func listenForResponsiveDDCChange() {
         responsiveDDCObservers.removeAll()
-        for (id, display) in brightnessAdapter.activeDisplays {
+        for (id, display) in displayController.activeDisplays {
             responsiveDDCObservers[id] = display.observe(\.responsive, options: [.new], changeHandler: { [unowned self] _, _ in
                 runInMainThreadAsyncAfter(ms: 1000) { [weak self] in
                     guard let self = self else { return }
                     self.tableView.beginUpdates()
                     self.setValue(
-                        brightnessAdapter.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
+                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
                         forKey: "displays"
                     )
                     self.tableView.reloadData()
@@ -313,7 +313,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     self.tableView.endUpdates()
 
                     self.adaptViewSize()
-                    if Defaults[.showQuickActions], brightnessAdapter.displays.count > 1,
+                    if Defaults[.showQuickActions], displayController.displays.count > 1,
                        let statusButton = appDelegate().statusItem.button
                     {
                         POPOVERS[.menu]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
@@ -367,15 +367,15 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             if sender == syncModeButton {
                 log.debug("SYNC")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .sync).cgColor
-                brightnessAdapter.enable(mode: .sync)
+                displayController.enable(mode: .sync)
             } else if sender == locationModeButton {
                 log.debug("LOCATION")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .location).cgColor
-                brightnessAdapter.enable(mode: .location)
+                displayController.enable(mode: .location)
             } else {
                 log.debug("MANUAL")
                 sender.layer?.backgroundColor = buttonBackgroundColor(mode: .manual).cgColor
-                brightnessAdapter.enable(mode: .manual)
+                displayController.enable(mode: .manual)
             }
         case .off:
             guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton,
@@ -385,16 +385,16 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             }
             sender.layer?.backgroundColor = getOffColor(sender)
             if sender == manualModeButton {
-                brightnessAdapter.enable()
-                if brightnessAdapter.mode == .location {
+                displayController.enable()
+                if displayController.adaptiveModeKey == .location {
                     locationModeButton.state = .on
                     locationModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: .location).cgColor
-                } else if brightnessAdapter.mode == .sync {
+                } else if displayController.adaptiveModeKey == .sync {
                     syncModeButton.state = .on
                     syncModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: .sync).cgColor
                 }
             } else {
-                brightnessAdapter.disable()
+                displayController.disable()
                 manualModeButton.state = .on
                 manualModeButton.layer?.backgroundColor = buttonBackgroundColor(mode: .manual).cgColor
             }

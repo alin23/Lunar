@@ -59,17 +59,17 @@ class SettingsPageController: NSViewController {
             }
 
             if updateLimitLines {
-                brightnessContrastChart?.setupLimitLines(mode: brightnessAdapter.mode)
+                brightnessContrastChart?.setupLimitLines(mode: displayController.adaptiveModeKey)
             }
         }
 
-        switch brightnessAdapter.mode {
+        switch displayController.adaptiveModeKey {
         case .sensor:
             log.info("Sensor mode")
         case .location:
             let maxValues = brightnessContrastChart.maxValuesLocation
             let steps = brightnessContrastChart.interpolationValues
-            let points = brightnessAdapter.getBrightnessContrastBatch(
+            let points = displayController.getBrightnessContrastBatch(
                 for: display, count: maxValues, minutesBetween: steps, factor: factor,
                 daylightExtension: daylightExtension, noonDuration: noonDuration,
                 appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
@@ -139,7 +139,7 @@ class SettingsPageController: NSViewController {
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
             for (x, b) in zip(
                 xs,
-                brightnessAdapter
+                displayController
                     .computeSIMDManualValueFromPercent(
                         from: percents,
                         key: "brightness",
@@ -151,14 +151,14 @@ class SettingsPageController: NSViewController {
             }
             for (x, b) in zip(
                 xs,
-                brightnessAdapter
+                displayController
                     .computeSIMDManualValueFromPercent(from: percents, key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax)
             ) {
                 contrastChartEntry[x].y = b
             }
         }
 
-        // brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode)
+        // brightnessContrastChart.clampDataset(display: display, mode: displayController.mode)
         runInMainThread { [weak brightnessContrastChart] in
             if withAnimation {
                 brightnessContrastChart?.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
@@ -175,12 +175,12 @@ class SettingsPageController: NSViewController {
                     return
                 }
                 if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
-                    self.initGraph(display: brightnessAdapter.firstDisplay, mode: change.newValue)
+                    self.initGraph(display: displayController.firstDisplay, mode: change.newValue)
                 }
             }
     }
 
-    func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
+    func initGraph(display: Display?, mode: AdaptiveModeKey? = nil) {
         runInMainThread { [weak brightnessContrastChart] in
             brightnessContrastChart?.initGraph(
                 display: display,

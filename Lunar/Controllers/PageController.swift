@@ -33,7 +33,7 @@ extension AppDelegate: NSPageControllerDelegate {
                 hideSwipeLeftHint(c: c)
                 splitViewController.yellowBackground()
                 if let settingsController = viewController as? SettingsPageController {
-                    settingsController.initGraph(display: brightnessAdapter.firstDisplay)
+                    settingsController.initGraph(display: displayController.firstDisplay)
                 }
             } else {
                 if c.selectedIndex > 2 {
@@ -96,19 +96,19 @@ extension AppDelegate: NSPageControllerDelegate {
             }
         }
 
-        if let displayController = c.viewControllers[identifier] as? DisplayViewController,
+        if let displayViewController = c.viewControllers[identifier] as? DisplayViewController,
            let displayId = CGDirectDisplayID(identifier)
         {
             if displayId == TEST_DISPLAY_ID {
-                displayController.display = TEST_DISPLAY()
+                displayViewController.display = TEST_DISPLAY()
             } else if displayId != GENERIC_DISPLAY.id {
-                displayController.display = brightnessAdapter.displays[displayId]
+                displayViewController.display = displayController.displays[displayId]
             } else {
-                displayController.display = GENERIC_DISPLAY
+                displayViewController.display = GENERIC_DISPLAY
             }
             if let display = c.arrangedObjects[2] as? Display, display.id == displayId {
-                displayController.swipeLeftHint?.isHidden = Defaults[.didSwipeLeft]
-                displayController.swipeRightHint?.isHidden = Defaults[.didSwipeRight] || c.arrangedObjects.count <= 3
+                displayViewController.swipeLeftHint?.isHidden = Defaults[.didSwipeLeft]
+                displayViewController.swipeRightHint?.isHidden = Defaults[.didSwipeRight] || c.arrangedObjects.count <= 3
             }
         }
 
@@ -182,7 +182,7 @@ class PageController: NSPageController {
         delegate = appDelegate()
 
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
-        let activeDisplays = brightnessAdapter.activeDisplays
+        let activeDisplays = displayController.activeDisplays
         if !activeDisplays.isEmpty {
             let displays: [Any] = activeDisplays.values.sorted(by: { (d1, d2) -> Bool in
                 d1.serial < d2.serial

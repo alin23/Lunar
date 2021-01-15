@@ -1,5 +1,5 @@
 //
-//  BrightnessAdapter.swift
+//  DisplayController.swift
 //  Lunar
 //
 //  Created by Alin on 02/12/2017.
@@ -18,68 +18,55 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
-enum AdaptiveMode: Int, Codable {
-    case location = 1
-    case sync = -1
-    case manual = 0
-    case sensor = 2
-}
-
-class BrightnessAdapter {
+class DisplayController {
     var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
 
     var appObserver: NSKeyValueObservation?
     var runningAppExceptions: [AppException]!
-    var geolocation: Geolocation? {
+
+    var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
-            fetchMoments()
+            activeDisplays = displays.filter { $1.active }
+            activeDisplaysByReadableID = [String: Display](
+                uniqueKeysWithValues: activeDisplays.map { _, display in
+                    (display.readableID, display)
+                }
+            )
         }
     }
 
-    var _moment: Moment?
-    var moment: Moment? {
-        get {
-            if let m = _moment, !m.solarNoon.isToday {
-                fetchMoments()
+    var activeDisplays: [CGDirectDisplayID: Display] = [:]
+    var activeDisplaysByReadableID: [String: Display] = [:]
+
+    var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+        didSet {
+            if oldValue.key != .manual {
+                oldValue.stopWatching()
+                lastNonManualAdaptiveMode = oldValue
             }
-            return _moment
-        }
-        set {
-            _moment = newValue
-            _moment?.store()
+            _ = adaptiveMode.watch()
         }
     }
 
-    var displays: [CGDirectDisplayID: Display] = [:]
-    var builtinDisplay = DDC.getBuiltinDisplay() {
-        didSet {
-            BrightnessAdapter.lastKnownBuiltinDisplayID = builtinDisplay ?? GENERIC_DISPLAY_ID
-        }
+    var adaptiveModeKey: AdaptiveModeKey {
+        adaptiveMode.key
     }
 
-    var activeDisplays: [CGDirectDisplayID: Display] {
-        displays.filter { $1.active }
-    }
+    var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
 
-    var mode: AdaptiveMode = Defaults[.adaptiveBrightnessMode] {
-        didSet {
-            if oldValue != .manual {
-                lastMode = oldValue
-            }
-        }
-    }
-
-    var lastMode: AdaptiveMode = Defaults[.adaptiveBrightnessMode]
-
-    var builtinBrightnessHistory: UInt64 = 0
-    var lastBuiltinBrightness = 0.0
-    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
-
-    var brightnessClipMin: Double = Double(Defaults[.brightnessClipMin])
-    var brightnessClipMax: Double = Double(Defaults[.brightnessClipMax])
+    var brightnessClipMin = Double(Defaults[.brightnessClipMin])
+    var brightnessClipMax = Double(Defaults[.brightnessClipMax])
     var brightnessClipMinObserver: DefaultsObservation?
     var brightnessClipMaxObserver: DefaultsObservation?
+
+    var appBrightnessOffset: Int {
+        Int(runningAppExceptions?.last?.brightness ?? 0)
+    }
+
+    var appContrastOffset: Int {
+        Int(runningAppExceptions?.last?.contrast ?? 0)
+    }
 
     var firstDisplay: Display {
         if !displays.isEmpty {
@@ -93,7 +80,7 @@ class BrightnessAdapter {
 
     var mainDisplay: Display? {
         guard let screen = getScreenWithMouse(),
-            let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
+              let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
         else { return nil }
 
         return activeDisplays[id]
@@ -126,10 +113,7 @@ class BrightnessAdapter {
         return nil
     }
 
-    static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
-        return id != GENERIC_DISPLAY_ID && id != TEST_DISPLAY_ID &&
-            (CGDisplayIsBuiltin(id) == 1 || id == BrightnessAdapter.lastKnownBuiltinDisplayID)
-    }
+    var onAdapt: ((Any) -> Void)?
 
     func removeDisplay(id: CGDirectDisplayID) {
         if let display = displays.removeValue(forKey: id) {
@@ -139,44 +123,46 @@ class BrightnessAdapter {
         Defaults[.displays] = nsDisplays
     }
 
+    static func getAdaptiveMode() -> AdaptiveMode {
+        return Defaults[.overrideAdaptiveMode] ? Defaults[.adaptiveBrightnessMode].mode : autoMode()
+    }
+
+    static func autoMode() -> AdaptiveMode {
+        if let mode = SensorMode().ifAvailable() {
+            return mode
+        } else if let mode = SyncMode().ifAvailable() {
+            return mode
+        } else if let mode = LocationMode().ifAvailable() {
+            return mode
+        } else {
+            return ManualMode()
+        }
+    }
+
     func toggle() {
-        switch mode {
-        case .sensor:
-            log.info("Sensor mode")
-        case .location:
-            if builtinDisplay != nil, !IsLidClosed() {
-                Defaults[.adaptiveBrightnessMode] = AdaptiveMode.sync
-            } else {
-                Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
-            }
-        case .sync:
-            Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
-        case .manual:
-            Defaults[.adaptiveBrightnessMode] = AdaptiveMode.location
+        if adaptiveModeKey == .manual {
+            enable()
+        } else {
+            disable()
         }
     }
 
     func disable() {
-        if mode != .manual {
-            lastMode = mode
-            mode = .manual
+        if adaptiveModeKey != .manual {
+            adaptiveMode = ManualMode()
         }
-        Defaults[.adaptiveBrightnessMode] = AdaptiveMode.manual
+        Defaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
     }
 
-    func enable(mode: AdaptiveMode? = nil) {
+    func enable(mode: AdaptiveModeKey? = nil) {
         if let newMode = mode {
-            self.mode = newMode
-            Defaults[.adaptiveBrightnessMode] = newMode
+            adaptiveMode = newMode.mode
+        } else if lastNonManualAdaptiveMode.available {
+            adaptiveMode = lastNonManualAdaptiveMode
         } else {
-            if IsLidClosed(), self.mode == .manual {
-                self.mode = .location
-            } else {
-                self.mode = lastMode
-            }
-
-            Defaults[.adaptiveBrightnessMode] = self.mode
+            adaptiveMode = DisplayController.getAdaptiveMode()
         }
+        Defaults[.adaptiveBrightnessMode] = adaptiveMode.key
     }
 
     func resetDisplayList() {
@@ -184,7 +170,7 @@ class BrightnessAdapter {
         for display in displays.values {
             display.removeObservers()
         }
-        displays = BrightnessAdapter.getDisplays()
+        displays = DisplayController.getDisplays()
         addSentryData()
     }
 
@@ -268,35 +254,25 @@ class BrightnessAdapter {
     }
 
     func adaptiveModeString(last: Bool = false) -> String {
-        let mode: AdaptiveMode
+        let mode: AdaptiveModeKey
         if last {
-            mode = lastMode
+            mode = lastNonManualAdaptiveMode.key
         } else {
-            mode = self.mode
+            mode = adaptiveModeKey
         }
 
-        switch mode {
-        case .sensor:
-            log.info("Sensor mode")
-            return "Sensor"
-        case .manual:
-            return "Manual"
-        case .location:
-            return "Location"
-        case .sync:
-            return "Sync"
-        }
+        return mode.str
     }
 
     func activateClamshellMode() {
-        if mode == .sync {
+        if adaptiveModeKey == .sync {
             clamshellMode = true
             disable()
         }
     }
 
     func deactivateClamshellMode() {
-        if mode == .manual {
+        if adaptiveModeKey == .manual {
             clamshellMode = false
             enable()
         }
@@ -315,64 +291,6 @@ class BrightnessAdapter {
                 activateClamshellMode()
             } else if clamshellMode {
                 deactivateClamshellMode()
-            }
-        }
-    }
-
-    func fetchMoments() {
-        let now = DateInRegion().convertTo(region: Region.local)
-        var date = now.date
-        date += TimeInterval(Region.local.timeZone.secondsFromGMT())
-        log.debug("Getting moments for \(date)")
-        if let geolocation = geolocation, let solar = Solar(for: date, coordinate: geolocation.coordinate) {
-            moment = Moment(solar)
-            log.debug("Computed moment from Solar")
-            return
-        }
-        if let moment = Moment() {
-            if moment.solarNoon.isToday {
-                self.moment = moment
-                log.debug("Computed moment is today, storing it")
-                return
-            }
-            log.debug("Computed moment is not today, not storing it")
-        }
-
-        if let geolocation = geolocation {
-            AF
-                .request(
-                    "https://api.sunrise-sunset.org/json?lat=\(geolocation.latitude)&lng=\(geolocation.longitude)&date=today&formatted=0"
-                )
-                .validate().responseJSON { [weak self] response in
-                    switch response.result {
-                    case let .success(value):
-                        let json = JSON(value)
-                        if json["status"].string == "OK" {
-                            self?.moment = Moment(result: json["results"].dictionaryValue)
-                        } else {
-                            log.error("Sunrise API status: \(json["status"].string ?? "null")")
-                        }
-                    case let .failure(error):
-                        log.error("Sunrise API error: \(error)")
-                    }
-                }
-        }
-    }
-
-    func fetchGeolocation() {
-        if let geolocation = Geolocation() {
-            self.geolocation = geolocation
-            return
-        }
-
-        AF.request("http://api.ipstack.com/check?access_key=4ce42ebf00e768aad70140eab4a95c75").validate().responseJSON { response in
-            switch response.result {
-            case let .success(value):
-                let json = JSON(value)
-                let geolocation = Geolocation(result: json)
-                self.geolocation = geolocation
-            case let .failure(error):
-                log.error("IP Geolocation error: \(error)")
             }
         }
     }
@@ -413,105 +331,89 @@ class BrightnessAdapter {
             display.refreshBrightness()
             display.refreshContrast()
             display.refreshVolume()
+            display.refreshInput()
         }
     }
 
-    func adaptBrightness(for displays: [Display]? = nil, percent: Double? = nil) {
-        if mode == .manual {
-            return
-        }
-
-        var adapt: (Display) -> Void
-
-        switch mode {
-        case .sync:
-            let builtinBrightness = percent ?? getBuiltinDisplayBrightness()
-            if builtinBrightness == nil {
-                log.warning("There's no builtin display to sync with")
-                return
-            }
-            adapt = { display in display.adapt(
-                moment: nil,
-                app: self.runningAppExceptions?.last,
-                percent: builtinBrightness,
-                brightnessClipMin: self.brightnessClipMin,
-                brightnessClipMax: self.brightnessClipMax
-            ) }
-        case .location:
-            if moment == nil {
-                log.warning("Day moments aren't fetched yet")
-                return
-            }
-            adapt = { display in display.adapt(moment: self.moment, app: self.runningAppExceptions?.last, percent: nil) }
-        default:
-            adapt = { _ in () }
-        }
-
-        if let displays = displays {
-            displays.forEach(adapt)
-        } else {
-            activeDisplays.values.forEach(adapt)
-        }
+    func adaptBrightness(for display: Display) {
+        adaptiveMode.adapt(display)
     }
 
-    func lastValidBuiltinBrightness(_ condition: (UInt8) -> Bool) -> UInt8? {
-        var brightnessHistory: UInt64 = builtinBrightnessHistory
-        var result: UInt8 = 0
-        while brightnessHistory > 0 {
-            result = UInt8(brightnessHistory & 0xFF)
-            if condition(result) {
-                return result
-            }
-            brightnessHistory >>= 8
+    func adaptBrightness(for displays: [Display]? = nil) {
+        for display in displays ?? Array(activeDisplays.values) {
+            adaptiveMode.adapt(display)
         }
-        return nil
+
+//        if mode == .manual {
+//            return
+//        }
+//
+//        var adapt: (Display) -> Void
+//
+//        switch mode {
+//        case .sync:
+//            let builtinBrightness = percent ?? SyncMode.getBuiltinDisplayBrightness()
+//            if builtinBrightness == nil {
+//                log.warning("There's no builtin display to sync with")
+//                return
+//            }
+//            adapt = { display in display.adapt(
+//                moment: nil,
+//                app: self.runningAppExceptions?.last,
+//                percent: builtinBrightness,
+//                brightnessClipMin: self.brightnessClipMin,
+//                brightnessClipMax: self.brightnessClipMax
+//            ) }
+//        case .location:
+//            if LocationMode.moment == nil {
+//                log.warning("Day moments aren't fetched yet")
+//                return
+//            }
+//            adapt = { display in display.adapt(moment: LocationMode.moment, app: self.runningAppExceptions?.last, percent: nil) }
+//        default:
+//            adapt = { _ in () }
+//        }
+//
+//        if let displays = displays {
+//            displays.forEach(adapt)
+//        } else {
+//            activeDisplays.values.forEach(adapt)
+//        }
     }
 
-    func getBuiltinDisplayBrightness() -> Double? {
-//        if builtinDisplay != nil, !IsLidClosed(), let brightness = DDC.getBrightness() {
-        if !IsLidClosed(), let brightness = DDC.getBrightness() {
-            if brightness >= 0.0, brightness <= 1.0 {
-                let percentBrightness = brightness * 100.0
-                builtinBrightnessHistory = (builtinBrightnessHistory << 8) | UInt64(UInt8(round(percentBrightness)))
-                return percentBrightness
-            }
-        }
-        return nil
-    }
-
-    func getBrightnessContrast(
-        for display: Display,
-        hour: Int? = nil,
-        minute: Int = 0,
-        factor: Double? = nil,
-        minBrightness: UInt8? = nil,
-        maxBrightness: UInt8? = nil,
-        minContrast: UInt8? = nil,
-        maxContrast: UInt8? = nil,
-        daylightExtension: Int? = nil,
-        noonDuration: Int? = nil,
-        appBrightnessOffset: Int = 0,
-        appContrastOffset: Int = 0
-    ) -> (NSNumber, NSNumber) {
-        if moment == nil {
-            log.warning("Day moments aren't fetched yet")
-            return (0, 0)
-        }
-        return display.getBrightnessContrast(
-            moment: moment,
-            hour: hour,
-            minute: minute,
-            factor: factor,
-            minBrightness: minBrightness,
-            maxBrightness: maxBrightness,
-            minContrast: minContrast,
-            maxContrast: maxContrast,
-            daylightExtension: daylightExtension,
-            noonDuration: noonDuration,
-            appBrightnessOffset: appBrightnessOffset,
-            appContrastOffset: appContrastOffset
-        )
-    }
+//    func getBrightnessContrast(
+//        for display: Display,
+//        hour: Int? = nil,
+//        minute: Int = 0,
+//        factor: Double? = nil,
+//        minBrightness: UInt8? = nil,
+//        maxBrightness: UInt8? = nil,
+//        minContrast: UInt8? = nil,
+//        maxContrast: UInt8? = nil,
+//        daylightExtension: Int? = nil,
+//        noonDuration: Int? = nil,
+//        appBrightnessOffset: Int = 0,
+//        appContrastOffset: Int = 0
+//    ) -> (NSNumber, NSNumber) {
+//        if LocationMode.moment == nil {
+//            log.warning("Day moments aren't fetched yet")
+//            return (0, 0)
+//        }
+//        return display.getBrightnessContrast(
+//            moment: LocationMode.moment,
+//            hour: hour,
+//            minute: minute,
+//            factor: factor,
+//            minBrightness: minBrightness,
+//            maxBrightness: maxBrightness,
+//            minContrast: minContrast,
+//            maxContrast: maxContrast,
+//            daylightExtension: daylightExtension,
+//            noonDuration: noonDuration,
+//            appBrightnessOffset: appBrightnessOffset,
+//            appContrastOffset: appContrastOffset
+//        )
+//    }
 
     func getBrightnessContrastBatch(
         for display: Display,
@@ -527,12 +429,12 @@ class BrightnessAdapter {
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0
     ) -> [(NSNumber, NSNumber)] {
-        if moment == nil {
+        if LocationMode.moment == nil {
             log.warning("Day moments aren't fetched yet")
             return [(NSNumber, NSNumber)](repeating: (0, 0), count: count * minutesBetween)
         }
         return display.getBrightnessContrastBatch(
-            moment: moment,
+            moment: LocationMode.moment,
             minutesBetween: minutesBetween,
             factor: factor,
             minBrightness: minBrightness,
@@ -641,8 +543,6 @@ class BrightnessAdapter {
             }
         }
     }
-
-    init() {
-        BrightnessAdapter.lastKnownBuiltinDisplayID = builtinDisplay ?? GENERIC_DISPLAY_ID
-    }
 }
+
+let displayController = DisplayController()

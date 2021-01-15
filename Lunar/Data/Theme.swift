@@ -135,7 +135,7 @@ let onStateButtonColor: [HoverState: [Page: NSColor]] = [
     ],
 ]
 
-let buttonDotColor: [AdaptiveMode: NSColor] = [
+let buttonDotColor: [AdaptiveModeKey: NSColor] = [
     .sync: green,
     .location: lunarYellow,
     .manual: red,

@@ -39,9 +39,10 @@
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
-		C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */; };
+		C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* DisplayController.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
+		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
@@ -54,6 +55,13 @@
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C7816BD82406A17200C30975 /* NonResponsiveDDCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
+		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
+		C78BD047259B30CA00FC823F /* EonilFSEvents in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD046259B30CA00FC823F /* EonilFSEvents */; };
+		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
+		C78BD04C259B365500FC823F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD04B259B365500FC823F /* Extensions.swift */; };
+		C78BD04E259B369A00FC823F /* Popovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD04D259B369A00FC823F /* Popovers.swift */; };
+		C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD054259B6BAD00FC823F /* SyncMode.swift */; };
+		C790D4BE259B9DC100868689 /* NanoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = C790D4BD259B9DC100868689 /* NanoID.swift */; };
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
@@ -86,7 +94,11 @@
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D6C720254ADAEB007E91B6 /* PageButton.swift */; };
+		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
+		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
+		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
+		C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
 		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
@@ -171,9 +183,9 @@
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
-		C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessAdapter.swift; sourceTree = "<group>"; };
-		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC.c; sourceTree = SOURCE_ROOT; };
-		C7574F762351FED100358397 /* LunarServiceRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarServiceRelease.entitlements; sourceTree = "<group>"; };
+		C7520C071FD20CC200756F82 /* DisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayController.swift; sourceTree = "<group>"; };
+		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC/DDC.c; sourceTree = SOURCE_ROOT; };
+		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
 		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = gencode.sh; sourceTree = "<group>"; };
 		C7574F812354691700358397 /* buildscript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = buildscript.sh; sourceTree = "<group>"; };
@@ -188,10 +200,14 @@
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C7816BD62406A17200C30975 /* NonResponsiveDDCTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonResponsiveDDCTextField.swift; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		C78BD043259B2FB100FC823F /* SensorMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMode.swift; sourceTree = "<group>"; };
+		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C78BD04D259B369A00FC823F /* Popovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popovers.swift; sourceTree = "<group>"; };
+		C78BD054259B6BAD00FC823F /* SyncMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMode.swift; sourceTree = "<group>"; };
+		C790D4BD259B9DC100868689 /* NanoID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NanoID.swift; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
-		C79B5A272434908400D62E52 /* LunarService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarService.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = dsa_pub.pem; path = Lunar/Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		C7A517A02593C11C00F6CC83 /* PopoverButon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverButon.swift; sourceTree = "<group>"; };
 		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
@@ -221,12 +237,11 @@
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
-		C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C7CFEA1B1FD376E6000AC4A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		C7CFEA1D1FD376E6000AC4A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7D6C720254ADAEB007E91B6 /* PageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageButton.swift; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
+		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
+		C7E07379259CB2C20019C9C2 /* ManualMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMode.swift; sourceTree = "<group>"; };
+		C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMode.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
 		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
@@ -246,12 +261,15 @@
 				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
 				C7045DBB2440ECA8002289E5 /* Solar in Frameworks */,
+				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C701A23C2546BA41004747B5 /* Magnet in Frameworks */,
+				C78BD047259B30CA00FC823F /* EonilFSEvents in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
+				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
@@ -280,6 +298,8 @@
 		C7151945224E34BA0024C6F6 /* DDC */ = {
 			isa = PBXGroup;
 			children = (
+				C7521D32226C762A0062EC81 /* DDC.c */,
+				C7151941224E34BA0024C6F6 /* DDC.h */,
 				C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */,
 				C7151944224E34BA0024C6F6 /* DDC.swift */,
 			);
@@ -380,8 +400,32 @@
 				C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */,
 				C7A7C2492593B5EA00745637 /* HotkeyButton.swift */,
 				C7A517A02593C11C00F6CC83 /* PopoverButon.swift */,
+				C7545E3125B1996300383AFB /* PopUpButton.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		C78BD03D259B2FA300FC823F /* Modes */ = {
+			isa = PBXGroup;
+			children = (
+				C78BD043259B2FB100FC823F /* SensorMode.swift */,
+				C78BD054259B6BAD00FC823F /* SyncMode.swift */,
+				C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */,
+				C7E07379259CB2C20019C9C2 /* ManualMode.swift */,
+				C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */,
+			);
+			path = Modes;
+			sourceTree = "<group>";
+		};
+		C790D4BC259B9DC100868689 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				C7520C071FD20CC200756F82 /* DisplayController.swift */,
+				C78BD04D259B369A00FC823F /* Popovers.swift */,
+				C78BD04B259B365500FC823F /* Extensions.swift */,
+				C790D4BD259B9DC100868689 /* NanoID.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		C7AEC7EC1FD0B4350039B562 = {
@@ -393,7 +437,6 @@
 				C7151935224E33590024C6F6 /* EDIDReader.xcodeproj */,
 				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
 				C7AEC7F71FD0B4350039B562 /* Lunar */,
-				C7CFEA131FD376E6000AC4A6 /* LunarService */,
 				C7AEC7F61FD0B4350039B562 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -409,35 +452,21 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
-				C7521D32226C762A0062EC81 /* DDC.c */,
+				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
 				C79B5A252434905900D62E52 /* Lunar.entitlements */,
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
-				C7151941224E34BA0024C6F6 /* DDC.h */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
+				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
-				C7520C071FD20CC200756F82 /* BrightnessAdapter.swift */,
-				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
 				C76545241FD8A10200DBACE9 /* Controllers */,
 				C76545231FD8A0E000DBACE9 /* Data */,
 				C7151945224E34BA0024C6F6 /* DDC */,
 				G_5197027794336 /* Generated */,
-				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
+				C78BD03D259B2FA300FC823F /* Modes */,
+				C790D4BC259B9DC100868689 /* Utils */,
 				C77CC75A1FEDB367009AA718 /* Views */,
 			);
 			path = Lunar;
-			sourceTree = "<group>";
-		};
-		C7CFEA131FD376E6000AC4A6 /* LunarService */ = {
-			isa = PBXGroup;
-			children = (
-				C79B5A272434908400D62E52 /* LunarService.entitlements */,
-				C7574F762351FED100358397 /* LunarServiceRelease.entitlements */,
-				C7CFEA141FD376E6000AC4A6 /* AppDelegate.swift */,
-				C7CFEA181FD376E6000AC4A6 /* Assets.xcassets */,
-				C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */,
-				C7CFEA1D1FD376E6000AC4A6 /* Info.plist */,
-			);
-			path = LunarService;
 			sourceTree = "<group>";
 		};
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
@@ -503,6 +532,9 @@
 				C7B5E8582548B3F900530B47 /* Defaults */,
 				C7B5E85C2548B5AC00530B47 /* AnyCodable */,
 				C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */,
+				C78BD046259B30CA00FC823F /* EonilFSEvents */,
+				C78BD049259B33D500FC823F /* Path */,
+				C7DA10F6259B8979006DD876 /* Regex */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -559,6 +591,9 @@
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
 				C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */,
+				C78BD045259B30CA00FC823F /* XCRemoteSwiftPackageReference "FSEvents" */,
+				C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */,
+				C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -697,7 +732,9 @@
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C72776E7201F02140055934F /* PageControl.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
+				C78BD04C259B365500FC823F /* Extensions.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
+				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
 				C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
@@ -705,9 +742,11 @@
 				C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
 				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
-				C7520C081FD20CC200756F82 /* BrightnessAdapter.swift in Sources */,
+				C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
+				C78BD04E259B369A00FC823F /* Popovers.swift in Sources */,
 				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */,
@@ -719,14 +758,18 @@
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
 				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
 				C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */,
+				C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
+				C790D4BE259B9DC100868689 /* NanoID.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
+				C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
+				C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
@@ -735,6 +778,7 @@
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */,
+				C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
@@ -756,14 +800,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C7AEC7FF1FD0B4350039B562 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		C7CFEA1A1FD376E6000AC4A6 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C7CFEA1B1FD376E6000AC4A6 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -1090,7 +1126,7 @@
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				minimumVersion = 6.0.0;
 			};
 		};
 		C73CC6A024615F3B003B2658 /* XCRemoteSwiftPackageReference "Down" */ = {
@@ -1133,6 +1169,22 @@
 				minimumVersion = 1.24.0;
 			};
 		};
+		C78BD045259B30CA00FC823F /* XCRemoteSwiftPackageReference "FSEvents" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/eonil/FSEvents";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.7;
+			};
+		};
+		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mxcl/Path.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 		C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
@@ -1155,6 +1207,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.2.0;
+			};
+		};
+		C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/crossroadlabs/Regex";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
 			};
 		};
 		C7FE72552391B3BC00EBA6DA /* XCRemoteSwiftPackageReference "BlueECC" */ = {
@@ -1248,6 +1308,16 @@
 			package = C77000102546E5C1005131FB /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
+		C78BD046259B30CA00FC823F /* EonilFSEvents */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C78BD045259B30CA00FC823F /* XCRemoteSwiftPackageReference "FSEvents" */;
+			productName = EonilFSEvents;
+		};
+		C78BD049259B33D500FC823F /* Path */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */;
+			productName = Path;
+		};
 		C7B5E8582548B3F900530B47 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */;
@@ -1262,6 +1332,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */;
 			productName = SwiftyAttributes;
+		};
+		C7DA10F6259B8979006DD876 /* Regex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */;
+			productName = Regex;
 		};
 		C7FE72562391B3BC00EBA6DA /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;

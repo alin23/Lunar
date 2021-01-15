@@ -257,7 +257,7 @@ class DisplayViewController: NSViewController {
                     DDC.readFaults[display.id]?.removeAll()
                     display.responsive = true
                     self?.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
-                    self?.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
+                    self?.setAdaptiveButtonEnabled(displayController.adaptiveModeKey != .manual)
                     self?.refreshView()
                 }
             }
@@ -275,7 +275,7 @@ class DisplayViewController: NSViewController {
         }
 
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
-        setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
+        setAdaptiveButtonEnabled(displayController.adaptiveModeKey != .manual)
         refreshView()
     }
 
@@ -291,11 +291,11 @@ class DisplayViewController: NSViewController {
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
-        switch brightnessAdapter.mode {
+        switch displayController.adaptiveModeKey {
         case .location:
             let maxValues = brightnessContrastChart.maxValuesLocation
             let steps = brightnessContrastChart.interpolationValues
-            let points = brightnessAdapter.getBrightnessContrastBatch(
+            let points = displayController.getBrightnessContrastBatch(
                 for: display, count: maxValues, minutesBetween: steps, factor: factor,
                 minBrightness: minBrightness, maxBrightness: maxBrightness,
                 minContrast: minContrast, maxContrast: maxContrast
@@ -336,8 +336,8 @@ class DisplayViewController: NSViewController {
             let xs = stride(from: 0, to: maxValues - 1, by: 1)
             let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
 
-            let clipMin = brightnessAdapter.brightnessClipMin
-            let clipMax = brightnessAdapter.brightnessClipMax
+            let clipMin = displayController.brightnessClipMin
+            let clipMax = displayController.brightnessClipMax
 
             for (x, b) in zip(
                 xs,
@@ -400,7 +400,9 @@ class DisplayViewController: NSViewController {
 
     func initToggleButton(_ button: NSButton?, helpButton: NSButton?) {
         guard let button = button else { return }
-        if brightnessAdapter.mode == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID) {
+        if displayController
+            .adaptiveModeKey == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID)
+        {
             button.isHidden = true
             helpButton?.isHidden = true
         } else {
@@ -484,7 +486,7 @@ class DisplayViewController: NSViewController {
                 runInMainThread { [weak self] in
                     guard let self = self else { return }
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
-                    self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
+                    self.setAdaptiveButtonEnabled(displayController.adaptiveModeKey != .manual)
 
                     textField.isHidden = !(self.algorithmButton?.isHidden ?? false)
                 }
@@ -522,7 +524,7 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func initGraph(mode: AdaptiveMode? = nil) {
+    func initGraph(mode: AdaptiveModeKey? = nil) {
         brightnessContrastChart?.initGraph(
             display: display,
             brightnessColor: brightnessGraphColor,
@@ -545,7 +547,7 @@ class DisplayViewController: NSViewController {
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
-    func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
+    func setValuesHidden(_ hidden: Bool, mode: AdaptiveModeKey? = nil) {
         scrollableBrightness?.setValuesHidden(hidden, mode: mode)
         scrollableContrast?.setValuesHidden(hidden, mode: mode)
     }
@@ -597,7 +599,7 @@ class DisplayViewController: NSViewController {
 
             initGraph()
 
-            if !display.adaptive || brightnessAdapter.mode == .manual {
+            if !display.adaptive || displayController.adaptiveModeKey == .manual {
                 setValuesHidden(true)
             }
         } else {

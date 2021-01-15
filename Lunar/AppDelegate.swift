@@ -20,32 +20,7 @@ import Sentry
 import SwiftDate
 import WAYWindow
 
-extension Collection where Index: Comparable {
-    subscript(back i: Int) -> Iterator.Element {
-        let backBy = i + 1
-        return self[index(endIndex, offsetBy: -backBy)]
-    }
-}
-
-extension Encodable {
-    var dictionary: [String: Any]? {
-        guard let data = try? JSONEncoder().encode(self) else { return nil }
-        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
-    }
-}
-
-extension NSViewController {
-    func listenForWindowClose(window: NSWindow) {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(windowWillClose(notification:)),
-            name: NSWindow.willCloseNotification,
-            object: window
-        )
-    }
-
-    @objc func windowWillClose(notification _: Notification) {}
-}
+let fm = FileManager()
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -56,7 +31,7 @@ let serialQueue = DispatchQueue(label: "site.lunarapp.serial.queue.fg", qos: .us
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = true
-let LOG_URL = FileManager().urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
+let LOG_URL = fm.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
     .appendingPathComponent("swiftybeaver.log", isDirectory: false)
 let TRANSFER_URL = "https://transfer.sh"
 let LOG_UPLOAD_URL = "https://log.lunar.fyi/upload"
@@ -68,73 +43,10 @@ let DEBUG_DATA_HEADERS: HTTPHeaders = [
 ]
 let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
 
-let log = Logger.self
-let brightnessAdapter = BrightnessAdapter()
-
-let datastore = DataStore()
 var activeDisplay: Display?
-
-enum PopoverKey {
-    case help
-    case hotkey
-    case menu
-}
-
-var POPOVERS: [PopoverKey: NSPopover?] = [
-    .help: nil,
-    .hotkey: nil,
-    .menu: NSPopover(),
-]
-var menuPopoverCloser = DispatchWorkItem {
-    POPOVERS[.menu]!!.close()
-}
-
-func closeMenuPopover(after ms: Int) {
-    menuPopoverCloser.cancel()
-    menuPopoverCloser = DispatchWorkItem {
-        POPOVERS[.menu]!!.close()
-    }
-    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
-
-    DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser)
-}
-
-extension Notification.Name {
-    static let killLauncher = Notification.Name("killLauncher")
-}
 
 func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     return max(min(number, maxVal), minVal)
-}
-
-var upHotkey: Magnet.HotKey?
-var downHotkey: Magnet.HotKey?
-var leftHotkey: Magnet.HotKey?
-var rightHotkey: Magnet.HotKey?
-
-func disableUpDownHotkeys() {
-    log.debug("Unregistering up/down hotkeys")
-    HotKeyCenter.shared.unregisterHotKey(with: "increaseValue")
-    HotKeyCenter.shared.unregisterHotKey(with: "decreaseValue")
-    upHotkey?.unregister()
-    downHotkey?.unregister()
-    upHotkey = nil
-    downHotkey = nil
-}
-
-func disableLeftRightHotkeys() {
-    log.debug("Unregistering left/right hotkeys")
-    HotKeyCenter.shared.unregisterHotKey(with: "navigateBack")
-    HotKeyCenter.shared.unregisterHotKey(with: "navigateForward")
-    leftHotkey?.unregister()
-    rightHotkey?.unregister()
-    leftHotkey = nil
-    rightHotkey = nil
-}
-
-func disableUIHotkeys() {
-    disableUpDownHotkeys()
-    disableLeftRightHotkeys()
 }
 
 var thisIsFirstRun = false
@@ -146,32 +58,6 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
-extension String {
-    var stripped: String {
-        let okayChars = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
-        return filter { okayChars.contains($0) }
-    }
-}
-
-class AudioEventSubscriber: EventSubscriber {
-    func eventReceiver(_ event: AMCoreAudio.Event) {
-        guard let hwEvent = event as? AudioHardwareEvent else {
-            return
-        }
-
-        switch hwEvent {
-        case .defaultOutputDeviceChanged, .defaultSystemOutputDeviceChanged:
-            runInMainThread {
-                appDelegate().startOrRestartMediaKeyTap()
-            }
-        default:
-            return
-        }
-    }
-
-    var hashValue: Int = 100
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager?
@@ -179,7 +65,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var valuesReaderThread: Foundation.Thread!
     var locationThread: Foundation.Thread!
     var syncThread: Foundation.Thread!
-    var syncPollingSeconds: Int = Defaults[.syncPollingSeconds]
     var refreshValues: Bool = Defaults[.refreshValues]
 
     var brightnessKeysEnabledObserver: DefaultsObservation?
@@ -195,7 +80,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adaptiveModeObserver: DefaultsObservation?
     var hotkeyObserver: DefaultsObservation?
     var loginItemObserver: DefaultsObservation?
-    var syncPollingSecondsObserver: DefaultsObservation?
     var refreshValuesObserver: DefaultsObservation?
     var hideMenuBarIconObserver: DefaultsObservation?
 
@@ -206,10 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
-    @IBOutlet var stateMenuItem: NSMenuItem!
-    @IBOutlet var toggleMenuItem: NSMenuItem!
     @IBOutlet var debugMenuItem: NSMenuItem!
-    @IBOutlet var builtinBrightnessMenuItem: NSMenuItem!
+    @IBOutlet var infoMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -227,8 +109,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3"
         versionMenuItem?.title = "Lunar v\(version)"
-        toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
-        stateMenuItem.title = AppDelegate.getStateMenuItemTitle()
     }
 
     func initHotkeys() {
@@ -300,18 +180,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { change in
-            if change.newValue == change.oldValue {
+            if change.newValue == change.oldValue || !Defaults[.overrideAdaptiveMode] {
                 return
             }
-            brightnessAdapter.mode = change.newValue
+            displayController.adaptiveMode = change.newValue.mode
             SentrySDK.configureScope { scope in
-                scope.setTag(value: brightnessAdapter.adaptiveModeString(), key: "adaptiveMode")
-                scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+                scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
+                scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
             }
             runInMainThread {
                 self.resetElements()
             }
-            self.manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
+            self.manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
         }
     }
 
@@ -325,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @objc func adaptToSettingsChange(notification _: Notification) {
-        brightnessAdapter.addSentryData()
+        displayController.addSentryData()
     }
 
     func showWindow() {
@@ -386,76 +266,54 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         setupHotkeys()
     }
 
-    func manageBrightnessAdapterActivity(mode: AdaptiveMode) {
-        locationThread?.cancel()
-        syncThread?.cancel()
+    func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
+        log.debug("Started DisplayController in \(mode.str) mode")
 
         switch mode {
         case .sensor:
             log.info("Sensor mode")
+            infoMenuItem.isHidden = true
+            displayController.onAdapt = {
+                [weak self] (value: Any) in
+                guard let ambientLight = value as? UInt8 else { return }
+                runInMainThread {
+                    self?.infoMenuItem?
+                        .title = "Ambient light: \(ambientLight.percentStr)"
+                }
+            }
         case .location:
-            log.debug("Started BrightnessAdapter in Location mode")
-            builtinBrightnessMenuItem.isHidden = true
-            brightnessAdapter.adaptBrightness()
-
-            locationThread = Thread {
-                while true {
-                    brightnessAdapter.adaptBrightness()
-
-                    if Thread.current.isCancelled { return }
-                    Thread.sleep(forTimeInterval: 60)
-                    if Thread.current.isCancelled { return }
+            infoMenuItem.isHidden = true
+            displayController.adaptBrightness()
+            displayController.onAdapt = {
+                [weak self] (value: Any) in
+                guard let moment = value as? Moment else { return }
+                runInMainThread {
+                    self?.infoMenuItem?
+                        .title = "Solar noon: \(moment.solarNoon.toString(.relative(style: RelativeFormatter.twitterStyle())))"
                 }
             }
-            locationThread.start()
         case .sync:
-            log.debug("Started BrightnessAdapter in Sync mode")
-            builtinBrightnessMenuItem.isHidden = false
-
-            let builtinBrightness = ((brightnessAdapter.getBuiltinDisplayBrightness() ?? 0.0) * 100).rounded(.toNearestOrAwayFromZero) / 100
-            runInMainThread {
-                builtinBrightnessMenuItem.title = "Built-in display brightness: \(builtinBrightness)"
-            }
-
-            brightnessAdapter.adaptBrightness()
-
-            syncThread = Thread { [weak self] in
-                while true {
-                    if var builtinBrightness = brightnessAdapter.getBuiltinDisplayBrightness(),
-                       brightnessAdapter.lastBuiltinBrightness != builtinBrightness
-                    {
-                        runInMainThread {
-                            self?.builtinBrightnessMenuItem?
-                                .title = "Built-in display brightness: \((builtinBrightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
-                        }
-
-                        if builtinBrightness == 0 || builtinBrightness == 100, IsLidClosed(),
-                           let lastBrightness = brightnessAdapter.lastValidBuiltinBrightness({ b in b > 0 && b < 100 })
-                        {
-                            builtinBrightness = Double(lastBrightness)
-                        }
-
-                        brightnessAdapter.lastBuiltinBrightness = builtinBrightness
-                        brightnessAdapter.adaptBrightness(percent: builtinBrightness)
-                    }
-
-                    if Thread.current.isCancelled { return }
-                    Thread.sleep(forTimeInterval: TimeInterval(self?.syncPollingSeconds ?? 1))
-                    if Thread.current.isCancelled { return }
+            infoMenuItem.isHidden = false
+            displayController.onAdapt = {
+                [weak self] (value: Any) in
+                guard let brightness = value as? Double else { return }
+                runInMainThread {
+                    self?.infoMenuItem?
+                        .title = "Built-in display brightness: \((brightness * 100).rounded(.toNearestOrAwayFromZero) / 100)"
                 }
             }
-            syncThread.start()
         case .manual:
-            log.debug("BrightnessAdapter set to manual")
-            builtinBrightnessMenuItem.isHidden = true
+            infoMenuItem.isHidden = true
+            displayController.onAdapt = nil
         }
+        _ = displayController.adaptiveMode.watch()
     }
 
     func startValuesReaderThread() {
         valuesReaderThread = Thread {
             while true {
                 if self.refreshValues {
-                    brightnessAdapter.fetchValues()
+                    displayController.fetchValues()
                 }
 
                 if Thread.current.isCancelled { return }
@@ -467,12 +325,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         valuesReaderThread.start()
     }
 
-    func initBrightnessAdapterActivity() {
+    func initDisplayControllerActivity() {
         if refreshValues {
             startValuesReaderThread()
         }
 
-        manageBrightnessAdapterActivity(mode: brightnessAdapter.mode)
+        manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
     }
 
     func initMenubarIcon() {
@@ -493,7 +351,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             button.addSubview(statusItemButtonController!)
         }
         statusItem.menu = menu
-        toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
 
         if POPOVERS[.menu]!!.contentViewController == nil {
             var storyboard: NSStoryboard?
@@ -552,9 +409,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @objc func adaptToScreenConfiguration(notification _: Notification) {
         POPOVERS[.menu]!!.close()
-        brightnessAdapter.manageClamshellMode()
-        brightnessAdapter.resetDisplayList()
-        brightnessAdapter.builtinDisplay = DDC.getBuiltinDisplay()
+        displayController.manageClamshellMode()
+        displayController.resetDisplayList()
+        SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
         if let visible = windowController?.window?.isVisible, visible {
             windowController?.close()
             windowController?.window = nil
@@ -565,49 +422,46 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addObservers() {
         sunsetObserver = Defaults.observe(.sunset) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         sunriseObserver = Defaults.observe(.sunrise) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         solarNoonObserver = Defaults.observe(.solarNoon) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         curveFactorObserver = Defaults.observe(.curveFactor) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         daylightObserver = Defaults.observe(.daylightExtensionMinutes) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         noonObserver = Defaults.observe(.noonDurationMinutes) { _ in
-            if brightnessAdapter.mode == .location {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey == .location {
+                displayController.adaptBrightness()
             }
         }
         brightnessOffsetObserver = Defaults.observe(.brightnessOffset) { _ in
-            if brightnessAdapter.mode != .manual {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey != .manual {
+                displayController.adaptBrightness()
             }
         }
         contrastOffsetObserver = Defaults.observe(.contrastOffset) { _ in
-            if brightnessAdapter.mode != .manual {
-                brightnessAdapter.adaptBrightness()
+            if displayController.adaptiveModeKey != .manual {
+                displayController.adaptBrightness()
             }
         }
 
-        syncPollingSecondsObserver = Defaults.observe(.syncPollingSeconds) { change in
-            self.syncPollingSeconds = change.newValue
-        }
         refreshValuesObserver = Defaults.observe(.refreshValues) { change in
             self.refreshValues = change.newValue
 
@@ -644,7 +498,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func setKeyEquivalents(_ hotkeys: [String: [HotkeyPart: Int]]) {
         Hotkey.setKeyEquivalent(HotkeyIdentifier.lunar.rawValue, menuItem: preferencesMenuItem, hotkeys: hotkeys)
-        Hotkey.setKeyEquivalent(HotkeyIdentifier.toggle.rawValue, menuItem: toggleMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent0.rawValue, menuItem: percent0MenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent25.rawValue, menuItem: percent25MenuItem, hotkeys: hotkeys)
@@ -671,41 +524,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return accessEnabled
     }
 
-    func sendAnalytics() {
-        guard let serialNumberHash = getSerialNumberHash(),
-              let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
-        else {
-            // log warning
-            let serialNumberHash = getSerialNumberHash() ?? "no-serial-number"
-            let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "no-version"
-
-            log.warning("Can't send analytics", context: [
-                serialNumberHash: serialNumberHash,
-                appVersion: appVersion,
-            ])
-
-            return
-        }
-
-        let dataString =
-            "id=\(serialNumberHash) version=\(appVersion) clamshell=\(IsLidClosed()) displays=\(brightnessAdapter.activeDisplays.count) mode=\(brightnessAdapter.mode) machine=\(Sysctl.model)"
-        let data = dataString.data(using: .utf8, allowLossyConversion: true) ?? "no-data".data(using: .utf8)!
-        log.info("Sending analytics", context: ["data": dataString])
-        let req = AF.upload(data, to: ANALYTICS_URL)
-            .authenticate(username: "lunar", password: secrets.analyticsHash)
-            .validate()
-
-        req.response(completionHandler: { resp in
-            if let err = resp.error {
-                log.error("Error sending analytics", context: ["error": err.errorDescription ?? ""])
-            } else if let data = resp.data, let dataStr = String(data: data, encoding: .utf8) {
-                log.debug("Analytics response", context: ["response": resp.debugDescription, "data": dataStr])
-            } else {
-                log.debug("Analytics response", context: ["response": resp.debugDescription])
-            }
-        })
-    }
-
     func configureAlamofire() {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 24.hours.timeInterval
@@ -720,23 +538,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         log.initLogger()
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
-        SentrySDK.start(options: [
-            "dsn": secrets.sentryDSN,
-            "enabled": true,
-            "release": "v\(release)",
-            "dist": release,
-            "environment": "production",
-        ])
+        SentrySDK.start { options in
+            options.dsn = secrets.sentryDSN
+            options.releaseName = "v\(release)"
+            options.dist = release
+            options.environment = "production"
+        }
 
         let user = User(userId: getSerialNumberHash() ?? "NOID")
         SentrySDK.configureScope { scope in
             scope.setUser(user)
-            scope.setTag(value: brightnessAdapter.adaptiveModeString(), key: "adaptiveMode")
-            scope.setTag(value: brightnessAdapter.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+            scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
+            scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
         }
 
-        brightnessAdapter.displays = BrightnessAdapter.getDisplays()
-        brightnessAdapter.addSentryData()
+        displayController.displays = DisplayController.getDisplays()
+        displayController.addSentryData()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {
             log.info("Setting log path to \(LOG_URL?.path ?? "")")
@@ -745,14 +562,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         handleDaemon()
 
-        initBrightnessAdapterActivity()
+        initDisplayControllerActivity()
         initMenubarIcon()
         initHotkeys()
 
         listenForAdaptiveModeChange()
         listenForScreenConfigurationChanged()
-        brightnessAdapter.listenForRunningApps()
-        brightnessAdapter.listenForBrightnessClipChange()
+        displayController.listenForRunningApps()
+        displayController.listenForBrightnessClipChange()
 
         addObservers()
         if thisIsFirstRun || TEST_MODE {
@@ -760,8 +577,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         configureAlamofire()
-        // sendAnalytics()
         startReceivingSignificantLocationChanges()
+
+        SentrySDK.capture(message: "Launch")
         log.debug("App finished launching")
     }
 
@@ -776,18 +594,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func geolocationFallback() {
-        brightnessAdapter.fetchGeolocation()
+        LocationMode.fetchGeolocation()
     }
 
     internal func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            brightnessAdapter.geolocation = Geolocation(location: location)
-            if brightnessAdapter.geolocation!.latitude != 0, brightnessAdapter.geolocation!.longitude != 0 {
+            LocationMode.geolocation = Geolocation(location: location)
+            if LocationMode.geolocation!.latitude != 0, LocationMode.geolocation!.longitude != 0 {
                 log.debug("Zero LocationManager coordinates")
             } else {
                 log.debug("Got LocationManager coordinates")
             }
-            brightnessAdapter.fetchMoments()
+            LocationMode.fetchMoments()
         } else {
             geolocationFallback()
         }
@@ -813,7 +631,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func startReceivingSignificantLocationChanges() {
         if Defaults[.manualLocation] {
-            brightnessAdapter.geolocation = Geolocation()
+            LocationMode.geolocation = Geolocation()
             return
         }
         locationManager = CLLocationManager()
@@ -833,73 +651,70 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         locationManager?.startUpdatingLocation()
     }
 
-    static func getToggleMenuItemTitle() -> String {
-        switch brightnessAdapter.mode {
-        case .sensor:
-            log.info("Sensor mode")
-            return "Sensor mode"
-        case .location:
-            return "Adapt brightness based on built-in display"
-        case .sync:
-            return "Disable adaptive brightness"
-        case .manual:
-            return "Adapt brightness based on location"
-        }
-    }
+//    static func getToggleMenuItemTitle() -> String {
+//        switch displayController.adaptiveModeKey {
+//        case .sensor:
+//            log.info("Sensor mode")
+//            return "Sensor mode"
+//        case .location:
+//            return "Adapt brightness based on built-in display"
+//        case .sync:
+//            return "Disable adaptive brightness"
+//        case .manual:
+//            return "Adapt brightness based on location"
+//        }
+//    }
 
-    static func getStateMenuItemTitle() -> String {
-        switch brightnessAdapter.mode {
-        case .sensor:
-            log.info("Sensor mode")
-            return "Sensor Mode"
-        case .location:
-            return "☀️ Location Mode"
-        case .sync:
-            return "💻 Display Sync Mode"
-        case .manual:
-            return "🖥 Manual Mode"
-        }
-    }
+//    static func getStateMenuItemTitle() -> String {
+//        switch displayController.adaptiveModeKey {
+//        case .sensor:
+//            log.info("Sensor mode")
+//            return "Sensor Mode"
+//        case .location:
+//            return "☀️ Location Mode"
+//        case .sync:
+//            return "💻 Display Sync Mode"
+//        case .manual:
+//            return "🖥 Manual Mode"
+//        }
+//    }
 
     func resetElements() {
-        toggleMenuItem.title = AppDelegate.getToggleMenuItemTitle()
         if let splitView = windowController?.window?.contentViewController as? SplitViewController {
-            for button in splitView.buttons {
-                button?.setNeedsDisplay()
-            }
+            splitView.activeModeButton?.setNeedsDisplay()
         }
     }
 
     func adapt() {
-        brightnessAdapter.adaptBrightness()
+        displayController.adaptBrightness()
     }
 
     func setLightPercent(percent: Int8) {
-        brightnessAdapter.disable()
-        brightnessAdapter.setBrightnessPercent(value: percent)
-        brightnessAdapter.setContrastPercent(value: percent)
+        displayController.disable()
+        displayController.setBrightnessPercent(value: percent)
+        displayController.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
     func toggleAudioMuted() {
-        brightnessAdapter.toggleAudioMuted(currentDisplay: true)
+        displayController.toggleAudioMuted(currentDisplay: true)
     }
 
     func increaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.volumeStep]
-        brightnessAdapter.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func decreaseVolume(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.volumeStep]
-        brightnessAdapter.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.brightnessStep]
-        if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
-        } else if brightnessAdapter.mode == .location {
+        if displayController.adaptiveModeKey == .manual {
+            displayController.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
+        } else if displayController.adaptiveModeKey == .location {
             let newCurveFactor = cap(Defaults[.curveFactor] - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             Defaults[.curveFactor] = newCurveFactor
         } else {
@@ -910,9 +725,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.contrastStep]
-        if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
-        } else if brightnessAdapter.mode == .location {
+        if displayController.adaptiveModeKey == .manual {
+            displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
+        } else if displayController.adaptiveModeKey == .location {
             let newCurveFactor = cap(Defaults[.curveFactor] - Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             Defaults[.curveFactor] = newCurveFactor
         } else {
@@ -923,9 +738,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func decreaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.brightnessStep]
-        if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
-        } else if brightnessAdapter.mode == .location {
+        if displayController.adaptiveModeKey == .manual {
+            displayController.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
+        } else if displayController.adaptiveModeKey == .location {
             let newCurveFactor = cap(Defaults[.curveFactor] + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             Defaults[.curveFactor] = newCurveFactor
         } else {
@@ -936,9 +751,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
         let amount = amount ?? Defaults[.contrastStep]
-        if brightnessAdapter.mode == .manual {
-            brightnessAdapter.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
-        } else if brightnessAdapter.mode == .location {
+        if displayController.adaptiveModeKey == .manual {
+            displayController.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
+        } else if displayController.adaptiveModeKey == .location {
             let newCurveFactor = cap(Defaults[.curveFactor] + Double(amount) * 0.1, minVal: 0.0, maxVal: 10.0)
             Defaults[.curveFactor] = newCurveFactor
         } else {
@@ -981,10 +796,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func contrastDown(_: Any) {
         decreaseContrast()
-    }
-
-    @IBAction func toggleBrightnessAdapter(sender _: Any?) {
-        brightnessAdapter.toggle()
     }
 
     @IBAction func showPreferencesWindow(sender _: Any?) {
@@ -1051,7 +862,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         concurrentQueue.async(group: nil, qos: .userInitiated, flags: .barrier) {
             guard let serialNumberHash = getSerialNumberHash() else { return }
 
-            let activeDisplays = brightnessAdapter.activeDisplays
+            let activeDisplays = displayController.activeDisplays
             let oldBrightness = [CGDirectDisplayID: NSNumber](activeDisplays.map { ($0, $1.brightness) }, uniquingKeysWith: { first, _ in
                 first
             })
@@ -1059,8 +870,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 first
             })
 
-            brightnessAdapter.resetDisplayList()
-            for (id, display) in brightnessAdapter.activeDisplays {
+            displayController.resetDisplayList()
+            for (id, display) in displayController.activeDisplays {
                 for value in 1 ... 100 {
                     display.brightness = NSNumber(value: value)
                     display.contrast = NSNumber(value: value)
@@ -1087,7 +898,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             runInMainThread {
                 self.debugMenuItem.title = "Gathering logs"
             }
-            guard let logURL = LOG_URL, let sourceString = FileManager().contents(atPath: logURL.path) else {
+            guard let logURL = LOG_URL, let sourceString = fm.contents(atPath: logURL.path) else {
                 self.failDebugData()
                 return
             }
