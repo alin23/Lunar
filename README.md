@@ -2,6 +2,8 @@
 
 ### Intelligent adaptive brightness for your external display
 
+#### [M1 doesn't provide DDC support so Lunar can't work on those devices yet.](https://github.com/alin23/Lunar/issues/210)
+
 *Note: Lunar changes the actual (physical) brightness and contrast of the monitor.*
 
 *It doesn't use a software overlay.*
