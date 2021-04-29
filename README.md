@@ -1,5 +1,7 @@
 # Lunar
 
+[![Join the chat at https://gitter.im/alin23-Lunar/community](https://badges.gitter.im/alin23-Lunar/community.svg)](https://gitter.im/alin23-Lunar/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Intelligent adaptive brightness for your external display
 
 #### [M1 doesn't provide DDC support so Lunar can't work on those devices yet.](https://github.com/alin23/Lunar/issues/210)
