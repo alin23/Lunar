@@ -5,7 +5,7 @@
 			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
 			"name": "Anaconda Python Builder",
 			"selector": "source.python",
-			"shell_cmd": "\"python\" -u \"$file\""
+			"shell_cmd": "\"python\" -u \"$file\"",
 		}
 	],
 	"folders":
@@ -22,10 +22,13 @@
 				"Releases/.tmp",
 				"*.framework",
 				"Extern",
-				"build"
+				"build",
+				"ddcutil-server/lib",
+				"ddcutil-server/bin",
+				"Frameworks/Shout/.build",
 			],
-			"path": "."
-		}
+			"path": ".",
+		},
 	],
 	"settings":
 	{
@@ -33,8 +36,16 @@
 		{
 			"cquery":
 			{
-				"enabled": true
-			}
-		}
-	}
+				"enabled": true,
+			},
+			"sourcekit-lsp":
+			{
+				"enabled": true,
+			},
+			"lua":
+			{
+				"enabled": true,
+			},
+		},
+	},
 }

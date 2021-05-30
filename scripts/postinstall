@@ -1,0 +1,9 @@
+#!/bin/sh
+if test -d /Applications/Lunar.localized/Lunar.app; then
+    if test -d /Applications/Lunar.app; then
+        rm -rf /Applications/Lunar.app
+    fi
+    mv /Applications/Lunar.localized/Lunar.app /Applications/Lunar.app
+    rm -rf /Applications/Lunar.localized
+fi
+exit 0 # all good

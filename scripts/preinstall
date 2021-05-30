@@ -1,0 +1,4 @@
+#!/bin/sh
+if test -d /Applications/Lunar.app; then
+    rm -rf /Applications/Lunar.app
+fi

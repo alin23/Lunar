@@ -1,6 +1,8 @@
-# Lunar
+# Lunar - control your monitors, even on M1
+## [Now with M1 support ](https://lunar.fyi/#m1)
 
 ### Intelligent adaptive brightness for your external display
+
 
 *Note: Lunar changes the actual (physical) brightness and contrast of the monitor.*
 
@@ -13,25 +15,37 @@
 - [Troubleshooting](#troubleshooting)
 - [Caveats](#caveats)
 - [Contributing](#contributing)
+- [Building](#building)
 
 ## Installation methods
-- Download DMG from [Official website](https://lunar.fyi)
-- Download DMG from the [Releases page](https://github.com/alin23/Lunar/releases)
-- `brew cask install lunar`
+- Download PKG from [Official website](https://lunar.fyi)
+- Download PKG from the [Releases page](https://github.com/alin23/Lunar/releases)
+- `brew install --cask lunar`
 
-![Display page](Images/display.png)
-![Settings page](Images/settings.png)
-![Hotkeys page](Images/hotkeys.png)
+## Display Page
+
+![Display page](https://static.lunar.fyi/img/display-page/display-page.webp)
+
+## Configuration Page
+
+![Configuration page](https://static.lunar.fyi/img/configuration-page/configuration-page.webp)
+
+## Hotkeys Page
+
+![Hotkeys page](https://static.lunar.fyi/img/hotkeys-page/hotkeys-page.webp)
 
 
 ## Features
-- **Sync-based Adaptive Brightness** (and contrast) based on the built-in light sensor of the Macbook or iMac
-- **Location-based Adaptive Brightness** (and contrast) based on the sunrise/sunset times in your location
+- [Sensor-based Adaptive Brightness](https://lunar.fyi/#sensor) (and contrast) based on [an external light sensor](https://lunar.fyi/sensor)
+- [Sync-based Adaptive Brightness](https://lunar.fyi/#sync) (and contrast) based on the built-in light sensor of the Macbook or iMac
+- [Location-based Adaptive Brightness](https://lunar.fyi/#location) (and contrast) based on the sunrise/sunset times in your location
 - **App Exception** list if you need more brightness for specific activities (watching movies, design work)
-- individual settings per display
-- **Manual controls** hotkeys for setting brightness and contrast that respect the min/max values per monitor
+- Individual settings per display
+- [Manual controls](https://lunar.fyi/#keys) and hotkeys for setting brightness and contrast that respect the min/max values per monitor
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
+
+It works well along Night Shift and True Tone (and f.lux if Gamma/Software controls are not used).
 
 ## Tested and known to work with the following types of connections
 - HDMI (1.0 - 2.1)
@@ -39,32 +53,19 @@ It doesn't interfere at all with the native adaptive brightness that macOS imple
 - Thunderbolt 3 (USB Type-C)
 - Thunderbolt 2 (mini DisplayPort)
 - VGA
+- DVI
 - Adapters that forward DDC messages properly
 
 ## Troubleshooting
-1. If Lunar doesn't start at all, try installing the [Swift 5 Runtime Support](https://support.apple.com/kb/DL1998?locale=en_US) from Apple
-    - Some older macOS versions don't have these libraries pre-installed and Lunar requires them 
-2. If Lunar freezes your system, make sure you have the latest version installed
-    - Version 2.9.1 was trying to read the monitor brightness periodically through DDC and if the monitor didn't support that, the system freezed
-3. If you activated the *Read Monitor Brightness Periodically* and your system freezes when using Lunar
-    - Make sure Lunar is not running
-    - Open Terminal.app
-    - Run the following command `defaults write site.lunarapp.Lunar refreshValues 0`
-    - If the above doesn't work, you can reset Lunar settings by deleting the following file:
-        - `~/Library/Preferences/site.lunarapp.Lunar.plist`
-    - If Lunar starts at login and freezes the computer before you can do anything, try doing the above in [Safe Mode](https://support.apple.com/en-us/HT201262)
-4. If you get system lag or occasional UI freeze, this might be caused by a slow DDC response from the monitor
-    - Make sure *Smooth Transition* is turned off in Lunar preferences
-    - If you are using *Sync* mode, set the *Polling Interval* to a bigger value like 5 seconds to avoid making DDC requests too often
-5. If you don't get the Location Permissions prompt, run the following commands in a terminal and restart Lunar:
-    ```shell
-    sudo defaults delete /var/db/locationd/clients.plist site.lunarapp.Lunar
-    sudo pkill -9 locationd
-    ```
+
+Check the [FAQ](https://lunar.fyi/faq)
 
 ## Caveats
 - Lunar *usually* doesn't work with monitors connected through USB hubs/docks/adapters **because a lot of them don't forward DDC messages properly**
 - Sync mode doesn't work when the Macbook lid is closed because the light sensor is completely covered
 
 ### Contributing
-Run `make dev` to prepare dev environment.
+I'm pausing contributions for the moment as Lunar has paid features and isn't compilable because of missing parts of the source code.
+
+### Building
+Lunar can't be built from this repo yet as the source code for the paid features is hidden. I will try to post stubs for those paid features to at least make it compilable in an only-free-features form.

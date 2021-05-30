@@ -7,39 +7,23 @@
 //
 
 import Cocoa
-import CoreLocation
 import Magnet
 
 extension AppDelegate: NSWindowDelegate {
-    func windowDidBecomeMain(_: Notification) {
-        if #available(OSX 10.15, *) {
-            switch CLLocationManager.authorizationStatus() {
-            case .notDetermined, .restricted, .denied:
-                log.debug("Requesting location permissions")
-                locationManager?.requestAlwaysAuthorization()
-            case .authorizedAlways:
-                log.debug("Location authorized")
-            @unknown default:
-                log.debug("Location status unknown")
-            }
-        }
-    }
-
     func windowWillClose(_ n: Notification) {
         log.info("Window closing")
 
-        disableUIHotkeys()
-
         if let window = n.object as? ModernWindow {
-            log.debug("Got window while closing: \(window)")
-            guard let pageController = window.contentView?.subviews[0].subviews[0].nextResponder as? PageController,
-                let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
-                let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
-                let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
-                let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
-                let tableView = exceptionsViewController.tableView
+            log.debug("Got window while closing: \(window.title)")
+            guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
+                  let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
+                  let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
+                  let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
+                  let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
+                  let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
+                  let tableView = exceptionsViewController.tableView
             else {
-                log.debug("No window found while closing")
+                log.warning("No window found while closing")
                 return
             }
 
@@ -71,33 +55,55 @@ extension AppDelegate: NSWindowDelegate {
 }
 
 class ModernWindowController: NSWindowController {
-    func initHelpPopover() {
-        if helpPopover == nil {
-            helpPopover = NSPopover()
+    func initPopover<T: NSViewController>(
+        _ popoverKey: PopoverKey,
+        identifier: String,
+        controllerType _: T.Type,
+        appearance: NSAppearance.Name = .vibrantLight
+    ) {
+        if POPOVERS[popoverKey]! == nil {
+            POPOVERS[popoverKey] = NSPopover()
         }
 
-        if helpPopover!.contentViewController == nil, let stb = storyboard,
-            let controller = stb.instantiateController(
-                withIdentifier: NSStoryboard.SceneIdentifier("HelpPopoverController")
-            ) as? HelpPopoverController {
-            helpPopover!.contentViewController = controller
-            helpPopover!.contentViewController!.loadView()
-            helpPopover!.appearance = NSAppearance(named: .vibrantLight)
+        guard let popover = POPOVERS[popoverKey]! else { return }
+
+        if popover.contentViewController == nil, let stb = storyboard,
+           let controller = stb.instantiateController(
+               withIdentifier: NSStoryboard.SceneIdentifier(identifier)
+           ) as? T
+        {
+            popover.contentViewController = controller
+            popover.contentViewController!.loadView()
+            popover.appearance = NSAppearance(named: appearance)
         }
+    }
+
+    func initPopovers() {
+        guard let w = window, w.title == "Settings" else { return }
+        initPopover(.help, identifier: "HelpPopoverController", controllerType: HelpPopoverController.self)
+        initPopover(.hotkey, identifier: "HotkeyPopoverController", controllerType: HotkeyPopoverController.self, appearance: .vibrantDark)
+        initPopover(.settings, identifier: "SettingsPopoverController", controllerType: SettingsPopoverController.self)
     }
 
     override func windowDidLoad() {
         super.windowDidLoad()
         setupWindow()
-        initHelpPopover()
     }
 
     func setupWindow() {
-        if let w = window as? ModernWindow {
-            w.delegate = appDelegate()
-            w.setup()
-        } else {
-            log.warning("No window found")
+        mainThread {
+            if let w = window as? ModernWindow {
+                if w.title == "Settings" {
+                    w.delegate = appDelegate()
+                }
+                w.setup()
+            } else {
+                log.warning("No window found")
+            }
         }
+    }
+
+    deinit {
+        log.verbose("")
     }
 }
