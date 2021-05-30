@@ -8,27 +8,12 @@
 
 import Charts
 import Cocoa
+import Defaults
+import Magnet
+import Sauce
+import SwiftDate
 
 class DisplayViewController: NSViewController {
-    let ADAPTIVE_HELP_TEXT = """
-    ## Description
-
-    This setting allows the user to **disable** the adaptive algorithm on a **per-monitor** basis.
-
-    - `ADAPTIVE` will **allow** Lunar to change the brightness and contrast automatically for this monitor
-    - `MANUAL` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
-    """
-    let BRIGHTNESS_RANGE_HELP_TEXT = """
-    ## Description
-
-    This setting allows the user to change the brightness range for the monitor.
-    Some monitors will have an extended brightness range with values up to 255 instead of the standard 100.
-
-    If you notice Lunar's 100% doesn't map to your monitor's 100% you might benefit from enabling the extended range by clicking on this button.
-
-    - `Normal range` will map Lunar's 100% brightness value to the monitor's 100 value
-    - `Extended range` will map Lunar's 100% brightness value to the monitor's 255 value and interpolate the value between 0 and 255
-    """
     let LOCK_BRIGHTNESS_HELP_TEXT = """
     ## Description
 
@@ -46,41 +31,153 @@ class DisplayViewController: NSViewController {
     - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
     """
 
+    let NATIVE_CONTROLS_HELP_TEXT = """
+    ## CoreDisplay
+
+    This monitor's brightness can be controlled natively through the **CoreDisplay framework**.
+
+    ### Advantages
+    * Lunar doesn't need to use less stable methods like *DDC* for the brightness
+    * Brightness transitions are smoother
+
+    ### Disadvantages
+    * **Contrast/Volume still needs to be changed through DDC** as there is no API for them in CoreDisplay
+    * Needs an additional USB connection for older Apple displays like LED Cinema
+    """
+    let HARDWARE_CONTROLS_HELP_TEXT = """
+    ## DDC/CI
+
+    This monitor's **hardware brightness** can be controlled through the **DDC protocol**.
+    That is the same brightness that you can control with the physical buttons/controls on your monitor.
+
+    ### Advantages
+    * Support for changing brightness, contrast, volume and input
+    * Colors are rendered more correctly than with a software overlay like *QuickShade*
+    * Allows the monitor to consume less power on low brightness values
+
+    ### Disadvantages
+    * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
+        - *Aim for using as little adapters as possible between your Mac device and your monitor*
+    * Can wear out the monitor flash memory
+    * Not supported by TVs
+    """
+    let SOFTWARE_CONTROLS_HELP_TEXT = """
+    ## Gamma tables
+
+    This monitor's hardware brightness can't be controlled in any way.
+    Lunar has to fallback to mimicking a brightness change through gamma table alteration.
+
+    ### Advantages
+    * It works on any monitor no matter what cable/adapter/connector you use
+    * Uhh.. the only thing that works out of the box on Apple Silicon for now
+
+    ### Disadvantages
+    * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+    * No support for changing volume or input
+    * No smooth transitions
+    * Low brightness values can wash out colors
+    * Quitting Lunar resets the brightness to default
+    * Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
+    """
+    let NO_CONTROLS_HELP_TEXT = """
+    ## No controls available
+
+    Looks like all available controls for this monitor have been disabled manually.
+
+    Click on the ⚙️ icon near the `RESET` button to enable a control.
+    """
+    let NETWORK_CONTROLS_HELP_TEXT = """
+    ## Network control
+
+    This monitor's hardware brightness can be controlled through another device accessible on the local network.
+
+    That is the same brightness that you can control with the physical buttons/controls on your monitor.
+
+    ### Advantages
+    * Support for changing brightness, contrast, volume and input
+    * Colors are rendered more correctly than with a software overlay like *QuickShade*
+    * Allows the monitor to consume less power on low brightness values
+
+    ### Disadvantages
+    * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
+        - *Aim for using as little adapters as possible between your network device and your monitor*
+    * Can wear out the monitor flash memory
+    * Not supported by TVs
+    """
+
     @IBOutlet var displayView: DisplayView?
     @IBOutlet var displayName: DisplayName?
-    @IBOutlet var adaptiveButton: NSButton?
+    @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
+        didSet {
+            guard let display = display, let button = inputDropdownHotkeyButton, initHotkeys(from: display) else { return }
 
-    @IBOutlet var brightnessRangeButton: NSButton?
-    @IBOutlet var algorithmText: NSTextField?
-    @IBOutlet var brightnessRangeText: NSTextField?
+            button.onClick = { [weak self, weak display] in
+                guard let self = self, let display = display else { return }
+                if self.initHotkeys(from: display) {
+                    button.onClick = nil
+                }
+            }
+        }
+    }
+
+    @IBOutlet var adaptiveNotice: NSTextField!
+    @IBOutlet var gammaNotice: NSTextField!
+    var inputDropdownHotkeyButton: HotkeyButton? {
+        _inputDropdownHotkeyButton as? HotkeyButton
+    }
+
+    @IBOutlet var inputDropdown: PopUpButton? {
+        didSet {
+            if let display = display, let input = InputSource(rawValue: display.input.uint8Value) {
+                inputDropdown?.selectItem(withTag: input.rawValue.i)
+            }
+        }
+    }
+
+    @IBOutlet var resetButton: ResetButton!
 
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
 
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
-    @IBOutlet var swipeLeftHint: NSTextField?
-    @IBOutlet var swipeRightHint: NSTextField?
+    @IBOutlet var _controlsButton: NSButton!
+    var controlsButton: HelpButton? {
+        _controlsButton as? HelpButton
+    }
 
-    @IBOutlet var adaptiveHelpButton: HelpButton?
+    @IBOutlet var _proButton: NSButton!
+    var proButton: Button? {
+        _proButton as? Button
+    }
 
-    @IBOutlet var brightnessRangeHelpButton: HelpButton?
-
-    @IBOutlet var nonResponsiveDDCTextField: NonResponsiveDDCTextField? {
+    @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
         didSet {
             if let d = display {
-                nonResponsiveDDCTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
+                nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
             }
         }
     }
 
-    @IBOutlet var lockContrastHelpButton: HelpButton?
-    @IBOutlet var lockBrightnessHelpButton: HelpButton?
+    @IBOutlet var _lockContrastHelpButton: NSButton?
+    var lockContrastHelpButton: HelpButton? {
+        _lockContrastHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _lockBrightnessHelpButton: NSButton?
+    var lockBrightnessHelpButton: HelpButton? {
+        _lockBrightnessHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _settingsButton: NSButton?
+    var settingsButton: SettingsButton? {
+        _settingsButton as? SettingsButton
+    }
 
     @objc dynamic weak var display: Display? {
         didSet {
             if let display = display {
-                update(from: display)
+                update()
                 noDisplay = display.id == GENERIC_DISPLAY_ID
             }
         }
@@ -88,34 +185,12 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic var noDisplay: Bool = false
 
-    var adaptiveButtonTrackingArea: NSTrackingArea?
-    var adaptiveModeObserver: NSKeyValueObservation?
-    var adaptiveObserver: ((Bool, Bool) -> Void)?
-    var brightnessRangeObserver: ((Bool, Bool) -> Void)?
+    var adaptiveModeObserver: DefaultsObservation?
+    var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
+    var sendingContrastObserver: ((Bool, Bool) -> Void)?
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
-    var showNavigationHintsObserver: NSKeyValueObservation?
+    var adaptiveObserver: ((Bool, Bool) -> Void)?
     var viewID: String?
-
-    func setAdaptiveButtonEnabled(_ enabled: Bool) {
-        guard let adaptiveButton = adaptiveButton else { return }
-
-        adaptiveButton.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-        adaptiveButton.isEnabled = enabled
-        adaptiveHelpButton?.isEnabled = enabled
-
-        if enabled {
-            switch adaptiveButton.state {
-            case .on:
-                adaptiveButton.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
-            case .off:
-                adaptiveButton.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
-            default:
-                return
-            }
-        } else {
-            adaptiveButton.layer?.backgroundColor = darkMauve.cgColor
-        }
-    }
 
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
@@ -126,379 +201,899 @@ class DisplayViewController: NSViewController {
     }
 
     func setButtonsHidden(_ hidden: Bool) {
-        adaptiveButton?.isHidden = hidden
-        adaptiveHelpButton?.isHidden = hidden
-        algorithmText?.isHidden = hidden
-
-        brightnessRangeButton?.isHidden = hidden
-        brightnessRangeHelpButton?.isHidden = hidden
-        brightnessRangeText?.isHidden = hidden
+        inputDropdown?.isHidden = hidden
+        inputDropdownHotkeyButton?.isHidden = hidden
     }
 
     func refreshView() {
         view.setNeedsDisplay(view.visibleRect)
     }
 
-    func update(from display: Display) {
+    func initHotkeys(from display: Display) -> Bool {
+        guard let controller = inputDropdownHotkeyButton?.popoverController else {
+            return false
+        }
+
+        controller.onDropdownSelect = { [weak display] dropdown in
+            guard let input = InputSource(rawValue: dropdown.selectedTag().u8), let display = display else { return }
+            display.hotkeyInput = input.rawValue.ns
+        }
+        controller.dropdown.removeAllItems()
+        controller.dropdown
+            .addItems(
+                withTitles: InputSource.mostUsed
+                    .map { input in input.str } + InputSource.leastUsed
+                    .map { input in input.str }
+            )
+        controller.dropdown.menu?.insertItem(.separator(), at: InputSource.mostUsed.count)
+        for item in controller.dropdown.itemArray {
+            guard let input = inputSourceMapping[item.title] else { continue }
+            item.tag = input.rawValue.i
+
+            if input == .unknown {
+                item.isEnabled = false
+                item.isHidden = true
+                item.title = "Select input"
+            }
+        }
+        controller.dropdown.selectItem(withTag: display.hotkeyInput.intValue)
+
+        let identifier = "toggle-last-input-\(display.serial)"
+        let handler = { [weak display] (_: HotKey) -> Void in
+            guard let display = display, display.hotkeyInput.uint8Value != InputSource.unknown.rawValue else { return }
+            display.brightness = Defaults[.brightnessOnInputChange].ns
+            display.contrast = Defaults[.contrastOnInputChange].ns
+            display.input = display.hotkeyInput
+        }
+        var hotkey: PersistentHotkey
+        if let hk = Defaults[.hotkeys][identifier],
+           let keyCode = hk[.keyCode],
+           let enabled = hk[.enabled],
+           let modifiers = hk[.modifiers], let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers)
+        {
+            hotkey = PersistentHotkey(hotkey: Magnet.HotKey(
+                identifier: identifier,
+                keyCombo: keyCombo,
+                handler: handler
+            ), isEnabled: enabled == 1)
+
+        } else {
+            hotkey = PersistentHotkey(
+                hotkey: Magnet
+                    .HotKey(
+                        identifier: identifier,
+                        keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                        handler: handler
+                    ),
+                isEnabled: false
+            )
+        }
+        if let hotkeyView = controller.hotkeyView {
+            hotkeyView.hotkey = hotkey
+            hotkeyView.endRecording()
+        }
+        return true
+    }
+
+    @objc func adaptToDataPointBounds(notification _: Notification) {
+        guard let display = display, brightnessContrastChart != nil, display.id != GENERIC_DISPLAY_ID else { return }
+        initGraph()
+    }
+
+    @objc func highlightChartValue(notification _: Notification) {
+        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID else { return }
+        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
+    }
+
+    @objc func adaptToUserDataPoint(notification: Notification) {
+        guard displayController.adaptiveModeKey != .manual,
+              let values = notification.userInfo?["values"] as? [Int: Int]
+        else { return }
+
+        if notification.name == brightnessDataPointInserted {
+            updateDataset(userBrightness: values)
+        } else if notification.name == contrastDataPointInserted {
+            updateDataset(userContrast: values)
+        }
+    }
+
+    func updateNotificationObservers(for display: Display) {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: brightnessDataPointInserted,
+            object: nil
+        )
+        NotificationCenter.default.removeObserver(
+            self,
+            name: contrastDataPointInserted,
+            object: nil
+        )
+        NotificationCenter.default.removeObserver(
+            self,
+            name: currentDataPointChanged,
+            object: nil
+        )
+        NotificationCenter.default.removeObserver(
+            self,
+            name: dataPointBoundsChanged,
+            object: nil
+        )
+        NotificationCenter.default.removeObserver(
+            self,
+            name: lunarProStateChanged,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(adaptToUserDataPoint(notification:)),
+            name: brightnessDataPointInserted,
+            object: display
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(adaptToUserDataPoint(notification:)),
+            name: contrastDataPointInserted,
+            object: display
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(highlightChartValue(notification:)),
+            name: currentDataPointChanged,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(adaptToDataPointBounds(notification:)),
+            name: dataPointBoundsChanged,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateProIndicator(notification:)),
+            name: lunarProStateChanged,
+            object: nil
+        )
+    }
+
+    @IBAction func proButtonClick(_: Any) {
+        if lunarProActive, !lunarProOnTrial {
+            NSWorkspace.shared.open(try! "https://lunar.fyi/#sync".asURL())
+        } else if lunarProBadSignature {
+            NSWorkspace.shared.open(try! "https://lunar.fyi/download/latest".asURL())
+        } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
+            if lunarProProduct.licenseCode != nil {
+                deactivateLicense {
+                    paddle.showProductAccessDialog(with: lunarProProduct)
+                }
+            } else {
+                paddle.showProductAccessDialog(with: lunarProProduct)
+            }
+        }
+    }
+
+    func setupProButton() {
+        guard let button = proButton else { return }
+
+        mainThread {
+            if lunarProActive {
+                button.bg = red
+                button.attributedTitle = "Pro".withAttribute(.textColor(white))
+                button.setFrameSize(NSSize(width: 50, height: button.frame.height))
+            } else if lunarProBadSignature {
+                button.bg = errorRed
+                button.attributedTitle = "Invalid App Signature".withAttribute(.textColor(.black.withAlphaComponent(0.8)))
+                button.setFrameSize(NSSize(width: 150, height: button.frame.height))
+            } else {
+                button.bg = green
+                button.attributedTitle = "Get Pro".withAttribute(.textColor(white))
+                button.setFrameSize(NSSize(width: 70, height: button.frame.height))
+            }
+            button.center(within: view, vertically: false)
+        }
+    }
+
+    @objc func updateProIndicator(notification _: Notification) {
+        setupProButton()
+    }
+
+    func update() {
+        guard let display = self.display else { return }
+
+        settingsButton?.display = display
+        updateControlsButton()
+        updateNotificationObservers(for: display)
+
+        scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
+            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual else {
+                self?.updateDataset(currentBrightness: brightness.u8)
+                return
+            }
+            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+
+            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? [:]
+            let lastDataPoint = displayController.adaptiveMode.brightnessDataPoint.last
+            Display.insertDataPoint(
+                values: &userValues,
+                featureValue: lastDataPoint,
+                targetValue: brightness,
+                logValue: false
+            )
+            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues)
+            display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
+        }
+        scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
+            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual else {
+                self?.updateDataset(currentContrast: contrast.u8)
+                return
+            }
+
+            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? [:]
+            let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
+            Display.insertDataPoint(
+                values: &userValues,
+                featureValue: lastDataPoint,
+                targetValue: contrast,
+                logValue: false
+            )
+            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues)
+            display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
+        }
+
+        display.onControlChange = { [weak self] control in
+            mainThread {
+                self?.updateControlsButton(control: control)
+                if control is GammaControl, display.enabledControls[.gamma] ?? false {
+                    self?.showGammaNotice()
+                } else {
+                    self?.hideGammaNotice()
+                }
+            }
+        }
+
+        if let input = InputSource(rawValue: display.input.uint8Value) {
+            inputDropdown?.selectItem(withTag: input.rawValue.i)
+        }
+        if !initHotkeys(from: display), let button = inputDropdownHotkeyButton {
+            button.onClick = { [weak self, weak display] in
+                guard let self = self, let display = display else { return }
+                if self.initHotkeys(from: display) {
+                    button.onClick = nil
+                }
+            }
+        }
+
         if display.id == GENERIC_DISPLAY_ID {
             displayName?.stringValue = "No Display"
             displayName?.display = nil
         } else {
             displayName?.stringValue = display.name
-            displayName?.display = display
-            nonResponsiveDDCTextField?.onClick = { [weak self] in
-                runInMainThread { [weak self] in
-                    DDC.skipWritingPropertyById[display.id]?.removeAll()
-                    DDC.skipReadingPropertyById[display.id]?.removeAll()
-                    DDC.writeFaults[display.id]?.removeAll()
-                    DDC.readFaults[display.id]?.removeAll()
-                    display.responsive = true
-                    self?.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
-                    self?.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
-                    self?.refreshView()
+            displayName?.display = self.display
+            nonResponsiveTextField?.onClick = { [weak self] in
+                mainThread { [weak self] in
+                    guard let self = self, let display = self.display else { return }
+                    display.control.resetState()
+                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+                    self.refreshView()
                 }
             }
         }
 
-        if display.adaptive {
-            adaptiveButton?.state = .on
-        } else {
-            adaptiveButton?.state = .off
-        }
-        if display.extendedBrightnessRange {
-            brightnessRangeButton?.state = .on
-        } else {
-            brightnessRangeButton?.state = .off
-        }
-
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
-        setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
         refreshView()
     }
 
-    func updateDataset(minBrightness: UInt8? = nil, maxBrightness: UInt8? = nil, minContrast: UInt8? = nil, maxContrast: UInt8? = nil, factor: Double? = nil) {
-        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID else { return }
+    func updateControlsButton(control: Control? = nil) {
+        guard let button = controlsButton, let display = display, let control = control ?? display.control else { return }
+
+        mainThread {
+            button.alpha = 1.0
+            button.hoverAlpha = 0.9
+            button.circle = false
+
+            switch control {
+            case is CoreDisplayControl:
+                button.bg = green
+                button.attributedTitle = "Native Controls".withAttribute(.textColor(mauve))
+                button.helpText = NATIVE_CONTROLS_HELP_TEXT
+            case is DDCControl:
+                button.bg = lunarYellow
+                button.attributedTitle = "Hardware Controls".withAttribute(.textColor(darkMauve))
+                button.helpText = HARDWARE_CONTROLS_HELP_TEXT
+            case is GammaControl where display.enabledControls[.gamma] ?? false:
+                button.bg = red.withAlphaComponent(0.9)
+                button.attributedTitle = "Software Controls".withAttribute(.textColor(.black))
+                button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
+            case is NetworkControl:
+                button.bg = blue.withAlphaComponent(0.9)
+                button.attributedTitle = "Network Controls".withAttribute(.textColor(.black))
+                button.helpText = NETWORK_CONTROLS_HELP_TEXT
+            default:
+                button.bg = gray.withAlphaComponent(0.9)
+                button.attributedTitle = "No Controls".withAttribute(.textColor(.darkGray))
+                button.helpText = NO_CONTROLS_HELP_TEXT
+            }
+        }
+    }
+
+    func updateDataset(
+        minBrightness: UInt8? = nil,
+        maxBrightness: UInt8? = nil,
+        minContrast: UInt8? = nil,
+        maxContrast: UInt8? = nil,
+        currentBrightness: UInt8? = nil,
+        currentContrast: UInt8? = nil,
+        factor: Double? = nil,
+        userBrightness: [Int: Int]? = nil,
+        userContrast: [Int: Int]? = nil,
+        force: Bool = false
+    ) {
+        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID
+        else { return }
 
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
-        switch brightnessAdapter.mode {
-        case .location:
-            let maxValues = brightnessContrastChart.maxValuesLocation
-            let steps = brightnessContrastChart.interpolationValues
-            let points = brightnessAdapter.getBrightnessContrastBatch(
-                for: display, count: maxValues, minutesBetween: steps, factor: factor,
+        switch displayController.adaptiveMode {
+        case let mode as LocationMode:
+            let points = mode.getBrightnessContrastBatch(
+                display: display, factor: factor,
                 minBrightness: minBrightness, maxBrightness: maxBrightness,
-                minContrast: minContrast, maxContrast: maxContrast
+                minContrast: minContrast, maxContrast: maxContrast,
+                userBrightness: userBrightness, userContrast: userContrast
             )
-            var idx: Int
-            for x in 0 ..< (maxValues - 1) {
-                let startIndex = x * steps
-                let xPoints = points[startIndex ..< (startIndex + steps)]
-                for (i, y) in xPoints.enumerated() {
-                    idx = x * steps + i
-                    if idx >= brightnessChartEntry.count || idx >= contrastChartEntry.count {
-                        break
-                    }
-                    brightnessChartEntry[idx].y = y.0.doubleValue
-                    contrastChartEntry[idx].y = y.1.doubleValue
-                }
+            let maxValues = min(
+                mode.maxChartDataPoints,
+                points.brightness.count,
+                points.contrast.count,
+                brightnessChartEntry.count,
+                contrastChartEntry.count
+            )
+            let xs = stride(from: 0, to: maxValues, by: 1)
+            for (x, y) in zip(xs, points.brightness) {
+                brightnessChartEntry[x].y = y
             }
-            for (i, point) in brightnessChartEntry.prefix(steps).reversed().enumerated() {
-                idx = (maxValues - 1) * steps + i
-                if idx >= brightnessChartEntry.count {
-                    break
-                }
-                brightnessChartEntry[idx].y = point.y
+            for (x, y) in zip(xs, points.contrast) {
+                contrastChartEntry[x].y = y
             }
-            for (i, point) in contrastChartEntry.prefix(steps).reversed().enumerated() {
-                idx = (maxValues - 1) * steps + i
-                if idx >= contrastChartEntry.count {
-                    break
-                }
-                contrastChartEntry[idx].y = point.y
-            }
-        case .sync:
-            let maxValues = brightnessContrastChart.maxValuesSync
-            let minBrightness = minBrightness != nil ? Double(minBrightness!) : nil
-            let maxBrightness = maxBrightness != nil ? Double(maxBrightness!) : nil
-            let minContrast = minContrast != nil ? Double(minContrast!) : nil
-            let maxContrast = maxContrast != nil ? Double(maxContrast!) : nil
-            let xs = stride(from: 0, to: maxValues - 1, by: 1)
-            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
+        case let mode as SyncMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
 
-            let clipMin = brightnessAdapter.brightnessClipMin
-            let clipMax = brightnessAdapter.brightnessClipMax
-
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, minVal: minBrightness, maxVal: maxBrightness, brightnessClipMin: clipMin, brightnessClipMax: clipMax)) {
-                brightnessChartEntry[x].y = b.doubleValue
+            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil {
+                let values = mode.interpolateSIMD(
+                    .brightness(0),
+                    display: display,
+                    minVal: minBrightness?.d,
+                    maxVal: maxBrightness?.d,
+                    userValues: userBrightness
+                )
+                for (x, b) in zip(xs, values) {
+                    brightnessChartEntry[x].y = b
+                }
             }
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, minVal: minContrast, maxVal: maxContrast, brightnessClipMin: clipMin, brightnessClipMax: clipMax)) {
-                contrastChartEntry[x].y = b.doubleValue
+            if force || minContrast != nil || maxContrast != nil || userContrast != nil {
+                let values = mode.interpolateSIMD(
+                    .contrast(0),
+                    display: display,
+                    minVal: minContrast?.d,
+                    maxVal: maxContrast?.d,
+                    userValues: userContrast
+                )
+                for (x, b) in zip(xs, values) {
+                    contrastChartEntry[x].y = b
+                }
+            }
+        case let mode as SensorMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+
+            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil {
+                let values = mode.interpolateSIMD(
+                    .brightness(0),
+                    display: display,
+                    minVal: minBrightness?.d,
+                    maxVal: maxBrightness?.d,
+                    userValues: userBrightness
+                )
+                for (x, b) in zip(xs, values) {
+                    brightnessChartEntry[x].y = b
+                }
+            }
+            if force || minContrast != nil || maxContrast != nil || userContrast != nil {
+                let values = mode.interpolateSIMD(
+                    .contrast(0),
+                    display: display,
+                    minVal: minContrast?.d,
+                    maxVal: maxContrast?.d,
+                    userValues: userContrast
+                )
+                for (x, b) in zip(xs, values) {
+                    contrastChartEntry[x].y = b
+                }
+            }
+        case let mode as ManualMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+            let percents = Array(stride(from: 0.0, to: maxValues.d / 100.0, by: 0.01))
+            for (x, b) in zip(
+                xs,
+                mode.computeSIMD(
+                    from: percents,
+                    minVal: minBrightness?.d ?? display.minBrightness.doubleValue,
+                    maxVal: maxBrightness?.d ?? display.maxBrightness.doubleValue
+                )
+            ) {
+                brightnessChartEntry[x].y = b
+            }
+            for (x, b) in zip(
+                xs,
+                mode.computeSIMD(
+                    from: percents,
+                    minVal: minContrast?.d ?? display.minContrast.doubleValue,
+                    maxVal: maxContrast?.d ?? display.maxContrast.doubleValue
+                )
+            ) {
+                contrastChartEntry[x].y = b
             }
         default:
             break
         }
 
+        brightnessContrastChart.highlightCurrentValues(
+            adaptiveMode: displayController.adaptiveMode, for: display,
+            brightness: currentBrightness?.d, contrast: currentContrast?.d
+        )
         brightnessContrastChart.notifyDataSetChanged()
     }
 
-    @IBAction func toggleAdaptive(_ sender: NSButton) {
-        switch sender.state {
-        case .on:
-            sender.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
-            display?.adaptive = true
-            setValuesHidden(false)
-        case .off:
-            sender.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
-            display?.adaptive = false
-            setValuesHidden(true)
-        default:
-            return
+//     func demo() {
+//         guard let solar = LocationMode.specific.geolocation?.solar,
+//               let sunrise = LocationMode.specific.moment?.sunrise,
+//               let sunset = LocationMode.specific.moment?.sunset,
+    // //              let sunrisePosition = solar.sunrisePosition,
+    // //              let sunsetPosition = solar.sunsetPosition,
+    // //              let solarNoonPosition = solar.solarNoonPosition,
+//               let display = display, let brightnessContrastChart = brightnessContrastChart
+//         else {
+//             return
+//         }
+//         scrollableBrightness?.onCurrentValueChanged = nil
+//         scrollableContrast?.onCurrentValueChanged = nil
+//         for hour in sunrise.hour ... sunset.hour {
+//             for minute in stride(from: 0, to: 60, by: 5) {
+//                 log.info("Setting time to \(hour):\(minute)")
+//                 let (brightness, contrast) = LocationMode.specific.getBrightnessContrast(
+//                     display: display, hour: hour, minute: minute
+//                 )
+//                 mainThread {
+//                     log.info("Brightness: \(brightness)    Contrast: \(contrast)")
+//                     scrollableBrightness!.currentValue.stringValue = brightness.intround.s
+//                     scrollableContrast!.currentValue.stringValue = contrast.intround.s
+//                     scrollableBrightness!.setNeedsDisplay(scrollableBrightness!.visibleRect)
+//                     scrollableContrast!.setNeedsDisplay(scrollableContrast!.visibleRect)
+
+//                     var now = DateInRegion().convertTo(region: Region.local)
+//                     now = now.dateBySet(hour: hour, min: minute, secs: 0)!
+
+//                     brightnessContrastChart.highlightCurrentValues(
+//                         adaptiveMode: displayController.adaptiveMode, for: display,
+//                         now: now.date
+//                     )
+//                     brightnessContrastChart.notifyDataSetChanged()
+//                     brightnessContrastChart.setNeedsDisplay(brightnessContrastChart.visibleRect)
+//                     view.setNeedsDisplay(view.visibleRect)
+//                 }
+    // //            let sleepTime = pow(0.01, 1 - (elevation / solarNoonPosition.elevation))
+    // //            log.info("Sleeping for \(sleepTime)")
+    // //            Thread.sleep(forTimeInterval: sleepTime)
+//                 Thread.sleep(forTimeInterval: 0.01)
+//             }
+//         }
+//     }
+
+    @IBAction func resetDisplay(_: ResetButton) {
+        guard let display = display else { return }
+
+        let resetHandler = { [weak display, weak self] (_: Bool) in
+            guard let display = display, let self = self else { return }
+            display.adaptivePaused = true
+            defer {
+                display.adaptivePaused = false
+                display.readapt(newValue: false, oldValue: true)
+            }
+
+            display.reset()
+            self.settingsButton?.popoverController?.display = display
+            self.updateDataset(force: true)
+        }
+
+        if display.control is GammaControl {
+            guard ask(message: "Monitor Reset", info: """
+            This will reset the following settings for this display:
+            • The algorithm curve that Lunar learned from your adjustments
+            • The enabled controls
+            • The "Always Use Network Control" setting
+            • The "Always Fallback to Gamma" setting
+            • The min/max brightness/contrast values
+            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true)
+            else { return }
+        } else {
+            guard ask(message: "Monitor Reset", info: """
+            This will reset the following settings for this display:
+            • Everything you have manually adjusted using the monitor's physical buttons/controls
+            • The algorithm curve that Lunar learned from your adjustments
+            • The enabled controls
+            • The "Always Use Network Control" setting
+            • The "Always Fallback to Gamma" setting
+            • The min/max brightness/contrast values
+            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true)
+            else { return }
+        }
+        if view.window == nil {
+            resetHandler(true)
         }
     }
 
-    @IBAction func toggleBrightnessRange(_ sender: NSButton) {
-        switch sender.state {
-        case .on:
-            sender.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
-            display?.extendedBrightnessRange = true
-        case .off:
-            sender.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
-            display?.extendedBrightnessRange = false
-        default:
-            return
-        }
-    }
-
-    func initToggleButton(_ button: NSButton?, helpButton: NSButton?, buttonColors: [ButtonColor: NSColor]) {
+    func initToggleButton(_ button: NSButton?, helpButton: NSButton?) {
         guard let button = button else { return }
-        if brightnessAdapter.mode == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID) {
+        if displayController
+            .adaptiveModeKey == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID)
+        {
             button.isHidden = true
             helpButton?.isHidden = true
         } else {
             button.isHidden = false
             helpButton?.isHidden = false
         }
-
-        let buttonSize = button.frame
-        button.wantsLayer = true
-
-        let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonColors[.labelOn]!, range: NSMakeRange(0, activeTitle.length))
-        let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonColors[.labelOff]!, range: NSMakeRange(0, inactiveTitle.length))
-
-        button.attributedTitle = inactiveTitle
-        button.attributedAlternateTitle = activeTitle
-
-        button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.height + 10))
-        button.layer?.cornerRadius = button.frame.height / 2
-        if button.state == .on {
-            button.layer?.backgroundColor = buttonColors[.bgOn]!.cgColor
-        } else {
-            button.layer?.backgroundColor = buttonColors[.bgOff]!.cgColor
-        }
-        button.addTrackingArea(NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: ["button": button, "colors": buttonColors]))
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        guard let data = event.trackingArea?.userInfo,
-            let button = data["button"] as? NSButton,
-            let colors = data["colors"] as? [ButtonColor: NSColor],
-            !button.isHidden, button.isEnabled else { return }
-
-        button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-
-        if button.state == .on {
-            button.layer?.backgroundColor = colors[.bgOnHover]!.cgColor
-        } else {
-            button.layer?.backgroundColor = colors[.bgOffHover]!.cgColor
-        }
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        guard let data = event.trackingArea?.userInfo,
-            let button = data["button"] as? NSButton,
-            let colors = data["colors"] as? [ButtonColor: NSColor],
-            !button.isHidden, button.isEnabled else { return }
-
-        button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-
-        if button.state == .on {
-            button.layer?.backgroundColor = colors[.bgOn]!.cgColor
-        } else {
-            button.layer?.backgroundColor = colors[.bgOff]!.cgColor
-        }
     }
 
     func setIsHidden(_ value: Bool) {
         setButtonsHidden(value)
 
-        nonResponsiveDDCTextField?.isHidden = value
+        nonResponsiveTextField?.isHidden = value
         scrollableBrightness?.isHidden = value
         scrollableContrast?.isHidden = value
         brightnessContrastChart?.isHidden = value
-        swipeLeftHint?.isHidden = value
-        swipeRightHint?.isHidden = value
-    }
-
-    func listenForShowNavigationHintsChange() {
-        showNavigationHintsObserver = datastore.defaults.observe(\.showNavigationHints, options: [.old, .new], changeHandler: { [weak self] _, change in
-            guard let show = change.newValue, let oldShow = change.oldValue, show != oldShow else {
-                return
-            }
-            runInMainThread { [weak self] in
-                guard let self = self else { return }
-                self.swipeLeftHint?.isHidden = !show
-                self.swipeRightHint?.isHidden = !show
-            }
-        })
     }
 
     deinit {
+        log.verbose("")
         let id = "displayViewController-\(self.viewID ?? "")"
-        display?.resetObserver(prop: "adaptive", key: id, type: Bool.self)
-        display?.resetObserver(prop: "activeAndResponsive", key: id, type: Bool.self)
+        guard let display = display else {return}
+        display.resetObserver(prop: .adaptive, key: id, type: Bool.self)
+        display.resetObserver(prop: .activeAndResponsive, key: id, type: Bool.self)
+        display.resetObserver(prop: .hasDDC, key: id, type: Bool.self)
+        display.resetObserver(prop: .sendingBrightness, key: id, type: Bool.self)
+        display.resetObserver(prop: .sendingContrast, key: id, type: Bool.self)
+
+        display.resetObserver(prop: .maxBrightness, key: id, type: NSNumber.self)
+        display.resetObserver(prop: .maxContrast, key: id, type: NSNumber.self)
     }
 
-    func listenForAdaptiveChange() {
-        adaptiveObserver = { [weak self] newAdaptive, oldValue in
-            if let self = self, let button = self.adaptiveButton, let display = self.display {
-                runInMainThread { [weak self] in
-                    guard let self = self else { return }
-                    if newAdaptive {
-                        button.layer?.backgroundColor = adaptiveButtonColors[.bgOn]!.cgColor
-                        self.setValuesHidden(false)
-                        button.state = .on
-                    } else {
-                        button.layer?.backgroundColor = adaptiveButtonColors[.bgOff]!.cgColor
-                        self.setValuesHidden(true)
-                        button.state = .off
-                    }
-                    display.readapt(newValue: newAdaptive, oldValue: oldValue)
+    func listenForSendingBrightnessContrast() {
+        sendingBrightnessObserver = { [weak self] (newValue: Bool, _: Bool) in
+            guard newValue else {
+                self?.scrollableBrightness?.currentValue.stopHighlighting()
+                return
+            }
+
+            if let control = self?.display?.control as? NetworkControl {
+                if control.isResponsive() {
+                    self?.scrollableBrightness?.currentValue.highlight(message: "Sending")
+                } else {
+                    self?.scrollableBrightness?.currentValue.highlight(message: "Not responding")
                 }
             }
         }
-        display?.setObserver(prop: "adaptive", key: "displayViewController-\(viewID ?? "")", action: adaptiveObserver!)
-    }
-
-    func listenForBrightnessRangeChange() {
-        brightnessRangeObserver = { [weak self] newBrightnessRange, oldValue in
-            if let self = self, let button = self.brightnessRangeButton, let display = self.display {
-                runInMainThread { [weak display, weak button] in
-                    if newBrightnessRange {
-                        button?.layer?.backgroundColor = brightnessRangeButtonColors[.bgOn]!.cgColor
-                        button?.state = .on
-                    } else {
-                        button?.layer?.backgroundColor = brightnessRangeButtonColors[.bgOff]!.cgColor
-                        button?.state = .off
-                    }
-                    display?.readapt(newValue: newBrightnessRange, oldValue: oldValue)
+        sendingContrastObserver = { [weak self] (newValue: Bool, _: Bool) in
+            guard newValue else {
+                self?.scrollableContrast?.currentValue.stopHighlighting()
+                return
+            }
+            if let control = self?.display?.control as? NetworkControl {
+                if control.isResponsive() {
+                    self?.scrollableContrast?.currentValue.highlight(message: "Sending")
+                } else {
+                    self?.scrollableContrast?.currentValue.highlight(message: "Not responding")
                 }
             }
         }
-        display?.setObserver(prop: "extendedBrightnessRange", key: "displayViewController-\(viewID ?? "")", action: brightnessRangeObserver!)
+        display?.setObserver(prop: .sendingBrightness, key: "displayViewController-\(viewID ?? "")", action: sendingBrightnessObserver!)
+        display?.setObserver(prop: .sendingContrast, key: "displayViewController-\(viewID ?? "")", action: sendingContrastObserver!)
     }
 
-    func listenForActiveAndResponsiveChange() {
-        activeAndResponsiveObserver = { [weak self] newActiveAndResponsive, _ in
-            if let self = self, let display = self.display, let textField = self.nonResponsiveDDCTextField {
-                runInMainThread { [weak self] in
+    func listenForBrightnessContrastChange() {
+        display?
+            .setObserver(prop: .maxBrightness, key: "displayViewController-\(viewID ?? "")") { [weak self] (value: NSNumber, _: NSNumber) in
+                guard let self = self else { return }
+                self.scrollableBrightness?.maxValue.integerValue = value.intValue
+            }
+        display?
+            .setObserver(prop: .maxContrast, key: "displayViewController-\(viewID ?? "")") { [weak self] (value: NSNumber, _: NSNumber) in
+                guard let self = self else { return }
+                self.scrollableContrast?.maxValue.integerValue = value.intValue
+            }
+    }
+
+    func listenForDisplayBoolChange() {
+        activeAndResponsiveObserver = { [weak self] (newActiveAndResponsive: Bool, _: Bool) in
+            if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
+                mainThread { [weak self] in
                     guard let self = self else { return }
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
-                    self.setAdaptiveButtonEnabled(brightnessAdapter.mode != .manual)
 
-                    textField.isHidden = !(self.adaptiveButton?.isHidden ?? false)
+                    textField.isHidden = newActiveAndResponsive
                 }
             }
         }
-        display?.setObserver(prop: "activeAndResponsive", key: "displayViewController-\(viewID ?? "")", action: activeAndResponsiveObserver!)
+        display?.setObserver(
+            prop: .activeAndResponsive,
+            key: "displayViewController-\(viewID ?? "")",
+            action: activeAndResponsiveObserver!
+        )
+
+        adaptiveObserver = { [weak self] (newAdaptive: Bool, _: Bool) in
+            if let self = self {
+                mainThread { [weak self] in
+                    guard let self = self else { return }
+                    if !newAdaptive {
+                        self.showAdaptiveNotice()
+                    } else {
+                        self.hideAdaptiveNotice()
+                    }
+                }
+            }
+        }
+        if let display = display {
+            if !display.adaptive {
+                showAdaptiveNotice()
+            }
+            display.setObserver(
+                prop: .adaptive,
+                key: "displayViewController-\(viewID ?? "")",
+                action: adaptiveObserver!
+            )
+        }
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self] _, change in
-            runInMainThread { [weak self, weak brightnessContrastChart = self?.brightnessContrastChart] in
-                guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
+            mainThread { [weak self] in
+                guard let self = self, change.newValue != change.oldValue else {
                     return
                 }
-                let adaptiveMode = AdaptiveMode(rawValue: mode)
-                if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
-                    self.initGraph(mode: adaptiveMode)
-                }
-                if adaptiveMode == .manual {
-                    self.scrollableBrightness?.disabled = true
-                    self.scrollableContrast?.disabled = true
-                    self.setValuesHidden(true, mode: adaptiveMode)
-                    self.setAdaptiveButtonEnabled(false)
+                let adaptiveMode = change.newValue
+
+                if Defaults[.overrideAdaptiveMode] {
+                    self.inputDropdown?.selectItem(withTag: adaptiveMode.rawValue)
                 } else {
-                    self.scrollableBrightness?.disabled = false
-                    self.scrollableContrast?.disabled = false
-                    self.setValuesHidden(false, mode: adaptiveMode)
-                    self.setAdaptiveButtonEnabled((self.display?.id ?? GENERIC_DISPLAY_ID) != GENERIC_DISPLAY_ID)
+                    self.inputDropdown?.selectItem(withTag: AUTO_MODE_TAG)
+                }
+
+                if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                    self.initGraph(mode: adaptiveMode.mode)
                 }
             }
-        })
+        }
     }
 
     func initGraph(mode: AdaptiveMode? = nil) {
-        brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor, mode: mode)
+        brightnessContrastChart?.initGraph(
+            display: display,
+            brightnessColor: brightnessGraphColor,
+            contrastColor: contrastGraphColor,
+            labelColor: xAxisLabelColor,
+            mode: mode
+        )
         brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
     }
 
     func zeroGraph() {
-        brightnessContrastChart?.initGraph(display: nil, brightnessColor: brightnessGraphColor, contrastColor: contrastGraphColor, labelColor: xAxisLabelColor)
+        brightnessContrastChart?.initGraph(
+            display: nil,
+            brightnessColor: brightnessGraphColor,
+            contrastColor: contrastGraphColor,
+            labelColor: xAxisLabelColor
+        )
         brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.0)
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
-    func setValuesHidden(_ hidden: Bool, mode: AdaptiveMode? = nil) {
-        scrollableBrightness?.setValuesHidden(hidden, mode: mode)
-        scrollableContrast?.setValuesHidden(hidden, mode: mode)
+    @IBAction func powerOff(_: Any) {
+        _ = display?.control?.setPower(.off)
+    }
+
+    @IBAction func setInput(_ sender: NSPopUpButton) {
+        guard let display = display, let input = InputSource(rawValue: sender.selectedTag().u8) else { return }
+        display.input = input.rawValue.ns
+    }
+
+    var gammaHighlighterTask: CFRunLoopTimer?
+    var gammaHighlighterSemaphore = DispatchSemaphore(value: 1)
+
+    func showGammaNotice() {
+        mainThread { [weak self] in
+            guard let self = self, gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), let w = view.window,
+                  w.isVisible
+            else {
+                return
+            }
+
+            gammaHighlighterTask = realtimeQueue.async(every: 10.seconds) { [weak self] (_: CFRunLoopTimer?) in
+                guard let s = self else {
+                    if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                    return
+                }
+
+                s.gammaHighlighterSemaphore.wait()
+                defer {
+                    s.gammaHighlighterSemaphore.signal()
+                }
+
+                var windowVisible: Bool = false
+                mainThread {
+                    windowVisible = s.view.window?.isVisible ?? false
+                }
+                guard windowVisible, let gammaNotice = s.gammaNotice
+                else {
+                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                    return
+                }
+
+                mainThread {
+                    if gammaNotice.alphaValue == 0 {
+                        gammaNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                        gammaNotice.alphaValue = 0.9
+                        gammaNotice.needsDisplay = true
+                    } else {
+                        gammaNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                        gammaNotice.alphaValue = 0.0
+                        gammaNotice.needsDisplay = true
+                    }
+                }
+            }
+        }
+    }
+
+    func hideGammaNotice() {
+        if let timer = gammaHighlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        gammaHighlighterTask = nil
+        gammaHighlighterSemaphore.wait()
+        defer {
+            self.gammaHighlighterSemaphore.signal()
+        }
+
+        mainThread { [weak self] in
+            guard let gammaNotice = self?.gammaNotice else { return }
+            gammaNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+            gammaNotice.alphaValue = 0.0
+            gammaNotice.needsDisplay = true
+        }
+    }
+
+    var adaptiveHighlighterTask: CFRunLoopTimer?
+    var adaptiveHighlighterSemaphore = DispatchSemaphore(value: 1)
+
+    func showAdaptiveNotice() {
+        mainThread { [weak self] in
+            guard let self = self, adaptiveHighlighterTask == nil || !realtimeQueue.isValid(timer: adaptiveHighlighterTask!),
+                  let w = view.window,
+                  w.isVisible
+            else {
+                return
+            }
+
+            adaptiveHighlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
+                guard let s = self else {
+                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                    return
+                }
+
+                s.adaptiveHighlighterSemaphore.wait()
+                defer {
+                    s.adaptiveHighlighterSemaphore.signal()
+                }
+
+                var windowVisible: Bool = false
+                mainThread {
+                    windowVisible = s.view.window?.isVisible ?? false
+                }
+                guard windowVisible, let adaptiveNotice = s.adaptiveNotice
+                else {
+                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                    return
+                }
+
+                mainThread {
+                    if adaptiveNotice.alphaValue == 0 {
+                        adaptiveNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                        adaptiveNotice.alphaValue = 0.9
+                        adaptiveNotice.needsDisplay = true
+                    } else {
+                        adaptiveNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                        adaptiveNotice.alphaValue = 0.0
+                        adaptiveNotice.needsDisplay = true
+                    }
+                }
+            }
+        }
+    }
+
+    func hideAdaptiveNotice() {
+        if let timer = adaptiveHighlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        adaptiveHighlighterTask = nil
+        adaptiveHighlighterSemaphore.wait()
+        defer {
+            self.adaptiveHighlighterSemaphore.signal()
+        }
+
+        mainThread { [weak self] in
+            guard let adaptiveNotice = self?.adaptiveNotice else { return }
+            adaptiveNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+            adaptiveNotice.alphaValue = 0.0
+            adaptiveNotice.needsDisplay = true
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         viewID = view.accessibilityIdentifier()
 
-        swipeLeftHint?.isHidden = true
-        swipeRightHint?.isHidden = true
-
-        adaptiveHelpButton?.helpText = ADAPTIVE_HELP_TEXT
-        brightnessRangeHelpButton?.helpText = BRIGHTNESS_RANGE_HELP_TEXT
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
         if let display = display, display.id != GENERIC_DISPLAY_ID {
-            update(from: display)
+            update()
 
             scrollableBrightness?.display = display
             scrollableContrast?.display = display
 
-            initToggleButton(adaptiveButton, helpButton: adaptiveHelpButton, buttonColors: adaptiveButtonColors)
-            initToggleButton(brightnessRangeButton, helpButton: brightnessRangeHelpButton, buttonColors: brightnessRangeButtonColors)
+            resetButton?.page = .displayReset
+
+            if let inputDropdown = inputDropdown {
+                inputDropdown.appearance = NSAppearance(named: .vibrantLight)
+
+                for item in inputDropdown.itemArray {
+                    var title = item.attributedTitle?.string ?? item.title
+                    if title == "Unknown" {
+                        title = "Input"
+                    }
+                    item.attributedTitle = title
+                        .withAttribute(.textColor(darkMauve.blended(withFraction: 0.3, of: gray)!))
+                }
+            }
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor
 
-            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: UInt8(value)) }
-            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: UInt8(value)) }
-            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: UInt8(value)) }
-            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: UInt8(value)) }
+            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u8) }
+            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u8) }
+            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u8) }
+            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u8) }
 
             initGraph()
-
-            if !display.adaptive || brightnessAdapter.mode == .manual {
-                setValuesHidden(true)
-            }
         } else {
             setIsHidden(true)
         }
-        listenForAdaptiveChange()
-        listenForBrightnessRangeChange()
+        listenForSendingBrightnessContrast()
         listenForAdaptiveModeChange()
-        listenForActiveAndResponsiveChange()
-        listenForShowNavigationHintsChange()
+        listenForDisplayBoolChange()
+        listenForBrightnessContrastChange()
+        updateControlsButton()
+        setupProButton()
+
+        // upHotkey = Magnet.HotKey(identifier: "LocationMode Demo", keyCombo: KeyCombo(key: .d, cocoaModifiers: [.option])!) { _ in
+        //     log.debug("DEMO TIME!!")
+        //     async(threaded: true) {
+        //         self.demo()
+        //     }
+        // }
+        // upHotkey?.register()
     }
 }

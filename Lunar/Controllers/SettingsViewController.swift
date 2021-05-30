@@ -10,7 +10,7 @@ import Cocoa
 
 class SettingsViewController: NSSplitViewController {
     override func splitView(_: NSSplitView, effectiveRect _: NSRect, forDrawnRect _: NSRect, ofDividerAt _: Int) -> NSRect {
-        return NSRect()
+        NSRect()
     }
 
     @IBAction func viewDidLoad(_: Any?) {

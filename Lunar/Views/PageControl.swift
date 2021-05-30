@@ -23,8 +23,8 @@ public class PageControl: NSView {
     }
 
     public var hidesForSinglePage: Bool = true
-    public var pageIndicatorTintColor: NSColor = NSColor.darkGray
-    public var currentPageIndicatorTintColor: NSColor = NSColor.white
+    public var pageIndicatorTintColor = NSColor.darkGray
+    public var currentPageIndicatorTintColor = NSColor.white
     public var animationDuration: CFTimeInterval = 0.04
     public var dotLength: CGFloat = 8.0
     public var dotMargin: CGFloat = 12.0
@@ -48,7 +48,7 @@ public class PageControl: NSView {
 
     // MARK: - lifecycle
 
-    public override func draw(_ dirtyRect: NSRect) {
+    override public func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
         let dotWidthSum: CGFloat = dotLength * CGFloat(numberOfPages)
@@ -77,11 +77,11 @@ public class PageControl: NSView {
             let verticalCenter: CGFloat = (dirtyRect.height - dotLength) / 2
             let y: CGFloat = verticalCenter - dotLength / 2
             let rect: CGRect = NSRect(x: x, y: y, width: dotLength, height: dotLength)
-            let cgPath: CGMutablePath = CGMutablePath()
+            let cgPath = CGMutablePath()
             cgPath.addEllipse(in: rect)
 
             let fillColor: NSColor = (i == currentPage) ? currentPageIndicatorTintColor : pageIndicatorTintColor
-            let shapeLayer: CAShapeLayer = CAShapeLayer()
+            let shapeLayer = CAShapeLayer()
             shapeLayer.path = cgPath
             shapeLayer.fillColor = fillColor.cgColor
 
@@ -104,7 +104,7 @@ public class PageControl: NSView {
     }
 
     private func fillColorAnimation(with color: NSColor) -> CABasicAnimation {
-        let fillColorAnimation: CABasicAnimation = CABasicAnimation(keyPath: "fillColor")
+        let fillColorAnimation = CABasicAnimation(keyPath: "fillColor")
         fillColorAnimation.toValue = color.cgColor
         fillColorAnimation.duration = animationDuration
         fillColorAnimation.fillMode = convertToCAMediaTimingFillMode(convertFromCAMediaTimingFillMode(CAMediaTimingFillMode.forwards))
@@ -115,10 +115,10 @@ public class PageControl: NSView {
 
 // Helper function inserted by Swift 4.2 migrator.
 private func convertToCAMediaTimingFillMode(_ input: String) -> CAMediaTimingFillMode {
-    return CAMediaTimingFillMode(rawValue: input)
+    CAMediaTimingFillMode(rawValue: input)
 }
 
 // Helper function inserted by Swift 4.2 migrator.
 private func convertFromCAMediaTimingFillMode(_ input: CAMediaTimingFillMode) -> String {
-    return input.rawValue
+    input.rawValue
 }

@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class DisplayName: NSTextField {
+class DisplayName: NSTextField, NSTextFieldDelegate {
     var centerAlign: NSParagraphStyle?
     var trackingArea: NSTrackingArea?
 
@@ -19,18 +19,19 @@ class DisplayName: NSTextField {
     }
 
     func setup() {
+        delegate = self
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         centerAlign = paragraphStyle
 
         usesSingleLineMode = false
-        allowsEditingTextAttributes = true
+        allowsEditingTextAttributes = false
         wantsLayer = true
-        layer?.cornerRadius = 8
+        radius = 8.ns
 
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
-        setNeedsDisplay()
+        needsDisplay = true
     }
 
     override init(frame frameRect: NSRect) {
@@ -48,25 +49,41 @@ class DisplayName: NSTextField {
             return
         }
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        layer?.backgroundColor = lunarYellow.withAlphaComponent(0.3).cgColor
-        disableLeftRightHotkeys()
+        bg = lunarYellow.withAlphaComponent(0.3)
     }
 
     override func mouseExited(with _: NSEvent) {
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        layer?.backgroundColor = NSColor.clear.cgColor
-        appDelegate().setupHotkeys()
+        bg = NSColor.clear
     }
 
     override func mouseDown(with _: NSEvent) {
         if isEditable {
+            refusesFirstResponder = false
             becomeFirstResponder()
         }
     }
 
+    func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        switch commandSelector {
+        case #selector(insertNewline(_:)):
+            validateEditing()
+            if let editor = currentEditor() {
+                endEditing(editor)
+            }
+            return true
+        default:
+            return false
+        }
+    }
+
+    override func cancelOperation(_: Any?) {
+        abortEditing()
+        refusesFirstResponder = true
+    }
+
     override func textDidBeginEditing(_: Notification) {
         log.info("Editing display name", context: ["display": display])
-        disableLeftRightHotkeys()
     }
 
     override func textShouldEndEditing(_ textObject: NSText) -> Bool {
@@ -79,10 +96,10 @@ class DisplayName: NSTextField {
             log.info("Changing display name from \(display.name) to \(stringValue)")
             display.name = stringValue
         }
-        appDelegate().setupHotkeys()
         if let editor = currentEditor() {
             editor.selectedRange = NSMakeRange(0, 0)
             endEditing(editor)
         }
+        refusesFirstResponder = true
     }
 }

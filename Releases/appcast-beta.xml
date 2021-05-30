@@ -1,0 +1,408 @@
+<?xml version='1.0' encoding='ASCII' standalone='yes'?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Lunar</title>
+        <item>
+            <title>2.3.1</title>
+            <pubDate>Sat, 23 Mar 2019 14:55:46 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14406819" sparkle:dsaSignature="MEUCIH6zea3Tux46MMW2+RdHS5YI24i+PwDsOezjzG0NtUs2AiEAiGLrF7KHyc2pEq4sWSiNN9rEozgmnUAFHPdZhG0ew8g=" sparkle:edSignature="xCdmaVYMkHmcehUjr7QkbwsWJmVknCr9PgzdiaEF26Lal1o8hJZc6tGR3YdHWqNH9D87K9h0ANBe/DMzOnXZBQ==" sparkle:shortVersionString="2.3.1" sparkle:version="2.3.1" type="application/octet-stream" url="https://lunar.fyi/download/2.3.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;            }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Check chart entries bounds before updating</li></ul><h2 id="improvements">Improvements</h2><ul><li>Move to edDSA key for signing updates</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.3.2</title>
+            <pubDate>Sat, 23 Mar 2019 16:33:17 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14402892" sparkle:dsaSignature="MEUCIBZX0NnaPGefSBi2zkOFwXUdhBVmrdyTAz6TQOLhw0t1AiEAltAvRjiCeh/eKPg9+MOdiwx/lX93TVXb70qWEfwexnM=" sparkle:edSignature="zbzpN4NuC9QMZ/A1vKtl1Hg4CXWkgGDcB/x1NRz8oBf28GhicxnTRIl6wWEVecsm5eGOS9BuFT7C0Zc/yRyqBw==" sparkle:shortVersionString="2.3.2" sparkle:version="2.3.2" type="application/octet-stream" url="https://lunar.fyi/download/2.3.2"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;            }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Don't send DDC/CI request for locked value</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.3.3</title>
+            <pubDate>Fri, 29 Mar 2019 15:32:20 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14142524" sparkle:dsaSignature="MEQCICLa1a7aphiyBZSGd/CRjZq3RlsP3pRPmkR8Ag2Ex+LHAiBlCJgEOsn+leLVSbOgGY0fQR2TZO9fsUCE1pj8c3Bhhw==" sparkle:edSignature="G3kt4fO9TiFMnOCJY5m0NGT/7lUrIJDaGv2UJVkt8D7oWYgu5oPzxS5Xjo25cYBTHcXQSZpfzkZHZjJhPXtfCA==" sparkle:shortVersionString="2.3.3" sparkle:version="2.3.3" type="application/octet-stream" url="https://lunar.fyi/download/2.3.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;            }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Use all EDID data to encode monitor IDs<ul><li>this should allow Lunar to support multiple monitors of the same kind</li></ul></li></ul><h2 id="improvements">Improvements</h2><ul><li>Convert to Swift 5</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.4.0</title>
+            <pubDate>Tue, 02 Apr 2019 20:25:32 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14193692" sparkle:dsaSignature="MEUCIQCnc8r3R/X2psfiaFQACEyoY1WQl+wVMNIYhl01I/tZ5QIgSb7QNdbNvL2sfwaeLciy+U4oMy88Awe8ZmIpWuOaYwU=" sparkle:edSignature="mkXUoFS6n+VwFgNt8vCT6ExpWg7BZqh8U6GgUkrdOVAM1X8zzaq49d0eYHOhsl29QgpgAcImZzuocVhEFoUnAQ==" sparkle:shortVersionString="2.4.0" sparkle:version="2.4.0" type="application/octet-stream" url="https://lunar.fyi/download/2.4.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add diagnostic tools<ul><li>You can now open Lunar menu and click on <em>Open Lunar diagnostics</em>to send me Lunar logs</li></ul></li><li>Complete multi-monitor support</li></ul><h2 id="fixes">Fixes</h2><ul><li>Use system generated UUID to store settings per display</li></ul><h2 id="improvements">Improvements</h2><ul><li>Convert to DDC handling code to Swift</li><li>Store min/max settings as soon as they are changed</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.5.0</title>
+            <pubDate>Mon, 22 Apr 2019 13:22:55 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14170398" sparkle:dsaSignature="MEQCIFUs4nay/gHdvaYMhh+uCtLBo0bSP/6Ek58iZIus6/3aAiAMMTgJp1WtTvACYTiG7zLSdu9sNZnw/wiwmQonVHU+9Q==" sparkle:edSignature="hHMEAeZbJhFgNyHoI7OMoYO5yOr8iB2Fkp2IejlCRytnQ5JHHb1/5WcD9+Vo1QltMOvgNvBjEsqpcPPD36Q5Cg==" sparkle:shortVersionString="2.5.0" sparkle:version="2.5.0" type="application/octet-stream" url="https://lunar.fyi/download/2.5.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Revert DDC to C implementation with added multi-monitor support</li><li>Fix 2.4.0 regression where only some types of connectors worked</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.6.0</title>
+            <pubDate>Thu, 23 May 2019 18:28:20 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14206881" sparkle:dsaSignature="MEQCIAl+1ydqDVrMw5TLRRgnABg3nD1t8rKmatsyLgdNqzaSAiAQoExD++EjLtBaTHCeE3dCp8tpjNvjnzKsk8G1ZfRPOg==" sparkle:edSignature="U3KBjk7G3S5MlYtypfI9MF5TEIP9/q6aowjMwnYUfA18A8ekWjB+jescGVXM9AHT8IZlt0PHY9l4lmuIve3lDQ==" sparkle:shortVersionString="2.6.0" sparkle:version="2.6.0" type="application/octet-stream" url="https://lunar.fyi/download/2.6.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add customizable location coordinates</li><li>Move updates to new domain: <a href="https://lunar.fyi">lunar.fyi</a></li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.8.0</title>
+            <pubDate>Wed, 12 Jun 2019 20:41:06 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14205949" sparkle:dsaSignature="MEQCIDgD/4YlrQY5HjT7mQv1++niMsXo6uToZSooCfe7YmQNAiAfE9QqpO4a4/gaah42Omv8Thy9YGf9kKtOtIFnbLjKMA==" sparkle:edSignature="FpPpFSCYC/YgSDY9Lryl/FQP1SyOaGnQKRSt/7n2NnnHS9yypyxhFhioYGa25f7f3x0RVyaUAzEbZMahpsK8Dw==" sparkle:shortVersionString="2.8.0" sparkle:version="2.8.0" type="application/octet-stream" url="https://lunar.fyi/download/2.8.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Make the UI larger to allow for more info and settings</li><li>Add more annotations on the brightness chart</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix cases where the UUID can't be allocated</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.8.1</title>
+            <pubDate>Thu, 13 Jun 2019 13:09:31 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14205987" sparkle:dsaSignature="MEQCIGxtLdAbhJM5UCX/lZTqq8QmhQ5z9cp3uY3K4UpBKjeyAiBCVMEOl8HanuaBf/JDym0g9V4rk/X9MKBpj3W1fBJ8aA==" sparkle:edSignature="jCpZjsnqhSNAzTlgWBs3qugmYDTkVrT9LCZ3CrbukxCu7yB4rxFFwt9kl8dMPdjZUTlSM1y/OKlawPWvdexyCg==" sparkle:shortVersionString="2.8.1" sparkle:version="2.8.1" type="application/octet-stream" url="https://lunar.fyi/download/2.8.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix another case where UUID can't be allocated</li><li>Fix display name detection</li><li>Allow new monitor data to overwrite cached db rows</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.8.2</title>
+            <pubDate>Fri, 14 Jun 2019 00:41:56 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="14205597" sparkle:dsaSignature="MEQCIGP4KbRQ7CAh4PLJyer0ExTuqANLX+JQev9GvxQ1RTRMAiAD21JycDd3QfFo9rYgxE+uE6inDscj+zKrNvMurtWSqQ==" sparkle:edSignature="fSbD6lKfYwNvE9WKh27vIGlzFcb6C6ik1z7eDm4S/0Jxo29Jr4Y5q/KsmCls7NBnQ3tYMVLRTIzAr0dAb54CCQ==" sparkle:shortVersionString="2.8.2" sparkle:version="2.8.2" type="application/octet-stream" url="https://lunar.fyi/download/2.8.2"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix memory management of EDID data</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.8.3</title>
+            <pubDate>Mon, 17 Jun 2019 01:20:21 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13888879" sparkle:dsaSignature="MEUCIQCP86QLM0GXYToXpj9C9u4lVEGLHV+joEsBYOuMxfXGyQIgQCqvc/sqDJh8ipp86DYH4sWqHP7cRVOgmsPT9yezeW0=" sparkle:edSignature="xQA4e8RwPf/xfnlH7EbDzoF205dhT6aqzWewRTgj3B7/1EOnKHLsfgAuR8TtTRodloXvd/MhPFXv+f4wWvD7BA==" sparkle:shortVersionString="2.8.3" sparkle:version="2.8.3" type="application/octet-stream" url="https://lunar.fyi/download/2.8.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix data store merge policy</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add help buttons with popovers for explaining settings and modes</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.0</title>
+            <pubDate>Wed, 23 Oct 2019 21:49:08 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13551871" sparkle:dsaSignature="MEQCIF+BcVx/m4tH1HtNXZFOWfkyXb62TI9HKOb9NKaxcXpkAiByuaL279+kqlEDxxUbJA/Qt8rTHHQWu6nlgkX0Bs+JQA==" sparkle:edSignature="oKvzcD57AKB9TFZXGZODy8Vfo4Do5ry4PGti4JO24FuHM3FyzYdF+CiG1w5YLl7WDp01S1xRyT6dyvp67Z9dAA==" sparkle:shortVersionString="2.9.0" sparkle:version="2.9.0" type="application/octet-stream" url="https://lunar.fyi/download/2.9.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Lunar is now notarized and signed with a certificate bought from your donations! Thanks everyone!</li><li>Added a polling interval in the Sync mode to adjust how fast Lunar syncs the built-in display brightness</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix <code>Start at Login</code>functionality</li><li>The available settings now change instantly when you change the mode</li><li>Settings should save properly now</li><li>Fix a few crashes in the C code for DDC (still a few to go, but new job, less time..)</li></ul><h2 id="improvements">Improvements</h2><ul><li>Change help popovers font to something more legible</li><li>Make help links clickable (somewhat)</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.1</title>
+            <pubDate>Sun, 01 Dec 2019 20:59:52 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13777773" sparkle:dsaSignature="MEYCIQCcF/uhEjkpey59BEyaRb+53R163K4CN5YZR4Ne8Rq2bAIhAJrw7GnEsga78HEmtNk0Nw9os1k9JlMDFEFiOhDhAvwD" sparkle:edSignature="FREzC3mMdTImvqF5cI83wIbo0JtLgWaTxqdYCy3DBIlV41WWeSbuymIBi76w1B0Ya3jiX6zX3LsV9hxcQa+PAg==" sparkle:shortVersionString="2.9.1" sparkle:version="2.9.1" type="application/octet-stream" url="https://lunar.fyi/download/2.9.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Quick Actions popover when hovering over the menu item</li><li>Add support for LG UltraFine displays</li><li>Implement Clamshell Mode</li><li>Keep Lunar in sync by reading the monitor's brightness and contrast periodically</li><li>Remove all third party analytics and add a single request for counting unique users anonymously<ul><li>This request sends a SHA256 hash of your device serial number to my server through a pubsub service</li><li>The serial number is impossible to deduce from the hash and the request is untraceable back to your device</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix left and right hotkeys not being registered sometimes</li><li>Patch Magnet to disable Input Monitoring request</li><li>Fix preferences saving permission</li><li>Fix dictionary access race condition in DDC code</li></ul><h2 id="improvements">Improvements</h2><ul><li>Replace Fabric with Sentry for crash reporting because Fabric was acquired by Google</li><li>Remove HotKey library and rely only on the Magnet framework</li><li>Add sane defaults for brightness/contrast limits and offsets</li><li>Improve speed and responsiveness by using concurrent tasks where possible</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.3</title>
+            <pubDate>Mon, 02 Dec 2019 00:44:56 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13785485" sparkle:dsaSignature="MEQCICFOk5C+t2wwx/tv0M0JdzQ7MA/hqV9wD9lny9FsL3bwAiB0ywj+xKvssW9YIjE4pG+Z2PPlsKeLmR9l7JMyd48PQw==" sparkle:edSignature="Gn2sVouP3OZX2q3F/oVLZwy/YAOKztgrc0bjgpnL0XlmzH3LJ5WB5wvqbzXk+1Ar5pIri0mFSFXQ6bySLKYJBw==" sparkle:shortVersionString="2.9.3" sparkle:version="2.9.3" type="application/octet-stream" url="https://lunar.fyi/download/2.9.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix system freeze caused by trying to read monitor brightness using DDC</li><li>Fix Manual mode values not respecting limits</li></ul><h2 id="improvements">Improvements</h2><ul><li>Show Quick Actions when changing brightness/contrast using hotkeys</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.4</title>
+            <pubDate>Mon, 02 Dec 2019 13:18:58 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13803447" sparkle:dsaSignature="MEQCIG/Hz1X9n2ADBpURuxB1ciQqVcfyTPpe2KQ+RIHhNFSMAiB3P8vx+5e4dv+VwvYYSAm3rdUx8yGTnbGwxBMLPrpzIw==" sparkle:edSignature="u2c91p88t1GJ9Fiy7g4aTbEEqzGd1TP5KJiOMrcCFp3/NwmbLkBzwE1Osv/a4d2ekv6Qs8ikVZ088U5d3MejBA==" sparkle:shortVersionString="2.9.4" sparkle:version="2.9.4" type="application/octet-stream" url="https://lunar.fyi/download/2.9.4"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix lid closed detection on iMacs and Mac Minis</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add more crash data to allow me to better diagnose issues remotely</li><li>Make transitions smooth by default on UltraFine displays</li><li>Read brightness periodically by default on UltraFine displays</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.5</title>
+            <pubDate>Mon, 02 Dec 2019 16:29:40 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13798518" sparkle:dsaSignature="MEQCIE0CRYWdiQLLKzd33NWhR0/rW13lzYsOpmW+kh9kVL6VAiBbRg4EpB8oxIxO7wEcYVvnKPXdekp7MY2UuV9tFC2GYA==" sparkle:edSignature="G2HDaBZoZltJgNRTA/USkBzLkLkeBtofJIzOn7hgoDgiKek3yivOu6Sp9FKPjkvEZ0exijaJfqmO//SKZoHCDw==" sparkle:shortVersionString="2.9.5" sparkle:version="2.9.5" type="application/octet-stream" url="https://lunar.fyi/download/2.9.5"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add option to disable Quick Actions popover</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.6</title>
+            <pubDate>Wed, 04 Dec 2019 15:08:21 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="10588992" sparkle:dsaSignature="MEUCIQCmOzzhfvDrtjZCWbMq5DLyLX0jHd/dRWg3SZixnUZeMwIgMGO6AM8mpK90xNZxVPL/aY0iy6VRgGZwjNSy48s0vHs=" sparkle:edSignature="sACZqTgm73U5BiheQXZhMSZsRAOa8QfcG1SymcjH2myDjK7dr3eNDyoJDpmwG9d2Y003oqI76Uq2RnDOaRaWCw==" sparkle:shortVersionString="2.9.6" sparkle:version="2.9.6" type="application/octet-stream" url="https://lunar.fyi/download/2.9.6"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Show both connected and disconnected displays in Quick Actions</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix all kinds of crashes</li></ul><h2 id="improvements">Improvements</h2><ul><li>Move display and app exceptions from Core Data to User Defaults to avoid concurrency bugs</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.7</title>
+            <pubDate>Wed, 04 Dec 2019 18:04:17 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13852546" sparkle:dsaSignature="MEQCIFssfCC4zCri/fp8nafiWUSWg1zto8ZuZgSoC/7n+agXAiA3DzA2F/L9tQR2mtXUUZxhdVl3DSsPMcl6rQi/zJX09w==" sparkle:edSignature="PI+nQtkHqAWqQ1tXUMY99WY+7T++/4v5deM3Tqb/h0JOrQS97hU+ZlULYKyicD8StCszgMCi0JhyDo12CEqzBw==" sparkle:shortVersionString="2.9.7" sparkle:version="2.9.7" type="application/octet-stream" url="https://lunar.fyi/download/2.9.7"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add special support for Apple Thunderbolt Display</li><li>Add option to manually enable brightness monitoring (only for the brave)</li></ul><h2 id="fixes">Fixes</h2><ul><li>Filter out built-in and testing displays from saved data</li></ul><h2 id="improvements">Improvements</h2><ul><li>Make an attempt to detect slow DDC implementations and skip reading in those cases</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.8</title>
+            <pubDate>Thu, 05 Dec 2019 18:36:01 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="10601753" sparkle:dsaSignature="MEQCIEKmUthotGFppxpH39sZr8si6FfUCfU5LSrcHLv+8xNiAiBW0o2YlkVBtQ4nNlqQp+x9X49ARbAH08L1rlPuPjpMqg==" sparkle:edSignature="8RkZw9AlXjouFFoXfYU5jjs9B+YG0vQjucVqjyzXCnnY5+VvVYvvbwSyRrbYCuFYrM7mCkpHZfMLO4KoQoYiDg==" sparkle:shortVersionString="2.9.8" sparkle:version="2.9.8" type="application/octet-stream" url="https://lunar.fyi/download/2.9.8"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add option to remove disconnected displays from the Quick Actions popover</li><li>Better detection of builtin displays</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix a memory corruption bug</li></ul><h2 id="improvements">Improvements</h2><ul><li>Improve detection of slow DDC implementations</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.9</title>
+            <pubDate>Fri, 06 Dec 2019 11:48:49 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13866393" sparkle:dsaSignature="MEUCIBKtF3KTFfKn/Ede5S+sDPDcB4xhUpqBtge5zn8l6VfRAiEAo83Op1oy7gKytzb4CCoiGg3kkQPp6QKFwAzPALd4q9o=" sparkle:edSignature="qCwAjE+eZd369n7NgATJaQrNXMj2i3I4bEjJ887QsLjU/xVKj2m/h5YxuIrJcZaEYWpv4Ih8NejATc7qb6n1AQ==" sparkle:shortVersionString="2.9.9" sparkle:version="2.9.9" type="application/octet-stream" url="https://lunar.fyi/download/2.9.9"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Minimize non-null assertions</li><li>Fix Day Length calculation in Location mode</li><li>Fix "end scrolling" detection</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>2.9.10</title>
+            <pubDate>Fri, 06 Dec 2019 22:42:33 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <enclosure length="13868489" sparkle:dsaSignature="MEQCICAhvZDk76mstH5a1O0aDYYY0cp5iaDTSOJKcBLFbyRFAiAF6Asiri5F0DNYz9MGheed7++hA1GyWwjtHZtwoTP7pA==" sparkle:edSignature="x/XPNVae+BYe+w2TOUt4CYvXXN7zt5CsrJwB3PR+zKS5GpVp+exemuR9VNWnHbcdEz8NnaY/R9dPGeQSMBzSCQ==" sparkle:shortVersionString="2.9.10" sparkle:version="2.9.10" type="application/octet-stream" url="https://lunar.fyi/download/2.9.10"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Clamshell mode detection toggle in menu</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.0.0</title>
+            <pubDate>Fri, 28 Feb 2020 12:15:36 +0100</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13470178" sparkle:dsaSignature="MEUCIDYLGRIytmN+uxXbInoDAlW4CIOfInq5thglac1SSXm6AiEAqZNh82TmmBYdEeiUUDlikAhvkIrjRQFUo1uNXkhQP1E=" sparkle:edSignature="GonkzjX7smJAYbHXUVvfSmBoIRg471lGBf2FPE3+nbGmAOypnkKMcgo6+ACUNNLqxr5F70Fl+0w2Awsox3pGDQ==" sparkle:shortVersionString="3.0.0" sparkle:version="3.0.0" type="application/octet-stream" url="https://lunar.fyi/download/3.0.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add support for changing monitor volume and mute state</li><li>Show native OSD when changing monitor brightness, contrast and volume</li><li>Implement listeners for media keys<ul><li>Lunar will ask for accessibility permissions to enable this functionality</li><li>Instructions: <ul><li>Press keyboard brightness keys while the cursor is on an external monitor to change the brightness on that monitor </li><li>Press Control + keyboard brightness keys to adjust contrast </li><li>Press keyboard volume/mute keys while the audio output is set to the monitor audio device to adjust volume/mute</li><li>In multi-monitor setups, Lunar can't detect which monitor audio device is selected so it will change the volume of the display that the cursor is on</li></ul></li></ul></li><li>Many thanks to Hongfeng Xu (@Mic238) for helping me with extensive testing on these features!</li></ul><h2 id="improvements">Improvements</h2><ul><li>Detect non-responsive monitors and show that in the Quick Actions popover</li><li>Automatic detection of GPU for adaptive DDC reply delay<ul><li>This should minimize kernel panics and system freezes when reading values from the monitor</li></ul></li><li>Add special brightness implementation for <strong>LED Cinema</strong>monitors </li></ul><h2 id="fixes">Fixes</h2><ul><li>Fixed a typo that was preventing smooth transition to be disabled for contrast</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.0</title>
+            <pubDate>Thu, 05 Mar 2020 12:59:47 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13478605" sparkle:dsaSignature="MEQCIH/Tupi3GnpTULV4nx3QwhexzUyqHAxBIFMX360kKehuAiBVhqKqnfBeORUYUynT9aonw/Kq8Mi0D5xJ4Nw9KwF3zw==" sparkle:edSignature="RmELOeSgCuuBqapiI2Mc2MwqVXNjW8FrZA/hZyIZWm8cSOhtl6PmxXanwK8ah7TgjTPBO8mhTADoMDaNdNYzCQ==" sparkle:shortVersionString="3.1.0" sparkle:version="3.1.0" type="application/octet-stream" url="https://lunar.fyi/download/3.1.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Make active screen detection more reliable</li><li>Only allow one thread at a time to use DDC to avoid race conditions</li><li>Disable up/down value change hotkeys when Quick Actions disappear</li><li>Embed all used Swift libraries to avoid crashes on some systems</li></ul><h2 id="improvements">Improvements</h2><ul><li>Increase brightness/contrast/volume hotkey step to 6</li><li>Allow fine-adjustment hotkeys:<ul><li>Use Option + hotkey for hotkeys assigned from the Lunar hotkey page</li><li>Use Option + Shift + hotkey for media keys</li></ul></li><li>Open System Preferences for displays/sound when pressing Option + media key</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.1</title>
+            <pubDate>Tue, 17 Mar 2020 12:23:19 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13471701" sparkle:dsaSignature="MEQCIGYHw+IaT4EGkDGGw8fyuN19ijLMxgFHfVF7gjksETNiAiAN9tNiC4O66/AW5BZmPU0vHVeFHij3INFjFdFIKSGJpQ==" sparkle:edSignature="dbu/T6N1mtaofnR6KDOd0eaD/USgE9OwS+d6Wny5fNRoOQR4dL6JTqeqcf9eCRxgmolJpFmpx8Ylfa3wzr2wAg==" sparkle:shortVersionString="3.1.1" sparkle:version="3.1.1" type="application/octet-stream" url="https://lunar.fyi/download/3.1.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix some memory corruption bugs by improving concurrency</li><li>Properly hide/show the <code>Non-responsive DDC</code>message</li><li>Fix diagnostics encryption key missing</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add <em>reset on click</em>action to the <code>Non-responsive DDC</code>message</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.2</title>
+            <pubDate>Sat, 21 Mar 2020 13:53:06 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13565026" sparkle:dsaSignature="MEUCIGsyjHfQ9PpglPmrOnghudB+AwfzuQar3j95aRIQDAvFAiEAhqu9uYIGMYv5dq66Jgrjm4Nrom6m/iu8ni+jZSw+0Bs=" sparkle:edSignature="a9Ax2pD0j+Ew2mOJ8KbB1U6Axs8UywTlgJwKOpTtcurguild2QG6hMj9WkwDfT0tb5lo0Spj31LX2nqv++HLDg==" sparkle:shortVersionString="3.1.2" sparkle:version="3.1.2" type="application/octet-stream" url="https://lunar.fyi/download/3.1.2"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix crash when there are displays with same UUID</li><li>Fix crash on MediaKeyTap deinit</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add a way to extend brightness range up to 255 for monitors that support this</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.3</title>
+            <pubDate>Sat, 28 Mar 2020 21:25:38 +0200</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13564171" sparkle:dsaSignature="MEQCIHQ15BPtCIlcrXNv7ToDrumG/OjqCyw96+BmkrMRjYW+AiB+JdYH42FZKaUT2s1y94iFMXhJvefsCkJbW65zRvoVyw==" sparkle:edSignature="n9gkbEoCNPmkX7JRMSx53xIFGP6bOxpFW3o/HQqYEuFBWqRZFUo+WiIPveMz/Q4JMQlLBxeCtjVBgEEMWKVcBQ==" sparkle:shortVersionString="3.1.3" sparkle:version="3.1.3" type="application/octet-stream" url="https://lunar.fyi/download/3.1.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix Sync mode thread not running on some occasions</li></ul><h2 id="improvements">Improvements</h2><ul><li>Disable Adaptive button in Manual mode</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.4</title>
+            <pubDate>Tue, 31 Mar 2020 23:24:32 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="16462968" sparkle:dsaSignature="MEQCIAlx5Pu0L+xkgTOVMX9Con6l441RIypJistfurjrt69XAiBcfOCOwdo7wINbQUi2b6ECzgeqmpLikHHfMUT9VFmyYQ==" sparkle:edSignature="DjPh/0BlsmaOxWVboU0L3/aeww2WPPe7aepBKvhw00dpyJduuvGWJV+xVQ3jfCWWChqFGhNP76hI+vjI+G49Cw==" sparkle:shortVersionString="3.1.4" sparkle:version="3.1.4" type="application/octet-stream" url="https://lunar.fyi/download/3.1.4"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Hide buttons and labels properly when no display is connected</li><li>Fix a ton of memory leaks</li><li>Fix volume keys not being able to be disabled</li></ul><h2 id="improvements">Improvements</h2><ul><li>Show Lunar version in the menu</li><li>Hide rarely used menu items under an <b>Advanced</b>submenu item</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.1.5</title>
+            <pubDate>Mon, 13 Apr 2020 20:02:47 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="16286468" sparkle:dsaSignature="MEQCIE1SD3mIYVpT8C05tlSek6zduwV4g0gelRuGXmPmPvM/AiBoeV/3FvkCXweWnO9VURTI3xvL9u+S8JS/z5bb2FKZ8A==" sparkle:edSignature="ZEYUNDO43ULdngC2iYYkzc1vd15tqqmBsOalmowOfs0b09nnrUrxTyd+/81KxuIPriOgAYx4WyLpVxmPDLeJDw==" sparkle:shortVersionString="3.1.5" sparkle:version="3.1.5" type="application/octet-stream" url="https://lunar.fyi/download/3.1.5"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Implement built-in brightness clipping limits for monitors with lower range of brightness/contrast</li><li>Add a menu item to allow disabling volume key listener</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix Location Permissions prompt not showing up on macOS Catalina</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add a bit more analytics data and route the requests through my own server</li><li>Upload diagnostics to my own server instead of transfer.sh</li><li>Reduce memory usage by manually deallocating unused views</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.2.0</title>
+            <pubDate>Thu, 23 Apr 2020 14:08:19 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="16286076" sparkle:dsaSignature="MEUCIHY/wOISxYFVv4tePSCQLAp3AlMLjWBEyeI7ddzg2UKiAiEAn2uRrDuy81gVwD/Ffd6MXo5PgJtbXtmXcYFdM47w/Sw=" sparkle:edSignature="gCH1saIZC92oOK2ovAR4E+hA5V8K9oFQx6bXwou35XJv8axpiTkdZriABpvbDX2v+/gDqnNfCWD6TqhdZJBzDQ==" sparkle:shortVersionString="3.2.0" sparkle:version="3.2.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix monitor volume restore</li><li>Fix crashes because of using deallocated self</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.2.1</title>
+            <pubDate>Fri, 24 Apr 2020 14:07:50 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="13049255" sparkle:dsaSignature="MEUCIQCcpevbkXqdjxxUVtL+9jwBWgcEYUvq1xLvasD+aoG94QIgaDX7RTUpSnBgRdVNoNj9wCYkjPCdy9sgsYuMz5asKvM=" sparkle:edSignature="g6NG/WpH3Vy8GOOqRH5ePXM3KXdmL5oVslbuKvg6SFb8WkjHV5zuStqGiG28iRJ0tL58qnDHTSS2LdnU5oSlDg==" sparkle:shortVersionString="3.2.1" sparkle:version="3.2.1" type="application/octet-stream" url="https://lunar.fyi/download/3.2.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Make display name editable</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.2.2</title>
+            <pubDate>Tue, 28 Apr 2020 22:12:39 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="16300358" sparkle:dsaSignature="MEUCIQCjme2DBQb24JesBRTlVminoj+rJi4YeGmU4ALfrUochwIgV2JytoujKIalihU282KN0+ytEfYoi7uZzqW4DxcwWDY=" sparkle:edSignature="vkLh4a+Bdqg+uP9XDE4y8j0T1Zo43foMM5PbFvXFrrO86LiUykJv0epd2TmEXIOt/6Nw3i7rAKPSWqHjfTn3Dg==" sparkle:shortVersionString="3.2.2" sparkle:version="3.2.2" type="application/octet-stream" url="https://lunar.fyi/download/3.2.2"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix tooltip not closing when clicking on the display page</li></ul><h2 id="improvements">Improvements</h2><ul><li>Detect scrolling direction so that scrolling up always increases value</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>3.2.3</title>
+            <pubDate>Tue, 05 May 2020 20:48:53 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="3.2.3" sparkle:version="3.2.3" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Show built-in brightness in menu</li><li>Update hotkey libraries</li><li>Use Swift Package Manager for most of the frameworks</li><li>Use LaunchAtLogin framework to fix start at login</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>4.0.0-alpha.1</title>
+            <pubDate>Mon, 26 Apr 2021 21:23:47 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="18519757" sparkle:dsaSignature="MEUCIQChroSHuBOOSrSZbt7WMENHmE3WiPl7tzznT+SjqIYP+wIgPDwWjGksThBieoWzUOLjhOpuniabpc5iNukt7bT+oiI=" sparkle:edSignature="wElN0Cni8BzGRUkraYC8aZ5AJRUS+3tgwR4TGJS3kVBxp5GQcc0g4E4FN5CHV9DoQmIMl2dAM4VxliC5k4oSDQ==" sparkle:shortVersionString="4.0.0-alpha.1" sparkle:version="4.0.0-alpha.1" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0-alpha.1"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="features">Features</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
+            </description>
+            <signature>xQEA/Sz8bzh00qIhNGOvgH9jKFk=</signature>
+        </item>
+        <item>
+            <title>4.0.0-alpha.2</title>
+            <pubDate>Thu, 29 Apr 2021 11:25:20 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="21825220" sparkle:dsaSignature="MEQCIHy1BPQ9eI9vZbFTUm9Zx0LffwfXopYoru5XAm3Ecsz6AiBgwL6OZkyqjDYb4nMM6gmMDwuaGeDiGPb2XuEUb9bmRw==" sparkle:edSignature="vYsc0OQIDB11p8/4yhB3VpitJqsFuZ2ryV+E8dmnDfh1tyuqH+RoqQs/LTpIuXNnug6CAuQF1mJXoGXFINPiAw==" sparkle:shortVersionString="4.0.0-alpha.2" sparkle:version="4.0.0-alpha.2" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0-alpha.2"/>
+            <signature>s0wUqwBDCy8cr9MIoRF6vpcGrCM=</signature>
+        </item>
+        <item>
+            <title>4.0.0-alpha.3</title>
+            <pubDate>Fri, 30 Apr 2021 00:31:37 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="21983879" sparkle:dsaSignature="MEUCIFjvnuVjVjxBm55vQyzmHTGHivOqNgafm6QNbjzYjtz8AiEAi7SC0v4tMygdS/Fi86O0mf8ho11g2qgD966pu9Wu39c=" sparkle:edSignature="qwidoILDHNS36JdVzwQ4nPoj8/hs+UCtikC2q6u5WBAeoQ4vsPVQJRWjujdcf6vH2oLQ9u0G06hnCLunkjBCBg==" sparkle:shortVersionString="4.0.0-alpha.3" sparkle:version="4.0.0-alpha.3" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0-alpha.3"/>
+            <signature>nGEdBYdMx00L4V4O9vw58ONmaGs=</signature>
+        </item>
+        <item>
+            <title>4.0.0-alpha.4</title>
+            <pubDate>Fri, 30 Apr 2021 13:26:31 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="21975766" sparkle:dsaSignature="MEUCIA802YBKdIdE4R9Pijjf5sgCG2hUXnyuCjBtNq8d6qjWAiEAm8Q6YS4kkBPb03W9x0sA+/dPtdCC67pyrDBQnJ6qaMI=" sparkle:edSignature="iJx4pqTWxpc98k+Mz4tXmQwewzuWmazx7xGqJGAZ/4hRHpW5cc7WudRMeq/RzjDNcpvR0bCWr3uUYF97IYw2CQ==" sparkle:shortVersionString="4.0.0-alpha.4" sparkle:version="4.0.0-alpha.4" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0-alpha.4"/>
+            <signature>W/BU1DmupILWyCdNxNsUUy3YjI8=</signature>
+        </item>
+        <item>
+            <title>4.0.0.5</title>
+            <pubDate>Sun, 02 May 2021 21:13:18 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="22116360" sparkle:dsaSignature="MEQCICpRcy7bi0setmv+ny6UIXPmUWAw9tWuP7kq+t1oX8i8AiAzATAtDHLeLA2W2D6/4rVebIQoRsk0SVgQzTdqbjnJJg==" sparkle:edSignature="2KH096poI7l7POk2hVebnB5vUfNd5B5Z8N32f9aEqdalluJG2GL7lRZr9bxOjN9+K68rOquYgqMLsRpKezaQCg==" sparkle:shortVersionString="4.0.0.5" sparkle:version="4.0.0.5" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.5"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }  code { color: #f23343; }  a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="features">Features</h2><ul><li>Complete CLI integration
+
+                <ul><li><code>lunar ddcctl</code>can now call directly into <code>ddcctl</code>without having to compile or install any binary</li><li><code>lunar ddc</code>will use Lunar&rsquo;s own DDC implementation to control monitors</li></ul></li><li>Option to make the brightness keys control all monitors at once instead of just the active one (on the <strong>Hotkeys</strong>page)</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fixed DDC implementation for Intel based Macs</li></ul><h2 id="improvements">Improvements</h2><ul><li>Media keys settings are now on the <strong>Hotkeys</strong>page</li><li>The <em>Network controller found</em>dialog appears inside the SSH Installer window to avoid looking around for windows</li><li>The <code>Pro</code>tag under the logo now shows <code>Invalid App Signature</code>if the Lunar.app bundle has been modified in any way</li></ul></div></div>]]>
+            </description>
+            <signature>JXQNkZLXYwt+MRAZXvfbFl5ubFs=</signature>
+            <signature>2ejvXso+o5M0C3HF9ZSNrku1q8Y=</signature>
+        </item>
+        <item>
+            <title>4.0.0.6</title>
+            <pubDate>Sun, 07 May 2021 18:40:18 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="23761538" sparkle:dsaSignature="MEYCIQCpPBRpHBsMqbkgmmAJmBdfMUHnFxCE8aQ868DOPW3T0QIhAKpxHmq4O6bG5mocuiDzzD8kmhekLGXFFFgC4EjXjhnm" sparkle:edSignature="+sJlmi+4ZOg09RpimLoVDuI7OnZmFsD5Sb9iBuFAfKzh04G+xms8VDkRQXXXJHzrdfrxdHNH6wIaWFQCCk6IAQ==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.6" sparkle:version="4.0.0.6" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.6"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }  code { color: #f23343; }  a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>The app identifier changed from <code>site.lunarapp.Lunar</code>to <code>fyi.lunar.Lunar</code></li><li>The adjustment limit should now be enforced only in free mode</li><li>Fix a few crashes</li><li>Fix location fetching</li></ul><h2 id="improvements">Improvements</h2><ul><li>Hidden the Extended Brightness Range setting to minimize the amount of support emails about why the brightness maxes out at 39%</li><li>Added help text to make it clearer what the Hotkey for switching input does</li></ul></div></div>]]>
+            </description>
+            <signature>ffDBZnbsv2b71jKK0717LG2L0oQ=</signature>
+            <signature>gEzASV0UXNY5CXN1PYqEqufJ4Tg=</signature>
+        </item>
+        <item>
+            <title>4.0.0.7</title>
+            <pubDate>Wed, 12 May 2021 21:52:27 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="22921576" sparkle:dsaSignature="MEQCIGlSeRiQJ16533k+26DB/ET+/P5agKGdfdibEY4xTQw2AiA6oVznVk3UPXgwAJ8cbEPIEqKv1Q7P0D2Bo+fVA4y5cA==" sparkle:edSignature="oRvV/m5a1rPHqK9wIQds+j4AQsZ1AG4MbqweZ4Ke9vJfVM/08CKZ7DY+onn9+wShQfTJ73cf8a3pYn4+Ahr5DA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.7" sparkle:version="4.0.0.7" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.7"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }  code { color: #f23343; }  a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix crash caused by updating layout on non-main thread</li><li>Make sure to store data points for auto-learning when using the menu popover</li><li>Fix menubar popover being a bit too wide and causing UI glitches</li><li>Disable curve factor until I figure out how to take advantage of it without breaking the auto-learning algorithm</li></ul><h2 id="improvements">Improvements</h2><ul><li>Inline critical functions</li><li>Improve how hotkeys work: <a href="https://gist.github.com/alin23/1754033b01439346cf918ed88a7863c4">Details</a></li></ul></div></div>]]>
+            </description>
+            <signature>c+5Q2svJV4hTbdhG1RTtOk9lR58=</signature>
+            <signature>kgzXncirNTnWcIoWYoQ3Cv3NSIY=</signature>
+        </item>
+        <item>
+            <title>4.0.0.8</title>
+            <pubDate>Wed, 18 May 2021 21:52:27 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="22921576" sparkle:dsaSignature="MEQCIDMvQepG+MzDrQXhk7QACJyLRixFgD8kOn5v6jFEmoEaAiAXiKMR4aGwVcjtjJDYLA/WqAgxwe+qmeEq/qT0odP4Ag==" sparkle:edSignature="oRvV/m5a1rPHqK9wIQds+j4AQsZ1AG4MbqweZ4Ke9vJfVM/08CKZ7DY+onn9+wShQfTJ73cf8a3pYn4+Ahr5DA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.7" sparkle:version="4.0.0.7" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.7"/>
+            <signature>cGc/EVDN1epXkE5KRkj5eyTC7QA=</signature>
+            <signature>kjGdmeWMHTYsnFVW7fThoY4fLcU=</signature>
+            <signature>ZYQbYGdI/FPz82WilKhScZNwi70=</signature>
+            <signature>Xdrai71aNGVwowxXuqx6roJGJ8Q=</signature>
+            <signature>5Qiwnp/ovx8A6W9BhCCof8R4lkU=</signature>
+            <signature>5oAv/xeuCN5zBUXOIAVJnyIFBqU=</signature>
+        </item>
+        <item>
+            <title>4.0.0.9</title>
+            <pubDate>Fri, 21 May 2021 15:11:46 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="23266023" sparkle:dsaSignature="MEUCIAYZpvpDaD/vf+BXqexT1nwYXyI6LzuoVhgq4bVH6+IIAiEAhyxSHJO6HCu82LAaFTYQQ9XY9SF/lZSor2165EA6Y6I=" sparkle:edSignature="Duu28strmYf6aXqJTznlOtfGUksHVqe5yRCgIs0gA/TdFS9F29HsSgJ3vUJaa0xUu94Ak9LxlbV9RkvwwcLGAA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.9" sparkle:version="4.0.0.9" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.9"/>
+            <description>
+                <![CDATA[<div><style>* {font-family: Menlo, monospace; } code {color: #f23343; } a {color: #1DA1F2; } a:hover {color: #0077b5; } h2#features {color: #EDB44B; } h2#improvements {color: #515193; } h2#fixes {color: #E14283; } li {font-size: 13px; } </style><div><h2 id="features">FaceLight!!</h2><p><b>Light up your face when doing video calls in your dungeon! Because why not?</b></p><h2 id="features">Features</h2><ul><li>Diagnostics screen, finally</li><li>DDC limits per brightness/contrast/volume</li></ul><h2 id="fixes">Fixes</h2><ul><li>Uhm, I don't know.. fixes..</li></ul></div></div>]]>
+            </description>
+            <signature>bJOpGin6Q3HgcuDQNRZ/D2XgCUE=</signature>
+            <signature>wujrgpcQUBL6gEPtXi+YHFI2b9Y=</signature>
+        </item>
+        <item>
+            <title>4.0.0.10</title>
+            <pubDate>Sat, 22 May 2021 10:13:37 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="23289710" sparkle:dsaSignature="MEUCIQCcNIlTLW8cUU+BQw6Okkf2Ry75GKgkwqyiHwrvvk6cFQIgGyyxbl2rpbN6HyenFj1d84ly6gFvxEuvDA3Mqzjxx7A=" sparkle:edSignature="OkOC4wHz5dM09RgMxzVU9l3OYQQ9aYgLvsrfa/YdCqBtML/Rx3bej3JO9eS46viGUWvyWRlebvXmSyi6f+jdCg==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.10" sparkle:version="4.0.0.10" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0.10"/>
+            <description>
+                <![CDATA[<div><style>* {font-family: Menlo, monospace; } code {color: #f23343; } a {color: #1DA1F2; } a:hover {color: #0077b5; } h2#features {color: #EDB44B; } h2#improvements {color: #515193; } h2#fixes {color: #E14283; } li {font-size: 13px; } </style><div><h2 id="fixes">Fixes</h2><ul><li>So. many. fixes...</li><li>Will this ever end??</li></ul></div></div>]]>
+            </description>
+            <signature>V6EJxRn/O4A0yScredTIBgpxVSc=</signature>
+            <signature>l7OCqTbOkJHlz3KqBPvFqzhXRPE=</signature>
+        </item>
+        <item>
+            <title>4.0.0.11</title>
+            <pubDate>Sat, 22 May 2021 10:38:10 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="23289901" sparkle:dsaSignature="MEQCIA/Y+D9Xg0Gq66RiwFbmKWJHlMGZUl82Jgxxx81RXcGCAiAHM96Rw6TKGvNrKuZU2aLUfDLMIKM6FGBW2N7O7iRxqA==" sparkle:edSignature="IXnq3XY/ea+IEbQGnmrG2sgo1qtvgeuBnDEEH9Wx9PMguUR1ug/1d5UqWLkkWr69KKXj6O+SEHHpbQOpCRwiDw==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0.11" sparkle:version="4.0.0.11" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.0-alpha.11.vM8T2yJVW.pkg"/>
+            <description>
+                <![CDATA[<div><style>* {font-family: Menlo, monospace; } code {color: #f23343; } a {color: #1DA1F2; } a:hover {color: #0077b5; } h2#features {color: #EDB44B; } h2#improvements {color: #515193; } h2#fixes {color: #E14283; } li {font-size: 13px; } </style><div><h2 id="fixes">Fixes</h2><ul><li>Updater reporting invalid version incorrectly</li><li>Yep, this will never end.</li></ul></div></div>]]>
+            </description>
+            <signature>X9t3qjIm35dkX+yr4epIaqG9CVM=</signature>
+            <signature>IxadgUUgyEScWvlPkuqaI1+AqWg=</signature>
+            <signature>test-signature</signature>
+        </item>
+        <item>
+            <title>4.0.0</title>
+            <pubDate>Thu, 27 May 2021 23:57:47 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure length="23434398" sparkle:dsaSignature="MEQCIAcbb7XT5+NMCMyBEdVkMbDvkwS0U1FiEZ7sxG2FBHq8AiAy6iwHjJGtlajS7+okRJfittjsSJ2eauy7K5Rcpu/RRQ==" sparkle:edSignature="g+bOTqPL7f201ef2r0ADdHxyJTMZJ3yzrgmmLSRhETi66uAxfctEF/pHn+R3/GY6pn5e2VwcnbE0BDuPvcspDA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0" sparkle:version="4.0.0" type="application/octet-stream" url="https://lunar.fyi/download/4.0.0"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Lunar 4 has been released!</h2><h4>Head over to <a href="https://lunar.fyi">the official website</a> for more details.</h4></div>]]>
+            </description>
+            <signature>+fZVx8ZMFnunb79BW4BOWLE2P6U=</signature>
+            <signature>au/KXE/IUyFoixxS4sY4QqnuXKc=</signature>
+        </item>
+    </channel>
+</rss>

@@ -4,6 +4,6 @@ repos:
       - id: swiftformat
         name: swiftformat
         language: system
-        entry: swiftformat --wraparguments beforefirst --wrapcollections beforefirst
+        entry: swiftformat --wraparguments beforefirst --wrapcollections beforefirst --maxwidth 140
         types: [swift]
         pass_filenames: true

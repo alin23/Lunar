@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Beta</key>
+	<string>$(BETA)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -30,6 +32,10 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>ipstack.com</key>
@@ -41,8 +47,16 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Lunar needs AppleEvents permission to open specific preference panes and control Night Shift.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_ddcutil._tcp</string>
+	</array>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2017 Alin. All rights reserved.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Lunar uses the local network to find devices that can send DDC messages to your monitor when this Mac device doesn't have this ability</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Lunar needs location data to get sunrise and sunset times</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -56,10 +70,12 @@
 	<key>NSPrincipalClass</key>
 	<string>SentryCrashExceptionApplication</string>
 	<key>SUFeedURL</key>
-	<string>https://lunar.fyi/appcast.xml</string>
+	<string>$(APPCAST_URL)</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUPublicEDKey</key>
 	<string>lqnO6tg2A9evTIFo2SC9ArZ6NS84gtBshcAWdwh12xQ=</string>
+	<key>TestMode</key>
+	<string>$(TEST_MODE)</string>
 </dict>
 </plist>
