@@ -1,0 +1,15 @@
+[submodule "Frameworks/WAYWindow"]
+	path = Frameworks/WAYWindow
+	url = git@github.com:alin23/WAYWindow
+[submodule "Frameworks/NSPageControl"]
+	path = Frameworks/NSPageControl
+	url = git@github.com:nerd0geek1/NSPageControl
+[submodule "Frameworks/Sparkle"]
+	path = Frameworks/Sparkle
+	url = git@github.com:sparkle-project/Sparkle
+[submodule "Frameworks/MLKit"]
+	path = Frameworks/MLKit
+	url = git@github.com:Somnibyte/MLKit
+[submodule "Frameworks/Shout"]
+	path = Frameworks/Shout
+	url = git@github.com:alin23/Shout

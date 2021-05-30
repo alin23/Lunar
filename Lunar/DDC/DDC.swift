@@ -6,9 +6,11 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import ArgumentParser
 import Cocoa
 import CoreGraphics
 import Foundation
+import Regex
 
 let MAX_REQUESTS = 10
 let MAX_READ_DURATION_MS = 1500
@@ -31,7 +33,129 @@ enum EDIDTextType: UInt8 {
     case serial = 0xFF
 }
 
-enum ControlID: UInt8 {
+enum InputSource: UInt8, CaseIterable {
+    case vga1 = 1
+    case vga2 = 2
+    case dvi1 = 3
+    case dvi2 = 4
+    case compositeVideo1 = 5
+    case compositeVideo2 = 6
+    case sVideo1 = 7
+    case sVideo2 = 8
+    case tuner1 = 9
+    case tuner2 = 10
+    case tuner3 = 11
+    case componentVideoYPrPbYCrCb1 = 12
+    case componentVideoYPrPbYCrCb2 = 13
+    case componentVideoYPrPbYCrCb3 = 14
+    case displayPort1 = 15
+    case displayPort2 = 16
+    case hdmi1 = 17
+    case hdmi2 = 18
+    case usbC = 27
+    case unknown = 246
+
+    static var mostUsed: [InputSource] {
+        [.usbC, .displayPort1, .displayPort2, .hdmi1, .hdmi2]
+    }
+
+    static var leastUsed: [InputSource] {
+        [
+            .vga1,
+            .vga2,
+            .dvi1,
+            .dvi2,
+            .compositeVideo1,
+            .compositeVideo2,
+            .sVideo1,
+            .sVideo2,
+            .tuner1,
+            .tuner2,
+            .tuner3,
+            .componentVideoYPrPbYCrCb1,
+            .componentVideoYPrPbYCrCb2,
+            .componentVideoYPrPbYCrCb3,
+        ]
+    }
+
+    var str: String {
+        displayName()
+    }
+
+    func displayName() -> String {
+        switch self {
+        case .vga1: return "VGA 1"
+        case .vga2: return "VGA 2"
+        case .dvi1: return "DVI 1"
+        case .dvi2: return "DVI 2"
+        case .compositeVideo1: return "Composite video 1"
+        case .compositeVideo2: return "Composite video 2"
+        case .sVideo1: return "S-Video 1"
+        case .sVideo2: return "S-Video 2"
+        case .tuner1: return "Tuner 1"
+        case .tuner2: return "Tuner 2"
+        case .tuner3: return "Tuner 3"
+        case .componentVideoYPrPbYCrCb1: return "Component video (YPrPb/YCrCb) 1"
+        case .componentVideoYPrPbYCrCb2: return "Component video (YPrPb/YCrCb) 2"
+        case .componentVideoYPrPbYCrCb3: return "Component video (YPrPb/YCrCb) 3"
+        case .displayPort1: return "DisplayPort 1"
+        case .displayPort2: return "DisplayPort 2"
+        case .hdmi1: return "HDMI 1"
+        case .hdmi2: return "HDMI 2"
+        case .usbC: return "USB-C"
+        case .unknown: return "Unknown"
+        }
+    }
+
+    init?(stringValue: String) {
+        switch #"[^\w\s]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
+        case "vga": self = .vga1
+        case "vga1": self = .vga1
+        case "vga2": self = .vga2
+        case "dvi": self = .dvi1
+        case "dvi1": self = .dvi1
+        case "dvi2": self = .dvi2
+        case "composite": self = .compositeVideo1
+        case "compositevideo": self = .compositeVideo1
+        case "compositevideo1": self = .compositeVideo1
+        case "compositevideo2": self = .compositeVideo2
+        case "svideo": self = .sVideo1
+        case "svideo1": self = .sVideo1
+        case "svideo2": self = .sVideo2
+        case "tuner": self = .tuner1
+        case "tuner1": self = .tuner1
+        case "tuner2": self = .tuner2
+        case "tuner3": self = .tuner3
+        case "component": self = .componentVideoYPrPbYCrCb1
+        case "componentvideo": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb1": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb2": self = .componentVideoYPrPbYCrCb2
+        case "componentvideoyprpbycrcb3": self = .componentVideoYPrPbYCrCb3
+        case "dp": self = .displayPort1
+        case "minidp": self = .displayPort1
+        case "minidisplayport": self = .displayPort1
+        case "displayport": self = .displayPort1
+        case "displayport1": self = .displayPort1
+        case "displayport2": self = .displayPort2
+        case "hdmi": self = .hdmi1
+        case "hdmi1": self = .hdmi1
+        case "hdmi2": self = .hdmi2
+        case "thunderbolt": self = .usbC
+        case "thunderbolt3": self = .usbC
+        case "usbc": self = .usbC
+        case "unknown": self = .unknown
+        default:
+            return nil
+        }
+    }
+}
+
+let inputSourceMapping: [String: InputSource] = Dictionary(uniqueKeysWithValues: InputSource.allCases.map { input in
+    (input.displayName(), input)
+})
+
+enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
     case RESET = 0x04
     case RESET_BRIGHTNESS_AND_CONTRAST = 0x05
     case RESET_GEOMETRY = 0x06
@@ -79,56 +203,79 @@ enum ControlID: UInt8 {
     case TOP_RIGHT_SCREEN_PURITY = 0xE9
     case BOTTOM_LEFT_SCREEN_PURITY = 0xEA
     case BOTTOM_RIGHT_SCREEN_PURITY = 0xEB
-}
 
-extension Data {
-    func str(hex: Bool = false, separator: String = " ") -> String {
-        return map { $0 }.str(hex: hex, separator: separator)
-    }
-}
+    init?(argument: String) {
+        var arg = argument
+        if arg.starts(with: "0x") {
+            arg = String(arg.suffix(from: arg.index(arg.startIndex, offsetBy: 2)))
+        }
+        if arg.starts(with: "x") {
+            arg = String(arg.suffix(from: arg.index(after: arg.startIndex)))
+        }
+        if arg.count <= 2 {
+            guard let value = Int(arg, radix: 16),
+                  let control = ControlID(rawValue: value.u8)
+            else { return nil }
+            self = control
+        }
 
-extension Array where Element == UInt8 {
-    func str(hex: Bool = false, separator: String = " ") -> String {
-        if !hex, !contains(where: { n in !(0x20 ... 0x7E).contains(n) }),
-            let value = NSString(bytes: self, length: count, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
-            return value
-        } else {
-            return map { n in String(format: "%02X", n) }.joined(separator: separator)
+        switch arg.lowercased().stripped.replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "_", with: " ") {
+        case "reset": self = ControlID.RESET
+        case "reset brightness and contrast": self = ControlID.RESET_BRIGHTNESS_AND_CONTRAST
+        case "reset geometry": self = ControlID.RESET_GEOMETRY
+        case "reset color": self = ControlID.RESET_COLOR
+        case "brightness": self = ControlID.BRIGHTNESS
+        case "contrast": self = ControlID.CONTRAST
+        case "color preset a": self = ControlID.COLOR_PRESET_A
+        case "red gain": self = ControlID.RED_GAIN
+        case "green gain": self = ControlID.GREEN_GAIN
+        case "blue gain": self = ControlID.BLUE_GAIN
+        case "auto size center": self = ControlID.AUTO_SIZE_CENTER
+        case "width": self = ControlID.WIDTH
+        case "height": self = ControlID.HEIGHT
+        case "vertical pos": self = ControlID.VERTICAL_POS
+        case "horizontal pos": self = ControlID.HORIZONTAL_POS
+        case "pincushion amp": self = ControlID.PINCUSHION_AMP
+        case "pincushion phase": self = ControlID.PINCUSHION_PHASE
+        case "keystone balance": self = ControlID.KEYSTONE_BALANCE
+        case "pincushion balance": self = ControlID.PINCUSHION_BALANCE
+        case "top pincushion amp": self = ControlID.TOP_PINCUSHION_AMP
+        case "top pincushion balance": self = ControlID.TOP_PINCUSHION_BALANCE
+        case "bottom pincushion amp": self = ControlID.BOTTOM_PINCUSHION_AMP
+        case "bottom pincushion balance": self = ControlID.BOTTOM_PINCUSHION_BALANCE
+        case "vertical linearity": self = ControlID.VERTICAL_LINEARITY
+        case "vertical linearity balance": self = ControlID.VERTICAL_LINEARITY_BALANCE
+        case "horizontal static convergence": self = ControlID.HORIZONTAL_STATIC_CONVERGENCE
+        case "vertical static convergence": self = ControlID.VERTICAL_STATIC_CONVERGENCE
+        case "moire cancel": self = ControlID.MOIRE_CANCEL
+        case "input source": self = ControlID.INPUT_SOURCE
+        case "audio speaker volume": self = ControlID.AUDIO_SPEAKER_VOLUME
+        case "red black level": self = ControlID.RED_BLACK_LEVEL
+        case "green black level": self = ControlID.GREEN_BLACK_LEVEL
+        case "blue black level": self = ControlID.BLUE_BLACK_LEVEL
+        case "orientation": self = ControlID.ORIENTATION
+        case "audio mute": self = ControlID.AUDIO_MUTE
+        case "settings": self = ControlID.SETTINGS
+        case "on screen display": self = ControlID.ON_SCREEN_DISPLAY
+        case "osd language": self = ControlID.OSD_LANGUAGE
+        case "dpms": self = ControlID.DPMS
+        case "color preset b": self = ControlID.COLOR_PRESET_B
+        case "vcp version": self = ControlID.VCP_VERSION
+        case "color preset c": self = ControlID.COLOR_PRESET_C
+        case "power control": self = ControlID.POWER_CONTROL
+        case "top left screen purity": self = ControlID.TOP_LEFT_SCREEN_PURITY
+        case "top right screen purity": self = ControlID.TOP_RIGHT_SCREEN_PURITY
+        case "bottom left screen purity": self = ControlID.BOTTOM_LEFT_SCREEN_PURITY
+        case "bottom right screen purity": self = ControlID.BOTTOM_RIGHT_SCREEN_PURITY
+        default:
+            return nil
         }
     }
 }
 
-extension UInt32 {
-    func toUInt8Array() -> [UInt8] {
-        return [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF), UInt8((self >> 16) & 0xFF), UInt8((self >> 24) & 0xFF)]
-    }
-
-    func str() -> String {
-        return toUInt8Array().str()
-    }
-}
-
-extension UInt16 {
-    func toUInt8Array() -> [UInt8] {
-        return [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF)]
-    }
-
-    func str() -> String {
-        return toUInt8Array().str()
-    }
-}
-
-extension UInt8 {
-    func str() -> String {
-        if (0x20 ... 0x7E).contains(self), let value = NSString(bytes: [self], length: 1, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
-            return value
-        } else {
-            return String(format: "%02X", self)
-        }
-    }
-}
-
-class DDC {
+enum DDC {
+    static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
+    static var apply = true
     static let requestDelay: useconds_t = 20000
     static let recoveryDelay: useconds_t = 40000
     static var displayPortByUUID = [CFUUID: io_service_t]()
@@ -153,89 +300,82 @@ class DDC {
         DDC.writeFaults.removeAll()
     }
 
-    static func findExternalDisplays() -> [CGDirectDisplayID] {
-        var displayIDs = [CGDirectDisplayID]()
+    static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID: String] {
+        var displayIDs = [CGDirectDisplayID: String]()
         for screen in NSScreen.screens {
-            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String, isScreenStr == "YES" {
+            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String,
+               isScreenStr == "YES"
+            {
                 if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
                     let screenID = CGDirectDisplayID(truncating: screenNumber)
-                    if BrightnessAdapter.isBuiltinDisplay(screenID) {
+                    if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
                         continue
                     }
-                    displayIDs.append(screenID)
+                    displayIDs[screenID] = screen.localizedName
                 }
             }
         }
         return displayIDs
     }
 
-    static func getBuiltinDisplay() -> CGDirectDisplayID? {
-        for screen in NSScreen.screens {
-            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen] as? String, isScreen == "YES",
-                let nsScreenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
-                let screenNumber = CGDirectDisplayID(truncating: nsScreenNumber)
-                if BrightnessAdapter.isBuiltinDisplay(screenNumber) {
-                    return screenNumber
-                }
-            }
-        }
-        return nil
-    }
-
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
-        _ = semaphore.wait(timeout: .now() + .seconds(10))
-        defer {
-            semaphore.signal()
-        }
+        guard apply, !TEST_IDS.contains(displayID) else { return true }
 
-        if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
-            log.debug("Skipping write for \(controlID)", context: displayID)
-            return false
-        }
-
-        var command = DDCWriteCommand(
-            control_id: controlID.rawValue,
-            new_value: newValue
-        )
-        let displayUUIDByEDIDCopy = displayUUIDByEDID
-        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
-
-        let writeStartedAt = DispatchTime.now()
-        let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
-        let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
-        if writeMs > MAX_WRITE_DURATION_MS {
-            log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
-            DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
-        }
-
-        displayUUIDByEDID.removeAll()
-        for (key, value) in nsDisplayUUIDByEDID {
-            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
-                displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+        return queue.sync {
+            _ = semaphore.wait(timeout: .now() + .seconds(10))
+            defer {
+                semaphore.signal()
             }
-        }
 
-        if !result {
-            log.debug("Error writing \(controlID)", context: displayID)
-            guard let propertyFaults = DDC.writeFaults[displayID] else {
-                DDC.writeFaults[displayID] = [controlID: 1]
+            if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+                log.debug("Skipping write for \(controlID)", context: displayID)
                 return false
             }
-            guard var faults = propertyFaults[controlID] else {
-                DDC.writeFaults[displayID]![controlID] = 1
-                return false
-            }
-            faults += 1
-            DDC.writeFaults[displayID]![controlID] = faults
 
-            if faults > MAX_WRITE_FAULTS {
+            var command = DDCWriteCommand(
+                control_id: controlID.rawValue,
+                new_value: newValue
+            )
+            let displayUUIDByEDIDCopy = displayUUIDByEDID
+            let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
+
+            let writeStartedAt = DispatchTime.now()
+            let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
+            let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
+            if writeMs > MAX_WRITE_DURATION_MS {
+                log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
                 DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
             }
 
-            return false
-        }
+            displayUUIDByEDID.removeAll()
+            for (key, value) in nsDisplayUUIDByEDID {
+                if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                    displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+                }
+            }
 
-        return result
+            if !result {
+                log.debug("Error writing \(controlID)", context: displayID)
+                guard let propertyFaults = DDC.writeFaults[displayID] else {
+                    DDC.writeFaults[displayID] = [controlID: 1]
+                    return false
+                }
+                guard var faults = propertyFaults[controlID] else {
+                    DDC.writeFaults[displayID]![controlID] = 1
+                    return false
+                }
+                faults += 1
+                DDC.writeFaults[displayID]![controlID] = faults
+
+                if faults > MAX_WRITE_FAULTS {
+                    DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+                }
+
+                return false
+            }
+
+            return result
+        }
     }
 
     static func skipReadingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
@@ -255,13 +395,14 @@ class DDC {
             DDC.skipWritingPropertyById[displayID] = Set([controlID])
         }
         if controlID == ControlID.BRIGHTNESS || controlID == ControlID.CONTRAST {
-            runInMainThread {
-                brightnessAdapter.displays[displayID]?.responsive = false
+            mainThread {
+                displayController.displays[displayID]?.responsiveDDC = false
             }
         }
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
+        guard !TEST_IDS.contains(displayID) else { return nil }
         _ = semaphore.wait(timeout: .now() + .seconds(10))
         defer {
             semaphore.signal()
@@ -334,6 +475,8 @@ class DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
+        guard !TEST_IDS.contains(displayID) else { return nil }
+
         _ = semaphore.wait(timeout: .now() + .seconds(10))
         defer {
             semaphore.signal()
@@ -384,7 +527,7 @@ class DDC {
             repeat {
                 object = IOIteratorNext(serialPortIterator)
                 let infoDict = IODisplayCreateInfoDictionary(
-                    object, UInt32(kIODisplayOnlyPreferredName)
+                    object, kIODisplayOnlyPreferredName.u32
                 ).takeRetainedValue()
                 let info = infoDict as NSDictionary as? [String: AnyObject]
 
@@ -417,7 +560,7 @@ class DDC {
         if let name = NSString(bytes: nameChars, length: 13, encoding: String.Encoding.nonLossyASCII.rawValue) as String? {
             return name.trimmingCharacters(in: .whitespacesAndNewlines)
         } else if hex {
-            let hexData = nameChars.map { String(format: "%02X", $0) }.joined(separator: " ")
+            let hexData = nameChars.map { String(format: "%02x", $0) }.joined(separator: " ")
             return hexData.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return nil
@@ -439,18 +582,52 @@ class DDC {
     }
 
     static func extractName(from edid: EDID, hex: Bool = false) -> String? {
-        return extractDescriptorText(from: edid, desType: EDIDTextType.name, hex: hex)
+        extractDescriptorText(from: edid, desType: EDIDTextType.name, hex: hex)
     }
 
     static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
-        return extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
+        extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
+    }
+
+    static func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
+        guard !TEST_IDS.contains(displayID) else { return nil }
+        return NSScreen.screens.first(where: { screen in
+            guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
+            return CGDirectDisplayID(id.uint32Value) == displayID
+        })
+    }
+
+    static func hasI2CController(displayID: CGDirectDisplayID) -> Bool {
+        guard !TEST_IDS.contains(displayID) else { return false }
+        return I2CController(displayID: displayID) != 0
+    }
+
+    static func I2CController(displayID: CGDirectDisplayID) -> io_service_t {
+        guard !TEST_IDS.contains(displayID) else { return 0 }
+
+        let activeIDs = NSScreen.screens
+            .compactMap { screen in screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID }
+        guard activeIDs.contains(displayID) else { return 0 }
+
+        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        defer {
+            semaphore.signal()
+        }
+
+        let displayUUIDByEDIDCopy = displayUUIDByEDID
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
+        return IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
     }
 
     static func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
-            return nil
+        if let screen = screen(for: displayID) {
+            return screen.localizedName
+        } else {
+            guard let edid = DDC.getEdid(displayID: displayID) else {
+                return nil
+            }
+            return extractName(from: edid)
         }
-        return extractName(from: edid)
     }
 
     static func getDisplaySerial(for displayID: CGDirectDisplayID) -> String? {
@@ -473,102 +650,114 @@ class DDC {
         return ("\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)", name)
     }
 
+    static func setInput(for displayID: CGDirectDisplayID, input: InputSource) -> Bool {
+        if input == .unknown {
+            return false
+        }
+        return write(displayID: displayID, controlID: ControlID.INPUT_SOURCE, newValue: input.rawValue)
+    }
+
+    static func readInput(for displayID: CGDirectDisplayID) -> DDCReadResult? {
+        read(displayID: displayID, controlID: ControlID.INPUT_SOURCE)
+    }
+
     static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.BRIGHTNESS, newValue: brightness)
+        write(displayID: displayID, controlID: ControlID.BRIGHTNESS, newValue: brightness)
     }
 
     static func readBrightness(for displayID: CGDirectDisplayID) -> DDCReadResult? {
-        return read(displayID: displayID, controlID: ControlID.BRIGHTNESS)
+        read(displayID: displayID, controlID: ControlID.BRIGHTNESS)
     }
 
     static func readContrast(for displayID: CGDirectDisplayID) -> DDCReadResult? {
-        return read(displayID: displayID, controlID: ControlID.CONTRAST)
+        read(displayID: displayID, controlID: ControlID.CONTRAST)
     }
 
     static func setContrast(for displayID: CGDirectDisplayID, contrast: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.CONTRAST, newValue: contrast)
+        write(displayID: displayID, controlID: ControlID.CONTRAST, newValue: contrast)
     }
 
     static func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.RED_GAIN, newValue: redGain)
+        write(displayID: displayID, controlID: ControlID.RED_GAIN, newValue: redGain)
     }
 
     static func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.GREEN_GAIN, newValue: greenGain)
+        write(displayID: displayID, controlID: ControlID.GREEN_GAIN, newValue: greenGain)
     }
 
     static func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.BLUE_GAIN, newValue: blueGain)
+        write(displayID: displayID, controlID: ControlID.BLUE_GAIN, newValue: blueGain)
     }
 
     static func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt8) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME, newValue: audioSpeakerVolume)
+        write(displayID: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME, newValue: audioSpeakerVolume)
     }
 
     static func setAudioMuted(for displayID: CGDirectDisplayID, audioMuted: Bool) -> Bool {
-        if audioMuted {
-            return write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: 1)
-        } else {
-            return write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: 2)
-        }
+        write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: audioMuted ? 1 : 2)
+    }
+
+    static func setPower(for displayID: CGDirectDisplayID, power: Bool) -> Bool {
+        write(displayID: displayID, controlID: ControlID.DPMS, newValue: power ? 1 : 5)
     }
 
     static func reset(displayID: CGDirectDisplayID) -> Bool {
-        return write(displayID: displayID, controlID: ControlID.RESET, newValue: 100)
+        write(displayID: displayID, controlID: ControlID.RESET, newValue: 100)
     }
 
-    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> Double? {
+    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt8? {
         log.debug("DDC reading \(controlID) for \(displayID)")
 
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
             return nil
         }
-        return Double(result.currentValue)
+        return result.currentValue
     }
 
-    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> Double? {
+    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt8? {
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
             return nil
         }
-        return Double(result.maxValue)
+        return result.maxValue
     }
 
-    static func getRedGain(for displayID: CGDirectDisplayID) -> Double? {
-        return DDC.getValue(for: displayID, controlID: ControlID.RED_GAIN)
+    static func getRedGain(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.getValue(for: displayID, controlID: ControlID.RED_GAIN)
     }
 
-    static func getGreenGain(for displayID: CGDirectDisplayID) -> Double? {
-        return DDC.getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
+    static func getGreenGain(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
     }
 
-    static func getBlueGain(for displayID: CGDirectDisplayID) -> Double? {
-        return DDC.getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
+    static func getBlueGain(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
     }
 
-    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> Double? {
-        return DDC.getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
+    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
     }
 
     static func isAudioMuted(for displayID: CGDirectDisplayID) -> Bool? {
         guard let mute = DDC.getValue(for: displayID, controlID: ControlID.AUDIO_MUTE) else {
             return nil
         }
-        return mute == 1.0
+        return mute != 2
     }
 
-    static func getContrast(for displayID: CGDirectDisplayID) -> Double? {
-        return DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
+    static func getContrast(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 
-    static func getBrightness(for displayID: CGDirectDisplayID? = nil) -> Double? {
-        if let id = displayID {
-            log.debug("DDC reading brightness for \(id)")
-            return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
-        }
-        let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IODisplayConnect"))
-        var brightness: Float = 0.0
-        IODisplayGetFloatParameter(service, 0, kIODisplayBrightnessKey as CFString, &brightness)
-        IOObjectRelease(service)
-        return Double(brightness)
+    static func getInput(for displayID: CGDirectDisplayID) -> UInt8? {
+        DDC.readInput(for: displayID)?.currentValue
+    }
+
+    static func getBrightness(for id: CGDirectDisplayID) -> UInt8? {
+        log.debug("DDC reading brightness for \(id)")
+        return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
+    }
+
+    static func resetBrightnessAndContrast(for displayID: CGDirectDisplayID) -> Bool {
+        DDC.write(displayID: displayID, controlID: .RESET_BRIGHTNESS_AND_CONTRAST, newValue: 1)
     }
 }

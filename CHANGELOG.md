@@ -1,3 +1,65 @@
+# 4.0.5
+## Improvements
+
+* Add native support for old **Apple Cinema** and **Cinema HD** displays
+* Add *Show Dock Icon* option under Advanced settings
+
+## Fixes
+
+* Ensure window is shown when launching Lunar while menubar icon is hidden
+* Fix crash on NetServiceBrowser reset
+* Fix crash because of settings observer being deallocated too soon
+
+# 4.0.4
+## Fixes
+
+* I'm really sorry if you have been seing the **Your period of free updates has expired** screen. This should be fixed now in 4.0.4 and the next update shouldn't show that screen anymore
+
+# 4.0.3
+## Fixes
+
+* It seems Lunar needs macOS 10.15 or higher (even though Xcode compiles it just fine for 10.13) so I made that the minimum requirement
+
+## Improvements
+
+* Added *Advanced* setting for disabling brightness re-apply on screen wake
+* Show Lunar window before showing Paddle licensing UI
+# 4.0.2
+## Fixes
+
+* Fix valid updates checking logic
+* Show window when menu bar icon is hidden and app is launched while already running
+* Fix data race when ddcutil service is found on the network
+* Fix setting brightness for Apple vendored displays
+* Delay reset for mDNS browser when coming out of standby to avoid a recent CoreFoundation bug: [CFRunLoopSource type mismatch, found CFSocket](https://developer.apple.com/forums/thread/663772)
+* Check for Catalina or higher before trying to get display info dictionary
+
+## Improvements
+
+* Added Sync Mode test inside diagnostics
+# 4.0.1
+## Fixes
+
+* Show window when menu bar icon is hidden and app is launched while already running
+* Fix data race when ddcutil service is found on the network
+* Fix setting brightness for Apple vendored displays
+* Delay reset for mDNS browser when coming out of standby to avoid a recent CoreFoundation bug: [CFRunLoopSource type mismatch, found CFSocket](https://developer.apple.com/forums/thread/663772)
+* Check for Catalina or higher before trying to get display info dictionary
+
+## Improvements
+
+* Added Sync Mode test inside diagnostics
+# 4.0.0
+## Features
+
+**Lunar 4 is released!**
+
+Head over to [the official website](https://lunar.fyi) for more details.
+# 4.0.0-alpha.1
+## Features
+
+- Lunar Pro
+
 # 3.2.3
 ## Improvements
 

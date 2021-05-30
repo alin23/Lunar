@@ -6,14 +6,30 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import AtomicWrite
 import Carbon.HIToolbox
 import Cocoa
+import Defaults
 import Magnet
 
-class ScrollableTextField: NSTextField {
+let PRECISE_SCROLL_Y_THRESHOLD: CGFloat = 25.0
+let NORMAL_SCROLL_Y_THRESHOLD: CGFloat = 9.0
+let FAST_SCROLL_Y_THRESHOLD: CGFloat = 2.0
+
+var scrollDeltaYThreshold: CGFloat = NORMAL_SCROLL_Y_THRESHOLD
+
+class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     @IBInspectable var lowerLimit: Double = 0.0
     @IBInspectable var upperLimit: Double = 100.0
     @IBInspectable var step: Double = 1.0
+
+    @IBInspectable var bgColor: NSColor = .clear {
+        didSet {
+            if !hover {
+                textColor = textFieldColor
+            }
+        }
+    }
 
     @IBInspectable var textFieldColor: NSColor = scrollableTextFieldColor {
         didSet {
@@ -39,7 +55,7 @@ class ScrollableTextField: NSTextField {
             if decimalPoints > 0 {
                 stringValue = String(format: "%.\(decimalPoints)f", doubleValue)
             } else {
-                stringValue = String(Int(round(doubleValue)))
+                stringValue = String(round(doubleValue).i)
             }
         }
     }
@@ -57,14 +73,16 @@ class ScrollableTextField: NSTextField {
     var onMouseExit: (() -> Void)?
 
     var centerAlign: NSParagraphStyle?
-    var didScrollTextField: Bool = datastore.defaults.didScrollTextField
+    var didScrollTextField: Bool = Defaults[.didScrollTextField]
 
     var normalSize: CGSize?
     var activeSize: CGSize?
 
+    var scrolledY: CGFloat = 0.0
+
     var trackingArea: NSTrackingArea?
     var captionTrackingArea: NSTrackingArea?
-    unowned var caption: ScrollableTextFieldCaption? {
+    weak var caption: ScrollableTextFieldCaption? {
         didSet {
             if didScrollTextField {
                 return
@@ -72,12 +90,31 @@ class ScrollableTextField: NSTextField {
             if let area = captionTrackingArea {
                 removeTrackingArea(area)
             }
-            captionTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: caption, userInfo: nil)
+            captionTrackingArea = NSTrackingArea(
+                rect: visibleRect,
+                options: [.mouseEnteredAndExited, .activeInActiveApp],
+                owner: caption,
+                userInfo: nil
+            )
             addTrackingArea(captionTrackingArea!)
         }
     }
 
     var adaptToScrollingFinished: DispatchWorkItem?
+
+    override func becomeFirstResponder() -> Bool {
+        refusesFirstResponder = false
+        let success = super.becomeFirstResponder()
+
+        if let editor = currentEditor() as? NSTextView {
+            editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
+            editor.insertionPointColor = darkMauve
+            if let fieldEditor = editor.window?.fieldEditor(true, for: self) as? NSTextView {
+                fieldEditor.insertionPointColor = darkMauve
+            }
+        }
+        return success
+    }
 
     func setup() {
         let paragraphStyle = NSMutableParagraphStyle()
@@ -87,24 +124,34 @@ class ScrollableTextField: NSTextField {
         usesSingleLineMode = false
         allowsEditingTextAttributes = true
         textColor = textFieldColor
-        wantsLayer = true
-        layer?.cornerRadius = 8
+        radius = 8.ns
+        delegate = self
+        focusRingType = .none
 
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
-        setNeedsDisplay()
+        needsDisplay = true
     }
 
-    override func textDidBeginEditing(_: Notification) {
+    override func cancelOperation(_: Any?) {
+        darken(color: textFieldColor)
+        abortEditing()
+    }
+
+    override func textDidBeginEditing(_ notification: Notification) {
+        if let editor = currentEditor() as? NSTextView {
+            editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
+        }
         log.verbose("Editing text \(stringValue)")
-        disableLeftRightHotkeys()
+        super.textDidBeginEditing(notification)
     }
 
-    override func textDidEndEditing(_: Notification) {
+    override func textDidEndEditing(_ notification: Notification) {
         log.verbose("Finished editing text \(stringValue)")
         darken(color: textFieldColor)
+        super.textDidEndEditing(notification)
     }
 
     override func textShouldEndEditing(_ textObject: NSText) -> Bool {
@@ -133,41 +180,62 @@ class ScrollableTextField: NSTextField {
         super.draw(dirtyRect)
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        if !isEnabled {
-            return
+    func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        switch commandSelector {
+        case #selector(insertNewline(_:)):
+            validateEditing()
+            if let editor = currentEditor(), textShouldEndEditing(editor) {
+                endEditing(editor)
+            }
+            return true
+        case #selector(moveUp(_:))
+            where scrollableAdjustHotkeysEnabled && window != nil &&
+            (window!.title == "Settings" || (window!.parent != nil && window!.parent!.title == "Settings")):
+            increaseValue()
+            onValueChanged?(integerValue)
+            onValueChangedDouble?(doubleValue)
+            return true
+        case #selector(moveDown(_:))
+            where scrollableAdjustHotkeysEnabled && window != nil &&
+            (window!.title == "Settings" || (window!.parent != nil && window!.parent!.title == "Settings")):
+            decreaseValue()
+            onValueChanged?(integerValue)
+            onValueChangedDouble?(doubleValue)
+            return true
+        default:
+            return false
         }
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        log.verbose("mouseEntered: \(caption?.stringValue ?? stringValue)")
+        guard isEnabled else { return }
+
         hover = true
         lightenUp(color: textFieldColorHover)
 
-        disableUpDownHotkeys()
-        log.debug("Registering up/down hotkeys")
-        if let upKeyCombo = KeyCombo(key: .upArrow, carbonModifiers: 0),
-            let downKeyCombo = KeyCombo(key: .downArrow, carbonModifiers: 0) {
-            upHotkey = Magnet.HotKey(identifier: "increaseValue", keyCombo: upKeyCombo) { [weak self] _ in
-                guard let self = self else { return }
-                self.increaseValue()
-                self.onValueChanged?(self.integerValue)
-                self.onValueChangedDouble?(self.doubleValue)
-            }
-            downHotkey = Magnet.HotKey(identifier: "decreaseValue", keyCombo: downKeyCombo) { [weak self] _ in
-                guard let self = self else { return }
-                self.decreaseValue()
-                self.onValueChanged?(self.integerValue)
-                self.onValueChangedDouble?(self.doubleValue)
-            }
-            upHotkey?.register()
-            downHotkey?.register()
-        }
-
         onMouseEnter?()
+
+//        refusesFirstResponder = false
+//        window?.makeFirstResponder(self)
+
+//        if let editor = currentEditor() as? NSTextView {
+//            editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
+//        }
+        super.mouseEntered(with: event)
     }
 
-    override func mouseExited(with _: NSEvent) {
-        disableUpDownHotkeys()
-        if !isEnabled {
-            return
-        }
+    override func mouseExited(with event: NSEvent) {
+        log.verbose("mouseExited: \(caption?.stringValue ?? stringValue)")
+//        if let editor = currentEditor() as? NSTextView {
+//            validateEditing()
+//            endEditing(editor)
+//            editor.resignFirstResponder()
+//        }
+//        window?.makeFirstResponder(window)
+//        refusesFirstResponder = true
+
+        guard isEnabled else { return }
 
         finishScrolling()
 
@@ -175,22 +243,107 @@ class ScrollableTextField: NSTextField {
         darken(color: textFieldColor)
 
         onMouseExit?()
+        super.mouseExited(with: event)
+    }
+
+    func setBgAlpha() {
+        guard bgColor.alphaComponent > 0 else { return }
+        if scrolling {
+            bg = bgColor.withAlphaComponent(0.5)
+        } else if hover || currentEditor() != nil {
+            bg = bgColor.withAlphaComponent(0.25)
+        } else {
+            bg = bgColor.withAlphaComponent(0.05)
+        }
+    }
+
+    @AtomicWrite var highlighterTask: CFRunLoopTimer?
+    var highlighterSemaphore = DispatchSemaphore(value: 1)
+
+    func highlight(message: String) {
+        mainThread {
+            guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
+                  let caption = self.caption, let w = window, w.isVisible
+            else {
+                return
+            }
+
+            caption.stringValue = message
+            highlighterTask = realtimeQueue.async(every: 1.seconds) { [weak self] (_: CFRunLoopTimer?) in
+                guard let s = self else {
+                    if let timer = self?.highlighterTask {
+                        realtimeQueue.cancel(timer: timer)
+                    }
+                    return
+                }
+
+                s.highlighterSemaphore.wait()
+                defer {
+                    s.highlighterSemaphore.signal()
+                }
+
+                var windowVisible = false
+                var textColor: NSColor?
+                mainThread {
+                    windowVisible = s.window?.isVisible ?? false
+                    textColor = caption.textColor
+                }
+                guard windowVisible, let caption = s.caption, let currentColor = textColor
+                else {
+                    if let timer = self?.highlighterTask {
+                        realtimeQueue.cancel(timer: timer)
+                    }
+                    return
+                }
+
+                mainThread {
+                    caption.lightenUp(color: lunarYellow)
+                    caption.needsDisplay = true
+                }
+
+                Thread.sleep(forTimeInterval: 0.5)
+
+                mainThread {
+                    caption.darken(color: currentColor)
+                    caption.needsDisplay = true
+                }
+            }
+        }
+    }
+
+    func stopHighlighting() {
+        if let timer = highlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        highlighterTask = nil
+        highlighterSemaphore.wait()
+        defer {
+            self.highlighterSemaphore.signal()
+        }
+
+        mainThread { [weak self] in
+            guard let caption = self?.caption else { return }
+            caption.resetText()
+            caption.needsDisplay = true
+        }
     }
 
     func lightenUp(color: NSColor) {
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        layer?.add(fadeTransition(duration: 0.15), forKey: "transition")
         textColor = color
+        setBgAlpha()
     }
 
     func darken(color: NSColor) {
         layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
         textColor = color
+        setBgAlpha()
     }
 
     func disableScrollHint() {
         if !didScrollTextField {
             didScrollTextField = true
-            datastore.defaults.set(true, forKey: "didScrollTextField")
+            Defaults[.didScrollTextField] = true
             if let area = captionTrackingArea {
                 removeTrackingArea(area)
             }
@@ -219,7 +372,7 @@ class ScrollableTextField: NSTextField {
         adaptToScrollingFinished = nil
         if scrolling {
             scrolling = false
-            log.debug("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
+            log.verbose("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
             onValueChanged?(integerValue)
             onValueChangedDouble?(doubleValue)
             darken(color: textFieldColorHover)
@@ -232,7 +385,7 @@ class ScrollableTextField: NSTextField {
             self?.finishScrolling()
             self?.adaptToScrollingFinished = nil
         }
-        runInMainThreadAsyncAfter(ms: ms, adaptToScrollingFinished!)
+        mainAsyncAfter(ms: ms, adaptToScrollingFinished!)
     }
 
     override func scrollWheel(with event: NSEvent) {
@@ -241,6 +394,12 @@ class ScrollableTextField: NSTextField {
                 return
             }
             if event.scrollingDeltaY < 0.0 {
+                scrolledY += event.scrollingDeltaY
+                if abs(scrolledY) < scrollDeltaYThreshold {
+                    return
+                }
+
+                scrolledY = 0.0
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
@@ -251,8 +410,14 @@ class ScrollableTextField: NSTextField {
                 } else {
                     decreaseValue()
                 }
-                finishScrolling(after: 1000)
+                finishScrolling(after: 2000)
             } else if event.scrollingDeltaY > 0.0 {
+                scrolledY += event.scrollingDeltaY
+                if abs(scrolledY) < scrollDeltaYThreshold {
+                    return
+                }
+
+                scrolledY = 0.0
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
@@ -263,7 +428,7 @@ class ScrollableTextField: NSTextField {
                 } else {
                     increaseValue()
                 }
-                finishScrolling(after: 1000)
+                finishScrolling(after: 2000)
             } else {
                 finishScrolling()
             }

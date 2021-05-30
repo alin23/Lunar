@@ -8,33 +8,33 @@
 
 import Charts
 import Cocoa
+import Defaults
 
 class SettingsPageController: NSViewController {
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView!
-    var adaptiveModeObserver: NSKeyValueObservation?
+    @IBOutlet var settingsContainerView: NSView!
+    @IBOutlet var advancedSettingsContainerView: NSView!
+    @IBOutlet var advancedSettingsButton: ToggleButton!
+    @objc dynamic var advancedSettingsShown = false
+
+    var adaptiveModeObserver: DefaultsObservation?
+
+    @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
+        advancedSettingsShown = sender.state == .on
+    }
 
     func updateDataset(
         display: Display,
         factor: Double? = nil,
-        daylightExtension: Int? = nil,
-        noonDuration: Int? = nil,
-        brightnessOffset: Int? = nil,
-        contrastOffset: Int? = nil,
-        brightnessLimitMin: Int? = nil,
-        contrastLimitMin: Int? = nil,
-        brightnessLimitMax: Int? = nil,
-        contrastLimitMax: Int? = nil,
-        brightnessClipMin: Double? = nil,
-        brightnessClipMax: Double? = nil,
+        daylightExtension _: Int? = nil,
+        noonDuration _: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false,
         updateLegend: Bool = false,
         updateLimitLines: Bool = false
     ) {
-        if display.id == GENERIC_DISPLAY_ID {
-            return
-        }
+        guard !advancedSettingsShown, display.id != GENERIC_DISPLAY_ID else { return }
 
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
@@ -43,99 +43,147 @@ class SettingsPageController: NSViewController {
             return
         }
 
-        runInMainThread { [weak brightnessContrastChart] in
+        mainThread { [weak self] in
             if updateLegend {
-                brightnessContrastChart?.setupLegend()
+                self?.brightnessContrastChart?.setupLegend()
             }
 
             if updateLimitLines {
-                brightnessContrastChart?.setupLimitLines(mode: brightnessAdapter.mode)
+                self?.brightnessContrastChart?.setupLimitLines(display: display)
             }
         }
 
-        switch brightnessAdapter.mode {
-        case .location:
-            let maxValues = brightnessContrastChart.maxValuesLocation
-            let steps = brightnessContrastChart.interpolationValues
-            let points = brightnessAdapter.getBrightnessContrastBatch(
-                for: display, count: maxValues, minutesBetween: steps, factor: factor,
-                daylightExtension: daylightExtension, noonDuration: noonDuration,
-                appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
-            )
-            var idx: Int
-            for x in 0 ..< (maxValues - 1) {
-                let startIndex = x * steps
-                let xPoints = points[startIndex ..< (startIndex + steps)]
-                for (i, y) in xPoints.enumerated() {
-                    idx = x * steps + i
-                    if idx >= brightnessChartEntry.count || idx >= contrastChartEntry.count {
-                        break
-                    }
-                    brightnessChartEntry[idx].y = y.0.doubleValue
-                    contrastChartEntry[idx].y = y.1.doubleValue
-                }
-            }
-            for (i, point) in brightnessChartEntry.prefix(steps).reversed().enumerated() {
-                idx = (maxValues - 1) * steps + i
-                if idx >= brightnessChartEntry.count {
-                    break
-                }
-                brightnessChartEntry[idx].y = point.y
-            }
-            for (i, point) in contrastChartEntry.prefix(steps).reversed().enumerated() {
-                idx = (maxValues - 1) * steps + i
-                if idx >= contrastChartEntry.count {
-                    break
-                }
-                contrastChartEntry[idx].y = point.y
-            }
-        case .sync:
-            let maxValues = brightnessContrastChart.maxValuesSync
-            let xs = stride(from: 0, to: maxValues - 1, by: 1)
-            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .brightness, offset: brightnessOffset, appOffset: appBrightnessOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
-                brightnessChartEntry[x].y = b.doubleValue
-            }
-            for (x, b) in zip(xs, display.computeSIMDValue(from: percents, type: .contrast, offset: contrastOffset, appOffset: appContrastOffset, brightnessClipMin: brightnessClipMin, brightnessClipMax: brightnessClipMax)) {
-                contrastChartEntry[x].y = b.doubleValue
-            }
-        case .manual:
-            let maxValues = brightnessContrastChart.maxValuesSync
-            let xs = stride(from: 0, to: maxValues - 1, by: 1)
-            let percents = Array(stride(from: 0.0, to: Double(maxValues - 1) / 100.0, by: 0.01))
-            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "brightness", minVal: brightnessLimitMin, maxVal: brightnessLimitMax)) {
+        switch displayController.adaptiveMode {
+        case let mode as SensorMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+            for (x, b) in zip(
+                xs,
+                mode.interpolateSIMD(
+                    .brightness(0),
+                    display: display,
+                    offset: appBrightnessOffset.d,
+                    factor: factor
+                )
+            ) {
                 brightnessChartEntry[x].y = b
             }
-            for (x, b) in zip(xs, brightnessAdapter.computeSIMDManualValueFromPercent(from: percents, key: "contrast", minVal: contrastLimitMin, maxVal: contrastLimitMax)) {
+            for (x, b) in zip(
+                xs,
+                mode.interpolateSIMD(
+                    .contrast(0),
+                    display: display,
+                    offset: appContrastOffset.d,
+                    factor: factor
+                )
+            ) {
                 contrastChartEntry[x].y = b
             }
+        case let mode as LocationMode:
+            let points = mode.getBrightnessContrastBatch(
+                display: display, factor: factor,
+                appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
+            )
+            let maxValues = min(mode.maxChartDataPoints, points.brightness.count, points.contrast.count, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+
+            for (x, y) in zip(xs, points.brightness) {
+                brightnessChartEntry[x].y = y
+            }
+            for (x, y) in zip(xs, points.contrast) {
+                contrastChartEntry[x].y = y
+            }
+        case let mode as SyncMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+
+            for (x, b) in zip(
+                xs,
+                mode.interpolateSIMD(
+                    .brightness(0),
+                    display: display,
+                    offset: appBrightnessOffset.d,
+                    factor: factor
+                )
+            ) {
+                brightnessChartEntry[x].y = b
+            }
+            for (x, b) in zip(
+                xs,
+                mode.interpolateSIMD(
+                    .contrast(0),
+                    display: display,
+                    offset: appContrastOffset.d,
+                    factor: factor
+                )
+            ) {
+                contrastChartEntry[x].y = b
+            }
+        case let mode as ManualMode:
+            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
+            let xs = stride(from: 0, to: maxValues, by: 1)
+            let percents = Array(stride(from: 0.0, to: maxValues.d / 100.0, by: 0.01))
+            for (x, b) in zip(
+                xs,
+                mode.computeSIMD(
+                    from: percents,
+                    minVal: display.minBrightness.doubleValue,
+                    maxVal: display.maxBrightness.doubleValue
+                )
+            ) {
+                brightnessChartEntry[x].y = b
+            }
+            for (x, b) in zip(
+                xs,
+                mode.computeSIMD(
+                    from: percents,
+                    minVal: display.minContrast.doubleValue,
+                    maxVal: display.maxContrast.doubleValue
+                )
+            ) {
+                contrastChartEntry[x].y = b
+            }
+        default:
+            print("Unknown mode")
         }
 
-        // brightnessContrastChart.clampDataset(display: display, mode: brightnessAdapter.mode)
-        runInMainThread { [weak brightnessContrastChart] in
+        // brightnessContrastChart.clampDataset(display: display, mode: displayController.mode)
+        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
+
+        mainThread { [weak self] in
             if withAnimation {
-                brightnessContrastChart?.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
+                self?.brightnessContrastChart?.animate(yAxisDuration: 1.0, easingOption: ChartEasingOption.easeOutExpo)
             } else {
-                brightnessContrastChart?.notifyDataSetChanged()
+                self?.brightnessContrastChart?.notifyDataSetChanged()
             }
         }
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = datastore.defaults.observe(\.adaptiveBrightnessMode, options: [.old, .new], changeHandler: { [weak self, weak brightnessContrastChart = self.brightnessContrastChart] _, change in
-            guard let self = self, let mode = change.newValue, let oldMode = change.oldValue, mode != oldMode else {
-                return
+        adaptiveModeObserver = Defaults
+            .observe(.adaptiveBrightnessMode) { [weak self] change in
+                guard let self = self, change.newValue != change.oldValue else {
+                    return
+                }
+                mainThread {
+                    if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                        self.initGraph(display: displayController.firstDisplay, mode: change.newValue.mode)
+                    }
+                }
             }
-            let adaptiveMode = AdaptiveMode(rawValue: mode)
-            if let chart = brightnessContrastChart, !chart.visibleRect.isEmpty {
-                self.initGraph(display: brightnessAdapter.firstDisplay, mode: adaptiveMode)
-            }
-        })
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
-        runInMainThread { [weak brightnessContrastChart] in
-            brightnessContrastChart?.initGraph(display: display, brightnessColor: brightnessGraphColorYellow, contrastColor: contrastGraphColorYellow, labelColor: xAxisLabelColorYellow, mode: mode)
+        guard !advancedSettingsShown else { return }
+
+        mainThread { [weak self] in
+            self?.brightnessContrastChart?.initGraph(
+                display: display,
+                brightnessColor: brightnessGraphColorYellow,
+                contrastColor: contrastGraphColorYellow,
+                labelColor: xAxisLabelColorYellow,
+                mode: mode
+            )
         }
     }
 
@@ -146,8 +194,10 @@ class SettingsPageController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.wantsLayer = true
-        view.layer?.backgroundColor = settingsBgColor.cgColor
+        view.bg = settingsBgColor
         initGraph(display: nil)
         listenForAdaptiveModeChange()
+        advancedSettingsButton.page = .settings
+        advancedSettingsButton.isHidden = false
     }
 }

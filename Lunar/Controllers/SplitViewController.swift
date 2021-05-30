@@ -7,17 +7,25 @@
 //
 
 import Cocoa
+import Defaults
 
 let NOTE_TEXT = """
 []()
 
 **Note:** The same logic applies for both brightness and contrast
 """
+let SENSOR_HELP_TEXT = """
+# Sensor Mode
+
+With an external ambient light sensor
+
+\(NOTE_TEXT)
+"""
 let LOCATION_HELP_TEXT = """
 # Location Mode
 
 In `Location` mode, Lunar adjusts the brightness and contrast automatically
-using the **sunrise**, **noon** and **sunset** times of your location.
+based on the sun elevation in the sky, at your location.
 
 The location detection uses the system **Location Services**, but the user needs
 to give Lunar permission to access it.
@@ -33,11 +41,9 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 []()
 
 ## Settings
-- Sunrise and sunset times can be offset by adjusting the `Daylight Extension` setting
-    - A higher daylight extension value will mean that, for Lunar, the sun will rise earlier and will set later
-- The noon period can be enlarged by adjusting the `Noon Duration` setting
-    - A higher noon duration will mean that the brightness will stay at `MAX` longer
-- The `Curve Factor` helps to adjust how fast the brightness should rise or fall between sunrise, noon and sunset
+- Adjusting the curve is as simple as changing the brightness to whatever you want it to be at that time of the day
+    - Lunar will learn from that and adjust the curve accordingly
+- The `Curve Factor` on the `Configuration` page helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """
@@ -61,14 +67,10 @@ and sending it to the external monitors.
 
 []()
 
-**Note:** This makes the brightness keys on the keyboard work for both the built-in display and the monitors at the same time.
-
 ## Settings
-
-- The `Brightness/Contrast Offset` setting models how the built-in brightness relates to the monitor brightness.
-    - **Example if the built-in brightness goes from 0% to 100%**
-        - A **negative** offset will make the monitor brightness rise **slow** for the **first** half (*until the built-in brightness reaches ~50%*) and rise **fast** for the **second** half
-        - A **positive** offset will make the monitor brightness rise **fast** for the **first** half and then rise **slow** for the **second** half
+- Adjusting the curve is as simple as changing the brightness of an external monitor to whatever you want it to be
+    - Lunar will learn from that and adjust the curve accordingly
+- The `Curve Factor` on the `Configuration` page helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """
@@ -107,101 +109,139 @@ This mode is the last resort for people that:
 []()
 
 ## Settings
-
-- `Brightness/Contrast Limit` restricts the computed values to always stay between these limits
 - `Brightness/Contrast Step` adjusts how much to increase or decrease the values when using the up/down hotkeys
 
 \(NOTE_TEXT)
 """
 
+let AUTO_MODE_TAG = 99
+
 class SplitViewController: NSSplitViewController {
-    var activeTitle: NSMutableAttributedString?
-    var activeTitleHover: NSMutableAttributedString?
+    var adaptiveModeObserver: DefaultsObservation?
+    var defaultAutoModeTitle: NSAttributedString?
 
     @IBOutlet var logo: NSTextField?
-    @IBOutlet var activeStateButton: ToggleButton?
+
     @IBOutlet var containerView: NSView?
-    @IBOutlet var helpButton: HelpButton!
-    @IBOutlet var navigationHelpButton: HelpButton!
 
-    @IBAction func toggleBrightnessAdapter(sender _: NSButton?) {
-        brightnessAdapter.toggle()
+    @IBOutlet var activeModeButton: AdaptiveModeButton!
+    @IBOutlet var _activeHelpButton: NSButton!
+    var activeHelpButton: HelpButton? {
+        _activeHelpButton as? HelpButton
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        activeStateButton?.hover()
+    @IBOutlet var goLeftButton: PageButton!
+    @IBOutlet var goRightButton: PageButton!
+
+    var onLeftButtonPress: (() -> Void)?
+    var onRightButtonPress: (() -> Void)?
+
+    @IBAction func goRight(_: Any) {
+        onRightButtonPress?()
     }
 
-    override func mouseExited(with _: NSEvent) {
-        activeStateButton?.defocus()
+    @IBAction func goLeft(_: Any) {
+        onLeftButtonPress?()
     }
 
-    func setHelpButtonText() {
-        switch brightnessAdapter.mode {
-        case .location:
-            helpButton?.helpText = LOCATION_HELP_TEXT
-            helpButton?.link = "https://ipstack.com"
-        case .sync:
-            helpButton?.helpText = SYNC_HELP_TEXT
-            helpButton?.link = nil
-        case .manual:
-            helpButton?.helpText = MANUAL_HELP_TEXT
-            helpButton?.link = nil
+    deinit {
+        log.verbose("")
+    }
+
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
+            if change.newValue == change.oldValue {
+                return
+            }
+            mainThread {
+                self?.activeModeButton.update(modeKey: change.newValue)
+                self?.updateHelpButton(modeKey: change.newValue)
+            }
         }
     }
 
+    func updateHelpButton(modeKey: AdaptiveModeKey? = nil) {
+        guard let button = activeHelpButton, let modeButton = activeModeButton else { return }
+
+        if Defaults[.overrideAdaptiveMode] {
+            button.helpText = (modeKey ?? displayController.adaptiveModeKey).helpText
+            button.link = (modeKey ?? displayController.adaptiveModeKey).helpLink
+        } else {
+            let mode = DisplayController.getAdaptiveMode()
+            button.helpText = mode.key.helpText
+            button.link = mode.key.helpLink
+        }
+        button.setFrameOrigin(NSPoint(x: modeButton.frame.minX - (button.frame.width + 10), y: button.frame.minY))
+    }
+
     func hasWhiteBackground() -> Bool {
-        return view.layer?.backgroundColor == white.cgColor
+        view.layer?.backgroundColor == white.cgColor
+    }
+
+    func lastPage() {
+        goLeftButton.enable()
+        goRightButton.disable()
     }
 
     func whiteBackground() {
         view.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        view.layer?.backgroundColor = white.cgColor
+        view.bg = white
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
             logo.stringValue = "LUNAR"
         }
-        activeStateButton?.page = .display
-        activeStateButton?.fade()
-        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+
+        activeModeButton?.page = .display
+        activeModeButton?.fade()
+
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
+
+        goLeftButton.enable()
+        goRightButton.enable()
     }
 
     func yellowBackground() {
-        view.layer?.backgroundColor = bgColor.cgColor
+        view.bg = bgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = bgColor
-            logo.stringValue = "LUNAR"
+            logo.stringValue = "SETTINGS"
         }
-        activeStateButton?.page = .settings
-        activeStateButton?.fade()
-        helpPopover?.appearance = NSAppearance(named: .vibrantLight)
+
+        activeModeButton?.page = .settings
+        activeModeButton?.fade()
+
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
+
+        goLeftButton.enable()
+        goRightButton.enable()
     }
 
     func mauveBackground() {
-        view.layer?.backgroundColor = hotkeysBgColor.cgColor
+        view.bg = hotkeysBgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
             logo.stringValue = "HOTKEYS"
         }
-        activeStateButton?.page = .hotkeys
-        activeStateButton?.fade()
-        helpPopover?.appearance = NSAppearance(named: .vibrantDark)
+
+        activeModeButton?.page = .hotkeys
+        activeModeButton?.fade()
+
+        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantDark)
+
+        goLeftButton.disable()
+        goRightButton.enable(color: logoColor)
     }
 
     override func viewDidLoad() {
         view.wantsLayer = true
-        view.layer?.cornerRadius = 12.0
+        view.radius = 12.0.ns
         whiteBackground()
-        setHelpButtonText()
-        navigationHelpButton?.onMouseEnter = {
-            datastore.defaults.set(true, forKey: "showNavigationHints")
-        }
-        navigationHelpButton?.onMouseExit = {
-            datastore.defaults.set(false, forKey: "showNavigationHints")
-        }
+        updateHelpButton()
+        listenForAdaptiveModeChange()
+
         super.viewDidLoad()
     }
 }

@@ -7,11 +7,12 @@
 //
 
 import Cocoa
+import Defaults
 import Solar
 import SwiftDate
 import SwiftyJSON
 
-class Moment: NSObject, NSCoding {
+class Moment: NSObject {
     let sunrise: DateInRegion
     let sunset: DateInRegion
     let solarNoon: DateInRegion
@@ -26,10 +27,15 @@ class Moment: NSObject, NSCoding {
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
     static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("moments")
 
+    var isToday: Bool {
+        sunrise.isToday && sunset.isToday && solarNoon.isToday
+    }
+
     static func defaultMoments() -> (DateInRegion, DateInRegion, DateInRegion) {
         guard let sevenAM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 7, min: 0, secs: 0),
-            let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0),
-            let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0) else {
+              let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0),
+              let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0)
+        else {
             let today = Date.nowAt(.startOfDay)
             return (
                 DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 7, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local),
@@ -50,7 +56,7 @@ class Moment: NSObject, NSCoding {
         )
     }
 
-    init(_ solar: Solar) {
+    init(_ solar: inout Solar) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMomentsAsDates()
 
         sunrise = DateInRegion(solar.sunrise ?? sevenAM, region: Region.local)
@@ -92,22 +98,23 @@ class Moment: NSObject, NSCoding {
 
     // MARK: UserDefaults
 
-    init?(defaults: UserDefaults = datastore.defaults) {
+    init?(defaults _: Bool = true) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMoments()
 
         let localTime = { (iso: String) -> DateInRegion? in
             iso.toDate()?.convertTo(region: Region.local)
         }
 
-        guard let sunrise = defaults.string(forKey: "sunrise"),
-            let sunset = defaults.string(forKey: "sunset"),
-            let solarNoon = defaults.string(forKey: "solarNoon"),
-            let civilTwilightBegin = defaults.string(forKey: "civilTwilightBegin"),
-            let civilTwilightEnd = defaults.string(forKey: "civilTwilightEnd"),
-            let nauticalTwilightBegin = defaults.string(forKey: "nauticalTwilightBegin"),
-            let nauticalTwilightEnd = defaults.string(forKey: "nauticalTwilightEnd"),
-            let astronomicalTwilightBegin = defaults.string(forKey: "astronomicalTwilightBegin"),
-            let astronomicalTwilightEnd = defaults.string(forKey: "astronomicalTwilightEnd") else {
+        guard let sunrise = Defaults[.sunrise],
+              let sunset = Defaults[.sunset],
+              let solarNoon = Defaults[.solarNoon],
+              let civilTwilightBegin = Defaults[.civilTwilightBegin],
+              let civilTwilightEnd = Defaults[.civilTwilightEnd],
+              let nauticalTwilightBegin = Defaults[.nauticalTwilightBegin],
+              let nauticalTwilightEnd = Defaults[.nauticalTwilightEnd],
+              let astronomicalTwilightBegin = Defaults[.astronomicalTwilightBegin],
+              let astronomicalTwilightEnd = Defaults[.astronomicalTwilightEnd]
+        else {
             log.error("Unable to decode moment.")
             return nil
         }
@@ -115,7 +122,7 @@ class Moment: NSObject, NSCoding {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        let length = UInt64(defaults.integer(forKey: "dayLength"))
+        let length = UInt64(Defaults[.dayLength])
         if length == 0 {
             dayLength = UInt64(self.sunset - self.sunrise)
         } else {
@@ -130,84 +137,15 @@ class Moment: NSObject, NSCoding {
     }
 
     func store() {
-        datastore.defaults.set(sunrise.toISO(), forKey: "sunrise")
-        datastore.defaults.set(sunset.toISO(), forKey: "sunset")
-        datastore.defaults.set(solarNoon.toISO(), forKey: "solarNoon")
-        datastore.defaults.set(dayLength, forKey: "dayLength")
-        datastore.defaults.set(civilSunrise.toISO(), forKey: "civilTwilightBegin")
-        datastore.defaults.set(civilSunset.toISO(), forKey: "civilTwilightEnd")
-        datastore.defaults.set(nauticalSunrise.toISO(), forKey: "nauticalTwilightBegin")
-        datastore.defaults.set(nauticalSunset.toISO(), forKey: "nauticalTwilightEnd")
-        datastore.defaults.set(astronomicalSunrise.toISO(), forKey: "astronomicalTwilightBegin")
-        datastore.defaults.set(astronomicalSunset.toISO(), forKey: "astronomicalTwilightEnd")
-    }
-
-    // MARK: NSCoding
-
-    func encode(with aCoder: NSCoder) {
-        aCoder.encode(sunrise.toISO(), forKey: "sunrise")
-        aCoder.encode(sunset.toISO(), forKey: "sunset")
-        aCoder.encode(solarNoon.toISO(), forKey: "solarNoon")
-        aCoder.encode(dayLength, forKey: "dayLength")
-        aCoder.encode(civilSunrise.toISO(), forKey: "civilTwilightBegin")
-        aCoder.encode(civilSunset.toISO(), forKey: "civilTwilightEnd")
-        aCoder.encode(nauticalSunrise.toISO(), forKey: "nauticalTwilightBegin")
-        aCoder.encode(nauticalSunset.toISO(), forKey: "nauticalTwilightEnd")
-        aCoder.encode(astronomicalSunrise.toISO(), forKey: "astronomicalTwilightBegin")
-        aCoder.encode(astronomicalSunset.toISO(), forKey: "astronomicalTwilightEnd")
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        let (sevenAM, noon, sevenPM) = Moment.defaultMoments()
-
-        let localTime = { (iso: String) -> DateInRegion? in
-            iso.toDate()?.convertTo(region: Region.local)
-        }
-
-        guard let sunrise = aDecoder.decodeObject(forKey: "sunrise") as? String,
-            let sunset = aDecoder.decodeObject(forKey: "sunset") as? String,
-            let solarNoon = aDecoder.decodeObject(forKey: "solarNoon") as? String,
-            let civilTwilightBegin = aDecoder.decodeObject(forKey: "civilTwilightBegin") as? String,
-            let civilTwilightEnd = aDecoder.decodeObject(forKey: "civilTwilightEnd") as? String,
-            let nauticalTwilightBegin = aDecoder.decodeObject(forKey: "nauticalTwilightBegin") as? String,
-            let nauticalTwilightEnd = aDecoder.decodeObject(forKey: "nauticalTwilightEnd") as? String,
-            let astronomicalTwilightBegin = aDecoder.decodeObject(forKey: "astronomicalTwilightBegin") as? String,
-            let astronomicalTwilightEnd = aDecoder.decodeObject(forKey: "astronomicalTwilightEnd") as? String else {
-            log.error("Unable to decode moment.")
-            return nil
-        }
-
-        self.sunrise = localTime(sunrise) ?? sevenAM
-        self.sunset = localTime(sunset) ?? sevenPM
-        self.solarNoon = localTime(solarNoon) ?? noon
-        let length = UInt64(aDecoder.decodeInt64(forKey: "dayLength"))
-        if length == 0 {
-            dayLength = UInt64(self.sunset - self.sunrise)
-        } else {
-            dayLength = length
-        }
-        civilSunrise = localTime(civilTwilightBegin) ?? sevenAM
-        civilSunset = localTime(civilTwilightEnd) ?? sevenPM
-        nauticalSunrise = localTime(nauticalTwilightBegin) ?? sevenAM
-        nauticalSunset = localTime(nauticalTwilightEnd) ?? sevenPM
-        astronomicalSunrise = localTime(astronomicalTwilightBegin) ?? sevenAM
-        astronomicalSunset = localTime(astronomicalTwilightEnd) ?? sevenPM
-    }
-
-    func serialize() {
-        if let archiveURL = Moment.ArchiveURL {
-            if NSKeyedArchiver.archiveRootObject(self, toFile: archiveURL.path) {
-                log.info("Saved moment data to \(archiveURL.path)")
-            } else {
-                log.error("Failed to save moment data to \(archiveURL.path)")
-            }
-        }
-    }
-
-    static func deserialize() -> Moment? {
-        if let archiveURL = Moment.ArchiveURL {
-            return NSKeyedUnarchiver.unarchiveObject(withFile: archiveURL.path) as? Moment
-        }
-        return nil
+        Defaults[.sunrise] = sunrise.toISO()
+        Defaults[.sunset] = sunset.toISO()
+        Defaults[.solarNoon] = solarNoon.toISO()
+        Defaults[.dayLength] = dayLength
+        Defaults[.civilTwilightBegin] = civilSunrise.toISO()
+        Defaults[.civilTwilightEnd] = civilSunset.toISO()
+        Defaults[.nauticalTwilightBegin] = nauticalSunrise.toISO()
+        Defaults[.nauticalTwilightEnd] = nauticalSunset.toISO()
+        Defaults[.astronomicalTwilightBegin] = astronomicalSunrise.toISO()
+        Defaults[.astronomicalTwilightEnd] = astronomicalSunset.toISO()
     }
 }

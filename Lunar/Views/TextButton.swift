@@ -48,7 +48,7 @@ class TextButton: NSButton {
         wantsLayer = true
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + 4))
-        layer?.cornerRadius = frame.height / 2
+        radius = (frame.height / 2.0).ns
         layer?.backgroundColor = bgColor
 
         let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))

@@ -7,10 +7,12 @@
 //
 
 import Cocoa
+import Defaults
 
 class StatusItemButtonController: NSView {
     var statusButton: NSStatusBarButton?
     var menuPopoverOpener: DispatchWorkItem?
+    var clicked = false
 
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
@@ -18,14 +20,14 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if !datastore.defaults.showQuickActions || brightnessAdapter.displays.count == 0 {
+        if !Defaults[.showQuickActions] || displayController.displays.count == 0 || clicked {
             return
         }
 
         menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem { [unowned self] in
-            if let area = event.trackingArea, let button = self.statusButton {
-                menuPopover.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
-                menuPopover.becomeFirstResponder()
+            if let area = event.trackingArea, let button = self.statusButton, !self.clicked {
+                POPOVERS[.menu]!!.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
+                POPOVERS[.menu]!!.becomeFirstResponder()
             }
             self.menuPopoverOpener = nil
         }
@@ -39,12 +41,18 @@ class StatusItemButtonController: NSView {
             opener.cancel()
             menuPopoverOpener = nil
         }
-        closeMenuPopover(after: 2500)
+        closeMenuPopover(after: 4000)
     }
 
     override func mouseDown(with event: NSEvent) {
-        menuPopover.close()
+        clicked = true
+        asyncAfter(ms: 3000) { [weak self] in
+            self?.clicked = false
+        }
+
+        POPOVERS[.menu]!!.close()
         closeMenuPopover(after: 1500)
+
         if let button = statusButton {
             button.mouseDown(with: event)
         }

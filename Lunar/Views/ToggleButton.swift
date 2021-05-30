@@ -7,6 +7,8 @@
 //
 
 import Cocoa
+import Defaults
+import SwiftyAttributes
 
 enum HoverState: Int {
     case hover
@@ -17,35 +19,37 @@ enum Page: Int {
     case hotkeys
     case settings
     case display
+    case hotkeysReset
+    case settingsReset
+    case displayReset
+    case displayBrightnessRange
+    case displayAlgorithm
 }
 
-let titleString: [AdaptiveMode: String] = [
-    .sync: "Sync    ⚫︎",
-    .location: "Location ⚫︎",
-    .manual: "Manual  ⚫︎",
-]
-
 class ToggleButton: NSButton {
-    static func getStateTitle(adaptiveMode: AdaptiveMode, hoverState: HoverState, page: Page) -> NSMutableAttributedString {
-        return ToggleButton.titleWithAttributes(title: titleString[adaptiveMode]!, mode: adaptiveMode, hoverState: hoverState, page: page)
+    var page = Page.display {
+        didSet {
+            setColors()
+        }
     }
 
-    var page = Page.display
     var hoverState = HoverState.noHover
-    var bgColor: CGColor {
-        return stateButtonColor[hoverState]![page]!.cgColor
+    var bgColor: NSColor {
+        if !isEnabled {
+            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!).shadow(withLevel: 0.3)!
+        } else if state == .on {
+            return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
+        } else {
+            return offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!
+        }
     }
 
-    var labelColor: CGColor {
-        return stateButtonLabelColor[hoverState]![page]!.cgColor
-    }
-
-    var buttonState: NSControl.StateValue {
-        return NSControl.StateValue(rawValue: brightnessAdapter.mode.rawValue)
-    }
-
-    var buttonTitle: NSMutableAttributedString {
-        return ToggleButton.getStateTitle(adaptiveMode: brightnessAdapter.mode, hoverState: hoverState, page: page)
+    var labelColor: NSColor {
+        if state == .on {
+            return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
+        } else {
+            return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
+        }
     }
 
     override init(frame frameRect: NSRect) {
@@ -58,53 +62,50 @@ class ToggleButton: NSButton {
         setup()
     }
 
-    static func titleWithAttributes(title: String, mode: AdaptiveMode, hoverState: HoverState, page: Page) -> NSMutableAttributedString {
-        let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))
-        mutableTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: stateButtonLabelColor[hoverState]![page]!, range: NSMakeRange(0, mutableTitle.length - 2))
-        mutableTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonDotColor[mode]!, range: NSMakeRange(mutableTitle.length - 2, 2))
-        mutableTitle.setAlignment(.center, range: NSMakeRange(0, mutableTitle.length))
-        return mutableTitle
+    override func mouseEntered(with _: NSEvent) {
+        if isEnabled {
+            hover()
+        }
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        defocus()
+    }
+
+    func setColors(fadeDuration: TimeInterval = 0.2) {
+        layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
+        bg = bgColor
+        attributedTitle = attributedTitle.string.withAttribute(.textColor(labelColor))
+        attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
     }
 
     func fade() {
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-        layer?.backgroundColor = bgColor
-        setTitle()
+        setColors()
     }
 
     func defocus() {
         hoverState = .noHover
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        layer?.backgroundColor = bgColor
-        setTitle()
+        setColors()
     }
 
     func hover() {
         hoverState = .hover
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-        layer?.backgroundColor = bgColor
-        setTitle()
-    }
-
-    func setTitle() {
-        attributedTitle = buttonTitle
-        attributedAlternateTitle = buttonTitle
+        setColors(fadeDuration: 0.1)
     }
 
     func setup() {
         wantsLayer = true
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
-        layer?.cornerRadius = frame.height / 2
-        allowsMixedState = true
+        radius = (frame.height / 2).ns
+        allowsMixedState = false
+        setColors()
 
         let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(area)
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        state = buttonState
-        setTitle()
         super.draw(dirtyRect)
     }
 }

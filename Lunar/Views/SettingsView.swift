@@ -10,7 +10,7 @@ import Cocoa
 
 class SettingsView: NSSplitView {
     override var dividerThickness: CGFloat {
-        return 1.0
+        1.0
     }
 
     override func drawDivider(in rect: NSRect) {

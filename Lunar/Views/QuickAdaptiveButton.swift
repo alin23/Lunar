@@ -14,7 +14,7 @@ class QuickAdaptiveButton: NSButton {
     var displayID: CGDirectDisplayID?
     weak var display: Display? {
         guard let id = displayID else { return nil }
-        return brightnessAdapter.displays[id]
+        return displayController.displays[id]
     }
 
     func setup(displayID: CGDirectDisplayID) {
@@ -26,13 +26,17 @@ class QuickAdaptiveButton: NSButton {
         let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
         activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonLabelOn, range: NSMakeRange(0, activeTitle.length))
         let inactiveTitle = NSMutableAttributedString(attributedString: attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: buttonLabelOff, range: NSMakeRange(0, inactiveTitle.length))
+        inactiveTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: buttonLabelOff,
+            range: NSMakeRange(0, inactiveTitle.length)
+        )
 
         attributedTitle = inactiveTitle
         attributedAlternateTitle = activeTitle
 
         setFrameSize(NSSize(width: buttonSize.width, height: 18))
-        layer?.cornerRadius = frame.height / 2
+        radius = (frame.height / 2).ns
 
         if let adaptive = display?.adaptive {
             if adaptive {
@@ -43,32 +47,37 @@ class QuickAdaptiveButton: NSButton {
         }
 
         if state == .on {
-            layer?.backgroundColor = buttonBgOn.cgColor
+            bg = buttonBgOn
         } else {
-            layer?.backgroundColor = buttonBgOff.cgColor
+            bg = buttonBgOff
         }
-        adaptiveButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        adaptiveButtonTrackingArea = NSTrackingArea(
+            rect: visibleRect,
+            options: [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: self,
+            userInfo: nil
+        )
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        adaptiveObserver = { [unowned self] newAdaptive, oldValue in
+        adaptiveObserver = { [unowned self] (newAdaptive: Bool, oldValue: Bool) in
             if let display = self.display {
-                runInMainThread {
+                mainThread {
                     if newAdaptive {
-                        self.layer?.backgroundColor = buttonBgOn.cgColor
+                        self.bg = buttonBgOn
                         self.state = .on
                     } else {
-                        self.layer?.backgroundColor = buttonBgOff.cgColor
+                        self.bg = buttonBgOff
                         self.state = .off
                     }
                     display.readapt(newValue: newAdaptive, oldValue: oldValue)
                 }
             }
         }
-        display?.setObserver(prop: "adaptive", key: "quickAdaptiveButton-\(accessibilityIdentifier())", action: adaptiveObserver!)
+        display?.setObserver(prop: .adaptive, key: "quickAdaptiveButton-\(accessibilityIdentifier())", action: adaptiveObserver!)
     }
 
     deinit {
-        display?.resetObserver(prop: "adaptive", key: "quickAdaptiveButton-\(self.accessibilityIdentifier())", type: Bool.self)
+        display?.resetObserver(prop: .adaptive, key: "quickAdaptiveButton-\(self.accessibilityIdentifier())", type: Bool.self)
     }
 
     override func mouseDown(with _: NSEvent) {
@@ -84,10 +93,10 @@ class QuickAdaptiveButton: NSButton {
 
     func refresh(adaptive: Bool) {
         if adaptive {
-            layer?.backgroundColor = buttonBgOn.cgColor
+            bg = buttonBgOn
             display?.adaptive = true
         } else {
-            layer?.backgroundColor = buttonBgOff.cgColor
+            bg = buttonBgOff
             display?.adaptive = false
         }
     }
@@ -96,9 +105,9 @@ class QuickAdaptiveButton: NSButton {
         layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
         if state == .on {
-            layer?.backgroundColor = buttonBgOnHover.cgColor
+            bg = buttonBgOnHover
         } else {
-            layer?.backgroundColor = buttonBgOffHover.cgColor
+            bg = buttonBgOffHover
         }
     }
 
@@ -106,9 +115,9 @@ class QuickAdaptiveButton: NSButton {
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
 
         if state == .on {
-            layer?.backgroundColor = buttonBgOn.cgColor
+            bg = buttonBgOn
         } else {
-            layer?.backgroundColor = buttonBgOff.cgColor
+            bg = buttonBgOff
         }
     }
 }

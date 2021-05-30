@@ -14,6 +14,7 @@ class HelpPopoverController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        helpTextField.isSelectable = true
     }
 
     override func mouseDown(with event: NSEvent) {

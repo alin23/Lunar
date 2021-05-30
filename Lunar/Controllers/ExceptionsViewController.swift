@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Defaults
 
 class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet var tableView: NSTableView!
@@ -16,7 +17,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     @IBOutlet var addAppButton: NSButton!
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
-    var observer: NSKeyValueObservation!
+    var observer: DefaultsObservation!
 
     @IBInspectable dynamic var appExceptions: [AppException] = datastore.appExceptions() ?? []
 
@@ -29,7 +30,11 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         dialog.canChooseDirectories = false
         dialog.canCreateDirectories = false
         dialog.allowsMultipleSelection = false
-        dialog.allowedFileTypes = ["app"]
+        if #available(OSX 11.0, *) {
+            dialog.allowedContentTypes = [.application]
+        } else {
+            dialog.allowedFileTypes = ["app"]
+        }
         dialog.treatsFilePackagesAsDirectories = false
         dialog.directoryURL = URL(string: "file:///Applications")
 
@@ -39,11 +44,12 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             if let res = result {
                 let bundle = Bundle(url: res)
                 guard let name = bundle?.infoDictionary?["CFBundleName"] as? String,
-                    let id = bundle?.bundleIdentifier else {
+                      let id = bundle?.bundleIdentifier
+                else {
                     log.warning("Bundle for \(res.path) does not contain required fields")
                     return
                 }
-                if !(datastore.defaults.appExceptions?.contains(where: DataStore.appByIdentifier(id)) ?? false) {
+                if !(Defaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
                     let app = AppException(identifier: id, name: name)
                     DataStore.storeAppException(app: app)
                 }
@@ -59,8 +65,8 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             button.wantsLayer = true
 
             button.setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
-            button.layer?.cornerRadius = button.frame.width / 2
-            button.layer?.backgroundColor = white.cgColor
+            button.radius = (button.frame.width / 2).ns
+            button.bg = white
             button.alphaValue = 0.8
 
             addAppButtonShadow = button.shadow
@@ -91,10 +97,10 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         super.viewDidLoad()
         tableView.headerView = nil
         initAddAppButton()
-        observer = datastore.defaults.observe(\.appExceptions, options: [.new], changeHandler: { [weak self] _, change in
-            if let newVal = change.newValue, (newVal?.count ?? 0) != self?.appExceptions.count {
+        observer = Defaults.observe(.appExceptions) { [weak self] change in
+            if let newVal = change.newValue, newVal.count != self?.appExceptions.count {
                 self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
             }
-        })
+        }
     }
 }

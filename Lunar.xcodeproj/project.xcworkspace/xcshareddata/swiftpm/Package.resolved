@@ -6,17 +6,17 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire",
         "state": {
           "branch": null,
-          "revision": "fca036f7aeca07124067cb6e0c12b0ad6359e3d4",
-          "version": "5.1.0"
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
         }
       },
       {
-        "package": "AMCoreAudio",
-        "repositoryURL": "https://github.com/rnine/AMCoreAudio",
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
-          "branch": "master",
-          "revision": "92c2b2c858d602a7815e599bd763c33f157a5273",
-          "version": null
+          "branch": null,
+          "revision": "38b05fc9f86501ef8018aa90cf3d83bd97f74067",
+          "version": "0.4.0"
         }
       },
       {
@@ -24,8 +24,26 @@
         "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
         "state": {
           "branch": null,
-          "revision": "73f362cb0d9c5f1fd0089240d7b293cd2bff18db",
-          "version": "1.2.5"
+          "revision": "baf6ed3fc1a622675f0041b4aff7c02dd1a93818",
+          "version": "1.2.200"
+        }
+      },
+      {
+        "package": "Socket",
+        "repositoryURL": "https://github.com/Kitura/BlueSocket",
+        "state": {
+          "branch": null,
+          "revision": "c9894fd117457f1d006575fbfb2fdfd6f79eac03",
+          "version": "1.0.200"
+        }
+      },
+      {
+        "package": "Burritos",
+        "repositoryURL": "https://github.com/alin23/Burritos",
+        "state": {
+          "branch": "master",
+          "revision": "3dd5867dc5b321fbd5a28d2d8b283e4252b2e4d7",
+          "version": null
         }
       },
       {
@@ -33,35 +51,116 @@
         "repositoryURL": "https://github.com/danielgindi/Charts",
         "state": {
           "branch": null,
-          "revision": "7ac4a05e83d279bac305a472af9128c2a0eca3d7",
-          "version": "3.5.0"
+          "revision": "8d134a78bb2cb9e7a0f05ecbd5880bb05cd02863",
+          "version": "4.0.1"
+        }
+      },
+      {
+        "package": "Ciao",
+        "repositoryURL": "https://github.com/alin23/Ciao",
+        "state": {
+          "branch": "master",
+          "revision": "3b1d78e82dfe0a09d7ed41912cb77297cd8eecf3",
+          "version": null
+        }
+      },
+      {
+        "package": "DataCompression",
+        "repositoryURL": "https://github.com/mw99/DataCompression/",
+        "state": {
+          "branch": null,
+          "revision": "6abb8f3cd0e4b2a33b4927a7a92b6764528f2440",
+          "version": "3.6.0"
+        }
+      },
+      {
+        "package": "Defaults",
+        "repositoryURL": "https://github.com/sindresorhus/Defaults",
+        "state": {
+          "branch": null,
+          "revision": "d98119fee49c893fae553103a8659ffe003b6cfe",
+          "version": "4.1.0"
         }
       },
       {
         "package": "Down",
-        "repositoryURL": "https://github.com/iwasrobbed/Down",
+        "repositoryURL": "https://github.com/johnxnguyen/Down",
         "state": {
           "branch": null,
-          "revision": "2aada56e6a0a5593a58e1ad583bd605b6d0b58dd",
-          "version": "0.9.2"
+          "revision": "f34b166be1f1db4aa8f573067e901d72f2a6be57",
+          "version": "0.11.0"
+        }
+      },
+      {
+        "package": "EonilFSEvents",
+        "repositoryURL": "https://github.com/eonil/FSEvents",
+        "state": {
+          "branch": null,
+          "revision": "e6b7cdfa2754454e194a45ee6c2004d0f630fe88",
+          "version": "0.1.7"
+        }
+      },
+      {
+        "package": "Glob",
+        "repositoryURL": "https://github.com/Bouke/Glob",
+        "state": {
+          "branch": null,
+          "revision": "deda6e163d2ff2a8d7e138e2c3326dbd71157faf",
+          "version": "1.0.5"
         }
       },
       {
         "package": "KeyHolder",
         "repositoryURL": "https://github.com/alin23/KeyHolder",
         "state": {
-          "branch": null,
-          "revision": "5c0f1c32c9e7a1f53d6b9d079e0ae2fa40ec79fc",
+          "branch": "master",
+          "revision": "212dad3e6def0ee25e0700c03680d9ba8c31486b",
           "version": null
         }
       },
       {
+        "package": "LaunchAtLogin",
+        "repositoryURL": "https://github.com/sindresorhus/LaunchAtLogin",
+        "state": {
+          "branch": null,
+          "revision": "6b16bcdf7d45a9d76a768a5c4912dde925cf0e95",
+          "version": "4.1.0"
+        }
+      },
+      {
         "package": "Magnet",
-        "repositoryURL": "https://github.com/alin23/Magnet",
+        "repositoryURL": "https://github.com/Clipy/Magnet",
         "state": {
           "branch": "master",
-          "revision": "127a19b47f5f5e9f421c3a5f821582ea00f15b82",
+          "revision": "4193969b15434499ae902ebc5174f78b94b0d00e",
           "version": null
+        }
+      },
+      {
+        "package": "MediaKeyTap",
+        "repositoryURL": "https://github.com/alin23/MediaKeyTap",
+        "state": {
+          "branch": "master",
+          "revision": "533ccd31e367f37b90efb5fa01812dec314d52c8",
+          "version": null
+        }
+      },
+      {
+        "package": "Path.swift",
+        "repositoryURL": "https://github.com/mxcl/Path.swift",
+        "state": {
+          "branch": null,
+          "revision": "142d4bc1118602f3679c777d2e0da89c227cd918",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "Regex",
+        "repositoryURL": "https://github.com/crossroadlabs/Regex",
+        "state": {
+          "branch": null,
+          "revision": "166728756082a9cac6e4aed3ebbce8e41cb3a945",
+          "version": "1.2.0"
         }
       },
       {
@@ -69,8 +168,8 @@
         "repositoryURL": "https://github.com/Clipy/Sauce",
         "state": {
           "branch": null,
-          "revision": "a06f28c6246c0c8a0835c5427f6b169484955a1a",
-          "version": "2.0.2"
+          "revision": "2fcf7e43a242b183fdea3f2275ebec0d773b65f5",
+          "version": "2.2.0"
         }
       },
       {
@@ -78,8 +177,17 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "7ec74a730bf7c39376df9055151704041ea55cfa",
-          "version": "5.0.0"
+          "revision": "440dee65fbb6605dc17736732cc3be7f6e3a21f2",
+          "version": "7.0.1"
+        }
+      },
+      {
+        "package": "SimplyCoreAudio",
+        "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
+        "state": {
+          "branch": null,
+          "revision": "e049672b919127f0dda41503699983d2c905cd83",
+          "version": "4.0.1"
         }
       },
       {
@@ -87,8 +195,17 @@
         "repositoryURL": "https://github.com/alin23/Solar",
         "state": {
           "branch": null,
-          "revision": "939f125badb2bc5012c5a8f651a7dbab96868a13",
-          "version": "2.3.3"
+          "revision": "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
+          "version": "3.1.1"
+        }
+      },
+      {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/sparkle-project/Sparkle",
+        "state": {
+          "branch": null,
+          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
+          "version": "1.26.0"
         }
       },
       {
@@ -101,12 +218,66 @@
         }
       },
       {
+        "package": "swift-algorithms",
+        "repositoryURL": "https://github.com/apple/swift-algorithms",
+        "state": {
+          "branch": null,
+          "revision": "04d91803a2dd58c14db9cf66c7412c6dd4a26fc8",
+          "version": "0.1.1"
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "47bd06ebeff8146ecd0020809e186218b46f465f",
+          "version": "0.4.2"
+        }
+      },
+      {
+        "package": "swift-atomics",
+        "repositoryURL": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "branch": null,
+          "revision": "3e95ba32cd1b4c877f6163e8eea54afc4e63bf9f",
+          "version": "0.0.3"
+        }
+      },
+      {
+        "package": "swift-numerics",
+        "repositoryURL": "https://github.com/apple/swift-numerics",
+        "state": {
+          "branch": null,
+          "revision": "6583ac70c326c3ee080c1d42d9ca3361dca816cd",
+          "version": "0.1.0"
+        }
+      },
+      {
         "package": "SwiftDate",
         "repositoryURL": "https://github.com/malcommac/SwiftDate",
         "state": {
           "branch": null,
-          "revision": "700dde1b3417fd4a7fd2bec9f5bc8ab2de1b96b4",
-          "version": "6.1.0"
+          "revision": "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
+          "version": "6.3.1"
+        }
+      },
+      {
+        "package": "SwiftSerial",
+        "repositoryURL": "https://github.com/alin23/SwiftSerial",
+        "state": {
+          "branch": "master",
+          "revision": "06a57193a96af68e58d94ac53fe000b0fecafb5a",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftyAttributes",
+        "repositoryURL": "https://github.com/eddiekaiger/SwiftyAttributes",
+        "state": {
+          "branch": null,
+          "revision": "0fbf992e6e4e1b98954f3d48f8523a67dfa5c8f3",
+          "version": "5.2.0"
         }
       },
       {
@@ -114,8 +285,8 @@
         "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver",
         "state": {
           "branch": null,
-          "revision": "e0fb3a74cb993d7dcf1e56734cdc98ad6e6d8176",
-          "version": "1.9.1"
+          "revision": "2c513a2e8fbfbd6495afc4a05941d8e3fdba68e9",
+          "version": "1.9.3"
         }
       },
       {
@@ -125,6 +296,15 @@
           "branch": null,
           "revision": "2b6054efa051565954e1d2b9da831680026cd768",
           "version": "5.0.0"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation",
+        "state": {
+          "branch": null,
+          "revision": "cf10bbff6ac3b873e97b36b9784c79866a051a8e",
+          "version": "0.9.12"
         }
       }
     ]
