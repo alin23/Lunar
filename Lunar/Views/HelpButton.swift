@@ -11,10 +11,10 @@ import Down
 
 let STYLESHEET = """
 p, ul, ol, li, a {
-    font-family: 'SF Compact Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'SF Compact Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Avenir, sans-serif;
 }
 
-ul, ol {
+ul, ol, li:last-child {
     margin-bottom: 10px;
 }
 
@@ -23,11 +23,15 @@ a {
     margin-top: 1px;
 }
 
-h1, h2 {
+h1, h2, h3, h4 {
     padding-top: 10px;
     margin-bottom: 8px;
     font-family: Menlo, monospace;
     font-weight: bold;
+}
+
+h3, h4 {
+    margin-bottom: 4px;
 }
 
 pre, code {
@@ -49,54 +53,35 @@ pre, code {
 }
 """
 
-class HelpButton: NSButton {
+class HelpButton: PopoverButton<HelpPopoverController> {
     var link: String?
-    var trackingArea: NSTrackingArea!
-    var buttonShadow: NSShadow!
+
+    override var popoverKey: PopoverKey {
+        .help
+    }
 
     @IBInspectable var helpText: String = ""
 
-    var onMouseEnter: (() -> Void)?
-    var onMouseExit: (() -> Void)?
-
     func getParsedHelpText() -> NSAttributedString? {
-        guard let popover = helpPopover else { return nil }
+        guard let popover = POPOVERS[popoverKey]! else { return nil }
         let down = Down(markdownString: helpText)
 
         do {
-            return try down.toAttributedString(.default, stylesheet: popover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET)
+            return try down.toAttributedString(
+                .default,
+                stylesheet: popover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET
+            )
         } catch {
             log.error("Markdown error: \(error)")
             return nil
         }
     }
 
-    func setup() {
-        let buttonSize = frame
-        wantsLayer = true
-
-        setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
-        layer?.cornerRadius = frame.width / 2
-        layer?.backgroundColor = .clear
-        alphaValue = 0.2
-
-        buttonShadow = shadow
-        shadow = nil
-
-        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(trackingArea)
-    }
-
-    override func mouseEntered(with _: NSEvent) {
-        if !isEnabled { return }
-
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
-        alphaValue = 0.7
-        shadow = buttonShadow
-
-        guard let popover = helpPopover else { return }
-
-        if let c = popover.contentViewController as? HelpPopoverController, !helpText.isEmpty, let parsedHelpText = getParsedHelpText() {
+    override func mouseDown(with event: NSEvent) {
+        if !helpText.isEmpty,
+           let parsedHelpText = getParsedHelpText(),
+           let c = popoverController
+        {
             c.helpTextField?.attributedStringValue = parsedHelpText
             if let link = self.link {
                 c.onClick = {
@@ -105,34 +90,7 @@ class HelpButton: NSButton {
                     }
                 }
             }
-            popover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
-            popover.becomeFirstResponder()
         }
-
-        onMouseEnter?()
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if !isEnabled { return }
-
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        alphaValue = 0.2
-        shadow = nil
-
-        onMouseExit?()
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
+        super.mouseDown(with: event)
     }
 }

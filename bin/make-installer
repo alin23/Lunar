@@ -1,0 +1,71 @@
+#!/usr/bin/env fish
+set DIR (cd (dirname (status -f)); and pwd)
+if test -f "$DIR/.env.sh"
+    . $DIR/.env.sh
+end
+
+if not set -q PROJECT_DIR
+    set PROJECT_DIR (dirname $DIR)
+end
+
+set CODESIGN_CERT "Developer ID Application: Alin Panaitiu (RDDXV84A73)"
+set CODESIGN_CERT_INSTALLER "Developer ID Installer: Alin Panaitiu (RDDXV84A73)"
+set WORK_DIR "$PROJECT_DIR"
+set SCRIPTS_DIR "$PROJECT_DIR/scripts"
+
+set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
+set TMP_DIR /tmp/Lunar
+set RELEASE_DIR "$WORK_DIR/Releases"
+set APPCAST "$RELEASE_DIR/appcast.xml"
+if test "$CONFIGURATION" != Release
+    set APPCAST "$RELEASE_DIR/appcast-"(string lower -- $CONFIGURATION)".xml"
+end
+
+set APP_TMP "$TMP_DIR/Lunar.app"
+set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
+
+function make-installer -a ext
+    set TMP_INSTALLER_DIR "$TMP_DIR/$ext"
+    mkdir -p $TMP_INSTALLER_DIR || exit 1
+
+    set APP_LATEST_INSTALLER "$RELEASE_DIR/Lunar.$ext"
+    set APP_INSTALLER "$RELEASE_DIR/Lunar-$APP_VERSION.$ext"
+    set APP_INSTALLER_ZIP "$RELEASE_DIR/Lunar-$APP_VERSION.zip"
+    set APP_TMP_INSTALLER "$TMP_INSTALLER_DIR/Lunar-$APP_VERSION.$ext"
+
+    if test -f "$APP_INSTALLER"
+        echo (set_color red)"Deleting $APP_INSTALLER"(set_color normal)
+        rm "$APP_INSTALLER"
+    end
+    if test -f "$APP_LATEST_INSTALLER"
+        echo \n(set_color red)"Deleting $APP_LATEST_INSTALLER"(set_color normal)
+        rm "$APP_LATEST_INSTALLER"
+    end
+    if test -f "$APP_TMP_INSTALLER"
+        echo \n(set_color red)"Deleting $APP_TMP_INSTALLER"(set_color normal)
+        rm "$APP_TMP_INSTALLER"
+    end
+
+    if test "$ext" = pkg
+        pkgbuild --sign $CODESIGN_CERT_INSTALLER --identifier fyi.lunar.Lunar --scripts "$SCRIPTS_DIR" --install-location /Applications --component "$APP_TMP" "$APP_TMP_INSTALLER" || exit 1
+    else if test "$ext" = dmg
+        create-dmg --identity="$CODESIGN_CERT" "$APP_TMP" "$TMP_INSTALLER_DIR" || exit 1
+        set APP_TMP_INSTALLER_CREATED "$TMP_INSTALLER_DIR/Lunar $APP_VERSION.$ext"
+        mv "$APP_TMP_INSTALLER_CREATED" "$APP_TMP_INSTALLER"
+    end
+
+    cp "$APP_TMP_INSTALLER" "$APP_INSTALLER" || exit 1
+
+    if not set -q DISABLE_NOTARIZATION
+        xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_INSTALLER" || exit 1
+    end
+
+    cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
+    if test "$ext" = pkg
+        cd "$RELEASE_DIR"
+        zip "$APP_INSTALLER_ZIP" "$APP_INSTALLER"
+        cd -
+    end
+end
+
+make-installer $argv

@@ -23,13 +23,13 @@ class LockButton: NSButton {
         attributedAlternateTitle = activeTitle
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
-        layer?.cornerRadius = frame.height / 2
+        radius = (frame.height / 2).ns
         if locked {
             state = .on
-            layer?.backgroundColor = lockButtonBgOn.cgColor
+            bg = lockButtonBgOn
         } else {
             state = .off
-            layer?.backgroundColor = lockButtonBgOff.cgColor
+            bg = lockButtonBgOff
         }
         lockButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(lockButtonTrackingArea)
@@ -39,9 +39,9 @@ class LockButton: NSButton {
         layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
 
         if state == .on {
-            layer?.backgroundColor = lockButtonBgOnHover.cgColor
+            bg = lockButtonBgOnHover
         } else {
-            layer?.backgroundColor = lockButtonBgOffHover.cgColor
+            bg = lockButtonBgOffHover
         }
     }
 
@@ -49,9 +49,9 @@ class LockButton: NSButton {
         layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
 
         if state == .on {
-            layer?.backgroundColor = lockButtonBgOn.cgColor
+            bg = lockButtonBgOn
         } else {
-            layer?.backgroundColor = lockButtonBgOff.cgColor
+            bg = lockButtonBgOff
         }
     }
 

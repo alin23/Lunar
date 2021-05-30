@@ -2,11 +2,11 @@ import Foundation
 
 class AppExceptionTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
-        return AppException.self
+        AppException.self
     }
 
     override class func allowsReverseTransformation() -> Bool {
-        return true
+        true
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
@@ -15,17 +15,17 @@ class AppExceptionTransformer: ValueTransformer {
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        return (value as? AppException)?.dictionaryRepresentation()
+        (value as? AppException)?.dictionary
     }
 }
 
 class DisplayTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
-        return Display.self
+        Display.self
     }
 
     override class func allowsReverseTransformation() -> Bool {
-        return true
+        true
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
@@ -34,7 +34,7 @@ class DisplayTransformer: ValueTransformer {
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        return (value as? Display)?.dictionaryRepresentation()
+        (value as? Display)?.dictionary
     }
 }
 

@@ -281,5 +281,109 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Show built-in brightness in menu</li><li>Update hotkey libraries</li><li>Use Swift Package Manager for most of the frameworks</li><li>Use LaunchAtLogin framework to fix start at login</li></ul></div></div>]]>
             </description>
         </item>
+        <item>
+            <title>4.0.0</title>
+            <pubDate>Thu, 27 May 2021 23:57:47 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="23232162" sparkle:dsaSignature="MEUCIQCHYS3O2mThqj9NvwaHZsGdyjomjcfjhJWvvGXYnn0QRAIgNz/A3B50fUf17MD31mNlv7NJRBm4YF3fO6zUNwpW+pU=" sparkle:edSignature="yjs3NusaHd1oOKKi7GZU8rvcRM90XQoJtbzepYVvQcARjAjPxRkj80FAq4rtE2VPxCe08Ymw46aTYlyf1qrZDA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.0" sparkle:version="4.0.0" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.0.zip"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Lunar 4 has been released!</h2><h4>Head over to <a href="https://lunar.fyi">the official website</a>for more details.</h4></div>]]>
+            </description>
+            <signature>+fZVx8ZMFnunb79BW4BOWLE2P6U=</signature>
+            <signature>au.KXE.IUyFoixxS4sY4QqnuXKc=</signature>
+            <signature>au/KXE/IUyFoixxS4sY4QqnuXKc=</signature>
+        </item>
+        <item>
+            <title>4.0.1</title>
+            <pubDate>Fri, 28 May 2021 18:51:35 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="23239439" sparkle:dsaSignature="MEUCIQCgIp8+YxE91YmyAerYk1HJp7e5/CO2DCMeymlI8oGNKAIgR4laAOZhHynQkuSotnzjj6cKmbxG1n5cVl9xy5hlpYw=" sparkle:edSignature="cPVo3TuIBtS4AeBSFvIo4IU/xyTY0ryomrMV39Wwdr6i4otU+VfZzEc5OrUNvMwgHvZGFMkJguHYdC3/vURvBw==" sparkle:installationType="package" sparkle:shortVersionString="4.0.1" sparkle:version="4.0.1" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.1.zip"/>
+            <sparkle:deltas>
+                <enclosure length="1535793" sparkle:deltaFrom="4.0.0" sparkle:dsaSignature="MEQCIBMqTVDjCZ7cOfNeAvM2pypI3nE6I6K8fpGH7IzT91AEAiAZlPF03qU9g98XmeSEohFc+yocbFMRHkvCQ3OcceWAPg==" sparkle:edSignature="56fJHbmGtbAC28TX8IeXRacxNJSzrF2p733yru072zmhk0y+6OyE3anRZC6JyMS7tG4Ut8ccFF38gVuD/GP+CA==" sparkle:shortVersionString="4.0.1" sparkle:version="4.0.1" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.1/4.0.0"/>
+            </sparkle:deltas>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Show window when menu bar icon is hidden and app is launched while already running</li><li>Fix data race when ddcutil service is found on the network</li><li>Fix setting brightness for Apple vendored displays</li><li>Delay reset for mDNS browser when coming out of standby to avoid a recent CoreFoundation bug: <a href="https://developer.apple.com/forums/thread/663772">CFRunLoopSource type mismatch, found CFSocket</a></li><li>Check for Catalina or higher before trying to get display info dictionary</li></ul><h2 id="improvements">Improvements</h2><ul><li>Added Sync Mode test inside diagnostics</li></ul></div></div>]]>
+            </description>
+            <signature>.2.cnMk+DoKNFSsIH3SPrNUN+C4=</signature>
+            <signature>/2/cnMk+DoKNFSsIH3SPrNUN+C4=</signature>
+            <signature>9VLcsNWZBa.icOICqGyd9RWPSuk=</signature>
+            <signature>9VLcsNWZBa/icOICqGyd9RWPSuk=</signature>
+        </item>
+        <item>
+            <title>4.0.2</title>
+            <pubDate>Fri, 28 May 2021 21:01:07 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="23240442" sparkle:dsaSignature="MEQCIDLsvDjf79eNbDJCoU/gqnc2Ps3bW2JDaZy6lpbGdnVzAiBATkcBbDQCSElxRO7NLw61KUTKVTj9ezxAG/Xtv3AIPg==" sparkle:edSignature="997Rz41ViujqXD6UhCKrCFgc770zUpwfBeXQ88ERB7brq6pvWEaSzrV4+o4aCj/sipArWgIcF7XgqqGa42wQCw==" sparkle:installationType="package" sparkle:shortVersionString="4.0.2" sparkle:version="4.0.2" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.2.zip"/>
+            <sparkle:deltas>
+                <enclosure length="884278" sparkle:deltaFrom="4.0.1" sparkle:dsaSignature="MEQCIGts8rVb5f+E5UUZ+U06NQ7ScVy1AkZw+saLajpuDwh9AiAWM6VIhTeLsUlvYaZ1OkTGVhY2HytoGFRqabxEjW3sxw==" sparkle:edSignature="Cnm15BnWCKNRhqAG5jy46Dq3j8h1hWmfZC3YiObaECaxHMkx9DhFg6J0rkFK1Rk5T/LQsQTKe71ZzrDo8y22Bw==" sparkle:shortVersionString="4.0.2" sparkle:version="4.0.2" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.2/4.0.1"/>
+                <enclosure length="1561914" sparkle:deltaFrom="4.0.0" sparkle:dsaSignature="MEQCIFa1fSO2VkOcyUapi0NIN67IJfGH764F3rU5YrzP6LuqAiAgQiGldQLWDNfaxgqnRauhtG3qzWCUgXNGet2oBzn47Q==" sparkle:edSignature="68C1DHt1pJSvlOwAHiPSzJIPj1x49Bh+nEP7yngN4wlIu6WRIEor32fqCqJ4aribCJgtPV0L0GhAOWv9kj7lDA==" sparkle:shortVersionString="4.0.2" sparkle:version="4.0.2" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.2/4.0.0"/>
+            </sparkle:deltas>
+            <signature>aStGYSM3Zr2L6+1e.TmpqE3PlDg=</signature>
+            <signature>aStGYSM3Zr2L6+1e/TmpqE3PlDg=</signature>
+            <signature>NNBwHq8LsKDMlmzAULRMIyo9k68=</signature>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix valid updates checking logic</li><li>Show window when menu bar icon is hidden and app is launched while already running</li><li>Fix data race when ddcutil service is found on the network</li><li>Fix setting brightness for Apple vendored displays</li><li>Delay reset for mDNS browser when coming out of standby to avoid a recent CoreFoundation bug: <a href="https://developer.apple.com/forums/thread/663772">CFRunLoopSource type mismatch, found CFSocket</a></li><li>Check for Catalina or higher before trying to get display info dictionary</li></ul><h2 id="improvements">Improvements</h2><ul><li>Added Sync Mode test inside diagnostics</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>4.0.3</title>
+            <pubDate>Sat, 29 May 2021 19:39:19 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="19834282" sparkle:dsaSignature="MEYCIQCGH1cIcOI6G/hGR+RV099DQYOJ2cF6bsrVLiBvL6tyawIhAKp4sGTkMhZXGsxhmYDZMJkjkHjaSLhxiCXKUpJPZveU" sparkle:edSignature="l3POGkVBrmsGVW/JYk1x9/URg+AU/Vtbv+H2y1QW7NnCXjDR+/rqAMsIWTcEQc38S8/IpjOTsMmOLk5y4pxwBw==" sparkle:installationType="package" sparkle:shortVersionString="4.0.3" sparkle:version="4.0.3" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.3.zip"/>
+            <sparkle:deltas>
+                <enclosure length="2784447" sparkle:deltaFrom="4.0.2" sparkle:dsaSignature="MEQCIE47FwSuPwAXc2YYZOhWdJjuCd0beX6n6lw2ptnzOK7NAiB6vgy4qWwfDWqw9qJR4QN5iT3RXsjamwlzOm1OWg7FEw==" sparkle:edSignature="Ca/0afaZuKyFlL++L7qLKCs52iMk7zVUXn9gQrSq061wuRxJbalbKDfA9fz0VJPhxUQsV8lZ+JhXBmKm2nVUCg==" sparkle:shortVersionString="4.0.3" sparkle:version="4.0.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.3/4.0.2"/>
+                <enclosure length="2798086" sparkle:deltaFrom="4.0.1" sparkle:dsaSignature="MEQCIEqxnQKhIRDsXBi7b9HRfjK2sFkYmw3JrHNh/LdydWcrAiAywznHBNz+iKXsWXmYNNjQWCu4iqW9LkNMo2D+hfoYIg==" sparkle:edSignature="5l+Y13A+HNCGTE7J4PptVkdMl0Xj7v305Bfo448R+62CrQg2sDbP9i4y+nVdYQ135vW2i9K86+wlfdaQRIkXCw==" sparkle:shortVersionString="4.0.3" sparkle:version="4.0.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.3/4.0.1"/>
+                <enclosure length="2889155" sparkle:deltaFrom="4.0.0" sparkle:dsaSignature="MEUCIQCNaX4EWirAjDPqAf7o4hHEseoCihwb9BugXA5ZZKI7EAIgVGNlnHwyn2HfMsd8ows3BR4MHpX7WHxyospkbcw1AIs=" sparkle:edSignature="pag+ECxFtSHamMND1WfjkOp2FIalVCzScqbVH6K6KDVscEMK2q8Xuiay11DXO/cIe8jSjBZqQI9EUx2zGzm7Cw==" sparkle:shortVersionString="4.0.3" sparkle:version="4.0.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.3/4.0.0"/>
+            </sparkle:deltas>
+            <signature>oRctvIpvc+.Q60e+cDdHoCFKntM=</signature>
+            <signature>oRctvIpvc+/Q60e+cDdHoCFKntM=</signature>
+            <signature>9titfDIKChA6iCI6WAJdhoH1C2o=</signature>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>It seems Lunar needs macOS 10.15 or higher (even though Xcode compiles it just fine for 10.13) so I made that the minimum requirement</li></ul><h2 id="improvements">Improvements</h2><ul><li>Added <em>Advanced</em>setting for disabling brightness re-apply on screen wake</li><li>Show Lunar window before showing Paddle licensing UI</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>4.0.4</title>
+            <pubDate>Sat, 29 May 2021 20:19:12 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="19832148" sparkle:dsaSignature="MEQCID9ubl74Sg4Xv7WD5iArm4iMmC2ZAFsjfn1dcLnYGIK4AiA9JHOF7FehOJBLVSaFCl3ZkRJXGClwNCr4bvyl41AR6A==" sparkle:edSignature="X3EQUh22mezsNvqEI0z8VpuvRQj+qmZoPQqz2sTMi8ZT+0r5QiIVQSxtlRqw3dD/9AGAleziyXUSl0Vq+/rkDg==" sparkle:installationType="package" sparkle:shortVersionString="4.0.4" sparkle:version="4.0.4" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.4.zip"/>
+            <sparkle:deltas>
+                <enclosure length="532505" sparkle:deltaFrom="4.0.3" sparkle:dsaSignature="MEQCIBKH5536L948++oEY1TZitSSgBL21KfVneX5bzGVeJogAiAAryrMqEtyev+UMj7mTJWYSu65nVcoHv/yMevuXk66ug==" sparkle:edSignature="fqRT1laohs5Ve8bA3La5ca/7ZDIeZ+MVQQUrNpJtIXnzDvyDyCM+OMMzlQ5GODfn58IBoR1LgCIxiHFREq01BQ==" sparkle:shortVersionString="4.0.4" sparkle:version="4.0.4" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.4/4.0.3"/>
+                <enclosure length="2799206" sparkle:deltaFrom="4.0.2" sparkle:dsaSignature="MEUCIQCDclruhA1Jx6Bt7Xg88jRRh1M0ny9JbabD+BXAKJpNNgIgOrGDiE1CcRSQhE0TbLemYubOCNIx2bAifTvBQtHC7hE=" sparkle:edSignature="GphtrA5woMCDgC7TE3L1UqjCgGP+ynp4UtIzUwaUBxsjCBckR9AxkJGUfFE1GQpPXPhqy61/bWZou7rdOdkaAw==" sparkle:shortVersionString="4.0.4" sparkle:version="4.0.4" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.4/4.0.2"/>
+                <enclosure length="2809492" sparkle:deltaFrom="4.0.1" sparkle:dsaSignature="MEQCIBtbHbwiOBsMrD8pIq4MFHhn2vXBktBYaK/ZEQyNWGcYAiBJ8Yr0LxBrhExZ/bIne8cVGbV8x4NO3yHWEITWBCNsuQ==" sparkle:edSignature="3YTz1SxGDIcPeB8KHQvTuh44PE2vEhNtd3pXGjRXyMq6SGn1KU6swmemFpEyZYTgoHIFVkxZpIlHbdDr0FlADg==" sparkle:shortVersionString="4.0.4" sparkle:version="4.0.4" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.4/4.0.1"/>
+                <enclosure length="2883047" sparkle:deltaFrom="4.0.0" sparkle:dsaSignature="MEUCIQCRcnoo5fw3QaC87pPeyAyWgWCDf/JWeuDOxwY+Dw1OYAIgEDuhim6oQpuekmTWgTdrWJK9jJHO2TqyB2MW+cDoiRw=" sparkle:edSignature="cHlXaDbcR/jTqS3Db9Ijj+DWcDeOpQ9b4v6FiereuOdPC1snj02Gy43p7X8x5DzKfburbBa0nSDLF0BEd5lDAw==" sparkle:shortVersionString="4.0.4" sparkle:version="4.0.4" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.4/4.0.0"/>
+            </sparkle:deltas>
+            <signature>sEMkmPPEzqfIjTnLcQsENlf.qJI=</signature>
+            <signature>sEMkmPPEzqfIjTnLcQsENlf/qJI=</signature>
+            <signature>t4x2f10ekxzCdnNdzKEuYFxFAl0=</signature>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>I'm really sorry if you have been seing the <strong>Your period of free updates has expired</strong>screen. This should be fixed now in 4.0.4 and the next update shouldn't show that screen anymore</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>4.0.5</title>
+            <pubDate>Mon, 31 May 2021 15:28:44 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="19841206" sparkle:dsaSignature="MEYCIQCheUV2LN4pbYTy2IZM/fae7CGMq7yZy+m3WHegn/uTogIhAJoG7LAZtWCjsL9nbDoUpoYlOaVrD5PS48Ro1eDidMWN" sparkle:edSignature="8dtmWyFnGJSUaCtOnZh85qoqCp1/1FtOh5+BwwgYUhSnyukpMT3IO2veNtWVdKJKxS2jP59cqIBCBcraNezgAA==" sparkle:installationType="package" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.0.5.zip"/>
+            <sparkle:deltas>
+                <enclosure length="2630537" sparkle:deltaFrom="4.0.3" sparkle:dsaSignature="MEQCIGwJhnBbo3BvDIbvuesY4RvjaK6OcJCEp7Rf3P9jgtUWAiAz6LozwtKRb+Gw2Nu60wpta7RIwIT9nCZPCNGMNcHaRQ==" sparkle:edSignature="7pMPYajysxgfu2lgx//PW8GH6WjhKYIfpditAfJWIMdAj2pw10gM3X6PcjTU3TWEbJRcD5ZPO8Jz15agBVLUAw==" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.5/4.0.3"/>
+                <enclosure length="3116978" sparkle:deltaFrom="4.0.2" sparkle:dsaSignature="MEQCIDgvoM2AFr9InEHHkZjZkEa7mDLQI5qDWaIFakb+u+rCAiBC5o846OVlX73mLs14+IKW6BpKCCrSxkOmAGcXB3kiIQ==" sparkle:edSignature="S8fkvsTV9phWmm4Dy8arjMrg+Hazl//yYJDXQu5EORtbOrYmeq/nHjKBUb2SoaGlYzbJfA700xWMJofr+84oCw==" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.5/4.0.2"/>
+                <enclosure length="2683884" sparkle:deltaFrom="4.0.4" sparkle:dsaSignature="MEQCIAx2eXnZKn03vX9mbtNOf7ogTKbgEXbnNmgYuyu2cdPEAiArW5su0tl5ym7vTtexjllxX0Xb8XHg3aQu61bRf5kDvQ==" sparkle:edSignature="Sjby5aRevKWh9DdGuesqC+5fFtaj+mCF+ZlD20ROMUhIFTz76c+IERGr6OXYp8+o6Rgj/q5xJ72RwK+pJElfDA==" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.5/4.0.4"/>
+                <enclosure length="3121445" sparkle:deltaFrom="4.0.1" sparkle:dsaSignature="MEUCIBmzynVXYJ8mljcdVLYGJ4bAiUCdJkHvKwj+tJw20r/BAiEAgmAasWcHHdX5cD95eAaHJxr+DvtfKzaHU+ch0fbnUCY=" sparkle:edSignature="6+HzTIQ9bORtQe/Gs+AhGB0jLNBuo+BpV9t0gAE4ikNa0eUHqWzcTba6gjc+sbfdPad1rwTuhVVLNG9R1G/jBw==" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.5/4.0.1"/>
+                <enclosure length="3217730" sparkle:deltaFrom="4.0.0" sparkle:dsaSignature="MEUCIBhlNmIRjRxSvJhRyPgRIx78gVvqidoihl/VzpZZ5JsSAiEAlk+V452eunnHwioceevDGKVBaAf+lCTmGIp76qTS0pY=" sparkle:edSignature="23bOXFwPppZ96nwXBql3omrelbb2PbqkmIIIDxTQPixVuD6qrZaNUltuA/vwBj3J0tlkmmdCYFqBTbAIh4lKBg==" sparkle:shortVersionString="4.0.5" sparkle:version="4.0.5" type="application/octet-stream" url="https://lunar.fyi/delta/4.0.5/4.0.0"/>
+            </sparkle:deltas>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Add native support for old <strong>Apple Cinema</strong> and <strong>Cinema HD</strong> displays</li><li>Add <em>Show Dock Icon</em> option under Advanced settings</li></ul><h2 id="fixes">Fixes</h2><ul><li>Ensure window is shown when launching Lunar while menubar icon is hidden</li><li>Fix crash on NetServiceBrowser reset</li><li>Fix crash because of settings observer being deallocated too soon</li></ul></div></div>]]>
+            </description>
+            <signature>y.b66XpeybqUy5TvB9Y2mXWOpkA=</signature>
+            <signature>y/b66XpeybqUy5TvB9Y2mXWOpkA=</signature>
+            <signature>PJUOqgJV9TOd6jUp8oGoB0B9Zks=</signature>
+        </item>
     </channel>
 </rss>

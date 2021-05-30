@@ -35,3 +35,12 @@ GoogleService-Info.plist
 Frameworks/Extern
 Lunar/Resources/eddsa_priv
 Lunar.dmg
+default.profraw
+.build/
+*.pkg
+*.dmg
+Releases/*.zip
+Lunar/Modes/SensorMode.swift
+Lunar/Modes/SyncMode.swift
+Lunar/Modes/LocationMode.swift
+Lunar/Data/Pro.swift

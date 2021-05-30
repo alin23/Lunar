@@ -1,0 +1,79 @@
+#!/usr/bin/env fish
+set DIR (cd (dirname (status -f)); and pwd)
+if test -f "$DIR/.env.sh"
+    . $DIR/.env.sh
+end
+
+if not set -q PROJECT_DIR
+    set PROJECT_DIR (dirname $DIR)
+end
+
+set CODESIGN_CERT "Developer ID Application: Alin Panaitiu (RDDXV84A73)"
+set CODESIGN_CERT_INSTALLER "Developer ID Installer: Alin Panaitiu (RDDXV84A73)"
+set WORK_DIR "$PROJECT_DIR"
+set SCRIPTS_DIR "$PROJECT_DIR/scripts"
+
+if not command_exists create-dmg
+    npm i -g create-dmg
+end
+if not command_exists xcnotary
+    brew install xcnotary
+end
+if not "$WORK_DIR/bin/update_appcast.py" --help 2>/dev/null >/dev/null
+    pip install -U -r "$WORK_DIR/requirements.txt"
+end
+
+set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
+set TMP_DIR /tmp/Lunar
+set RELEASE_DIR "$WORK_DIR/Releases"
+set APPCAST "$RELEASE_DIR/appcast.xml"
+if test "$CONFIGURATION" != Release
+    set APPCAST "$RELEASE_DIR/appcast-"(string lower -- $CONFIGURATION)".xml"
+end
+
+set APP_TMP "$TMP_DIR/Lunar.app"
+
+rm -rf $TMP_DIR
+mkdir -p $TMP_DIR || exit 1
+rsync -avzP "$BUILD_DIR" "$TMP_DIR" || exit 1
+find "$APP_TMP" -not -perm 644 -and -not -perm 755 -exec chmod 644 \{\} \;
+
+set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/* \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app \
+    $APP_TMP/Contents/Frameworks/*.framework \
+    $APP_TMP/Contents/Frameworks/*.dylib \
+    $APP_TMP/Contents/Resources/ddcctl \
+    $APP_TMP/Contents/Library/LoginItems/LaunchAtLoginHelper.app/Contents/Frameworks/*.dylib \
+    $APP_TMP/Contents/Library/LoginItems/LaunchAtLoginHelper.app \
+    $APP_TMP
+
+for file in $filesToSign
+    codesign -fs "$CODESIGN_CERT" -o runtime --timestamp "$file" || exit 1
+end
+
+
+if not set -q DISABLE_NOTARIZATION
+    if not codesign -vvv --deep --strict "$APP_TMP"
+        echo 'Bad signature'
+        exit 1
+    end
+
+    set spctlOut (spctl --assess -vvvvv --no-cache --ignore-cache "$APP_TMP" 2>&1)
+    if not echo $spctlOut | grep -q 'source=Notarized Developer ID'
+        if not echo $spctlOut | grep -q 'source=Unnotarized Developer ID'
+            echo 'Bad signature'
+            exit 1
+        end
+
+        xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP" || exit 1
+    end
+end
+
+# exit 0
+set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
+
+./make-installer dmg
+./make-installer pkg
+
+export CONFIGURATION=$CONFIGURATION
+./update_appcast

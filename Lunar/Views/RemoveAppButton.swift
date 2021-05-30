@@ -13,8 +13,8 @@ class RemoveAppButton: NSButton {
         wantsLayer = true
 
         setFrameSize(NSSize(width: 14, height: 14))
-        layer?.cornerRadius = 7
-        layer?.backgroundColor = removeButtonColor.cgColor
+        radius = 7.ns
+        bg = removeButtonColor
 
         super.draw(dirtyRect)
     }

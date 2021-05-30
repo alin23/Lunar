@@ -1,0 +1,313 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire",
+        "state": {
+          "branch": null,
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
+        }
+      },
+      {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "876d162385e9862ae8b3c8d65dc301312b040005",
+          "version": "0.6.0"
+        }
+      },
+      {
+        "package": "CryptorECC",
+        "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
+        "state": {
+          "branch": null,
+          "revision": "baf6ed3fc1a622675f0041b4aff7c02dd1a93818",
+          "version": "1.2.200"
+        }
+      },
+      {
+        "package": "Socket",
+        "repositoryURL": "https://github.com/Kitura/BlueSocket",
+        "state": {
+          "branch": null,
+          "revision": "c9894fd117457f1d006575fbfb2fdfd6f79eac03",
+          "version": "1.0.200"
+        }
+      },
+      {
+        "package": "Burritos",
+        "repositoryURL": "https://github.com/alin23/Burritos",
+        "state": {
+          "branch": "master",
+          "revision": "3dd5867dc5b321fbd5a28d2d8b283e4252b2e4d7",
+          "version": null
+        }
+      },
+      {
+        "package": "Charts",
+        "repositoryURL": "https://github.com/danielgindi/Charts",
+        "state": {
+          "branch": null,
+          "revision": "8d134a78bb2cb9e7a0f05ecbd5880bb05cd02863",
+          "version": "4.0.1"
+        }
+      },
+      {
+        "package": "Ciao",
+        "repositoryURL": "https://github.com/alin23/Ciao",
+        "state": {
+          "branch": "master",
+          "revision": "00739be5d469498b289b7680edb3129f47192804",
+          "version": null
+        }
+      },
+      {
+        "package": "DataCompression",
+        "repositoryURL": "https://github.com/mw99/DataCompression/",
+        "state": {
+          "branch": null,
+          "revision": "6abb8f3cd0e4b2a33b4927a7a92b6764528f2440",
+          "version": "3.6.0"
+        }
+      },
+      {
+        "package": "Defaults",
+        "repositoryURL": "https://github.com/sindresorhus/Defaults",
+        "state": {
+          "branch": null,
+          "revision": "229dea452fee8d2205f56a12e5c21dfec00948f2",
+          "version": "4.2.2"
+        }
+      },
+      {
+        "package": "Down",
+        "repositoryURL": "https://github.com/johnxnguyen/Down",
+        "state": {
+          "branch": null,
+          "revision": "f34b166be1f1db4aa8f573067e901d72f2a6be57",
+          "version": "0.11.0"
+        }
+      },
+      {
+        "package": "EonilFSEvents",
+        "repositoryURL": "https://github.com/eonil/FSEvents",
+        "state": {
+          "branch": null,
+          "revision": "e6b7cdfa2754454e194a45ee6c2004d0f630fe88",
+          "version": "0.1.7"
+        }
+      },
+      {
+        "package": "Glob",
+        "repositoryURL": "https://github.com/Bouke/Glob",
+        "state": {
+          "branch": null,
+          "revision": "deda6e163d2ff2a8d7e138e2c3326dbd71157faf",
+          "version": "1.0.5"
+        }
+      },
+      {
+        "package": "KeyHolder",
+        "repositoryURL": "https://github.com/alin23/KeyHolder",
+        "state": {
+          "branch": "master",
+          "revision": "212dad3e6def0ee25e0700c03680d9ba8c31486b",
+          "version": null
+        }
+      },
+      {
+        "package": "LaunchAtLogin",
+        "repositoryURL": "https://github.com/sindresorhus/LaunchAtLogin",
+        "state": {
+          "branch": null,
+          "revision": "6b16bcdf7d45a9d76a768a5c4912dde925cf0e95",
+          "version": "4.1.0"
+        }
+      },
+      {
+        "package": "Magnet",
+        "repositoryURL": "https://github.com/Clipy/Magnet",
+        "state": {
+          "branch": "master",
+          "revision": "e719b5cae545a43e2965a3fbbdd42485c3a3abcb",
+          "version": null
+        }
+      },
+      {
+        "package": "MediaKeyTap",
+        "repositoryURL": "https://github.com/alin23/MediaKeyTap",
+        "state": {
+          "branch": "master",
+          "revision": "533ccd31e367f37b90efb5fa01812dec314d52c8",
+          "version": null
+        }
+      },
+      {
+        "package": "Path.swift",
+        "repositoryURL": "https://github.com/mxcl/Path.swift",
+        "state": {
+          "branch": null,
+          "revision": "39f81ae258dcbb6a3d3995ac9547dd6b073179a4",
+          "version": "1.2.1"
+        }
+      },
+      {
+        "package": "Regex",
+        "repositoryURL": "https://github.com/crossroadlabs/Regex",
+        "state": {
+          "branch": null,
+          "revision": "166728756082a9cac6e4aed3ebbce8e41cb3a945",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "Sauce",
+        "repositoryURL": "https://github.com/Clipy/Sauce",
+        "state": {
+          "branch": null,
+          "revision": "2fcf7e43a242b183fdea3f2275ebec0d773b65f5",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "Sentry",
+        "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
+        "state": {
+          "branch": null,
+          "revision": "f7c3de2d9fc09d7a61f7259521d97091fb2f8bda",
+          "version": "7.1.3"
+        }
+      },
+      {
+        "package": "SimplyCoreAudio",
+        "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
+        "state": {
+          "branch": null,
+          "revision": "e049672b919127f0dda41503699983d2c905cd83",
+          "version": "4.0.1"
+        }
+      },
+      {
+        "package": "Solar",
+        "repositoryURL": "https://github.com/alin23/Solar",
+        "state": {
+          "branch": null,
+          "revision": "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
+          "version": "3.1.1"
+        }
+      },
+      {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/sparkle-project/Sparkle",
+        "state": {
+          "branch": null,
+          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
+          "version": "1.26.0"
+        }
+      },
+      {
+        "package": "Surge",
+        "repositoryURL": "https://github.com/Jounce/Surge",
+        "state": {
+          "branch": null,
+          "revision": "6e4a47e63da8801afe6188cf039e9f04eb577721",
+          "version": "2.3.2"
+        }
+      },
+      {
+        "package": "swift-algorithms",
+        "repositoryURL": "https://github.com/apple/swift-algorithms",
+        "state": {
+          "branch": null,
+          "revision": "e25cf27e57fc3eec00ea2fc8ea7f99695c59966f",
+          "version": "0.2.0"
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "986d191f94cec88f6350056da59c2e59e83d1229",
+          "version": "0.4.3"
+        }
+      },
+      {
+        "package": "swift-atomics",
+        "repositoryURL": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "branch": null,
+          "revision": "3e95ba32cd1b4c877f6163e8eea54afc4e63bf9f",
+          "version": "0.0.3"
+        }
+      },
+      {
+        "package": "swift-numerics",
+        "repositoryURL": "https://github.com/apple/swift-numerics",
+        "state": {
+          "branch": null,
+          "revision": "6583ac70c326c3ee080c1d42d9ca3361dca816cd",
+          "version": "0.1.0"
+        }
+      },
+      {
+        "package": "SwiftDate",
+        "repositoryURL": "https://github.com/malcommac/SwiftDate",
+        "state": {
+          "branch": null,
+          "revision": "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
+          "version": "6.3.1"
+        }
+      },
+      {
+        "package": "SwiftSerial",
+        "repositoryURL": "https://github.com/alin23/SwiftSerial",
+        "state": {
+          "branch": "master",
+          "revision": "06a57193a96af68e58d94ac53fe000b0fecafb5a",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftyAttributes",
+        "repositoryURL": "https://github.com/eddiekaiger/SwiftyAttributes",
+        "state": {
+          "branch": null,
+          "revision": "0fbf992e6e4e1b98954f3d48f8523a67dfa5c8f3",
+          "version": "5.2.0"
+        }
+      },
+      {
+        "package": "SwiftyBeaver",
+        "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver",
+        "state": {
+          "branch": null,
+          "revision": "2c039501d6eeb4d4cd4aec4a8d884ad28862e044",
+          "version": "1.9.5"
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
+          "version": "5.0.1"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation",
+        "state": {
+          "branch": null,
+          "revision": "cf10bbff6ac3b873e97b36b9784c79866a051a8e",
+          "version": "0.9.12"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
