@@ -495,14 +495,22 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
+        let allMonitors = Defaults[.mediaKeysControlAllMonitors]
+
         switch flags {
         case [] where lidClosed:
             adjust(mediaKey, currentDisplay: true)
         case [.option, .shift] where lidClosed:
             adjust(mediaKey, by: 1, currentDisplay: true)
-
-        case [], [.option, .shift]:
+        case [] where allMonitors, [.option, .shift] where allMonitors:
             return event
+
+        case []:
+            guard displayController.mainDisplay != nil else { return event }
+            adjust(mediaKey, currentDisplay: true)
+        case [.option, .shift]:
+            guard displayController.mainDisplay != nil else { return event }
+            adjust(mediaKey, by: 1, currentDisplay: true)
 
         case [.control]:
             adjust(mediaKey, currentDisplay: true)
