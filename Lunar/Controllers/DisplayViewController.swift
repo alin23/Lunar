@@ -760,7 +760,7 @@ class DisplayViewController: NSViewController {
     deinit {
         log.verbose("")
         let id = "displayViewController-\(self.viewID ?? "")"
-        guard let display = display else {return}
+        guard let display = display else { return }
         display.resetObserver(prop: .adaptive, key: id, type: Bool.self)
         display.resetObserver(prop: .activeAndResponsive, key: id, type: Bool.self)
         display.resetObserver(prop: .hasDDC, key: id, type: Bool.self)

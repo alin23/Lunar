@@ -287,7 +287,7 @@ class DisplayController {
         }
     }
 
-    var overrideAdaptiveModeObserver: Defaults.Observation? = nil
+    var overrideAdaptiveModeObserver: Defaults.Observation?
 
     func watchModeAvailability() {
         guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {

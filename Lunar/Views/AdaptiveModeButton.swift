@@ -98,7 +98,21 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         guard let mode = AdaptiveModeKey(rawValue: menuItem.tag) else {
             return false
         }
-        return mode.available
+
+        guard mode.available else {
+            switch mode {
+            case .location:
+                menuItem.toolTip = "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
+            case .sensor:
+                menuItem.toolTip = "Disabled because there is no external light sensor connected to this \(Sysctl.device)"
+            case .sync:
+                menuItem.toolTip = "Disabled because no display with a built-in light sensor was found"
+            default:
+                break
+            }
+            return false
+        }
+        return true
     }
 
     override func draw(_ dirtyRect: NSRect) {
