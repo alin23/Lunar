@@ -112,6 +112,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
             }
             return false
         }
+        menuItem.toolTip = nil
         return true
     }
 
