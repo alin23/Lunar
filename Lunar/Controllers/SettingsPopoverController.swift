@@ -193,8 +193,8 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
-    var displaysObserver: Defaults.Observation? = nil
-    
+    var displaysObserver: Defaults.Observation?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
