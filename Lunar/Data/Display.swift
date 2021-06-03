@@ -116,8 +116,6 @@ enum ValueType {
     case contrast
 }
 
-var GAMMA_LOCKS = [String: NSDistributedLock]()
-
 // MARK: Display Class
 
 @objc class Display: NSObject, Codable {
@@ -1602,22 +1600,16 @@ var GAMMA_LOCKS = [String: NSDistributedLock]()
     }
 
     lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
-    var gammaDistributedLock: NSDistributedLock {
-        if GAMMA_LOCKS[serial] == nil {
-            GAMMA_LOCKS[serial] = NSDistributedLock(path: gammaLockPath)!
-        }
-
-        return GAMMA_LOCKS[serial]!
-    }
+    lazy var gammaDistributedLock: NSDistributedLock? = NSDistributedLock(path: gammaLockPath)
 
     @discardableResult func gammaLock() -> Bool {
         log.verbose("Locking gamma", context: context)
-        return gammaDistributedLock.try()
+        return gammaDistributedLock?.try() ?? false
     }
 
     func gammaUnlock() {
         log.verbose("Unlocking gamma", context: context)
-        gammaDistributedLock.unlock()
+        gammaDistributedLock?.unlock()
     }
 
     func computeGamma(brightness: UInt8? = nil, contrast: UInt8? = nil) -> Gamma {
