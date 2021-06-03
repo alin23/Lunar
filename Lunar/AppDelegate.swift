@@ -617,11 +617,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         signal(SIGINT) { _ in
-            for lock in GAMMA_LOCKS.values {
-                lock.unlock()
-            }
             for display in displayController.displays.values {
                 display.resetGamma()
+                display.gammaUnlock()
                 refreshScreen()
             }
             exit(0)
