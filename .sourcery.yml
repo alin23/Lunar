@@ -15,3 +15,4 @@ args:
   encryptionKey: ${SB_ENCRYPTION_KEY}
   sentryDSN: ${SENTRY_DSN}
   analyticsHash: ${ANALYTICS_HASH}
+  ipstackKey: ${IPSTACK_KEY}
