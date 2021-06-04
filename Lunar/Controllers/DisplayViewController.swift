@@ -109,12 +109,14 @@ class DisplayViewController: NSViewController {
     @IBOutlet var displayName: DisplayName?
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
-            guard let display = display, let button = inputDropdownHotkeyButton, initHotkeys(from: display) else { return }
+            mainThread {
+                guard let display = display, let button = inputDropdownHotkeyButton, initHotkeys(from: display) else { return }
 
-            button.onClick = { [weak self, weak display] in
-                guard let self = self, let display = display else { return }
-                if self.initHotkeys(from: display) {
-                    button.onClick = nil
+                button.onClick = { [weak self, weak display] in
+                    guard let self = self, let display = display else { return }
+                    if self.initHotkeys(from: display) {
+                        button.onClick = nil
+                    }
                 }
             }
         }
@@ -154,7 +156,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
         didSet {
             if let d = display {
-                nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
+                mainThread {
+                    nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
+                }
             }
         }
     }
@@ -177,7 +181,7 @@ class DisplayViewController: NSViewController {
     @objc dynamic weak var display: Display? {
         didSet {
             if let display = display {
-                update()
+                mainThread { update() }
                 noDisplay = display.id == GENERIC_DISPLAY_ID
             }
         }
