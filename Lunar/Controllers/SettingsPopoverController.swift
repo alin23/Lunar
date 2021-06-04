@@ -10,6 +10,16 @@ import Cocoa
 import Defaults
 
 class SettingsPopoverController: NSViewController {
+    let SYNC_MODE_ROLE_HELP_TEXT = """
+    ## Description
+
+    `Available only for monitors with a built-in light sensor that are controllable using CoreDisplay`
+
+    This setting allows the user to choose a monitor to be used as the source when a built-in display is not available or can't be used (e.g. MacBook lid closed, Mac Mini).
+
+    - `SOURCE`: Sync Mode will read this monitor's brightness/contrast and send it to the other external monitors
+    - `TARGET`: Sync Mode will send brightness/contrast to this monitor after detecting a brightness change on the built-in/source monitor
+    """
     let ADAPTIVE_HELP_TEXT = """
     ## Description
 
@@ -34,16 +44,16 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var coreDisplayControlCheckbox: NSButton!
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
-    @IBOutlet weak var resetNetworkControlButton: ResetButton!
-    @IBOutlet weak var resetDDCButton: ResetButton!
-    
+    @IBOutlet var resetNetworkControlButton: ResetButton!
+    @IBOutlet var resetDDCButton: ResetButton!
+
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
 
     @IBOutlet var adaptAutoToggle: MacToggle!
-    @IBOutlet weak var syncModeRoleToggle: MacToggle!
-    
+    @IBOutlet var syncModeRoleToggle: MacToggle!
+
     @IBOutlet var _ddcLimitsHelpButton: NSButton!
     var ddcLimitsHelpButton: HelpButton? {
         _ddcLimitsHelpButton as? HelpButton
@@ -53,11 +63,12 @@ class SettingsPopoverController: NSViewController {
     var adaptAutomaticallyHelpButton: HelpButton? {
         _adaptAutomaticallyHelpButton as? HelpButton
     }
-    @IBOutlet weak var _syncModeRoleHelpButton: NSButton?
+
+    @IBOutlet var _syncModeRoleHelpButton: NSButton?
     var syncModeRoleHelpButton: HelpButton? {
         _syncModeRoleHelpButton as? HelpButton
     }
-    
+
     var lastEnabledCheckbox: NSButton? {
         [networkControlCheckbox, coreDisplayControlCheckbox, ddcControlCheckbox, gammaControlCheckbox]
             .first(where: { checkbox in checkbox!.state == .on })
@@ -80,6 +91,7 @@ class SettingsPopoverController: NSViewController {
                 gammaEnabled = display.enabledControls[.gamma] ?? true
 
                 adaptAutoToggle.isOn = display.adaptive
+                syncModeRoleToggle.isOn = display.isSource
             }
             setupDDCLimits(display)
         }
@@ -94,6 +106,14 @@ class SettingsPopoverController: NSViewController {
                 display.adaptivePaused = false
             }
             display.adaptive = adaptive
+            display.save()
+        }
+    }
+
+    @objc dynamic var isSource = false {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.isSource = isSource
             display.save()
         }
     }
@@ -147,20 +167,34 @@ class SettingsPopoverController: NSViewController {
     }
 
     @IBAction func resetDDC(_: Any) {
-        guard let display = display else { return }
-        if display.control is DDCControl {
-            display.control.resetState()
-        } else {
-            DDCControl(display: display).resetState()
+        asyncAfter(ms: 10, uniqueTaskKey: "resetDDCTask") { [weak self] in
+            guard let display = self?.display else { return }
+            if display.control is DDCControl {
+                display.control.resetState()
+            } else {
+                DDCControl(display: display).resetState()
+            }
+
+            for _ in 1 ... 5 {
+                displayController.adaptBrightness(force: true)
+                sleep(3)
+            }
         }
     }
 
     @IBAction func resetNetworkController(_: Any) {
-        guard let display = display else { return }
-        if display.control is NetworkControl {
-            display.control.resetState()
-        } else {
-            NetworkControl.resetState()
+        asyncAfter(ms: 10, uniqueTaskKey: "resetNetworkControlTask") { [weak self] in
+            guard let display = self?.display else { return }
+            if display.control is NetworkControl {
+                display.control.resetState()
+            } else {
+                NetworkControl.resetState()
+            }
+
+            for _ in 1 ... 5 {
+                displayController.adaptBrightness(force: true)
+                sleep(3)
+            }
         }
     }
 
@@ -226,11 +260,23 @@ class SettingsPopoverController: NSViewController {
         resetNetworkControlButton?.page = .hotkeysReset
         resetDDCButton?.page = .hotkeysReset
 
+        syncModeRoleHelpButton?.helpText = SYNC_MODE_ROLE_HELP_TEXT
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
         ddcLimitsHelpButton?.helpText = DDC_LIMITS_HELP_TEXT
 
         adaptAutoToggle.callback = { [weak self] isOn in
             self?.adaptive = isOn
+        }
+        
+        syncModeRoleToggle.callback = { [weak self] isOn in
+            self?.isSource = isOn
+            if isOn {
+                for display in displayController.displays.values {
+                    display.isSource = false
+                }
+                datastore.storeDisplays(displayController.displays.values.map { $0 })
+            }
+            SyncMode.sourceDisplay = SyncMode.getSourceDisplay()
         }
         setupDDCLimits()
 
@@ -247,6 +293,7 @@ class SettingsPopoverController: NSViewController {
             self.gammaEnabled = display.enabledControls[.gamma] ?? true
             mainThread {
                 self.toggleWithoutCallback(self.adaptAutoToggle, value: display.adaptive)
+                self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
             }
         }
     }

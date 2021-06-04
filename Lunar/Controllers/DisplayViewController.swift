@@ -753,12 +753,14 @@ class DisplayViewController: NSViewController {
     }
 
     func setIsHidden(_ value: Bool) {
-        setButtonsHidden(value)
+        mainThread {
+            setButtonsHidden(value)
 
-        nonResponsiveTextField?.isHidden = value
-        scrollableBrightness?.isHidden = value
-        scrollableContrast?.isHidden = value
-        brightnessContrastChart?.isHidden = value
+            nonResponsiveTextField?.isHidden = value
+            scrollableBrightness?.isHidden = value
+            scrollableContrast?.isHidden = value
+            brightnessContrastChart?.isHidden = value
+        }
     }
 
     deinit {
