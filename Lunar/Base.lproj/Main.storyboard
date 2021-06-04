@@ -2806,7 +2806,7 @@ when dock and menubar icons are hidden</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="buh-dr-GoZ">
                                     <font key="font" metaFont="systemMedium" size="11"/>
-                                    <string key="title">Use the monitor buttons to set the brightness 
+                                    <string key="title">Use the monitor buttons to set the brightness
 and contrast to their highest values</string>
                                     <color key="textColor" red="0.99607843139999996" green="0.71498811600000001" blue="0.2230800654" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -3977,7 +3977,7 @@ After clicking install, Lunar will send an installation script along with a loca
 The installation script will do the following steps:
 
 1. Install server dependencies using apt
-2. Install the server as a daemon that runs at boot 
+2. Install the server as a daemon that runs at boot
 3. Update the kernel and firmware to a revision that contains the necessary video drivers for DDC
 4. Alter the boot config to enable the new video driver and I2C support</string>
                                     <color key="textColor" red="1" green="0.97004779558700915" blue="0.89950042517006801" alpha="0.60003621688741726" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4828,7 +4828,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
                                 <rect key="frame" x="59" y="206" width="47" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Source" id="tHM-5a-Ojq">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Target" id="tHM-5a-Ojq">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -4837,7 +4837,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
                                 <rect key="frame" x="158" y="206" width="43" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Target" id="KKZ-a3-9z1">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Source" id="KKZ-a3-9z1">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

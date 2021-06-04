@@ -632,7 +632,7 @@ class DisplayController {
             } else {
                 scope.setExtra(value: SyncMode.readBuiltinDisplayBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
             }
-            scope.setExtra(value: IsLidClosed(), key: "lidClosed")
+            scope.setExtra(value: self?.lidClosed ?? IsLidClosed(), key: "lidClosed")
 
             guard let self = self else { return }
             for display in self.displays.values {

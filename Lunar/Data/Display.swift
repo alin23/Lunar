@@ -52,10 +52,11 @@ var TEST_DISPLAY: Display = {
         name: "Test Display",
         active: true,
         minBrightness: 0,
-        maxBrightness: 100,
-        minContrast: 0,
-        maxContrast: 100,
-        adaptive: true
+        maxBrightness: 60,
+        minContrast: 50,
+        maxContrast: 75,
+        adaptive: true,
+        userBrightness: [.sync: [71: 55]]
     )
     d.hasI2C = true
     return d
@@ -344,6 +345,13 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var isSource: Bool = false {
+        didSet {
+            context = getContext()
+            runBoolObservers(property: .isSource, newValue: isSource, oldValue: oldValue)
+        }
+    }
+
     var enabledControls: [DisplayControl: Bool] = [
         .network: true,
         .coreDisplay: true,
@@ -466,6 +474,7 @@ enum ValueType {
         .neverFallbackControl: [:],
         .sendingBrightness: [:],
         .sendingContrast: [:],
+        .isSource: [:],
     ]
     var numberObservers: [CodingKeys: [String: (NSNumber, NSNumber) -> Void]] = [
         .maxDDCBrightness: [:],
@@ -582,6 +591,7 @@ enum ValueType {
             "alwaysFallbackControl": alwaysFallbackControl,
             "neverFallbackControl": neverFallbackControl,
             "isAppleDisplay": isAppleDisplay(),
+            "isSource": isSource,
         ]
     }
 
@@ -950,6 +960,7 @@ enum ValueType {
         case sendingContrast
         case sendingInput
         case sendingVolume
+        case isSource
 
         static var settable: [CodingKeys] {
             [
@@ -974,6 +985,7 @@ enum ValueType {
                 .alwaysUseNetworkControl,
                 .alwaysFallbackControl,
                 .neverFallbackControl,
+                .isSource,
             ]
         }
     }

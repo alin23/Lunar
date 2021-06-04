@@ -146,6 +146,7 @@ class DataStore: NSObject {
         Defaults[.appExceptions] = appExceptions
     }
 
+    @discardableResult
     func storeDisplays(_ displays: [Display]) -> [Display] {
         let displays = displays.filter {
             display in !SyncMode.isBuiltinDisplay(display.id)
@@ -162,7 +163,7 @@ class DataStore: NSObject {
         for display in inactiveDisplays {
             display.active = false
             while newDisplayIDs.contains(display.id) {
-                display.id = UInt32.random(in: 100 ... 1000)
+                display.id = UInt32.random(in: 100 ... 100_000)
             }
         }
 
@@ -242,7 +243,7 @@ class DataStore: NSObject {
             DataStore.firstRunAfterLunar4Upgrade()
             Defaults[.firstRunAfterLunar4Upgrade] = true
         }
-        
+
         Defaults[.toolTipDelay] = 1
     }
 }
