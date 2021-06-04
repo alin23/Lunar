@@ -390,7 +390,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     {
                                         self.render("""
                                         #### If you have technical knowledge about `SSH` and `curl`, you can check the following:
-                                        * See if the controller is reachable using this curl command: `curl \(url)`
+                                        * See if the controller is reachable using this curl command: `curl \(url.deletingLastPathComponent().appendingPathComponent("displays"))`
                                           * You should get a response similar to the one below:
                                           * ```
                                             Display 1
@@ -406,7 +406,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                               VCP version:         2.1
                                             ```
                                           * If you get `Invalid Display` try turning your monitor off then turn it on after a few seconds
-                                          * If you get `Display not found`, make sure your Pi is running an OS with a desktop environment
+                                          * If you get `Display not found`, make sure your Pi is running an OS with a desktop environment, and the desktop is visible when the Pi HDMI input is active
                                         * Check that the server is running
                                           * SSH into your Pi
                                           * Run `sudo systemctl status ddcutil-server`
