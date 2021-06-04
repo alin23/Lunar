@@ -34,13 +34,16 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var coreDisplayControlCheckbox: NSButton!
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
-
+    @IBOutlet weak var resetNetworkControlButton: ResetButton!
+    @IBOutlet weak var resetDDCButton: ResetButton!
+    
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
 
     @IBOutlet var adaptAutoToggle: MacToggle!
-
+    @IBOutlet weak var syncModeRoleToggle: MacToggle!
+    
     @IBOutlet var _ddcLimitsHelpButton: NSButton!
     var ddcLimitsHelpButton: HelpButton? {
         _ddcLimitsHelpButton as? HelpButton
@@ -50,9 +53,14 @@ class SettingsPopoverController: NSViewController {
     var adaptAutomaticallyHelpButton: HelpButton? {
         _adaptAutomaticallyHelpButton as? HelpButton
     }
-
+    @IBOutlet weak var _syncModeRoleHelpButton: NSButton?
+    var syncModeRoleHelpButton: HelpButton? {
+        _syncModeRoleHelpButton as? HelpButton
+    }
+    
     var lastEnabledCheckbox: NSButton? {
-        [networkControlCheckbox, coreDisplayControlCheckbox, ddcControlCheckbox, gammaControlCheckbox].first(where: { checkbox in checkbox!.state == .on })
+        [networkControlCheckbox, coreDisplayControlCheckbox, ddcControlCheckbox, gammaControlCheckbox]
+            .first(where: { checkbox in checkbox!.state == .on })
     }
 
     var onClick: (() -> Void)?
@@ -138,6 +146,24 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
+    @IBAction func resetDDC(_: Any) {
+        guard let display = display else { return }
+        if display.control is DDCControl {
+            display.control.resetState()
+        } else {
+            DDCControl(display: display).resetState()
+        }
+    }
+
+    @IBAction func resetNetworkController(_: Any) {
+        guard let display = display else { return }
+        if display.control is NetworkControl {
+            display.control.resetState()
+        } else {
+            NetworkControl.resetState()
+        }
+    }
+
     func ensureAtLeastOneControlEnabled() {
         guard let display = display else { return }
         if display.enabledControls.values.filter({ enabled in enabled }).count <= 1 {
@@ -197,6 +223,8 @@ class SettingsPopoverController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        resetNetworkControlButton?.page = .hotkeysReset
+        resetDDCButton?.page = .hotkeysReset
 
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
         ddcLimitsHelpButton?.helpText = DDC_LIMITS_HELP_TEXT
@@ -207,7 +235,8 @@ class SettingsPopoverController: NSViewController {
         setupDDCLimits()
 
         displaysObserver = displaysObserver ?? Defaults.observe(.displays) { [weak self] change in
-            guard let self = self, let thisDisplay = self.display, let displays = change.newValue, let display = displays.first(where: { d in d.serial == thisDisplay.serial }) else { return }
+            guard let self = self, let thisDisplay = self.display, let displays = change.newValue,
+                  let display = displays.first(where: { d in d.serial == thisDisplay.serial }) else { return }
             self.applySettings = false
             defer {
                 self.applySettings = true

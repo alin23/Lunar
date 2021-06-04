@@ -16,7 +16,7 @@ enum HoverState: Int {
 }
 
 enum Page: Int {
-    case hotkeys
+    case hotkeys = 0
     case settings
     case display
     case hotkeysReset
