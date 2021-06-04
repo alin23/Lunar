@@ -307,7 +307,7 @@ enum DDC {
                isScreenStr == "YES"
             {
                 if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
-                    let screenID = CGDirectDisplayID(truncating: screenNumber)
+                    let screenID = CGDirectDisplayID(screenNumber.uint32Value)
                     if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
                         continue
                     }
