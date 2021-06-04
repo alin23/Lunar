@@ -8,7 +8,7 @@ assignees: alin23
 ---
 
 # Issue details
-- Mac device where Lunar is installed (Macbook Pro 2019, iMac, Mac Mini, Hackintosh etc.):
+- Mac device where Lunar is installed (Macbook Pro 2019, iMac M1, Mac Mini M1, Hackintosh etc.):
     *write response here*
 
 - Monitor model (LG UltraFine 5K, DELL P2715Q etc.):
@@ -21,10 +21,15 @@ assignees: alin23
     *write yes or no here*
 
 - Lunar mode used (check it in the top-right corner of the Lunar interface)
-    *Sync, Location or Manual*
+    *Sync, Location, Sensor or Manual*
 
-- (only if you know how to compile a C program) Does this utility work for you? https://github.com/kfix/ddcctl
-    *optional response*
+- Tried Lunar Diagnostics?
+> 1. Click on **Open Lunar Diagnostics** in the Lunar menu
+> 2. **Make sure to not click anywhere in the window**
+> 3. Press keyboard keys when prompted by the text
+> 4. After finishing the process click on the **Send Diagnostics** button.
+
+    *write yes or no here*
 
 
 # Issue description:
