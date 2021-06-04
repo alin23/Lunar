@@ -67,10 +67,7 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
     func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         switch commandSelector {
         case #selector(insertNewline(_:)):
-            validateEditing()
-            if let editor = currentEditor() {
-                endEditing(editor)
-            }
+            window?.makeFirstResponder(nil)
             return true
         default:
             return false
