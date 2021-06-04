@@ -442,9 +442,18 @@ class NetworkControl: Control {
         Self.resetState()
     }
 
+    static let browserSemaphore = DispatchSemaphore(value: 1)
+
     static func resetState() {
-        browser.reset()
-        browser.browse(type: ServiceType.tcp("ddcutil"))
+        async(timeout: 2.minutes) {
+            browserSemaphore.wait()
+            defer {
+                browserSemaphore.signal()
+            }
+
+            browser.reset()
+            browser.browse(type: ServiceType.tcp("ddcutil"))
+        }
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {

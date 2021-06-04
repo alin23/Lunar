@@ -589,7 +589,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         guard isVolumeKey(mediaKey) else {
-            let lidClosed = IsLidClosed() || SyncMode.builtinDisplay == nil
+            let lidClosed = displayController.lidClosed || SyncMode.builtinDisplay == nil
             if displayController.activeDisplays.count == 1 {
                 return handleSingleDisplay(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
             } else {

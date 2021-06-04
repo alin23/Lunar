@@ -465,10 +465,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             displayController.manageClamshellMode()
             displayController.resetDisplayList()
             SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
-            asyncAfter(ms: 2000) {
-                if !NetworkControl.browser.services.isEmpty {
-                    NetworkControl.resetState()
-                }
+            asyncAfter(ms: 5000) {
+                NetworkControl.resetState()
             }
             if let visible = windowController?.window?.isVisible, visible {
                 windowController?.close()
@@ -486,10 +484,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             _ = displayController.adaptiveMode.watch()
 
             if Defaults[.reapplyValuesAfterWake] {
-                asyncAfter(ms: 2000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-                    if !NetworkControl.browser.services.isEmpty {
-                        NetworkControl.resetState()
-                    }
+                asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
+                    NetworkControl.resetState()
 
                     for _ in 1 ... 5 {
                         displayController.adaptBrightness(force: true)
