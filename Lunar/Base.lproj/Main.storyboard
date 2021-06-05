@@ -2385,7 +2385,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="64" y="74" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="h6T-2W-xq9" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy"/>
+                                            <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2412,7 +2412,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="65" y="252" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="GW0-Io-Qsz" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy"/>
+                                            <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2488,7 +2488,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="66" y="74" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="b0T-Nr-uCc" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy"/>
+                                            <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2515,7 +2515,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="66" y="252" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="bOn-60-FuP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy"/>
+                                            <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
