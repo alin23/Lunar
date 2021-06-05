@@ -11,6 +11,8 @@ import Foundation
 
 class ResetButton: ToggleButton {
     override func mouseDown(with event: NSEvent) {
+        guard isEnabled else {return}
+        
         state = .off
         hoverState = .noHover
 
