@@ -278,6 +278,7 @@ class SettingsPopoverController: NSViewController {
             }
             SyncMode.sourceDisplay = SyncMode.getSourceDisplay()
         }
+        syncModeRoleToggle.isEnabled = false
         setupDDCLimits()
 
         displaysObserver = displaysObserver ?? Defaults.observe(.displays) { [weak self] change in
