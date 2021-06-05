@@ -438,19 +438,20 @@ class NetworkControl: Control {
     }
 
     func resetState() {
-        Self.controllersForDisplay.removeValue(forKey: display.id)
-        Self.resetState()
+        Self.resetState(id: display.id)
     }
 
     static let browserSemaphore = DispatchSemaphore(value: 1)
 
-    static func resetState() {
+    static func resetState(id: CGDirectDisplayID? = nil) {
         async(timeout: 2.minutes) {
             browserSemaphore.wait()
             defer {
                 browserSemaphore.signal()
             }
-
+            if let id = id {
+                controllersForDisplay.removeValue(forKey: id)
+            }
             browser.reset()
             browser.browse(type: ServiceType.tcp("ddcutil"))
         }

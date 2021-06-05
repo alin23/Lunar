@@ -28,7 +28,6 @@ Releases/*.dmg
 Releases/*.delta
 Lunar/Generated/
 .env.sh
-Frameworks/*.framework*
 .gitsecret/keys/random_seed
 Lunar/Resources/dsa_priv.pem
 GoogleService-Info.plist
