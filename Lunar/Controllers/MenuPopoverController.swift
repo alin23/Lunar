@@ -79,8 +79,9 @@ class ModeButtonResponder: NSResponder {
         button.setFrameSize(NSSize(width: buttonSize.width, height: 20))
         button.radius = (button.frame.height / 2).ns
 
+        log.debug("Adding tracking area for quick actions: \(button.frame)")
         trackingArea = NSTrackingArea(
-            rect: button.visibleRect,
+            rect: button.frame,
             options: [.mouseEnteredAndExited, .activeInActiveApp],
             owner: self,
             userInfo: nil
@@ -364,6 +365,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     override func mouseExited(with _: NSEvent) {
         log.verbose("Mouse exited menu popover")
-        POPOVERS[.menu]!!.close()
+        mainAsyncAfter(ms: 1500) {
+            POPOVERS[.menu]!!.close()
+        }
     }
 }
