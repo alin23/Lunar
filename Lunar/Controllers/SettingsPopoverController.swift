@@ -188,7 +188,7 @@ class SettingsPopoverController: NSViewController {
             if display.control is NetworkControl {
                 display.control.resetState()
             } else {
-                NetworkControl.resetState()
+                NetworkControl.resetState(id: display.id)
             }
 
             for _ in 1 ... 5 {
