@@ -1,0 +1,11 @@
+framework module Paddle {
+    header "Paddle.h"
+    header "PADProduct.h"
+    header "PADError.h"
+    header "PADAlert.h"
+    header "PADCheckoutOptions.h"
+    header "PADProductConfiguration.h"
+    header "PADDisplayConfiguration.h"
+    header "PADPriceOverride.h"
+    export *
+}
