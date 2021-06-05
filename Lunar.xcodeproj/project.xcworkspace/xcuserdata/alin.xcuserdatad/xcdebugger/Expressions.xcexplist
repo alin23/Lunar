@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "static Hotkey.setKeyEquivalent(_:menuItem:hotkeys:):Hotkeys.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "&quot;\(modifierChars)\(keyChar)&quot;">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static RelativeFormatter.format(date:to:style:locale:):RelativeFormatter.swift">
+      </ContextState>
+      <ContextState
+         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
