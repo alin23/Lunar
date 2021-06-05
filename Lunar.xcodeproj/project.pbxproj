@@ -46,7 +46,6 @@
 		C740A1C5262192EF004BC1C7 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1C4262192EF004BC1C7 /* Sparkle */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
-		C740A1FD2624CC96004BC1C7 /* Ciao in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1FC2624CC96004BC1C7 /* Ciao */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
 		C74D07CE265BD73800291FC2 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C74D07CD265BD73800291FC2 /* Burritos */; };
@@ -135,6 +134,7 @@
 		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
 		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
 		C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */; };
+		C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E14F7E266BBC7500A4E2F1 /* Ciao.swift */; };
 		C7E242652119A65B0020326C /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E242642119A65B0020326C /* LockButton.swift */; };
 		C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */; };
 		C7E80E292637060F004718A4 /* ReadWrite.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E80E132637060F004718A4 /* ReadWrite.swift */; };
@@ -320,6 +320,7 @@
 		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
 		C7E07379259CB2C20019C9C2 /* ManualMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMode.swift; sourceTree = "<group>"; };
 		C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMode.swift; sourceTree = "<group>"; };
+		C7E14F7E266BBC7500A4E2F1 /* Ciao.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ciao.swift; sourceTree = "<group>"; };
 		C7E242642119A65B0020326C /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 		C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveAppButton.swift; sourceTree = "<group>"; };
 		C7E80E132637060F004718A4 /* ReadWrite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWrite.swift; sourceTree = "<group>"; };
@@ -376,7 +377,6 @@
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
 				C7DD623726178C7100B07B31 /* SimplyCoreAudio in Frameworks */,
-				C740A1FD2624CC96004BC1C7 /* Ciao in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C70EEF2625FFE8F2009C0C15 /* SwiftSerial in Frameworks */,
@@ -559,6 +559,7 @@
 				C78BD04B259B365500FC823F /* Extensions.swift */,
 				C790D4BD259B9DC100868689 /* NanoID.swift */,
 				C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */,
+				C7E14F7E266BBC7500A4E2F1 /* Ciao.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -787,7 +788,6 @@
 				C7DD623626178C7100B07B31 /* SimplyCoreAudio */,
 				C740A1C4262192EF004BC1C7 /* Sparkle */,
 				C740A1F726249176004BC1C7 /* ArgumentParser */,
-				C740A1FC2624CC96004BC1C7 /* Ciao */,
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7E80E4526370780004718A4 /* Socket */,
 				C7BADA0926386E940058974C /* ZIPFoundation */,
@@ -854,7 +854,6 @@
 				C7DD623526178C7100B07B31 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C740A1C3262192EF004BC1C7 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-				C740A1FB2624CC96004BC1C7 /* XCRemoteSwiftPackageReference "Ciao" */,
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C7BADA0826386E940058974C /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
@@ -1043,6 +1042,7 @@
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
+				C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C7E80E2E2637060F004718A4 /* Agent.swift in Sources */,
 				C7E80E312637060F004718A4 /* SSHError.swift in Sources */,
@@ -1710,14 +1710,6 @@
 				minimumVersion = 0.4.1;
 			};
 		};
-		C740A1FB2624CC96004BC1C7 /* XCRemoteSwiftPackageReference "Ciao" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/Ciao";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		C74D07CC265BD73800291FC2 /* XCRemoteSwiftPackageReference "Burritos" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/Burritos";
@@ -1912,11 +1904,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
-		};
-		C740A1FC2624CC96004BC1C7 /* Ciao */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C740A1FB2624CC96004BC1C7 /* XCRemoteSwiftPackageReference "Ciao" */;
-			productName = Ciao;
 		};
 		C74D07CD265BD73800291FC2 /* Burritos */ = {
 			isa = XCSwiftPackageProductDependency;

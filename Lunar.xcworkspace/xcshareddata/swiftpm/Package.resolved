@@ -56,15 +56,6 @@
         }
       },
       {
-        "package": "Ciao",
-        "repositoryURL": "https://github.com/alin23/Ciao",
-        "state": {
-          "branch": "master",
-          "revision": "00739be5d469498b289b7680edb3129f47192804",
-          "version": null
-        }
-      },
-      {
         "package": "DataCompression",
         "repositoryURL": "https://github.com/mw99/DataCompression/",
         "state": {

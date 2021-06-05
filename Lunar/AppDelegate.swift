@@ -33,6 +33,7 @@ private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operation.queue")
+let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)

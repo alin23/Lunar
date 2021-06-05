@@ -147,7 +147,6 @@ class Button: NSButton {
         shadow = buttonShadow
 
         onMouseEnter?()
-        super.mouseEntered(with: event)
     }
 
     override func mouseExited(with event: NSEvent) {
@@ -159,7 +158,6 @@ class Button: NSButton {
         shadow = nil
 
         onMouseExit?()
-        super.mouseExited(with: event)
     }
 
     override init(frame frameRect: NSRect) {

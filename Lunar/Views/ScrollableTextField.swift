@@ -222,7 +222,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 //        if let editor = currentEditor() as? NSTextView {
 //            editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
 //        }
-        super.mouseEntered(with: event)
     }
 
     override func mouseExited(with event: NSEvent) {
@@ -243,7 +242,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         darken(color: textFieldColor)
 
         onMouseExit?()
-        super.mouseExited(with: event)
     }
 
     func setBgAlpha() {
