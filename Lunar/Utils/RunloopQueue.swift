@@ -93,7 +93,7 @@ public class RunloopQueue: NSObject {
 
     // MARK: - Code That Runs On The Background Thread
 
-    private var runloop: CFRunLoop!
+    var runloop: CFRunLoop!
     private func startRunloop() {
         let conditionLock = NSConditionLock(condition: 0)
 
