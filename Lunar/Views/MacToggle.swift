@@ -34,6 +34,13 @@ class MacToggle: NSView {
 
     //================================================================================
 
+    public var isEnabled: Bool = true {
+        didSet {
+            mainThread {
+                alphaValue = isEnabled ? 1.0 : 0.7
+            }
+        }
+    }
     fileprivate var height: CGFloat = 26
     fileprivate var width: CGFloat { height + (height * 0.6) }
 
@@ -163,6 +170,7 @@ class MacToggle: NSView {
     }
 
     override func mouseDown(with _: NSEvent) {
+        guard isEnabled else {return}
         let push = Double(outlineWidth + width) - Double(height)
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.3
@@ -181,6 +189,8 @@ class MacToggle: NSView {
     }
 
     override func mouseUp(with _: NSEvent) {
+        guard isEnabled else {return}
+
         isOn = !isOn
     }
 
