@@ -6,9 +6,10 @@
 //  Copyright © 2021 Alin. All rights reserved.
 //
 
-import Ciao
+import Cocoa
 import Defaults
 import Foundation
+import SwiftDate
 
 class Service {
     var scheme: String
@@ -63,9 +64,50 @@ class Service {
         return nil
     }
 
-    lazy var url = getFirstRespondingURL(urls: urls)
-    lazy var maxValueUrl = getFirstRespondingURL(urls: maxValueUrls)
-    lazy var smoothTransitionUrl = getFirstRespondingURL(urls: smoothTransitionUrls)
+    var urlInitialized = false
+    @Atomic var _url: URL? = nil
+    var url: URL? {
+        get {
+            if !urlInitialized {
+                urlInitialized = true
+                _url = getFirstRespondingURL(urls: urls)
+            }
+            return _url
+        }
+        set {
+            _url = newValue
+        }
+    }
+
+    var maxValueUrlInitialized = false
+    @Atomic var _maxValueUrl: URL? = nil
+    var maxValueUrl: URL? {
+        get {
+            if !maxValueUrlInitialized {
+                maxValueUrlInitialized = true
+                _maxValueUrl = getFirstRespondingURL(urls: maxValueUrls)
+            }
+            return _maxValueUrl
+        }
+        set {
+            _maxValueUrl = newValue
+        }
+    }
+
+    var smoothTransitionUrlInitialized = false
+    @Atomic var _smoothTransitionUrl: URL? = nil
+    var smoothTransitionUrl: URL? {
+        get {
+            if !smoothTransitionUrlInitialized {
+                smoothTransitionUrlInitialized = true
+                _smoothTransitionUrl = getFirstRespondingURL(urls: smoothTransitionUrls)
+            }
+            return _smoothTransitionUrl
+        }
+        set {
+            _smoothTransitionUrl = newValue
+        }
+    }
 }
 
 class NetworkControl: Control {
@@ -85,6 +127,12 @@ class NetworkControl: Control {
     }
 
     static func setup() {
+        displayController.onActiveDisplaysChange = {
+            let matchedServices = serialSync { controllersForDisplay.values.map(\.service) }
+            for service in Set(browser.services).subtracting(matchedServices) {
+                matchTXTRecord(service)
+            }
+        }
         listenForDDCUtilControllers()
         controllerVideoObserver = Defaults.observe(.disableControllerVideo) { change in
             guard change.newValue != change.oldValue else { return }
@@ -92,51 +140,73 @@ class NetworkControl: Control {
         }
     }
 
+    static func shouldPromptForNetworkControl(_ display: Display) -> Bool {
+        guard !display.neverUseNetworkControl else { return false }
+
+        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty {
+            return true
+        }
+
+        return false
+    }
+
     static func promptForNetworkControl(_ displayNum: Int, netService: NetService, display: Display) {
         let service = Service(netService, path: "/\(displayNum)")
-        if !service.urls.isEmpty {
-            log
-                .debug(
-                    "Matched display [\(display.id): \(display.name)] with network controller (\(netService.hostName ?? "nil"): \(service.urls)"
-                )
-            let completionHandler = { (useNetwork: Bool) in
-                if useNetwork {
+        guard !service.urls.isEmpty else { return }
+
+        log
+            .debug(
+                "Matched display [\(display.id): \(display.name)] with network controller (\(netService.hostName ?? "nil"): \(service.urls)"
+            )
+        let semaphore = DispatchSemaphore(value: 0)
+        let completionHandler = { (useNetwork: NSApplication.ModalResponse) in
+            if useNetwork == .alertFirstButtonReturn {
+                serialSync {
                     controllersForDisplay[display.id] = service
-                    async(threaded: true) {
-                        display.control = display.getBestControl()
-                    }
+                }
+                async(threaded: true) {
+                    display.control = display.getBestControl()
                 }
             }
-            if display.alwaysUseNetworkControl {
-                completionHandler(true)
-                return
+            if useNetwork == .alertThirdButtonReturn {
+                display.neverUseNetworkControl = true
+                display.save()
             }
+            semaphore.signal()
+        }
+        if display.alwaysUseNetworkControl {
+            completionHandler(.alertFirstButtonReturn)
+            return
+        }
 
-            let window = mainThread { appDelegate().sshWindowController?.window ?? appDelegate().windowController?.window }
-            let resp = ask(
-                message: "Lunar Network Controller",
-                info: """
-                    Lunar found a network controller at \"\(service.urls.first!
-                    .absoluteString)\" for this \"\(display.name)\" monitor.
+        let window = mainThread { appDelegate().sshWindowController?.window ?? appDelegate().windowController?.window }
+        let resp = ask(
+            message: "Lunar Network Controller",
+            info: """
+                Lunar found a network controller at \"\(service.urls.first!
+                .absoluteString)\" for this \"\(display.name)\" monitor.
 
-                    Do you want to use it?
-                """,
-                okButton: "Yes",
-                cancelButton: "No",
-                screen: display.screen,
-                window: window,
-                suppressionText: "Always use network control for this display when possible",
-                onSuppression: { useNetworkControl in
-                    display.alwaysUseNetworkControl = useNetworkControl
-                    display.save()
-                },
-                onCompletion: completionHandler,
-                unique: true,
-                waitTimeout: 60.seconds
-            )
-            if window == nil {
-                completionHandler(resp)
-            }
+                Do you want to use it?
+            """,
+            okButton: "Yes",
+            cancelButton: "Not now",
+            thirdButton: "No, never ask again",
+            screen: display.screen,
+            window: window,
+            suppressionText: "Always use network control for this display when possible",
+            onSuppression: { useNetworkControl in
+                display.alwaysUseNetworkControl = useNetworkControl
+                display.save()
+            },
+            onCompletion: completionHandler,
+            unique: true,
+            waitTimeout: 60.seconds
+        )
+
+        if window == nil {
+            completionHandler(resp)
+        } else {
+            semaphore.wait()
         }
     }
 
@@ -144,8 +214,10 @@ class NetworkControl: Control {
         guard let txt = netService.txtRecordDictionary else { return }
 
         let serviceConnectedDisplayCount = Set(txt.compactMap { $0.key.split(separator: ":").first }).count
-        if serviceConnectedDisplayCount == 1, displayController.activeDisplays.count == 1, let display = displayController.activeDisplays.first {
-            promptForNetworkControl(1, netService: netService, display: display.value)
+        if serviceConnectedDisplayCount == 1, displayController.activeDisplays.count == 1,
+           let display = displayController.activeDisplays.first?.value, shouldPromptForNetworkControl(display)
+        {
+            promptForNetworkControl(1, netService: netService, display: display)
             return
         }
 
@@ -157,8 +229,11 @@ class NetworkControl: Control {
             else { return }
 
             guard let display = displayController.getMatchingDisplay(
-                name: name, serial: serial, productID: productID, manufactureYear: year, manufacturer: manufacturer
-            ) else {
+                name: name, serial: serial, productID: productID,
+                manufactureYear: year, manufacturer: manufacturer
+            ),
+                shouldPromptForNetworkControl(display)
+            else {
                 return
             }
             promptForNetworkControl(displayNum, netService: netService, display: display)
@@ -188,10 +263,14 @@ class NetworkControl: Control {
 
         browser.serviceRemovedHandler = { service in
             log.info("Service removed: \(service)")
-            if let toRemove = controllersForDisplay.first(where: { _, displayService in
-                service == displayService.service
-            }) {
-                controllersForDisplay.removeValue(forKey: toRemove.key)
+            serialSync {
+                if let toRemove = controllersForDisplay.first(where: { _, displayService in
+                    service == displayService.service
+                }) {
+                    _ = serialSync {
+                        controllersForDisplay.removeValue(forKey: toRemove.key)
+                    }
+                }
             }
         }
 
@@ -199,7 +278,8 @@ class NetworkControl: Control {
     }
 
     static func sendToAllControllers(_ action: (URL) -> Void) {
-        for url in controllersForDisplay.values.compactMap({ $0.url?.deletingLastPathComponent() }).uniqued() {
+        let urls = serialSync { controllersForDisplay.values.compactMap { $0.url?.deletingLastPathComponent() }.uniqued() }
+        for url in urls {
             action(url)
         }
     }
@@ -230,7 +310,7 @@ class NetworkControl: Control {
     }
 
     func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
-        guard let service = NetworkControl.controllersForDisplay[display.id],
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }),
               let url = smooth ? service.smoothTransitionUrl : service.url,
               DDC.apply
         else {
@@ -265,7 +345,7 @@ class NetworkControl: Control {
                 log.debug("Sent \(controlID)=\(value), received response `\(resp)`", context: display.context)
             } catch {
                 guard let display = self.display else { return }
-                log.error("Error sending \(controlID)=\(value): \(error)", context: display.context.with(["url": fullUrl]))
+                log.error("Error sending \(controlID)=\(value): \(error)", context: display.context?.with(["url": fullUrl]))
             }
 
             _ = self.setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
@@ -293,7 +373,7 @@ class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
         _ = setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
 
-        guard let controller = NetworkControl.controllersForDisplay[display.id],
+        guard let controller = serialSync({ NetworkControl.controllersForDisplay[display.id] }),
               let url = max ? controller.maxValueUrl : controller.url,
               setterTasks[controlID] == nil || setterTasks[controlID]!.isCancelled
         else {
@@ -385,7 +465,7 @@ class NetworkControl: Control {
         }
 
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay,
-              let service = NetworkControl.controllersForDisplay[display.id] else { return false }
+              let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else { return false }
 
         if service.url == nil {
             async(runLoopQueue: lowprioQueue) {
@@ -403,7 +483,7 @@ class NetworkControl: Control {
     var responsiveTryCount = 0
 
     func isResponsive() -> Bool {
-        guard let service = NetworkControl.controllersForDisplay[display.id] else {
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else {
             responsiveTryCount += 1
             if responsiveTryCount > 3 {
                 responsiveTryCount = 0
@@ -418,7 +498,7 @@ class NetworkControl: Control {
 
         asyncAfter(ms: 100, uniqueTaskKey: "networkControlResponsiveChecker") { [weak self] in
             guard let self = self else { return }
-            guard let service = NetworkControl.controllersForDisplay[self.display.id],
+            guard let service = serialSync({ NetworkControl.controllersForDisplay[self.display.id] }),
                   let url = service.url, let newURL = service.getFirstRespondingURL(urls: service.urls, timeout: 600.milliseconds, retries: 1)
             else {
                 self.responsiveTryCount += 1
@@ -450,7 +530,9 @@ class NetworkControl: Control {
                 browserSemaphore.signal()
             }
             if let id = id {
-                controllersForDisplay.removeValue(forKey: id)
+                _ = serialSync {
+                    controllersForDisplay.removeValue(forKey: id)
+                }
             }
             browser.reset()
             browser.browse(type: ServiceType.tcp("ddcutil"))
@@ -458,7 +540,7 @@ class NetworkControl: Control {
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
-        guard let service = NetworkControl.controllersForDisplay[display.id] else { return false }
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else { return false }
         return service.smoothTransitionUrl != nil
     }
 }

@@ -138,7 +138,7 @@ class Button: NSButton {
         super.mouseDown(with: event)
     }
 
-    override func mouseEntered(with event: NSEvent) {
+    override func mouseEntered(with _: NSEvent) {
         if !isEnabled { return }
         hover = true
 
@@ -149,7 +149,7 @@ class Button: NSButton {
         onMouseEnter?()
     }
 
-    override func mouseExited(with event: NSEvent) {
+    override func mouseExited(with _: NSEvent) {
         if !isEnabled { return }
         hover = false
 

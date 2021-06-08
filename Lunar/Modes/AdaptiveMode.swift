@@ -145,9 +145,9 @@ extension AdaptiveMode {
     }
 
     @inline(__always) func withForce(_ force: Bool = true, _ block: () -> Void) {
-        self.force = force
+        serialSync { self.force = force }
         block()
-        self.force = false
+        serialSync { self.force = false }
     }
 
     @inline(__always) func ifAvailable() -> Self? {

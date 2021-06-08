@@ -7,12 +7,13 @@
 //
 
 import Alamofire
+import Atomics
 import Carbon.HIToolbox
 import Cocoa
 import Compression
 import CoreLocation
 import Defaults
-import LaunchAtLogin
+// import LaunchAtLogin
 import LetsMove
 import Magnet
 import Path
@@ -25,7 +26,7 @@ import WAYWindow
 
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
-var screensSleeping = false
+var screensSleeping = ManagedAtomic<Bool>(false)
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
@@ -38,6 +39,8 @@ let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
+let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
+let dataSerialQueue = DispatchQueue(label: "fyi.lunar.dataSerial.queue", qos: .utility, target: DispatchQueue.global(qos: .utility))
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = AppSettings.testMode
@@ -68,21 +71,7 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SUUpdaterDelegate {
     var locationManager: CLLocationManager?
-    var windowControllerSemaphore = DispatchSemaphore(value: 1)
-    var _windowController: ModernWindowController?
-    var windowController: ModernWindowController? {
-        get {
-            windowControllerSemaphore.wait()
-            let controller = _windowController
-            windowControllerSemaphore.signal()
-            return controller
-        }
-        set {
-            windowControllerSemaphore.wait()
-            _windowController = newValue
-            windowControllerSemaphore.signal()
-        }
-    }
+    @Atomic var windowController: ModernWindowController?
 
     var sshWindowController: ModernWindowController?
     var updateInfoWindowController: ModernWindowController?
@@ -256,7 +245,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
-            LaunchAtLogin.isEnabled = shouldStartAtLogin
+            // LaunchAtLogin.isEnabled = shouldStartAtLogin
 
             guard let appPath = Path(Bundle.main.bundlePath), appPath.parent == Path("/Applications")
             else { return }
@@ -311,10 +300,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return true
     }
 
+    var didBecomeActiveAtLeastOnce = false
     func applicationDidBecomeActive(_: Notification) {
-        if Defaults[.hideMenuBarIcon] {
+        if didBecomeActiveAtLeastOnce, Defaults[.hideMenuBarIcon] {
             showWindow()
         }
+        didBecomeActiveAtLeastOnce = true
     }
 
     @objc func updateInfoMenuItem(notification: Notification) {
@@ -355,7 +346,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func startValuesReaderThread() {
         valuesReaderThread = asyncEvery(10.seconds, queue: lowprioQueue) { _ in
-            guard !screensSleeping else { return }
+            guard !screensSleeping.load(ordering: .relaxed) else { return }
 
             if self.refreshValues {
                 displayController.fetchValues()
@@ -468,6 +459,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
             asyncAfter(ms: 5000) {
                 NetworkControl.resetState()
+                DDCControl.resetState()
             }
             if let visible = windowController?.window?.isVisible, visible {
                 windowController?.close()
@@ -477,7 +469,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         case NSWorkspace.screensDidWakeNotification:
             log.debug("Screens woke up")
-            screensSleeping = false
+            screensSleeping.store(false, ordering: .sequentiallyConsistent)
 
             if refreshValues {
                 startValuesReaderThread()
@@ -487,6 +479,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             if Defaults[.reapplyValuesAfterWake] {
                 asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
                     NetworkControl.resetState()
+                    DDCControl.resetState()
 
                     for _ in 1 ... 5 {
                         displayController.adaptBrightness(force: true)
@@ -496,7 +489,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         case NSWorkspace.screensDidSleepNotification:
             log.debug("Screens gone to sleep")
-            screensSleeping = true
+            screensSleeping.store(true, ordering: .sequentiallyConsistent)
             if let task = valuesReaderThread {
                 lowprioQueue.cancel(timer: task)
             }
@@ -632,7 +625,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         log.initLogger()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        NetworkControl.setup()
         ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
         ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
 
@@ -678,6 +670,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         addObservers()
         initLicensing()
+        NetworkControl.setup()
         if thisIsFirstRun || TEST_MODE {
             showWindow()
         }

@@ -3,12 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
-		C701A2342546B9F4004747B5 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = C701A2332546B9F4004747B5 /* LaunchAtLogin */; };
 		C701A23C2546BA41004747B5 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23B2546BA41004747B5 /* Magnet */; };
 		C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23E2546C8BF004747B5 /* MediaKeyTap */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
@@ -48,7 +47,6 @@
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
-		C74D07CE265BD73800291FC2 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C74D07CD265BD73800291FC2 /* Burritos */; };
 		C74D46F326357DD400B0CBAE /* UpdateInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D46F126357DD400B0CBAE /* UpdateInfoViewController.swift */; };
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
@@ -57,6 +55,7 @@
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
+		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
@@ -383,18 +382,17 @@
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
-				C74D07CE265BD73800291FC2 /* Burritos in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
-				C701A2342546B9F4004747B5 /* LaunchAtLogin in Frameworks */,
 				C7138D972634B03400406EE3 /* Paddle.framework in Frameworks */,
 				C72CFB982586B371005F0340 /* NSPageControl.framework in Frameworks */,
 				C740A1C5262192EF004BC1C7 /* Sparkle in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
+				C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C7E80E4626370780004718A4 /* Socket in Frameworks */,
 				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
@@ -755,7 +753,6 @@
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C75083582222865F0020270E /* Embed Frameworks */,
-				C73CC69C24615915003B2658 /* Run Script */,
 				C78B9223237ED34E0060DC7C /* Run Script */,
 			);
 			buildRules = (
@@ -773,7 +770,6 @@
 				C73CC69E24615E9D003B2658 /* Sentry */,
 				C73CC6A4246161E6003B2658 /* Charts */,
 				C73CC6AD24616462003B2658 /* Sauce */,
-				C701A2332546B9F4004747B5 /* LaunchAtLogin */,
 				C701A23B2546BA41004747B5 /* Magnet */,
 				C701A23E2546C8BF004747B5 /* MediaKeyTap */,
 				C7B5E8582548B3F900530B47 /* Defaults */,
@@ -793,7 +789,7 @@
 				C7BADA0926386E940058974C /* ZIPFoundation */,
 				C7F1B613264C527900F02D8A /* Down */,
 				C7F48C492657A258000715A8 /* DataCompression */,
-				C74D07CD265BD73800291FC2 /* Burritos */,
+				C75FFA09266D24AA0034DDD6 /* Burritos */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -839,7 +835,6 @@
 				C73CC69D24615E9D003B2658 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */,
 				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
-				C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
 				C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */,
 				C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */,
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
@@ -859,7 +854,7 @@
 				C7BADA0826386E940058974C /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				C7F1B612264C527900F02D8A /* XCRemoteSwiftPackageReference "Down" */,
 				C7F48C482657A258000715A8 /* XCRemoteSwiftPackageReference "DataCompression" */,
-				C74D07CC265BD73800291FC2 /* XCRemoteSwiftPackageReference "Burritos" */,
+				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -923,25 +918,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		C73CC69C24615915003B2658 /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${BUILT_PRODUCTS_DIR}/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh\"\n";
-		};
 		C7574F84235469D600358397 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -976,7 +952,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    #exit 0\n    ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\n#exit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1582,14 +1558,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.0;
-			};
-		};
 		C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Clipy/Magnet";
@@ -1710,7 +1678,7 @@
 				minimumVersion = 0.4.1;
 			};
 		};
-		C74D07CC265BD73800291FC2 /* XCRemoteSwiftPackageReference "Burritos" */ = {
+		C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/Burritos";
 			requirement = {
@@ -1825,11 +1793,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C701A2332546B9F4004747B5 /* LaunchAtLogin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C701A2322546B9F4004747B5 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
-			productName = LaunchAtLogin;
-		};
 		C701A23B2546BA41004747B5 /* Magnet */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */;
@@ -1905,9 +1868,9 @@
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
-		C74D07CD265BD73800291FC2 /* Burritos */ = {
+		C75FFA09266D24AA0034DDD6 /* Burritos */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C74D07CC265BD73800291FC2 /* XCRemoteSwiftPackageReference "Burritos" */;
+			package = C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */;
 			productName = Burritos;
 		};
 		C78BD046259B30CA00FC823F /* EonilFSEvents */ = {

@@ -73,11 +73,13 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
 
 class DataStore: NSObject {
     func displays(serials: [String]? = nil) -> [Display]? {
-        guard let displays = Defaults[.displays] else { return nil }
-        if let ids = serials {
-            return displays.filter { display in ids.contains(display.serial) }
+        serialSync {
+            guard let displays = Defaults[.displays] else { return nil }
+            if let ids = serials {
+                return displays.filter { display in ids.contains(display.serial) }
+            }
+            return displays
         }
-        return displays
     }
 
     func appExceptions(identifiers: [String]? = nil) -> [AppException]? {

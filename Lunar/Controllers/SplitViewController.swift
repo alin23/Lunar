@@ -148,14 +148,17 @@ class SplitViewController: NSSplitViewController {
         log.verbose("")
     }
 
+    var pausedAdaptiveModeObserver: Bool = false
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
-            if change.newValue == change.oldValue {
+            guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
                 return
             }
             mainThread {
-                self?.activeModeButton.update(modeKey: change.newValue)
-                self?.updateHelpButton(modeKey: change.newValue)
+                self.pausedAdaptiveModeObserver = true
+                self.activeModeButton.update(modeKey: change.newValue)
+                self.updateHelpButton(modeKey: change.newValue)
+                self.pausedAdaptiveModeObserver = false
             }
         }
     }
