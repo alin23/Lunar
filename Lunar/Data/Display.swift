@@ -148,7 +148,9 @@ enum ValueType {
 
     @objc dynamic var adaptive: Bool {
         get {
-            _adaptive && !adaptivePaused
+            serialSync {
+                _adaptive && !adaptivePaused
+            }
         }
         set {
             let oldValue = _adaptive
@@ -331,6 +333,13 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var neverUseNetworkControl: Bool = false {
+        didSet {
+            context = getContext()
+            runBoolObservers(property: .neverUseNetworkControl, newValue: neverUseNetworkControl, oldValue: oldValue)
+        }
+    }
+
     @objc dynamic var alwaysFallbackControl: Bool = false {
         didSet {
             context = getContext()
@@ -363,8 +372,8 @@ enum ValueType {
 
     func manageSendingValue(_ key: CodingKeys, oldValue: Bool) {
         let name = key.rawValue
-        guard let value = self.value(forKey: name) as? Bool,
-              let condition = self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition
+        guard let value = serialSync({ self.value(forKey: name) as? Bool }),
+              let condition = serialSync({ self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition })
         else {
             log.error("No condition property found for \(name)")
             return
@@ -380,43 +389,46 @@ enum ValueType {
                 showOperationInProgress(screen: screen)
             }
             asyncAfter(ms: 5000, uniqueTaskKey: name) { [weak self] in
-                self?.setValue(false, forKey: name)
-                guard let condition = self?.value(
-                    forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
-                ) as? NSCondition
-                else {
-                    log.error("No condition property found for \(name)")
-                    return
+                serialSync {
+                    self?.setValue(false, forKey: name)
+
+                    guard let condition = self?.value(
+                        forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
+                    ) as? NSCondition
+                    else {
+                        log.error("No condition property found for \(name)")
+                        return
+                    }
+                    condition.broadcast()
                 }
-                condition.broadcast()
             }
         }
         runBoolObservers(property: key, newValue: value, oldValue: oldValue)
     }
 
     @objc dynamic var sentBrightnessCondition = NSCondition()
-    @objc dynamic var sendingBrightness: Bool = false {
+    @Atomic @objc dynamic var sendingBrightness: Bool = false {
         didSet {
             manageSendingValue(.sendingBrightness, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentContrastCondition = NSCondition()
-    @objc dynamic var sendingContrast: Bool = false {
+    @Atomic @objc dynamic var sendingContrast: Bool = false {
         didSet {
             manageSendingValue(.sendingContrast, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentInputCondition = NSCondition()
-    @objc dynamic var sendingInput: Bool = false {
+    @Atomic @objc dynamic var sendingInput: Bool = false {
         didSet {
             manageSendingValue(.sendingInput, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentVolumeCondition = NSCondition()
-    @objc dynamic var sendingVolume: Bool = false {
+    @Atomic @objc dynamic var sendingVolume: Bool = false {
         didSet {
             manageSendingValue(.sendingVolume, oldValue: oldValue)
         }
@@ -470,6 +482,7 @@ enum ValueType {
         .audioMuted: [:],
         .power: [:],
         .alwaysUseNetworkControl: [:],
+        .neverUseNetworkControl: [:],
         .alwaysFallbackControl: [:],
         .neverFallbackControl: [:],
         .sendingBrightness: [:],
@@ -504,8 +517,8 @@ enum ValueType {
         return "\(safeName)-\(shortHash(string: serial))"
     }
 
-    var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
-    var contrastDataPointInsertionTask: DispatchWorkItem? = nil
+    @Atomic var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
+    @Atomic var contrastDataPointInsertionTask: DispatchWorkItem? = nil
 
     var slowRead = false
     var slowWrite = false
@@ -555,7 +568,7 @@ enum ValueType {
         }
     }
 
-    lazy var context = getContext()
+    @Atomic var context: [String: Any]? = nil
 
     lazy var isForTesting = TEST_IDS.contains(id)
 
@@ -590,6 +603,8 @@ enum ValueType {
             "hasNetworkControl": hasNetworkControl,
             "alwaysFallbackControl": alwaysFallbackControl,
             "neverFallbackControl": neverFallbackControl,
+            "alwaysUseNetworkControl": alwaysUseNetworkControl,
+            "neverUseNetworkControl": neverUseNetworkControl,
             "isAppleDisplay": isAppleDisplay(),
             "isSource": isSource,
         ]
@@ -695,10 +710,12 @@ enum ValueType {
         lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
         lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
         alwaysUseNetworkControl = try container.decode(Bool.self, forKey: .alwaysUseNetworkControl)
+        neverUseNetworkControl = try container.decode(Bool.self, forKey: .neverUseNetworkControl)
         alwaysFallbackControl = try container.decode(Bool.self, forKey: .alwaysFallbackControl)
         neverFallbackControl = try container.decode(Bool.self, forKey: .neverFallbackControl)
         volume = (try container.decode(UInt8.self, forKey: .volume)).ns
         audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
+        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         input = (try container.decode(UInt8.self, forKey: .input)).ns
         hotkeyInput = (try container.decode(UInt8.self, forKey: .hotkeyInput)).ns
 
@@ -775,6 +792,7 @@ enum ValueType {
         userBrightness: [AdaptiveModeKey: [Int: Int]]? = nil,
         userContrast: [AdaptiveModeKey: [Int: Int]]? = nil,
         alwaysUseNetworkControl: Bool = false,
+        neverUseNetworkControl: Bool = false,
         alwaysFallbackControl: Bool = false,
         neverFallbackControl: Bool = false,
         enabledControls: [DisplayControl: Bool]? = nil
@@ -800,6 +818,7 @@ enum ValueType {
         self.input = input.ns
         self.hotkeyInput = hotkeyInput.ns
         self.alwaysUseNetworkControl = alwaysUseNetworkControl
+        self.neverUseNetworkControl = neverUseNetworkControl
         self.alwaysFallbackControl = alwaysFallbackControl
         self.neverFallbackControl = neverFallbackControl
 
@@ -871,6 +890,7 @@ enum ValueType {
             userBrightness: (config["userBrightness"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
             userContrast: (config["userContrast"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
             alwaysUseNetworkControl: (config["alwaysUseNetworkControl"] as? Bool) ?? false,
+            neverUseNetworkControl: (config["neverUseNetworkControl"] as? Bool) ?? false,
             alwaysFallbackControl: (config["alwaysFallbackControl"] as? Bool) ?? false,
             neverFallbackControl: (config["neverFallbackControl"] as? Bool) ?? false,
             enabledControls: (config["enabledControls"] as? [DisplayControl: Bool]) ?? [
@@ -883,7 +903,9 @@ enum ValueType {
     }
 
     func save() {
-        DataStore.storeDisplay(display: self)
+        serialSync {
+            DataStore.storeDisplay(display: self)
+        }
     }
 
     // MARK: EDID
@@ -949,6 +971,7 @@ enum ValueType {
         case userBrightness
         case userContrast
         case alwaysUseNetworkControl
+        case neverUseNetworkControl
         case alwaysFallbackControl
         case neverFallbackControl
         case enabledControls
@@ -983,6 +1006,7 @@ enum ValueType {
                 .input,
                 .hotkeyInput,
                 .alwaysUseNetworkControl,
+                .neverUseNetworkControl,
                 .alwaysFallbackControl,
                 .neverFallbackControl,
                 .isSource,
@@ -1049,9 +1073,11 @@ enum ValueType {
         try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
 
         try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
+        try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
         try container.encode(alwaysFallbackControl, forKey: .alwaysFallbackControl)
         try container.encode(neverFallbackControl, forKey: .neverFallbackControl)
         try container.encode(power, forKey: .power)
+        try container.encode(isSource, forKey: .isSource)
     }
 
     // MARK: Sentry
@@ -1494,13 +1520,13 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        guard !isUserAdjusting(), !sendingBrightness else { return }
+        guard !isUserAdjusting(), !serialSync({ sendingBrightness }) else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !sendingBrightness else { return }
+        guard !isUserAdjusting(), !serialSync({ sendingBrightness }) else { return }
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
@@ -1518,13 +1544,13 @@ enum ValueType {
     }
 
     func refreshContrast() {
-        guard !isUserAdjusting(), !sendingContrast else { return }
+        guard !isUserAdjusting(), !serialSync({ sendingContrast }) else { return }
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !sendingContrast else { return }
+        guard !isUserAdjusting(), !serialSync({ sendingContrast }) else { return }
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
@@ -1642,11 +1668,11 @@ enum ValueType {
             toLow: 0.3, toHigh: initialBlueGamma
         ))
 
-        let contrast = CGGammaValue(mapNumber(
+        let contrast = serialSync { CGGammaValue(mapNumber(
             powf(Float(contrast ?? self.contrast.uint8Value) / 100.0, 0.3),
             fromLow: 0, fromHigh: 1.0,
             toLow: -0.2, toHigh: 0.2
-        ))
+        )) }
 
         return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: contrast)
     }
@@ -1725,6 +1751,7 @@ enum ValueType {
         alwaysFallbackControl = false
         neverFallbackControl = false
         alwaysUseNetworkControl = false
+        neverUseNetworkControl = false
         enabledControls = [
             .network: true,
             .coreDisplay: true,
@@ -1874,7 +1901,7 @@ enum ValueType {
         ).i
 
         brightnessDataPointInsertionTask = DispatchWorkItem { [weak self] in
-            while let self = self, self.sendingBrightness {
+            while let self = self, serialSync({ self.sendingBrightness }) {
                 self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
@@ -1904,7 +1931,7 @@ enum ValueType {
         ).i
 
         contrastDataPointInsertionTask = DispatchWorkItem { [weak self] in
-            while let self = self, self.sendingContrast {
+            while let self = self, serialSync({ self.sendingContrast }) {
                 self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
@@ -1921,6 +1948,6 @@ enum ValueType {
     }
 
     func isUserAdjusting() -> Bool {
-        brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil
+        serialSync { brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil }
     }
 }

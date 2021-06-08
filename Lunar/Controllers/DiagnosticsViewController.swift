@@ -15,8 +15,8 @@ import Sentry
 let FAQ_URL = try! "https://lunar.fyi/faq".asURL()
 
 class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
-    @objc dynamic var editable = false
-    @objc dynamic var stopped = false
+    @Atomic @objc dynamic var editable = false
+    @Atomic @objc dynamic var stopped = false
     @objc dynamic var sent = false {
         didSet {
             mainThread {
@@ -57,10 +57,15 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     @IBOutlet var backingTextView: NSTextView!
     @IBOutlet var textView: NSTextView!
 
-    var keyPressed: UInt16 = 0
+    @Atomic var keyPressed: UInt16 = 0
 
     func setSendButtonEnabled() {
-        sendButton.isEnabled = !sent && !(name?.isEmpty ?? true) && !(email?.isEmpty ?? true)
+        sendButton.isEnabled = !sent && !(name?.isEmpty ?? true) && !(email?.isEmpty ?? true) && stopped
+        if sendButton.isEnabled {
+            sendButton.toolTip = nil
+        } else {
+            sendButton.toolTip = "Make sure the diagnostics process has finished."
+        }
     }
 
     let continueTestCondition = NSCondition()
@@ -124,14 +129,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             let steps = displayController.activeDisplays.values.count
             let stepPercent = 90.0 / steps.d
 
-            self.renderSeparated("""
+            self.render("""
             **Note: Don't copy/paste this output in an email as that is not enough.**
             **Clicking the `Send Diagnostics` button will send more useful technical data.**
-            **If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by:**
-
-            * Pressing the necessary keys when prompted
-            * Not clicking inside this text container as it steals the focus and keys will not be registered by the diagnostics window
-                * Click outside this text container if pressing keys doesn't continue the diagnostics
+            **If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by pressing the necessary keys when prompted.**
             """)
 
             for (i, display) in displayController.activeDisplays.values.enumerated() {
@@ -161,6 +162,8 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 setPercent(40)
                 guard !self.stopped else { return }
 
+                var br: Float = 0.0
+
                 self.render("""
                 * ID: `\(display.id)`
                 * EDID Name: `\(display.edidName)`
@@ -173,6 +176,11 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     "can't be controlled through the network" : "supports DDC through a network controller")_
                 * DDC Status: `\(display.responsiveDDC ? "responsive" : "unresponsive")`
                 * Apple vendored: `\(appleDisplay ? "YES" : "NO")`
+                  * **DisplayServicesCanChangeBrightness: \(DisplayServicesCanChangeBrightness(display.id))**
+                  * **DisplayServicesHasAmbientLightCompensation: \(DisplayServicesHasAmbientLightCompensation(display.id))**
+                  * **DisplayServicesIsSmartDisplay: \(DisplayServicesIsSmartDisplay(display.id))**
+                  * **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
+                  * **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
                   * _\(
                       appleDisplay
                           ?
@@ -241,7 +249,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             """
                         )
                         self.renderSeparated(
-                            "_Press the `Enter` key to test reading.\nPress `any other key` to `skip reading test` and continue diagnostics... (click outside this container if keys don't work)_"
+                            "_Press the `Enter` key to test reading.\nPress `any other key` to `skip reading test` and continue diagnostics..._"
                         )
                         self.continueTestCondition.wait()
 
@@ -458,7 +466,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 break
                             }
                             self.renderSeparated(
-                                "_Press any key to continue diagnostics... (click outside this container if keys don't work)_"
+                                "_Press any key to continue diagnostics..._"
                             )
                         }
                     )
@@ -473,7 +481,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                 if shouldStartTests {
                     self.renderSeparated(
-                        "_Press any key to start tests for this display... (click outside this container if keys don't work)_"
+                        "_Press any key to start tests for this display..._"
                     )
                     display.adaptivePaused = true
                     defer {
@@ -509,7 +517,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     self.render("**Do you want to test Sync Mode?**")
 
                     self.renderSeparated(
-                        "_Press the `Enter` key to test Sync Mode.\nPress `any other key` to `skip the Sync Mode test` and continue diagnostics... (click outside this container if keys don't work)_"
+                        "_Press the `Enter` key to test Sync Mode.\nPress `any other key` to `skip the Sync Mode test` and continue diagnostics..._"
                     )
                     self.continueTestCondition.wait()
                     guard !self.stopped else { return }
@@ -521,7 +529,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         **Lunar will launch System Preferences for Displays now**
                         **Please disable `\"Automatically adjust brightness\"` until this test is done**
 
-                        Press any key to continue diagnostics _after disabling the setting_... (click outside this container if keys don't work)_"
+                        Press any key to continue diagnostics _after disabling the setting_...
                         """)
                         Thread.sleep(forTimeInterval: 1)
                         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
@@ -606,7 +614,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         let trySync = { (brightness: UInt8, method: CoreDisplayMethod) in
                             guard !self.stopped else { return }
                             self.render("\n#### Setting built-in brightness to `\(brightness)` using `\(method)`")
-                            SyncMode.setBuiltinDisplayBrightness(brightness)
+                            SyncMode.setBuiltinDisplayBrightness(brightness, method: method)
                             Thread.sleep(forTimeInterval: 3)
                             guard !self.stopped else { return }
                             printBrightness()
@@ -632,12 +640,14 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             self.renderSeparated("""
             **If you want to send diagnostics, make sure to fill in the Name and Email fields.**
             **Don't copy/paste this output in an email as that is not enough, clicking the button will send more useful technical data.**
-            You can also add additional comments below this line.
+
+            `You can also add additional comments below this line.`
             """)
 
             mainThread {
                 self.percentDone = 100
                 self.stopDiagnostics(self)
+                self.textView.isSelectable = true
                 self.textView.isEditable = true
                 self.setSendButtonEnabled()
             }
@@ -727,9 +737,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         }
 
         textView?.isEditable = false
-        textView?.isSelectable = true
+        textView?.isSelectable = false
         textView.delegate = self
         backingTextView.isEditable = false
+        backingTextView.isSelectable = false
 
         setSendButtonEnabled()
         sendButton.bg = green

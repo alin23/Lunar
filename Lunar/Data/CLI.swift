@@ -8,7 +8,6 @@
 
 import AnyCodable
 import ArgumentParser
-import Ciao
 import Cocoa
 import Dispatch
 import Foundation
@@ -119,7 +118,11 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
         guard let currentDisplayId = displayController.currentDisplay?.id else { return nil }
         return displays.first(where: { $0.id == currentDisplayId })
     default:
-        return displays.first(where: { $0.serial == filter || $0.name == filter })
+        if let id = filter.u32 {
+            return displays.first(where: { $0.id == id })
+        } else {
+            return displays.first(where: { $0.serial == filter || $0.name == filter })
+        }
     }
 }
 
@@ -217,6 +220,176 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct CoreDisplay: ParsableCommand {
+        @OptionGroup var globals: GlobalOptions
+
+        static let configuration = CommandConfiguration(
+            abstract: "Use CoreDisplay methods on monitors."
+        )
+
+        enum CoreDisplayMethod: String, ExpressibleByArgument, CaseIterable {
+            case GetUserBrightness
+            case GetLinearBrightness
+            case GetDynamicLinearBrightness
+            case SetUserBrightness
+            case SetLinearBrightness
+            case SetDynamicLinearBrightness
+            case SetAutoBrightnessIsEnabled
+        }
+
+        @Argument(help: "Method to call. One of (\(CoreDisplayMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
+        var method: CoreDisplayMethod
+
+        @Argument(help: "Display serial/name/id or one of (first, main, all, builtin, source)")
+        var display: String
+
+        @Argument(help: "Value for the method's second argument")
+        var value: Double = 1.0
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            displayController.displays = DisplayController.getDisplays()
+            var displays = displayController.activeDisplays.values.map { $0 }
+            var displayIDs: [CGDirectDisplayID] = []
+
+            switch display {
+            case "all":
+                displayIDs = displays.map(\.id)
+            case "builtin":
+                guard let id = SyncMode.builtinDisplay else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [id]
+            case "source":
+                guard let id = SyncMode.sourceDisplayID else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [id]
+            default:
+                guard let display = getDisplay(displays: displays, filter: display) else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [display.id]
+            }
+
+            for id in displayIDs {
+                switch method {
+                case .GetUserBrightness:
+                    print(CoreDisplay_Display_GetUserBrightness(id))
+                case .GetLinearBrightness:
+                    print(CoreDisplay_Display_GetLinearBrightness(id))
+                case .GetDynamicLinearBrightness:
+                    print(CoreDisplay_Display_GetDynamicLinearBrightness(id))
+                case .SetUserBrightness:
+                    print("Setting UserBrightness to \(value) for ID: \(id)")
+                    CoreDisplay_Display_SetUserBrightness(id, value)
+                case .SetLinearBrightness:
+                    print("Setting LinearBrightness to \(value) for ID: \(id)")
+                    CoreDisplay_Display_SetLinearBrightness(id, value)
+                case .SetDynamicLinearBrightness:
+                    print("Setting DynamicLinearBrightness to \(value) for ID: \(id)")
+                    CoreDisplay_Display_SetDynamicLinearBrightness(id, value)
+                case .SetAutoBrightnessIsEnabled:
+                    print("Setting AutoBrightnessIsEnabled to \(value > 0) for ID: \(id)")
+                    CoreDisplay_Display_SetAutoBrightnessIsEnabled(id, value > 0)
+                }
+            }
+            globalExit(0)
+        }
+    }
+
+    struct DisplayServices: ParsableCommand {
+        @OptionGroup var globals: GlobalOptions
+
+        static let configuration = CommandConfiguration(
+            abstract: "Use DisplayServices methods on monitors."
+        )
+
+        enum DisplayServicesMethod: String, ExpressibleByArgument, CaseIterable {
+            case GetLinearBrightness
+            case SetLinearBrightness
+            case GetBrightness
+            case SetBrightness
+            case SetBrightnessSmooth
+            case CanChangeBrightness
+            case HasAmbientLightCompensation
+            case AmbientLightCompensationEnabled
+            case IsSmartDisplay
+            case BrightnessChanged
+        }
+
+        @Argument(help: "Method to call. One of (\(DisplayServicesMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
+        var method: DisplayServicesMethod
+
+        @Argument(help: "Display serial/name/id or one of (first, main, all, builtin, source)")
+        var display: String
+
+        @Argument(help: "Value for the method's second argument")
+        var value: Double = 1.0
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            displayController.displays = DisplayController.getDisplays()
+            var displays = displayController.activeDisplays.values.map { $0 }
+            var displayIDs: [CGDirectDisplayID] = []
+
+            switch display {
+            case "all":
+                displayIDs = displays.map(\.id)
+            case "builtin":
+                guard let id = SyncMode.builtinDisplay else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [id]
+            case "source":
+                guard let id = SyncMode.sourceDisplayID else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [id]
+            default:
+                guard let display = getDisplay(displays: displays, filter: display) else {
+                    throw CommandError.displayNotFound(display)
+                }
+                displayIDs = [display.id]
+            }
+
+            for id in displayIDs {
+                var brightness: Float = value.f
+                switch method {
+                case .GetLinearBrightness:
+                    DisplayServicesGetLinearBrightness(id, &brightness)
+                    print(value)
+                case .SetLinearBrightness:
+                    print("Setting LinearBrightness to \(brightness) for ID: \(id)")
+                    DisplayServicesSetLinearBrightness(id, brightness)
+                case .GetBrightness:
+                    DisplayServicesGetBrightness(id, &brightness)
+                    print(brightness)
+                case .SetBrightness:
+                    print("Setting Brightness to \(brightness) for ID: \(id)")
+                    DisplayServicesSetBrightness(id, brightness)
+                case .SetBrightnessSmooth:
+                    print("Setting BrightnessSmooth to \(brightness) for ID: \(id)")
+                    DisplayServicesSetBrightnessSmooth(id, brightness)
+                case .CanChangeBrightness:
+                    print(DisplayServicesCanChangeBrightness(id))
+                case .HasAmbientLightCompensation:
+                    print(DisplayServicesHasAmbientLightCompensation(id))
+                case .AmbientLightCompensationEnabled:
+                    print(DisplayServicesAmbientLightCompensationEnabled(id))
+                case .IsSmartDisplay:
+                    print(DisplayServicesIsSmartDisplay(id))
+                case .BrightnessChanged:
+                    print("Sending brightness change notification")
+                    DisplayServicesBrightnessChanged(id, value)
+                }
+            }
+            globalExit(0)
+        }
+    }
+
     struct Ddc: ParsableCommand {
         @OptionGroup var globals: GlobalOptions
 
@@ -230,7 +403,7 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Fetch max value instead of current")
         var max: Bool = false
 
-        @Argument(help: "Display serial/name or one of (first, main, all)")
+        @Argument(help: "Display serial/name/id or one of (first, main, all)")
         var display: String
 
         @Argument(help: "DDC control ID (VCP)\n\tCan be passed as hex VCP values (e.g. 0x10, E1) or constants\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))")
@@ -295,6 +468,7 @@ struct Lunar: ParsableCommand {
         )
 
         enum BuiltinDisplayProperty: String, ExpressibleByArgument, CaseIterable {
+            case id
             case brightness
             case contrast
             case all
@@ -317,6 +491,8 @@ struct Lunar: ParsableCommand {
                 }
 
                 switch property {
+                case .id:
+                    print(SyncMode.builtinDisplay?.s ?? "None")
                 case .brightness:
                     print(props["IOMFBBrightnessLevel"] ?? "nil")
                 case .contrast:
@@ -337,14 +513,21 @@ struct Lunar: ParsableCommand {
                 throw CommandError.displayNotFound("builtin")
             }
             switch property {
+            case .id:
+                print(SyncMode.builtinDisplay?.s ?? "None")
             case .brightness:
                 print(brightness.str(decimals: 2))
             case .contrast:
                 print(contrast.str(decimals: 2))
             case .all:
                 if json {
-                    print((try! prettyEncoder.encode(["brightness": brightness, "contrast": contrast])).str())
+                    print((try! prettyEncoder.encode([
+                        "id": SyncMode.builtinDisplay?.d ?? 0,
+                        "brightness": brightness,
+                        "contrast": contrast,
+                    ])).str())
                 } else {
+                    print("ID: \(SyncMode.builtinDisplay?.s ?? "None")")
                     print("Brightness: \(brightness.str(decimals: 2))")
                     print("Contrast: \(contrast.str(decimals: 2))")
                 }
@@ -438,7 +621,7 @@ struct Lunar: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         abstract: "Lunar CLI.",
-        subcommands: [Set.self, Get.self, Displays.self, Builtin.self, Ddc.self, Ddcctl.self, Lid.self, Lux.self, Signature.self, Launch.self, Gamma.self]
+        subcommands: [Set.self, Get.self, Displays.self, Builtin.self, Ddc.self, Ddcctl.self, Lid.self, Lux.self, Signature.self, Launch.self, Gamma.self, CoreDisplay.self, DisplayServices.self]
     )
 
     static func configureLogging(options globals: GlobalOptions) {
@@ -551,7 +734,7 @@ struct Lunar: ParsableCommand {
         @Option(name: .shortAndLong, help: "How many seconds to wait until the program exits and the gamma values reset (0 waits indefinitely)")
         var wait: Int = 0
 
-        @Option(name: .shortAndLong, help: "Display serial or name or one of (first, main, best-guess)")
+        @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, best-guess)")
         var display: String = "best-guess"
 
         @Option(name: .long, help: "Minimum red gamma value")
@@ -617,6 +800,7 @@ struct Lunar: ParsableCommand {
                     globalExit(0)
                 }
             }
+            globalExit(0)
         }
     }
 }
@@ -677,6 +861,7 @@ private func printDisplay(_ display: Display, json: Bool = false, terminator: St
         print("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value))")
     }
     let s = { (k: String) in spaced(k, longestKeySize) }
+    print("\(prefix)\(s("Is Sync Mode Source"))\(display.isSource)")
     print("\(prefix)\(s("Has I2C"))\(display.hasI2C)")
     print("\(prefix)\(s("Has Network Control"))\(display.hasNetworkControl)")
     print("\(prefix)\(s("Has DDC"))\(display.hasDDC)")

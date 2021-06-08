@@ -6,18 +6,17 @@
 //  Copyright © 2021 Alin. All rights reserved.
 //
 
-import AtomicWrite
 import Cocoa
 import Foundation
 
 class GammaViewController: NSViewController {
     @IBOutlet var dot: NSTextField!
 
-    @AtomicWrite var highlighterTask: CFRunLoopTimer?
+    @Atomic var highlighterTask: CFRunLoopTimer?
     var highlighterSemaphore = DispatchSemaphore(value: 1)
 
     func highlight() {
-        mainThread {
+        mainThreadSerial {
             guard highlighterTask == nil,
                   dot != nil, let w = view.window, w.isVisible
             else {
@@ -39,7 +38,7 @@ class GammaViewController: NSViewController {
                 }
 
                 var windowVisible: Bool = false
-                mainThread {
+                mainThreadSerial {
                     windowVisible = s.view.window?.isVisible ?? false
                 }
                 guard windowVisible, let dot = s.dot
@@ -50,7 +49,7 @@ class GammaViewController: NSViewController {
                     return
                 }
 
-                mainThread {
+                mainThreadSerial {
                     if dot.alphaValue == 0.0 {
                         dot.layer?.add(fadeTransition(duration: 0.25), forKey: "transition")
                         dot.alphaValue = 0.8
@@ -66,17 +65,13 @@ class GammaViewController: NSViewController {
     }
 
     func stopHighlighting() {
-        highlighterSemaphore.wait()
-        defer {
-            self.highlighterSemaphore.signal()
-        }
+        mainThreadSerial { [weak self] in
 
-        if let timer = highlighterTask {
-            operationHighlightQueue.cancel(timer: timer)
-        }
-        highlighterTask = nil
+            if let timer = highlighterTask {
+                operationHighlightQueue.cancel(timer: timer)
+            }
+            highlighterTask = nil
 
-        mainThread { [weak self] in
             guard let dot = self?.dot else { return }
             dot.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             dot.alphaValue = 0.0

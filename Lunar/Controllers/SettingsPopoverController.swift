@@ -92,6 +92,7 @@ class SettingsPopoverController: NSViewController {
 
                 adaptAutoToggle.isOn = display.adaptive
                 syncModeRoleToggle.isOn = display.isSource
+                syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(display.id) || TEST_MODE
             }
             setupDDCLimits(display)
         }
@@ -267,18 +268,25 @@ class SettingsPopoverController: NSViewController {
         adaptAutoToggle.callback = { [weak self] isOn in
             self?.adaptive = isOn
         }
-        
+
         syncModeRoleToggle.callback = { [weak self] isOn in
-            self?.isSource = isOn
+            guard let self = self, let display = self.display else {return}
+            self.isSource = isOn
             if isOn {
-                for display in displayController.displays.values {
-                    display.isSource = false
+                for targetDisplay in displayController.displays.values {
+                    if display.id != targetDisplay.id {
+                        targetDisplay.isSource = false
+                    }
                 }
                 datastore.storeDisplays(displayController.displays.values.map { $0 })
             }
             SyncMode.sourceDisplay = SyncMode.getSourceDisplay()
         }
-        syncModeRoleToggle.isEnabled = false
+        if let id = display?.id {
+            syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(id) || TEST_MODE
+        } else {
+            syncModeRoleToggle.isEnabled = false
+        }
         setupDDCLimits()
 
         displaysObserver = displaysObserver ?? Defaults.observe(.displays) { [weak self] change in

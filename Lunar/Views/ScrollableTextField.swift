@@ -6,7 +6,6 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
-import AtomicWrite
 import Carbon.HIToolbox
 import Cocoa
 import Defaults
@@ -207,7 +206,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    override func mouseEntered(with event: NSEvent) {
+    override func mouseEntered(with _: NSEvent) {
         log.verbose("mouseEntered: \(caption?.stringValue ?? stringValue)")
         guard isEnabled else { return }
 
@@ -224,7 +223,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 //        }
     }
 
-    override func mouseExited(with event: NSEvent) {
+    override func mouseExited(with _: NSEvent) {
         log.verbose("mouseExited: \(caption?.stringValue ?? stringValue)")
 //        if let editor = currentEditor() as? NSTextView {
 //            validateEditing()
@@ -255,11 +254,10 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    @AtomicWrite var highlighterTask: CFRunLoopTimer?
-    var highlighterSemaphore = DispatchSemaphore(value: 1)
+    @Atomic var highlighterTask: CFRunLoopTimer?
 
     func highlight(message: String) {
-        mainThread {
+        mainThreadSerial {
             guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
                   let caption = self.caption, let w = window, w.isVisible
             else {
@@ -275,14 +273,9 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                     return
                 }
 
-                s.highlighterSemaphore.wait()
-                defer {
-                    s.highlighterSemaphore.signal()
-                }
-
                 var windowVisible = false
                 var textColor: NSColor?
-                mainThread {
+                mainThreadSerial {
                     windowVisible = s.window?.isVisible ?? false
                     textColor = caption.textColor
                 }
@@ -294,14 +287,14 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                     return
                 }
 
-                mainThread {
+                mainThreadSerial {
                     caption.lightenUp(color: lunarYellow)
                     caption.needsDisplay = true
                 }
 
                 Thread.sleep(forTimeInterval: 0.5)
 
-                mainThread {
+                mainThreadSerial {
                     caption.darken(color: currentColor)
                     caption.needsDisplay = true
                 }
@@ -310,16 +303,13 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func stopHighlighting() {
-        if let timer = highlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        highlighterTask = nil
-        highlighterSemaphore.wait()
-        defer {
-            self.highlighterSemaphore.signal()
-        }
+        mainThreadSerial { [weak self] in
+            if let timer = highlighterTask {
+                realtimeQueue.cancel(timer: timer)
+            }
 
-        mainThread { [weak self] in
+            highlighterTask = nil
+
             guard let caption = self?.caption else { return }
             caption.resetText()
             caption.needsDisplay = true

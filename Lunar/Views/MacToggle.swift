@@ -37,10 +37,21 @@ class MacToggle: NSView {
     public var isEnabled: Bool = true {
         didSet {
             mainThread {
-                alphaValue = isEnabled ? 1.0 : 0.7
+                if isEnabled {
+                    alphaValue = 1.0
+                    backVw.bg = backColor
+                    circle.bg = toggleColor
+                    circle.layer?.borderColor = white.cgColor
+                } else {
+                    alphaValue = 0.6
+                    backVw.bg = darkMauve
+                    circle.bg = .darkGray
+                    circle.layer?.borderColor = NSColor.darkGray.cgColor
+                }
             }
         }
     }
+
     fileprivate var height: CGFloat = 26
     fileprivate var width: CGFloat { height + (height * 0.6) }
 
@@ -170,7 +181,7 @@ class MacToggle: NSView {
     }
 
     override func mouseDown(with _: NSEvent) {
-        guard isEnabled else {return}
+        guard isEnabled else { return }
         let push = Double(outlineWidth + width) - Double(height)
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.3
@@ -189,7 +200,7 @@ class MacToggle: NSView {
     }
 
     override func mouseUp(with _: NSEvent) {
-        guard isEnabled else {return}
+        guard isEnabled else { return }
 
         isOn = !isOn
     }

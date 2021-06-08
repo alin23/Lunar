@@ -21,7 +21,7 @@ class CoreDisplayControl: Control {
     weak var display: Display!
     lazy var responsive: Bool = testReadAndWrite(method: .displayServices) || testReadAndWrite(method: .coreDisplay)
     let str = "CoreDisplay Control"
-    var method = CoreDisplayMethod.coreDisplay
+    var method = CoreDisplayMethod.displayServices
 
     init(display: Display) {
         self.display = display
@@ -33,6 +33,7 @@ class CoreDisplayControl: Control {
             let currentBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
             let brightnessToSet = currentBrightness < 0.5 ? currentBrightness + 0.01 : currentBrightness - 0.01
             CoreDisplay_Display_SetUserBrightness(display.id, brightnessToSet)
+            DisplayServicesBrightnessChanged(display.id, brightnessToSet)
 
             let newBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
 
@@ -41,21 +42,27 @@ class CoreDisplayControl: Control {
             }
 
             CoreDisplay_Display_SetUserBrightness(display.id, currentBrightness)
+            DisplayServicesBrightnessChanged(display.id, currentBrightness)
             self.method = method
             return true
         case .displayServices:
+            if DisplayServicesCanChangeBrightness(display.id) {
+                self.method = method
+                return true
+            }
+
             var currentBrightness: Float = 0.0
-            guard DisplayServicesGetLinearBrightness(display.id, &currentBrightness) == KERN_SUCCESS else {
+            guard DisplayServicesGetBrightness(display.id, &currentBrightness) == KERN_SUCCESS else {
                 return false
             }
 
             let brightnessToSet = currentBrightness < 0.5 ? currentBrightness + 0.01 : currentBrightness - 0.01
-            guard DisplayServicesSetLinearBrightness(display.id, brightnessToSet) == KERN_SUCCESS else {
+            guard DisplayServicesSetBrightness(display.id, brightnessToSet) == KERN_SUCCESS else {
                 return false
             }
 
             var newBrightness: Float = 0.0
-            guard DisplayServicesGetLinearBrightness(display.id, &newBrightness) == KERN_SUCCESS else {
+            guard DisplayServicesGetBrightness(display.id, &newBrightness) == KERN_SUCCESS else {
                 return false
             }
 
@@ -63,7 +70,7 @@ class CoreDisplayControl: Control {
                 return false
             }
 
-            DisplayServicesSetLinearBrightness(display.id, currentBrightness)
+            DisplayServicesSetBrightness(display.id, currentBrightness)
             self.method = method
             return true
         }
@@ -85,9 +92,11 @@ class CoreDisplayControl: Control {
     func writeBrightness(_ brightness: Brightness) -> Bool {
         switch method {
         case .coreDisplay:
-            CoreDisplay_Display_SetUserBrightness(display.id, brightness.d / 100.0)
+            let br = brightness.d / 100.0
+            CoreDisplay_Display_SetUserBrightness(display.id, br)
+            DisplayServicesBrightnessChanged(display.id, br)
         case .displayServices:
-            DisplayServicesSetLinearBrightness(display.id, brightness.f / 100.0)
+            return DisplayServicesSetBrightness(display.id, brightness.f / 100.0) == KERN_SUCCESS
         }
         return true
     }
@@ -148,7 +157,7 @@ class CoreDisplayControl: Control {
             return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u8
         case .displayServices:
             var br = display.brightness.floatValue
-            DisplayServicesGetLinearBrightness(display.id, &br)
+            DisplayServicesGetBrightness(display.id, &br)
             return (br * 100.0).u8
         }
     }

@@ -1846,7 +1846,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="h3b-zL-1U3" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="504" width="16" height="16"/>
+                                <rect key="frame" x="7" y="509" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1859,7 +1859,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="3mT-HK-iGJ" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="438" width="16" height="16"/>
+                                <rect key="frame" x="7" y="443" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1872,7 +1872,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="MiW-AX-iOY" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="372" width="16" height="16"/>
+                                <rect key="frame" x="7" y="377" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1885,7 +1885,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="aSp-kK-Lh9" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="305" width="16" height="16"/>
+                                <rect key="frame" x="7" y="310" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1898,7 +1898,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="mGr-rx-1N2" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="192" width="16" height="16"/>
+                                <rect key="frame" x="7" y="197" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1946,7 +1946,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Ttq-LW-8du" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="243" width="16" height="16"/>
+                                <rect key="frame" x="7" y="248" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2385,7 +2385,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="64" y="74" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="h6T-2W-xq9" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="56"/>
+                                            <font key="font" metaFont="systemHeavy"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2412,7 +2412,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="65" y="252" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="GW0-Io-Qsz" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="56"/>
+                                            <font key="font" metaFont="systemHeavy"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2488,7 +2488,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="66" y="74" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="b0T-Nr-uCc" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="56"/>
+                                            <font key="font" metaFont="systemHeavy"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -2515,7 +2515,7 @@ when dock and menubar icons are hidden</string>
                                         <rect key="frame" x="66" y="252" width="120" height="60"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="bOn-60-FuP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="56"/>
+                                            <font key="font" metaFont="systemHeavy"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -4654,10 +4654,10 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <color key="value" red="1" green="0.71891602706157742" blue="0.19021045918367352" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
-                                        <real key="value" value="2"/>
+                                        <integer key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
-                                        <color key="value" red="0.08428291601" green="0.077799614769999997" blue="0.1058939201" alpha="0.34341370030000001" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.50528805272108845" green="0.27399530750607737" blue="0.15303031545079038" alpha="0.15089507450331127" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
@@ -4864,10 +4864,10 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <color key="value" red="1" green="0.71891602710000002" blue="0.19021045919999999" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
-                                        <real key="value" value="2"/>
+                                        <integer key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
-                                        <color key="value" red="0.08428291601" green="0.077799614769999997" blue="0.1058939201" alpha="0.34341370030000001" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
