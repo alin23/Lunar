@@ -24,6 +24,16 @@ class OutputScrollView: NSScrollView {
         onScroll?(event)
         super.scrollWheel(with: event)
     }
+
+    override func mouseDown(with event: NSEvent) {
+        guard let textView = documentView as? NSTextView, textView.isSelectable else { return }
+        super.mouseDown(with: event)
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        guard let textView = documentView as? NSTextView, textView.isSelectable else { return }
+        super.rightMouseDown(with: event)
+    }
 }
 
 class InstallOutputViewController: NSViewController {
@@ -76,7 +86,10 @@ class InstallOutputViewController: NSViewController {
             var newHostname = ssh.host
             do {
                 mainThread { textView.string += "[\(DDCUTIL_SERVER_INSTALLER_DIR)] ❯ sudo bash ./install.sh\n\n" }
-                status = try ssh.execute("cd \(DDCUTIL_SERVER_INSTALLER_DIR); sudo bash ./install.sh 2>&1", onChannelOpened: { channel in self.commandChannel = channel }) { output in
+                status = try ssh.execute(
+                    "cd \(DDCUTIL_SERVER_INSTALLER_DIR); sudo bash ./install.sh 2>&1",
+                    onChannelOpened: { channel in self.commandChannel = channel }
+                ) { output in
                     mainThread {
                         textView.string += output
                         if let match = NEW_HOSTNAME_PATTERN.findFirst(in: output), let hostname = match.group(named: "hostname") {
@@ -158,14 +171,17 @@ class InstallOutputViewController: NSViewController {
                 }
 
                 textView.string += "\nFound a new DDC server at \(newHostname):3485!"
-                textView.string += "\nIf this \(Sysctl.device) is connected to the same monitor as the Pi, you should receive a notification to confirm if Lunar should control the monitor through the Pi when it's available"
+                textView
+                    .string +=
+                    "\nIf this \(Sysctl.device) is connected to the same monitor as the Pi, you should receive a notification to confirm if Lunar should control the monitor through the Pi when it's available"
             }
         }
     }
 
     @IBAction func cancelInstall(_: Any) {
         async { [weak self] in
-            guard let self = self, let channel = self.commandChannel, let textView = self.outputScrollView.documentView as? NSTextView else { return }
+            guard let self = self, let channel = self.commandChannel,
+                  let textView = self.outputScrollView.documentView as? NSTextView else { return }
 
             mainThread {
                 self.cancellingCommand = true

@@ -288,13 +288,16 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         }
     }
 
+    var pausedAdaptiveModeObserver: Bool = false
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [unowned self] change in
             mainThread { [weak self] in
-                guard change.newValue != change.oldValue, let self = self, let tableView = self.tableView else {
+                guard change.newValue != change.oldValue, let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
                     return
                 }
 
+                self.pausedAdaptiveModeObserver = true
                 let adaptiveMode = change.newValue
 
                 switch adaptiveMode {
@@ -307,6 +310,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 case .manual:
                     tableView.setAdaptiveButtonHidden(true)
                 }
+                self.pausedAdaptiveModeObserver = false
             }
         }
     }

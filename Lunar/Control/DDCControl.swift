@@ -25,11 +25,27 @@ struct DDCControl: Control {
     }
 
     func resetState() {
-        DDC.skipWritingPropertyById[display.id]?.removeAll()
-        DDC.skipReadingPropertyById[display.id]?.removeAll()
-        DDC.writeFaults[display.id]?.removeAll()
-        DDC.readFaults[display.id]?.removeAll()
-        display.responsiveDDC = true
+        Self.resetState(display: display)
+    }
+
+    static func resetState(display: Display? = nil) {
+        serialSync {
+            if let display = display {
+                DDC.skipWritingPropertyById[display.id]?.removeAll()
+                DDC.skipReadingPropertyById[display.id]?.removeAll()
+                DDC.writeFaults[display.id]?.removeAll()
+                DDC.readFaults[display.id]?.removeAll()
+                display.responsiveDDC = true
+            } else {
+                DDC.skipWritingPropertyById.removeAll()
+                DDC.skipReadingPropertyById.removeAll()
+                DDC.writeFaults.removeAll()
+                DDC.readFaults.removeAll()
+                for display in displayController.activeDisplays.values {
+                    display.responsiveDDC = true
+                }
+            }
+        }
     }
 
     func setPower(_ power: PowerState) -> Bool {

@@ -159,16 +159,20 @@ class SettingsPageController: NSViewController {
         }
     }
 
+    var pausedAdaptiveModeObserver: Bool = false
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = Defaults
             .observe(.adaptiveBrightnessMode) { [weak self] change in
-                guard let self = self, change.newValue != change.oldValue else {
+                guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
                     return
                 }
                 mainThread {
+                    self.pausedAdaptiveModeObserver = true
                     if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
                         self.initGraph(display: displayController.firstDisplay, mode: change.newValue.mode)
                     }
+                    self.pausedAdaptiveModeObserver = false
                 }
             }
     }

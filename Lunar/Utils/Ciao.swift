@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 //
 //  CiaoBrowser.swift
 //  Ciao
@@ -16,7 +15,6 @@ import Foundation
 //  Created by Alexandre Tavares on 11/10/17.
 //  Copyright © 2017 Tavares. All rights reserved.
 //
-
 
 public class CiaoBrowser {
     var netServiceBrowser: NetServiceBrowser
@@ -29,7 +27,6 @@ public class CiaoBrowser {
     public var serviceRemovedHandler: ((NetService) -> Void)?
     public var serviceResolvedHandler: ((Result<NetService, ErrorDictionary>) -> Void)?
     public var serviceUpdatedTXTHandler: ((NetService) -> Void)?
-
 
     public var isSearching = false {
         didSet {
@@ -75,9 +72,6 @@ public class CiaoBrowser {
     }
 
     fileprivate func serviceRemoved(_ service: NetService) {
-        serviceBrowserQueue.sync {
-            service.remove(from: RunLoop.current, forMode: .default)
-        }
         services.remove(service)
         serviceRemovedHandler?(service)
     }
@@ -88,12 +82,14 @@ public class CiaoBrowser {
     }
 
     public func reset() {
+        Logger.info("Resetting browser")
         stop()
         services.removeAll()
-        
         serviceBrowserQueue.sync {
+            self.netServiceBrowser.remove(from: RunLoop.current, forMode: .default)
             self.netServiceBrowser.schedule(in: RunLoop.current, forMode: .default)
         }
+
 //        netServiceBrowser.delegate = nil
 //        netServiceBrowser = NetServiceBrowser()
 //        netServiceBrowser.delegate = delegate
@@ -105,7 +101,6 @@ public class CiaoBrowser {
         }
 
         serviceBrowserQueue.sync {
-            self.netServiceBrowser.remove(from: RunLoop.current, forMode: .default)
             self.netServiceBrowser.stop()
         }
     }
@@ -120,36 +115,37 @@ public class CiaoBrowser {
 
 public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     weak var browser: CiaoBrowser?
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+    public func netServiceBrowser(_: NetServiceBrowser, didFind service: NetService, moreComing _: Bool) {
         Logger.info("Service found \(service)")
-        self.browser?.serviceFound(service)
+        browser?.serviceFound(service)
     }
 
-    public func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
+    public func netServiceBrowserWillSearch(_: NetServiceBrowser) {
         Logger.info("Browser will search")
-        self.browser?.isSearching = true
+        browser?.isSearching = true
     }
 
-    public func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
+    public func netServiceBrowserDidStopSearch(_: NetServiceBrowser) {
         Logger.info("Browser stopped search")
-        self.browser?.isSearching = false
+        browser?.isSearching = false
     }
 
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
+    public func netServiceBrowser(_: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
         Logger.debug("Browser didn't search \(errorDict)")
-        self.browser?.isSearching = false
+        browser?.isSearching = false
     }
 
-    public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+    public func netServiceBrowser(_: NetServiceBrowser, didRemove service: NetService, moreComing _: Bool) {
         Logger.info("Service removed \(service)")
-        self.browser?.serviceRemoved(service)
+        browser?.serviceRemoved(service)
     }
 
     public func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
         Logger.info("Service updated txt records \(sender)")
-        self.browser?.serviceUpdatedTXT(sender, data)
+        browser?.serviceUpdatedTXT(sender, data)
     }
 }
+
 //
 //  CiaoResolver.swift
 //  Ciao
@@ -157,14 +153,13 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
 //  Created by Alexandre Mantovani Tavares on 14/07/19.
 //
 
-
 public class CiaoResolver {
     public init(service: NetService) {
         self.service = service
     }
 
     let service: NetService
-    let delegate: CiaoResolverDelegate = CiaoResolverDelegate()
+    let delegate = CiaoResolverDelegate()
 
     public func resolve(withTimeout timeout: TimeInterval, completion: @escaping (Result<NetService, ErrorDictionary>) -> Void) {
         delegate.onResolve = completion
@@ -176,10 +171,10 @@ public class CiaoResolver {
         Logger.verbose(self)
         service.stop()
     }
-
 }
 
 public typealias ErrorDictionary = [String: NSNumber]
+extension ErrorDictionary: Error {}
 
 extension CiaoResolver {
     class CiaoResolverDelegate: NSObject, NetServiceDelegate {
@@ -200,6 +195,7 @@ extension CiaoResolver {
         }
     }
 }
+
 //
 //  CiaoService.swift
 //  Ciao
@@ -207,7 +203,6 @@ extension CiaoResolver {
 //  Created by Alexandre Tavares on 10/10/17.
 //  Copyright © 2017 Tavares. All rights reserved.
 //
-
 
 public class CiaoServer {
     var netService: NetService
@@ -219,9 +214,10 @@ public class CiaoServer {
             successCallback = nil
         }
     }
+
     public var txtRecord: [String: String]? {
         get {
-            return netService.txtRecordDictionary
+            netService.txtRecordDictionary
         }
         set {
             netService.setTXTRecord(dictionary: newValue)
@@ -264,21 +260,22 @@ public class CiaoServer {
 class CiaoServerDelegate: NSObject, NetServiceDelegate {
     weak var server: CiaoServer?
 
-    func netServiceDidPublish(_ sender: NetService) {
+    func netServiceDidPublish(_: NetService) {
         server?.started = true
         Logger.info("CiaoServer Started")
     }
 
-    func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
+    func netService(_: NetService, didNotPublish errorDict: [String: NSNumber]) {
         server?.started = false
         Logger.error("CiaoServer did not publish \(errorDict)")
     }
 
-    func netServiceDidStop(_ sender: NetService) {
+    func netServiceDidStop(_: NetService) {
         server?.started = false
         Logger.info("CiaoServer Stopped")
     }
 }
+
 //
 //  Logger.swift
 //  Ciao
@@ -286,7 +283,6 @@ class CiaoServerDelegate: NSObject, NetServiceDelegate {
 //  Created by Alexandre Tavares on 11/10/17.
 //  Copyright © 2017 Tavares. All rights reserved.
 //
-
 
 public enum Level: Int {
     case verbose = 0
@@ -319,31 +315,31 @@ public enum Level: Int {
 //  Copyright © 2017 Tavares. All rights reserved.
 //
 
-
-extension NetService {
-    public class func dictionary(fromTXTRecord data: Data) -> [String: String] {
-        return NetService.dictionary(fromTXTRecord: data).mapValues { data in
+public extension NetService {
+    class func dictionary(fromTXTRecord data: Data) -> [String: String] {
+        NetService.dictionary(fromTXTRecord: data).mapValues { data in
             String(data: data, encoding: .utf8) ?? ""
         }
     }
 
-    public class func data(fromTXTRecord data: [String: String]) -> Data {
-        return NetService.data(fromTXTRecord: data.mapValues { $0.data(using: .utf8) ?? Data() })
+    class func data(fromTXTRecord data: [String: String]) -> Data {
+        NetService.data(fromTXTRecord: data.mapValues { $0.data(using: .utf8) ?? Data() })
     }
 
-    public func setTXTRecord(dictionary: [String: String]?){
+    func setTXTRecord(dictionary: [String: String]?) {
         guard let dictionary = dictionary else {
-            self.setTXTRecord(nil)
+            setTXTRecord(nil)
             return
         }
-        self.setTXTRecord(NetService.data(fromTXTRecord: dictionary))
+        setTXTRecord(NetService.data(fromTXTRecord: dictionary))
     }
 
-    public var txtRecordDictionary: [String: String]? {
-        guard let data = self.txtRecordData() else { return nil }
+    var txtRecordDictionary: [String: String]? {
+        guard let data = txtRecordData() else { return nil }
         return NetService.dictionary(fromTXTRecord: data)
     }
 }
+
 //
 //  ServiceType.swift
 //  Ciao
@@ -352,16 +348,15 @@ extension NetService {
 //  Copyright © 2017 Tavares. All rights reserved.
 //
 
-
 public enum ServiceType {
     case tcp(String)
     case udp(String)
 
     public var description: String {
         switch self {
-        case .tcp(let name):
+        case let .tcp(name):
             return "_\(name)._tcp"
-        case .udp(let name):
+        case let .udp(name):
             return "_\(name)._udp"
         }
     }

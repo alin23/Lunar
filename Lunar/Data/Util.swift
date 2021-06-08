@@ -260,6 +260,26 @@ func getSerialNumberHash() -> String? {
     return nil
 }
 
+func mainThreadSerial(_ action: () -> Void) {
+    if Thread.isMainThread {
+        action()
+    } else {
+        mainSerialQueue.sync {
+            action()
+        }
+    }
+}
+
+func mainThreadSerial<T>(_ action: () -> T) -> T {
+    if Thread.isMainThread {
+        return action()
+    } else {
+        return mainSerialQueue.sync {
+            return action()
+        }
+    }
+}
+
 func mainThread(_ action: () -> Void) {
     if Thread.isMainThread {
         action()
@@ -280,6 +300,16 @@ func mainThread<T>(_ action: () -> T) -> T {
     }
 }
 
+func serialSync<T>(_ action: () -> T) -> T {
+    if Thread.isMainThread || DispatchQueue.current == dataSerialQueue {
+        return action()
+    } else {
+        return dataSerialQueue.sync(flags: [.barrier]) {
+            return action()
+        }
+    }
+}
+
 func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
@@ -294,10 +324,7 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     serialQueue.asyncAfter(deadline: deadline, execute: action)
 }
 
-var asyncUniqueTasksSemaphore = DispatchSemaphore(value: 1)
 var asyncUniqueTasks = [String: DispatchWorkItem]()
-
-var asyncUniqueRecurringTasksSemaphore = DispatchSemaphore(value: 1)
 var asyncUniqueRecurringTasks = [String: Timer]()
 
 @discardableResult func asyncAfter(ms: Int, uniqueTaskKey: String? = nil, _ action: @escaping () -> Void) -> DispatchWorkItem {
@@ -307,15 +334,15 @@ var asyncUniqueRecurringTasks = [String: Timer]()
     if let key = uniqueTaskKey {
         task = DispatchWorkItem {
             action()
-            asyncUniqueTasksSemaphore.wait()
-            asyncUniqueTasks[key] = nil
-            asyncUniqueTasksSemaphore.signal()
+            serialSync {
+                asyncUniqueTasks[key] = nil
+            }
         }
 
-        asyncUniqueTasksSemaphore.wait()
-        asyncUniqueTasks[key]?.cancel()
-        asyncUniqueTasks[key] = task
-        asyncUniqueTasksSemaphore.signal()
+        serialSync {
+            asyncUniqueTasks[key]?.cancel()
+            asyncUniqueTasks[key] = task
+        }
     } else {
         task = DispatchWorkItem {
             action()
@@ -335,28 +362,28 @@ var asyncUniqueRecurringTasks = [String: Timer]()
     }
 
     if let key = uniqueTaskKey {
-        asyncUniqueRecurringTasksSemaphore.wait()
-        asyncUniqueRecurringTasks[key]?.invalidate()
-        asyncUniqueRecurringTasks[key] = timer
-        asyncUniqueRecurringTasksSemaphore.signal()
+        serialSync {
+            asyncUniqueRecurringTasks[key]?.invalidate()
+            asyncUniqueRecurringTasks[key] = timer
+        }
     }
 
     return timer
 }
 
 func cancelAsyncTask(_ key: String) {
-    if asyncUniqueTasks[key] == nil { return }
-    asyncUniqueTasksSemaphore.wait()
-    asyncUniqueTasks[key]?.cancel()
-    asyncUniqueTasks.removeValue(forKey: key)
-    asyncUniqueTasksSemaphore.signal()
+    serialSync {
+        if asyncUniqueTasks[key] == nil { return }
+        asyncUniqueTasks[key]?.cancel()
+        asyncUniqueTasks.removeValue(forKey: key)
+    }
 }
 
 func cancelAsyncRecurringTask(_ key: String) {
-    asyncUniqueRecurringTasksSemaphore.wait()
-    asyncUniqueRecurringTasks[key]?.invalidate()
-    asyncUniqueRecurringTasks.removeValue(forKey: key)
-    asyncUniqueRecurringTasksSemaphore.signal()
+    serialSync {
+        asyncUniqueRecurringTasks[key]?.invalidate()
+        asyncUniqueRecurringTasks.removeValue(forKey: key)
+    }
 }
 
 @discardableResult func async(
@@ -367,26 +394,28 @@ func cancelAsyncRecurringTask(_ key: String) {
     _ action: @escaping () -> Void
 ) -> DispatchTimeoutResult {
     if threaded {
-        guard let timeout = timeout else {
-            let thread = Thread { action() }
+        return serialSync {
+            guard let timeout = timeout else {
+                let thread = Thread { action() }
+                thread.start()
+                return .success
+            }
+
+            let semaphore = DispatchSemaphore(value: 0)
+
+            let thread = Thread {
+                action()
+                semaphore.signal()
+            }
             thread.start()
-            return .success
+
+            let result = semaphore.wait(timeout: DispatchTime.now() + timeout.timeInterval)
+            if result == .timedOut {
+                thread.cancel()
+            }
+
+            return result
         }
-
-        let semaphore = DispatchSemaphore(value: 0)
-
-        let thread = Thread {
-            action()
-            semaphore.signal()
-        }
-        thread.start()
-
-        let result = semaphore.wait(timeout: DispatchTime.now() + timeout.timeInterval)
-        if result == .timedOut {
-            thread.cancel()
-        }
-
-        return result
     }
 
     if let queue = runLoopQueue {
@@ -431,22 +460,24 @@ func asyncEvery(_ interval: DateComponents, queue: RunloopQueue, _ action: @esca
 }
 
 func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ action: @escaping (inout TimeInterval) -> Void) -> Thread {
-    let thread = Thread {
-        var pollingInterval = interval.timeInterval
-        while true {
-            action(&pollingInterval)
-            if Thread.current.isCancelled { return }
-            Thread.sleep(forTimeInterval: pollingInterval)
-            if Thread.current.isCancelled { return }
+    serialSync {
+        let thread = Thread {
+            var pollingInterval = interval.timeInterval
+            while true {
+                action(&pollingInterval)
+                if Thread.current.isCancelled { return }
+                Thread.sleep(forTimeInterval: pollingInterval)
+                if Thread.current.isCancelled { return }
+            }
         }
-    }
 
-    if let qos = qos {
-        thread.qualityOfService = qos
-    }
+        if let qos = qos {
+            thread.qualityOfService = qos
+        }
 
-    thread.start()
-    return thread
+        thread.start()
+        return thread
+    }
 }
 
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
@@ -857,6 +888,47 @@ func ask(
 }
 
 // MARK: Property Wrappers
+
+@propertyWrapper
+public struct Atomic<Value> {
+    var value: Value
+
+    public init(wrappedValue: Value) {
+        value = wrappedValue
+    }
+
+    public var wrappedValue: Value {
+        get {
+            serialSync { value }
+        }
+        set {
+            serialSync { value = newValue }
+        }
+    }
+}
+
+@propertyWrapper
+public struct LazyAtomic<Value> {
+    var storage: Value?
+    let constructor: () -> Value
+
+    public init(wrappedValue constructor: @autoclosure @escaping () -> Value) {
+        self.constructor = constructor
+    }
+
+    public var wrappedValue: Value {
+        mutating get {
+            serialSync { if storage == nil {
+                self.storage = constructor()
+            }
+            return storage!
+            }
+        }
+        set {
+            serialSync { storage = newValue }
+        }
+    }
+}
 
 func localNow() -> DateInRegion {
     DateInRegion().convertTo(region: .local)

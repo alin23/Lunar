@@ -863,12 +863,15 @@ class DisplayViewController: NSViewController {
         }
     }
 
+    var pausedAdaptiveModeObserver: Bool = false
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
             mainThread { [weak self] in
-                guard let self = self, change.newValue != change.oldValue else {
+                guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
                     return
                 }
+                self.pausedAdaptiveModeObserver = true
                 let adaptiveMode = change.newValue
 
                 if Defaults[.overrideAdaptiveMode] {
@@ -880,6 +883,7 @@ class DisplayViewController: NSViewController {
                 if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
                     self.initGraph(mode: adaptiveMode.mode)
                 }
+                self.pausedAdaptiveModeObserver = false
             }
         }
     }
@@ -916,11 +920,10 @@ class DisplayViewController: NSViewController {
         display.input = input.rawValue.ns
     }
 
-    var gammaHighlighterTask: CFRunLoopTimer?
-    var gammaHighlighterSemaphore = DispatchSemaphore(value: 1)
+    @Atomic var gammaHighlighterTask: CFRunLoopTimer?
 
     func showGammaNotice() {
-        mainThread { [weak self] in
+        mainThreadSerial { [weak self] in
             guard let self = self, gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), let w = view.window,
                   w.isVisible
             else {
@@ -933,22 +936,17 @@ class DisplayViewController: NSViewController {
                     return
                 }
 
-                s.gammaHighlighterSemaphore.wait()
-                defer {
-                    s.gammaHighlighterSemaphore.signal()
-                }
-
                 var windowVisible: Bool = false
-                mainThread {
+                mainThreadSerial {
                     windowVisible = s.view.window?.isVisible ?? false
                 }
                 guard windowVisible, let gammaNotice = s.gammaNotice
                 else {
-                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                    if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
                     return
                 }
 
-                mainThread {
+                mainThreadSerial {
                     if gammaNotice.alphaValue == 0 {
                         gammaNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
                         gammaNotice.alphaValue = 0.9
@@ -964,16 +962,12 @@ class DisplayViewController: NSViewController {
     }
 
     func hideGammaNotice() {
-        if let timer = gammaHighlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        gammaHighlighterTask = nil
-        gammaHighlighterSemaphore.wait()
-        defer {
-            self.gammaHighlighterSemaphore.signal()
-        }
+        mainThreadSerial { [weak self] in
+            if let timer = gammaHighlighterTask {
+                realtimeQueue.cancel(timer: timer)
+            }
+            gammaHighlighterTask = nil
 
-        mainThread { [weak self] in
             guard let gammaNotice = self?.gammaNotice else { return }
             gammaNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
             gammaNotice.alphaValue = 0.0
@@ -981,11 +975,10 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    var adaptiveHighlighterTask: CFRunLoopTimer?
-    var adaptiveHighlighterSemaphore = DispatchSemaphore(value: 1)
+    @Atomic var adaptiveHighlighterTask: CFRunLoopTimer?
 
     func showAdaptiveNotice() {
-        mainThread { [weak self] in
+        mainThreadSerial { [weak self] in
             guard let self = self, adaptiveHighlighterTask == nil || !realtimeQueue.isValid(timer: adaptiveHighlighterTask!),
                   let w = view.window,
                   w.isVisible
@@ -999,13 +992,8 @@ class DisplayViewController: NSViewController {
                     return
                 }
 
-                s.adaptiveHighlighterSemaphore.wait()
-                defer {
-                    s.adaptiveHighlighterSemaphore.signal()
-                }
-
                 var windowVisible: Bool = false
-                mainThread {
+                mainThreadSerial {
                     windowVisible = s.view.window?.isVisible ?? false
                 }
                 guard windowVisible, let adaptiveNotice = s.adaptiveNotice
@@ -1014,7 +1002,7 @@ class DisplayViewController: NSViewController {
                     return
                 }
 
-                mainThread {
+                mainThreadSerial {
                     if adaptiveNotice.alphaValue == 0 {
                         adaptiveNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
                         adaptiveNotice.alphaValue = 0.9
@@ -1030,16 +1018,12 @@ class DisplayViewController: NSViewController {
     }
 
     func hideAdaptiveNotice() {
-        if let timer = adaptiveHighlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        adaptiveHighlighterTask = nil
-        adaptiveHighlighterSemaphore.wait()
-        defer {
-            self.adaptiveHighlighterSemaphore.signal()
-        }
+        mainThreadSerial { [weak self] in
+            if let timer = adaptiveHighlighterTask {
+                realtimeQueue.cancel(timer: timer)
+            }
+            adaptiveHighlighterTask = nil
 
-        mainThread { [weak self] in
             guard let adaptiveNotice = self?.adaptiveNotice else { return }
             adaptiveNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
             adaptiveNotice.alphaValue = 0.0

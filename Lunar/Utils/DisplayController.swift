@@ -18,13 +18,13 @@ import SwiftDate
 import SwiftyJSON
 
 class DisplayController {
-    var lidClosed: Bool = IsLidClosed()
+    @Atomic var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
 
     var appObserver: NSKeyValueObservation?
-    var runningAppExceptions: [AppException]!
+    @Atomic var runningAppExceptions: [AppException]!
 
-    var displays: [CGDirectDisplayID: Display] = [:] {
+    @Atomic var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
             activeDisplaysByReadableID = [String: Display](
@@ -35,15 +35,17 @@ class DisplayController {
         }
     }
 
-    var activeDisplays: [CGDirectDisplayID: Display] = [:] {
+    var onActiveDisplaysChange: (() -> Void)?
+    @Atomic var activeDisplays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             Defaults[.hasActiveDisplays] = !activeDisplays.isEmpty
+            onActiveDisplaysChange?()
         }
     }
 
     var activeDisplaysByReadableID: [String: Display] = [:]
 
-    var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+    @Atomic var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
             if oldValue.key != .manual {
                 lastNonManualAdaptiveMode = oldValue
@@ -139,14 +141,16 @@ class DisplayController {
     }
 
     static func autoMode() -> AdaptiveMode {
-        if let mode = SensorMode.shared.ifAvailable() {
-            return mode
-        } else if let mode = SyncMode.shared.ifAvailable() {
-            return mode
-        } else if let mode = LocationMode.shared.ifAvailable() {
-            return mode
-        } else {
-            return ManualMode.shared
+        serialSync {
+            if let mode = SensorMode.shared.ifAvailable() {
+                return mode
+            } else if let mode = SyncMode.shared.ifAvailable() {
+                return mode
+            } else if let mode = LocationMode.shared.ifAvailable() {
+                return mode
+            } else {
+                return ManualMode.shared
+            }
         }
     }
 
@@ -198,7 +202,7 @@ class DisplayController {
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
         guard !display.neverFallbackControl else { return false }
 
-        if !screensSleeping, let screen = display.screen, !screen.visibleFrame.isEmpty, !display.control.isResponsive() {
+        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty, !display.control.isResponsive() {
             if let promptTime = fallbackPromptTime[display.id] {
                 return promptTime + 20.minutes < Date()
             }
@@ -214,11 +218,11 @@ class DisplayController {
         }
 
         controlWatcherTask = asyncEvery(15.seconds, queue: lowprioQueue) { [weak self] _ in
-            guard !screensSleeping, let self = self else { return }
+            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
             for display in self.activeDisplays.values {
                 display.control = display.getBestControl()
                 if self.shouldPromptAboutFallback(display) {
-                    log.warning("Non-responsive display", context: display.context)
+                    serialSync { log.warning("Non-responsive display", context: display.context) }
                     self.fallbackPromptTime[display.id] = Date()
                     let semaphore = DispatchSemaphore(value: 0)
                     let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
@@ -288,6 +292,7 @@ class DisplayController {
     }
 
     var overrideAdaptiveModeObserver: Defaults.Observation?
+    var pausedAdaptiveModeObserver: Bool = false
 
     func watchModeAvailability() {
         guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {
@@ -302,16 +307,20 @@ class DisplayController {
         )
 
         let startOrStopWatcher = { (shouldStop: Bool) in
+            guard !self.pausedAdaptiveModeObserver else { return }
+
+            self.pausedAdaptiveModeObserver = true
             if shouldStop {
                 if let task = self.modeWatcherTask {
                     lowprioQueue.cancel(timer: task)
                 }
             } else {
                 self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                    guard !screensSleeping, let self = self, !Defaults[.overrideAdaptiveMode] else { return }
+                    guard !screensSleeping.load(ordering: .relaxed), let self = self, !Defaults[.overrideAdaptiveMode] else { return }
                     self.autoAdaptMode()
                 }
             }
+            self.pausedAdaptiveModeObserver = false
         }
         startOrStopWatcher(Defaults[.overrideAdaptiveMode])
         overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? Defaults.observe(.overrideAdaptiveMode) { startOrStopWatcher($0.newValue) }
@@ -743,9 +752,11 @@ class DisplayController {
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        for display in displays ?? Array(activeDisplays.values) {
-            adaptiveMode.withForce(force || display.force.load(ordering: .relaxed)) {
-                adaptiveMode.adapt(display)
+        serialSync {
+            for display in displays ?? Array(activeDisplays.values) {
+                adaptiveMode.withForce(force || display.force.load(ordering: .relaxed)) {
+                    adaptiveMode.adapt(display)
+                }
             }
         }
     }
