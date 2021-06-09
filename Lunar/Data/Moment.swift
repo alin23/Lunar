@@ -105,15 +105,15 @@ class Moment: NSObject {
             iso.toDate()?.convertTo(region: Region.local)
         }
 
-        guard let sunrise = Defaults[.sunrise],
-              let sunset = Defaults[.sunset],
-              let solarNoon = Defaults[.solarNoon],
-              let civilTwilightBegin = Defaults[.civilTwilightBegin],
-              let civilTwilightEnd = Defaults[.civilTwilightEnd],
-              let nauticalTwilightBegin = Defaults[.nauticalTwilightBegin],
-              let nauticalTwilightEnd = Defaults[.nauticalTwilightEnd],
-              let astronomicalTwilightBegin = Defaults[.astronomicalTwilightBegin],
-              let astronomicalTwilightEnd = Defaults[.astronomicalTwilightEnd]
+        guard let sunrise = CachedDefaults[.sunrise],
+              let sunset = CachedDefaults[.sunset],
+              let solarNoon = CachedDefaults[.solarNoon],
+              let civilTwilightBegin = CachedDefaults[.civilTwilightBegin],
+              let civilTwilightEnd = CachedDefaults[.civilTwilightEnd],
+              let nauticalTwilightBegin = CachedDefaults[.nauticalTwilightBegin],
+              let nauticalTwilightEnd = CachedDefaults[.nauticalTwilightEnd],
+              let astronomicalTwilightBegin = CachedDefaults[.astronomicalTwilightBegin],
+              let astronomicalTwilightEnd = CachedDefaults[.astronomicalTwilightEnd]
         else {
             log.error("Unable to decode moment.")
             return nil
@@ -137,15 +137,15 @@ class Moment: NSObject {
     }
 
     func store() {
-        Defaults[.sunrise] = sunrise.toISO()
-        Defaults[.sunset] = sunset.toISO()
-        Defaults[.solarNoon] = solarNoon.toISO()
-        Defaults[.dayLength] = dayLength
-        Defaults[.civilTwilightBegin] = civilSunrise.toISO()
-        Defaults[.civilTwilightEnd] = civilSunset.toISO()
-        Defaults[.nauticalTwilightBegin] = nauticalSunrise.toISO()
-        Defaults[.nauticalTwilightEnd] = nauticalSunset.toISO()
-        Defaults[.astronomicalTwilightBegin] = astronomicalSunrise.toISO()
-        Defaults[.astronomicalTwilightEnd] = astronomicalSunset.toISO()
+        CachedDefaults[.sunrise] = sunrise.toISO()
+        CachedDefaults[.sunset] = sunset.toISO()
+        CachedDefaults[.solarNoon] = solarNoon.toISO()
+        CachedDefaults[.dayLength] = dayLength
+        CachedDefaults[.civilTwilightBegin] = civilSunrise.toISO()
+        CachedDefaults[.civilTwilightEnd] = civilSunset.toISO()
+        CachedDefaults[.nauticalTwilightBegin] = nauticalSunrise.toISO()
+        CachedDefaults[.nauticalTwilightEnd] = nauticalSunset.toISO()
+        CachedDefaults[.astronomicalTwilightBegin] = astronomicalSunrise.toISO()
+        CachedDefaults[.astronomicalTwilightEnd] = astronomicalSunset.toISO()
     }
 }

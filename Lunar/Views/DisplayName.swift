@@ -12,7 +12,11 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
     var centerAlign: NSParagraphStyle?
     var trackingArea: NSTrackingArea?
 
-    weak var display: Display?
+    weak var display: Display? {
+        didSet {
+            stringValue = display?.name ?? "No display"
+        }
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)

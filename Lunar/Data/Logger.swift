@@ -6,6 +6,7 @@
 //  Copyright © 2018 Alin. All rights reserved.
 //
 
+import Combine
 import Defaults
 import Foundation
 import SwiftyBeaver
@@ -14,7 +15,7 @@ class Logger: SwiftyBeaver {
     static let console = ConsoleDestination()
     static let file = FileDestination()
     static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
-    static var debugModeObserver: DefaultsObservation?
+    static var debugModeObserver: Cancellable?
 
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
@@ -25,12 +26,12 @@ class Logger: SwiftyBeaver {
         }
 
         setMinLevel(
-            debug: debugMode(cli ? debug : Defaults[.debug]),
+            debug: debugMode(cli ? debug : CachedDefaults[.debug]),
             verbose: verbose || TEST_MODE,
             cloud: !cli && AppSettings.beta,
             cli: cli
         )
-        debugModeObserver = Defaults.observe(.debug) { change in
+        debugModeObserver = debugPublisher.sink { change in
             guard !cli else { return }
             self.setMinLevel(
                 debug: debugMode(change.newValue),

@@ -5,6 +5,7 @@ import CryptorECC
 import Foundation
 import Surge
 import SwiftDate
+import UserNotifications
 
 class RequestTimeoutError: Error {}
 struct ResponseError: Error {
@@ -732,43 +733,45 @@ func dialog(
     wide: Bool = false,
     ultrawide: Bool = false
 ) -> NSAlert {
-    let alert = NSAlert()
-    alert.messageText = message
-    alert.informativeText = info
-    alert.alertStyle = .warning
+    mainThread {
+        let alert = NSAlert()
+        alert.messageText = message
+        alert.informativeText = info
+        alert.alertStyle = .warning
 
-    if ultrawide {
-        alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
-    } else if wide {
-        alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 650, height: 0)))
-    }
-
-    if let okButton = okButton {
-        alert.addButton(withTitle: okButton)
-    }
-    if let cancelButton = cancelButton {
-        alert.addButton(withTitle: cancelButton)
-    }
-    if let thirdButton = thirdButton {
-        alert.addButton(withTitle: thirdButton)
-    }
-
-    if let suppressionText = suppressionText {
-        alert.showsSuppressionButton = true
-        alert.suppressionButton?.title = suppressionText
-    }
-
-    if let screen = screen {
-        let w = window ?? alert.window
-
-        let alertSize = w.frame.size
-        w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - alertSize.width / 2, y: screen.visibleFrame.midY - alertSize.height / 2))
-        w.makeKeyAndOrderFront(nil)
-        if window != nil {
-            NSApplication.shared.activate(ignoringOtherApps: true)
+        if ultrawide {
+            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
+        } else if wide {
+            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 650, height: 0)))
         }
+
+        if let okButton = okButton {
+            alert.addButton(withTitle: okButton)
+        }
+        if let cancelButton = cancelButton {
+            alert.addButton(withTitle: cancelButton)
+        }
+        if let thirdButton = thirdButton {
+            alert.addButton(withTitle: thirdButton)
+        }
+
+        if let suppressionText = suppressionText {
+            alert.showsSuppressionButton = true
+            alert.suppressionButton?.title = suppressionText
+        }
+
+        if let screen = screen {
+            let w = window ?? alert.window
+
+            let alertSize = w.frame.size
+            w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - alertSize.width / 2, y: screen.visibleFrame.midY - alertSize.height / 2))
+            w.makeKeyAndOrderFront(nil)
+            if window != nil {
+                NSApplication.shared.activate(ignoringOtherApps: true)
+            }
+        }
+        return alert
     }
-    return alert
 }
 
 func ask(
@@ -889,6 +892,72 @@ func ask(
 
 // MARK: Property Wrappers
 
+/// An `os_unfair_lock` wrapper.
+final class UnfairLock {
+    private let unfairLock: os_unfair_lock_t
+
+    init() {
+        unfairLock = .allocate(capacity: 1)
+        unfairLock.initialize(to: os_unfair_lock())
+    }
+
+    deinit {
+        unfairLock.deinitialize(count: 1)
+        unfairLock.deallocate()
+    }
+
+    func locked() -> Bool { !os_unfair_lock_trylock(unfairLock) }
+
+    private func trylock() -> Bool {
+        os_unfair_lock_trylock(unfairLock)
+    }
+
+    private func lock() {
+        os_unfair_lock_lock(unfairLock)
+    }
+
+    private func unlock() {
+        os_unfair_lock_unlock(unfairLock)
+    }
+
+    /// Executes a closure returning a value while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    ///
+    /// - Returns:           The value the closure generated.
+    func around<T>(_ closure: () -> T) -> T {
+        let locked = trylock(); defer { if locked { unlock() } }
+        return closure()
+    }
+
+    /// Execute a closure while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    func around(_ closure: () -> Void) {
+        let locked = trylock(); defer { if locked { unlock() } }
+        return closure()
+    }
+}
+
+@propertyWrapper
+public struct AtomicLock<Value> {
+    var value: Value
+    var lock = UnfairLock()
+
+    public init(wrappedValue: Value) {
+        value = wrappedValue
+    }
+
+    public var wrappedValue: Value {
+        get {
+            lock.around { value }
+        }
+        set {
+            lock.around { value = newValue }
+        }
+    }
+}
+
 @propertyWrapper
 public struct Atomic<Value> {
     var value: Value
@@ -967,4 +1036,15 @@ class PlainTextFieldCell: NSTextFieldCell {
 
 func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     max(min(number, maxVal), minVal)
+}
+
+func notify(identifier: String, title: String, body: String) {
+    let content = UNMutableNotificationContent()
+    content.title = title
+    content.body = body
+    content.sound = UNNotificationSound.default
+    UNUserNotificationCenter.current().add(
+        UNNotificationRequest(identifier: identifier, content: content, trigger: nil),
+        withCompletionHandler: nil
+    )
 }

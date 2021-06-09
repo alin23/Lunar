@@ -56,8 +56,8 @@ pre, code {
 class HelpButton: PopoverButton<HelpPopoverController> {
     var link: String?
 
-    override var popoverKey: PopoverKey {
-        .help
+    override var popoverKey: String {
+        "help"
     }
 
     @IBInspectable var helpText: String = ""

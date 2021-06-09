@@ -8,6 +8,7 @@
 
 import Charts
 import Cocoa
+import Combine
 import Defaults
 
 class SettingsPageController: NSViewController {
@@ -17,7 +18,7 @@ class SettingsPageController: NSViewController {
     @IBOutlet var advancedSettingsButton: ToggleButton!
     @objc dynamic var advancedSettingsShown = false
 
-    var adaptiveModeObserver: DefaultsObservation?
+    var adaptiveModeObserver: Cancellable?
 
     @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
         advancedSettingsShown = sender.state == .on
@@ -162,19 +163,20 @@ class SettingsPageController: NSViewController {
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = Defaults
-            .observe(.adaptiveBrightnessMode) { [weak self] change in
-                guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
-                    return
-                }
-                mainThread {
-                    self.pausedAdaptiveModeObserver = true
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
+            guard let self = self, !self.pausedAdaptiveModeObserver else {
+                return
+            }
+            mainThread {
+                self.pausedAdaptiveModeObserver = true
+                Defaults.withoutPropagation {
                     if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
                         self.initGraph(display: displayController.firstDisplay, mode: change.newValue.mode)
                     }
-                    self.pausedAdaptiveModeObserver = false
                 }
+                self.pausedAdaptiveModeObserver = false
             }
+        }
     }
 
     func initGraph(display: Display?, mode: AdaptiveMode? = nil) {

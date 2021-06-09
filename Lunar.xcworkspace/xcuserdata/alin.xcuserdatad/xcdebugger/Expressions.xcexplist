@@ -3,35 +3,7 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "BrightnessContrastChartView.highlightCurrentValues(adaptiveMode:for:):BrightnessContrastChartView.swift">
-      </ContextState>
-      <ContextState
          contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
-      </ContextState>
-      <ContextState
-         contextName = "static Hotkey.setKeyEquivalent(_:menuItem:hotkeys:):Hotkeys.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "&quot;\(modifierChars)\(keyChar)&quot;">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "static RelativeFormatter.format(date:to:style:locale:):RelativeFormatter.swift">
-      </ContextState>
-      <ContextState
-         contextName = "ToggleButton.labelColor.getter:ToggleButton.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "title">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
       </ContextState>
       <ContextState
          contextName = "BrightnessContrastChartView.setup(mode:):BrightnessContrastChartView.swift">
@@ -42,6 +14,105 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "HotKeyCenter.register(with:):HotKeyCenter.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "hotKeyCount">
+            </PersistentString>
+            <PersistentString
+               value = "hotKeys.keys">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "BrightnessContrastChartView.highlightCurrentValues(adaptiveMode:for:):BrightnessContrastChartView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
+      </ContextState>
+      <ContextState
+         contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DisplayViewController.display.didset:DisplayViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "display.id == GENERIC_DISPLAY_ID">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "HotkeyView.recordView(_:didChangeKeyCombo:):HotKeyView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
+      </ContextState>
+      <ContextState
+         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "HotkeyButton.mouseDown(with:):HotkeyButton.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "popoverController?.hotkeyView?.hotkey?.identifier">
+            </PersistentString>
+            <PersistentString
+               value = "hotkey!.identifier">
+            </PersistentString>
+            <PersistentString
+               value = "popoverController!.dropdown.itemTitles">
+            </PersistentString>
+            <PersistentString
+               value = "popoverController?.hotkeyView?.hotkey?.isEnabled">
+            </PersistentString>
+            <PersistentString
+               value = "_popover == nil">
+            </PersistentString>
+            <PersistentString
+               value = "popoverController?.hotkeyView?.hotkey?.hotkey.hotKeyId">
+            </PersistentString>
+            <PersistentString
+               value = "popoverController?.hotkeyView?.hotkey?.hotkey.hotKeyRef">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DisplayViewController.update(_:):DisplayViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "display.id">
+            </PersistentString>
+            <PersistentString
+               value = "GENERIC_DISPLAY_ID">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "display.serial">
+            </PersistentString>
+            <PersistentString
+               value = "display.name">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ToggleButton.labelColor.getter:ToggleButton.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "title">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Display.addObservers():Display.swift">
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveModeButton.setAutoModeItemTitle(modeKey:):AdaptiveModeButton.swift">
          <PersistentStrings>
             <PersistentString
@@ -50,10 +121,23 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
+         contextName = "static Hotkey.setKeyEquivalent(_:menuItem:hotkeys:):Hotkeys.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "&quot;\(modifierChars)\(keyChar)&quot;">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
+         contextName = "closure #5 in DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "$0.identifier">
+            </PersistentString>
+            <PersistentString
+               value = "$0.isEnabled">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "AdaptiveModeButton.update(modeKey:):AdaptiveModeButton.swift">
@@ -62,6 +146,9 @@
                value = "self.lastItem?.attributedTitle?.string">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static RelativeFormatter.format(date:to:style:locale:):RelativeFormatter.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

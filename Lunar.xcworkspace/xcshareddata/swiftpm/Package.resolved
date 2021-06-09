@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/sindresorhus/Defaults",
         "state": {
           "branch": null,
-          "revision": "229dea452fee8d2205f56a12e5c21dfec00948f2",
-          "version": "4.2.2"
+          "revision": "63d93f97ad545c8bceb125a8a36175ea705f7cf5",
+          "version": "5.0.0"
         }
       },
       {
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/apple/swift-algorithms",
         "state": {
           "branch": null,
-          "revision": "e25cf27e57fc3eec00ea2fc8ea7f99695c59966f",
-          "version": "0.2.0"
+          "revision": "2327673b0e9c7e90e6b1826376526ec3627210e4",
+          "version": "0.2.1"
         }
       },
       {

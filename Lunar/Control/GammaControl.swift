@@ -70,7 +70,7 @@ struct GammaControl: Control {
             window: window,
             suppressionText: "Never ask again",
             onSuppression: { shouldStopAsking in
-                Defaults[.neverAskAboutFlux] = shouldStopAsking
+                CachedDefaults[.neverAskAboutFlux] = shouldStopAsking
             },
             onCompletion: completionHandler,
             unique: true,
@@ -100,7 +100,7 @@ struct GammaControl: Control {
             return false
         }
 
-        // if Defaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
+        // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
         if let oldValue = oldValue {
             display.setGamma(brightness: brightness, oldBrightness: oldValue)
             return true
@@ -115,7 +115,7 @@ struct GammaControl: Control {
             return false
         }
 
-        // if Defaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
+        // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
         if let oldValue = oldValue {
             display.setGamma(contrast: contrast, oldContrast: oldValue)
             return true

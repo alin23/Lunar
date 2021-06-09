@@ -14,18 +14,20 @@ import Sauce
 
 class HotkeyView: RecordView, RecordViewDelegate {
     var hoverState: HoverState = .noHover
-    var hotkey: PersistentHotkey! {
+    var hotkey: PersistentHotkey? {
         didSet {
-            if let h = hotkey {
-                keyCombo = h.keyCombo
-                if hotkeyEnabled {
-                    tintColor = hotkeyColor[hoverState]!["tint"]!
+            mainThread {
+                if let h = hotkey {
+                    keyCombo = h.keyCombo
+                    if hotkeyEnabled {
+                        tintColor = hotkeyColor[hoverState]!["tint"]!
+                    } else {
+                        tintColor = hotkeyColor[hoverState]!["tintDisabled"]!
+                    }
                 } else {
+                    keyCombo = nil
                     tintColor = hotkeyColor[hoverState]!["tintDisabled"]!
                 }
-            } else {
-                keyCombo = nil
-                tintColor = hotkeyColor[hoverState]!["tintDisabled"]!
             }
         }
     }
@@ -36,29 +38,25 @@ class HotkeyView: RecordView, RecordViewDelegate {
                   let hk = hotkey
             else { return }
 
-            let hotkeys = Defaults[.hotkeys]
-            if let coarseHk = hotkeys[hk.identifier], let preciseIdentifier = preciseHotkeysMapping[hk.identifier],
-               let preciseHk = hotkeys[preciseIdentifier]
-            {
-                checkbox.state = NSControl.StateValue(rawValue: preciseHk[.enabled] ?? Hotkey.defaults[hk.identifier]?[.enabled] ?? 0)
-                checkbox.isEnabled = isHotkeyCheckboxEnabled(coarseHk)
-                checkbox.toolTip = hotkeyCheckboxTooltip(coarseHk)
+            let hotkeys = CachedDefaults[.hotkeys]
+            guard let preciseIdentifier = preciseHotkeysMapping[hk.identifier],
+                  let preciseHotkey = hotkeys.first(where: { $0.identifier == preciseIdentifier })
+            else {
+                return
             }
+            checkbox.state = NSControl.StateValue(rawValue: preciseHotkey.isEnabled.i)
+            checkbox.isEnabled = isHotkeyCheckboxEnabled(hk)
+            checkbox.toolTip = hotkeyCheckboxTooltip(hk)
         }
     }
 
     var hotkeyEnabled: Bool {
-        let hotkeys = Defaults[.hotkeys]
-        if let hk = hotkey,
-           let hotkey = (hotkeys[hk.identifier] ?? Hotkey.defaults[hk.identifier])
-        {
-            return (hotkey[.enabled] ?? 0) == 1
-        }
-        return false
+        hotkey?.isEnabled ?? false
     }
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
         log.debug("Begin hotkey recording: \(hotkey?.identifier ?? "")")
+        transition()
         return true
     }
 
@@ -72,10 +70,13 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewDidEndRecording(_: RecordView) {
         log.debug("End hotkey recording: \(hotkey?.identifier ?? "")")
+        transition()
     }
 
     func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
-        log.debug("Changed hotkey for \(hotkey?.identifier ?? "") with \(keyCombo?.keyEquivalent ?? "no hotkey")")
+        log.debug("Changed hotkey for \(hotkey?.identifier ?? "") with \(keyCombo?.keyEquivalentModifierMaskString ?? "") \(keyCombo?.keyEquivalent ?? "no hotkey")")
+
+        guard let hotkey = hotkey else { return }
 
         hotkey.unregister()
         guard let keyCombo = keyCombo else {
@@ -85,33 +86,37 @@ class HotkeyView: RecordView, RecordViewDelegate {
             return
         }
         if let target = hotkey.target, let action = hotkey.action {
-            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action)
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action, actionQueue: .main)
         } else {
-            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, handler: hotkey.handler!)
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, actionQueue: .main, handler: hotkey.handler!)
         }
         hotkey.isEnabled = true
 
-        if let checkbox = preciseHotkeyCheckbox {
-            if NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(.option) {
-                checkbox.isEnabled = false
-                checkbox.toolTip = fineAdjustmentDisabledBecauseOfOptionKey
-            } else {
-                checkbox.isEnabled = true
-                checkbox.toolTip = nil
-                if let hk = hotkey, let preciseIdentifier = preciseHotkeysMapping[hk.identifier],
-                   let preciseHk = Hotkey.keys[preciseIdentifier],
-                   var hotkey = preciseHk,
-                   let kc = KeyCombo(QWERTYKeyCode: keyCombo.QWERTYKeyCode, cocoaModifiers: keyCombo.keyEquivalentModifierMask.union([.option]))
-                {
-                    hotkey.unregister()
-                    if let target = hotkey.target, let action = hotkey.action {
-                        hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, target: target, action: action)
-                    } else if let handler = hotkey.handler {
-                        hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, handler: handler)
-                    }
-                    hotkey.isEnabled = true
-                    hotkey.register()
+        guard let checkbox = preciseHotkeyCheckbox else {
+            return
+        }
+
+        if NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(.option) {
+            checkbox.isEnabled = false
+            checkbox.toolTip = fineAdjustmentDisabledBecauseOfOptionKey
+        } else {
+            checkbox.isEnabled = true
+            checkbox.toolTip = nil
+            if let preciseIdentifier = preciseHotkeysMapping[hotkey.identifier],
+               let hotkey = CachedDefaults[.hotkeys].first(where: { $0.identifier == preciseIdentifier }),
+               let kc = KeyCombo(
+                   QWERTYKeyCode: keyCombo.QWERTYKeyCode,
+                   cocoaModifiers: keyCombo.keyEquivalentModifierMask.union([.option])
+               )
+            {
+                hotkey.unregister()
+                if let target = hotkey.target, let action = hotkey.action {
+                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main)
+                } else if let handler = hotkey.handler {
+                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, actionQueue: .main, handler: handler)
                 }
+                hotkey.isEnabled = true
+                hotkey.register()
             }
         }
     }
@@ -119,25 +124,26 @@ class HotkeyView: RecordView, RecordViewDelegate {
     override open func mouseDown(with _: NSEvent) {
         log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
         beginRecording()
+        transition()
     }
 
     override func didChangeValue(forKey key: String) {
         if key == "recording" {
             transition()
             if isRecording {
-                hotkey.unregister()
+                hotkey?.unregister()
             } else if hotkeyEnabled {
-                hotkey.register()
+                hotkey?.register()
             }
         }
     }
 
-    func isHotkeyCheckboxEnabled(_ hk: [HotkeyPart: Int]) -> Bool {
-        (hk[.enabled] ?? 1) == 1 && !NSEvent.ModifierFlags(carbonModifiers: hk[.modifiers] ?? 0).contains(.option)
+    func isHotkeyCheckboxEnabled(_ hk: PersistentHotkey) -> Bool {
+        hk.isEnabled && !NSEvent.ModifierFlags(carbonModifiers: hk.modifiers).contains(.option)
     }
 
-    func hotkeyCheckboxTooltip(_ hk: [HotkeyPart: Int]) -> String? {
-        if NSEvent.ModifierFlags(carbonModifiers: hk[.modifiers] ?? 0).contains(.option) {
+    func hotkeyCheckboxTooltip(_ hk: PersistentHotkey) -> String? {
+        if NSEvent.ModifierFlags(carbonModifiers: hk.modifiers).contains(.option) {
             return fineAdjustmentDisabledBecauseOfOptionKey
         } else {
             return nil

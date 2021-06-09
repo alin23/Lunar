@@ -7,18 +7,14 @@
 //
 
 import Cocoa
+import Combine
 
 let textFieldColor = sunYellow
 let textFieldColorHover = sunYellow.blended(withFraction: 0.2, of: red) ?? textFieldColor
 let textFieldColorLight = sunYellow.blended(withFraction: 0.4, of: red) ?? textFieldColor
 
 class DisplayValuesView: NSTableView {
-    var brightnessObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
-    var contrastObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
-    var minBrightnessObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
-    var minContrastObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
-    var maxBrightnessObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
-    var maxContrastObservers: [CGDirectDisplayID: (NSNumber, NSNumber) -> Void] = [:]
+    var displayObservers: [CGDirectDisplayID: Set<AnyCancellable>] = [:]
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
@@ -39,11 +35,10 @@ class DisplayValuesView: NSTableView {
     }
 
     deinit {
-        enumerateAvailableRowViews { rowView, _ in
-            if let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display {
-                let id = "displayValuesView-\(accessibilityIdentifier())"
-                display.resetObserver(prop: .brightness, key: id, type: NSNumber.self)
-                display.resetObserver(prop: .contrast, key: id, type: NSNumber.self)
+        log.verbose("")
+        for (_, observers) in displayObservers {
+            for observer in observers {
+                observer.cancel()
             }
         }
     }
@@ -83,9 +78,9 @@ class DisplayValuesView: NSTableView {
                 self.endUpdates()
                 if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
                     mainAsyncAfter(ms: 200) {
-                        POPOVERS[.menu]!!.animates = false
+                        POPOVERS["menu"]!!.animates = false
                         controller.adaptViewSize()
-                        POPOVERS[.menu]!!.animates = true
+                        POPOVERS["menu"]!!.animates = true
                         self.resetDeleteButtons()
                     }
                 }
@@ -95,15 +90,25 @@ class DisplayValuesView: NSTableView {
     }
 
     func removeRow(_ rowView: NSTableRowView, forRow _: Int) {
-        guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display else {
+        if let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
+           let observers = displayObservers[display.id]
+        {
+            for observer in observers {
+                observer.cancel()
+            }
+        }
+
+        guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+              let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField
+        else {
             return
         }
-        let id = "displayValuesView-\(accessibilityIdentifier())"
-        display.resetObserver(prop: .brightness, key: id, type: NSNumber.self)
-        display.resetObserver(prop: .contrast, key: id, type: NSNumber.self)
 
-        brightnessObservers.removeValue(forKey: display.id)
-        contrastObservers.removeValue(forKey: display.id)
+        scrollableBrightness.onValueChangedInstant = nil
+        scrollableBrightness.onValueChanged = nil
+
+        scrollableContrast.onValueChangedInstant = nil
+        scrollableContrast.onValueChanged = nil
     }
 
     override func didRemove(_ rowView: NSTableRowView, forRow row: Int) {
@@ -126,8 +131,10 @@ class DisplayValuesView: NSTableView {
               let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption
         else { return }
 
-        notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
-        adaptiveButton.setup(displayID: display.id)
+        let id = display.id
+
+        notConnectedTextField.onClick = getDeleteAction(displayID: id, row: row)
+        adaptiveButton.setup(displayID: id)
         adaptiveButton.isHidden = !display.active || displayController.adaptiveModeKey == .manual
 
         scrollableBrightness.textFieldColor = textFieldColor
@@ -159,78 +166,86 @@ class DisplayValuesView: NSTableView {
         scrollableBrightnessCaption.initialColor = white
         scrollableContrastCaption.initialColor = white
 
-        scrollableBrightness.onValueChangedInstant = { [weak display] value in
+        scrollableBrightness.onValueChangedInstant = { value in
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
-            display?.insertBrightnessUserDataPoint(displayController.adaptiveMode.brightnessDataPoint.last, value, modeKey: displayController.adaptiveModeKey)
+            display.insertBrightnessUserDataPoint(
+                datapointLockAround { displayController.adaptiveMode.brightnessDataPoint.last },
+                value,
+                modeKey: displayController.adaptiveModeKey
+            )
         }
-        scrollableBrightness.onValueChanged = { [weak display] value in
-            display?.brightness = value.ns
+        scrollableBrightness.onValueChanged = { value in
+            display.brightness = value.ns
         }
-        scrollableContrast.onValueChangedInstant = { [weak display] value in
+        scrollableContrast.onValueChangedInstant = { value in
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
-            display?.insertContrastUserDataPoint(displayController.adaptiveMode.contrastDataPoint.last, value, modeKey: displayController.adaptiveModeKey)
+            display.insertContrastUserDataPoint(
+                datapointLockAround { displayController.adaptiveMode.contrastDataPoint.last },
+                value,
+                modeKey: displayController.adaptiveModeKey
+            )
         }
-        scrollableContrast.onValueChanged = { [weak display] value in
-            display?.contrast = value.ns
-        }
-        let id = display.id
-        brightnessObservers[id] = { (newBrightness: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableBrightness.integerValue = newBrightness.intValue
-                    scrollableBrightness.needsDisplay = true
-                }
-            }
+        scrollableContrast.onValueChanged = { value in
+            display.contrast = value.ns
         }
 
-        contrastObservers[id] = { (newContrast: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableContrast.integerValue = newContrast.intValue
-                    scrollableContrast.needsDisplay = true
-                }
+        serialSync {
+            if displayObservers[id] == nil {
+                displayObservers[id] = []
             }
-        }
 
-        minBrightnessObservers[id] = { (newBrightness: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableBrightness.lowerLimit = newBrightness.doubleValue
+            guard var observers = displayObservers[id] else { return }
+
+            display.$brightness.sink { newBrightness in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableBrightness.integerValue = newBrightness.intValue
+                        scrollableBrightness.needsDisplay = true
+                    }
                 }
-            }
-        }
+            }.store(in: &observers)
 
-        minContrastObservers[id] = { (newContrast: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableContrast.lowerLimit = newContrast.doubleValue
+            display.$contrast.sink { newContrast in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableContrast.integerValue = newContrast.intValue
+                        scrollableContrast.needsDisplay = true
+                    }
                 }
-            }
-        }
+            }.store(in: &observers)
 
-        maxBrightnessObservers[id] = { (newBrightness: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableBrightness.upperLimit = newBrightness.doubleValue
+            display.$minBrightness.sink { newBrightness in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableBrightness.lowerLimit = newBrightness.doubleValue
+                    }
                 }
-            }
-        }
+            }.store(in: &observers)
 
-        maxContrastObservers[id] = { (newContrast: NSNumber, _: NSNumber) in
-            if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                mainThread {
-                    scrollableContrast.upperLimit = newContrast.doubleValue
+            display.$minContrast.sink { newContrast in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableContrast.lowerLimit = newContrast.doubleValue
+                    }
                 }
-            }
-        }
+            }.store(in: &observers)
 
-        let oid = "displayValuesView-\(accessibilityIdentifier())"
-        display.setObserver(prop: .brightness, key: oid, action: brightnessObservers[id]!)
-        display.setObserver(prop: .contrast, key: oid, action: contrastObservers[id]!)
-        display.setObserver(prop: .minBrightness, key: oid, action: minBrightnessObservers[id]!)
-        display.setObserver(prop: .minContrast, key: oid, action: minContrastObservers[id]!)
-        display.setObserver(prop: .maxBrightness, key: oid, action: maxBrightnessObservers[id]!)
-        display.setObserver(prop: .maxContrast, key: oid, action: maxContrastObservers[id]!)
+            display.$maxBrightness.sink { newBrightness in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableBrightness.upperLimit = newBrightness.doubleValue
+                    }
+                }
+            }.store(in: &observers)
+
+            display.$maxContrast.sink { newContrast in
+                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+                    mainThread {
+                        scrollableContrast.upperLimit = newContrast.doubleValue
+                    }
+                }
+            }.store(in: &observers)
+        }
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {

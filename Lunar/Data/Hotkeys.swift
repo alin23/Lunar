@@ -72,8 +72,10 @@ let preciseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.volumeDown.rawValue: HotkeyIdentifier.preciseVolumeDown.rawValue,
 ]
 
-enum HotkeyPart: String, CaseIterable, Codable {
-    case modifiers, keyCode, enabled
+enum HotkeyPart: String, CaseIterable, Defaults.Serializable {
+    case modifiers
+    case keyCode
+    case enabled
 }
 
 enum OSDImage: Int64 {
@@ -83,17 +85,117 @@ enum OSDImage: Int64 {
     case muted = 4
 }
 
-struct PersistentHotkey {
+class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     var hotkey: HotKey {
         didSet {
-            Defaults[.hotkeys][hotkey.identifier] = dict()
+            log.debug("Reset hotkey with handler \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            oldValue.unregister()
+            handleRegistration(persist: true)
+            if HotkeyIdentifier(rawValue: identifier) != nil {
+                appDelegate().setKeyEquivalents(CachedDefaults[.hotkeys])
+            }
         }
+    }
+
+    static func == (lhs: PersistentHotkey, rhs: PersistentHotkey) -> Bool {
+        lhs.identifier == rhs.identifier
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+    }
+
+    func with(target: AnyObject, action: Selector) -> PersistentHotkey {
+        hotkey = Magnet.HotKey(
+            identifier: identifier,
+            keyCombo: keyCombo,
+            target: target,
+            action: action,
+            actionQueue: .main
+        )
+        return self
+    }
+
+    init(_ identifier: String, handler: ((HotKey) -> Void)? = nil, dict hk: [HotkeyPart: Int]) {
+        let keyCode = hk[.keyCode]!
+        let enabled = hk[.enabled]!
+        let modifiers = hk[.modifiers]!
+        let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers)!
+
+        if let handler = handler {
+            hotkey = Magnet.HotKey(
+                identifier: identifier,
+                keyCombo: keyCombo,
+                actionQueue: .main,
+                handler: handler
+            )
+            isEnabled = enabled == 1
+            if isEnabled {
+                register()
+            }
+            log.debug("Created hotkey with handler \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            return
+        }
+
+        if let hkIdentifier = HotkeyIdentifier(rawValue: identifier) {
+            hotkey = Magnet.HotKey(
+                identifier: identifier,
+                keyCombo: keyCombo,
+                target: appDelegate(),
+                action: Hotkey.handler(identifier: hkIdentifier),
+                actionQueue: .main
+            )
+            isEnabled = enabled == 1
+            if isEnabled {
+                register()
+            }
+            log
+                .debug(
+                    "Created hotkey with action/target \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)"
+                )
+            return
+        }
+
+        hotkey = Magnet.HotKey(
+            identifier: identifier,
+            keyCombo: keyCombo,
+            target: appDelegate(),
+            action: #selector(AppDelegate.doNothing),
+            actionQueue: .main
+        )
+        isEnabled = enabled == 1
+    }
+
+    deinit {
+        log.debug("deinit hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+//        hotkey.unregister()
     }
 
     var isEnabled: Bool {
         didSet {
+            if isEnabled {
+                log.debug("Enabled hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            } else {
+                log.debug("Disabled hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            }
             handleRegistration()
         }
+    }
+
+    var key: Key {
+        hotkey.keyCombo.key
+    }
+
+    var keyChar: String {
+        (Sauce.shared.character(for: Sauce.shared.keyCode(for: key).i, carbonModifiers: 0) ?? "").uppercased()
+    }
+
+    var keyCode: Int {
+        hotkey.keyCombo.QWERTYKeyCode
+    }
+
+    var modifiers: Int {
+        hotkey.keyCombo.modifiers
     }
 
     var keyCombo: KeyCombo {
@@ -116,29 +218,33 @@ struct PersistentHotkey {
         hotkey.callback
     }
 
-    init(hotkey: HotKey, isEnabled: Bool = true) {
+    init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
         self.hotkey = hotkey
         self.isEnabled = isEnabled
-        handleRegistration(persist: false)
+        if register {
+            handleRegistration(persist: false)
+        }
     }
 
     func unregister() {
+        log.debug("Unregistered hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
         hotkey.unregister()
     }
 
     func register() {
+        log.debug("Registered hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
         hotkey.register()
     }
 
     func handleRegistration(persist: Bool = true) {
-        if persist {
-            Defaults[.hotkeys][hotkey.identifier]?[.enabled] = isEnabled ? 1 : 0
-        }
-
         if isEnabled {
             hotkey.register()
         } else {
             hotkey.unregister()
+        }
+
+        if persist {
+            CachedDefaults[.hotkeys].update(with: self)
         }
     }
 
@@ -148,6 +254,37 @@ struct PersistentHotkey {
             .keyCode: hotkey.keyCombo.QWERTYKeyCode,
             .modifiers: hotkey.keyCombo.modifiers,
         ]
+    }
+
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case identifier
+        case keyCode
+        case enabled
+        case modifiers
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(identifier, forKey: .identifier)
+        try container.encode(keyCode, forKey: .keyCode)
+        try container.encode(modifiers, forKey: .modifiers)
+        try container.encode(isEnabled, forKey: .enabled)
+    }
+
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let identifier = try container.decode(String.self, forKey: .identifier)
+        let enabled = try container.decode(Bool.self, forKey: .enabled)
+        let modifiers = try container.decode(Int.self, forKey: .modifiers)
+        let keyCode = try container.decode(Int.self, forKey: .keyCode)
+
+        self.init(identifier, dict: [
+            .enabled: enabled ? 1 : 0,
+            .keyCode: keyCode,
+            .modifiers: modifiers,
+        ])
     }
 }
 
@@ -174,114 +311,161 @@ enum Hotkey {
         kVK_F19: String(Unicode.Scalar(NSF19FunctionKey)!),
         kVK_F20: String(Unicode.Scalar(NSF20FunctionKey)!),
     ]
-    static var keys: [String: PersistentHotkey?] = [:]
 
-    static let defaults: [String: [HotkeyPart: Int]] = [
-        HotkeyIdentifier.toggle.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_L,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.lunar.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_L,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.percent0.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_0,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.percent25.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_1,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.percent50.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_2,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.percent75.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_3,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.percent100.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_4,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.faceLight.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_ANSI_5,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseBrightnessUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F2,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseBrightnessDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F1,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseContrastUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F2,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseContrastDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F1,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseVolumeUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F12,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.preciseVolumeDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F11,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .option]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.brightnessUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F2,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.brightnessDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F1,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.contrastUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F2,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.contrastDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F1,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control, .shift]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.muteAudio.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F10,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.volumeUp.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F12,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
-        ],
-        HotkeyIdentifier.volumeDown.rawValue: [
-            .enabled: 1,
-            .keyCode: kVK_F11,
-            .modifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]).carbonModifiers(),
-        ],
+    static let defaults: Set<PersistentHotkey> = [
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.toggle.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_L,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option])
+            )!,
+            target: appDelegate(),
+            action: handler(identifier: .toggle),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.lunar.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_L,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift])
+            )!,
+            target: appDelegate(),
+            action: handler(identifier: .lunar),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.percent0.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .percent0),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.percent25.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .percent25),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.percent50.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .percent50),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.percent75.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_3, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .percent75),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.percent100.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_4, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .percent100),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.faceLight.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_5, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate(),
+            action: handler(identifier: .faceLight),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseBrightnessUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseBrightnessDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseBrightnessDown),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseContrastUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseContrastUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseContrastDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseContrastDown),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseVolumeUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseVolumeUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.preciseVolumeDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
+            target: appDelegate(),
+            action: handler(identifier: .preciseVolumeDown),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.brightnessUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
+            target: appDelegate(),
+            action: handler(identifier: .brightnessUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.brightnessDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
+            target: appDelegate(),
+            action: handler(identifier: .brightnessDown),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.contrastUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
+            target: appDelegate(),
+            action: handler(identifier: .contrastUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.contrastDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
+            target: appDelegate(),
+            action: handler(identifier: .contrastDown),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.muteAudio.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F10, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
+            target: appDelegate(),
+            action: handler(identifier: .muteAudio),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.volumeUp.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
+            target: appDelegate(),
+            action: handler(identifier: .volumeUp),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.volumeDown.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
+            target: appDelegate(),
+            action: handler(identifier: .volumeDown),
+            actionQueue: .main
+        )),
     ]
 
     static func toDictionary(_ hotkeys: [String: Any]) -> [HotkeyIdentifier: [HotkeyPart: Int]] {
@@ -351,20 +535,15 @@ enum Hotkey {
         }
     }
 
-    static func setKeyEquivalent(_ identifier: String, menuItem: NSMenuItem?, hotkeys: [String: [HotkeyPart: Int]]) {
-        guard let menuItem = menuItem else { return }
-        if let hk = hotkeys[identifier], let keyCode = hk[.keyCode], let enabled = hk[.enabled], let modifiers = hk[.modifiers] {
-            if enabled == 1 {
-                if let keyEquivalent = Hotkey.functionKeyMapping[keyCode] {
-                    menuItem.keyEquivalent = keyEquivalent
-                } else if let key = Key(QWERTYKeyCode: keyCode) {
-                    let keyChar = (Sauce.shared.character(for: Sauce.shared.keyCode(for: key).i, carbonModifiers: 0) ?? "").uppercased()
-                    menuItem.keyEquivalent = keyChar
-                }
-                menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(carbonModifiers: modifiers)
+    static func setKeyEquivalent(_ identifier: String, menuItem: NSMenuItem?, hotkeys: Set<PersistentHotkey>) {
+        guard let menuItem = menuItem, let hotkey = hotkeys.first(where: { $0.identifier == identifier }) else { return }
+        if hotkey.isEnabled {
+            if let keyEquivalent = Hotkey.functionKeyMapping[hotkey.keyCode] {
+                menuItem.keyEquivalent = keyEquivalent
             } else {
-                menuItem.keyEquivalent = ""
+                menuItem.keyEquivalent = hotkey.keyChar
             }
+            menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(carbonModifiers: hotkey.modifiers)
         } else {
             menuItem.keyEquivalent = ""
         }
@@ -422,7 +601,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             mediaKeyTapAudio?.stop()
             mediaKeyTapAudio = nil
 
-            if brightnessKeysEnabled ?? Defaults[.brightnessKeysEnabled] {
+            if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
                 mediaKeyTapBrightness = MediaKeyTap(
                     delegate: self,
                     for: [.brightnessUp, .brightnessDown],
@@ -431,7 +610,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 mediaKeyTapBrightness?.start()
             }
 
-            if volumeKeysEnabled ?? Defaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
+            if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
                !audioDevice.canSetVirtualMasterVolume(scope: .output)
             {
                 mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
@@ -495,7 +674,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
-        let allMonitors = Defaults[.mediaKeysControlAllMonitors]
+        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
 
         switch flags {
         case [] where lidClosed:
@@ -535,7 +714,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
-        let allMonitors = Defaults[.mediaKeysControlAllMonitors]
+        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
 
         switch flags {
         case [] where lidClosed:
@@ -684,7 +863,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func faceLightHotkeyHandler() {
-        guard lunarProActive else { return }
+        guard lunarProActive.load(ordering: .relaxed) else { return }
         cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")
@@ -740,7 +919,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             toggleAudioMuted()
         }
 
-        if let display = displayController.currentDisplay {
+        if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -753,7 +932,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             toggleAudioMuted()
         }
 
-        if let display = displayController.currentDisplay {
+        if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -763,7 +942,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func muteAudioHotkeyHandler() {
         toggleAudioMuted()
 
-        if let display = displayController.currentDisplay {
+        if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -817,4 +996,6 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func preciseVolumeDownHotkeyHandler() {
         volumeDownAction(offset: 1)
     }
+
+    @objc func doNothing() {}
 }

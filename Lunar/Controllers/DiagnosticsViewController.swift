@@ -152,7 +152,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 setPercent(20)
                 guard !self.stopped else { return }
 
-                let networkController = NetworkControl.controllersForDisplay[display.id]
+                let networkController = NetworkControl.controllersForDisplay[display.serial]
                 let network = networkController?.url?.absoluteString
                 setPercent(30)
                 guard !self.stopped else { return }
@@ -285,7 +285,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     }
 
                     if control is NetworkControl {
-                        if let networkController = NetworkControl.controllersForDisplay[display.id],
+                        if let networkController = NetworkControl.controllersForDisplay[display.serial],
                            let url = networkController.url
                         {
                             self.render("#### Detecting connected displays...")
@@ -393,7 +393,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     self.renderSeparated("""
                                     ### The assigned network controller wasn't able to control this monitor
                                     """)
-                                    if let networkController = NetworkControl.controllersForDisplay[display.id],
+                                    if let networkController = NetworkControl.controllersForDisplay[display.serial],
                                        let url = networkController.url
                                     {
                                         self.render("""
@@ -538,7 +538,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                         let lastMode = displayController.adaptiveMode
                         let lastPollingInterval = SyncMode.pollingSeconds
-                        let smoothTransitionActive = Defaults[.smoothTransition]
+                        let smoothTransitionActive = CachedDefaults[.smoothTransition]
                         defer {
                             if lastMode.key != .sync {
                                 self.render("Going back from Sync to \(lastMode.str) Mode")
@@ -550,7 +550,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             }
                             if smoothTransitionActive {
                                 self.render("Re-enabling smooth transition")
-                                Defaults[.smoothTransition] = true
+                                CachedDefaults[.smoothTransition] = true
                             }
                         }
                         if lastMode.key != .sync {
@@ -566,7 +566,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         }
                         if smoothTransitionActive {
                             self.render("Disabling smooth transition")
-                            Defaults[.smoothTransition] = false
+                            CachedDefaults[.smoothTransition] = false
                         }
 
                         let builtinBrightness = SyncMode.getBuiltinDisplayBrightnessContrast()?.0

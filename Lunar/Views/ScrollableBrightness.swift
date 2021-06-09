@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 class ScrollableBrightness: NSView {
@@ -21,8 +22,8 @@ class ScrollableBrightness: NSView {
 
     @IBOutlet var lockButton: LockButton!
 
-    var minObserver: DefaultsObservation?
-    var maxObserver: DefaultsObservation?
+    var minObserver: Cancellable?
+    var maxObserver: Cancellable?
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var onCurrentValueChanged: ((Int) -> Void)?
@@ -77,10 +78,10 @@ class ScrollableBrightness: NSView {
         }
     }
 
-    var brightnessObserver: ((NSNumber, NSNumber) -> Void)?
+    var displayObservers = Set<AnyCancellable>()
 
     func addObserver(_ display: Display) {
-        brightnessObserver = { [weak self] (newBrightness: NSNumber, _: NSNumber) in
+        display.$brightness.sink { [weak self] newBrightness in
             if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
                 let minBrightness = display.minBrightness.uint8Value
                 let maxBrightness = display.maxBrightness.uint8Value
@@ -90,8 +91,7 @@ class ScrollableBrightness: NSView {
                     self?.currentValue?.stringValue = String(newBrightness)
                 }
             }
-        }
-        display.setObserver(prop: .brightness, key: "scrollableBrightness-\(accessibilityIdentifier())", action: brightnessObserver!)
+        }.store(in: &displayObservers)
     }
 
     func update(from display: Display) {
@@ -116,7 +116,9 @@ class ScrollableBrightness: NSView {
     }
 
     deinit {
-        display?.resetObserver(prop: .brightness, key: "scrollableBrightness-\(self.accessibilityIdentifier())", type: NSNumber.self)
+        for observer in displayObservers {
+            observer.cancel()
+        }
     }
 
     override init(frame frameRect: NSRect) {

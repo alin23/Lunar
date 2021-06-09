@@ -52,7 +52,7 @@ class PopUpButton: NSPopUpButton {
     }
 
     var dotColor: NSColor {
-        if Defaults[.overrideAdaptiveMode] {
+        if CachedDefaults[.overrideAdaptiveMode] {
             return buttonDotColor[displayController.adaptiveModeKey]!
         } else {
             return darkMauve

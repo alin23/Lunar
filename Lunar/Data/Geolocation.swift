@@ -12,7 +12,7 @@ import Defaults
 import Solar
 import SwiftyJSON
 
-class Geolocation: NSObject, Codable {
+class Geolocation: NSObject, Codable, Defaults.Serializable {
     var altitude: Double
     var latitude: Double
     var longitude: Double
@@ -75,7 +75,7 @@ class Geolocation: NSObject, Codable {
     // MARK: UserDefaults
 
     func store() {
-        Defaults[.location] = self
+        CachedDefaults[.location] = self
     }
 
     // MARK: Codable

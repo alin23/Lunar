@@ -62,6 +62,9 @@ class PageController: NSPageController {
             if TEST_MODE {
                 arrangedObjects.append(TEST_DISPLAY)
                 arrangedObjects.append(TEST_DISPLAY_PERSISTENT)
+                arrangedObjects.append(TEST_DISPLAY_PERSISTENT2)
+                arrangedObjects.append(TEST_DISPLAY_PERSISTENT3)
+                arrangedObjects.append(TEST_DISPLAY_PERSISTENT4)
             }
             arrangedObjects.append(GENERIC_DISPLAY)
         }
@@ -149,7 +152,7 @@ extension PageController: NSPageControllerDelegate {
         if let identifier = object as? NSPageController.ObjectIdentifier {
             return identifier
         }
-        return NSPageController.ObjectIdentifier(String(describing: (object as! Display).id))
+        return NSPageController.ObjectIdentifier(String(describing: (object as! Display).serial))
     }
 
     func pageController(
@@ -159,32 +162,40 @@ extension PageController: NSPageControllerDelegate {
         unowned let c = c as! PageController
 
         if c.viewControllers[identifier] == nil {
-            if identifier == c.hotkeyViewControllerIdentifier {
+            switch identifier {
+            case c.hotkeyViewControllerIdentifier:
                 c.viewControllers[identifier] = c.storyboard!
                     .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
-            } else if identifier == c.settingsPageControllerIdentifier {
+            case c.settingsPageControllerIdentifier:
                 c.viewControllers[identifier] = c.storyboard!
                     .instantiateController(
                         withIdentifier: NSStoryboard
                             .SceneIdentifier("settingsPageController")
                     ) as! SettingsPageController
-            } else {
+            default:
                 c.viewControllers[identifier] = c.storyboard!
                     .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
             }
         }
 
-        if let displayViewController = c.viewControllers[identifier] as? DisplayViewController,
-           let displayId = CGDirectDisplayID(identifier)
-        {
-            if displayId == TEST_DISPLAY_ID {
-                displayViewController.display = TEST_DISPLAY
-            } else if displayId == TEST_DISPLAY_PERSISTENT_ID {
-                displayViewController.display = TEST_DISPLAY_PERSISTENT
-            } else if displayId != GENERIC_DISPLAY.id {
-                displayViewController.display = displayController.displays[displayId]
-            } else {
-                displayViewController.display = GENERIC_DISPLAY
+        if let displayViewController = c.viewControllers[identifier] as? DisplayViewController {
+            if displayViewController.display == nil {
+                switch identifier {
+                case TEST_DISPLAY.serial:
+                    displayViewController.display = TEST_DISPLAY
+                case TEST_DISPLAY_PERSISTENT.serial:
+                    displayViewController.display = TEST_DISPLAY_PERSISTENT
+                case TEST_DISPLAY_PERSISTENT2.serial:
+                    displayViewController.display = TEST_DISPLAY_PERSISTENT2
+                case TEST_DISPLAY_PERSISTENT3.serial:
+                    displayViewController.display = TEST_DISPLAY_PERSISTENT3
+                case TEST_DISPLAY_PERSISTENT4.serial:
+                    displayViewController.display = TEST_DISPLAY_PERSISTENT4
+                case GENERIC_DISPLAY.serial:
+                    displayViewController.display = GENERIC_DISPLAY
+                default:
+                    displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
+                }
             }
         }
 
