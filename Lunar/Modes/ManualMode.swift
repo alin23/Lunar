@@ -6,6 +6,7 @@
 //  Copyright © 2020 Alin. All rights reserved.
 //
 
+import Combine
 import Foundation
 import Surge
 
@@ -23,24 +24,26 @@ class ManualMode: AdaptiveMode {
     var available: Bool { true }
     var watching = false
 
+    var displayObservers = Set<AnyCancellable>()
+
     func stopWatching() {
         guard watching else { return }
-        for display in displayController.displays.values {
-            display.resetObserver(prop: .brightness, key: "manual-mode", type: NSNumber.self)
-            display.resetObserver(prop: .contrast, key: "manual-mode", type: NSNumber.self)
+        for observer in displayObservers {
+            observer.cancel()
         }
+
         watching = false
     }
 
     func watch() -> Bool {
         guard !watching else { return false }
         for display in displayController.displays.values {
-            display.setObserver(prop: .brightness, key: "manual-mode", action: { (value: NSNumber, _: NSNumber) in
+            display.$brightness.sink { value in
                 NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["brightness": value])
-            })
-            display.setObserver(prop: .contrast, key: "manual-mode", action: { (value: NSNumber, _: NSNumber) in
+            }.store(in: &displayObservers)
+            display.$contrast.sink { value in
                 NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["contrast": value])
-            })
+            }.store(in: &displayObservers)
         }
         watching = true
         return true

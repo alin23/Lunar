@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 class ScrollableContrast: NSView {
@@ -21,8 +22,8 @@ class ScrollableContrast: NSView {
 
     @IBOutlet var lockButton: LockButton!
 
-    var minObserver: DefaultsObservation?
-    var maxObserver: DefaultsObservation?
+    var minObserver: Cancellable?
+    var maxObserver: Cancellable?
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var onCurrentValueChanged: ((Int) -> Void)?
@@ -77,10 +78,10 @@ class ScrollableContrast: NSView {
         }
     }
 
-    var contrastObserver: ((NSNumber, NSNumber) -> Void)?
+    var displayObservers = Set<AnyCancellable>()
 
     func addObserver(_ display: Display) {
-        contrastObserver = { [weak self] (newContrast: NSNumber, _: NSNumber) in
+        display.$contrast.sink { [weak self] newContrast in
             if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
                 let minContrast = display.minContrast.uint8Value
                 let maxContrast = display.maxContrast.uint8Value
@@ -90,8 +91,7 @@ class ScrollableContrast: NSView {
                     self?.currentValue?.stringValue = String(newContrast)
                 }
             }
-        }
-        display.setObserver(prop: .contrast, key: "scrollableContrast-\(accessibilityIdentifier())", action: contrastObserver!)
+        }.store(in: &displayObservers)
     }
 
     func update(from display: Display) {
@@ -116,7 +116,9 @@ class ScrollableContrast: NSView {
     }
 
     deinit {
-        display?.resetObserver(prop: .contrast, key: "scrollableContrast-\(self.accessibilityIdentifier())", type: NSNumber.self)
+        for observer in displayObservers {
+            observer.cancel()
+        }
     }
 
     override init(frame frameRect: NSRect) {

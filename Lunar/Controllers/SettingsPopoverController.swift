@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 class SettingsPopoverController: NSViewController {
@@ -163,6 +164,10 @@ class SettingsPopoverController: NSViewController {
             display.control = display.getBestControl()
             display.onControlChange?(display.control)
 
+            if !gammaEnabled {
+                display.resetGamma()
+            }
+
             ensureAtLeastOneControlEnabled()
         }
     }
@@ -189,7 +194,7 @@ class SettingsPopoverController: NSViewController {
             if display.control is NetworkControl {
                 display.control.resetState()
             } else {
-                NetworkControl.resetState(id: display.id)
+                NetworkControl.resetState(serial: display.serial)
             }
 
             for _ in 1 ... 5 {
@@ -248,13 +253,13 @@ class SettingsPopoverController: NSViewController {
                 maxDDCVolumeField.intValue = display.maxDDCVolume.int32Value
             }
 
-            maxDDCBrightnessField.onValueChanged = { [weak display] value in display?.maxDDCBrightness = value.ns }
-            maxDDCContrastField.onValueChanged = { [weak display] value in display?.maxDDCContrast = value.ns }
-            maxDDCVolumeField.onValueChanged = { [weak display] value in display?.maxDDCVolume = value.ns }
+            maxDDCBrightnessField.onValueChanged = { [weak self] value in self?.display?.maxDDCBrightness = value.ns }
+            maxDDCContrastField.onValueChanged = { [weak self] value in self?.display?.maxDDCContrast = value.ns }
+            maxDDCVolumeField.onValueChanged = { [weak self] value in self?.display?.maxDDCVolume = value.ns }
         }
     }
 
-    var displaysObserver: Defaults.Observation?
+    var displaysObserver: Cancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -270,7 +275,7 @@ class SettingsPopoverController: NSViewController {
         }
 
         syncModeRoleToggle.callback = { [weak self] isOn in
-            guard let self = self, let display = self.display else {return}
+            guard let self = self, let display = self.display else { return }
             self.isSource = isOn
             if isOn {
                 for targetDisplay in displayController.displays.values {
@@ -289,8 +294,8 @@ class SettingsPopoverController: NSViewController {
         }
         setupDDCLimits()
 
-        displaysObserver = displaysObserver ?? Defaults.observe(.displays) { [weak self] change in
-            guard let self = self, let thisDisplay = self.display, let displays = change.newValue,
+        displaysObserver = displaysObserver ?? CachedDefaults.displaysPublisher.sink { [weak self] displays in
+            guard let self = self, let thisDisplay = self.display,
                   let display = displays.first(where: { d in d.serial == thisDisplay.serial }) else { return }
             self.applySettings = false
             defer {

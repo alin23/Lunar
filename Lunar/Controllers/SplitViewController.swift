@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 let NOTE_TEXT = """
@@ -117,7 +118,7 @@ This mode is the last resort for people that:
 let AUTO_MODE_TAG = 99
 
 class SplitViewController: NSSplitViewController {
-    var adaptiveModeObserver: DefaultsObservation?
+    var adaptiveModeObserver: Cancellable?
     var defaultAutoModeTitle: NSAttributedString?
 
     @IBOutlet var logo: NSTextField?
@@ -150,14 +151,16 @@ class SplitViewController: NSSplitViewController {
 
     var pausedAdaptiveModeObserver: Bool = false
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
+            guard let self = self, !self.pausedAdaptiveModeObserver else {
                 return
             }
             mainThread {
                 self.pausedAdaptiveModeObserver = true
-                self.activeModeButton.update(modeKey: change.newValue)
-                self.updateHelpButton(modeKey: change.newValue)
+                Defaults.withoutPropagation {
+                    self.activeModeButton.update(modeKey: change.newValue)
+                    self.updateHelpButton(modeKey: change.newValue)
+                }
                 self.pausedAdaptiveModeObserver = false
             }
         }
@@ -166,7 +169,7 @@ class SplitViewController: NSSplitViewController {
     func updateHelpButton(modeKey: AdaptiveModeKey? = nil) {
         guard let button = activeHelpButton, let modeButton = activeModeButton else { return }
 
-        if Defaults[.overrideAdaptiveMode] {
+        if CachedDefaults[.overrideAdaptiveMode] {
             button.helpText = (modeKey ?? displayController.adaptiveModeKey).helpText
             button.link = (modeKey ?? displayController.adaptiveModeKey).helpLink
         } else {
@@ -198,7 +201,7 @@ class SplitViewController: NSSplitViewController {
         activeModeButton?.page = .display
         activeModeButton?.fade()
 
-        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
+        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
         goRightButton.enable()
@@ -215,7 +218,7 @@ class SplitViewController: NSSplitViewController {
         activeModeButton?.page = .settings
         activeModeButton?.fade()
 
-        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantLight)
+        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton.enable()
         goRightButton.enable()
@@ -232,7 +235,7 @@ class SplitViewController: NSSplitViewController {
         activeModeButton?.page = .hotkeys
         activeModeButton?.fade()
 
-        POPOVERS[.help]!?.appearance = NSAppearance(named: .vibrantDark)
+        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
 
         goLeftButton.disable()
         goRightButton.enable(color: logoColor)

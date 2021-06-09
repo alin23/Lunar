@@ -72,7 +72,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     var onMouseExit: (() -> Void)?
 
     var centerAlign: NSParagraphStyle?
-    var didScrollTextField: Bool = Defaults[.didScrollTextField]
+    var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
 
     var normalSize: CGSize?
     var activeSize: CGSize?
@@ -331,7 +331,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     func disableScrollHint() {
         if !didScrollTextField {
             didScrollTextField = true
-            Defaults[.didScrollTextField] = true
+            CachedDefaults[.didScrollTextField] = true
             if let area = captionTrackingArea {
                 removeTrackingArea(area)
             }

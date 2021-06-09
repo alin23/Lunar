@@ -7,20 +7,21 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 import Foundation
 
 class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
     var defaultAutoModeTitle: NSAttributedString!
-    var adaptiveModeObserver: DefaultsObservation?
+    var adaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveModeObserver ?? Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else { return }
+        adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] _ in
+            guard let self = self, !self.pausedAdaptiveModeObserver else { return }
             mainThread {
                 self.pausedAdaptiveModeObserver = true
-                self.update()
+                Defaults.withoutPropagation { self.update() }
                 self.pausedAdaptiveModeObserver = false
             }
         }
@@ -35,7 +36,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
     }
 
     func setAutoModeItemTitle(modeKey: AdaptiveModeKey? = nil) {
-        if Defaults[.overrideAdaptiveMode] {
+        if CachedDefaults[.overrideAdaptiveMode] {
             if let buttonTitle = defaultAutoModeTitle, let item = lastItem {
                 item.attributedTitle = buttonTitle
             }
@@ -48,8 +49,8 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
     }
 
     func update(modeKey: AdaptiveModeKey? = nil) {
-        if Defaults[.overrideAdaptiveMode] {
-            selectItem(withTag: (modeKey ?? Defaults[.adaptiveBrightnessMode]).rawValue)
+        if CachedDefaults[.overrideAdaptiveMode] {
+            selectItem(withTag: (modeKey ?? CachedDefaults[.adaptiveBrightnessMode]).rawValue)
         } else {
             selectItem(withTag: AUTO_MODE_TAG)
         }
@@ -73,18 +74,18 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         if let mode = AdaptiveModeKey(rawValue: button.selectedTag()) {
             if !mode.available {
                 log.warning("Mode \(mode) not available!")
-                button.selectItem(withTag: Defaults[.overrideAdaptiveMode] ? displayController.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
+                button.selectItem(withTag: CachedDefaults[.overrideAdaptiveMode] ? displayController.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
             } else {
                 log.debug("Changed mode to \(mode)")
-                Defaults[.overrideAdaptiveMode] = true
-                Defaults[.adaptiveBrightnessMode] = mode
+                CachedDefaults[.overrideAdaptiveMode] = true
+                CachedDefaults[.adaptiveBrightnessMode] = mode
             }
         } else if button.selectedTag() == AUTO_MODE_TAG {
-            Defaults[.overrideAdaptiveMode] = false
+            CachedDefaults[.overrideAdaptiveMode] = false
 
             let mode = DisplayController.getAdaptiveMode()
             log.debug("Changed mode to Auto: \(mode)")
-            Defaults[.adaptiveBrightnessMode] = mode.key
+            CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
         button.setAutoModeItemTitle()
         button.fade()

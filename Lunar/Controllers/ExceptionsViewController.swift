@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
@@ -17,7 +18,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     @IBOutlet var addAppButton: NSButton!
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
-    var observer: DefaultsObservation!
+    var observer: Cancellable!
 
     @IBInspectable dynamic var appExceptions: [AppException] = datastore.appExceptions() ?? []
 
@@ -97,7 +98,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         super.viewDidLoad()
         tableView.headerView = nil
         initAddAppButton()
-        observer = Defaults.observe(.appExceptions) { [weak self] change in
+        observer = appExceptionsPublisher.sink { [weak self] change in
             if let newVal = change.newValue, newVal.count != self?.appExceptions.count {
                 self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
             }

@@ -39,34 +39,34 @@ class HotkeyViewController: NSViewController {
     @IBOutlet var resetButton: ResetButton!
     @IBOutlet var fnKeysNotice: NSTextField!
 
-    var cachedFnState = false
+    var cachedFnState = Defaults[.fKeysAsFunctionKeys]
 
     @IBAction func resetHotkeys(_: Any) {
-        Defaults.reset(.hotkeys)
+        CachedDefaults.reset(.hotkeys)
         setHotkeys()
     }
 
     @IBAction func toggleFineAdjustments(_ sender: NSButton) {
-        var hotkey: PersistentHotkey??
+        var hotkey: PersistentHotkey?
 
         switch sender.tag {
         case 1:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseBrightnessDown.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessDown.rawValue }
         case 2:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseBrightnessUp.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessUp.rawValue }
         case 3:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseContrastDown.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastDown.rawValue }
         case 4:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseContrastUp.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastUp.rawValue }
         case 5:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseVolumeDown.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeDown.rawValue }
         case 6:
-            hotkey = Hotkey.keys[HotkeyIdentifier.preciseVolumeUp.rawValue]
+            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeUp.rawValue }
         default:
             log.warning("Unknown tag: \(sender.tag)")
         }
 
-        guard let hkTemp = hotkey, let hk = hkTemp else { return }
+        guard let hk = hotkey else { return }
 
         if sender.state == .on {
             hk.register()
@@ -74,27 +74,28 @@ class HotkeyViewController: NSViewController {
             hk.unregister()
         }
 
-        var hotkeys = Defaults[.hotkeys]
-        hotkeys[hk.identifier]?[.enabled] = sender.state.rawValue
-        Defaults[.hotkeys] = hotkeys
+        hk.isEnabled = sender.state == .on
+        CachedDefaults[.hotkeys].update(with: hk)
     }
 
     func setHotkeys() {
-        toggleHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.toggle.rawValue] ?? nil
-        lunarHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.lunar.rawValue] ?? nil
-        percent0HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent0.rawValue] ?? nil
-        percent25HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent25.rawValue] ?? nil
-        percent50HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent50.rawValue] ?? nil
-        percent75HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent75.rawValue] ?? nil
-        percent100HotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.percent100.rawValue] ?? nil
-        faceLightHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.faceLight.rawValue] ?? nil
+        let hotkeys = CachedDefaults[.hotkeys]
 
-        brightnessUpHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.brightnessUp.rawValue] ?? nil
-        brightnessDownHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.brightnessDown.rawValue] ?? nil
-        contrastUpHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.contrastUp.rawValue] ?? nil
-        contrastDownHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.contrastDown.rawValue] ?? nil
-        volumeUpHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.volumeUp.rawValue] ?? nil
-        volumeDownHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.volumeDown.rawValue] ?? nil
+        toggleHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.toggle.rawValue }
+        lunarHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.lunar.rawValue }
+        percent0HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent0.rawValue }
+        percent25HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent25.rawValue }
+        percent50HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent50.rawValue }
+        percent75HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent75.rawValue }
+        percent100HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent100.rawValue }
+        faceLightHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.faceLight.rawValue }
+
+        brightnessUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessUp.rawValue }
+        brightnessDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessDown.rawValue }
+        contrastUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastUp.rawValue }
+        contrastDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastDown.rawValue }
+        volumeUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }
+        volumeDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }
 
         brightnessUpHotkeyView.preciseHotkeyCheckbox = preciseBrightnessUpCheckbox
         brightnessDownHotkeyView.preciseHotkeyCheckbox = preciseBrightnessDownCheckbox
@@ -103,7 +104,7 @@ class HotkeyViewController: NSViewController {
         volumeUpHotkeyView.preciseHotkeyCheckbox = preciseVolumeUpCheckbox
         volumeDownHotkeyView.preciseHotkeyCheckbox = preciseVolumeDownCheckbox
 
-        muteAudioHotkeyView.hotkey = Hotkey.keys[HotkeyIdentifier.muteAudio.rawValue] ?? nil
+        muteAudioHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }
     }
 
     func setupFKeysNotice(asFunctionKeys: Bool? = nil) {
@@ -153,7 +154,9 @@ class HotkeyViewController: NSViewController {
             self.setupFKeysNotice(asFunctionKeys: self.cachedFnState)
         }
         handler()
-        fkeysSettingWatcher = asyncEvery(5.seconds, handler)
+        cachedFnState = Defaults[.fKeysAsFunctionKeys]
+        setupFKeysNotice(asFunctionKeys: cachedFnState)
+        fkeysSettingWatcher = asyncEvery(10.seconds, handler)
     }
 
     deinit {

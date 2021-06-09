@@ -7,9 +7,11 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 import Foundation
 import SwiftDate
+import UserNotifications
 
 class Service {
     var scheme: String
@@ -114,9 +116,9 @@ class NetworkControl: Control {
     var displayControl: DisplayControl = .network
 
     static var browser = CiaoBrowser()
-    static var controllersForDisplay: [CGDirectDisplayID: Service] = [:]
+    static var controllersForDisplay: [String: Service] = [:]
     static let alamoFireManager = buildAlamofireSession()
-    static var controllerVideoObserver: DefaultsObservation?
+    static var controllerVideoObserver: Cancellable?
     let str = "Network Control"
     weak var display: Display!
     var setterTasks = [ControlID: DispatchWorkItem]()
@@ -134,8 +136,7 @@ class NetworkControl: Control {
             }
         }
         listenForDDCUtilControllers()
-        controllerVideoObserver = Defaults.observe(.disableControllerVideo) { change in
-            guard change.newValue != change.oldValue else { return }
+        controllerVideoObserver = disableControllerVideoPublisher.sink { change in
             setDisplayPower(!change.newValue)
         }
     }
@@ -162,7 +163,7 @@ class NetworkControl: Control {
         let completionHandler = { (useNetwork: NSApplication.ModalResponse) in
             if useNetwork == .alertFirstButtonReturn {
                 serialSync {
-                    controllersForDisplay[display.id] = service
+                    controllersForDisplay[display.serial] = service
                 }
                 async(threaded: true) {
                     display.control = display.getBestControl()
@@ -262,14 +263,22 @@ class NetworkControl: Control {
         }
 
         browser.serviceRemovedHandler = { service in
+            let displayService = controllersForDisplay.first(where: { _, displayService in
+                service == displayService.service
+            })
+            if let serial = displayService?.key, let controller = displayService?.value,
+               let display = displayController.displays.values.first(where: { $0.serial == serial })
+            {
+                let serviceName = controller.url?.absoluteString ?? "\(service.hostName ?? service.name):\(service.port)"
+                let body =
+                    "Connection was lost for the controller found at \(serviceName). \(display.name) will not be controllable through network until reconnection"
+                notify(identifier: "serviceRemoved\(service.domain):\(service.port)", title: "Network controller disappeared", body: body)
+            }
+
             log.info("Service removed: \(service)")
             serialSync {
-                if let toRemove = controllersForDisplay.first(where: { _, displayService in
-                    service == displayService.service
-                }) {
-                    _ = serialSync {
-                        controllersForDisplay.removeValue(forKey: toRemove.key)
-                    }
+                if let toRemove = displayService {
+                    controllersForDisplay.removeValue(forKey: toRemove.key)
                 }
             }
         }
@@ -310,7 +319,7 @@ class NetworkControl: Control {
     }
 
     func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }),
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }),
               let url = smooth ? service.smoothTransitionUrl : service.url,
               DDC.apply
         else {
@@ -373,7 +382,7 @@ class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
         _ = setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
 
-        guard let controller = serialSync({ NetworkControl.controllersForDisplay[display.id] }),
+        guard let controller = serialSync({ NetworkControl.controllersForDisplay[display.serial] }),
               let url = max ? controller.maxValueUrl : controller.url,
               setterTasks[controlID] == nil || setterTasks[controlID]!.isCancelled
         else {
@@ -400,14 +409,14 @@ class NetworkControl: Control {
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if Defaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
+        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
             return set(brightness, for: .BRIGHTNESS, smooth: true, oldValue: oldValue)
         }
         return set(brightness, for: .BRIGHTNESS)
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if Defaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
+        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
             return set(contrast, for: .CONTRAST, smooth: true, oldValue: oldValue)
         }
         return set(contrast, for: .CONTRAST)
@@ -465,7 +474,7 @@ class NetworkControl: Control {
         }
 
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay,
-              let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else { return false }
+              let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else { return false }
 
         if service.url == nil {
             async(runLoopQueue: lowprioQueue) {
@@ -483,7 +492,7 @@ class NetworkControl: Control {
     var responsiveTryCount = 0
 
     func isResponsive() -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else {
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else {
             responsiveTryCount += 1
             if responsiveTryCount > 3 {
                 responsiveTryCount = 0
@@ -498,8 +507,12 @@ class NetworkControl: Control {
 
         asyncAfter(ms: 100, uniqueTaskKey: "networkControlResponsiveChecker") { [weak self] in
             guard let self = self else { return }
-            guard let service = serialSync({ NetworkControl.controllersForDisplay[self.display.id] }),
-                  let url = service.url, let newURL = service.getFirstRespondingURL(urls: service.urls, timeout: 600.milliseconds, retries: 1)
+            guard let service = serialSync({ NetworkControl.controllersForDisplay[self.display.serial] }),
+                  let url = service.url, let newURL = service.getFirstRespondingURL(
+                      urls: service.urls,
+                      timeout: 600.milliseconds,
+                      retries: 1
+                  )
             else {
                 self.responsiveTryCount += 1
                 if self.responsiveTryCount > 10 {
@@ -510,7 +523,11 @@ class NetworkControl: Control {
             }
             if newURL != url {
                 service.url = newURL
-                service.smoothTransitionUrl = service.getFirstRespondingURL(urls: service.smoothTransitionUrls, timeout: 600.milliseconds, retries: 1)
+                service.smoothTransitionUrl = service.getFirstRespondingURL(
+                    urls: service.smoothTransitionUrls,
+                    timeout: 600.milliseconds,
+                    retries: 1
+                )
             }
         }
 
@@ -518,20 +535,20 @@ class NetworkControl: Control {
     }
 
     func resetState() {
-        Self.resetState(id: display.id)
+        Self.resetState(serial: display.serial)
     }
 
     static let browserSemaphore = DispatchSemaphore(value: 1)
 
-    static func resetState(id: CGDirectDisplayID? = nil) {
+    static func resetState(serial: String? = nil) {
         async(timeout: 2.minutes) {
             browserSemaphore.wait()
             defer {
                 browserSemaphore.signal()
             }
-            if let id = id {
+            if let serial = serial {
                 _ = serialSync {
-                    controllersForDisplay.removeValue(forKey: id)
+                    controllersForDisplay.removeValue(forKey: serial)
                 }
             }
             browser.reset()
@@ -540,7 +557,7 @@ class NetworkControl: Control {
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.id] }) else { return false }
+        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else { return false }
         return service.smoothTransitionUrl != nil
     }
 }

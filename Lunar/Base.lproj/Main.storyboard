@@ -452,7 +452,7 @@
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES"/>
                                             <connections>
-                                                <action selector="contrastUp:" target="Voe-Tx-rLC" id="L4X-qo-NUV"/>
+                                                <action selector="volumeUp:" target="Voe-Tx-rLC" id="i4D-bF-0qb"/>
                                                 <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="arw-dc-ISz"/>
                                             </connections>
                                         </menuItem>
@@ -460,8 +460,16 @@
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES"/>
                                             <connections>
-                                                <action selector="contrastDown:" target="Voe-Tx-rLC" id="1sH-DE-UjW"/>
+                                                <action selector="volumeDown:" target="Voe-Tx-rLC" id="cDb-jp-cJb"/>
                                                 <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="S2g-Xn-F8n"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Mute Audio" keyEquivalent="" id="g92-oe-Taz">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                            <connections>
+                                                <action selector="muteAudio:" target="Voe-Tx-rLC" id="fuQ-17-0R5"/>
+                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="xoT-Yn-wFv"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="7x9-QU-LR6"/>
@@ -564,6 +572,7 @@
                         <outlet property="infoMenuItem" destination="B7F-Wk-7dh" id="Ygz-Xr-3e0"/>
                         <outlet property="lunarProMenuItem" destination="fev-Gj-SRD" id="itY-CS-AJi"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
+                        <outlet property="muteAudioMenuItem" destination="g92-oe-Taz" id="kE3-mC-M4Q"/>
                         <outlet property="percent0MenuItem" destination="9Jm-7d-C6T" id="f9t-jn-RIA"/>
                         <outlet property="percent100MenuItem" destination="UL7-qh-pTF" id="9lg-G5-OdX"/>
                         <outlet property="percent25MenuItem" destination="ZLP-Iz-rrn" id="KiH-Cm-5Wq"/>
@@ -573,6 +582,8 @@
                         <outlet property="resetTrialMenuItem" destination="v9d-uL-JbA" id="9bY-DS-tBe"/>
                         <outlet property="updater" destination="Moa-uB-Vso" id="zdg-Db-Obi"/>
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
+                        <outlet property="volumeDownMenuItem" destination="ORj-JY-7d6" id="bIx-iF-AnX"/>
+                        <outlet property="volumeUpMenuItem" destination="91P-qR-leE" id="UjC-Dk-2b5"/>
                     </connections>
                 </customObject>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -2577,7 +2588,7 @@ when dock and menubar icons are hidden</string>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="343" y="409" width="264" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LG Ultra HD" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" size="28" name="Menlo-Bold"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3380,7 +3391,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="95"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -3776,7 +3787,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hvo-Ym-RZd">
-                                <rect key="frame" x="89" y="218" width="220" height="19"/>
+                                <rect key="frame" x="-2" y="218" width="404" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Input Hotkey" id="IXT-tc-HgO">
                                     <font key="font" size="13" name="Menlo-Regular"/>

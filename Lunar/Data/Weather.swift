@@ -3,9 +3,10 @@
 //  Model Generated using http://www.jsoncafe.com/
 //  Created on May 6, 2021
 
+import Defaults
 import Foundation
 
-struct Wttr: Codable {
+struct Wttr: Codable, Defaults.Serializable {
     let currentCondition: [WeatherCurrentCondition]?
     let weather: [Weather]?
 
@@ -21,7 +22,7 @@ struct Wttr: Codable {
     }
 }
 
-struct Weather: Codable {
+struct Weather: Codable, Defaults.Serializable {
     let date: String?
     let hourly: [WeatherHourly]?
 
@@ -37,7 +38,7 @@ struct Weather: Codable {
     }
 }
 
-struct WeatherHourly: Codable {
+struct WeatherHourly: Codable, Defaults.Serializable {
     let cloudcover: UInt8
     let time: Int
     let visibility: UInt32
@@ -57,7 +58,7 @@ struct WeatherHourly: Codable {
     }
 }
 
-struct WeatherCurrentCondition: Codable {
+struct WeatherCurrentCondition: Codable, Defaults.Serializable {
     let cloudcover: UInt8
     let visibility: UInt32
 

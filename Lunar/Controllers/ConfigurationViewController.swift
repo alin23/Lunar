@@ -8,6 +8,7 @@
 
 import AnyCodable
 import Cocoa
+import Combine
 import Defaults
 
 class ConfigurationViewController: NSViewController {
@@ -230,15 +231,15 @@ class ConfigurationViewController: NSViewController {
 
     weak var settingsController: SettingsPageController?
 
-    var dayMomentsObserver: Defaults.Observation?
-    var curveFactorObserver: Defaults.Observation?
-    var locationObserver: Defaults.Observation?
-    var brightnessStepObserver: Defaults.Observation?
-    var syncPollingSecondsObserver: Defaults.Observation?
-    var sensorPollingSecondsObserver: Defaults.Observation?
-    var contrastStepObserver: Defaults.Observation?
-    var volumeStepObserver: Defaults.Observation?
-    var adaptiveBrightnessModeObserver: Defaults.Observation?
+    var dayMomentsObserver: Cancellable?
+    var curveFactorObserver: Cancellable?
+    var locationObserver: Cancellable?
+    var brightnessStepObserver: Cancellable?
+    var syncPollingSecondsObserver: Cancellable?
+    var sensorPollingSecondsObserver: Cancellable?
+    var contrastStepObserver: Cancellable?
+    var volumeStepObserver: Cancellable?
+    var adaptiveBrightnessModeObserver: Cancellable?
 
     func showRelevantSettings(_ adaptiveMode: AdaptiveModeKey) {
         let locationMode = adaptiveMode == .location
@@ -287,10 +288,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForCurveFactorChange() {
-        curveFactorObserver = curveFactorObserver ?? Defaults.observe(.curveFactor) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.curveFactorField?.doubleValue = change.newValue
             }
@@ -301,11 +299,8 @@ class ConfigurationViewController: NSViewController {
         let updateDataset = { [unowned self] () -> Void in
             self.settingsController?.updateDataset(display: displayController.firstDisplay, updateLimitLines: true)
         }
-        dayMomentsObserver = dayMomentsObserver ?? Defaults.observe(keys: .sunrise, .sunset, .solarNoon, handler: updateDataset)
-        locationObserver = locationObserver ?? Defaults.observe(.location) { [unowned self] change in
-            guard change.newValue != change.oldValue else {
-                return
-            }
+        dayMomentsObserver = dayMomentsObserver ?? dayMomentsPublisher.sink(receiveValue: updateDataset)
+        locationObserver = locationObserver ?? locationPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.locationLatField?.doubleValue = change.newValue?.latitude ?? 0.0
                 self?.locationLonField?.doubleValue = change.newValue?.longitude ?? 0.0
@@ -314,10 +309,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForBrightnessStepChange() {
-        brightnessStepObserver = brightnessStepObserver ?? Defaults.observe(.brightnessStep) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        brightnessStepObserver = brightnessStepObserver ?? brightnessStepPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.brightnessStepField?.stringValue = String(change.newValue)
             }
@@ -325,10 +317,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForSyncPollingIntervalChange() {
-        syncPollingSecondsObserver = syncPollingSecondsObserver ?? Defaults.observe(.syncPollingSeconds) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        syncPollingSecondsObserver = syncPollingSecondsObserver ?? syncPollingSecondsPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.syncPollingIntervalField?.stringValue = String(change.newValue)
             }
@@ -336,10 +325,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForSensorPollingIntervalChange() {
-        sensorPollingSecondsObserver = sensorPollingSecondsObserver ?? Defaults.observe(.sensorPollingSeconds) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        sensorPollingSecondsObserver = sensorPollingSecondsObserver ?? sensorPollingSecondsPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.sensorPollingIntervalField?.stringValue = String(change.newValue)
             }
@@ -347,10 +333,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForContrastStepChange() {
-        contrastStepObserver = contrastStepObserver ?? Defaults.observe(.contrastStep) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        contrastStepObserver = contrastStepObserver ?? contrastStepPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.contrastStepField?.stringValue = String(change.newValue)
             }
@@ -358,10 +341,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForVolumeStepChange() {
-        volumeStepObserver = volumeStepObserver ?? Defaults.observe(.volumeStep) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        volumeStepObserver = volumeStepObserver ?? volumeStepPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.volumeStepField?.stringValue = String(change.newValue)
             }
@@ -369,10 +349,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? Defaults.observe(.adaptiveBrightnessMode) { [unowned self] change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? adaptiveBrightnessModePublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.showRelevantSettings(change.newValue)
             }
@@ -480,7 +457,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             latField, caption: latCaption, lowerLimit: -90.00, upperLimit: 90.00,
             onValueChangedDouble: { value, settingsController in
-                Defaults[.manualLocation] = true
+                CachedDefaults[.manualLocation] = true
                 settingsController?.updateDataset(display: displayController.firstDisplay)
 
                 let geolocation = Geolocation(
@@ -495,7 +472,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             lonField, caption: lonCaption, lowerLimit: -180.00, upperLimit: 180.00,
             onValueChangedDouble: { value, settingsController in
-                Defaults[.manualLocation] = true
+                CachedDefaults[.manualLocation] = true
                 settingsController?.updateDataset(display: displayController.firstDisplay)
 
                 let geolocation = Geolocation(
@@ -539,14 +516,14 @@ class ConfigurationViewController: NSViewController {
         field.caption = caption
 
         if field.decimalPoints > 0, let key = settingKeyDouble {
-            field.doubleValue = Defaults[key]
+            field.doubleValue = CachedDefaults[key]
             field.onValueChangedDouble = { (value: Double) in
-                Defaults[settingKeyDouble!] = value
+                CachedDefaults[settingKeyDouble!] = value
             }
         } else if let key = settingKeyInt {
-            field.integerValue = Defaults[key]
+            field.integerValue = CachedDefaults[key]
             field.onValueChanged = { (value: Int) in
-                Defaults[settingKeyInt!] = value
+                CachedDefaults[settingKeyInt!] = value
             }
         }
         field.lowerLimit = lowerLimit
@@ -567,7 +544,7 @@ class ConfigurationViewController: NSViewController {
             field.onValueChanged = { [weak self] value in
                 guard let self = self else { return }
                 if let key = settingKeyInt {
-                    Defaults[key] = value
+                    CachedDefaults[key] = value
                 }
                 handler(value, self.settingsController)
             }
@@ -576,7 +553,7 @@ class ConfigurationViewController: NSViewController {
             field.onValueChangedDouble = { [weak self] value in
                 guard let self = self else { return }
                 if let key = settingKeyDouble {
-                    Defaults[key] = value
+                    CachedDefaults[key] = value
                 }
                 handler(value, self.settingsController)
             }
@@ -609,7 +586,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     @IBAction func resetLocation(_: Any?) {
-        Defaults[.manualLocation] = false
+        CachedDefaults[.manualLocation] = false
         mainThread { appDelegate().startReceivingSignificantLocationChanges() }
     }
 

@@ -14,7 +14,7 @@ import Surge
 
 let STRIDE = vDSP_Stride(1)
 
-enum AdaptiveModeKey: Int, Codable {
+enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
     case location = 1
     case sync = -1
     case manual = 0
@@ -139,6 +139,15 @@ protocol AdaptiveMode: AnyObject {
     func adapt(_ display: Display)
 }
 
+var datapointSemaphore = DispatchSemaphore(value: 1)
+func datapointLockAround<T>(_ action: () -> T) -> T {
+    datapointSemaphore.wait()
+    defer {
+        datapointSemaphore.signal()
+    }
+    return action()
+}
+
 extension AdaptiveMode {
     var str: String {
         key.str
@@ -186,12 +195,12 @@ extension AdaptiveMode {
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
-            dataPoint = brightnessDataPoint
+            dataPoint = datapointLockAround { brightnessDataPoint }
         default:
-            dataPoint = contrastDataPoint
+            dataPoint = datapointLockAround { contrastDataPoint }
         }
 
-        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? Defaults[.curveFactor]), offset: offset?.f ?? 0.0)
+        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? CachedDefaults[.curveFactor]), offset: offset?.f ?? 0.0)
 
         return mapNumberSIMD(
             curve,
@@ -209,9 +218,9 @@ extension AdaptiveMode {
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
-            dataPoint = brightnessDataPoint
+            dataPoint = datapointLockAround { brightnessDataPoint }
         default:
-            dataPoint = contrastDataPoint
+            dataPoint = datapointLockAround { contrastDataPoint }
         }
 
         var newValue: Double
@@ -236,7 +245,7 @@ extension AdaptiveMode {
                 newValue = externalLow
             } else {
                 newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
-                newValue = adjustCurve(newValue, factor: factor ?? Defaults[.curveFactor], minVal: externalLow, maxVal: externalHigh)
+                newValue = adjustCurve(newValue, factor: factor ?? CachedDefaults[.curveFactor], minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
                 log.error("NaN value!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])

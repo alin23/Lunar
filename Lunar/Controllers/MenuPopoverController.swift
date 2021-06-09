@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 
 let offColor = gray.withAlphaComponent(0.5).cgColor
@@ -134,8 +135,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var viewHeight: CGFloat?
 
     var trackingArea: NSTrackingArea?
-    var adaptiveModeObserver: DefaultsObservation?
-    var displaysObserver: DefaultsObservation!
+    var adaptiveModeObserver: Cancellable?
+    var displaysObserver: Cancellable!
     var responsiveDDCObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
 
     func listenForPopoverEvents() {
@@ -143,19 +144,19 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             self,
             selector: #selector(popoverDidShow(notification:)),
             name: NSPopover.didShowNotification,
-            object: POPOVERS[.menu]!!
+            object: POPOVERS["menu"]!!
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(popoverWillShow(notification:)),
             name: NSPopover.willShowNotification,
-            object: POPOVERS[.menu]!!
+            object: POPOVERS["menu"]!!
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(popoverDidClose(notification:)),
             name: NSPopover.didCloseNotification,
-            object: POPOVERS[.menu]!!
+            object: POPOVERS["menu"]!!
         )
     }
 
@@ -184,7 +185,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func adaptViewSize() {
-        POPOVERS[.menu]!!.animates = false
+        POPOVERS["menu"]!!.animates = false
 
         let scrollFrame = scrollView.frame
         viewHeight = viewHeight ?? view.frame.size.height
@@ -194,7 +195,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         } else if view.frame.size.height != neededHeight {
             view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
         }
-        POPOVERS[.menu]!!.contentSize = view.frame.size
+        POPOVERS["menu"]!!.contentSize = view.frame.size
 
         scrollView.setFrameSize(NSSize(width: scrollFrame.size.width, height: tableView.fittingSize.height))
         scrollView.setFrameOrigin(scrollFrame.origin)
@@ -202,7 +203,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         scrollView.setNeedsDisplay(scrollView.frame)
         view.setNeedsDisplay(view.frame)
 
-        POPOVERS[.menu]!!.animates = true
+        POPOVERS["menu"]!!.animates = true
     }
 
     @objc func popoverWillShow(notification _: Notification) {
@@ -241,7 +242,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForDisplaysChange() {
-        displaysObserver = Defaults.observe(.displays) { [unowned self] _ in
+        displaysObserver = CachedDefaults.displaysPublisher.sink { [unowned self] _ in
             mainAsyncAfter(ms: 2000) { [weak self] in
                 guard let self = self else { return }
                 if !self.sameDisplays() {
@@ -277,10 +278,10 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     self.tableView.endUpdates()
 
                     self.adaptViewSize()
-//                    if Defaults[.showQuickActions], displayController.displays.count > 1,
+//                    if CachedDefaults[.showQuickActions], displayController.displays.count > 1,
 //                       let statusButton = appDelegate().statusItem.button
 //                    {
-//                        POPOVERS[.menu]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
+//                        POPOVERS["menu"]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
 //                        closeMenuPopover(after: 2500)
 //                    }
                 }
@@ -291,24 +292,26 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [unowned self] change in
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [unowned self] change in
             mainThread { [weak self] in
-                guard change.newValue != change.oldValue, let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
+                guard let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
                     return
                 }
 
                 self.pausedAdaptiveModeObserver = true
-                let adaptiveMode = change.newValue
+                Defaults.withoutPropagation {
+                    let adaptiveMode = change.newValue
 
-                switch adaptiveMode {
-                case .sensor:
-                    tableView.setAdaptiveButtonHidden(false)
-                case .sync:
-                    tableView.setAdaptiveButtonHidden(false)
-                case .location:
-                    tableView.setAdaptiveButtonHidden(false)
-                case .manual:
-                    tableView.setAdaptiveButtonHidden(true)
+                    switch adaptiveMode {
+                    case .sensor:
+                        tableView.setAdaptiveButtonHidden(false)
+                    case .sync:
+                        tableView.setAdaptiveButtonHidden(false)
+                    case .location:
+                        tableView.setAdaptiveButtonHidden(false)
+                    case .manual:
+                        tableView.setAdaptiveButtonHidden(true)
+                    }
                 }
                 self.pausedAdaptiveModeObserver = false
             }
@@ -370,7 +373,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     override func mouseExited(with _: NSEvent) {
         log.verbose("Mouse exited menu popover")
         mainAsyncAfter(ms: 1500) {
-            POPOVERS[.menu]!!.close()
+            POPOVERS["menu"]!!.close()
         }
     }
 }

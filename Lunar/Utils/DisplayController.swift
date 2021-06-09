@@ -8,6 +8,7 @@
 
 import Alamofire
 import Cocoa
+import Combine
 import CoreLocation
 import Defaults
 import Foundation
@@ -18,6 +19,7 @@ import SwiftDate
 import SwiftyJSON
 
 class DisplayController {
+    let getDisplaysLock = UnfairLock()
     @Atomic var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
 
@@ -36,22 +38,33 @@ class DisplayController {
     }
 
     var onActiveDisplaysChange: (() -> Void)?
-    @Atomic var activeDisplays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            Defaults[.hasActiveDisplays] = !activeDisplays.isEmpty
-            onActiveDisplaysChange?()
+    var _activeDisplaysLock = UnfairLock()
+    var _activeDisplays: [CGDirectDisplayID: Display] = [:]
+    var activeDisplays: [CGDirectDisplayID: Display] {
+        get { _activeDisplaysLock.around { _activeDisplays } }
+        set {
+            _activeDisplaysLock.around {
+                _activeDisplays = newValue
+                CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
+                onActiveDisplaysChange?()
+            }
         }
     }
 
     var activeDisplaysByReadableID: [String: Display] = [:]
 
-    @Atomic var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
-        didSet {
-            if oldValue.key != .manual {
-                lastNonManualAdaptiveMode = oldValue
+    var _adaptiveModeLock = UnfairLock()
+    var _adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
+    var adaptiveMode: AdaptiveMode {
+        get { _adaptiveModeLock.around { _adaptiveMode } }
+        set {
+            _adaptiveModeLock.around { _adaptiveMode = newValue
+                if _adaptiveMode.key != .manual {
+                    lastNonManualAdaptiveMode = _adaptiveMode
+                }
+                _adaptiveMode.stopWatching()
+                _ = newValue.watch()
             }
-            oldValue.stopWatching()
-            _ = adaptiveMode.watch()
         }
     }
 
@@ -120,21 +133,21 @@ class DisplayController {
     var controlWatcherTask: CFRunLoopTimer?
     var modeWatcherTask: CFRunLoopTimer?
 
-    func removeDisplay(id: CGDirectDisplayID) {
-        if let display = displays.removeValue(forKey: id) {
-            display.removeObservers()
-        }
+    func removeDisplay(id _: CGDirectDisplayID) {
+//        if let display = displays.removeValue(forKey: id) {
+//            display.removeObservers()
+//        }
         let nsDisplays = displays.values.map { $0 }
-        Defaults[.displays] = nsDisplays
+        CachedDefaults[.displays] = nsDisplays
     }
 
     static func getAdaptiveMode() -> AdaptiveMode {
-        if Defaults[.overrideAdaptiveMode] {
-            return Defaults[.adaptiveBrightnessMode].mode
+        if CachedDefaults[.overrideAdaptiveMode] {
+            return CachedDefaults[.adaptiveBrightnessMode].mode
         } else {
             let mode = autoMode()
-            if mode.key != Defaults[.adaptiveBrightnessMode] {
-                Defaults[.adaptiveBrightnessMode] = mode.key
+            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
+                CachedDefaults[.adaptiveBrightnessMode] = mode.key
             }
             return mode
         }
@@ -168,33 +181,35 @@ class DisplayController {
         }
         if !Defaults[.overrideAdaptiveMode] {
             lastModeWasAuto = true
-            Defaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = true
         }
-        Defaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
+        CachedDefaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
     }
 
     func enable(mode: AdaptiveModeKey? = nil) {
         if let newMode = mode {
             adaptiveMode = newMode.mode
         } else if lastModeWasAuto {
-            Defaults[.overrideAdaptiveMode] = false
+            CachedDefaults[.overrideAdaptiveMode] = false
             adaptiveMode = DisplayController.getAdaptiveMode()
         } else if lastNonManualAdaptiveMode.available {
             adaptiveMode = lastNonManualAdaptiveMode
         } else {
             adaptiveMode = DisplayController.getAdaptiveMode()
         }
-        Defaults[.adaptiveBrightnessMode] = adaptiveMode.key
+        CachedDefaults[.adaptiveBrightnessMode] = adaptiveMode.key
         adaptBrightness(force: true)
     }
 
     func resetDisplayList() {
-        DDC.reset()
-        for display in displays.values {
-            display.removeObservers()
+        getDisplaysLock.around {
+            DDC.reset()
+//            for display in displays.values {
+//                display.removeObservers()
+//            }
+            displays = DisplayController.getDisplays()
+            addSentryData()
         }
-        displays = DisplayController.getDisplays()
-        addSentryData()
     }
 
     var fallbackPromptTime = [CGDirectDisplayID: Date]()
@@ -202,7 +217,9 @@ class DisplayController {
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
         guard !display.neverFallbackControl else { return false }
 
-        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty, !display.control.isResponsive() {
+        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty,
+           !display.control.isResponsive()
+        {
             if let promptTime = fallbackPromptTime[display.id] {
                 return promptTime + 20.minutes < Date()
             }
@@ -285,13 +302,11 @@ class DisplayController {
         let mode = DisplayController.autoMode()
         if mode.key != adaptiveMode.key {
             adaptiveMode = mode
-        }
-        if mode.key != Defaults[.adaptiveBrightnessMode] {
-            Defaults[.adaptiveBrightnessMode] = mode.key
+            CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
     }
 
-    var overrideAdaptiveModeObserver: Defaults.Observation?
+    var overrideAdaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver: Bool = false
 
     func watchModeAvailability() {
@@ -299,31 +314,36 @@ class DisplayController {
             return
         }
 
+        let startOrStopWatcher = { (shouldStop: Bool) in
+            guard !self.pausedAdaptiveModeObserver else { return }
+
+            self.pausedAdaptiveModeObserver = true
+            Defaults.withoutPropagation {
+                if shouldStop {
+                    if let task = self.modeWatcherTask {
+                        lowprioQueue.cancel(timer: task)
+                    }
+                } else {
+                    self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
+                        guard !screensSleeping.load(ordering: .relaxed), let self = self, !Defaults[.overrideAdaptiveMode] else { return }
+                        self.autoAdaptMode()
+                    }
+                }
+            }
+            self.pausedAdaptiveModeObserver = false
+        }
+        startOrStopWatcher(Defaults[.overrideAdaptiveMode])
+        overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? overrideAdaptiveModePublisher
+            .sink { startOrStopWatcher($0.newValue) }
+    }
+
+    func initObservers() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(autoAdaptMode(notification:)),
             name: lunarProStateChanged,
             object: nil
         )
-
-        let startOrStopWatcher = { (shouldStop: Bool) in
-            guard !self.pausedAdaptiveModeObserver else { return }
-
-            self.pausedAdaptiveModeObserver = true
-            if shouldStop {
-                if let task = self.modeWatcherTask {
-                    lowprioQueue.cancel(timer: task)
-                }
-            } else {
-                self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                    guard !screensSleeping.load(ordering: .relaxed), let self = self, !Defaults[.overrideAdaptiveMode] else { return }
-                    self.autoAdaptMode()
-                }
-            }
-            self.pausedAdaptiveModeObserver = false
-        }
-        startOrStopWatcher(Defaults[.overrideAdaptiveMode])
-        overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? Defaults.observe(.overrideAdaptiveMode) { startOrStopWatcher($0.newValue) }
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(adaptToScreenConfiguration(notification:)),
@@ -361,6 +381,7 @@ class DisplayController {
         concurrentQueue.async {
             log.info("Sensor initial serial port: \(SensorMode.validSensorSerialPort?.path ?? "none")")
         }
+        initObservers()
     }
 
     deinit {
@@ -583,7 +604,6 @@ class DisplayController {
                     }
                 }
                 display.active = true
-                display.addObservers()
             }
 
             displays = Dictionary(displayList.map {
@@ -597,16 +617,28 @@ class DisplayController {
                 } else {
                     displays[id] = Display(id: id, active: true)
                 }
-                displays[id]?.addObservers()
             }
 
+            #if DEBUG
+                print("STORING UPDATED DISPLAYS", displays.values.map(\.serial))
+            #endif
             let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
+            #if DEBUG
+                print("STORED UPDATED DISPLAYS", storedDisplays.map(\.serial))
+            #endif
+
             return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
         }
         displays = Dictionary(displayIDs.map { id in (id, Display(id: id, active: true)) }, uniquingKeysWith: { first, _ in first })
-        displays.values.forEach { $0.addObservers() }
 
+        #if DEBUG
+            print("STORING NEW DISPLAYS", displays.values.map(\.serial))
+        #endif
         let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
+        #if DEBUG
+            print("STORED NEW DISPLAYS", storedDisplays.map(\.serial))
+        #endif
+
         return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
     }
 
@@ -699,7 +731,7 @@ class DisplayController {
             scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
         }
 
-        if Defaults[.clamshellModeDetection] {
+        if CachedDefaults[.clamshellModeDetection] {
             if lidClosed {
                 activateClamshellMode()
             } else if clamshellMode {
@@ -835,7 +867,7 @@ class DisplayController {
     }
 
     func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        guard Defaults[.secure].checkRemainingAdjustments() else { return }
+        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
@@ -854,7 +886,7 @@ class DisplayController {
     }
 
     func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        guard Defaults[.secure].checkRemainingAdjustments() else { return }
+        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)

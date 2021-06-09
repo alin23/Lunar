@@ -16,8 +16,8 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
         }
     }
 
-    override var popoverKey: PopoverKey {
-        .settings
+    override var popoverKey: String {
+        "settings"
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -27,8 +27,8 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
 }
 
 class PopoverButton<T: NSViewController>: Button {
-    var popoverKey: PopoverKey {
-        .help
+    var popoverKey: String {
+        "help"
     }
 
     var popoverController: T? {
@@ -40,7 +40,10 @@ class PopoverButton<T: NSViewController>: Button {
 
     override func mouseDown(with event: NSEvent) {
         guard let popover = POPOVERS[popoverKey]!, isEnabled else { return }
+        handlePopoverClick(popover, with: event)
+    }
 
+    func handlePopoverClick(_ popover: NSPopover, with event: NSEvent) {
         if popover.isShown {
             popover.close()
             return

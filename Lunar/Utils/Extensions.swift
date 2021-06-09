@@ -303,7 +303,7 @@ extension Float {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(self)
+        UInt8(cap(self, minVal: 0, maxVal: 255))
     }
 
     @inline(__always) var u16: UInt16 {

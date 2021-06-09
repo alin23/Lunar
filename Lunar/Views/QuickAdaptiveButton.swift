@@ -1,4 +1,5 @@
 import Cocoa
+import Combine
 import Foundation
 
 let buttonBgOn = sunYellow
@@ -16,6 +17,8 @@ class QuickAdaptiveButton: NSButton {
         guard let id = displayID else { return nil }
         return displayController.displays[id]
     }
+
+    var displayObservers = Set<AnyCancellable>()
 
     func setup(displayID: CGDirectDisplayID) {
         self.displayID = displayID
@@ -59,7 +62,7 @@ class QuickAdaptiveButton: NSButton {
         )
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        adaptiveObserver = { [unowned self] (newAdaptive: Bool, oldValue: Bool) in
+        display?.$adaptive.sink { [unowned self] newAdaptive in
             if let display = self.display {
                 mainThread {
                     if newAdaptive {
@@ -69,15 +72,16 @@ class QuickAdaptiveButton: NSButton {
                         self.bg = buttonBgOff
                         self.state = .off
                     }
-                    display.readapt(newValue: newAdaptive, oldValue: oldValue)
+                    display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
                 }
             }
-        }
-        display?.setObserver(prop: .adaptive, key: "quickAdaptiveButton-\(accessibilityIdentifier())", action: adaptiveObserver!)
+        }.store(in: &displayObservers)
     }
 
     deinit {
-        display?.resetObserver(prop: .adaptive, key: "quickAdaptiveButton-\(self.accessibilityIdentifier())", type: Bool.self)
+        for observer in displayObservers {
+            observer.cancel()
+        }
     }
 
     override func mouseDown(with _: NSEvent) {

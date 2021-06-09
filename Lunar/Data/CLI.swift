@@ -95,6 +95,9 @@ struct ForgivingEncodable: Encodable {
             try AnyEncodable(value).encode(to: encoder)
         case let data as Data:
             try container.encode(data.str(base64: true))
+        case let array as [PersistentHotkey]:
+            print(array)
+            try container.encode(array)
         case let array as [Any?]:
             try container.encode(array.map { ForgivingEncodable($0) })
         case let dictionary as [String: Any?]:
@@ -157,8 +160,6 @@ struct Lunar: ParsableCommand {
                 return
             }
             print(sig)
-
-            globalExit(0)
         }
     }
 
@@ -171,13 +172,13 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             if IsLidClosed() {
                 print("closed")
             } else {
                 print("opened")
             }
-
-            globalExit(0)
         }
     }
 
@@ -190,9 +191,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
             print(SyncMode.getLux() ?? -1)
-
-            globalExit(0)
         }
     }
 
@@ -248,9 +248,10 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
-            var displays = displayController.activeDisplays.values.map { $0 }
+            let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
 
             switch display {
@@ -295,7 +296,6 @@ struct Lunar: ParsableCommand {
                     CoreDisplay_Display_SetAutoBrightnessIsEnabled(id, value > 0)
                 }
             }
-            globalExit(0)
         }
     }
 
@@ -330,9 +330,10 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
-            var displays = displayController.activeDisplays.values.map { $0 }
+            let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
 
             switch display {
@@ -386,7 +387,6 @@ struct Lunar: ParsableCommand {
                     DisplayServicesBrightnessChanged(id, value)
                 }
             }
-            globalExit(0)
         }
     }
 
@@ -406,14 +406,19 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Display serial/name/id or one of (first, main, all)")
         var display: String
 
-        @Argument(help: "DDC control ID (VCP)\n\tCan be passed as hex VCP values (e.g. 0x10, E1) or constants\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))")
+        @Argument(
+            help: "DDC control ID (VCP)\n\tCan be passed as hex VCP values (e.g. 0x10, E1) or constants\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))"
+        )
         var control: ControlID
 
-        @Argument(help: "Value to set for the control. Caution: if this argument is omitted, Lunar will send a read message which can cause kernel panics if your DDC connection is slow!")
+        @Argument(
+            help: "Value to set for the control. Caution: if this argument is omitted, Lunar will send a read message which can cause kernel panics if your DDC connection is slow!"
+        )
         var value: UInt8?
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
             var displays = displayController.activeDisplays.values.map { $0 }
@@ -456,7 +461,41 @@ struct Lunar: ParsableCommand {
                     print("\(display.name)[\(display.serial)]: \("Can't write \(control)")")
                 }
             }
-            globalExit(0)
+        }
+    }
+
+    struct Hotkeys: ParsableCommand {
+        @OptionGroup var globals: GlobalOptions
+
+        static let configuration = CommandConfiguration(
+            abstract: "Prints information about Lunar hotkeys."
+        )
+
+        @Flag(name: .shortAndLong, help: "Print response as JSON.")
+        var json = false
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
+            guard !json else {
+                print((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
+                return
+            }
+
+            let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
+                let modifiers = hotkey.keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
+                    switch char {
+                    case "⌥": return "option"
+                    case "⌘": return "command"
+                    case "⌃": return "control"
+                    case "⇧": return "shift"
+                    default: return char
+                    }
+                }
+                return (hotkey.identifier, "\(String(modifiers.joined(by: "+")))-\(hotkey.keyChar)")
+            }, uniquingKeysWith: first(this:other:))
+            printDictionary(hotkeys)
         }
     }
 
@@ -485,6 +524,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             if raw {
                 guard let props = SyncMode.getArmBuiltinDisplayProperties() else {
                     throw CommandError.displayNotFound("builtin")
@@ -505,7 +546,6 @@ struct Lunar: ParsableCommand {
                         printDictionary(props)
                     }
                 }
-
                 return
             }
 
@@ -532,7 +572,6 @@ struct Lunar: ParsableCommand {
                     print("Contrast: \(contrast.str(decimals: 2))")
                 }
             }
-            globalExit(0)
         }
     }
 
@@ -580,6 +619,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             displayController.displays = DisplayController.getDisplays(includeVirtual: virtual || all)
 
             let displays = (all ? displayController.displays : displayController.activeDisplays).sorted(by: { d1, d2 in
@@ -587,7 +628,15 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             if let displayFilter = display {
-                try handleDisplay(displayFilter, displays: displays, property: property, value: value, json: json, controls: controls, read: read)
+                try handleDisplay(
+                    displayFilter,
+                    displays: displays,
+                    property: property,
+                    value: value,
+                    json: json,
+                    controls: controls,
+                    read: read
+                )
                 return
             }
 
@@ -615,13 +664,27 @@ struct Lunar: ParsableCommand {
             if json {
                 print("}")
             }
-            globalExit(0)
         }
     }
 
     static let configuration = CommandConfiguration(
         abstract: "Lunar CLI.",
-        subcommands: [Set.self, Get.self, Displays.self, Builtin.self, Ddc.self, Ddcctl.self, Lid.self, Lux.self, Signature.self, Launch.self, Gamma.self, CoreDisplay.self, DisplayServices.self]
+        subcommands: [
+            Set.self,
+            Get.self,
+            Displays.self,
+            Builtin.self,
+            Ddc.self,
+            Ddcctl.self,
+            Lid.self,
+            Lux.self,
+            Signature.self,
+            Launch.self,
+            Gamma.self,
+            CoreDisplay.self,
+            DisplayServices.self,
+            Hotkeys.self,
+        ]
     )
 
     static func configureLogging(options globals: GlobalOptions) {
@@ -667,6 +730,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             displayController.displays = DisplayController.getDisplays()
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -674,8 +739,6 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             try handleDisplay("first", displays: displays, property: property, controls: controls, read: read)
-
-            globalExit(0)
         }
     }
 
@@ -702,12 +765,15 @@ struct Lunar: ParsableCommand {
 
         func validate() throws {
             if !Display.CodingKeys.settable.contains(property) {
-                throw CommandError.propertyNotValid("Property must be one of (\(Display.CodingKeys.settable.map(\.rawValue).joined(separator: ", ")))")
+                throw CommandError
+                    .propertyNotValid("Property must be one of (\(Display.CodingKeys.settable.map(\.rawValue).joined(separator: ", ")))")
             }
         }
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             displayController.displays = DisplayController.getDisplays()
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -719,8 +785,6 @@ struct Lunar: ParsableCommand {
             }
 
             try handleDisplay("first", displays: displays, property: property, value: value, controls: controls)
-
-            globalExit(0)
         }
     }
 
@@ -731,7 +795,10 @@ struct Lunar: ParsableCommand {
             abstract: "Sets gamma values. The values can only be persisted while the program is running."
         )
 
-        @Option(name: .shortAndLong, help: "How many seconds to wait until the program exits and the gamma values reset (0 waits indefinitely)")
+        @Option(
+            name: .shortAndLong,
+            help: "How many seconds to wait until the program exits and the gamma values reset (0 waits indefinitely)"
+        )
         var wait: Int = 0
 
         @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, best-guess)")
@@ -774,7 +841,10 @@ struct Lunar: ParsableCommand {
 
             let alreadyLocked = !display.gammaLock()
             if alreadyLocked {
-                throw CommandError.gammaError("Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete \(display.gammaLockPath) if you think this is incorrect).")
+                throw CommandError
+                    .gammaError(
+                        "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete \(display.gammaLockPath) if you think this is incorrect)."
+                    )
             }
 
             foundDisplay = display
@@ -782,9 +852,13 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
+
             guard let display = foundDisplay else { return }
 
-            print("Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)")
+            print(
+                "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
+            )
 
             showOperationInProgress(screen: display.screen)
             var stepsDone = 0
@@ -800,7 +874,6 @@ struct Lunar: ParsableCommand {
                     globalExit(0)
                 }
             }
-            globalExit(0)
         }
     }
 }
@@ -821,7 +894,14 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
     }
 }
 
-private func printDisplay(_ display: Display, json: Bool = false, terminator: String = "\n", prefix: String = "", systemInfo: Bool = false, edid: Bool = false) throws {
+private func printDisplay(
+    _ display: Display,
+    json: Bool = false,
+    terminator: String = "\n",
+    prefix: String = "",
+    systemInfo: Bool = false,
+    edid: Bool = false
+) throws {
     var edidStr = ""
     if edid {
         let data = DDC.getEdidData(displayID: display.id)
@@ -861,7 +941,6 @@ private func printDisplay(_ display: Display, json: Bool = false, terminator: St
         print("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value))")
     }
     let s = { (k: String) in spaced(k, longestKeySize) }
-    print("\(prefix)\(s("Is Sync Mode Source"))\(display.isSource)")
     print("\(prefix)\(s("Has I2C"))\(display.hasI2C)")
     print("\(prefix)\(s("Has Network Control"))\(display.hasNetworkControl)")
     print("\(prefix)\(s("Has DDC"))\(display.hasDDC)")
