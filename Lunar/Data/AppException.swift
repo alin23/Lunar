@@ -15,7 +15,7 @@ let APP_MAX_BRIGHTNESS: UInt8 = 30
 let APP_MAX_CONTRAST: UInt8 = 30
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix"]
 
-@objc class AppException: NSObject, Codable {
+@objc class AppException: NSObject, Codable, Defaults.Serializable {
     @objc dynamic var identifier: String {
         didSet {
             save()
@@ -70,9 +70,9 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
     }
 
     @objc func remove() {
-        if var apps = Defaults[.appExceptions] {
+        if var apps = CachedDefaults[.appExceptions] {
             apps.removeAll(where: { $0.identifier == identifier })
-            Defaults[.appExceptions] = apps
+            CachedDefaults[.appExceptions] = apps
         }
         removeSentryData()
     }

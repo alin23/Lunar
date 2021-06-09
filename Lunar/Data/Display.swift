@@ -10,6 +10,7 @@ import AnyCodable
 import ArgumentParser
 import Atomics
 import Cocoa
+import Combine
 import CoreGraphics
 import DataCompression
 import Defaults
@@ -34,7 +35,10 @@ let DEFAULT_MAX_CONTRAST: UInt8 = 75
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
 let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
 let TEST_DISPLAY_PERSISTENT_ID: CGDirectDisplayID = UINT32_MAX / 3
-let TEST_IDS = Set(arrayLiteral: GENERIC_DISPLAY_ID, TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID)
+let TEST_DISPLAY_PERSISTENT2_ID: CGDirectDisplayID = UINT32_MAX / 4
+let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = UINT32_MAX / 5
+let TEST_DISPLAY_PERSISTENT4_ID: CGDirectDisplayID = UINT32_MAX / 6
+let TEST_IDS = Set(arrayLiteral: GENERIC_DISPLAY_ID, TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID)
 
 let GENERIC_DISPLAY = Display(
     id: GENERIC_DISPLAY_ID,
@@ -67,6 +71,54 @@ var TEST_DISPLAY_PERSISTENT: Display = {
         id: TEST_DISPLAY_PERSISTENT_ID,
         serial: "TEST_SERIAL_PERSISTENT",
         name: "Persistent",
+        active: true,
+        minBrightness: 0,
+        maxBrightness: 100,
+        minContrast: 0,
+        maxContrast: 100,
+        adaptive: true
+    )
+    d.hasI2C = true
+    return d
+}()
+
+var TEST_DISPLAY_PERSISTENT2: Display = {
+    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_TWO"])?.first ?? Display(
+        id: TEST_DISPLAY_PERSISTENT2_ID,
+        serial: "TEST_SERIAL_PERSISTENT_TWO",
+        name: "Persistent v2",
+        active: true,
+        minBrightness: 0,
+        maxBrightness: 100,
+        minContrast: 0,
+        maxContrast: 100,
+        adaptive: true
+    )
+    d.hasI2C = true
+    return d
+}()
+
+var TEST_DISPLAY_PERSISTENT3: Display = {
+    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_THREE"])?.first ?? Display(
+        id: TEST_DISPLAY_PERSISTENT3_ID,
+        serial: "TEST_SERIAL_PERSISTENT_THREE",
+        name: "Persistent v3",
+        active: true,
+        minBrightness: 0,
+        maxBrightness: 100,
+        minContrast: 0,
+        maxContrast: 100,
+        adaptive: true
+    )
+    d.hasI2C = true
+    return d
+}()
+
+var TEST_DISPLAY_PERSISTENT4: Display = {
+    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_FOUR"])?.first ?? Display(
+        id: TEST_DISPLAY_PERSISTENT4_ID,
+        serial: "TEST_SERIAL_PERSISTENT_FOUR",
+        name: "Persistent v4",
         active: true,
         minBrightness: 0,
         maxBrightness: 100,
@@ -119,14 +171,21 @@ enum ValueType {
 
 // MARK: Display Class
 
-@objc class Display: NSObject, Codable {
+@objc class Display: NSObject, Codable, Defaults.Serializable {
     // MARK: Stored Properties
 
-    @objc dynamic var id: CGDirectDisplayID {
-        didSet {
-            save()
-        }
+    var _idLock = UnfairLock()
+    var _id: CGDirectDisplayID
+    var id: CGDirectDisplayID {
+        get { _idLock.around { _id } }
+        set { _idLock.around { _id = newValue } }
     }
+
+    // @AtomicLock @objc dynamic var id: CGDirectDisplayID {
+    //     didSet {
+    //         save()
+    //     }
+    // }
 
     @objc dynamic var serial: String {
         didSet {
@@ -142,222 +201,318 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var adaptivePaused: Bool = false
+    @Published var adaptivePaused: Bool = false {
+        didSet {
+            readapt(newValue: adaptivePaused, oldValue: oldValue)
+        }
+    }
 
-    @objc dynamic var _adaptive: Bool = true
+    @Published @objc dynamic var adaptive: Bool {
+        didSet {
+            save()
+            readapt(newValue: adaptive, oldValue: oldValue)
+        }
+    }
 
-    @objc dynamic var adaptive: Bool {
-        get {
-            serialSync {
-                _adaptive && !adaptivePaused
+    @Published @objc dynamic var maxDDCBrightness: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: maxDDCBrightness, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var maxDDCContrast: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: maxDDCContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var maxDDCVolume: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: maxDDCVolume, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var lockedBrightness: Bool {
+        didSet {
+            save()
+        }
+    }
+
+    @Published @objc dynamic var lockedContrast: Bool {
+        didSet {
+            save()
+        }
+    }
+
+    @Published @objc dynamic var minBrightness: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: minBrightness, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var maxBrightness: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: maxBrightness, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var minContrast: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: minContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var maxContrast: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: maxContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var brightness: NSNumber {
+        didSet {
+            save()
+
+            guard !lockedBrightness, force.load(ordering: .relaxed) || brightness != oldValue else { return }
+
+            if !force.load(ordering: .relaxed) {
+                guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+            }
+
+            guard !isForTesting else { return }
+            var brightness: UInt8
+            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
+                brightness = cap(self.brightness.uint8Value, minVal: 0, maxVal: 100)
+            } else {
+                brightness = cap(self.brightness.uint8Value, minVal: minBrightness.uint8Value, maxVal: maxBrightness.uint8Value)
+            }
+
+            var oldBrightness: UInt8 = oldValue.uint8Value
+            if maxDDCBrightness != 100, !(control is GammaControl) {
+                oldBrightness = mapNumber(
+                    oldBrightness.d,
+                    fromLow: 0,
+                    fromHigh: 100,
+                    toLow: 0,
+                    toHigh: maxDDCBrightness.doubleValue
+                ).rounded().u8
+                brightness = mapNumber(
+                    brightness.d,
+                    fromLow: 0,
+                    fromHigh: 100,
+                    toLow: 0,
+                    toHigh: maxDDCBrightness.doubleValue
+                ).rounded().u8
+            }
+
+            log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness)", context: context)
+            if !control.setBrightness(brightness, oldValue: oldBrightness) {
+                log.warning(
+                    "Error writing brightness using \(control!.str)",
+                    context: context
+                )
             }
         }
-        set {
-            let oldValue = _adaptive
-            _adaptive = newValue
+    }
+
+    @Published @objc dynamic var contrast: NSNumber {
+        didSet {
             save()
-            runBoolObservers(property: .adaptive, newValue: adaptive, oldValue: oldValue)
+
+            guard !lockedContrast, force.load(ordering: .relaxed) || contrast != oldValue else { return }
+
+            if !force.load(ordering: .relaxed) {
+                guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+            }
+
+            guard !isForTesting else { return }
+            var contrast: UInt8
+            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
+                contrast = cap(self.contrast.uint8Value, minVal: 0, maxVal: 100)
+            } else {
+                contrast = cap(self.contrast.uint8Value, minVal: minContrast.uint8Value, maxVal: maxContrast.uint8Value)
+            }
+
+            var oldContrast: UInt8 = oldValue.uint8Value
+            if maxDDCContrast != 100, !(control is GammaControl) {
+                oldContrast = mapNumber(
+                    oldContrast.d,
+                    fromLow: 0,
+                    fromHigh: 100,
+                    toLow: 0,
+                    toHigh: maxDDCContrast.doubleValue
+                ).rounded().u8
+                contrast = mapNumber(
+                    contrast.d,
+                    fromLow: 0,
+                    fromHigh: 100,
+                    toLow: 0,
+                    toHigh: maxDDCContrast.doubleValue
+                ).rounded().u8
+            }
+
+            log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast)", context: context)
+            if !control.setContrast(contrast, oldValue: oldContrast) {
+                log.warning(
+                    "Error writing contrast using \(control!.str)",
+                    context: context
+                )
+            }
         }
     }
 
-    @objc dynamic var maxDDCBrightness: NSNumber {
+    @Published @objc dynamic var volume: NSNumber {
         didSet {
             save()
-            runNumberObservers(property: .maxDDCBrightness, newValue: maxDDCBrightness, oldValue: oldValue)
+
+            guard !isForTesting else { return }
+
+            var volume = self.volume.uint8Value
+            if maxDDCVolume != 100, !(control is GammaControl) {
+                volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: maxDDCVolume.doubleValue).rounded().u8
+            }
+
+            if !control.setVolume(volume) {
+                log.warning(
+                    "Error writing volume using \(control!.str)",
+                    context: context
+                )
+            }
         }
     }
 
-    @objc dynamic var maxDDCContrast: NSNumber {
+    @Published @objc dynamic var input: NSNumber {
         didSet {
             save()
-            runNumberObservers(property: .maxDDCContrast, newValue: maxDDCContrast, oldValue: oldValue)
+
+            guard !isForTesting,
+                  let input = InputSource(rawValue: self.input.uint8Value),
+                  input != .unknown
+            else { return }
+            if !control.setInput(input) {
+                log.warning(
+                    "Error writing input using \(control!.str)",
+                    context: context
+                )
+            }
         }
     }
 
-    @objc dynamic var maxDDCVolume: NSNumber {
+    @Published @objc dynamic var hotkeyInput: NSNumber {
         didSet {
             save()
-            runNumberObservers(property: .maxDDCVolume, newValue: maxDDCVolume, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var lockedBrightness: Bool {
+    @Published @objc dynamic var brightnessOnInputChange: NSNumber {
         didSet {
             save()
-            runBoolObservers(property: .lockedBrightness, newValue: lockedBrightness, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var lockedContrast: Bool {
+    @Published @objc dynamic var contrastOnInputChange: NSNumber {
         didSet {
             save()
-            runBoolObservers(property: .lockedContrast, newValue: lockedContrast, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var minBrightness: NSNumber {
+    @Published @objc dynamic var audioMuted: Bool {
         didSet {
             save()
-            runNumberObservers(property: .minBrightness, newValue: minBrightness, oldValue: oldValue)
+
+            guard !isForTesting else { return }
+            if !control.setMute(audioMuted) {
+                log.warning(
+                    "Error writing muted audio using \(control!.str)",
+                    context: context
+                )
+            }
         }
     }
 
-    @objc dynamic var maxBrightness: NSNumber {
+    @Published @objc dynamic var power: Bool = true {
         didSet {
             save()
-            runNumberObservers(property: .maxBrightness, newValue: maxBrightness, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var minContrast: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .minContrast, newValue: minContrast, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var maxContrast: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .maxContrast, newValue: maxContrast, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var brightness: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .brightness, newValue: brightness, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var contrast: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .contrast, newValue: contrast, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var volume: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .volume, newValue: volume, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var input: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .input, newValue: input, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var hotkeyInput: NSNumber {
-        didSet {
-            save()
-            runNumberObservers(property: .hotkeyInput, newValue: hotkeyInput, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var audioMuted: Bool {
-        didSet {
-            save()
-            runBoolObservers(property: .audioMuted, newValue: audioMuted, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var power: Bool = true {
-        didSet {
-            save()
-            runBoolObservers(property: .power, newValue: power, oldValue: oldValue)
         }
     }
 
     // MARK: Computed Properties
 
-    @objc dynamic var active: Bool = false {
+    @Published @objc dynamic var active: Bool = false {
         didSet {
             save()
-            runBoolObservers(property: .active, newValue: active, oldValue: oldValue)
             mainThread {
                 activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
             }
         }
     }
 
-    @objc dynamic var responsiveDDC: Bool = true {
+    @Published @objc dynamic var responsiveDDC: Bool = true {
         didSet {
             context = getContext()
-            runBoolObservers(property: .responsiveDDC, newValue: responsiveDDC, oldValue: oldValue)
             mainThread {
                 activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
             }
         }
     }
 
-    @objc dynamic var activeAndResponsive: Bool = false {
-        didSet {
-            runBoolObservers(property: .activeAndResponsive, newValue: activeAndResponsive, oldValue: oldValue)
-        }
-    }
+    @Published @objc dynamic var activeAndResponsive: Bool = false
 
-    @objc dynamic var hasI2C: Bool = true {
+    @Published @objc dynamic var hasI2C: Bool = true {
         didSet {
             context = getContext()
-            runBoolObservers(property: .hasI2C, newValue: hasI2C, oldValue: oldValue)
             mainThread {
                 hasDDC = hasI2C || hasNetworkControl
             }
         }
     }
 
-    @objc dynamic var hasNetworkControl: Bool = false {
+    @Published @objc dynamic var hasNetworkControl: Bool = false {
         didSet {
             context = getContext()
-            runBoolObservers(property: .hasNetworkControl, newValue: hasNetworkControl, oldValue: oldValue)
             mainThread {
                 hasDDC = hasI2C || hasNetworkControl
             }
         }
     }
 
-    @objc dynamic var hasDDC: Bool = false {
+    @Published @objc dynamic var hasDDC: Bool = false {
+        didSet {}
+    }
+
+    @Published @objc dynamic var alwaysUseNetworkControl: Bool = false {
         didSet {
-            runBoolObservers(property: .hasDDC, newValue: hasDDC, oldValue: oldValue)
+            context = getContext()
         }
     }
 
-    @objc dynamic var alwaysUseNetworkControl: Bool = false {
+    @Published @objc dynamic var neverUseNetworkControl: Bool = false {
         didSet {
             context = getContext()
-            runBoolObservers(property: .alwaysUseNetworkControl, newValue: alwaysUseNetworkControl, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var neverUseNetworkControl: Bool = false {
+    @Published @objc dynamic var alwaysFallbackControl: Bool = false {
         didSet {
             context = getContext()
-            runBoolObservers(property: .neverUseNetworkControl, newValue: neverUseNetworkControl, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var alwaysFallbackControl: Bool = false {
+    @Published @objc dynamic var neverFallbackControl: Bool = false {
         didSet {
             context = getContext()
-            runBoolObservers(property: .alwaysFallbackControl, newValue: alwaysFallbackControl, oldValue: oldValue)
         }
     }
 
-    @objc dynamic var neverFallbackControl: Bool = false {
+    @Published @objc dynamic var isSource: Bool = false {
         didSet {
             context = getContext()
-            runBoolObservers(property: .neverFallbackControl, newValue: neverFallbackControl, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var isSource: Bool = false {
-        didSet {
-            context = getContext()
-            runBoolObservers(property: .isSource, newValue: isSource, oldValue: oldValue)
         }
     }
 
@@ -370,10 +525,11 @@ enum ValueType {
 
     // MARK: "Sending" states
 
-    func manageSendingValue(_ key: CodingKeys, oldValue: Bool) {
+    func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
         let name = key.rawValue
         guard let value = serialSync({ self.value(forKey: name) as? Bool }),
-              let condition = serialSync({ self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition })
+              let condition =
+              serialSync({ self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition })
         else {
             log.error("No condition property found for \(name)")
             return
@@ -403,32 +559,31 @@ enum ValueType {
                 }
             }
         }
-        runBoolObservers(property: key, newValue: value, oldValue: oldValue)
     }
 
     @objc dynamic var sentBrightnessCondition = NSCondition()
-    @Atomic @objc dynamic var sendingBrightness: Bool = false {
+    @Published @objc dynamic var sendingBrightness: Bool = false {
         didSet {
             manageSendingValue(.sendingBrightness, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentContrastCondition = NSCondition()
-    @Atomic @objc dynamic var sendingContrast: Bool = false {
+    @Published @objc dynamic var sendingContrast: Bool = false {
         didSet {
             manageSendingValue(.sendingContrast, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentInputCondition = NSCondition()
-    @Atomic @objc dynamic var sendingInput: Bool = false {
+    @Published @objc dynamic var sendingInput: Bool = false {
         didSet {
             manageSendingValue(.sendingInput, oldValue: oldValue)
         }
     }
 
     @objc dynamic var sentVolumeCondition = NSCondition()
-    @Atomic @objc dynamic var sendingVolume: Bool = false {
+    @Published @objc dynamic var sendingVolume: Bool = false {
         didSet {
             manageSendingValue(.sendingVolume, oldValue: oldValue)
         }
@@ -467,44 +622,6 @@ enum ValueType {
 
     let semaphore = DispatchSemaphore(value: 1)
 
-    // MARK: Observer Dictionaries
-
-    var boolObservers: [CodingKeys: [String: (Bool, Bool) -> Void]] = [
-        .adaptive: [:],
-        .lockedBrightness: [:],
-        .lockedContrast: [:],
-        .active: [:],
-        .responsiveDDC: [:],
-        .activeAndResponsive: [:],
-        .hasI2C: [:],
-        .hasNetworkControl: [:],
-        .hasDDC: [:],
-        .audioMuted: [:],
-        .power: [:],
-        .alwaysUseNetworkControl: [:],
-        .neverUseNetworkControl: [:],
-        .alwaysFallbackControl: [:],
-        .neverFallbackControl: [:],
-        .sendingBrightness: [:],
-        .sendingContrast: [:],
-        .isSource: [:],
-    ]
-    var numberObservers: [CodingKeys: [String: (NSNumber, NSNumber) -> Void]] = [
-        .maxDDCBrightness: [:],
-        .maxDDCContrast: [:],
-        .maxDDCVolume: [:],
-        .minBrightness: [:],
-        .maxBrightness: [:],
-        .minContrast: [:],
-        .maxContrast: [:],
-        .brightness: [:],
-        .contrast: [:],
-        .volume: [:],
-        .input: [:],
-        .hotkeyInput: [:],
-    ]
-    var datastoreObservers: [DefaultsObservation] = []
-
     // MARK: Misc Properties
 
     var onReadapt: (() -> Void)?
@@ -539,7 +656,7 @@ enum ValueType {
     }
 
     var onControlChange: ((Control) -> Void)? = nil
-    var control: Control! = nil {
+    @Atomic var control: Control! = nil {
         didSet {
             context = getContext()
             if let control = control {
@@ -691,10 +808,10 @@ enum ValueType {
         let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
         let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
 
-        id = try container.decode(CGDirectDisplayID.self, forKey: .id)
+        _id = try container.decode(CGDirectDisplayID.self, forKey: .id)
         serial = try container.decode(String.self, forKey: .serial)
 
-        _adaptive = try container.decode(Bool.self, forKey: .adaptive)
+        adaptive = try container.decode(Bool.self, forKey: .adaptive)
         brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
         contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
         name = try container.decode(String.self, forKey: .name)
@@ -718,6 +835,8 @@ enum ValueType {
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         input = (try container.decode(UInt8.self, forKey: .input)).ns
         hotkeyInput = (try container.decode(UInt8.self, forKey: .hotkeyInput)).ns
+        brightnessOnInputChange = (try container.decode(UInt8.self, forKey: .brightnessOnInputChange)).ns
+        contrastOnInputChange = (try container.decode(UInt8.self, forKey: .contrastOnInputChange)).ns
 
         if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
             userBrightness[.sync] = syncUserBrightness
@@ -795,12 +914,14 @@ enum ValueType {
         neverUseNetworkControl: Bool = false,
         alwaysFallbackControl: Bool = false,
         neverFallbackControl: Bool = false,
-        enabledControls: [DisplayControl: Bool]? = nil
+        enabledControls: [DisplayControl: Bool]? = nil,
+        brightnessOnInputChange: UInt8 = 100,
+        contrastOnInputChange: UInt8 = 75
     ) {
-        self.id = id
+        _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
-        _adaptive = adaptive
+        self.adaptive = adaptive
         self.maxDDCBrightness = maxDDCBrightness.ns
         self.maxDDCContrast = maxDDCContrast.ns
         self.maxDDCVolume = maxDDCVolume.ns
@@ -821,6 +942,9 @@ enum ValueType {
         self.neverUseNetworkControl = neverUseNetworkControl
         self.alwaysFallbackControl = alwaysFallbackControl
         self.neverFallbackControl = neverFallbackControl
+
+        self.brightnessOnInputChange = brightnessOnInputChange.ns
+        self.contrastOnInputChange = contrastOnInputChange.ns
 
         if let enabledControls = enabledControls {
             self.enabledControls = enabledControls
@@ -843,7 +967,7 @@ enum ValueType {
         super.init()
 
         if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-            if Defaults[.refreshValues] {
+            if CachedDefaults[.refreshValues] {
                 serialQueue.async { [weak self] in
                     guard let self = self else { return }
                     self.refreshBrightness()
@@ -898,7 +1022,9 @@ enum ValueType {
                 .coreDisplay: true,
                 .ddc: true,
                 .gamma: true,
-            ]
+            ],
+            brightnessOnInputChange: (config["brightnessOnInputChange"] as? UInt8) ?? 100,
+            contrastOnInputChange: (config["contrastOnInputChange"] as? UInt8) ?? 75
         )
     }
 
@@ -984,6 +1110,8 @@ enum ValueType {
         case sendingInput
         case sendingVolume
         case isSource
+        case brightnessOnInputChange
+        case contrastOnInputChange
 
         static var settable: [CodingKeys] {
             [
@@ -1010,6 +1138,8 @@ enum ValueType {
                 .alwaysFallbackControl,
                 .neverFallbackControl,
                 .isSource,
+                .brightnessOnInputChange,
+                .contrastOnInputChange,
             ]
         }
     }
@@ -1056,6 +1186,8 @@ enum ValueType {
         try container.encode(volume.uint8Value, forKey: .volume)
         try container.encode(input.uint8Value, forKey: .input)
         try container.encode(hotkeyInput.uint8Value, forKey: .hotkeyInput)
+        try container.encode(brightnessOnInputChange.uint8Value, forKey: .brightnessOnInputChange)
+        try container.encode(contrastOnInputChange.uint8Value, forKey: .contrastOnInputChange)
 
         try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
         try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
@@ -1127,13 +1259,6 @@ enum ValueType {
         }
     }
 
-    func setSentryExtra(value: Any, key: String) {
-        SentrySDK.configureScope { [weak self] scope in
-            guard let self = self else { return }
-            scope.setExtra(value: value, key: "display-\(self.id)-\(key)")
-        }
-    }
-
     // MARK: CoreDisplay Detection
 
     func isUltraFine() -> Bool {
@@ -1157,7 +1282,7 @@ enum ValueType {
     }
 
     func isAppleDisplay() -> Bool {
-        Defaults[.useCoreDisplay] && (isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID())
+        CachedDefaults[.useCoreDisplay] && (isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID())
     }
 
     func isAppleVendorID() -> Bool {
@@ -1232,59 +1357,6 @@ enum ValueType {
         }
     }
 
-    // MARK: Observers
-
-    func setObserver<T>(prop: CodingKeys, key: String, action: @escaping ((T, T) -> Void)) {
-        semaphore.wait()
-        defer {
-            semaphore.signal()
-        }
-
-        switch T.self {
-        case is NSNumber.Type:
-            if numberObservers[prop] != nil {
-                numberObservers[prop]![key] = (action as! ((NSNumber, NSNumber) -> Void))
-            }
-        case is Bool.Type:
-            if boolObservers[prop] != nil {
-                boolObservers[prop]![key] = (action as! ((Bool, Bool) -> Void))
-            }
-        default:
-            log.warning("Unknown observer type: \(T.self)")
-        }
-    }
-
-    func resetObserver<T>(prop: CodingKeys, key: String, type: T.Type) {
-        semaphore.wait()
-        defer {
-            semaphore.signal()
-        }
-
-        switch type {
-        case is NSNumber.Type:
-            if numberObservers[prop] != nil {
-                numberObservers[prop]!.removeValue(forKey: key)
-            }
-        case is Bool.Type:
-            if boolObservers[prop] != nil {
-                boolObservers[prop]!.removeValue(forKey: key)
-            }
-        default:
-            log.warning("Unknown observer type: \(T.self)")
-        }
-    }
-
-    func removeObservers() {
-        semaphore.wait()
-        defer {
-            semaphore.signal()
-        }
-
-        boolObservers.removeAll(keepingCapacity: true)
-        numberObservers.removeAll(keepingCapacity: true)
-        datastoreObservers.removeAll(keepingCapacity: true)
-    }
-
     func readapt<T: Equatable>(newValue: T?, oldValue: T?) {
         if let readaptListener = onReadapt {
             readaptListener()
@@ -1292,207 +1364,6 @@ enum ValueType {
         if adaptive, displayController.adaptiveModeKey != .manual, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
             withForce {
                 displayController.adaptBrightness(for: self)
-            }
-        }
-    }
-
-    func runNumberObservers(property: CodingKeys, newValue: NSNumber, oldValue: NSNumber) {
-        semaphore.wait()
-        guard let obs = numberObservers[property] else {
-            semaphore.signal()
-            return
-        }
-        semaphore.signal()
-
-        for (_, observer) in obs {
-            observer(newValue, oldValue)
-        }
-    }
-
-    func runBoolObservers(property: CodingKeys, newValue: Bool, oldValue: Bool) {
-        semaphore.wait()
-        guard let obs = boolObservers[property] else {
-            semaphore.signal()
-            return
-        }
-        semaphore.signal()
-
-        for (_, observer) in obs {
-            observer(newValue, oldValue)
-        }
-    }
-
-    func addObservers() {
-        datastoreObservers = []
-
-        semaphore.wait()
-        defer {
-            semaphore.signal()
-        }
-
-        boolObservers[.adaptive]!["self.adaptive"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.maxDDCBrightness]!["self.maxDDCBrightness"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "maxDDCBrightness")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.maxDDCContrast]!["self.maxDDCContrast"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "maxDDCContrast")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.maxDDCVolume]!["self.maxDDCVolume"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "maxDDCVolume")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.minBrightness]!["self.minBrightness"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "minBrightness")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.maxBrightness]!["self.maxBrightness"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "maxBrightness")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.minContrast]!["self.minContrast"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "minContrast")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.maxContrast]!["self.maxContrast"] = { [weak self] newValue, oldValue in
-            guard let self = self else { return }
-            self.setSentryExtra(value: newValue, key: "maxContrast")
-            self.readapt(newValue: newValue, oldValue: oldValue)
-        }
-        numberObservers[.input]!["self.input"] = { [weak self] newInput, _ in
-            guard let self = self, !self.isForTesting,
-                  let input = InputSource(rawValue: newInput.uint8Value),
-                  input != .unknown
-            else { return }
-            if !self.control.setInput(input) {
-                log.warning(
-                    "Error writing input using \(self.control!.str)",
-                    context: self.context
-                )
-            }
-        }
-        numberObservers[.volume]!["self.volume"] = { [weak self] newVolume, _ in
-            guard let self = self, !self.isForTesting else { return }
-
-            var volume = newVolume.uint8Value
-            if self.maxDDCVolume != 100, !(self.control is GammaControl) {
-                volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: self.maxDDCVolume.doubleValue).rounded().u8
-            }
-
-            if !self.control.setVolume(volume) {
-                log.warning(
-                    "Error writing volume using \(self.control!.str)",
-                    context: self.context
-                )
-            }
-        }
-        boolObservers[.audioMuted]!["self.audioMuted"] = { [weak self] newAudioMuted, _ in
-            guard let self = self, !self.isForTesting else { return }
-            if !self.control.setMute(newAudioMuted) {
-                log.warning(
-                    "Error writing muted audio using \(self.control!.str)",
-                    context: self.context
-                )
-            }
-        }
-
-        // MARK: - Brightness Observer
-
-        numberObservers[.brightness]!["self.brightness"] = { [weak self] newBrightness, oldValue in
-            guard let self = self, !self.lockedBrightness, self.force.load(ordering: .relaxed) || newBrightness != oldValue else { return }
-
-            if !self.force.load(ordering: .relaxed) {
-                guard Defaults[.secure].checkRemainingAdjustments() else { return }
-            }
-
-            guard !self.isForTesting else { return }
-            var brightness: UInt8
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
-                brightness = cap(newBrightness.uint8Value, minVal: 0, maxVal: 100)
-            } else {
-                brightness = cap(newBrightness.uint8Value, minVal: self.minBrightness.uint8Value, maxVal: self.maxBrightness.uint8Value)
-            }
-
-            var oldBrightness: UInt8 = oldValue.uint8Value
-            if self.maxDDCBrightness != 100, !(self.control is GammaControl) {
-                oldBrightness = mapNumber(
-                    oldBrightness.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: 0,
-                    toHigh: self.maxDDCBrightness.doubleValue
-                ).rounded().u8
-                brightness = mapNumber(
-                    brightness.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: 0,
-                    toHigh: self.maxDDCBrightness.doubleValue
-                ).rounded().u8
-            }
-
-            self.setSentryExtra(value: brightness, key: "brightness")
-            log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness)", context: self.context)
-            if !self.control.setBrightness(brightness, oldValue: oldBrightness) {
-                log.warning(
-                    "Error writing brightness using \(self.control!.str)",
-                    context: self.context
-                )
-            }
-        }
-
-        // MARK: - Contrast Observer
-
-        numberObservers[.contrast]!["self.contrast"] = { [weak self] newContrast, oldValue in
-            guard let self = self, !self.lockedContrast, self.force.load(ordering: .relaxed) || newContrast != oldValue else { return }
-
-            if !self.force.load(ordering: .relaxed) {
-                guard Defaults[.secure].checkRemainingAdjustments() else { return }
-            }
-
-            guard !self.isForTesting else { return }
-            var contrast: UInt8
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
-                contrast = cap(newContrast.uint8Value, minVal: 0, maxVal: 100)
-            } else {
-                contrast = cap(newContrast.uint8Value, minVal: self.minContrast.uint8Value, maxVal: self.maxContrast.uint8Value)
-            }
-
-            var oldContrast: UInt8 = oldValue.uint8Value
-            if self.maxDDCContrast != 100, !(self.control is GammaControl) {
-                oldContrast = mapNumber(
-                    oldContrast.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: 0,
-                    toHigh: self.maxDDCContrast.doubleValue
-                ).rounded().u8
-                contrast = mapNumber(
-                    contrast.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: 0,
-                    toHigh: self.maxDDCContrast.doubleValue
-                ).rounded().u8
-            }
-
-            self.setSentryExtra(value: contrast, key: "contrast")
-            log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast)", context: self.context)
-            if !self.control.setContrast(contrast, oldValue: oldContrast) {
-                log.warning(
-                    "Error writing contrast using \(self.control!.str)",
-                    context: self.context
-                )
             }
         }
     }
@@ -1687,6 +1558,7 @@ enum ValueType {
         log.debug("green: \(newGamma.green)")
         log.debug("blue: \(newGamma.blue)")
         let semaphore = DispatchSemaphore(value: 0)
+        let id = serialSync { self.id }
 
         showOperationInProgress(screen: screen)
         async {
@@ -1700,6 +1572,11 @@ enum ValueType {
                     return
                 }
                 Thread.sleep(forTimeInterval: 0.005)
+
+                let redGamma = serialSync { self.initialRedGamma }
+                let greenGamma = serialSync { self.initialGreenGamma }
+                let blueGamma = serialSync { self.initialBlueGamma }
+
                 let oldGamma = self.computeGamma(brightness: oldBrightness, contrast: oldContrast)
                 let maxDiff = max(
                     abs(newGamma.red - oldGamma.red), abs(newGamma.green - oldGamma.green),
@@ -1707,16 +1584,16 @@ enum ValueType {
                 )
                 for gamma in oldGamma.stride(to: newGamma, samples: (maxDiff * 100).intround) {
                     CGSetDisplayTransferByFormula(
-                        self.id,
+                        id,
                         self.redMin,
                         gamma.red,
-                        self.initialRedGamma + gamma.contrast,
+                        redGamma + gamma.contrast,
                         self.greenMin,
                         gamma.green,
-                        self.initialGreenGamma + gamma.contrast,
+                        greenGamma + gamma.contrast,
                         self.blueMin,
                         gamma.blue,
-                        self.initialBlueGamma + gamma.contrast
+                        blueGamma + gamma.contrast
                     )
                     Thread.sleep(forTimeInterval: 0.01)
                 }
@@ -1728,17 +1605,22 @@ enum ValueType {
             if oldBrightness != nil || oldContrast != nil {
                 semaphore.wait()
             }
+
+            let redGamma = serialSync { self.initialRedGamma }
+            let greenGamma = serialSync { self.initialGreenGamma }
+            let blueGamma = serialSync { self.initialBlueGamma }
+
             CGSetDisplayTransferByFormula(
-                self.id,
+                id,
                 self.redMin,
                 newGamma.red,
-                self.initialRedGamma + newGamma.contrast,
+                redGamma + newGamma.contrast,
                 self.greenMin,
                 newGamma.green,
-                self.initialGreenGamma + newGamma.contrast,
+                greenGamma + newGamma.contrast,
                 self.blueMin,
                 newGamma.blue,
-                self.initialBlueGamma + newGamma.contrast
+                blueGamma + newGamma.contrast
             )
             semaphore.signal()
         }
@@ -1787,20 +1669,20 @@ enum ValueType {
             return
         }
 
-        Defaults[.smoothTransition] = false
+        CachedDefaults[.smoothTransition] = false
         block()
-        Defaults[.smoothTransition] = true
+        CachedDefaults[.smoothTransition] = true
     }
 
     @inline(__always) func withSmoothTransition(_ block: () -> Void) {
-        if Defaults[.smoothTransition] {
+        if CachedDefaults[.smoothTransition] {
             block()
             return
         }
 
-        Defaults[.smoothTransition] = true
+        CachedDefaults[.smoothTransition] = true
         block()
-        Defaults[.smoothTransition] = false
+        CachedDefaults[.smoothTransition] = false
     }
 
     // MARK: Computing Values

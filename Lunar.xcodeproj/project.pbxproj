@@ -18,7 +18,6 @@
 		C70EEF2625FFE8F2009C0C15 /* SwiftSerial in Frameworks */ = {isa = PBXBuildFile; productRef = C70EEF2525FFE8F2009C0C15 /* SwiftSerial */; };
 		C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C7138D8C2634AF0500406EE3 /* KeyHolder */; };
 		C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; };
-		C7138D972634B03400406EE3 /* Paddle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; };
 		C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
@@ -386,7 +385,6 @@
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
-				C7138D972634B03400406EE3 /* Paddle.framework in Frameworks */,
 				C72CFB982586B371005F0340 /* NSPageControl.framework in Frameworks */,
 				C740A1C5262192EF004BC1C7 /* Sparkle in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
@@ -802,7 +800,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1210;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -1147,6 +1145,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BETA = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
@@ -1257,6 +1256,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BETA = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
@@ -1427,6 +1427,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BETA = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
@@ -1483,6 +1484,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BETA = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
@@ -1707,7 +1709,7 @@
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.0;
+				minimumVersion = 5.0.0;
 			};
 		};
 		C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {

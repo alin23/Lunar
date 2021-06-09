@@ -8,6 +8,7 @@
 
 import Charts
 import Cocoa
+import Combine
 import Defaults
 import Magnet
 import Sauce
@@ -110,14 +111,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
-                guard let display = display, let button = inputDropdownHotkeyButton, initHotkeys(from: display) else { return }
-
-                button.onClick = { [weak self, weak display] in
-                    guard let self = self, let display = display else { return }
-                    if self.initHotkeys(from: display) {
-                        button.onClick = nil
-                    }
-                }
+                initHotkeys()
             }
         }
     }
@@ -181,7 +175,7 @@ class DisplayViewController: NSViewController {
     @objc dynamic weak var display: Display? {
         didSet {
             if let display = display {
-                mainThread { update() }
+                mainThread { update(display) }
                 noDisplay = display.id == GENERIC_DISPLAY_ID
             }
         }
@@ -189,12 +183,13 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic var noDisplay: Bool = false
 
-    var adaptiveModeObserver: DefaultsObservation?
+    var adaptiveModeObserver: Cancellable?
     var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
     var sendingContrastObserver: ((Bool, Bool) -> Void)?
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var viewID: String?
+    var displayObservers = Set<AnyCancellable>()
 
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
@@ -213,69 +208,21 @@ class DisplayViewController: NSViewController {
         view.setNeedsDisplay(view.visibleRect)
     }
 
-    func initHotkeys(from display: Display) -> Bool {
-        guard let controller = inputDropdownHotkeyButton?.popoverController else {
+    func initHotkeys() -> Bool {
+        guard let button = inputDropdownHotkeyButton, let display = display, button.popoverController != nil
+        else {
+            if let button = inputDropdownHotkeyButton {
+                button.onClick = { [weak self] in
+                    guard let self = self else { return }
+                    if self.initHotkeys() {
+                        button.onClick = nil
+                    }
+                }
+            }
             return false
         }
 
-        controller.onDropdownSelect = { [weak display] dropdown in
-            guard let input = InputSource(rawValue: dropdown.selectedTag().u8), let display = display else { return }
-            display.hotkeyInput = input.rawValue.ns
-        }
-        controller.dropdown.removeAllItems()
-        controller.dropdown
-            .addItems(
-                withTitles: InputSource.mostUsed
-                    .map { input in input.str } + InputSource.leastUsed
-                    .map { input in input.str }
-            )
-        controller.dropdown.menu?.insertItem(.separator(), at: InputSource.mostUsed.count)
-        for item in controller.dropdown.itemArray {
-            guard let input = inputSourceMapping[item.title] else { continue }
-            item.tag = input.rawValue.i
-
-            if input == .unknown {
-                item.isEnabled = false
-                item.isHidden = true
-                item.title = "Select input"
-            }
-        }
-        controller.dropdown.selectItem(withTag: display.hotkeyInput.intValue)
-
-        let identifier = "toggle-last-input-\(display.serial)"
-        let handler = { [weak display] (_: HotKey) -> Void in
-            guard let display = display, display.hotkeyInput.uint8Value != InputSource.unknown.rawValue else { return }
-            display.brightness = Defaults[.brightnessOnInputChange].ns
-            display.contrast = Defaults[.contrastOnInputChange].ns
-            display.input = display.hotkeyInput
-        }
-        var hotkey: PersistentHotkey
-        if let hk = Defaults[.hotkeys][identifier],
-           let keyCode = hk[.keyCode],
-           let enabled = hk[.enabled],
-           let modifiers = hk[.modifiers], let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers)
-        {
-            hotkey = PersistentHotkey(hotkey: Magnet.HotKey(
-                identifier: identifier,
-                keyCombo: keyCombo,
-                handler: handler
-            ), isEnabled: enabled == 1)
-
-        } else {
-            hotkey = PersistentHotkey(
-                hotkey: Magnet
-                    .HotKey(
-                        identifier: identifier,
-                        keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
-                        handler: handler
-                    ),
-                isEnabled: false
-            )
-        }
-        if let hotkeyView = controller.hotkeyView {
-            hotkeyView.hotkey = hotkey
-            hotkeyView.endRecording()
-        }
+        button.setup(from: display)
         return true
     }
 
@@ -361,7 +308,7 @@ class DisplayViewController: NSViewController {
     }
 
     @IBAction func proButtonClick(_: Any) {
-        if lunarProActive, !lunarProOnTrial {
+        if lunarProActive.load(ordering: .relaxed), !lunarProOnTrial {
             NSWorkspace.shared.open(try! "https://lunar.fyi/#sync".asURL())
         } else if lunarProBadSignature {
             NSWorkspace.shared.open(try! "https://lunar.fyi/download/latest".asURL())
@@ -380,7 +327,7 @@ class DisplayViewController: NSViewController {
         guard let button = proButton else { return }
 
         mainThread {
-            if lunarProActive {
+            if lunarProActive.load(ordering: .relaxed) {
                 button.bg = red
                 button.attributedTitle = "Pro".withAttribute(.textColor(white))
                 button.setFrameSize(NSSize(width: 50, height: button.frame.height))
@@ -401,8 +348,8 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
-    func update() {
-        guard let display = self.display else { return }
+    func update(_ display: Display? = nil) {
+        guard let display = display ?? self.display else { return }
 
         settingsButton?.display = display
         updateControlsButton()
@@ -416,7 +363,7 @@ class DisplayViewController: NSViewController {
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
 
             var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? [:]
-            let lastDataPoint = displayController.adaptiveMode.brightnessDataPoint.last
+            let lastDataPoint = datapointLockAround { displayController.adaptiveMode.brightnessDataPoint.last }
             Display.insertDataPoint(
                 values: &userValues,
                 featureValue: lastDataPoint,
@@ -455,18 +402,6 @@ class DisplayViewController: NSViewController {
             }
         }
 
-        if let input = InputSource(rawValue: display.input.uint8Value) {
-            inputDropdown?.selectItem(withTag: input.rawValue.i)
-        }
-        if !initHotkeys(from: display), let button = inputDropdownHotkeyButton {
-            button.onClick = { [weak self, weak display] in
-                guard let self = self, let display = display else { return }
-                if self.initHotkeys(from: display) {
-                    button.onClick = nil
-                }
-            }
-        }
-
         if display.id == GENERIC_DISPLAY_ID {
             displayName?.stringValue = "No Display"
             displayName?.display = nil
@@ -483,6 +418,10 @@ class DisplayViewController: NSViewController {
             }
         }
 
+        if let input = InputSource(rawValue: display.input.uint8Value) {
+            inputDropdown?.selectItem(withTag: input.rawValue.i)
+        }
+        initHotkeys()
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
         refreshView()
     }
@@ -699,8 +638,8 @@ class DisplayViewController: NSViewController {
     @IBAction func resetDisplay(_: ResetButton) {
         guard let display = display else { return }
 
-        let resetHandler = { [weak display, weak self] (_: Bool) in
-            guard let display = display, let self = self else { return }
+        let resetHandler = { [weak self] (_: Bool) in
+            guard let display = self?.display, let self = self else { return }
             display.adaptivePaused = true
             defer {
                 display.adaptivePaused = false
@@ -765,20 +704,13 @@ class DisplayViewController: NSViewController {
 
     deinit {
         log.verbose("")
-        let id = "displayViewController-\(self.viewID ?? "")"
-        guard let display = display else { return }
-        display.resetObserver(prop: .adaptive, key: id, type: Bool.self)
-        display.resetObserver(prop: .activeAndResponsive, key: id, type: Bool.self)
-        display.resetObserver(prop: .hasDDC, key: id, type: Bool.self)
-        display.resetObserver(prop: .sendingBrightness, key: id, type: Bool.self)
-        display.resetObserver(prop: .sendingContrast, key: id, type: Bool.self)
-
-        display.resetObserver(prop: .maxBrightness, key: id, type: NSNumber.self)
-        display.resetObserver(prop: .maxContrast, key: id, type: NSNumber.self)
+        for observer in displayObservers {
+            observer.cancel()
+        }
     }
 
     func listenForSendingBrightnessContrast() {
-        sendingBrightnessObserver = { [weak self] (newValue: Bool, _: Bool) in
+        display?.$sendingContrast.sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableBrightness?.currentValue.stopHighlighting()
                 return
@@ -791,8 +723,8 @@ class DisplayViewController: NSViewController {
                     self?.scrollableBrightness?.currentValue.highlight(message: "Not responding")
                 }
             }
-        }
-        sendingContrastObserver = { [weak self] (newValue: Bool, _: Bool) in
+        }.store(in: &displayObservers)
+        display?.$sendingContrast.sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableContrast?.currentValue.stopHighlighting()
                 return
@@ -804,26 +736,22 @@ class DisplayViewController: NSViewController {
                     self?.scrollableContrast?.currentValue.highlight(message: "Not responding")
                 }
             }
-        }
-        display?.setObserver(prop: .sendingBrightness, key: "displayViewController-\(viewID ?? "")", action: sendingBrightnessObserver!)
-        display?.setObserver(prop: .sendingContrast, key: "displayViewController-\(viewID ?? "")", action: sendingContrastObserver!)
+        }.store(in: &displayObservers)
     }
 
     func listenForBrightnessContrastChange() {
-        display?
-            .setObserver(prop: .maxBrightness, key: "displayViewController-\(viewID ?? "")") { [weak self] (value: NSNumber, _: NSNumber) in
-                guard let self = self else { return }
-                self.scrollableBrightness?.maxValue.integerValue = value.intValue
-            }
-        display?
-            .setObserver(prop: .maxContrast, key: "displayViewController-\(viewID ?? "")") { [weak self] (value: NSNumber, _: NSNumber) in
-                guard let self = self else { return }
-                self.scrollableContrast?.maxValue.integerValue = value.intValue
-            }
+        display?.$maxBrightness.sink { [weak self] value in
+            guard let self = self else { return }
+            self.scrollableBrightness?.maxValue.integerValue = value.intValue
+        }.store(in: &displayObservers)
+        display?.$maxContrast.sink { [weak self] value in
+            guard let self = self else { return }
+            self.scrollableContrast?.maxValue.integerValue = value.intValue
+        }.store(in: &displayObservers)
     }
 
     func listenForDisplayBoolChange() {
-        activeAndResponsiveObserver = { [weak self] (newActiveAndResponsive: Bool, _: Bool) in
+        display?.$activeAndResponsive.sink { [weak self] newActiveAndResponsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
                 mainThread { [weak self] in
                     guard let self = self else { return }
@@ -832,56 +760,53 @@ class DisplayViewController: NSViewController {
                     textField.isHidden = newActiveAndResponsive
                 }
             }
-        }
-        display?.setObserver(
-            prop: .activeAndResponsive,
-            key: "displayViewController-\(viewID ?? "")",
-            action: activeAndResponsiveObserver!
-        )
+        }.store(in: &displayObservers)
 
-        adaptiveObserver = { [weak self] (newAdaptive: Bool, _: Bool) in
-            if let self = self {
-                mainThread { [weak self] in
-                    guard let self = self else { return }
-                    if !newAdaptive {
-                        self.showAdaptiveNotice()
-                    } else {
-                        self.hideAdaptiveNotice()
-                    }
-                }
-            }
-        }
         if let display = display {
             if !display.adaptive {
                 showAdaptiveNotice()
             }
-            display.setObserver(
-                prop: .adaptive,
-                key: "displayViewController-\(viewID ?? "")",
-                action: adaptiveObserver!
-            )
+            display.$adaptive.sink { [weak self] newAdaptive in
+                if let self = self {
+                    mainThread { [weak self] in
+                        guard let self = self else { return }
+                        if !newAdaptive {
+                            self.showAdaptiveNotice()
+                        } else {
+                            self.hideAdaptiveNotice()
+                        }
+                    }
+                }
+            }.store(in: &displayObservers)
+//            display.setObserver(
+//                prop: .adaptive,
+//                key: "displayViewController-\(viewID ?? "")",
+//                action: adaptiveObserver!
+//            )
         }
     }
 
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = Defaults.observe(.adaptiveBrightnessMode) { [weak self] change in
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             mainThread { [weak self] in
-                guard let self = self, !self.pausedAdaptiveModeObserver, change.newValue != change.oldValue else {
+                guard let self = self, !self.pausedAdaptiveModeObserver else {
                     return
                 }
                 self.pausedAdaptiveModeObserver = true
-                let adaptiveMode = change.newValue
+                Defaults.withoutPropagation {
+                    let adaptiveMode = change.newValue
 
-                if Defaults[.overrideAdaptiveMode] {
-                    self.inputDropdown?.selectItem(withTag: adaptiveMode.rawValue)
-                } else {
-                    self.inputDropdown?.selectItem(withTag: AUTO_MODE_TAG)
-                }
+                    if CachedDefaults[.overrideAdaptiveMode] {
+                        self.inputDropdown?.selectItem(withTag: adaptiveMode.rawValue)
+                    } else {
+                        self.inputDropdown?.selectItem(withTag: AUTO_MODE_TAG)
+                    }
 
-                if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
-                    self.initGraph(mode: adaptiveMode.mode)
+                    if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                        self.initGraph(mode: adaptiveMode.mode)
+                    }
                 }
                 self.pausedAdaptiveModeObserver = false
             }

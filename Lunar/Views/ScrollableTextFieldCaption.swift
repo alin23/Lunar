@@ -10,7 +10,7 @@ import Cocoa
 import Defaults
 
 class ScrollableTextFieldCaption: NSTextField {
-    var didScrollTextField: Bool = Defaults[.didScrollTextField]
+    var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
 
     var initialText: String!
     var initialAlphaValue: CGFloat!

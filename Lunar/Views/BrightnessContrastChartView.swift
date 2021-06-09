@@ -46,7 +46,13 @@ class BrightnessContrastChartView: LineChartView {
         }
     }
 
-    func highlightCurrentValues(adaptiveMode: AdaptiveMode, for display: Display?, brightness: Double? = nil, contrast: Double? = nil, now: Date? = nil) {
+    func highlightCurrentValues(
+        adaptiveMode: AdaptiveMode,
+        for display: Display?,
+        brightness: Double? = nil,
+        contrast: Double? = nil,
+        now: Date? = nil
+    ) {
         mainThread {
             guard let data = data, data.dataSetCount >= 2 else { return }
 
@@ -54,10 +60,14 @@ class BrightnessContrastChartView: LineChartView {
             case let mode as SensorMode:
                 let lux = mode.lastAmbientLight.rounded()
                 var highlights: [Highlight] = []
-                if (30 ... (mode.brightnessDataPoint.max.i - 30)).contains(lux.i) {
+
+                let maxBr = datapointLockAround { mode.brightnessDataPoint.max.i }
+                let maxCr = datapointLockAround { mode.contrastDataPoint.max.i }
+
+                if (30 ... (maxBr - 30)).contains(lux.i) {
                     highlights.append(Highlight(x: lux, dataSetIndex: 0, stackIndex: 0))
                 }
-                if (30 ... (mode.contrastDataPoint.max.i - 30)).contains(lux.i) {
+                if (30 ... (maxCr - 30)).contains(lux.i) {
                     highlights.append(Highlight(x: lux, dataSetIndex: 1, stackIndex: 1))
                 }
                 if highlights.isEmpty {

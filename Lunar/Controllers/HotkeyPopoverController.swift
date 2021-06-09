@@ -22,16 +22,25 @@ class HotkeyPopoverController: NSViewController {
 
     var onClick: (() -> Void)?
     var onDropdownSelect: ((NSPopUpButton) -> Void)?
+    weak var display: Display?
+
+    func setup(from display: Display) {
+        self.display = display
+        scrollableBrightnessField.integerValue = display.brightnessOnInputChange.intValue
+        scrollableContrastField.integerValue = display.contrastOnInputChange.intValue
+        scrollableBrightnessField.onValueChanged = { display.brightnessOnInputChange = $0.ns }
+        scrollableContrastField.onValueChanged = { display.contrastOnInputChange = $0.ns }
+    }
 
     override func viewDidLoad() {
         backingView.radius = 8.ns
 
         scrollableBrightnessField.caption = scrollableBrightnessCaption
         scrollableContrastField.caption = scrollableContrastCaption
-        scrollableBrightnessField.integerValue = Defaults[.brightnessOnInputChange]
-        scrollableContrastField.integerValue = Defaults[.contrastOnInputChange]
-        scrollableBrightnessField.onValueChanged = { Defaults[.brightnessOnInputChange] = $0 }
-        scrollableContrastField.onValueChanged = { Defaults[.contrastOnInputChange] = $0 }
+        scrollableBrightnessField.integerValue = CachedDefaults[.brightnessOnInputChange]
+        scrollableContrastField.integerValue = CachedDefaults[.contrastOnInputChange]
+        scrollableBrightnessField.onValueChanged = { CachedDefaults[.brightnessOnInputChange] = $0 }
+        scrollableContrastField.onValueChanged = { CachedDefaults[.contrastOnInputChange] = $0 }
 
         for field in [scrollableBrightnessField, scrollableContrastField] {
             field!.textFieldColor = scrollableTextFieldColorOnBlack

@@ -10,6 +10,7 @@ import Alamofire
 import Atomics
 import Carbon.HIToolbox
 import Cocoa
+import Combine
 import Compression
 import CoreLocation
 import Defaults
@@ -22,6 +23,7 @@ import Sentry
 import SimplyCoreAudio
 import Sparkle
 import SwiftDate
+import UserNotifications
 import WAYWindow
 
 let fm = FileManager()
@@ -60,6 +62,7 @@ var activeDisplay: Display?
 
 var thisIsFirstRun = false
 var thisIsFirstRunAfterLunar4Upgrade = false
+var thisIsFirstRunAfterDefaults5Upgrade = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -71,29 +74,35 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SUUpdaterDelegate {
     var locationManager: CLLocationManager?
-    @Atomic var windowController: ModernWindowController?
+    var _windowControllerLock = UnfairLock()
+    var _windowController: ModernWindowController?
+    var windowController: ModernWindowController? {
+        get { _windowControllerLock.around { _windowController } }
+        set { _windowControllerLock.around { _windowController = newValue } }
+    }
 
     var sshWindowController: ModernWindowController?
     var updateInfoWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
     var gammaWindowController: ModernWindowController?
 
+    var secureObserver: Cancellable?
+
     var valuesReaderThread: CFRunLoopTimer?
-    var refreshValues: Bool = Defaults[.refreshValues]
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager = buildAlamofireSession(requestTimeout: 24.hours, resourceTimeout: 7.days)
 
-    var adaptiveBrightnessModeObserver: Defaults.Observation?
-    var startAtLoginObserver: Defaults.Observation?
-    var dayMomentsObserver: Defaults.Observation?
-    var curveFactorObserver: Defaults.Observation?
-    var refreshValuesObserver: Defaults.Observation?
-    var hotkeysObserver: Defaults.Observation?
-    var mediaKeysObserver: Defaults.Observation?
-    var hideMenuBarIconObserver: Defaults.Observation?
-    var showDockIconObserver: Defaults.Observation?
+    var adaptiveBrightnessModeObserver: Cancellable?
+    var startAtLoginObserver: Cancellable?
+    var dayMomentsObserver: Cancellable?
+    var curveFactorObserver: Cancellable?
+    var refreshValuesObserver: Cancellable?
+    var hotkeysObserver: Cancellable?
+    var mediaKeysObserver: Cancellable?
+    var hideMenuBarIconObserver: Cancellable?
+    var showDockIconObserver: Cancellable?
 
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
@@ -111,6 +120,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var brightnessDownMenuItem: NSMenuItem!
     @IBOutlet var contrastUpMenuItem: NSMenuItem!
     @IBOutlet var contrastDownMenuItem: NSMenuItem!
+    @IBOutlet var volumeDownMenuItem: NSMenuItem!
+    @IBOutlet var volumeUpMenuItem: NSMenuItem!
+    @IBOutlet var muteAudioMenuItem: NSMenuItem!
     @IBOutlet var resetTrialMenuItem: NSMenuItem!
     @IBOutlet var expireTrialMenuItem: NSMenuItem!
     @IBOutlet var updater: SUUpdater!
@@ -130,83 +142,41 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initHotkeys() {
-        var hotkeyConfig = Defaults[.hotkeys]
+        guard !Defaults[.hotkeys].isEmpty else {
+            CachedDefaults[.hotkeys] = Hotkey.defaults
+            return
+        }
+        var hotkeys = CachedDefaults[.hotkeys]
+        let existingIdentifiers = Set(hotkeys.map(\.identifier))
 
         for identifierCase in HotkeyIdentifier.allCases {
             let identifier = identifierCase.rawValue
-            guard let hotkey = hotkeyConfig[identifier] ?? Hotkey.defaults[identifier],
-                  let keyCode = hotkey[.keyCode],
-                  var enabled = hotkey[.enabled],
-                  let modifiers = hotkey[.modifiers]
-            else {
-                continue
-            }
-
-            if hotkeyConfig[identifier] == nil {
-                hotkeyConfig[identifier] = hotkey
-            }
-
-            if !preciseHotkeys.contains(identifier) {
-                if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                    Hotkey.keys[identifier] = PersistentHotkey(hotkey: Magnet.HotKey(
-                        identifier: identifier,
-                        keyCombo: keyCombo,
-                        target: self,
-                        action: Hotkey.handler(identifier: identifierCase)
-                    ), isEnabled: enabled == 1)
-                }
-            } else {
-                guard let coarseIdentifier = coarseHotkeysMapping[identifier],
-                      let coarseHotkey = hotkeyConfig[coarseIdentifier] ?? Hotkey.defaults[coarseIdentifier],
-                      let coarseKeyCode = coarseHotkey[.keyCode],
-                      let coarseEnabled = coarseHotkey[.enabled],
-                      let coarseModifiers = coarseHotkey[.modifiers]
-                else {
-                    continue
-                }
-
-                var flags = NSEvent.ModifierFlags(carbonModifiers: coarseModifiers)
-                if flags.contains(.option) {
-                    log.warning("Hotkey \(coarseIdentifier) already binds option. Fine adjustment will be disabled")
-                    enabled = 0
-                } else {
-                    if coarseEnabled == 0 {
-                        enabled = coarseEnabled
-                    }
-                    flags.insert(.option)
-                }
-
-                let newModifiers = flags.carbonModifiers()
-
-                hotkeyConfig[identifier]?[.modifiers] = newModifiers
-                hotkeyConfig[identifier]?[.keyCode] = coarseKeyCode
-
-                if let keyCombo = KeyCombo(QWERTYKeyCode: coarseKeyCode, carbonModifiers: newModifiers) {
-                    Hotkey.keys[identifier] = PersistentHotkey(hotkey: Magnet.HotKey(
-                        identifier: identifier,
-                        keyCombo: keyCombo,
-                        target: self,
-                        action: Hotkey.handler(identifier: identifierCase)
-                    ), isEnabled: enabled == 1)
-                }
+            if !existingIdentifiers.contains(identifier), let hotkey = Hotkey.defaults.first(where: { $0.identifier == identifier }) {
+                hotkeys.update(with: hotkey)
             }
         }
-        Defaults[.hotkeys] = hotkeyConfig
-        setKeyEquivalents(hotkeyConfig)
+        for hotkey in Hotkey.defaults {
+            hotkey.unregister()
+        }
+        for hotkey in hotkeys {
+            hotkey.handleRegistration(persist: false)
+        }
+        CachedDefaults[.hotkeys] = hotkeys
+        setKeyEquivalents(hotkeys)
         startOrRestartMediaKeyTap()
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? Defaults.observe(.adaptiveBrightnessMode) { change in
+        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? adaptiveBrightnessModePublisher.sink { change in
             SentrySDK.configureScope { scope in
                 scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
                 scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
-                scope.setTag(value: Defaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
+                scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
-            if change.newValue == change.oldValue || !Defaults[.overrideAdaptiveMode] {
+            if !Defaults[.overrideAdaptiveMode] {
                 return
             }
-            Defaults[.nonManualMode] = change.newValue != .manual
+            CachedDefaults[.nonManualMode] = change.newValue != .manual
             displayController.adaptiveMode = change.newValue.mode
             mainThread {
                 self.resetElements()
@@ -257,10 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         handler(Defaults[.startAtLogin])
-        startAtLoginObserver = startAtLoginObserver ?? Defaults.observe(.startAtLogin) { change in
-            if change.newValue == change.oldValue {
-                return
-            }
+        startAtLoginObserver = startAtLoginObserver ?? startAtLoginPublisher.sink { change in
             handler(change.newValue)
         }
     }
@@ -302,7 +269,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var didBecomeActiveAtLeastOnce = false
     func applicationDidBecomeActive(_: Notification) {
-        if didBecomeActiveAtLeastOnce, Defaults[.hideMenuBarIcon] {
+        if didBecomeActiveAtLeastOnce, CachedDefaults[.hideMenuBarIcon] {
             showWindow()
         }
         didBecomeActiveAtLeastOnce = true
@@ -348,14 +315,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         valuesReaderThread = asyncEvery(10.seconds, queue: lowprioQueue) { _ in
             guard !screensSleeping.load(ordering: .relaxed) else { return }
 
-            if self.refreshValues {
+            if CachedDefaults[.refreshValues] {
                 displayController.fetchValues()
             }
         }
     }
 
     func initDisplayControllerActivity() {
-        if refreshValues {
+        if CachedDefaults[.refreshValues] {
             startValuesReaderThread()
         }
 
@@ -381,12 +348,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         statusItem.menu = menu
 
-        if POPOVERS[.menu]!!.contentViewController == nil {
+        if POPOVERS["menu"]!!.contentViewController == nil {
             guard let storyboard = NSStoryboard.main else { return }
 
-            POPOVERS[.menu]!!.contentViewController = storyboard
+            POPOVERS["menu"]!!.contentViewController = storyboard
                 .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
-            POPOVERS[.menu]!!.contentViewController!.loadView()
+            POPOVERS["menu"]!!.contentViewController!.loadView()
 
             DistributedNotificationCenter.default().addObserver(
                 self,
@@ -404,7 +371,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func adaptAppearance() {
         mainThread {
-            guard let menuPopover = POPOVERS[.menu]! else { return }
+            guard let menuPopover = POPOVERS["menu"]! else { return }
             menuPopover.appearance = NSAppearance(named: .vibrantLight)
             let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
             if appearanceDescription.contains("dark") {
@@ -453,7 +420,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         switch notification.name {
         case NSApplication.didChangeScreenParametersNotification:
             log.debug("Screen configuration changed")
-            POPOVERS[.menu]!!.close()
+            POPOVERS["menu"]!!.close()
             displayController.manageClamshellMode()
             displayController.resetDisplayList()
             SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
@@ -471,12 +438,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.debug("Screens woke up")
             screensSleeping.store(false, ordering: .sequentiallyConsistent)
 
-            if refreshValues {
+            if CachedDefaults[.refreshValues] {
                 startValuesReaderThread()
             }
             _ = displayController.adaptiveMode.watch()
 
-            if Defaults[.reapplyValuesAfterWake] {
+            if CachedDefaults[.reapplyValuesAfterWake] {
                 asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
                     NetworkControl.resetState()
                     DDCControl.resetState()
@@ -500,43 +467,41 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
-        dayMomentsObserver = dayMomentsObserver ?? Defaults.observe(keys: .sunset, .sunset, .solarNoon) {
+        dayMomentsObserver = dayMomentsObserver ?? dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
                 displayController.adaptBrightness()
             }
         }
-        curveFactorObserver = curveFactorObserver ?? Defaults.observe(.curveFactor) { _ in
+        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { _ in
             displayController.adaptBrightness()
         }
 
-        refreshValuesObserver = refreshValuesObserver ?? Defaults.observe(.refreshValues) { change in
-            self.refreshValues = change.newValue
-
+        refreshValuesObserver = refreshValuesObserver ?? refreshValuesPublisher.sink { _ in
             if let task = self.valuesReaderThread {
                 lowprioQueue.cancel(timer: task)
             }
-            if self.refreshValues {
+            if CachedDefaults[.refreshValues] {
                 self.startValuesReaderThread()
             }
         }
 
-        hotkeysObserver = hotkeysObserver ?? Defaults.observe(.hotkeys) { _ in
-            mainThread {
-                self.setKeyEquivalents(Defaults[.hotkeys])
-            }
-        }
+        // hotkeysObserver = hotkeysObserver ?? hotkeysPublisher.sink { _ in
+        //     mainThread {
+        //         self.setKeyEquivalents(Defaults[.hotkeys])
+        //     }
+        // }
 
-        mediaKeysObserver = mediaKeysObserver ?? Defaults.observe(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors) {
+        mediaKeysObserver = mediaKeysObserver ?? mediaKeysPublisher.sink {
             self.startOrRestartMediaKeyTap()
         }
 
-        hideMenuBarIconObserver = hideMenuBarIconObserver ?? Defaults.observe(.hideMenuBarIcon) { change in
+        hideMenuBarIconObserver = hideMenuBarIconObserver ?? hideMenuBarIconPublisher.sink { change in
             log.info("Hiding menu bar icon: \(change.newValue)")
             self.statusItem.isVisible = !change.newValue
         }
         statusItem.isVisible = !Defaults[.hideMenuBarIcon]
 
-        showDockIconObserver = showDockIconObserver ?? Defaults.observe(.showDockIcon) { change in
+        showDockIconObserver = showDockIconObserver ?? showDockIconPublisher.sink { change in
             log.info("Showing dock icon: \(change.newValue)")
             NSApp.setActivationPolicy(change.newValue ? .regular : .accessory)
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
@@ -563,7 +528,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func setKeyEquivalents(_ hotkeys: [String: [HotkeyPart: Int]]) {
+    func setKeyEquivalents(_ hotkeys: Set<PersistentHotkey>) {
         Hotkey.setKeyEquivalent(HotkeyIdentifier.lunar.rawValue, menuItem: preferencesMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent0.rawValue, menuItem: percent0MenuItem, hotkeys: hotkeys)
@@ -571,11 +536,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent50.rawValue, menuItem: percent50MenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent75.rawValue, menuItem: percent75MenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent100.rawValue, menuItem: percent100MenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.faceLight.rawValue, menuItem: faceLightMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessUp.rawValue, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessDown.rawValue, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.contrastUp.rawValue, menuItem: contrastUpMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.contrastDown.rawValue, menuItem: contrastDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.volumeDown.rawValue, menuItem: volumeDownMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.volumeUp.rawValue, menuItem: volumeUpMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.muteAudio.rawValue, menuItem: muteAudioMenuItem, hotkeys: hotkeys)
 
         menu?.update()
     }
@@ -606,6 +575,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        initCache()
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
                 display.resetGamma()
@@ -622,6 +592,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             return
         }
+
+        let nc = UNUserNotificationCenter.current()
+        nc.requestAuthorization(options: [.alert, .criticalAlert, .provisional], completionHandler: { _, _ in })
 
         log.initLogger()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
@@ -643,14 +616,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setUser(user)
             scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
             scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
-            scope.setTag(value: Defaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
+            scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
         }
 
         acquirePrivileges {
             self.startOrRestartMediaKeyTap()
         }
 
-        displayController.displays = DisplayController.getDisplays()
+        displayController.displays = displayController.getDisplaysLock.around { DisplayController.getDisplays() }
         displayController.addSentryData()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {
@@ -707,7 +680,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
 
-        Defaults[.debug] = false
+        CachedDefaults[.debug] = false
 
         if let task = valuesReaderThread {
             lowprioQueue.cancel(timer: task)
@@ -765,8 +738,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func startReceivingSignificantLocationChanges() {
-        if Defaults[.manualLocation] {
-            LocationMode.specific.geolocation = Defaults[.location]
+        if CachedDefaults[.manualLocation] {
+            LocationMode.specific.geolocation = CachedDefaults[.location]
             return
         }
 
@@ -807,7 +780,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func setLightPercent(percent: Int8) {
-        guard Defaults[.secure].checkRemainingAdjustments() else { return }
+        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
         displayController.disable()
         displayController.setBrightnessPercent(value: percent)
         displayController.setContrastPercent(value: percent)
@@ -824,7 +797,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentDisplay: Bool = false,
         currentAudioDisplay _: Bool = true
     ) {
-        let amount = amount ?? Defaults[.volumeStep]
+        let amount = amount ?? CachedDefaults[.volumeStep]
         displayController.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentDisplay)
     }
 
@@ -834,27 +807,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentDisplay: Bool = false,
         currentAudioDisplay _: Bool = true
     ) {
-        let amount = amount ?? Defaults[.volumeStep]
+        let amount = amount ?? CachedDefaults[.volumeStep]
         displayController.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentDisplay)
     }
 
     func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? Defaults[.brightnessStep]
+        let amount = amount ?? CachedDefaults[.brightnessStep]
         displayController.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? Defaults[.contrastStep]
+        let amount = amount ?? CachedDefaults[.contrastStep]
         displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func decreaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? Defaults[.brightnessStep]
+        let amount = amount ?? CachedDefaults[.brightnessStep]
         displayController.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
     }
 
     func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        let amount = amount ?? Defaults[.contrastStep]
+        let amount = amount ?? CachedDefaults[.contrastStep]
         displayController.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
     }
 
@@ -879,19 +852,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func brightnessUp(_: Any) {
-        increaseBrightness()
+        brightnessUpHotkeyHandler()
     }
 
     @IBAction func brightnessDown(_: Any) {
-        decreaseBrightness()
+        brightnessDownHotkeyHandler()
     }
 
     @IBAction func contrastUp(_: Any) {
-        increaseContrast()
+        contrastUpHotkeyHandler()
     }
 
     @IBAction func contrastDown(_: Any) {
-        decreaseContrast()
+        contrastDownHotkeyHandler()
+    }
+
+    @IBAction func volumeUp(_: Any) {
+        volumeUpHotkeyHandler()
+    }
+
+    @IBAction func volumeDown(_: Any) {
+        volumeDownHotkeyHandler()
+    }
+
+    @IBAction func muteAudio(_: Any) {
+        muteAudioHotkeyHandler()
     }
 
     @IBAction func showPreferencesWindow(sender _: Any?) {
