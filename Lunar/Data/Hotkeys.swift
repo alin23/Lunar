@@ -167,6 +167,10 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         log.debug("deinit hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
 //        hotkey.unregister()
     }
@@ -594,7 +598,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(_ brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
-        let workItem = DispatchWorkItem {
+        let workItem = DispatchWorkItem(name: "startOrRestartMediaKeyTap") {
             mediaKeyTapBrightness?.stop()
             mediaKeyTapBrightness = nil
 
@@ -617,8 +621,8 @@ extension AppDelegate: MediaKeyTapDelegate {
                 mediaKeyTapAudio?.start()
             }
         }
-        concurrentQueue.async(execute: workItem)
-        switch workItem.wait(timeout: DispatchTime.now() + 5) {
+        concurrentQueue.async(execute: workItem.workItem)
+        switch workItem.wait(for: 5) {
         case .timedOut:
             workItem.cancel()
         default:

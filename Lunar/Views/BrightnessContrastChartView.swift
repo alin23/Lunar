@@ -276,56 +276,55 @@ class BrightnessContrastChartView: LineChartView {
         setup(mode: adaptiveMode.key)
     }
 
-    func setupLimitLines(_ mode: LocationMode? = nil, display: Display, chartEntry: LocationModeChartEntry? = nil) {
+    func setupLimitLines(_: LocationMode? = nil, display _: Display, chartEntry _: LocationModeChartEntry? = nil) {
         xAxis.removeAllLimitLines()
-        return
-        let mode = mode ?? LocationMode.specific
-        guard mode.moment != nil else { return }
-
-        let chartEntry = chartEntry ?? mode.lastChartEntry ?? mode.getBrightnessContrastBatch(display: display)
-        let sunriseLine = ChartLimitLine(
-            limit: chartEntry.sunriseIndex.d,
-            label: "Sunrise"
-        )
-        let solarNoonLine = ChartLimitLine(
-            limit: chartEntry.noonIndex.d,
-            label: "No on"
-        )
-        let sunsetLine = ChartLimitLine(
-            limit: chartEntry.sunsetIndex.d,
-            label: "Sunset"
-        )
-
-        sunsetLine.labelPosition = .leftTop
-        solarNoonLine.xOffset = -20
-
-        sunriseLine.yOffset = 75
-        sunsetLine.yOffset = 75
-        solarNoonLine.yOffset = 75
-
-        sunriseLine.lineDashPhase = 3.0
-        sunriseLine.lineDashLengths = [3.0, 1.0]
-        solarNoonLine.lineDashPhase = 2.0
-        solarNoonLine.lineDashLengths = [3.0, 1.0]
-        sunsetLine.lineDashPhase = 2.0
-        sunsetLine.lineDashLengths = [3.0, 1.0]
-
-        sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-        solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-        sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-
-        sunriseLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-        solarNoonLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-        sunsetLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-
-        sunriseLine.lineColor = contrastGraph.fillColor.withAlphaComponent(0.7)
-        solarNoonLine.lineColor = (red.blended(withFraction: 0.5, of: lunarYellow) ?? red).withAlphaComponent(0.7)
-        solarNoonLine.valueTextColor = solarNoonLine.lineColor
-        sunsetLine.lineColor = brightnessGraph.fillColor.withAlphaComponent(0.7)
-
-        xAxis.addLimitLine(sunriseLine)
-        xAxis.addLimitLine(solarNoonLine)
-        xAxis.addLimitLine(sunsetLine)
+        //        let mode = mode ?? LocationMode.specific
+//        guard mode.moment != nil else { return }
+//
+//        let chartEntry = chartEntry ?? mode.lastChartEntry ?? mode.getBrightnessContrastBatch(display: display)
+//        let sunriseLine = ChartLimitLine(
+//            limit: chartEntry.sunriseIndex.d,
+//            label: "Sunrise"
+//        )
+//        let solarNoonLine = ChartLimitLine(
+//            limit: chartEntry.noonIndex.d,
+//            label: "No on"
+//        )
+//        let sunsetLine = ChartLimitLine(
+//            limit: chartEntry.sunsetIndex.d,
+//            label: "Sunset"
+//        )
+//
+//        sunsetLine.labelPosition = .leftTop
+//        solarNoonLine.xOffset = -20
+//
+//        sunriseLine.yOffset = 75
+//        sunsetLine.yOffset = 75
+//        solarNoonLine.yOffset = 75
+//
+//        sunriseLine.lineDashPhase = 3.0
+//        sunriseLine.lineDashLengths = [3.0, 1.0]
+//        solarNoonLine.lineDashPhase = 2.0
+//        solarNoonLine.lineDashLengths = [3.0, 1.0]
+//        sunsetLine.lineDashPhase = 2.0
+//        sunsetLine.lineDashLengths = [3.0, 1.0]
+//
+//        sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+//        solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+//        sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+//
+//        sunriseLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+//        solarNoonLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+//        sunsetLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
+//
+//        sunriseLine.lineColor = contrastGraph.fillColor.withAlphaComponent(0.7)
+//        solarNoonLine.lineColor = (red.blended(withFraction: 0.5, of: lunarYellow) ?? red).withAlphaComponent(0.7)
+//        solarNoonLine.valueTextColor = solarNoonLine.lineColor
+//        sunsetLine.lineColor = brightnessGraph.fillColor.withAlphaComponent(0.7)
+//
+//        xAxis.addLimitLine(sunriseLine)
+//        xAxis.addLimitLine(solarNoonLine)
+//        xAxis.addLimitLine(sunsetLine)
     }
 
     func valueLegend(_ label: String, color: NSColor) -> LegendEntry {

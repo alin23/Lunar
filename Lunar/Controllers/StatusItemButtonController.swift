@@ -24,7 +24,7 @@ class StatusItemButtonController: NSView {
             return
         }
 
-        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem { [unowned self] in
+        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem(name: "menuPopoverOpener") { [unowned self] in
             if let area = event.trackingArea, let button = self.statusButton, !self.clicked {
                 POPOVERS["menu"]!!.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
                 POPOVERS["menu"]!!.becomeFirstResponder()
@@ -33,7 +33,7 @@ class StatusItemButtonController: NSView {
         }
         let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(500_000_000))
 
-        DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverOpener!)
+        DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverOpener!.workItem)
     }
 
     override func mouseExited(with _: NSEvent) {

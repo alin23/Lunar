@@ -19,16 +19,16 @@ var POPOVERS: [String: NSPopover?] = [
     }(),
     "settings": nil,
 ]
-var menuPopoverCloser = DispatchWorkItem {
+var menuPopoverCloser = DispatchWorkItem(name: "menuPopoverCloser") {
     POPOVERS["menu"]!!.close()
 }
 
 func closeMenuPopover(after ms: Int) {
     menuPopoverCloser.cancel()
-    menuPopoverCloser = DispatchWorkItem {
+    menuPopoverCloser = DispatchWorkItem(name: "menuPopoverCloser") {
         POPOVERS["menu"]!!.close()
     }
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser)
+    DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverCloser.workItem)
 }

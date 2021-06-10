@@ -28,7 +28,7 @@ class HourValueFormatter: AxisValueFormatter {
 
 class ElevationValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
-        guard let moment = LocationMode.specific.moment, let chartEntry = LocationMode.specific.lastChartEntry
+        guard LocationMode.specific.moment != nil, let chartEntry = LocationMode.specific.lastChartEntry
         else { return "" }
 
         if value.i > chartEntry.noonIndex {

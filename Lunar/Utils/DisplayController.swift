@@ -241,7 +241,7 @@ class DisplayController {
                 if self.shouldPromptAboutFallback(display) {
                     serialSync { log.warning("Non-responsive display", context: display.context) }
                     self.fallbackPromptTime[display.id] = Date()
-                    let semaphore = DispatchSemaphore(value: 0)
+                    let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
                     let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
                         if fallbackToGamma == .alertFirstButtonReturn {
                             display.control = GammaControl(display: display)
@@ -289,7 +289,7 @@ class DisplayController {
                     if window == nil {
                         completionHandler(resp)
                     } else {
-                        semaphore.wait()
+                        semaphore.wait(for: nil)
                     }
                 }
             }
@@ -385,6 +385,10 @@ class DisplayController {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         if let task = controlWatcherTask {
             lowprioQueue.cancel(timer: task)
         }

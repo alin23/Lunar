@@ -87,6 +87,10 @@ public class Session {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         libssh2_session_free(cSession)
     }
 }

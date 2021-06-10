@@ -139,9 +139,9 @@ protocol AdaptiveMode: AnyObject {
     func adapt(_ display: Display)
 }
 
-var datapointSemaphore = DispatchSemaphore(value: 1)
+var datapointSemaphore = DispatchSemaphore(value: 1, name: "datapointSemaphore")
 func datapointLockAround<T>(_ action: () -> T) -> T {
-    datapointSemaphore.wait()
+    datapointSemaphore.wait(for: nil)
     defer {
         datapointSemaphore.signal()
     }

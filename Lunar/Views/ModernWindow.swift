@@ -90,6 +90,9 @@ class ModernWindow: WAYWindow {
     }
 
     deinit {
-        log.verbose("")
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
     }
 }

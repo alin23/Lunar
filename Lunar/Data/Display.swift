@@ -620,8 +620,6 @@ enum ValueType {
     var initialBlueMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.blue ?? 1.0 }
     var initialBlueGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.blue ?? 1.0 }
 
-    let semaphore = DispatchSemaphore(value: 1)
-
     // MARK: Misc Properties
 
     var onReadapt: (() -> Void)?
@@ -1557,18 +1555,18 @@ enum ValueType {
         log.debug("red: \(newGamma.red)")
         log.debug("green: \(newGamma.green)")
         log.debug("blue: \(newGamma.blue)")
-        let semaphore = DispatchSemaphore(value: 0)
+        let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
         let id = serialSync { self.id }
 
         showOperationInProgress(screen: screen)
         async {
-            _ = semaphore.wait(timeout: DispatchTime.now() + 1.8)
+            _ = gammaSemaphore.wait(for: 1.8)
             hideOperationInProgress()
         }
         if oldBrightness != nil || oldContrast != nil {
             async(runLoopQueue: realtimeQueue) { [weak self] in
                 guard let self = self else {
-                    semaphore.signal()
+                    gammaSemaphore.signal()
                     return
                 }
                 Thread.sleep(forTimeInterval: 0.005)
@@ -1597,13 +1595,13 @@ enum ValueType {
                     )
                     Thread.sleep(forTimeInterval: 0.01)
                 }
-                semaphore.signal()
+                gammaSemaphore.signal()
             }
         }
         async(runLoopQueue: lowprioQueue) { [weak self] in
             guard let self = self else { return }
             if oldBrightness != nil || oldContrast != nil {
-                semaphore.wait()
+                gammaSemaphore.wait(for: nil)
             }
 
             let redGamma = serialSync { self.initialRedGamma }
@@ -1622,7 +1620,7 @@ enum ValueType {
                 newGamma.blue,
                 blueGamma + newGamma.contrast
             )
-            semaphore.signal()
+            gammaSemaphore.signal()
         }
     }
 
@@ -1782,7 +1780,7 @@ enum ValueType {
             toHigh: MAX_BRIGHTNESS.f
         ).i
 
-        brightnessDataPointInsertionTask = DispatchWorkItem { [weak self] in
+        brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
             while let self = self, serialSync({ self.sendingBrightness }) {
                 self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
@@ -1812,7 +1810,7 @@ enum ValueType {
             toHigh: MAX_CONTRAST.f
         ).i
 
-        contrastDataPointInsertionTask = DispatchWorkItem { [weak self] in
+        contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
             while let self = self, serialSync({ self.sendingContrast }) {
                 self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }

@@ -208,6 +208,7 @@ class DisplayViewController: NSViewController {
         view.setNeedsDisplay(view.visibleRect)
     }
 
+    @discardableResult
     func initHotkeys() -> Bool {
         guard let button = inputDropdownHotkeyButton, let display = display, button.popoverController != nil
         else {
@@ -703,7 +704,11 @@ class DisplayViewController: NSViewController {
     }
 
     deinit {
-        log.verbose("")
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+
         for observer in displayObservers {
             observer.cancel()
         }

@@ -61,6 +61,10 @@ public class SFTP {
         }
 
         deinit {
+            #if DEBUG
+                log.verbose("START DEINIT")
+                defer { log.verbose("END DEINIT") }
+            #endif
             libssh2_sftp_close_handle(sftpHandle)
         }
     }
@@ -277,6 +281,10 @@ public class SFTP {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         libssh2_sftp_shutdown(sftpSession)
     }
 }

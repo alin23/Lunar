@@ -278,14 +278,14 @@ enum CachedDefaults {
     static var displaysPublisher = PassthroughSubject<[Display], Never>()
     static var cache: [String: AnyCodable] = [:]
     static var lock = UnfairLock()
-    static var semaphore = DispatchSemaphore(value: 1)
+    static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
 
     static func reset(_ keys: Defaults.AnyKey...) {
         reset(keys)
     }
 
     static func reset(_ keys: [Defaults.AnyKey]) {
-        semaphore.wait()
+        semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
         defer { semaphore.signal() }
 
         Defaults.reset(keys)
@@ -296,7 +296,7 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            semaphore.wait()
+            semaphore.wait(for: nil, context: "get \(key.name)")
 
             if let value = cache[key.name]?.value as? Value {
                 semaphore.signal()
@@ -309,7 +309,7 @@ enum CachedDefaults {
             }
         }
         set {
-            semaphore.wait()
+            semaphore.wait(for: nil, context: "set \(key.name)")
             cache[key.name] = AnyCodable(newValue)
             semaphore.signal()
 

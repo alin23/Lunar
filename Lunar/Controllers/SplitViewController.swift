@@ -146,7 +146,10 @@ class SplitViewController: NSSplitViewController {
     }
 
     deinit {
-        log.verbose("")
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
     }
 
     var pausedAdaptiveModeObserver: Bool = false

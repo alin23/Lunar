@@ -122,7 +122,7 @@ class NetworkControl: Control {
     let str = "Network Control"
     weak var display: Display!
     var setterTasks = [ControlID: DispatchWorkItem]()
-    let setterTasksSemaphore = DispatchSemaphore(value: 1)
+    let setterTasksSemaphore = DispatchSemaphore(value: 1, name: "setterTasksSemaphore")
 
     init(display: Display) {
         self.display = display
@@ -159,7 +159,7 @@ class NetworkControl: Control {
             .debug(
                 "Matched display [\(display.id): \(display.name)] with network controller (\(netService.hostName ?? "nil"): \(service.urls)"
             )
-        let semaphore = DispatchSemaphore(value: 0)
+        let semaphore = DispatchSemaphore(value: 0, name: "Network Control found prompt")
         let completionHandler = { (useNetwork: NSApplication.ModalResponse) in
             if useNetwork == .alertFirstButtonReturn {
                 serialSync {
@@ -207,7 +207,7 @@ class NetworkControl: Control {
         if window == nil {
             completionHandler(resp)
         } else {
-            semaphore.wait()
+            semaphore.wait(for: nil)
         }
     }
 
@@ -341,7 +341,7 @@ class NetworkControl: Control {
             fullUrl = url / controlID / value
         }
 
-        let setter = DispatchWorkItem { [weak self] in
+        let setter = DispatchWorkItem(name: "Network Control Setter \(controlID)(\(value)") { [weak self] in
             guard let self = self else { return }
 
             defer {
@@ -357,7 +357,7 @@ class NetworkControl: Control {
                 log.error("Error sending \(controlID)=\(value): \(error)", context: display.context?.with(["url": fullUrl]))
             }
 
-            _ = self.setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
+            _ = self.setterTasksSemaphore.wait(for: 5.seconds)
             defer {
                 self.setterTasksSemaphore.signal()
             }
@@ -365,7 +365,7 @@ class NetworkControl: Control {
             self.setterTasks.removeValue(forKey: controlID)
         }
 
-        _ = setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
+        _ = setterTasksSemaphore.wait(for: 5.seconds)
         defer {
             self.setterTasksSemaphore.signal()
         }
@@ -380,7 +380,7 @@ class NetworkControl: Control {
     }
 
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
-        _ = setterTasksSemaphore.wait(timeout: DispatchTime.now() + 5.seconds.timeInterval)
+        _ = setterTasksSemaphore.wait(for: 5.seconds)
 
         guard let controller = serialSync({ NetworkControl.controllersForDisplay[display.serial] }),
               let url = max ? controller.maxValueUrl : controller.url,
@@ -538,11 +538,11 @@ class NetworkControl: Control {
         Self.resetState(serial: display.serial)
     }
 
-    static let browserSemaphore = DispatchSemaphore(value: 1)
+    static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
 
     static func resetState(serial: String? = nil) {
         async(timeout: 2.minutes) {
-            browserSemaphore.wait()
+            browserSemaphore.wait(for: nil)
             defer {
                 browserSemaphore.signal()
             }
