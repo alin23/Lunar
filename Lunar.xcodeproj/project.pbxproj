@@ -950,7 +950,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\nexit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\n#exit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
