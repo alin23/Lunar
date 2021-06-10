@@ -26,7 +26,10 @@ class PageController: NSPageController {
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
     deinit {
-        log.verbose("")
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
     }
 
     private func setupPageControl(size: Int) {

@@ -106,6 +106,10 @@ public class CiaoBrowser {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         stop()
 
         services.removeAll()
@@ -168,6 +172,10 @@ public class CiaoResolver {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         Logger.verbose(self)
         service.stop()
     }
@@ -251,6 +259,10 @@ public class CiaoServer {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         stop()
         netService.delegate = nil
         delegate = nil

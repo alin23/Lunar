@@ -45,7 +45,7 @@ struct DDCCTLControl: Control {
 
     func ddcctlSet(_ property: ControlID, value: UInt8) -> Bool {
         guard let index = displayIndex else { return false }
-        let ddcctlSemaphore = DispatchSemaphore(value: 0)
+        let ddcctlSemaphore = DispatchSemaphore(value: 0, name: "ddcctlSemaphore")
         var command = "ddcctl "
         let process: Process
         do {
@@ -68,7 +68,7 @@ struct DDCCTLControl: Control {
             return false
         }
 
-        guard ddcctlSemaphore.wait(timeout: DispatchTime.now() + 20) != .timedOut else {
+        guard ddcctlSemaphore.wait(for: 20) != .timedOut else {
             log.error("Timed out on command `\(command)`")
             process.terminate()
             return false

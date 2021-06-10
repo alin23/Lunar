@@ -153,8 +153,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "If the output should be printed as hex.")
         var hex = false
 
-        func run() {
+        func run() throws {
             Lunar.configureLogging(options: globals)
+            defer { globalExit(0) }
 
             guard let sig = getCodeSignature(hex: hex) else {
                 return

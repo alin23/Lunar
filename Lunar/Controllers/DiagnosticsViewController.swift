@@ -655,6 +655,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         stopped = true
         continueTestCondition.signal()
         for display in displayController.activeDisplays.values {

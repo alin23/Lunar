@@ -65,6 +65,10 @@ class Agent {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         libssh2_agent_disconnect(cAgent)
         libssh2_agent_free(cAgent)
     }
