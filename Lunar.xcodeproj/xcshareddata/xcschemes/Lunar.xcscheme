@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "mkdir -p $HOME/.bin&#10;echo &apos;#!/bin/bash&apos; &gt; $HOME/.bin/lunar&#10;echo &quot;$BUILT_PRODUCTS_DIR/Lunar.app/Contents/MacOS/Lunar @ \$@&quot; &gt;&gt; $HOME/.bin/lunar&#10;chmod 755 $HOME/.bin/lunar &#10;">
+               scriptText = "&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -46,16 +46,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C7B7432725BD7B67000D0EF1"
-               BuildableName = "LunarTests.xctest"
-               BlueprintName = "LunarTests"
-               ReferencedContainer = "container:Lunar.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

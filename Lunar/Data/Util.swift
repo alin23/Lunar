@@ -12,8 +12,94 @@ struct ResponseError: Error {
     var statusCode: Int
 }
 
+class DispatchWorkItem {
+    var name: String = ""
+    var workItem: Foundation.DispatchWorkItem
+
+    init(name: String, flags: DispatchWorkItemFlags = [], block: @escaping @convention(block) () -> Void) {
+        workItem = Foundation.DispatchWorkItem(flags: flags, block: block)
+        self.name = name
+    }
+
+    @discardableResult
+    @inline(__always) func wait(for timeout: DateComponents?) -> DispatchTimeoutResult {
+        guard let timeout = timeout else {
+            return wait(for: 0)
+        }
+        return wait(for: timeout.timeInterval)
+    }
+
+    @inline(__always) func cancel() {
+        workItem.cancel()
+    }
+
+    @inline(__always) var isCancelled: Bool {
+        workItem.isCancelled
+    }
+
+    @discardableResult
+    @inline(__always) func wait(for timeout: TimeInterval) -> DispatchTimeoutResult {
+        #if DEBUG
+            if timeout > 0 {
+                log.verbose("Waiting for \(timeout) seconds on \(name)")
+            } else {
+                log.verbose("Waiting for \(name)")
+            }
+            defer { log.verbose("Done waiting for \(name)") }
+        #endif
+
+        if timeout > 0 {
+            return workItem.wait(timeout: DispatchTime.now() + timeout)
+        } else {
+            workItem.wait()
+            return .success
+        }
+    }
+}
+
+class DispatchSemaphore {
+    var name: String = ""
+    var sem: Foundation.DispatchSemaphore
+
+    init(value: Int, name: String) {
+        sem = Foundation.DispatchSemaphore(value: value)
+        self.name = name
+    }
+
+    @discardableResult
+    @inline(__always) func wait(for timeout: DateComponents?, context: Any? = nil) -> DispatchTimeoutResult {
+        guard let timeout = timeout else {
+            return wait(for: 0, context: context)
+        }
+        return wait(for: timeout.timeInterval, context: context)
+    }
+
+    @inline(__always) func signal() {
+        sem.signal()
+    }
+
+    @discardableResult
+    @inline(__always) func wait(for timeout: TimeInterval, context: Any? = nil) -> DispatchTimeoutResult {
+        #if DEBUG
+            if timeout > 0 {
+                log.verbose("Waiting for \(timeout) seconds on \(name)", context: context)
+            } else {
+                log.verbose("Waiting for \(name)", context: context)
+            }
+            defer { log.verbose("Done waiting for \(name)", context: context) }
+        #endif
+
+        if timeout > 0 {
+            return sem.wait(timeout: DispatchTime.now() + timeout)
+        } else {
+            sem.wait()
+            return .success
+        }
+    }
+}
+
 func query(url: URL, timeout: TimeInterval = 0.seconds.timeInterval, wait: Bool = true) throws -> String {
-    let semaphore = DispatchSemaphore(value: 0)
+    let semaphore = DispatchSemaphore(value: 0, name: "query \(url.absoluteString)")
 
     var result: String = ""
     var responseError: Error?
@@ -36,7 +122,7 @@ func query(url: URL, timeout: TimeInterval = 0.seconds.timeInterval, wait: Bool 
     task.resume()
     guard wait else { return "" }
 
-    switch semaphore.wait(timeout: DispatchTime.now() + timeout) {
+    switch semaphore.wait(for: timeout) {
     case .timedOut:
         throw RequestTimeoutError()
     case .success:
@@ -291,6 +377,7 @@ func mainThread(_ action: () -> Void) {
     }
 }
 
+@discardableResult
 func mainThread<T>(_ action: () -> T) -> T {
     if Thread.isMainThread {
         return action()
@@ -322,7 +409,7 @@ func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
 func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    serialQueue.asyncAfter(deadline: deadline, execute: action)
+    serialQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
 var asyncUniqueTasks = [String: DispatchWorkItem]()
@@ -333,7 +420,7 @@ var asyncUniqueRecurringTasks = [String: Timer]()
 
     let task: DispatchWorkItem
     if let key = uniqueTaskKey {
-        task = DispatchWorkItem {
+        task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
             action()
             serialSync {
                 asyncUniqueTasks[key] = nil
@@ -345,12 +432,12 @@ var asyncUniqueRecurringTasks = [String: Timer]()
             asyncUniqueTasks[key] = task
         }
     } else {
-        task = DispatchWorkItem {
+        task = DispatchWorkItem(name: "asyncAfter(\(ms) ms)") {
             action()
         }
     }
 
-    concurrentQueue.asyncAfter(deadline: deadline, execute: task)
+    concurrentQueue.asyncAfter(deadline: deadline, execute: task.workItem)
 
     return task
 }
@@ -402,7 +489,7 @@ func cancelAsyncRecurringTask(_ key: String) {
                 return .success
             }
 
-            let semaphore = DispatchSemaphore(value: 0)
+            let semaphore = DispatchSemaphore(value: 0, name: "Async Thread Timeout")
 
             let thread = Thread {
                 action()
@@ -410,7 +497,7 @@ func cancelAsyncRecurringTask(_ key: String) {
             }
             thread.start()
 
-            let result = semaphore.wait(timeout: DispatchTime.now() + timeout.timeInterval)
+            let result = semaphore.wait(for: timeout)
             if result == .timedOut {
                 thread.cancel()
             }
@@ -425,14 +512,14 @@ func cancelAsyncRecurringTask(_ key: String) {
             return .success
         }
 
-        let semaphore = DispatchSemaphore(value: 0)
+        let semaphore = DispatchSemaphore(value: 0, name: "Async RunLoopQueue Timeout")
 
         queue.async {
             action()
             semaphore.signal()
         }
 
-        let result = semaphore.wait(timeout: DispatchTime.now() + timeout.timeInterval)
+        let result = semaphore.wait(for: timeout)
 
         return result
     }
@@ -443,12 +530,12 @@ func cancelAsyncRecurringTask(_ key: String) {
         return .success
     }
 
-    let task = DispatchWorkItem {
+    let task = DispatchWorkItem(name: "async(\(queue.label)") {
         action()
     }
-    queue.async(execute: task)
+    queue.async(execute: task.workItem)
 
-    let result = task.wait(timeout: DispatchTime.now() + timeout.timeInterval)
+    let result = task.wait(for: timeout)
     if result == .timedOut {
         task.cancel()
     }
@@ -484,7 +571,7 @@ func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ acti
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    concurrentQueue.asyncAfter(deadline: deadline, execute: action)
+    concurrentQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
 func mainAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
@@ -498,7 +585,7 @@ func mainAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
 func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    DispatchQueue.main.asyncAfter(deadline: deadline, execute: action)
+    DispatchQueue.main.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
 func getScreenWithMouse() -> NSScreen? {
@@ -718,7 +805,7 @@ func hideOperationInProgress() {
 
 // MARK: Dialogs
 
-var alertsByMessageSemaphore = DispatchSemaphore(value: 1)
+var alertsByMessageSemaphore = DispatchSemaphore(value: 1, name: "alertsByMessageSemaphore")
 var alertsByMessage = [String: Bool]()
 
 func dialog(
@@ -825,7 +912,7 @@ func ask(
     ultrawide: Bool = false
 ) -> NSApplication.ModalResponse {
     if unique {
-        switch alertsByMessageSemaphore.wait(timeout: DispatchTime.now() + waitTimeout.timeInterval) {
+        switch alertsByMessageSemaphore.wait(for: waitTimeout) {
         case .success:
             if alertsByMessage[message] != nil {
                 return .cancel
@@ -858,7 +945,7 @@ func ask(
                 onSuppression?((alert.suppressionButton?.state ?? .off) == .on)
 
                 if unique {
-                    switch alertsByMessageSemaphore.wait(timeout: DispatchTime.now() + 5) {
+                    switch alertsByMessageSemaphore.wait(for: 5) {
                     case .success:
                         alertsByMessage.removeValue(forKey: message)
                     case .timedOut:
@@ -877,7 +964,7 @@ func ask(
         }
 
         if unique {
-            switch alertsByMessageSemaphore.wait(timeout: DispatchTime.now() + 5) {
+            switch alertsByMessageSemaphore.wait(for: 5) {
             case .success:
                 alertsByMessage.removeValue(forKey: message)
             case .timedOut:
@@ -902,6 +989,10 @@ final class UnfairLock {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         unfairLock.deinitialize(count: 1)
         unfairLock.deallocate()
     }

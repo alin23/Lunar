@@ -13,7 +13,7 @@ class GammaViewController: NSViewController {
     @IBOutlet var dot: NSTextField!
 
     @Atomic var highlighterTask: CFRunLoopTimer?
-    var highlighterSemaphore = DispatchSemaphore(value: 1)
+    var highlighterSemaphore = DispatchSemaphore(value: 1, name: "highlighterSemaphore")
 
     func highlight() {
         mainThreadSerial {
@@ -24,7 +24,7 @@ class GammaViewController: NSViewController {
             }
 
             highlighterTask = operationHighlightQueue.async(every: 200.milliseconds) { [weak self] (_: CFRunLoopTimer?) in
-                self?.highlighterSemaphore.wait()
+                self?.highlighterSemaphore.wait(for: nil)
                 defer {
                     self?.highlighterSemaphore.signal()
                 }

@@ -35,7 +35,11 @@ class DisplayValuesView: NSTableView {
     }
 
     deinit {
-        log.verbose("")
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+
         for (_, observers) in displayObservers {
             for observer in observers {
                 observer.cancel()

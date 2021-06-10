@@ -103,6 +103,10 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         guard let display = display else { return }
         POPOVERS.removeValue(forKey: display.serial)
     }

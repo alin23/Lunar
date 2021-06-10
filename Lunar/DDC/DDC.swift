@@ -284,10 +284,10 @@ enum DDC {
     static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
     static var readFaults = [CGDirectDisplayID: [ControlID: Int]]()
     static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
-    static let semaphore = DispatchSemaphore(value: 1)
+    static let semaphore = DispatchSemaphore(value: 1, name: "DDC")
 
     static func reset() {
-        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        _ = semaphore.wait(for: 10.seconds)
         defer {
             semaphore.signal()
         }
@@ -322,7 +322,7 @@ enum DDC {
         guard apply, !TEST_IDS.contains(displayID) else { return true }
 
         return queue.sync {
-            _ = semaphore.wait(timeout: .now() + .seconds(10))
+            _ = semaphore.wait(for: 10.seconds)
             defer {
                 semaphore.signal()
             }
@@ -403,7 +403,7 @@ enum DDC {
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
         guard !TEST_IDS.contains(displayID) else { return nil }
-        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        _ = semaphore.wait(for: 10.seconds)
         defer {
             semaphore.signal()
         }
@@ -477,7 +477,7 @@ enum DDC {
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
         guard !TEST_IDS.contains(displayID) else { return nil }
 
-        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        _ = semaphore.wait(for: 10.seconds)
         defer {
             semaphore.signal()
         }
@@ -609,7 +609,7 @@ enum DDC {
             .compactMap { screen in screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID }
         guard activeIDs.contains(displayID) else { return 0 }
 
-        _ = semaphore.wait(timeout: .now() + .seconds(10))
+        _ = semaphore.wait(for: 10.seconds)
         defer {
             semaphore.signal()
         }

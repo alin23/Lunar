@@ -79,6 +79,10 @@ class QuickAdaptiveButton: NSButton {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         for observer in displayObservers {
             observer.cancel()
         }

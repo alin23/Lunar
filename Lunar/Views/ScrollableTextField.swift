@@ -369,7 +369,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     func finishScrolling(after ms: Int) {
         adaptToScrollingFinished?.cancel()
-        adaptToScrollingFinished = DispatchWorkItem { [weak self] in
+        adaptToScrollingFinished = DispatchWorkItem(name: "adaptToScrollingFinished") { [weak self] in
             self?.finishScrolling()
             self?.adaptToScrollingFinished = nil
         }

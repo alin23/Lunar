@@ -227,6 +227,10 @@ class InstallOutputViewController: NSViewController {
     }
 
     deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
         cancelInstall(self)
     }
 }
