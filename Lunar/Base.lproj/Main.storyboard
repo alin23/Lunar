@@ -537,6 +537,13 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="JfK-0c-iRE"/>
+                                        <menuItem title="Force update display list" id="YHO-fH-eQk">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="forceUpdateDisplayList:" target="Voe-Tx-rLC" id="fPU-mc-8El"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="Xzc-1A-RF2"/>
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>

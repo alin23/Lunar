@@ -75,13 +75,11 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
 
 class DataStore: NSObject {
     func displays(serials: [String]? = nil) -> [Display]? {
-        serialSync {
-            guard let displays = CachedDefaults[.displays] else { return nil }
-            if let ids = serials {
-                return displays.filter { display in ids.contains(display.serial) }
-            }
-            return displays
+        guard let displays = CachedDefaults[.displays] else { return nil }
+        if let serials = serials {
+            return displays.filter { display in serials.contains(display.serial) }
         }
+        return displays
     }
 
     func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
@@ -180,7 +178,7 @@ class DataStore: NSObject {
     }
 
     static func storeDisplay(display: Display) {
-        guard display.id != TEST_DISPLAY_ID, display.id != GENERIC_DISPLAY_ID else {
+        guard !isGeneric(display.id) else {
             return
         }
 
@@ -314,7 +312,7 @@ enum CachedDefaults {
             semaphore.signal()
 
             if key == .displays, let displays = newValue as? [Display] {
-                displaysPublisher.send(displays)
+                async { displaysPublisher.send(displays) }
             }
 
             lock.around {

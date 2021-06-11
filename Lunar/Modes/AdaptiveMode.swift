@@ -7,6 +7,7 @@
 //
 
 import Accelerate
+import Atomics
 import Cocoa
 import Defaults
 import Foundation
@@ -123,6 +124,8 @@ struct DataPoint {
     var last: Int
 }
 
+var curveFactor: Double = 1
+
 protocol AdaptiveMode: AnyObject {
     var force: Bool { get set }
     var brightnessDataPoint: DataPoint { get set }
@@ -139,9 +142,9 @@ protocol AdaptiveMode: AnyObject {
     func adapt(_ display: Display)
 }
 
-var datapointSemaphore = DispatchSemaphore(value: 1, name: "datapointSemaphore")
+var datapointSemaphore = Foundation.DispatchSemaphore(value: 1)
 func datapointLockAround<T>(_ action: () -> T) -> T {
-    datapointSemaphore.wait(for: nil)
+    datapointSemaphore.wait()
     defer {
         datapointSemaphore.signal()
     }
@@ -154,9 +157,9 @@ extension AdaptiveMode {
     }
 
     @inline(__always) func withForce(_ force: Bool = true, _ block: () -> Void) {
-        serialSync { self.force = force }
+        self.force = force
         block()
-        serialSync { self.force = false }
+        self.force = false
     }
 
     @inline(__always) func ifAvailable() -> Self? {
@@ -200,7 +203,7 @@ extension AdaptiveMode {
             dataPoint = datapointLockAround { contrastDataPoint }
         }
 
-        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? CachedDefaults[.curveFactor]), offset: offset?.f ?? 0.0)
+        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? curveFactor), offset: offset?.f ?? 0.0)
 
         return mapNumberSIMD(
             curve,
@@ -245,7 +248,7 @@ extension AdaptiveMode {
                 newValue = externalLow
             } else {
                 newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
-                newValue = adjustCurve(newValue, factor: factor ?? CachedDefaults[.curveFactor], minVal: externalLow, maxVal: externalHigh)
+                newValue = adjustCurve(newValue, factor: factor ?? curveFactor, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
                 log.error("NaN value!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])

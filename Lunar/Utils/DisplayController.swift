@@ -24,9 +24,9 @@ class DisplayController {
     var clamshellMode: Bool = false
 
     var appObserver: NSKeyValueObservation?
-    @Atomic var runningAppExceptions: [AppException]!
+    @AtomicLock var runningAppExceptions: [AppException]!
 
-    @Atomic var displays: [CGDirectDisplayID: Display] = [:] {
+    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
             activeDisplaysByReadableID = [String: Display](
@@ -86,9 +86,12 @@ class DisplayController {
     var firstDisplay: Display {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
-        } else if TEST_MODE {
-            return TEST_DISPLAY
         } else {
+            #if DEBUG
+                if TEST_MODE {
+                    return TEST_DISPLAY
+                }
+            #endif
             return GENERIC_DISPLAY
         }
     }
@@ -134,9 +137,6 @@ class DisplayController {
     var modeWatcherTask: CFRunLoopTimer?
 
     func removeDisplay(id _: CGDirectDisplayID) {
-//        if let display = displays.removeValue(forKey: id) {
-//            display.removeObservers()
-//        }
         let nsDisplays = displays.values.map { $0 }
         CachedDefaults[.displays] = nsDisplays
     }
@@ -154,16 +154,14 @@ class DisplayController {
     }
 
     static func autoMode() -> AdaptiveMode {
-        serialSync {
-            if let mode = SensorMode.shared.ifAvailable() {
-                return mode
-            } else if let mode = SyncMode.shared.ifAvailable() {
-                return mode
-            } else if let mode = LocationMode.shared.ifAvailable() {
-                return mode
-            } else {
-                return ManualMode.shared
-            }
+        if let mode = SensorMode.shared.ifAvailable() {
+            return mode
+        } else if let mode = SyncMode.shared.ifAvailable() {
+            return mode
+        } else if let mode = LocationMode.shared.ifAvailable() {
+            return mode
+        } else {
+            return ManualMode.shared
         }
     }
 
@@ -202,13 +200,24 @@ class DisplayController {
     }
 
     func resetDisplayList() {
-        getDisplaysLock.around {
-            DDC.reset()
-//            for display in displays.values {
-//                display.removeObservers()
-//            }
-            displays = DisplayController.getDisplays()
-            addSentryData()
+        async {
+            self.getDisplaysLock.around {
+                DDC.reset()
+                self.displays = DisplayController.getDisplays()
+                SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
+                SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
+                self.addSentryData()
+            }
+
+            mainThread {
+                let appd = appDelegate()
+                if appd.windowController?.window != nil {
+                    appd.windowController?.close()
+                    appd.windowController?.window = nil
+                    appd.windowController = nil
+                    appd.showWindow()
+                }
+            }
         }
     }
 
@@ -239,7 +248,7 @@ class DisplayController {
             for display in self.activeDisplays.values {
                 display.control = display.getBestControl()
                 if self.shouldPromptAboutFallback(display) {
-                    serialSync { log.warning("Non-responsive display", context: display.context) }
+                    log.warning("Non-responsive display", context: display.context)
                     self.fallbackPromptTime[display.id] = Date()
                     let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
                     let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
@@ -578,72 +587,68 @@ class DisplayController {
     }
 
     static func getDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID: Display] {
-        var displays: [CGDirectDisplayID: Display]
-        let displayIDNameMapping = DDC.findExternalDisplays(includeVirtual: includeVirtual || TEST_MODE)
-
-        var serials = displayIDNameMapping.keys.map { Display.uuid(id: $0) }
-        let displayIDs = Set(displayIDNameMapping.keys.map { $0 })
-        let names = displayIDNameMapping.values.map { $0 }
-        var serialsAndNames = zip(serials, names).map { ($0, $1) }
+        let ids = DDC.findExternalDisplays(includeVirtual: includeVirtual || TEST_MODE)
+        var serials = ids.map { Display.uuid(id: $0) }
 
         // Make sure serials are unique
         if serials.count != Set(serials).count {
-            serials = zip(serials, displayIDs).map { serial, id in "\(serial)-\(id)" }
-            serialsAndNames = zip(serialsAndNames, serials).map { d, serial in (serial, d.1) }
+            serials = zip(serials, ids).map { serial, id in "\(serial)-\(id)" }
         }
 
-        let displaySerialIDMapping = Dictionary(zip(serials, displayIDs), uniquingKeysWith: { first, _ in first })
-        let displaySerialNameMapping = Dictionary(serialsAndNames, uniquingKeysWith: { first, _ in first })
-        let displayIDSerialNameMapping = Dictionary(zip(displayIDs, serialsAndNames), uniquingKeysWith: { first, _ in first })
+        let idForSerial = Dictionary(zip(serials, ids), uniquingKeysWith: first(this:other:))
+        let serialForID = Dictionary(zip(ids, serials), uniquingKeysWith: first(this:other:))
 
-        if let displayList = datastore.displays(serials: serials) {
-            for display in displayList {
-                if let newID = displaySerialIDMapping[display.serial] {
-                    display.id = newID
-                }
-                if let newName = displaySerialNameMapping[display.serial] {
-                    display.edidName = newName
-                    if display.name.isEmpty {
-                        display.name = newName
-                    }
-                }
-                display.active = true
-            }
-
-            displays = Dictionary(displayList.map {
-                d -> (CGDirectDisplayID, Display) in (d.id, d)
-            }, uniquingKeysWith: { first, _ in first })
-
-            let loadedDisplayIDs = Set(displays.keys)
-            for id in displayIDs.subtracting(loadedDisplayIDs) {
-                if let (serial, name) = displayIDSerialNameMapping[id] {
-                    displays[id] = Display(id: id, serial: serial, name: name, active: true)
-                } else {
-                    displays[id] = Display(id: id, active: true)
-                }
-            }
+        guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
+            let displays = ids.map { Display(id: $0, active: true) }
 
             #if DEBUG
-                print("STORING UPDATED DISPLAYS", displays.values.map(\.serial))
+                log.debug("STORING NEW DISPLAYS \(displays.map(\.serial))")
             #endif
-            let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
+            let storedDisplays = datastore.storeDisplays(displays)
             #if DEBUG
-                print("STORED UPDATED DISPLAYS", storedDisplays.map(\.serial))
+                log.debug("STORED NEW DISPLAYS \(storedDisplays.map(\.serial))")
             #endif
 
-            return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
+            return Dictionary(
+                storedDisplays.map { d in (d.id, d) },
+                uniquingKeysWith: first(this:other:)
+            )
         }
-        displays = Dictionary(displayIDs.map { id in (id, Display(id: id, active: true)) }, uniquingKeysWith: { first, _ in first })
+
+        // Update IDs after reconnection
+        for display in displayList {
+            defer { display.active = true }
+            guard let newID = idForSerial[display.serial] else {
+                continue
+            }
+
+            display.id = newID
+            display.edidName = Display.printableName(id: newID)
+            if display.name.isEmpty {
+                display.name = display.edidName
+            }
+        }
+
+        var displays = Dictionary(
+            displayList.map { ($0.id, $0) },
+            uniquingKeysWith: first(this:other:)
+        )
+
+        // Initialize displays that were never seen before
+        let newDisplayIDs = Set(ids).subtracting(Set(displays.keys))
+        for id in newDisplayIDs {
+            displays[id] = Display(id: id, serial: serialForID[id], active: true)
+        }
 
         #if DEBUG
-            print("STORING NEW DISPLAYS", displays.values.map(\.serial))
+            log.debug("STORING UPDATED DISPLAYS \(displays.values.map(\.serial))")
         #endif
         let storedDisplays = datastore.storeDisplays(displays.values.map { $0 })
         #if DEBUG
-            print("STORED NEW DISPLAYS", storedDisplays.map(\.serial))
+            log.debug("STORED UPDATED DISPLAYS \(storedDisplays.map(\.serial))")
         #endif
 
-        return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: { first, _ in first })
+        return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
     }
 
     func addSentryData() {
@@ -788,11 +793,9 @@ class DisplayController {
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        serialSync {
-            for display in displays ?? Array(activeDisplays.values) {
-                adaptiveMode.withForce(force || display.force.load(ordering: .relaxed)) {
-                    adaptiveMode.adapt(display)
-                }
+        for display in displays ?? Array(activeDisplays.values) {
+            adaptiveMode.withForce(force || display.force) {
+                adaptiveMode.adapt(display)
             }
         }
     }
@@ -871,7 +874,7 @@ class DisplayController {
     }
 
     func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+        guard checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
@@ -890,7 +893,7 @@ class DisplayController {
     }
 
     func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
-        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+        guard checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)

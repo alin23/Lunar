@@ -867,7 +867,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func faceLightHotkeyHandler() {
-        guard lunarProActive.load(ordering: .relaxed) else { return }
+        guard lunarProActive else { return }
         cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")

@@ -6,13 +6,14 @@
 //  Copyright © 2019 Alin. All rights reserved.
 //
 
+import Atomics
 import Cocoa
 import Defaults
 
 class StatusItemButtonController: NSView {
     var statusButton: NSStatusBarButton?
     var menuPopoverOpener: DispatchWorkItem?
-    var clicked = false
+    @Atomic var clicked = false
 
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)

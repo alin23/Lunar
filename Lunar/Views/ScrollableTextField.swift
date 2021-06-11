@@ -14,6 +14,7 @@ import Magnet
 let PRECISE_SCROLL_Y_THRESHOLD: CGFloat = 25.0
 let NORMAL_SCROLL_Y_THRESHOLD: CGFloat = 9.0
 let FAST_SCROLL_Y_THRESHOLD: CGFloat = 2.0
+let FASTEST_SCROLL_Y_THRESHOLD: CGFloat = 0.1
 
 var scrollDeltaYThreshold: CGFloat = NORMAL_SCROLL_Y_THRESHOLD
 
@@ -254,7 +255,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    @Atomic var highlighterTask: CFRunLoopTimer?
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func highlight(message: String) {
         mainThreadSerial {
