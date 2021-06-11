@@ -33,12 +33,14 @@ let DEFAULT_MIN_CONTRAST: UInt8 = 50
 let DEFAULT_MAX_CONTRAST: UInt8 = 75
 
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
-let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
-let TEST_DISPLAY_PERSISTENT_ID: CGDirectDisplayID = UINT32_MAX / 3
-let TEST_DISPLAY_PERSISTENT2_ID: CGDirectDisplayID = UINT32_MAX / 4
-let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = UINT32_MAX / 5
-let TEST_DISPLAY_PERSISTENT4_ID: CGDirectDisplayID = UINT32_MAX / 6
-let TEST_IDS = Set(arrayLiteral: GENERIC_DISPLAY_ID, TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID)
+#if DEBUG
+    let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
+    let TEST_DISPLAY_PERSISTENT_ID: CGDirectDisplayID = UINT32_MAX / 3
+    let TEST_DISPLAY_PERSISTENT2_ID: CGDirectDisplayID = UINT32_MAX / 4
+    let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = UINT32_MAX / 5
+    let TEST_DISPLAY_PERSISTENT4_ID: CGDirectDisplayID = UINT32_MAX / 6
+    let TEST_IDS = Set(arrayLiteral: GENERIC_DISPLAY_ID, TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID)
+#endif
 
 let GENERIC_DISPLAY = Display(
     id: GENERIC_DISPLAY_ID,
@@ -49,86 +51,88 @@ let GENERIC_DISPLAY = Display(
     minContrast: 0,
     maxContrast: 100
 )
-var TEST_DISPLAY: Display = {
-    let d = Display(
-        id: TEST_DISPLAY_ID,
-        serial: "TEST_SERIAL",
-        name: "Test Display",
-        active: true,
-        minBrightness: 0,
-        maxBrightness: 60,
-        minContrast: 50,
-        maxContrast: 75,
-        adaptive: true,
-        userBrightness: [.sync: [71: 55]]
-    )
-    d.hasI2C = true
-    return d
-}()
+#if DEBUG
+    var TEST_DISPLAY: Display = {
+        let d = Display(
+            id: TEST_DISPLAY_ID,
+            serial: "TEST_DISPLAY_SERIAL",
+            name: "Test Display",
+            active: true,
+            minBrightness: 0,
+            maxBrightness: 60,
+            minContrast: 50,
+            maxContrast: 75,
+            adaptive: true,
+            userBrightness: [.sync: [71: 55]]
+        )
+        d.hasI2C = true
+        return d
+    }()
 
-var TEST_DISPLAY_PERSISTENT: Display = {
-    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT"])?.first ?? Display(
-        id: TEST_DISPLAY_PERSISTENT_ID,
-        serial: "TEST_SERIAL_PERSISTENT",
-        name: "Persistent",
-        active: true,
-        minBrightness: 0,
-        maxBrightness: 100,
-        minContrast: 0,
-        maxContrast: 100,
-        adaptive: true
-    )
-    d.hasI2C = true
-    return d
-}()
+    var TEST_DISPLAY_PERSISTENT: Display = {
+        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT_SERIAL"])?.first ?? Display(
+            id: TEST_DISPLAY_PERSISTENT_ID,
+            serial: "TEST_DISPLAY_PERSISTENT_SERIAL_PERSISTENT",
+            name: "Persistent",
+            active: true,
+            minBrightness: 0,
+            maxBrightness: 100,
+            minContrast: 0,
+            maxContrast: 100,
+            adaptive: true
+        )
+        d.hasI2C = true
+        return d
+    }()
 
-var TEST_DISPLAY_PERSISTENT2: Display = {
-    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_TWO"])?.first ?? Display(
-        id: TEST_DISPLAY_PERSISTENT2_ID,
-        serial: "TEST_SERIAL_PERSISTENT_TWO",
-        name: "Persistent v2",
-        active: true,
-        minBrightness: 0,
-        maxBrightness: 100,
-        minContrast: 0,
-        maxContrast: 100,
-        adaptive: true
-    )
-    d.hasI2C = true
-    return d
-}()
+    var TEST_DISPLAY_PERSISTENT2: Display = {
+        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT2_SERIAL"])?.first ?? Display(
+            id: TEST_DISPLAY_PERSISTENT2_ID,
+            serial: "TEST_DISPLAY_PERSISTENT2_SERIAL_PERSISTENT_TWO",
+            name: "Persistent v2",
+            active: true,
+            minBrightness: 0,
+            maxBrightness: 100,
+            minContrast: 0,
+            maxContrast: 100,
+            adaptive: true
+        )
+        d.hasI2C = true
+        return d
+    }()
 
-var TEST_DISPLAY_PERSISTENT3: Display = {
-    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_THREE"])?.first ?? Display(
-        id: TEST_DISPLAY_PERSISTENT3_ID,
-        serial: "TEST_SERIAL_PERSISTENT_THREE",
-        name: "Persistent v3",
-        active: true,
-        minBrightness: 0,
-        maxBrightness: 100,
-        minContrast: 0,
-        maxContrast: 100,
-        adaptive: true
-    )
-    d.hasI2C = true
-    return d
-}()
+    var TEST_DISPLAY_PERSISTENT3: Display = {
+        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT3_SERIAL"])?.first ?? Display(
+            id: TEST_DISPLAY_PERSISTENT3_ID,
+            serial: "TEST_DISPLAY_PERSISTENT3_SERIAL_PERSISTENT_THREE",
+            name: "Persistent v3",
+            active: true,
+            minBrightness: 0,
+            maxBrightness: 100,
+            minContrast: 0,
+            maxContrast: 100,
+            adaptive: true
+        )
+        d.hasI2C = true
+        return d
+    }()
 
-var TEST_DISPLAY_PERSISTENT4: Display = {
-    let d = datastore.displays(serials: ["TEST_SERIAL_PERSISTENT_FOUR"])?.first ?? Display(
-        id: TEST_DISPLAY_PERSISTENT4_ID,
-        serial: "TEST_SERIAL_PERSISTENT_FOUR",
-        name: "Persistent v4",
-        active: true,
-        minBrightness: 0,
-        maxBrightness: 100,
-        minContrast: 0,
-        maxContrast: 100,
-        adaptive: true
-    )
-    d.hasI2C = true
-    return d
-}()
+    var TEST_DISPLAY_PERSISTENT4: Display = {
+        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT4_SERIAL"])?.first ?? Display(
+            id: TEST_DISPLAY_PERSISTENT4_ID,
+            serial: "TEST_DISPLAY_PERSISTENT4_SERIAL_PERSISTENT_FOUR",
+            name: "Persistent v4",
+            active: true,
+            minBrightness: 0,
+            maxBrightness: 100,
+            minContrast: 0,
+            maxContrast: 100,
+            adaptive: true
+        )
+        d.hasI2C = true
+        return d
+    }()
+#endif
 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
 
@@ -279,10 +283,10 @@ enum ValueType {
         didSet {
             save()
 
-            guard !lockedBrightness, force.load(ordering: .relaxed) || brightness != oldValue else { return }
+            guard !lockedBrightness, force || brightness != oldValue else { return }
 
-            if !force.load(ordering: .relaxed) {
-                guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+            if !force {
+                guard checkRemainingAdjustments() else { return }
             }
 
             guard !isForTesting else { return }
@@ -325,10 +329,10 @@ enum ValueType {
         didSet {
             save()
 
-            guard !lockedContrast, force.load(ordering: .relaxed) || contrast != oldValue else { return }
+            guard !lockedContrast, force || contrast != oldValue else { return }
 
-            if !force.load(ordering: .relaxed) {
-                guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+            if !force {
+                guard checkRemainingAdjustments() else { return }
             }
 
             guard !isForTesting else { return }
@@ -527,9 +531,9 @@ enum ValueType {
 
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
         let name = key.rawValue
-        guard let value = serialSync({ self.value(forKey: name) as? Bool }),
+        guard let value = self.value(forKey: name) as? Bool,
               let condition =
-              serialSync({ self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition })
+              self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition
         else {
             log.error("No condition property found for \(name)")
             return
@@ -545,18 +549,17 @@ enum ValueType {
                 showOperationInProgress(screen: screen)
             }
             asyncAfter(ms: 5000, uniqueTaskKey: name) { [weak self] in
-                serialSync {
-                    self?.setValue(false, forKey: name)
 
-                    guard let condition = self?.value(
-                        forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
-                    ) as? NSCondition
-                    else {
-                        log.error("No condition property found for \(name)")
-                        return
-                    }
-                    condition.broadcast()
+                self?.setValue(false, forKey: name)
+
+                guard let condition = self?.value(
+                    forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
+                ) as? NSCondition
+                else {
+                    log.error("No condition property found for \(name)")
+                    return
                 }
+                condition.broadcast()
             }
         }
     }
@@ -632,8 +635,8 @@ enum ValueType {
         return "\(safeName)-\(shortHash(string: serial))"
     }
 
-    @Atomic var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
-    @Atomic var contrastDataPointInsertionTask: DispatchWorkItem? = nil
+    @AtomicLock var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
+    @AtomicLock var contrastDataPointInsertionTask: DispatchWorkItem? = nil
 
     var slowRead = false
     var slowWrite = false
@@ -654,7 +657,7 @@ enum ValueType {
     }
 
     var onControlChange: ((Control) -> Void)? = nil
-    @Atomic var control: Control! = nil {
+    @AtomicLock var control: Control! = nil {
         didSet {
             context = getContext()
             if let control = control {
@@ -683,9 +686,9 @@ enum ValueType {
         }
     }
 
-    @Atomic var context: [String: Any]? = nil
+    @AtomicLock var context: [String: Any]? = nil
 
-    lazy var isForTesting = TEST_IDS.contains(id)
+    lazy var isForTesting = isTestID(id)
 
     lazy var screen: NSScreen? = {
         guard !isForTesting else { return nil }
@@ -698,8 +701,8 @@ enum ValueType {
 
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
 
-    var force = ManagedAtomic<Bool>(false)
-    var faceLightEnabled = false
+    @Atomic var force = false
+    @Atomic var faceLightEnabled = false
     var brightnessBeforeFacelight = 50.ns
     var contrastBeforeFacelight = 50.ns
     var maxBrightnessBeforeFacelight = 100.ns
@@ -877,7 +880,11 @@ enum ValueType {
 
         super.init()
         refreshGamma()
-        hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
+        #if DEBUG
+            hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
+        #else
+            hasI2C = DDC.hasI2CController(displayID: id)
+        #endif
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
@@ -964,7 +971,7 @@ enum ValueType {
 
         super.init()
 
-        if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
+        if !isGeneric(id) {
             if CachedDefaults[.refreshValues] {
                 serialQueue.async { [weak self] in
                     guard let self = self else { return }
@@ -976,7 +983,11 @@ enum ValueType {
             }
             refreshGamma()
         }
-        hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
+        #if DEBUG
+            hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
+        #else
+            hasI2C = DDC.hasI2CController(displayID: id)
+        #endif
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
@@ -1027,7 +1038,7 @@ enum ValueType {
     }
 
     func save() {
-        serialSync {
+        asyncAfter(ms: 800, uniqueTaskKey: "displaySave") {
             DataStore.storeDisplay(display: self)
         }
     }
@@ -1035,6 +1046,23 @@ enum ValueType {
     // MARK: EDID
 
     static func printableName(id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "Test Display"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "Persistent"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "Persistent v2"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "Persistent v3"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "Persistent v4"
+            default:
+                break
+            }
+        #endif
+
         if var name = DDC.getDisplayName(for: id) {
             name = name.stripped
             let minChars = floor(name.count.d * 0.8)
@@ -1046,10 +1074,26 @@ enum ValueType {
     }
 
     static func uuid(id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "TEST_DISPLAY_SERIAL"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "TEST_DISPLAY_PERSISTENT_SERIAL"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "TEST_DISPLAY_PERSISTENT2_SERIAL"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "TEST_DISPLAY_PERSISTENT3_SERIAL"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "TEST_DISPLAY_PERSISTENT4_SERIAL"
+            default:
+                break
+            }
+        #endif
+
         if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
             let uuidValue = uuid.takeRetainedValue()
             let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
-//            uuid.release()
             return uuidString
         }
         if let edid = Display.edid(id: id) {
@@ -1389,13 +1433,13 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        guard !isUserAdjusting(), !serialSync({ sendingBrightness }) else { return }
+        guard !isUserAdjusting(), !sendingBrightness else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !serialSync({ sendingBrightness }) else { return }
+        guard !isUserAdjusting(), !sendingBrightness else { return }
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
@@ -1413,13 +1457,13 @@ enum ValueType {
     }
 
     func refreshContrast() {
-        guard !isUserAdjusting(), !serialSync({ sendingContrast }) else { return }
+        guard !isUserAdjusting(), !sendingContrast else { return }
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !serialSync({ sendingContrast }) else { return }
+        guard !isUserAdjusting(), !sendingContrast else { return }
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
@@ -1537,11 +1581,11 @@ enum ValueType {
             toLow: 0.3, toHigh: initialBlueGamma
         ))
 
-        let contrast = serialSync { CGGammaValue(mapNumber(
+        let contrast = CGGammaValue(mapNumber(
             powf(Float(contrast ?? self.contrast.uint8Value) / 100.0, 0.3),
             fromLow: 0, fromHigh: 1.0,
             toLow: -0.2, toHigh: 0.2
-        )) }
+        ))
 
         return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: contrast)
     }
@@ -1556,7 +1600,7 @@ enum ValueType {
         log.debug("green: \(newGamma.green)")
         log.debug("blue: \(newGamma.blue)")
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
-        let id = serialSync { self.id }
+        let id = self.id
 
         showOperationInProgress(screen: screen)
         async {
@@ -1571,9 +1615,9 @@ enum ValueType {
                 }
                 Thread.sleep(forTimeInterval: 0.005)
 
-                let redGamma = serialSync { self.initialRedGamma }
-                let greenGamma = serialSync { self.initialGreenGamma }
-                let blueGamma = serialSync { self.initialBlueGamma }
+                let redGamma = self.initialRedGamma
+                let greenGamma = self.initialGreenGamma
+                let blueGamma = self.initialBlueGamma
 
                 let oldGamma = self.computeGamma(brightness: oldBrightness, contrast: oldContrast)
                 let maxDiff = max(
@@ -1604,9 +1648,9 @@ enum ValueType {
                 gammaSemaphore.wait(for: nil)
             }
 
-            let redGamma = serialSync { self.initialRedGamma }
-            let greenGamma = serialSync { self.initialGreenGamma }
-            let blueGamma = serialSync { self.initialBlueGamma }
+            let redGamma = self.initialRedGamma
+            let greenGamma = self.initialGreenGamma
+            let blueGamma = self.initialBlueGamma
 
             CGSetDisplayTransferByFormula(
                 id,
@@ -1656,9 +1700,9 @@ enum ValueType {
     }
 
     @inline(__always) func withForce(_ force: Bool = true, _ block: () -> Void) {
-        self.force.store(force, ordering: .releasing)
+        self.force = force
         block()
-        self.force.store(false, ordering: .releasing)
+        self.force = false
     }
 
     @inline(__always) func withoutSmoothTransition(_ block: () -> Void) {
@@ -1781,7 +1825,7 @@ enum ValueType {
         ).i
 
         brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
-            while let self = self, serialSync({ self.sendingBrightness }) {
+            while let self = self, self.sendingBrightness {
                 self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
@@ -1811,7 +1855,7 @@ enum ValueType {
         ).i
 
         contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
-            while let self = self, serialSync({ self.sendingContrast }) {
+            while let self = self, self.sendingContrast {
                 self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
@@ -1828,6 +1872,6 @@ enum ValueType {
     }
 
     func isUserAdjusting() -> Bool {
-        serialSync { brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil }
+        brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil
     }
 }

@@ -67,7 +67,7 @@ class Service {
     }
 
     var urlInitialized = false
-    @Atomic var _url: URL? = nil
+    @AtomicLock var _url: URL? = nil
     var url: URL? {
         get {
             if !urlInitialized {
@@ -82,7 +82,7 @@ class Service {
     }
 
     var maxValueUrlInitialized = false
-    @Atomic var _maxValueUrl: URL? = nil
+    @AtomicLock var _maxValueUrl: URL? = nil
     var maxValueUrl: URL? {
         get {
             if !maxValueUrlInitialized {
@@ -97,7 +97,7 @@ class Service {
     }
 
     var smoothTransitionUrlInitialized = false
-    @Atomic var _smoothTransitionUrl: URL? = nil
+    @AtomicLock var _smoothTransitionUrl: URL? = nil
     var smoothTransitionUrl: URL? {
         get {
             if !smoothTransitionUrlInitialized {
@@ -130,7 +130,7 @@ class NetworkControl: Control {
 
     static func setup() {
         displayController.onActiveDisplaysChange = {
-            let matchedServices = serialSync { controllersForDisplay.values.map(\.service) }
+            let matchedServices = controllersForDisplay.values.map(\.service)
             for service in Set(browser.services).subtracting(matchedServices) {
                 matchTXTRecord(service)
             }
@@ -162,9 +162,8 @@ class NetworkControl: Control {
         let semaphore = DispatchSemaphore(value: 0, name: "Network Control found prompt")
         let completionHandler = { (useNetwork: NSApplication.ModalResponse) in
             if useNetwork == .alertFirstButtonReturn {
-                serialSync {
-                    controllersForDisplay[display.serial] = service
-                }
+                controllersForDisplay[display.serial] = service
+
                 async(threaded: true) {
                     display.control = display.getBestControl()
                 }
@@ -276,10 +275,9 @@ class NetworkControl: Control {
             }
 
             log.info("Service removed: \(service)")
-            serialSync {
-                if let toRemove = displayService {
-                    controllersForDisplay.removeValue(forKey: toRemove.key)
-                }
+
+            if let toRemove = displayService {
+                controllersForDisplay.removeValue(forKey: toRemove.key)
             }
         }
 
@@ -287,7 +285,7 @@ class NetworkControl: Control {
     }
 
     static func sendToAllControllers(_ action: (URL) -> Void) {
-        let urls = serialSync { controllersForDisplay.values.compactMap { $0.url?.deletingLastPathComponent() }.uniqued() }
+        let urls = controllersForDisplay.values.compactMap { $0.url?.deletingLastPathComponent() }.uniqued()
         for url in urls {
             action(url)
         }
@@ -319,7 +317,7 @@ class NetworkControl: Control {
     }
 
     func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }),
+        guard let service = NetworkControl.controllersForDisplay[display.serial],
               let url = smooth ? service.smoothTransitionUrl : service.url,
               DDC.apply
         else {
@@ -382,7 +380,7 @@ class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
         _ = setterTasksSemaphore.wait(for: 5.seconds)
 
-        guard let controller = serialSync({ NetworkControl.controllersForDisplay[display.serial] }),
+        guard let controller = NetworkControl.controllersForDisplay[display.serial],
               let url = max ? controller.maxValueUrl : controller.url,
               setterTasks[controlID] == nil || setterTasks[controlID]!.isCancelled
         else {
@@ -474,7 +472,7 @@ class NetworkControl: Control {
         }
 
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay,
-              let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else { return false }
+              let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
 
         if service.url == nil {
             async(runLoopQueue: lowprioQueue) {
@@ -492,7 +490,7 @@ class NetworkControl: Control {
     var responsiveTryCount = 0
 
     func isResponsive() -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else {
+        guard let service = NetworkControl.controllersForDisplay[display.serial] else {
             responsiveTryCount += 1
             if responsiveTryCount > 3 {
                 responsiveTryCount = 0
@@ -507,7 +505,7 @@ class NetworkControl: Control {
 
         asyncAfter(ms: 100, uniqueTaskKey: "networkControlResponsiveChecker") { [weak self] in
             guard let self = self else { return }
-            guard let service = serialSync({ NetworkControl.controllersForDisplay[self.display.serial] }),
+            guard let service = NetworkControl.controllersForDisplay[self.display.serial],
                   let url = service.url, let newURL = service.getFirstRespondingURL(
                       urls: service.urls,
                       timeout: 600.milliseconds,
@@ -547,9 +545,8 @@ class NetworkControl: Control {
                 browserSemaphore.signal()
             }
             if let serial = serial {
-                _ = serialSync {
+                _ =
                     controllersForDisplay.removeValue(forKey: serial)
-                }
             }
             browser.reset()
             browser.browse(type: ServiceType.tcp("ddcutil"))
@@ -557,7 +554,7 @@ class NetworkControl: Control {
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
-        guard let service = serialSync({ NetworkControl.controllersForDisplay[display.serial] }) else { return false }
+        guard let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
         return service.smoothTransitionUrl != nil
     }
 }

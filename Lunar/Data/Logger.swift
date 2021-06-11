@@ -41,11 +41,13 @@ class Logger: SwiftyBeaver {
         }
 
         Logger.addDestination(console)
-        Logger.addDestination(file)
-        if !cli, AppSettings.beta {
-            cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
-            Logger.addDestination(cloud)
-        }
+        #if !DEBUG
+            Logger.addDestination(file)
+            if !cli, AppSettings.beta {
+                cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
+                Logger.addDestination(cloud)
+            }
+        #endif
     }
 
     class func disable() {

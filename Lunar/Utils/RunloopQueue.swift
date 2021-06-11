@@ -99,23 +99,21 @@ public class RunloopQueue: NSObject {
 
     var runloop: CFRunLoop!
     private func startRunloop() {
-        serialSync {
-            let conditionLock = NSConditionLock(condition: 0)
+        let conditionLock = NSConditionLock(condition: 0)
 
-            thread.start {
-                [weak self] runloop in
-                // This is on the background thread.
+        thread.start {
+            [weak self] runloop in
+            // This is on the background thread.
 
-                conditionLock.lock()
-                defer { conditionLock.unlock(withCondition: 1) }
+            conditionLock.lock()
+            defer { conditionLock.unlock(withCondition: 1) }
 
-                guard let self = self else { return }
-                self.runloop = runloop
-            }
-
-            conditionLock.lock(whenCondition: 1)
-            conditionLock.unlock()
+            guard let self = self else { return }
+            self.runloop = runloop
         }
+
+        conditionLock.lock(whenCondition: 1)
+        conditionLock.unlock()
     }
 }
 

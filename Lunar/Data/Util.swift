@@ -1,11 +1,36 @@
 import Accelerate
 import Alamofire
+import Atomics
 import Cocoa
 import CryptorECC
 import Foundation
 import Surge
 import SwiftDate
 import UserNotifications
+
+@inline(__always) func isGeneric(_ id: CGDirectDisplayID) -> Bool {
+    #if DEBUG
+        return id == GENERIC_DISPLAY_ID || id == TEST_DISPLAY_ID
+    #else
+        return id == GENERIC_DISPLAY_ID
+    #endif
+}
+
+@inline(__always) func isGeneric(serial: String) -> Bool {
+    #if DEBUG
+        return serial == GENERIC_DISPLAY.serial || serial == TEST_DISPLAY.serial
+    #else
+        return serial == GENERIC_DISPLAY.serial
+    #endif
+}
+
+@inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
+    #if DEBUG
+        return TEST_IDS.contains(id)
+    #else
+        return id == GENERIC_DISPLAY_ID
+    #endif
+}
 
 class RequestTimeoutError: Error {}
 struct ResponseError: Error {
@@ -389,7 +414,8 @@ func mainThread<T>(_ action: () -> T) -> T {
 }
 
 func serialSync<T>(_ action: () -> T) -> T {
-    if Thread.isMainThread || DispatchQueue.current == dataSerialQueue {
+    action()
+    if DispatchQueue.current == dataSerialQueue {
         return action()
     } else {
         return dataSerialQueue.sync(flags: [.barrier]) {
@@ -412,6 +438,7 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     serialQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
+let asyncUniqueLock = UnfairLock()
 var asyncUniqueTasks = [String: DispatchWorkItem]()
 var asyncUniqueRecurringTasks = [String: Timer]()
 
@@ -422,15 +449,15 @@ var asyncUniqueRecurringTasks = [String: Timer]()
     if let key = uniqueTaskKey {
         task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
             action()
-            serialSync {
-                asyncUniqueTasks[key] = nil
-            }
+
+            asyncUniqueLock.around { asyncUniqueTasks[key] = nil }
         }
 
-        serialSync {
+        asyncUniqueLock.around {
             asyncUniqueTasks[key]?.cancel()
             asyncUniqueTasks[key] = task
         }
+
     } else {
         task = DispatchWorkItem(name: "asyncAfter(\(ms) ms)") {
             action()
@@ -450,7 +477,7 @@ var asyncUniqueRecurringTasks = [String: Timer]()
     }
 
     if let key = uniqueTaskKey {
-        serialSync {
+        asyncUniqueLock.around {
             asyncUniqueRecurringTasks[key]?.invalidate()
             asyncUniqueRecurringTasks[key] = timer
         }
@@ -460,7 +487,7 @@ var asyncUniqueRecurringTasks = [String: Timer]()
 }
 
 func cancelAsyncTask(_ key: String) {
-    serialSync {
+    asyncUniqueLock.around {
         if asyncUniqueTasks[key] == nil { return }
         asyncUniqueTasks[key]?.cancel()
         asyncUniqueTasks.removeValue(forKey: key)
@@ -468,7 +495,7 @@ func cancelAsyncTask(_ key: String) {
 }
 
 func cancelAsyncRecurringTask(_ key: String) {
-    serialSync {
+    asyncUniqueLock.around {
         asyncUniqueRecurringTasks[key]?.invalidate()
         asyncUniqueRecurringTasks.removeValue(forKey: key)
     }
@@ -482,28 +509,26 @@ func cancelAsyncRecurringTask(_ key: String) {
     _ action: @escaping () -> Void
 ) -> DispatchTimeoutResult {
     if threaded {
-        return serialSync {
-            guard let timeout = timeout else {
-                let thread = Thread { action() }
-                thread.start()
-                return .success
-            }
-
-            let semaphore = DispatchSemaphore(value: 0, name: "Async Thread Timeout")
-
-            let thread = Thread {
-                action()
-                semaphore.signal()
-            }
+        guard let timeout = timeout else {
+            let thread = Thread { action() }
             thread.start()
-
-            let result = semaphore.wait(for: timeout)
-            if result == .timedOut {
-                thread.cancel()
-            }
-
-            return result
+            return .success
         }
+
+        let semaphore = DispatchSemaphore(value: 0, name: "Async Thread Timeout")
+
+        let thread = Thread {
+            action()
+            semaphore.signal()
+        }
+        thread.start()
+
+        let result = semaphore.wait(for: timeout)
+        if result == .timedOut {
+            thread.cancel()
+        }
+
+        return result
     }
 
     if let queue = runLoopQueue {
@@ -548,24 +573,22 @@ func asyncEvery(_ interval: DateComponents, queue: RunloopQueue, _ action: @esca
 }
 
 func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ action: @escaping (inout TimeInterval) -> Void) -> Thread {
-    serialSync {
-        let thread = Thread {
-            var pollingInterval = interval.timeInterval
-            while true {
-                action(&pollingInterval)
-                if Thread.current.isCancelled { return }
-                Thread.sleep(forTimeInterval: pollingInterval)
-                if Thread.current.isCancelled { return }
-            }
+    let thread = Thread {
+        var pollingInterval = interval.timeInterval
+        while true {
+            action(&pollingInterval)
+            if Thread.current.isCancelled { return }
+            Thread.sleep(forTimeInterval: pollingInterval)
+            if Thread.current.isCancelled { return }
         }
-
-        if let qos = qos {
-            thread.qualityOfService = qos
-        }
-
-        thread.start()
-        return thread
     }
+
+    if let qos = qos {
+        thread.qualityOfService = qos
+    }
+
+    thread.start()
+    return thread
 }
 
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
@@ -997,18 +1020,27 @@ final class UnfairLock {
         unfairLock.deallocate()
     }
 
+    @Atomic var lockedInThread: Int32 = 0
+
     func locked() -> Bool { !os_unfair_lock_trylock(unfairLock) }
 
+    @discardableResult
     private func trylock() -> Bool {
         os_unfair_lock_trylock(unfairLock)
     }
 
-    private func lock() {
+    private func lock() -> Bool {
+        guard let threadID = Thread.current.value(forKeyPath: "private.seqNum") as? Int32, lockedInThread != threadID else {
+            return trylock()
+        }
         os_unfair_lock_lock(unfairLock)
+        lockedInThread = threadID
+        return true
     }
 
     private func unlock() {
         os_unfair_lock_unlock(unfairLock)
+        lockedInThread = 0
     }
 
     /// Executes a closure returning a value while acquiring the lock.
@@ -1017,7 +1049,7 @@ final class UnfairLock {
     ///
     /// - Returns:           The value the closure generated.
     func around<T>(_ closure: () -> T) -> T {
-        let locked = trylock(); defer { if locked { unlock() } }
+        let locked = lock(); defer { if locked { unlock() } }
         return closure()
     }
 
@@ -1025,7 +1057,7 @@ final class UnfairLock {
     ///
     /// - Parameter closure: The closure to run.
     func around(_ closure: () -> Void) {
-        let locked = trylock(); defer { if locked { unlock() } }
+        let locked = lock(); defer { if locked { unlock() } }
         return closure()
     }
 }
@@ -1050,19 +1082,40 @@ public struct AtomicLock<Value> {
 }
 
 @propertyWrapper
-public struct Atomic<Value> {
-    var value: Value
+public struct Atomic<Value: AtomicValue> {
+    var value: ManagedAtomic<Value>
 
     public init(wrappedValue: Value) {
-        value = wrappedValue
+        value = ManagedAtomic<Value>(wrappedValue)
     }
 
     public var wrappedValue: Value {
         get {
-            serialSync { value }
+            value.load(ordering: .relaxed)
         }
         set {
-            serialSync { value = newValue }
+            value.store(newValue, ordering: .sequentiallyConsistent)
+        }
+    }
+}
+
+@propertyWrapper
+public struct AtomicOptional<Value: AtomicValue & Equatable> {
+    var nilValue: Value
+    var value: ManagedAtomic<Value>
+
+    public init(wrappedValue: Value?, nilValue: Value) {
+        self.nilValue = nilValue
+        value = ManagedAtomic<Value>(wrappedValue ?? nilValue)
+    }
+
+    public var wrappedValue: Value? {
+        get {
+            let v = value.load(ordering: .relaxed)
+            return v == nilValue ? nil : v
+        }
+        set {
+            value.store(newValue ?? nilValue, ordering: .sequentiallyConsistent)
         }
     }
 }
@@ -1078,14 +1131,13 @@ public struct LazyAtomic<Value> {
 
     public var wrappedValue: Value {
         mutating get {
-            serialSync { if storage == nil {
+            if storage == nil {
                 self.storage = constructor()
             }
             return storage!
-            }
         }
         set {
-            serialSync { storage = newValue }
+            storage = newValue
         }
     }
 }
@@ -1138,4 +1190,12 @@ func notify(identifier: String, title: String, body: String) {
         UNNotificationRequest(identifier: identifier, content: content, trigger: nil),
         withCompletionHandler: nil
     )
+}
+
+func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
+    guard !isTestID(displayID) else { return nil }
+    return NSScreen.screens.first(where: { screen in
+        guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
+        return CGDirectDisplayID(id.uint32Value) == displayID
+    })
 }

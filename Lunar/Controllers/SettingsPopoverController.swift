@@ -6,6 +6,7 @@
 //  Copyright © 2021 Alin. All rights reserved.
 //
 
+import Atomics
 import Cocoa
 import Combine
 import Defaults
@@ -99,7 +100,7 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
-    var applySettings = true
+    @Atomic var applySettings = true
 
     @objc dynamic var adaptive = true {
         didSet {
@@ -285,7 +286,7 @@ class SettingsPopoverController: NSViewController {
                 }
                 datastore.storeDisplays(displayController.displays.values.map { $0 })
             }
-            SyncMode.sourceDisplay = SyncMode.getSourceDisplay()
+            SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
         }
         if let id = display?.id {
             syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(id) || TEST_MODE

@@ -11,7 +11,7 @@ import Foundation
 import Surge
 
 class ManualMode: AdaptiveMode {
-    var force = false
+    @Atomic var force = false
     var brightnessDataPoint = DataPoint(min: 0, max: 100, last: 0)
     var contrastDataPoint = DataPoint(min: 0, max: 100, last: 0)
     var maxChartDataPoints: Int = 101
@@ -22,7 +22,7 @@ class ManualMode: AdaptiveMode {
     var key = AdaptiveModeKey.manual
 
     var available: Bool { true }
-    var watching = false
+    @Atomic var watching = false
 
     var displayObservers = Set<AnyCancellable>()
 
@@ -50,7 +50,7 @@ class ManualMode: AdaptiveMode {
     }
 
     func adapt(_ display: Display) {
-        display.withForce(force || display.force.load(ordering: .relaxed)) {
+        display.withForce(force || display.force) {
             display.brightness = display.brightness.uint8Value.ns
             display.contrast = display.contrast.uint8Value.ns
         }
