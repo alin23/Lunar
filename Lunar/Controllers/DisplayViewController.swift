@@ -309,7 +309,7 @@ class DisplayViewController: NSViewController {
     }
 
     @IBAction func proButtonClick(_: Any) {
-        if lunarProActive.load(ordering: .relaxed), !lunarProOnTrial {
+        if lunarProActive, !lunarProOnTrial {
             NSWorkspace.shared.open(try! "https://lunar.fyi/#sync".asURL())
         } else if lunarProBadSignature {
             NSWorkspace.shared.open(try! "https://lunar.fyi/download/latest".asURL())
@@ -328,7 +328,7 @@ class DisplayViewController: NSViewController {
         guard let button = proButton else { return }
 
         mainThread {
-            if lunarProActive.load(ordering: .relaxed) {
+            if lunarProActive {
                 button.bg = red
                 button.attributedTitle = "Pro".withAttribute(.textColor(white))
                 button.setFrameSize(NSSize(width: 50, height: button.frame.height))
@@ -850,7 +850,7 @@ class DisplayViewController: NSViewController {
         display.input = input.rawValue.ns
     }
 
-    @Atomic var gammaHighlighterTask: CFRunLoopTimer?
+    @AtomicLock var gammaHighlighterTask: CFRunLoopTimer?
 
     func showGammaNotice() {
         mainThreadSerial { [weak self] in
@@ -905,7 +905,7 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @Atomic var adaptiveHighlighterTask: CFRunLoopTimer?
+    @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
     func showAdaptiveNotice() {
         mainThreadSerial { [weak self] in

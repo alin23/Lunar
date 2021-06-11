@@ -12,7 +12,7 @@ import Foundation
 class GammaViewController: NSViewController {
     @IBOutlet var dot: NSTextField!
 
-    @Atomic var highlighterTask: CFRunLoopTimer?
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
     var highlighterSemaphore = DispatchSemaphore(value: 1, name: "highlighterSemaphore")
 
     func highlight() {

@@ -275,7 +275,7 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 
 enum DDC {
     static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
-    static var apply = true
+    @Atomic static var apply = true
     static let requestDelay: useconds_t = 20000
     static let recoveryDelay: useconds_t = 40000
     static var displayPortByUUID = [CFUUID: io_service_t]()
@@ -300,8 +300,8 @@ enum DDC {
         DDC.writeFaults.removeAll()
     }
 
-    static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID: String] {
-        var displayIDs = [CGDirectDisplayID: String]()
+    static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID] {
+        var displayIDs = [CGDirectDisplayID]()
         for screen in NSScreen.screens {
             if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String,
                isScreenStr == "YES"
@@ -311,15 +311,26 @@ enum DDC {
                     if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
                         continue
                     }
-                    displayIDs[screenID] = screen.localizedName
+                    displayIDs.append(screenID)
                 }
             }
         }
-        return displayIDs
+        #if DEBUG
+            if !displayIDs.isEmpty {
+                return displayIDs
+            }
+            return [TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID]
+        #else
+            return displayIDs
+        #endif
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
-        guard apply, !TEST_IDS.contains(displayID) else { return true }
+        #if DEBUG
+            guard apply, !isTestID(displayID) else { return true }
+        #else
+            guard apply else { return true }
+        #endif
 
         return queue.sync {
             _ = semaphore.wait(for: 10.seconds)
@@ -402,7 +413,7 @@ enum DDC {
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !TEST_IDS.contains(displayID) else { return nil }
+        guard !isTestID(displayID) else { return nil }
         _ = semaphore.wait(for: 10.seconds)
         defer {
             semaphore.signal()
@@ -475,7 +486,7 @@ enum DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        guard !TEST_IDS.contains(displayID) else { return nil }
+        guard !isTestID(displayID) else { return nil }
 
         _ = semaphore.wait(for: 10.seconds)
         defer {
@@ -589,21 +600,13 @@ enum DDC {
         extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
 
-    static func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
-        guard !TEST_IDS.contains(displayID) else { return nil }
-        return NSScreen.screens.first(where: { screen in
-            guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
-            return CGDirectDisplayID(id.uint32Value) == displayID
-        })
-    }
-
     static func hasI2CController(displayID: CGDirectDisplayID) -> Bool {
-        guard !TEST_IDS.contains(displayID) else { return false }
+        guard !isTestID(displayID) else { return false }
         return I2CController(displayID: displayID) != 0
     }
 
     static func I2CController(displayID: CGDirectDisplayID) -> io_service_t {
-        guard !TEST_IDS.contains(displayID) else { return 0 }
+        guard !isTestID(displayID) else { return 0 }
 
         let activeIDs = NSScreen.screens
             .compactMap { screen in screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID }

@@ -423,16 +423,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             POPOVERS["menu"]!!.close()
             displayController.manageClamshellMode()
             displayController.resetDisplayList()
-            SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
+
             asyncAfter(ms: 5000) {
+                self.disableFaceLight()
                 NetworkControl.resetState()
                 DDCControl.resetState()
-            }
-            if let visible = windowController?.window?.isVisible, visible {
-                windowController?.close()
-                windowController?.window = nil
-                windowController = nil
-                showWindow()
             }
         case NSWorkspace.screensDidWakeNotification:
             log.debug("Screens woke up")
@@ -472,7 +467,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.adaptBrightness()
             }
         }
-        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { _ in
+        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { change in
+            curveFactor = change.newValue
             displayController.adaptBrightness()
         }
 
@@ -576,6 +572,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         initCache()
+        curveFactor = CachedDefaults[.curveFactor]
+
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
                 display.resetGamma()
@@ -671,6 +669,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         log.debug("App finished launching")
+    }
+
+    @IBAction func forceUpdateDisplayList(_: Any) {
+        displayController.resetDisplayList()
     }
 
     @IBAction func openLunarDiagnostics(_: Any) {
@@ -780,7 +782,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func setLightPercent(percent: Int8) {
-        guard CachedDefaults[.secure].checkRemainingAdjustments() else { return }
+        guard checkRemainingAdjustments() else { return }
         displayController.disable()
         displayController.setBrightnessPercent(value: percent)
         displayController.setContrastPercent(value: percent)

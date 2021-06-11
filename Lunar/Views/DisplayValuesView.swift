@@ -193,63 +193,61 @@ class DisplayValuesView: NSTableView {
             display.contrast = value.ns
         }
 
-        serialSync {
-            if displayObservers[id] == nil {
-                displayObservers[id] = []
-            }
-
-            guard var observers = displayObservers[id] else { return }
-
-            display.$brightness.sink { newBrightness in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableBrightness.integerValue = newBrightness.intValue
-                        scrollableBrightness.needsDisplay = true
-                    }
-                }
-            }.store(in: &observers)
-
-            display.$contrast.sink { newContrast in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableContrast.integerValue = newContrast.intValue
-                        scrollableContrast.needsDisplay = true
-                    }
-                }
-            }.store(in: &observers)
-
-            display.$minBrightness.sink { newBrightness in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableBrightness.lowerLimit = newBrightness.doubleValue
-                    }
-                }
-            }.store(in: &observers)
-
-            display.$minContrast.sink { newContrast in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableContrast.lowerLimit = newContrast.doubleValue
-                    }
-                }
-            }.store(in: &observers)
-
-            display.$maxBrightness.sink { newBrightness in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableBrightness.upperLimit = newBrightness.doubleValue
-                    }
-                }
-            }.store(in: &observers)
-
-            display.$maxContrast.sink { newContrast in
-                if id != GENERIC_DISPLAY_ID, id != TEST_DISPLAY_ID {
-                    mainThread {
-                        scrollableContrast.upperLimit = newContrast.doubleValue
-                    }
-                }
-            }.store(in: &observers)
+        if displayObservers[id] == nil {
+            displayObservers[id] = []
         }
+
+        guard var observers = displayObservers[id] else { return }
+
+        display.$brightness.sink { newBrightness in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableBrightness.integerValue = newBrightness.intValue
+                    scrollableBrightness.needsDisplay = true
+                }
+            }
+        }.store(in: &observers)
+
+        display.$contrast.sink { newContrast in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableContrast.integerValue = newContrast.intValue
+                    scrollableContrast.needsDisplay = true
+                }
+            }
+        }.store(in: &observers)
+
+        display.$minBrightness.sink { newBrightness in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableBrightness.lowerLimit = newBrightness.doubleValue
+                }
+            }
+        }.store(in: &observers)
+
+        display.$minContrast.sink { newContrast in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableContrast.lowerLimit = newContrast.doubleValue
+                }
+            }
+        }.store(in: &observers)
+
+        display.$maxBrightness.sink { newBrightness in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableBrightness.upperLimit = newBrightness.doubleValue
+                }
+            }
+        }.store(in: &observers)
+
+        display.$maxContrast.sink { newContrast in
+            if !isGeneric(id) {
+                mainThread {
+                    scrollableContrast.upperLimit = newContrast.doubleValue
+                }
+            }
+        }.store(in: &observers)
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {

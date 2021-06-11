@@ -40,6 +40,7 @@ private enum CommandError: Error {
     case invalidValue(String)
     case ddcError(String)
     case gammaError(String)
+    case noUUID(CGDirectDisplayID)
 }
 
 private func printArray(_ array: [Any], level: Int = 0, longestKeySize: Int = 0) {
@@ -155,12 +156,12 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             guard let sig = getCodeSignature(hex: hex) else {
-                return
+                globalExit(1)
             }
             print(sig)
+            globalExit(0)
         }
     }
 
@@ -173,13 +174,13 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             if IsLidClosed() {
                 print("closed")
             } else {
                 print("opened")
             }
+            globalExit(0)
         }
     }
 
@@ -192,8 +193,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
             print(SyncMode.getLux() ?? -1)
+            globalExit(0)
         }
     }
 
@@ -249,7 +250,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
             let displays = displayController.activeDisplays.values.map { $0 }
@@ -297,6 +297,7 @@ struct Lunar: ParsableCommand {
                     CoreDisplay_Display_SetAutoBrightnessIsEnabled(id, value > 0)
                 }
             }
+            globalExit(0)
         }
     }
 
@@ -331,7 +332,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
             let displays = displayController.activeDisplays.values.map { $0 }
@@ -388,6 +388,7 @@ struct Lunar: ParsableCommand {
                     DisplayServicesBrightnessChanged(id, value)
                 }
             }
+            globalExit(0)
         }
     }
 
@@ -419,7 +420,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
             var displays = displayController.activeDisplays.values.map { $0 }
@@ -445,7 +445,7 @@ struct Lunar: ParsableCommand {
                         print("\(display.name)[\(display.serial)]: Can't read \(control)")
                     }
                 }
-                return
+                globalExit(0)
             }
 
             for display in displays {
@@ -462,6 +462,7 @@ struct Lunar: ParsableCommand {
                     print("\(display.name)[\(display.serial)]: \("Can't write \(control)")")
                 }
             }
+            globalExit(0)
         }
     }
 
@@ -477,11 +478,10 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             guard !json else {
                 print((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
-                return
+                globalExit(0)
             }
 
             let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
@@ -497,6 +497,7 @@ struct Lunar: ParsableCommand {
                 return (hotkey.identifier, "\(String(modifiers.joined(by: "+")))-\(hotkey.keyChar)")
             }, uniquingKeysWith: first(this:other:))
             printDictionary(hotkeys)
+            globalExit(0)
         }
     }
 
@@ -525,7 +526,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             if raw {
                 guard let props = SyncMode.getArmBuiltinDisplayProperties() else {
@@ -547,7 +547,7 @@ struct Lunar: ParsableCommand {
                         printDictionary(props)
                     }
                 }
-                return
+                globalExit(0)
             }
 
             guard let (brightness, contrast) = SyncMode.getBuiltinDisplayBrightnessContrast() else {
@@ -573,6 +573,42 @@ struct Lunar: ParsableCommand {
                     print("Contrast: \(contrast.str(decimals: 2))")
                 }
             }
+            globalExit(0)
+        }
+    }
+
+    struct DisplayUuid: ParsableCommand {
+        @OptionGroup var globals: GlobalOptions
+
+        static let configuration = CommandConfiguration(
+            abstract: "Generates UUID for a display ID."
+        )
+
+        @Flag(name: .shortAndLong, help: "Fall back to EDID if UUID is not possible to generate")
+        var fallback = false
+
+        @Argument(help: "Display ID")
+        var id: CGDirectDisplayID
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
+                let uuidValue = uuid.takeRetainedValue()
+                let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
+                if !uuidString.isEmpty {
+                    print(uuidString)
+                    globalExit(0)
+                }
+            }
+
+            if fallback {
+                if let edid = Display.edid(id: id), let uuid = UUID(namespace: .oid, name: edid) {
+                    print(uuid)
+                    globalExit(0)
+                }
+            }
+            throw CommandError.noUUID(id)
         }
     }
 
@@ -620,7 +656,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays(includeVirtual: virtual || all)
 
@@ -638,7 +673,7 @@ struct Lunar: ParsableCommand {
                     controls: controls,
                     read: read
                 )
-                return
+                globalExit(0)
             }
 
             if json {
@@ -665,6 +700,7 @@ struct Lunar: ParsableCommand {
             if json {
                 print("}")
             }
+            globalExit(0)
         }
     }
 
@@ -685,6 +721,7 @@ struct Lunar: ParsableCommand {
             CoreDisplay.self,
             DisplayServices.self,
             Hotkeys.self,
+            DisplayUuid.self,
         ]
     )
 
@@ -731,7 +768,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
 
@@ -740,6 +776,7 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             try handleDisplay("first", displays: displays, property: property, controls: controls, read: read)
+            globalExit(0)
         }
     }
 
@@ -773,7 +810,6 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
             displayController.displays = DisplayController.getDisplays()
 
@@ -786,6 +822,7 @@ struct Lunar: ParsableCommand {
             }
 
             try handleDisplay("first", displays: displays, property: property, value: value, controls: controls)
+            globalExit(0)
         }
     }
 
@@ -853,9 +890,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            defer { globalExit(0) }
 
-            guard let display = foundDisplay else { return }
+            guard let display = foundDisplay else { globalExit(0) }
 
             print(
                 "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
@@ -875,6 +911,7 @@ struct Lunar: ParsableCommand {
                     globalExit(0)
                 }
             }
+            globalExit(0)
         }
     }
 }

@@ -57,13 +57,16 @@ class ModernWindow: WAYWindow {
     }
 
     override func flagsChanged(with event: NSEvent) {
-        if event.modifierFlags.contains(.command) {
+        if event.modifierFlags.contains(.control) {
+            log.verbose("Fastest scroll threshold")
+            scrollDeltaYThreshold = FASTEST_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.contains(.command) {
             log.verbose("Precise scroll threshold")
             scrollDeltaYThreshold = PRECISE_SCROLL_Y_THRESHOLD
         } else if event.modifierFlags.contains(.option) {
             log.verbose("Fast scroll threshold")
             scrollDeltaYThreshold = FAST_SCROLL_Y_THRESHOLD
-        } else if event.modifierFlags.isDisjoint(with: [.command, .option]) {
+        } else if event.modifierFlags.isDisjoint(with: [.command, .option, .control]) {
             log.verbose("Normal scroll threshold")
             scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
         }
@@ -77,8 +80,13 @@ class ModernWindow: WAYWindow {
         trafficLightButtonsLeftMargin = 20
         trafficLightButtonsTopMargin = 0
         hideTitleBarInFullScreen = false
-        if let v = titlebarAccessoryViewControllers[0].parent?.view.subviews[3] {
-            v.frame = NSRect(x: 0, y: 0, width: 100, height: v.frame.height)
+        if let titlebarViews = titlebarAccessoryViewControllers[0].parent?.view.subviews {
+            log.info("Titlebar views: \(titlebarViews.map { $0.frame })")
+            let matchingViews = titlebarViews
+                .filter { $0.frame.origin.x == 0 && $0.frame.origin.y == 0 && $0.frame.width == 950 && $0.frame.height == 28 }
+            if let v = matchingViews.last {
+                v.frame = NSRect(x: 0, y: 0, width: 100, height: v.frame.height)
+            }
         }
 
         setContentBorderThickness(0.0, for: NSRectEdge.minY)

@@ -61,14 +61,12 @@ class PageController: NSPageController {
                 d1.serial < d2.serial
             })
             arrangedObjects.append(contentsOf: displays)
+        } else if TEST_MODE {
+            let displays: [Any] = displayController.displays.values.sorted(by: { d1, d2 -> Bool in
+                d1.serial < d2.serial
+            })
+            arrangedObjects.append(contentsOf: displays.isEmpty ? [GENERIC_DISPLAY] : displays.map { $0 })
         } else {
-            if TEST_MODE {
-                arrangedObjects.append(TEST_DISPLAY)
-                arrangedObjects.append(TEST_DISPLAY_PERSISTENT)
-                arrangedObjects.append(TEST_DISPLAY_PERSISTENT2)
-                arrangedObjects.append(TEST_DISPLAY_PERSISTENT3)
-                arrangedObjects.append(TEST_DISPLAY_PERSISTENT4)
-            }
             arrangedObjects.append(GENERIC_DISPLAY)
         }
 
@@ -183,22 +181,30 @@ extension PageController: NSPageControllerDelegate {
 
         if let displayViewController = c.viewControllers[identifier] as? DisplayViewController {
             if displayViewController.display == nil {
-                switch identifier {
-                case TEST_DISPLAY.serial:
-                    displayViewController.display = TEST_DISPLAY
-                case TEST_DISPLAY_PERSISTENT.serial:
-                    displayViewController.display = TEST_DISPLAY_PERSISTENT
-                case TEST_DISPLAY_PERSISTENT2.serial:
-                    displayViewController.display = TEST_DISPLAY_PERSISTENT2
-                case TEST_DISPLAY_PERSISTENT3.serial:
-                    displayViewController.display = TEST_DISPLAY_PERSISTENT3
-                case TEST_DISPLAY_PERSISTENT4.serial:
-                    displayViewController.display = TEST_DISPLAY_PERSISTENT4
-                case GENERIC_DISPLAY.serial:
-                    displayViewController.display = GENERIC_DISPLAY
-                default:
-                    displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
-                }
+                #if DEBUG
+                    switch identifier {
+                    case TEST_DISPLAY.serial:
+                        displayViewController.display = TEST_DISPLAY
+                    case TEST_DISPLAY_PERSISTENT.serial:
+                        displayViewController.display = TEST_DISPLAY_PERSISTENT
+                    case TEST_DISPLAY_PERSISTENT2.serial:
+                        displayViewController.display = TEST_DISPLAY_PERSISTENT2
+                    case TEST_DISPLAY_PERSISTENT3.serial:
+                        displayViewController.display = TEST_DISPLAY_PERSISTENT3
+                    case TEST_DISPLAY_PERSISTENT4.serial:
+                        displayViewController.display = TEST_DISPLAY_PERSISTENT4
+                    case GENERIC_DISPLAY.serial:
+                        displayViewController.display = GENERIC_DISPLAY
+                    default:
+                        displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
+                    }
+                #else
+                    if !isGeneric(serial: identifier) {
+                        displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
+                    } else {
+                        displayViewController.display = GENERIC_DISPLAY
+                    }
+                #endif
             }
         }
 
