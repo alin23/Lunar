@@ -421,41 +421,47 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case NSApplication.didChangeScreenParametersNotification:
             log.debug("Screen configuration changed")
             POPOVERS["menu"]!!.close()
-            displayController.manageClamshellMode()
-            displayController.resetDisplayList()
+            asyncAfter(ms: 2000, uniqueTaskKey: "didChangeScreenParametersHandler") {
+                displayController.manageClamshellMode()
+                displayController.resetDisplayList()
 
-            asyncAfter(ms: 5000) {
-                self.disableFaceLight()
-                NetworkControl.resetState()
-                DDCControl.resetState()
+                asyncAfter(ms: 5000) {
+                    self.disableFaceLight()
+                    NetworkControl.resetState()
+                    DDCControl.resetState()
+                }
             }
         case NSWorkspace.screensDidWakeNotification:
             log.debug("Screens woke up")
-            screensSleeping.store(false, ordering: .sequentiallyConsistent)
+            asyncAfter(ms: 2000, uniqueTaskKey: "screenWakeSleepHandler") {
+                screensSleeping.store(false, ordering: .sequentiallyConsistent)
 
-            if CachedDefaults[.refreshValues] {
-                startValuesReaderThread()
-            }
-            _ = displayController.adaptiveMode.watch()
+                if CachedDefaults[.refreshValues] {
+                    self.startValuesReaderThread()
+                }
+                _ = displayController.adaptiveMode.watch()
 
-            if CachedDefaults[.reapplyValuesAfterWake] {
-                asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-                    NetworkControl.resetState()
-                    DDCControl.resetState()
+                if CachedDefaults[.reapplyValuesAfterWake] {
+                    asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
+                        NetworkControl.resetState()
+                        DDCControl.resetState()
 
-                    for _ in 1 ... 5 {
-                        displayController.adaptBrightness(force: true)
-                        sleep(3)
+                        for _ in 1 ... 5 {
+                            displayController.adaptBrightness(force: true)
+                            sleep(3)
+                        }
                     }
                 }
             }
         case NSWorkspace.screensDidSleepNotification:
             log.debug("Screens gone to sleep")
-            screensSleeping.store(true, ordering: .sequentiallyConsistent)
-            if let task = valuesReaderThread {
-                lowprioQueue.cancel(timer: task)
+            asyncAfter(ms: 2000, uniqueTaskKey: "screenWakeSleepHandler") {
+                screensSleeping.store(true, ordering: .sequentiallyConsistent)
+                if let task = self.valuesReaderThread {
+                    lowprioQueue.cancel(timer: task)
+                }
+                displayController.adaptiveMode.stopWatching()
             }
-            displayController.adaptiveMode.stopWatching()
         default:
             return
         }
