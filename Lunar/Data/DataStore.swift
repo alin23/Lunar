@@ -296,7 +296,7 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            return lock.around {
+            lock.around {
 //                semaphore.wait(for: nil, context: "get \(key.name)")
 
                 if let value = cache[key.name]?.value as? Value {

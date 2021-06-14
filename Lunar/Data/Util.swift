@@ -414,7 +414,7 @@ func mainThread<T>(_ action: () -> T) -> T {
     }
 }
 
-//func serialSync<T>(_ action: () -> T) -> T {
+// func serialSync<T>(_ action: () -> T) -> T {
 //    action()
 //    if DispatchQueue.current == dataSerialQueue {
 //        return action()
@@ -423,7 +423,7 @@ func mainThread<T>(_ action: () -> T) -> T {
 //            return action()
 //        }
 //    }
-//}
+// }
 
 func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))

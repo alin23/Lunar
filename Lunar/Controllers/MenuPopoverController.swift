@@ -240,7 +240,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         let newDisplays = displayController.displays.values.map { $0 }
         return newDisplays.count == displays.count && zip(displays, newDisplays).allSatisfy { d1, d2 in d1 === d2 }
     }
-    
+
     override func flagsChanged(with event: NSEvent) {
         if event.modifierFlags.contains(.control) {
             log.verbose("Fastest scroll threshold")
