@@ -142,14 +142,7 @@ protocol AdaptiveMode: AnyObject {
     func adapt(_ display: Display)
 }
 
-var datapointSemaphore = Foundation.DispatchSemaphore(value: 1)
-func datapointLockAround<T>(_ action: () -> T) -> T {
-    datapointSemaphore.wait()
-    defer {
-        datapointSemaphore.signal()
-    }
-    return action()
-}
+var datapointLock = NSRecursiveLock()
 
 extension AdaptiveMode {
     var str: String {
@@ -198,9 +191,9 @@ extension AdaptiveMode {
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
-            dataPoint = datapointLockAround { brightnessDataPoint }
+            dataPoint = datapointLock.around { brightnessDataPoint }
         default:
-            dataPoint = datapointLockAround { contrastDataPoint }
+            dataPoint = datapointLock.around { contrastDataPoint }
         }
 
         let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? curveFactor), offset: offset?.f ?? 0.0)
@@ -221,9 +214,9 @@ extension AdaptiveMode {
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
-            dataPoint = datapointLockAround { brightnessDataPoint }
+            dataPoint = datapointLock.around { brightnessDataPoint }
         default:
-            dataPoint = datapointLockAround { contrastDataPoint }
+            dataPoint = datapointLock.around { contrastDataPoint }
         }
 
         var newValue: Double

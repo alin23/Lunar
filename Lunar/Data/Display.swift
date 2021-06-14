@@ -178,7 +178,7 @@ enum ValueType {
 @objc class Display: NSObject, Codable, Defaults.Serializable {
     // MARK: Stored Properties
 
-    var _idLock = UnfairLock()
+    var _idLock = NSRecursiveLock()
     var _id: CGDirectDisplayID
     var id: CGDirectDisplayID {
         get { _idLock.around { _id } }
@@ -1404,9 +1404,7 @@ enum ValueType {
             readaptListener()
         }
         if adaptive, displayController.adaptiveModeKey != .manual, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
-            withForce {
-                displayController.adaptBrightness(for: self)
-            }
+            displayController.adaptBrightness(for: self, force: true)
         }
     }
 

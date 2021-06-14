@@ -133,6 +133,14 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
         needsDisplay = true
+        // toolTip = """
+        // Scroll to change, click to edit.
+
+        // When scrolling, you can:
+        // • Hold Command for more precise adjustments
+        // • Hold Option for faster adjustments
+        // • Hold Control for highest sensitivity possible
+        // """
     }
 
     override func cancelOperation(_: Any?) {

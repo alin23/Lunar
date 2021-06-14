@@ -19,7 +19,7 @@ import SwiftDate
 import SwiftyJSON
 
 class DisplayController {
-    let getDisplaysLock = UnfairLock()
+    let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
 
@@ -38,7 +38,7 @@ class DisplayController {
     }
 
     var onActiveDisplaysChange: (() -> Void)?
-    var _activeDisplaysLock = UnfairLock()
+    var _activeDisplaysLock = NSRecursiveLock()
     var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around { _activeDisplays } }
@@ -53,7 +53,7 @@ class DisplayController {
 
     var activeDisplaysByReadableID: [String: Display] = [:]
 
-    var _adaptiveModeLock = UnfairLock()
+    var _adaptiveModeLock = NSRecursiveLock()
     var _adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
     var adaptiveMode: AdaptiveMode {
         get { _adaptiveModeLock.around { _adaptiveMode } }
@@ -788,16 +788,22 @@ class DisplayController {
         }
     }
 
-    func adaptBrightness(for display: Display) {
-        adaptiveMode.adapt(display)
+    func adaptBrightness(for display: Display, force: Bool = false) {
+//        async(queue: dataPublisherQueue) {
+            self.adaptiveMode.withForce(force || display.force) {
+                self.adaptiveMode.adapt(display)
+            }
+//        }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        for display in displays ?? Array(activeDisplays.values) {
-            adaptiveMode.withForce(force || display.force) {
-                adaptiveMode.adapt(display)
+//        async(queue: dataPublisherQueue) {
+            for display in displays ?? Array(self.activeDisplays.values) {
+                self.adaptiveMode.withForce(force || display.force) {
+                    self.adaptiveMode.adapt(display)
+                }
             }
-        }
+//        }
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {

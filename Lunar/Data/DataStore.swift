@@ -275,7 +275,7 @@ extension AnyCodable: Defaults.Serializable {}
 enum CachedDefaults {
     static var displaysPublisher = PassthroughSubject<[Display], Never>()
     static var cache: [String: AnyCodable] = [:]
-    static var lock = UnfairLock()
+    static var lock = NSRecursiveLock()
     static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
 
     static func reset(_ keys: Defaults.AnyKey...) {
@@ -283,96 +283,114 @@ enum CachedDefaults {
     }
 
     static func reset(_ keys: [Defaults.AnyKey]) {
-        semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
-        defer { semaphore.signal() }
+        // semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
+        // defer { semaphore.signal() }
 
-        Defaults.reset(keys)
-        for key in keys {
-            cache.removeValue(forKey: key.name)
+        lock.around {
+            Defaults.reset(keys)
+            for key in keys {
+                cache.removeValue(forKey: key.name)
+            }
         }
     }
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            semaphore.wait(for: nil, context: "get \(key.name)")
-
-            if let value = cache[key.name]?.value as? Value {
-                semaphore.signal()
-                return value
-            }
-            semaphore.signal()
-
             return lock.around {
-                key.suite[key]
+//                semaphore.wait(for: nil, context: "get \(key.name)")
+
+                if let value = cache[key.name]?.value as? Value {
+//                    semaphore.signal()
+                    return value
+                }
+//                semaphore.signal()
+
+                return
+                    key.suite[key]
             }
         }
         set {
-            semaphore.wait(for: nil, context: "set \(key.name)")
-            cache[key.name] = AnyCodable(newValue)
-            semaphore.signal()
-
-            if key == .displays, let displays = newValue as? [Display] {
-                async { displaysPublisher.send(displays) }
-            }
-
             lock.around {
+//            semaphore.wait(for: nil, context: "set \(key.name)")
+                cache[key.name] = AnyCodable(newValue)
+//            semaphore.signal()
+
+                if key == .displays, let displays = newValue as? [Display] {
+                    async { displaysPublisher.send(displays) }
+                    Defaults.withoutPropagation {
+                        key.suite[key] = newValue
+                    }
+                    return
+                }
+
                 key.suite[key] = newValue
             }
         }
     }
 }
 
-func initCache() {
-    CachedDefaults.cache["curveFactor"] = AnyCodable(Defaults[.curveFactor])
-    CachedDefaults.cache["brightnessKeysEnabled"] = AnyCodable(Defaults[.brightnessKeysEnabled])
-    CachedDefaults.cache["volumeKeysEnabled"] = AnyCodable(Defaults[.volumeKeysEnabled])
-    CachedDefaults.cache["mediaKeysControlAllMonitors"] = AnyCodable(Defaults[.mediaKeysControlAllMonitors])
-    CachedDefaults.cache["didScrollTextField"] = AnyCodable(Defaults[.didScrollTextField])
-    CachedDefaults.cache["didSwipeToHotkeys"] = AnyCodable(Defaults[.didSwipeToHotkeys])
-    CachedDefaults.cache["didSwipeLeft"] = AnyCodable(Defaults[.didSwipeLeft])
-    CachedDefaults.cache["didSwipeRight"] = AnyCodable(Defaults[.didSwipeRight])
-    CachedDefaults.cache["smoothTransition"] = AnyCodable(Defaults[.smoothTransition])
-    CachedDefaults.cache["refreshValues"] = AnyCodable(Defaults[.refreshValues])
-    CachedDefaults.cache["useCoreDisplay"] = AnyCodable(Defaults[.useCoreDisplay])
-    CachedDefaults.cache["debug"] = AnyCodable(Defaults[.debug])
-    CachedDefaults.cache["showQuickActions"] = AnyCodable(Defaults[.showQuickActions])
-    CachedDefaults.cache["manualLocation"] = AnyCodable(Defaults[.manualLocation])
-    CachedDefaults.cache["startAtLogin"] = AnyCodable(Defaults[.startAtLogin])
-    CachedDefaults.cache["clamshellModeDetection"] = AnyCodable(Defaults[.clamshellModeDetection])
-    CachedDefaults.cache["brightnessStep"] = AnyCodable(Defaults[.brightnessStep])
-    CachedDefaults.cache["contrastStep"] = AnyCodable(Defaults[.contrastStep])
-    CachedDefaults.cache["volumeStep"] = AnyCodable(Defaults[.volumeStep])
-    CachedDefaults.cache["syncPollingSeconds"] = AnyCodable(Defaults[.syncPollingSeconds])
-    CachedDefaults.cache["sensorPollingSeconds"] = AnyCodable(Defaults[.sensorPollingSeconds])
-    CachedDefaults.cache["adaptiveBrightnessMode"] = AnyCodable(Defaults[.adaptiveBrightnessMode])
-    CachedDefaults.cache["nonManualMode"] = AnyCodable(Defaults[.nonManualMode])
-    CachedDefaults.cache["overrideAdaptiveMode"] = AnyCodable(Defaults[.overrideAdaptiveMode])
-    CachedDefaults.cache["reapplyValuesAfterWake"] = AnyCodable(Defaults[.reapplyValuesAfterWake])
-    CachedDefaults.cache["sunrise"] = AnyCodable(Defaults[.sunrise])
-    CachedDefaults.cache["sunset"] = AnyCodable(Defaults[.sunset])
-    CachedDefaults.cache["solarNoon"] = AnyCodable(Defaults[.solarNoon])
-    CachedDefaults.cache["civilTwilightBegin"] = AnyCodable(Defaults[.civilTwilightBegin])
-    CachedDefaults.cache["civilTwilightEnd"] = AnyCodable(Defaults[.civilTwilightEnd])
-    CachedDefaults.cache["nauticalTwilightBegin"] = AnyCodable(Defaults[.nauticalTwilightBegin])
-    CachedDefaults.cache["nauticalTwilightEnd"] = AnyCodable(Defaults[.nauticalTwilightEnd])
-    CachedDefaults.cache["astronomicalTwilightBegin"] = AnyCodable(Defaults[.astronomicalTwilightBegin])
-    CachedDefaults.cache["astronomicalTwilightEnd"] = AnyCodable(Defaults[.astronomicalTwilightEnd])
-    CachedDefaults.cache["dayLength"] = AnyCodable(Defaults[.dayLength])
-    CachedDefaults.cache["hideMenuBarIcon"] = AnyCodable(Defaults[.hideMenuBarIcon])
-    CachedDefaults.cache["showDockIcon"] = AnyCodable(Defaults[.showDockIcon])
-    CachedDefaults.cache["brightnessOnInputChange"] = AnyCodable(Defaults[.brightnessOnInputChange])
-    CachedDefaults.cache["contrastOnInputChange"] = AnyCodable(Defaults[.contrastOnInputChange])
-    CachedDefaults.cache["disableControllerVideo"] = AnyCodable(Defaults[.disableControllerVideo])
-    CachedDefaults.cache["neverAskAboutFlux"] = AnyCodable(Defaults[.neverAskAboutFlux])
-    CachedDefaults.cache["hasActiveDisplays"] = AnyCodable(Defaults[.hasActiveDisplays])
-    CachedDefaults.cache["ignoredVolumes"] = AnyCodable(Defaults[.ignoredVolumes])
+var allKeysObservers = Set<AnyCancellable>()
 
-    CachedDefaults.cache["location"] = AnyCodable(Defaults[.location])
-    CachedDefaults.cache["secure"] = AnyCodable(Defaults[.secure])
-    CachedDefaults.cache["wttr"] = AnyCodable(Defaults[.wttr])
-    CachedDefaults.cache["hotkeys"] = AnyCodable(Defaults[.hotkeys])
-    CachedDefaults.cache["displays"] = AnyCodable(Defaults[.displays])
-    CachedDefaults.cache["appExceptions"] = AnyCodable(Defaults[.appExceptions])
+func cacheKey<Value>(_ key: Defaults.Key<Value>) {
+    CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
+    Defaults.publisher(key).sink { change in
+        Defaults.withoutPropagation {
+            CachedDefaults[key] = change.newValue
+        }
+    }.store(in: &allKeysObservers)
+}
+
+func initCache() {
+    cacheKey(.curveFactor)
+    cacheKey(.brightnessKeysEnabled)
+    cacheKey(.volumeKeysEnabled)
+    cacheKey(.mediaKeysControlAllMonitors)
+    cacheKey(.didScrollTextField)
+    cacheKey(.didSwipeToHotkeys)
+    cacheKey(.didSwipeLeft)
+    cacheKey(.didSwipeRight)
+    cacheKey(.smoothTransition)
+    cacheKey(.refreshValues)
+    cacheKey(.useCoreDisplay)
+    cacheKey(.debug)
+    cacheKey(.showQuickActions)
+    cacheKey(.manualLocation)
+    cacheKey(.startAtLogin)
+    cacheKey(.clamshellModeDetection)
+    cacheKey(.brightnessStep)
+    cacheKey(.contrastStep)
+    cacheKey(.volumeStep)
+    cacheKey(.syncPollingSeconds)
+    cacheKey(.sensorPollingSeconds)
+    cacheKey(.adaptiveBrightnessMode)
+    cacheKey(.nonManualMode)
+    cacheKey(.overrideAdaptiveMode)
+    cacheKey(.reapplyValuesAfterWake)
+    cacheKey(.sunrise)
+    cacheKey(.sunset)
+    cacheKey(.solarNoon)
+    cacheKey(.civilTwilightBegin)
+    cacheKey(.civilTwilightEnd)
+    cacheKey(.nauticalTwilightBegin)
+    cacheKey(.nauticalTwilightEnd)
+    cacheKey(.astronomicalTwilightBegin)
+    cacheKey(.astronomicalTwilightEnd)
+    cacheKey(.dayLength)
+    cacheKey(.hideMenuBarIcon)
+    cacheKey(.showDockIcon)
+    cacheKey(.brightnessOnInputChange)
+    cacheKey(.contrastOnInputChange)
+    cacheKey(.disableControllerVideo)
+    cacheKey(.neverAskAboutFlux)
+    cacheKey(.hasActiveDisplays)
+    cacheKey(.ignoredVolumes)
+
+    cacheKey(.location)
+    cacheKey(.secure)
+    cacheKey(.wttr)
+    cacheKey(.hotkeys)
+    cacheKey(.displays)
+    cacheKey(.appExceptions)
 }
 
 extension Defaults.Keys {

@@ -14,7 +14,8 @@
 			"file_exclude_patterns":
 			[
 				"Releases/*.delta",
-				"Releases/*.dmg"
+				"Releases/*.dmg",
+				"Releases/*.pkg"
 			],
 			"folder_exclude_patterns":
 			[
