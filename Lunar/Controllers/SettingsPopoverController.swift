@@ -159,17 +159,17 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.enabledControls[.gamma] = gammaEnabled
             display.save()
-            
+
             resetControl()
             ensureAtLeastOneControlEnabled()
         }
     }
-    
+
     func resetControl() {
-        guard let display = display else {return}
+        guard let display = display else { return }
         display.control = display.getBestControl()
         display.onControlChange?(display.control)
-        
+
         if !gammaEnabled {
             display.resetGamma()
         }
@@ -183,7 +183,7 @@ class SettingsPopoverController: NSViewController {
             } else {
                 DDCControl(display: display).resetState()
             }
-            
+
             self.resetControl()
 
             for _ in 1 ... 5 {
@@ -203,7 +203,7 @@ class SettingsPopoverController: NSViewController {
             }
 
             self.resetControl()
-            
+
             for _ in 1 ... 5 {
                 displayController.adaptBrightness(force: true)
                 sleep(3)
