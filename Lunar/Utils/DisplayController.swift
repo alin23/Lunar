@@ -790,19 +790,19 @@ class DisplayController {
 
     func adaptBrightness(for display: Display, force: Bool = false) {
 //        async(queue: dataPublisherQueue) {
-            self.adaptiveMode.withForce(force || display.force) {
-                self.adaptiveMode.adapt(display)
-            }
+        adaptiveMode.withForce(force || display.force) {
+            self.adaptiveMode.adapt(display)
+        }
 //        }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
 //        async(queue: dataPublisherQueue) {
-            for display in displays ?? Array(self.activeDisplays.values) {
-                self.adaptiveMode.withForce(force || display.force) {
-                    self.adaptiveMode.adapt(display)
-                }
+        for display in displays ?? Array(activeDisplays.values) {
+            adaptiveMode.withForce(force || display.force) {
+                self.adaptiveMode.adapt(display)
             }
+        }
 //        }
     }
 
