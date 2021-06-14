@@ -200,12 +200,16 @@ class DisplayViewController: NSViewController {
     }
 
     func setButtonsHidden(_ hidden: Bool) {
-        inputDropdown?.isHidden = hidden
-        inputDropdownHotkeyButton?.isHidden = hidden
+        mainThread {
+            inputDropdown?.isHidden = hidden
+            inputDropdownHotkeyButton?.isHidden = hidden
+        }
     }
 
     func refreshView() {
-        view.setNeedsDisplay(view.visibleRect)
+        mainThread {
+            view.setNeedsDisplay(view.visibleRect)
+        }
     }
 
     @discardableResult
@@ -364,7 +368,7 @@ class DisplayViewController: NSViewController {
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
 
             var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? [:]
-            let lastDataPoint = datapointLockAround { displayController.adaptiveMode.brightnessDataPoint.last }
+            let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             Display.insertDataPoint(
                 values: &userValues,
                 featureValue: lastDataPoint,
@@ -715,7 +719,7 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForSendingBrightnessContrast() {
-        display?.$sendingContrast.sink { [weak self] newValue in
+        display?.$sendingContrast.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableBrightness?.currentValue.stopHighlighting()
                 return
@@ -729,7 +733,7 @@ class DisplayViewController: NSViewController {
                 }
             }
         }.store(in: &displayObservers)
-        display?.$sendingContrast.sink { [weak self] newValue in
+        display?.$sendingContrast.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableContrast?.currentValue.stopHighlighting()
                 return
@@ -745,25 +749,22 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForBrightnessContrastChange() {
-        display?.$maxBrightness.sink { [weak self] value in
+        display?.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
-            self.scrollableBrightness?.maxValue.integerValue = value.intValue
+            mainThread { self.scrollableBrightness?.maxValue.integerValue = value.intValue }
         }.store(in: &displayObservers)
-        display?.$maxContrast.sink { [weak self] value in
+        display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
-            self.scrollableContrast?.maxValue.integerValue = value.intValue
+            mainThread { self.scrollableContrast?.maxValue.integerValue = value.intValue }
         }.store(in: &displayObservers)
     }
 
     func listenForDisplayBoolChange() {
-        display?.$activeAndResponsive.sink { [weak self] newActiveAndResponsive in
+        display?.$activeAndResponsive.receive(on: dataPublisherQueue).sink { [weak self] newActiveAndResponsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
-                mainThread { [weak self] in
-                    guard let self = self else { return }
-                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
+                self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
 
-                    textField.isHidden = newActiveAndResponsive
-                }
+                mainThread { textField.isHidden = newActiveAndResponsive }
             }
         }.store(in: &displayObservers)
 
@@ -771,10 +772,9 @@ class DisplayViewController: NSViewController {
             if !display.adaptive {
                 showAdaptiveNotice()
             }
-            display.$adaptive.sink { [weak self] newAdaptive in
+            display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
                 if let self = self {
-                    mainThread { [weak self] in
-                        guard let self = self else { return }
+                    mainThread {
                         if !newAdaptive {
                             self.showAdaptiveNotice()
                         } else {
@@ -795,14 +795,13 @@ class DisplayViewController: NSViewController {
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            mainThread { [weak self] in
-                guard let self = self, !self.pausedAdaptiveModeObserver else {
-                    return
-                }
-                self.pausedAdaptiveModeObserver = true
-                Defaults.withoutPropagation {
-                    let adaptiveMode = change.newValue
-
+            guard let self = self, !self.pausedAdaptiveModeObserver else {
+                return
+            }
+            self.pausedAdaptiveModeObserver = true
+            Defaults.withoutPropagation {
+                let adaptiveMode = change.newValue
+                mainThread {
                     if CachedDefaults[.overrideAdaptiveMode] {
                         self.inputDropdown?.selectItem(withTag: adaptiveMode.rawValue)
                     } else {

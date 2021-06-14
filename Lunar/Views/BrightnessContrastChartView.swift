@@ -61,8 +61,8 @@ class BrightnessContrastChartView: LineChartView {
                 let lux = mode.lastAmbientLight.rounded()
                 var highlights: [Highlight] = []
 
-                let maxBr = datapointLockAround { mode.brightnessDataPoint.max.i }
-                let maxCr = datapointLockAround { mode.contrastDataPoint.max.i }
+                let maxBr = datapointLock.around { mode.brightnessDataPoint.max.i }
+                let maxCr = datapointLock.around { mode.contrastDataPoint.max.i }
 
                 if (30 ... (maxBr - 30)).contains(lux.i) {
                     highlights.append(Highlight(x: lux, dataSetIndex: 0, stackIndex: 0))

@@ -126,9 +126,8 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.enabledControls[.network] = networkEnabled
             display.save()
-            display.control = display.getBestControl()
-            display.onControlChange?(display.control)
 
+            resetControl()
             ensureAtLeastOneControlEnabled()
         }
     }
@@ -138,9 +137,8 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.enabledControls[.coreDisplay] = coreDisplayEnabled
             display.save()
-            display.control = display.getBestControl()
-            display.onControlChange?(display.control)
 
+            resetControl()
             ensureAtLeastOneControlEnabled()
         }
     }
@@ -150,9 +148,8 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.enabledControls[.ddc] = ddcEnabled
             display.save()
-            display.control = display.getBestControl()
-            display.onControlChange?(display.control)
 
+            resetControl()
             ensureAtLeastOneControlEnabled()
         }
     }
@@ -162,25 +159,32 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.enabledControls[.gamma] = gammaEnabled
             display.save()
-            display.control = display.getBestControl()
-            display.onControlChange?(display.control)
-
-            if !gammaEnabled {
-                display.resetGamma()
-            }
-
+            
+            resetControl()
             ensureAtLeastOneControlEnabled()
+        }
+    }
+    
+    func resetControl() {
+        guard let display = display else {return}
+        display.control = display.getBestControl()
+        display.onControlChange?(display.control)
+        
+        if !gammaEnabled {
+            display.resetGamma()
         }
     }
 
     @IBAction func resetDDC(_: Any) {
         asyncAfter(ms: 10, uniqueTaskKey: "resetDDCTask") { [weak self] in
-            guard let display = self?.display else { return }
+            guard let self = self, let display = self.display else { return }
             if display.control is DDCControl {
                 display.control.resetState()
             } else {
                 DDCControl(display: display).resetState()
             }
+            
+            self.resetControl()
 
             for _ in 1 ... 5 {
                 displayController.adaptBrightness(force: true)
@@ -191,13 +195,15 @@ class SettingsPopoverController: NSViewController {
 
     @IBAction func resetNetworkController(_: Any) {
         asyncAfter(ms: 10, uniqueTaskKey: "resetNetworkControlTask") { [weak self] in
-            guard let display = self?.display else { return }
+            guard let self = self, let display = self.display else { return }
             if display.control is NetworkControl {
                 display.control.resetState()
             } else {
                 NetworkControl.resetState(serial: display.serial)
             }
 
+            self.resetControl()
+            
             for _ in 1 ... 5 {
                 displayController.adaptBrightness(force: true)
                 sleep(3)

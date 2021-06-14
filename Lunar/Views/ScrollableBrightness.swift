@@ -81,15 +81,14 @@ class ScrollableBrightness: NSView {
     var displayObservers = Set<AnyCancellable>()
 
     func addObserver(_ display: Display) {
-        display.$brightness.sink { [weak self] newBrightness in
-            if let display = self?.display, display.id != GENERIC_DISPLAY_ID {
-                let minBrightness = display.minBrightness.uint8Value
-                let maxBrightness = display.maxBrightness.uint8Value
+        display.$brightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
+            guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
+            let minBrightness = display.minBrightness.uint8Value
+            let maxBrightness = display.maxBrightness.uint8Value
 
-                let newBrightness = cap(newBrightness.uint8Value, minVal: minBrightness, maxVal: maxBrightness)
-                mainThread {
-                    self?.currentValue?.stringValue = String(newBrightness)
-                }
+            let newBrightness = cap(newBrightness.uint8Value, minVal: minBrightness, maxVal: maxBrightness)
+            mainThread {
+                self?.currentValue?.stringValue = String(newBrightness)
             }
         }.store(in: &displayObservers)
     }

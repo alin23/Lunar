@@ -35,7 +35,8 @@ private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChange
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
-let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operation.queue")
+let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .utility)
+let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
@@ -74,7 +75,7 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SUUpdaterDelegate {
     var locationManager: CLLocationManager?
-    var _windowControllerLock = UnfairLock()
+    var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
     var windowController: ModernWindowController? {
         get { _windowControllerLock.around { _windowController } }

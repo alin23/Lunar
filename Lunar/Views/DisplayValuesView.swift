@@ -173,7 +173,7 @@ class DisplayValuesView: NSTableView {
         scrollableBrightness.onValueChangedInstant = { value in
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display.insertBrightnessUserDataPoint(
-                datapointLockAround { displayController.adaptiveMode.brightnessDataPoint.last },
+                datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last },
                 value,
                 modeKey: displayController.adaptiveModeKey
             )
@@ -184,7 +184,7 @@ class DisplayValuesView: NSTableView {
         scrollableContrast.onValueChangedInstant = { value in
             cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display.insertContrastUserDataPoint(
-                datapointLockAround { displayController.adaptiveMode.contrastDataPoint.last },
+                datapointLock.around { displayController.adaptiveMode.contrastDataPoint.last },
                 value,
                 modeKey: displayController.adaptiveModeKey
             )
@@ -199,53 +199,47 @@ class DisplayValuesView: NSTableView {
 
         guard var observers = displayObservers[id] else { return }
 
-        display.$brightness.sink { newBrightness in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableBrightness.integerValue = newBrightness.intValue
-                    scrollableBrightness.needsDisplay = true
-                }
+        display.$brightness.receive(on: dataPublisherQueue).sink { newBrightness in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableBrightness.integerValue = newBrightness.intValue
+                scrollableBrightness.needsDisplay = true
             }
         }.store(in: &observers)
 
-        display.$contrast.sink { newContrast in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableContrast.integerValue = newContrast.intValue
-                    scrollableContrast.needsDisplay = true
-                }
+        display.$contrast.receive(on: dataPublisherQueue).sink { newContrast in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableContrast.integerValue = newContrast.intValue
+                scrollableContrast.needsDisplay = true
             }
         }.store(in: &observers)
 
-        display.$minBrightness.sink { newBrightness in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableBrightness.lowerLimit = newBrightness.doubleValue
-                }
+        display.$minBrightness.receive(on: dataPublisherQueue).sink { newBrightness in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableBrightness.lowerLimit = newBrightness.doubleValue
             }
         }.store(in: &observers)
 
-        display.$minContrast.sink { newContrast in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableContrast.lowerLimit = newContrast.doubleValue
-                }
+        display.$minContrast.receive(on: dataPublisherQueue).sink { newContrast in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableContrast.lowerLimit = newContrast.doubleValue
             }
         }.store(in: &observers)
 
-        display.$maxBrightness.sink { newBrightness in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableBrightness.upperLimit = newBrightness.doubleValue
-                }
+        display.$maxBrightness.receive(on: dataPublisherQueue).sink { newBrightness in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableBrightness.upperLimit = newBrightness.doubleValue
             }
         }.store(in: &observers)
 
-        display.$maxContrast.sink { newContrast in
-            if !isGeneric(id) {
-                mainThread {
-                    scrollableContrast.upperLimit = newContrast.doubleValue
-                }
+        display.$maxContrast.receive(on: dataPublisherQueue).sink { newContrast in
+            guard !isGeneric(id) else { return }
+            mainThread {
+                scrollableContrast.upperLimit = newContrast.doubleValue
             }
         }.store(in: &observers)
     }

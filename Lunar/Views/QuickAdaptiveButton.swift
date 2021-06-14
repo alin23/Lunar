@@ -62,19 +62,18 @@ class QuickAdaptiveButton: NSButton {
         )
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        display?.$adaptive.sink { [unowned self] newAdaptive in
-            if let display = self.display {
-                mainThread {
-                    if newAdaptive {
-                        self.bg = buttonBgOn
-                        self.state = .on
-                    } else {
-                        self.bg = buttonBgOff
-                        self.state = .off
-                    }
-                    display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
+        display?.$adaptive.receive(on: dataPublisherQueue).sink { [unowned self] newAdaptive in
+            guard let display = self.display else {return}
+            mainThread {
+                if newAdaptive {
+                    self.bg = buttonBgOn
+                    self.state = .on
+                } else {
+                    self.bg = buttonBgOff
+                    self.state = .off
                 }
             }
+            display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
         }.store(in: &displayObservers)
     }
 

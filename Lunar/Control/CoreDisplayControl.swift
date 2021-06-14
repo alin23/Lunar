@@ -82,7 +82,11 @@ class CoreDisplayControl: Control {
     }
 
     func isResponsive() -> Bool {
-        responsive
+        #if DEBUG
+            responsive || TEST_IDS.contains(display.id)
+        #else
+            responsive
+        #endif
     }
 
     func resetState() {

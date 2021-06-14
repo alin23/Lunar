@@ -26,6 +26,7 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
+        return id == GENERIC_DISPLAY_ID
         return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
@@ -413,16 +414,16 @@ func mainThread<T>(_ action: () -> T) -> T {
     }
 }
 
-func serialSync<T>(_ action: () -> T) -> T {
-    action()
-    if DispatchQueue.current == dataSerialQueue {
-        return action()
-    } else {
-        return dataSerialQueue.sync(flags: [.barrier]) {
-            return action()
-        }
-    }
-}
+//func serialSync<T>(_ action: () -> T) -> T {
+//    action()
+//    if DispatchQueue.current == dataSerialQueue {
+//        return action()
+//    } else {
+//        return dataSerialQueue.sync(flags: [.barrier]) {
+//            return action()
+//        }
+//    }
+//}
 
 func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
@@ -438,7 +439,7 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     serialQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-let asyncUniqueLock = UnfairLock()
+let asyncUniqueLock = NSRecursiveLock()
 var asyncUniqueTasks = [String: DispatchWorkItem]()
 var asyncUniqueRecurringTasks = [String: Timer]()
 
@@ -1062,10 +1063,30 @@ final class UnfairLock {
     }
 }
 
+extension NSRecursiveLock {
+    /// Executes a closure returning a value while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    ///
+    /// - Returns:           The value the closure generated.
+    func around<T>(timeout: TimeInterval = 10, _ closure: () -> T) -> T {
+        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
+        return closure()
+    }
+
+    /// Execute a closure while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    func around(timeout: TimeInterval = 10, _ closure: () -> Void) {
+        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
+        return closure()
+    }
+}
+
 @propertyWrapper
 public struct AtomicLock<Value> {
     var value: Value
-    var lock = UnfairLock()
+    var lock = NSRecursiveLock()
 
     public init(wrappedValue: Value) {
         value = wrappedValue

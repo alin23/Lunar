@@ -13,7 +13,8 @@ class GammaViewController: NSViewController {
     @IBOutlet var dot: NSTextField!
 
     @AtomicLock var highlighterTask: CFRunLoopTimer?
-    var highlighterSemaphore = DispatchSemaphore(value: 1, name: "highlighterSemaphore")
+//    var highlighterSemaphore = DispatchSemaphore(value: 1, name: "highlighterSemaphore")
+    var highlighterLock = NSRecursiveLock()
 
     func highlight() {
         mainThreadSerial {
@@ -24,40 +25,42 @@ class GammaViewController: NSViewController {
             }
 
             highlighterTask = operationHighlightQueue.async(every: 200.milliseconds) { [weak self] (_: CFRunLoopTimer?) in
-                self?.highlighterSemaphore.wait(for: nil)
-                defer {
-                    self?.highlighterSemaphore.signal()
-                }
+                // self?.highlighterSemaphore.wait(for: nil)
+                // defer {
+                //     self?.highlighterSemaphore.signal()
+                // }
 
-                guard let s = self else {
-                    if let timer = self?.highlighterTask {
-                        operationHighlightQueue.cancel(timer: timer)
-                        self?.highlighterTask = nil
+                self?.highlighterLock.around {
+                    guard let s = self else {
+                        if let timer = self?.highlighterTask {
+                            operationHighlightQueue.cancel(timer: timer)
+                            self?.highlighterTask = nil
+                        }
+                        return
                     }
-                    return
-                }
 
-                var windowVisible: Bool = false
-                mainThreadSerial {
-                    windowVisible = s.view.window?.isVisible ?? false
-                }
-                guard windowVisible, let dot = s.dot
-                else {
-                    if let timer = self?.highlighterTask {
-                        operationHighlightQueue.cancel(timer: timer)
+                    var windowVisible: Bool = false
+                    mainThreadSerial {
+                        windowVisible = s.view.window?.isVisible ?? false
                     }
-                    return
-                }
+                    guard windowVisible, let dot = s.dot
+                    else {
+                        if let timer = self?.highlighterTask {
+                            operationHighlightQueue.cancel(timer: timer)
+                        }
+                        return
+                    }
 
-                mainThreadSerial {
-                    if dot.alphaValue == 0.0 {
-                        dot.layer?.add(fadeTransition(duration: 0.25), forKey: "transition")
-                        dot.alphaValue = 0.8
-                        dot.needsDisplay = true
-                    } else {
-                        dot.layer?.add(fadeTransition(duration: 0.35), forKey: "transition")
-                        dot.alphaValue = 0.0
-                        dot.needsDisplay = true
+                    mainThreadSerial {
+                        if dot.alphaValue == 0.0 {
+                            dot.layer?.add(fadeTransition(duration: 0.25), forKey: "transition")
+                            dot.alphaValue = 0.8
+                            dot.needsDisplay = true
+                        } else {
+                            dot.layer?.add(fadeTransition(duration: 0.35), forKey: "transition")
+                            dot.alphaValue = 0.0
+                            dot.needsDisplay = true
+                        }
                     }
                 }
             }

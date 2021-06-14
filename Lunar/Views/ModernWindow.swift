@@ -81,7 +81,7 @@ class ModernWindow: WAYWindow {
         trafficLightButtonsTopMargin = 0
         hideTitleBarInFullScreen = false
         if let titlebarViews = titlebarAccessoryViewControllers[0].parent?.view.subviews {
-            log.info("Titlebar views: \(titlebarViews.map { $0.frame })")
+            log.info("Titlebar views: \(titlebarViews.map(\.frame))")
             let matchingViews = titlebarViews
                 .filter { $0.frame.origin.x == 0 && $0.frame.origin.y == 0 && $0.frame.width == 950 && $0.frame.height == 28 }
             if let v = matchingViews.last {

@@ -20,6 +20,7 @@ class Logger: SwiftyBeaver {
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
+        Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
             enabled || TEST_MODE || AppSettings.beta
@@ -40,7 +41,6 @@ class Logger: SwiftyBeaver {
             )
         }
 
-        Logger.addDestination(console)
         #if !DEBUG
             Logger.addDestination(file)
             if !cli, AppSettings.beta {
