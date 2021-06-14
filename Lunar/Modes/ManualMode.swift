@@ -31,6 +31,7 @@ class ManualMode: AdaptiveMode {
         for observer in displayObservers {
             observer.cancel()
         }
+        displayObservers.removeAll()
 
         watching = false
     }
@@ -38,10 +39,10 @@ class ManualMode: AdaptiveMode {
     func watch() -> Bool {
         guard !watching else { return false }
         for display in displayController.displays.values {
-            display.$brightness.sink { value in
+            display.$brightness.receive(on: dataPublisherQueue).sink { value in
                 NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["brightness": value])
             }.store(in: &displayObservers)
-            display.$contrast.sink { value in
+            display.$contrast.receive(on: dataPublisherQueue).sink { value in
                 NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["contrast": value])
             }.store(in: &displayObservers)
         }

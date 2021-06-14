@@ -240,6 +240,22 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         let newDisplays = displayController.displays.values.map { $0 }
         return newDisplays.count == displays.count && zip(displays, newDisplays).allSatisfy { d1, d2 in d1 === d2 }
     }
+    
+    override func flagsChanged(with event: NSEvent) {
+        if event.modifierFlags.contains(.control) {
+            log.verbose("Fastest scroll threshold")
+            scrollDeltaYThreshold = FASTEST_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.contains(.command) {
+            log.verbose("Precise scroll threshold")
+            scrollDeltaYThreshold = PRECISE_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.contains(.option) {
+            log.verbose("Fast scroll threshold")
+            scrollDeltaYThreshold = FAST_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.isDisjoint(with: [.command, .option, .control]) {
+            log.verbose("Normal scroll threshold")
+            scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
+        }
+    }
 
     func listenForDisplaysChange() {
         displaysObserver = CachedDefaults.displaysPublisher.sink { [unowned self] _ in

@@ -217,7 +217,7 @@ class NetworkControl: Control {
         if serviceConnectedDisplayCount == 1, displayController.activeDisplays.count == 1,
            let display = displayController.activeDisplays.first?.value, shouldPromptForNetworkControl(display)
         {
-            promptForNetworkControl(1, netService: netService, display: display)
+            async { promptForNetworkControl(1, netService: netService, display: display) }
             return
         }
 
@@ -236,7 +236,7 @@ class NetworkControl: Control {
             else {
                 return
             }
-            promptForNetworkControl(displayNum, netService: netService, display: display)
+            async { promptForNetworkControl(displayNum, netService: netService, display: display) }
         }
     }
 
@@ -490,6 +490,11 @@ class NetworkControl: Control {
     var responsiveTryCount = 0
 
     func isResponsive() -> Bool {
+        #if DEBUG
+            if TEST_IDS.contains(display.id) {
+                return true
+            }
+        #endif
         guard let service = NetworkControl.controllersForDisplay[display.serial] else {
             responsiveTryCount += 1
             if responsiveTryCount > 3 {
