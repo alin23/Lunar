@@ -703,10 +703,10 @@ enum ValueType {
 
     @Atomic var force = false
     @Atomic var faceLightEnabled = false
-    var brightnessBeforeFacelight = 50.ns
-    var contrastBeforeFacelight = 50.ns
-    var maxBrightnessBeforeFacelight = 100.ns
-    var maxContrastBeforeFacelight = 100.ns
+    lazy var brightnessBeforeFacelight = brightness
+    lazy var contrastBeforeFacelight = contrast
+    lazy var maxBrightnessBeforeFacelight = maxBrightness
+    lazy var maxContrastBeforeFacelight = maxContrast
 
     // MARK: Functions
 
@@ -1601,12 +1601,12 @@ enum ValueType {
         let id = self.id
 
         showOperationInProgress(screen: screen)
-        async {
+        asyncNow {
             _ = gammaSemaphore.wait(for: 1.8)
             hideOperationInProgress()
         }
         if oldBrightness != nil || oldContrast != nil {
-            async(runLoopQueue: realtimeQueue) { [weak self] in
+            asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
                 guard let self = self else {
                     gammaSemaphore.signal()
                     return
@@ -1640,7 +1640,7 @@ enum ValueType {
                 gammaSemaphore.signal()
             }
         }
-        async(runLoopQueue: lowprioQueue) { [weak self] in
+        asyncNow(runLoopQueue: lowprioQueue) { [weak self] in
             guard let self = self else { return }
             if oldBrightness != nil || oldContrast != nil {
                 gammaSemaphore.wait(for: nil)
@@ -1704,7 +1704,7 @@ enum ValueType {
     }
 
     @inline(__always) func withoutSmoothTransition(_ block: () -> Void) {
-        if !Defaults[.smoothTransition] {
+        if !CachedDefaults[.smoothTransition] {
             block()
             return
         }

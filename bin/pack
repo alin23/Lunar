@@ -39,7 +39,9 @@ rsync -avzP "$BUILD_DIR" "$TMP_DIR" || exit 1
 find "$APP_TMP" -not -perm 644 -and -not -perm 755 -exec chmod 644 \{\} \;
 
 set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/* \
-    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Updater.app \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Autoupdate \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Sparkle \
     $APP_TMP/Contents/Frameworks/*.framework \
     $APP_TMP/Contents/Frameworks/*.dylib \
     $APP_TMP/Contents/Resources/ddcctl \
@@ -69,7 +71,7 @@ if not set -q DISABLE_NOTARIZATION
     end
 end
 
-exit 0
+# exit 0
 set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
 
 ./make-installer dmg

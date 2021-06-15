@@ -921,7 +921,7 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
         display.alwaysUseNetworkControl = true
     }
 
-    async(runLoopQueue: realtimeQueue) {
+    asyncNow(runLoopQueue: realtimeQueue) {
         NetworkControl.browser = CiaoBrowser()
         NetworkControl.listenForDDCUtilControllers()
     }

@@ -73,7 +73,7 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 }
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SUUpdaterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUUpdaterDelegate {
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
@@ -126,13 +126,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var muteAudioMenuItem: NSMenuItem!
     @IBOutlet var resetTrialMenuItem: NSMenuItem!
     @IBOutlet var expireTrialMenuItem: NSMenuItem!
-    @IBOutlet var updater: SUUpdater!
+    @IBOutlet var updateController: SPUStandardUpdaterController?
 
     @IBOutlet var lunarProMenuItem: NSMenuItem!
     @IBOutlet var activateLicenseMenuItem: NSMenuItem!
     @IBOutlet var faceLightMenuItem: NSMenuItem!
 
-    @objc dynamic var faceLightOn = false
+    @Atomic var faceLightOn = false
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -143,7 +143,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func initHotkeys() {
-        guard !Defaults[.hotkeys].isEmpty else {
+        guard !CachedDefaults[.hotkeys].isEmpty else {
             CachedDefaults[.hotkeys] = Hotkey.defaults
             return
         }
@@ -174,7 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
                 scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
-            if !Defaults[.overrideAdaptiveMode] {
+            if !CachedDefaults[.overrideAdaptiveMode] {
                 return
             }
             CachedDefaults[.nonManualMode] = change.newValue != .manual
@@ -227,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
 
-        handler(Defaults[.startAtLogin])
+        handler(CachedDefaults[.startAtLogin])
         startAtLoginObserver = startAtLoginObserver ?? startAtLoginPublisher.sink { change in
             handler(change.newValue)
         }
@@ -490,7 +490,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         // hotkeysObserver = hotkeysObserver ?? hotkeysPublisher.sink { _ in
         //     mainThread {
-        //         self.setKeyEquivalents(Defaults[.hotkeys])
+        //         self.setKeyEquivalents(CachedDefaults[.hotkeys])
         //     }
         // }
 
@@ -502,14 +502,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.info("Hiding menu bar icon: \(change.newValue)")
             self.statusItem.isVisible = !change.newValue
         }
-        statusItem.isVisible = !Defaults[.hideMenuBarIcon]
+        statusItem.isVisible = !CachedDefaults[.hideMenuBarIcon]
 
         showDockIconObserver = showDockIconObserver ?? showDockIconPublisher.sink { change in
             log.info("Showing dock icon: \(change.newValue)")
             NSApp.setActivationPolicy(change.newValue ? .regular : .accessory)
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
         }
-        NSApp.setActivationPolicy(Defaults[.showDockIcon] ? .regular : .accessory)
+        NSApp.setActivationPolicy(CachedDefaults[.showDockIcon] ? .regular : .accessory)
 
         NotificationCenter.default.addObserver(
             forName: .defaultOutputDeviceChanged,
@@ -592,8 +592,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if let idx = CommandLine.arguments.firstIndex(of: "@") {
             log.initLogger(cli: true)
-            async {
+            asyncNow {
                 Lunar.main(Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count]))
+                exit(0)
             }
             return
         }
@@ -701,7 +702,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     internal func locationManager(_ lm: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard !Defaults[.manualLocation] else { return }
+        guard !CachedDefaults[.manualLocation] else { return }
 
         guard let location = locations.last ?? lm.location, let geolocation = Geolocation(location: location)
         else {
@@ -718,7 +719,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     internal func locationManager(_ lm: CLLocationManager, didFailWithError error: Error) {
         log.error("Location manager failed with error: \(error)")
-        guard !Defaults[.manualLocation] else { return }
+        guard !CachedDefaults[.manualLocation] else { return }
 
         guard let location = lm.location, let geolocation = Geolocation(location: location)
         else {
