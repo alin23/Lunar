@@ -21,7 +21,7 @@ class StatusItemButtonController: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if !Defaults[.showQuickActions] || displayController.displays.count == 0 || clicked {
+        if !CachedDefaults[.showQuickActions] || displayController.displays.count == 0 || clicked {
             return
         }
 

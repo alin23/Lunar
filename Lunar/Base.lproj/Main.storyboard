@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19115.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19115.2"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -403,7 +403,6 @@
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
                                                 <action selector="faceLight:" target="Voe-Tx-rLC" id="H0f-Ug-3J8"/>
-                                                <binding destination="Voe-Tx-rLC" name="value" keyPath="self.faceLightOn" id="bk5-ue-E0u"/>
                                                 <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="IDl-sw-lX8"/>
                                             </connections>
                                         </menuItem>
@@ -547,7 +546,11 @@
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="checkForUpdates:" target="Moa-uB-Vso" id="zuL-1B-X1K"/>
+                                                <binding destination="hYb-xA-BhZ" name="target" keyPath="self" id="u54-XU-zLW">
+                                                    <dictionary key="options">
+                                                        <string key="NSSelectorName">checkForUpdates:</string>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Quit Lunar" keyEquivalent="q" id="8Oe-Go-Jnc">
@@ -587,18 +590,14 @@
                         <outlet property="percent75MenuItem" destination="rXC-7i-Z75" id="rln-kM-6lF"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="resetTrialMenuItem" destination="v9d-uL-JbA" id="9bY-DS-tBe"/>
-                        <outlet property="updater" destination="Moa-uB-Vso" id="zdg-Db-Obi"/>
+                        <outlet property="updateController" destination="hYb-xA-BhZ" id="jlH-HQ-4vJ"/>
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
                         <outlet property="volumeDownMenuItem" destination="ORj-JY-7d6" id="bIx-iF-AnX"/>
                         <outlet property="volumeUpMenuItem" destination="91P-qR-leE" id="UjC-Dk-2b5"/>
                     </connections>
                 </customObject>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-                <customObject id="Moa-uB-Vso" customClass="SUUpdater">
-                    <connections>
-                        <outlet property="delegate" destination="Voe-Tx-rLC" id="brS-th-V4E"/>
-                    </connections>
-                </customObject>
+                <customObject id="hYb-xA-BhZ" customClass="SPUStandardUpdaterController"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="3YV-ka-Eop"/>
                 <userDefaultsController id="u0a-cA-m1f"/>
@@ -1340,7 +1339,7 @@
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="automaticallyChecksForUpdates" id="XMz-Oy-bZe"/>
+                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="updater.automaticallyChecksForUpdates" id="OMN-47-Bbg"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHC-2c-i2Q">
@@ -1361,7 +1360,7 @@
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="automaticallyDownloadsUpdates" id="65l-Ur-8UQ"/>
+                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="updater.automaticallyDownloadsUpdates" id="z1j-Mw-a6c"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFM-4J-v5n">
@@ -1433,7 +1432,7 @@ when dock and menubar icons are hidden</string>
                     </connections>
                 </viewController>
                 <customObject id="1Xr-ze-Y7B" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="nt4-Hn-Aot" customClass="SUUpdater"/>
+                <customObject id="nt4-Hn-Aot" customClass="SPUStandardUpdaterController"/>
                 <userDefaultsController id="DNB-4H-88e"/>
             </objects>
             <point key="canvasLocation" x="-1933" y="2007"/>
@@ -2089,7 +2088,7 @@ when dock and menubar icons are hidden</string>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="GDa-lA-NYA" customClass="RemoveAppButton" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="4" y="13" width="18" height="22"/>
+                                                                    <rect key="frame" x="4" y="18" width="18" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Trash" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="HSS-NB-D8i">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2760,7 +2759,7 @@ when dock and menubar icons are hidden</string>
                                     <action selector="proButtonClick:" target="1Bn-Ca-ETm" id="4yD-2G-3l1"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                            <button toolTip="Power off the monitor. Works only if the monitor can be controlled through DDC." focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="591" y="495" width="26" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
@@ -3418,7 +3417,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="HbC-w6-tw4">
-                                                            <rect key="frame" x="10" y="10" width="124" height="75"/>
+                                                            <rect key="frame" x="8" y="10" width="124" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbk-Gm-ehs" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -3481,7 +3480,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="sUH-3g-BTj">
-                                                            <rect key="frame" x="134" y="10" width="140" height="75"/>
+                                                            <rect key="frame" x="132" y="10" width="140" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">
@@ -4823,7 +4822,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G0C-wy-YwY" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="179" y="258" width="86" height="14"/>
+                                <rect key="frame" x="177" y="258" width="86" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset DDC" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="fa6-tN-dwu">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

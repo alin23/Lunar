@@ -167,11 +167,11 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     }
 
     deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        log.debug("deinit hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+//        #if DEBUG
+//            log.verbose("START DEINIT")
+//            defer { log.verbose("END DEINIT") }
+//        #endif
+//        log.debug("deinit hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
 //        hotkey.unregister()
     }
 

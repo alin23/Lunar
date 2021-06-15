@@ -80,7 +80,7 @@ class InstallOutputViewController: NSViewController {
     }
 
     func startInstall(ssh: SSH) {
-        async { [weak self] in
+        asyncNow { [weak self] in
             guard let self = self, let textView = self.outputScrollView.documentView as? NSTextView else { return }
             var status: Int32 = -1
             var newHostname = ssh.host
@@ -179,7 +179,7 @@ class InstallOutputViewController: NSViewController {
     }
 
     @IBAction func cancelInstall(_: Any) {
-        async { [weak self] in
+        asyncNow { [weak self] in
             guard let self = self, let channel = self.commandChannel,
                   let textView = self.outputScrollView.documentView as? NSTextView else { return }
 

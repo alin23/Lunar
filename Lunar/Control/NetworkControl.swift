@@ -164,7 +164,7 @@ class NetworkControl: Control {
             if useNetwork == .alertFirstButtonReturn {
                 controllersForDisplay[display.serial] = service
 
-                async(threaded: true) {
+                asyncNow(threaded: true) {
                     display.control = display.getBestControl()
                 }
             }
@@ -217,7 +217,7 @@ class NetworkControl: Control {
         if serviceConnectedDisplayCount == 1, displayController.activeDisplays.count == 1,
            let display = displayController.activeDisplays.first?.value, shouldPromptForNetworkControl(display)
         {
-            async { promptForNetworkControl(1, netService: netService, display: display) }
+            asyncNow { promptForNetworkControl(1, netService: netService, display: display) }
             return
         }
 
@@ -236,7 +236,7 @@ class NetworkControl: Control {
             else {
                 return
             }
-            async { promptForNetworkControl(displayNum, netService: netService, display: display) }
+            asyncNow { promptForNetworkControl(displayNum, netService: netService, display: display) }
         }
     }
 
@@ -475,7 +475,7 @@ class NetworkControl: Control {
               let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
 
         if service.url == nil {
-            async(runLoopQueue: lowprioQueue) {
+            asyncNow(runLoopQueue: lowprioQueue) {
                 guard let newURL = service.getFirstRespondingURL(urls: service.urls) else { return }
                 if newURL != service.url {
                     service.url = newURL
@@ -544,7 +544,7 @@ class NetworkControl: Control {
     static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
 
     static func resetState(serial: String? = nil) {
-        async(timeout: 2.minutes) {
+        asyncNow(timeout: 2.minutes) {
             browserSemaphore.wait(for: nil)
             defer {
                 browserSemaphore.signal()

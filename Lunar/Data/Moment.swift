@@ -122,7 +122,7 @@ class Moment: NSObject {
         self.sunrise = localTime(sunrise) ?? sevenAM
         self.sunset = localTime(sunset) ?? sevenPM
         self.solarNoon = localTime(solarNoon) ?? noon
-        let length = UInt64(Defaults[.dayLength])
+        let length = UInt64(CachedDefaults[.dayLength])
         if length == 0 {
             dayLength = UInt64(self.sunset - self.sunrise)
         } else {

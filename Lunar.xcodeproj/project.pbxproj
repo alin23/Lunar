@@ -41,7 +41,6 @@
 		C73CC69F24615E9D003B2658 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC69E24615E9D003B2658 /* Sentry */; };
 		C73CC6A5246161E6003B2658 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A4246161E6003B2658 /* Charts */; };
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
-		C740A1C5262192EF004BC1C7 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1C4262192EF004BC1C7 /* Sparkle */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
@@ -129,6 +128,8 @@
 		C7DD622F2614CBAA00B07B31 /* PaddedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */; };
 		C7DD623726178C7100B07B31 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C7DD623626178C7100B07B31 /* SimplyCoreAudio */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
+		C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; };
+		C7DED3662678E0DC002E0188 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
 		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
 		C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */; };
@@ -201,6 +202,7 @@
 			files = (
 				C72CFB992586B371005F0340 /* NSPageControl.framework in Embed Frameworks */,
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
+				C7DED3662678E0DC002E0188 /* Sparkle.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
 				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
 			);
@@ -315,6 +317,7 @@
 		C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHConnectionViewController.swift; sourceTree = "<group>"; };
 		C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedButton.swift; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
+		C7DED3632678E0CD002E0188 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
 		C7E07379259CB2C20019C9C2 /* ManualMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMode.swift; sourceTree = "<group>"; };
 		C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMode.swift; sourceTree = "<group>"; };
@@ -362,6 +365,7 @@
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
+				C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
 				C7E99267260A90E70055370A /* Solar in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
@@ -386,7 +390,6 @@
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
 				C72CFB982586B371005F0340 /* NSPageControl.framework in Frameworks */,
-				C740A1C5262192EF004BC1C7 /* Sparkle in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
@@ -650,6 +653,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7DED3632678E0CD002E0188 /* Sparkle.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,
 				C7138D952634B02900406EE3 /* Paddle.framework */,
@@ -780,7 +784,6 @@
 				C70EEF2525FFE8F2009C0C15 /* SwiftSerial */,
 				C7E99266260A90E70055370A /* Solar */,
 				C7DD623626178C7100B07B31 /* SimplyCoreAudio */,
-				C740A1C4262192EF004BC1C7 /* Sparkle */,
 				C740A1F726249176004BC1C7 /* ArgumentParser */,
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7E80E4526370780004718A4 /* Socket */,
@@ -845,7 +848,6 @@
 				C70EEF2425FFE8F2009C0C15 /* XCRemoteSwiftPackageReference "SwiftSerial" */,
 				C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */,
 				C7DD623526178C7100B07B31 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
-				C740A1C3262192EF004BC1C7 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */,
@@ -1152,7 +1154,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.0.5;
+				CURRENT_PROJECT_VERSION = 4.1.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1178,7 +1180,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.0.5;
+				MARKETING_VERSION = 4.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1264,7 +1266,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.0.5;
+				CURRENT_PROJECT_VERSION = 4.1.0;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1290,7 +1292,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.0.5;
+				MARKETING_VERSION = 4.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1437,7 +1439,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.0.5;
+				CURRENT_PROJECT_VERSION = 4.1.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1463,7 +1465,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.0.5;
+				MARKETING_VERSION = 4.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1495,7 +1497,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.0.5;
+				CURRENT_PROJECT_VERSION = 4.1.0;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1521,7 +1523,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.0.5;
+				MARKETING_VERSION = 4.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1670,14 +1672,6 @@
 				minimumVersion = 2.2.0;
 			};
 		};
-		C740A1C3262192EF004BC1C7 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.26.0;
-			};
-		};
 		C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-argument-parser";
@@ -1755,7 +1749,7 @@
 			repositoryURL = "https://github.com/rnine/SimplyCoreAudio";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
+				minimumVersion = 4.0.1;
 			};
 		};
 		C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
@@ -1865,11 +1859,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */;
 			productName = Sauce;
-		};
-		C740A1C4262192EF004BC1C7 /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C740A1C3262192EF004BC1C7 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
 		};
 		C740A1F726249176004BC1C7 /* ArgumentParser */ = {
 			isa = XCSwiftPackageProductDependency;

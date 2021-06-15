@@ -601,7 +601,7 @@ class ConfigurationViewController: NSViewController {
 
         smoothTransitionCheckbox.needsDisplay = true
 
-        showRelevantSettings(Defaults[.adaptiveBrightnessMode])
+        showRelevantSettings(CachedDefaults[.adaptiveBrightnessMode])
 
         listenForLocationChange()
         listenForCurveFactorChange()

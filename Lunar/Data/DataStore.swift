@@ -275,6 +275,8 @@ extension AnyCodable: Defaults.Serializable {}
 enum CachedDefaults {
     static var displaysPublisher = PassthroughSubject<[Display], Never>()
     static var cache: [String: AnyCodable] = [:]
+    static var locks: [String: NSRecursiveLock] = [:]
+    static var observers = Set<AnyCancellable>()
     static var lock = NSRecursiveLock()
     static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
 
@@ -296,27 +298,28 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            lock.around {
-//                semaphore.wait(for: nil, context: "get \(key.name)")
-
+            let lock = locks[key.name] ?? Self.lock
+            return lock.around {
                 if let value = cache[key.name]?.value as? Value {
-//                    semaphore.signal()
                     return value
                 }
-//                semaphore.signal()
 
-                return
-                    key.suite[key]
+                return key.suite[key]
             }
         }
         set {
+            guard let lock = locks[key.name] else {
+                Self.lock.around {
+                    cache[key.name] = AnyCodable(newValue)
+                    key.suite[key] = newValue
+                }
+                return
+            }
             lock.around {
-//            semaphore.wait(for: nil, context: "set \(key.name)")
                 cache[key.name] = AnyCodable(newValue)
-//            semaphore.signal()
 
                 if key == .displays, let displays = newValue as? [Display] {
-                    async { displaysPublisher.send(displays) }
+                    asyncNow { displaysPublisher.send(displays) }
                     Defaults.withoutPropagation {
                         key.suite[key] = newValue
                     }
@@ -329,15 +332,16 @@ enum CachedDefaults {
     }
 }
 
-var allKeysObservers = Set<AnyCancellable>()
-
 func cacheKey<Value>(_ key: Defaults.Key<Value>) {
     CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
+    CachedDefaults.locks[key.name] = NSRecursiveLock()
     Defaults.publisher(key).sink { change in
-        Defaults.withoutPropagation {
-            CachedDefaults[key] = change.newValue
+        log.debug("Caching \(key.name) = \(change.newValue)")
+        CachedDefaults.cache[key.name] = AnyCodable(change.newValue)
+        if key == .displays, let displays = change.newValue as? [Display] {
+            asyncNow { CachedDefaults.displaysPublisher.send(displays) }
         }
-    }.store(in: &allKeysObservers)
+    }.store(in: &CachedDefaults.observers)
 }
 
 func initCache() {

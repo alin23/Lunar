@@ -62,7 +62,8 @@ public extension LoginServiceKit {
         guard let sharedFileList = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil) else { return false }
         let loginItemList = sharedFileList.takeRetainedValue()
         let url = URL(fileURLWithPath: path) as CFURL
-        LSSharedFileListInsertItemURL(loginItemList, nil, nil, nil, url, nil, nil)
+        let first = kLSSharedFileListItemBeforeFirst.takeRetainedValue()
+        LSSharedFileListInsertItemURL(loginItemList, first, nil, nil, url, nil, nil)
         return true
     }
 
@@ -73,7 +74,7 @@ public extension LoginServiceKit {
         guard let sharedFileList = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil) else { return false }
         let loginItemList = sharedFileList.takeRetainedValue()
         let url = URL(fileURLWithPath: path)
-        let loginItemsListSnapshot: NSArray = LSSharedFileListCopySnapshot(loginItemList, nil).takeRetainedValue()
+        let loginItemsListSnapshot: CFArray? = LSSharedFileListCopySnapshot(loginItemList, nil)?.takeRetainedValue()
         guard let loginItems = loginItemsListSnapshot as? [LSSharedFileListItem] else { return false }
         for loginItem in loginItems {
             guard let resolvedUrl = LSSharedFileListItemCopyResolvedURL(loginItem, 0, nil) else { continue }
@@ -92,7 +93,7 @@ private extension LoginServiceKit {
         guard let sharedFileList = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil) else { return nil }
         let loginItemList = sharedFileList.takeRetainedValue()
         let url = URL(fileURLWithPath: path)
-        let loginItemsListSnapshot: NSArray = LSSharedFileListCopySnapshot(loginItemList, nil).takeRetainedValue()
+        let loginItemsListSnapshot: CFArray? = LSSharedFileListCopySnapshot(loginItemList, nil)?.takeRetainedValue()
         guard let loginItems = loginItemsListSnapshot as? [LSSharedFileListItem] else { return nil }
         for loginItem in loginItems {
             guard let resolvedUrl = LSSharedFileListItemCopyResolvedURL(loginItem, 0, nil) else { continue }

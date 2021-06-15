@@ -73,7 +73,7 @@ class DisplayController {
     }
 
     var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
-    var lastModeWasAuto: Bool = !Defaults[.overrideAdaptiveMode]
+    var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
     var appBrightnessOffset: Int {
         (runningAppExceptions?.last?.brightness ?? 0).i
@@ -177,7 +177,7 @@ class DisplayController {
         if adaptiveModeKey != .manual {
             adaptiveMode = ManualMode.shared
         }
-        if !Defaults[.overrideAdaptiveMode] {
+        if !CachedDefaults[.overrideAdaptiveMode] {
             lastModeWasAuto = true
             CachedDefaults[.overrideAdaptiveMode] = true
         }
@@ -200,7 +200,7 @@ class DisplayController {
     }
 
     func resetDisplayList() {
-        async {
+        asyncNow {
             self.getDisplaysLock.around {
                 DDC.reset()
                 self.displays = DisplayController.getDisplays()
@@ -306,7 +306,7 @@ class DisplayController {
     }
 
     @objc func autoAdaptMode(notification _: Notification? = nil) {
-        guard !Defaults[.overrideAdaptiveMode] else { return }
+        guard !CachedDefaults[.overrideAdaptiveMode] else { return }
 
         let mode = DisplayController.autoMode()
         if mode.key != adaptiveMode.key {
@@ -334,14 +334,14 @@ class DisplayController {
                     }
                 } else {
                     self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                        guard !screensSleeping.load(ordering: .relaxed), let self = self, !Defaults[.overrideAdaptiveMode] else { return }
+                        guard !screensSleeping.load(ordering: .relaxed), let self = self, !CachedDefaults[.overrideAdaptiveMode] else { return }
                         self.autoAdaptMode()
                     }
                 }
             }
             self.pausedAdaptiveModeObserver = false
         }
-        startOrStopWatcher(Defaults[.overrideAdaptiveMode])
+        startOrStopWatcher(CachedDefaults[.overrideAdaptiveMode])
         overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? overrideAdaptiveModePublisher
             .sink { startOrStopWatcher($0.newValue) }
     }
