@@ -28,7 +28,7 @@ struct GammaControl: Control {
     let str = "Gamma Control"
 
     func fluxChecker(flux: NSRunningApplication) {
-        guard !Defaults[.neverAskAboutFlux] else { return }
+        guard !CachedDefaults[.neverAskAboutFlux] else { return }
 
         let completionHandler = { (quitFlux: Bool) in
             if quitFlux {

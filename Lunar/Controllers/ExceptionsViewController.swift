@@ -50,7 +50,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
                     log.warning("Bundle for \(res.path) does not contain required fields")
                     return
                 }
-                if !(Defaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
+                if !(CachedDefaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
                     let app = AppException(identifier: id, name: name)
                     DataStore.storeAppException(app: app)
                 }

@@ -148,7 +148,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
             "sshKeyPath": sshKeyPath,
         ])
 
-        async { [weak self] in
+        asyncNow { [weak self] in
             guard let self = self, !self.cancelled else { return }
 
             mainThread {
@@ -214,7 +214,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
     @IBAction func cancel(_: Any) {
         cancelled = true
-        async { [weak self] in
+        asyncNow { [weak self] in
             guard let self = self, let channel = self.commandChannel else { return }
 
             mainThread {

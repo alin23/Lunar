@@ -123,7 +123,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     }
 
     func startDiagnostics() {
-        async(threaded: true) { [weak self] in
+        asyncNow(threaded: true) { [weak self] in
             guard let self = self else { return }
 
             let steps = displayController.activeDisplays.values.count

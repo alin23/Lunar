@@ -15,12 +15,12 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
           "branch": null,
-          "revision": "876d162385e9862ae8b3c8d65dc301312b040005",
-          "version": "0.6.0"
+          "revision": "69261f239f0fffaf51495dadc4f8483fbfe97025",
+          "version": "0.6.1"
         }
       },
       {
-        "package": "CryptorECC",
+        "package": "BlueECC",
         "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
         "state": {
           "branch": null,
@@ -29,7 +29,7 @@
         }
       },
       {
-        "package": "Socket",
+        "package": "BlueSocket",
         "repositoryURL": "https://github.com/Kitura/BlueSocket",
         "state": {
           "branch": null,
@@ -83,7 +83,7 @@
         }
       },
       {
-        "package": "EonilFSEvents",
+        "package": "FSEvents",
         "repositoryURL": "https://github.com/eonil/FSEvents",
         "state": {
           "branch": null,
@@ -155,7 +155,7 @@
         }
       },
       {
-        "package": "Sentry",
+        "package": "sentry-cocoa",
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
@@ -179,15 +179,6 @@
           "branch": null,
           "revision": "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
           "version": "3.1.1"
-        }
-      },
-      {
-        "package": "Sparkle",
-        "repositoryURL": "https://github.com/sparkle-project/Sparkle",
-        "state": {
-          "branch": null,
-          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
-          "version": "1.26.0"
         }
       },
       {

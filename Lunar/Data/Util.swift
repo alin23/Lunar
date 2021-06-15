@@ -502,7 +502,7 @@ func cancelAsyncRecurringTask(_ key: String) {
     }
 }
 
-@discardableResult func async(
+@discardableResult func asyncNow(
     timeout: DateComponents? = nil,
     queue: DispatchQueue? = nil,
     runLoopQueue: RunloopQueue? = nil,
@@ -1049,7 +1049,7 @@ final class UnfairLock {
     /// - Parameter closure: The closure to run.
     ///
     /// - Returns:           The value the closure generated.
-    func around<T>(_ closure: () -> T) -> T {
+    @inline(__always) func around<T>(_ closure: () -> T) -> T {
         let locked = lock(); defer { if locked { unlock() } }
         return closure()
     }
@@ -1057,7 +1057,7 @@ final class UnfairLock {
     /// Execute a closure while acquiring the lock.
     ///
     /// - Parameter closure: The closure to run.
-    func around(_ closure: () -> Void) {
+    @inline(__always) func around(_ closure: () -> Void) {
         let locked = lock(); defer { if locked { unlock() } }
         return closure()
     }
@@ -1069,7 +1069,7 @@ extension NSRecursiveLock {
     /// - Parameter closure: The closure to run.
     ///
     /// - Returns:           The value the closure generated.
-    func around<T>(timeout: TimeInterval = 10, _ closure: () -> T) -> T {
+    @inline(__always) func around<T>(timeout: TimeInterval = 10, _ closure: () -> T) -> T {
         let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
         return closure()
     }
@@ -1077,7 +1077,7 @@ extension NSRecursiveLock {
     /// Execute a closure while acquiring the lock.
     ///
     /// - Parameter closure: The closure to run.
-    func around(timeout: TimeInterval = 10, _ closure: () -> Void) {
+    @inline(__always) func around(timeout: TimeInterval = 10, _ closure: () -> Void) {
         let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
         return closure()
     }

@@ -16,8 +16,10 @@ class Logger: SwiftyBeaver {
     static let file = FileDestination()
     static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
     static var debugModeObserver: Cancellable?
+    @Atomic static var initialized = false
 
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
+        defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
         Logger.addDestination(console)
@@ -78,6 +80,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
+        guard initialized else { return }
         super.verbose(message(), file, function, line: line, context: context)
     }
 
@@ -100,6 +103,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
+        guard initialized else { return }
         super.info(message(), file, function, line: line, context: context)
     }
 
@@ -111,6 +115,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
+        guard initialized else { return }
         super.warning(message(), file, function, line: line, context: context)
     }
 
@@ -122,6 +127,7 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
+        guard initialized else { return }
         super.error(message(), file, function, line: line, context: context)
     }
 }

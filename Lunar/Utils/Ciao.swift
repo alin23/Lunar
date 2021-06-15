@@ -181,7 +181,7 @@ public class CiaoResolver {
     }
 }
 
-public typealias ErrorDictionary = [String: NSNumber]
+public typealias ErrorDictionary = [String: Int]
 extension ErrorDictionary: Error {}
 
 extension CiaoResolver {
@@ -190,7 +190,7 @@ extension CiaoResolver {
 
         func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
             Logger.error("Service didn't resolve \(sender) \(errorDict)")
-            onResolve?(Result.failure(errorDict))
+            onResolve?(Result.failure(errorDict.mapValues { $0.intValue }))
         }
 
         func netServiceDidResolveAddress(_ sender: NetService) {
