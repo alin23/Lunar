@@ -1,3 +1,23 @@
+# 4.1.0
+## Features
+
+* Make it possible to set Pro Display XDR and LG UltraFine monitors as source for Sync Mode
+
+## Improvements
+
+* Show tooltips with the reason why a specific Mode is disabled when hovering on it
+* Allow controlling monitor with the cursor on it when **Send Keys To All Monitors** is unchecked
+* Add useful reset buttons in the gear icon menu
+    * **Reset Network Control** for when the network controls aren't activated automatically because the system mDNS browser is stuck
+    * **Reset DDC** for when DDC is deemed unresponsive because the system has reported the monitor as active when it was in fact inactive
+
+## Fixes
+
+* Fix crashes because of gamma locking
+* More UI accesses moved to Main Thread
+* Fix display name edit not saving
+* Fix network controller reset on wake and display reconnect
+* Fix QuickActions floating window disappearing too quickly
 # 4.0.5
 ## Improvements
 
