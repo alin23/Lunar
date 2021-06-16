@@ -1,3 +1,22 @@
+# 4.1.4
+## Fixes
+
+* Fix changing modes would not stop/start the Sync/Location/Sensor listeners
+
+## Improvements
+
+* Show why Sync/Location/Sensor modes are disabled when Lunar Pro is not active 
+* Add **Join the community** menu item
+
+# 4.1.3
+## Improvements
+
+* Use DisplayServices to read builtin brightness and fix the HDR issue
+
+## Fixes
+
+* Show correct builtin brightness in Lunar menu
+
 # 4.1.2
 ## Fixes
 
