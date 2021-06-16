@@ -14,7 +14,6 @@ import Combine
 import Compression
 import CoreLocation
 import Defaults
-// import LaunchAtLogin
 import LetsMove
 import Magnet
 import Path
@@ -216,15 +215,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
-            // LaunchAtLogin.isEnabled = shouldStartAtLogin
-
-            guard let appPath = Path(Bundle.main.bundlePath), appPath.parent == Path("/Applications")
+            guard let appPath = Path(Bundle.main.bundlePath),
+                  appPath.parent == Path("/Applications")
             else { return }
-            if shouldStartAtLogin {
-                LoginServiceKit.addLoginItems()
-            } else if !shouldStartAtLogin {
-                LoginServiceKit.removeLoginItems()
-            }
+            LaunchAtLoginController().setLaunchAtLogin(shouldStartAtLogin, for: appPath.url)
         }
 
         handler(CachedDefaults[.startAtLogin])

@@ -5,6 +5,7 @@
 #import "ExceptionCatcher.h"
 #import "CBBlueLightClient.h"
 #import "DDC.h"
+#import "LaunchAtLoginController.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
