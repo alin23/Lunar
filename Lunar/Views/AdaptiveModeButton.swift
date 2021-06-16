@@ -74,7 +74,8 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         if let mode = AdaptiveModeKey(rawValue: button.selectedTag()) {
             if !mode.available {
                 log.warning("Mode \(mode) not available!")
-                button.selectItem(withTag: CachedDefaults[.overrideAdaptiveMode] ? displayController.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
+                button
+                    .selectItem(withTag: CachedDefaults[.overrideAdaptiveMode] ? displayController.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
             } else {
                 log.debug("Changed mode to \(mode)")
                 CachedDefaults[.overrideAdaptiveMode] = true
@@ -103,11 +104,25 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         guard mode.available else {
             switch mode {
             case .location:
-                menuItem.toolTip = "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
+                if lunarProActive {
+                    menuItem
+                        .toolTip =
+                        "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
+                } else {
+                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
+                }
             case .sensor:
-                menuItem.toolTip = "Disabled because there is no external light sensor connected to this \(Sysctl.device)"
+                if lunarProActive {
+                    menuItem.toolTip = "Disabled because there is no external light sensor connected to this \(Sysctl.device)"
+                } else {
+                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
+                }
             case .sync:
-                menuItem.toolTip = "Disabled because no display with a built-in light sensor was found"
+                if lunarProActive {
+                    menuItem.toolTip = "Disabled because no display with a built-in light sensor was found"
+                } else {
+                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
+                }
             default:
                 break
             }

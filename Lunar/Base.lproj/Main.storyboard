@@ -510,6 +510,12 @@
                                                 <action selector="leaveFeedback:" target="Voe-Tx-rLC" id="CJp-p3-GzZ"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Join the community" id="Imr-CD-aeg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="joinCommunity:" target="Voe-Tx-rLC" id="MWp-Kq-aZ0"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="GNT-HB-tbd"/>
                                         <menuItem title="Get Lunar Pro" id="fev-Gj-SRD">
                                             <modifierMask key="keyEquivalentModifierMask"/>

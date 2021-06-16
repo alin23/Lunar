@@ -173,11 +173,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
                 scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
-            if !CachedDefaults[.overrideAdaptiveMode] {
-                return
-            }
+
             CachedDefaults[.nonManualMode] = change.newValue != .manual
             displayController.adaptiveMode = change.newValue.mode
+
             mainThread {
                 self.resetElements()
             }
@@ -285,14 +284,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case .sync:
             guard let info = notification.userInfo as? [String: Double], let builtinBrightness = info["brightness"] else { return }
             mainThread {
+//                log.warning("BUILTIN BRIGHTNESS GOT NOTIFICATION: \(builtinBrightness.str(decimals: 2)) \(builtinBrightness.rounded(.toNearestOrAwayFromZero))")
                 self.infoMenuItem?.title = "Built-in display brightness: \(builtinBrightness.rounded(.toNearestOrAwayFromZero))%"
             }
         case .manual:
             guard let info = notification.userInfo as? [String: Double] else { return }
             mainThread {
-                if let brightness = info["brightness"] {
+                if let brightness = info["manualBrightness"] {
                     self.infoMenuItem?.title = "Last set brightness: \(brightness)"
-                } else if let contrast = info["contrast"] {
+                } else if let contrast = info["manualContrast"] {
                     self.infoMenuItem?.title = "Last set contrast: \(contrast)"
                 }
             }
@@ -302,7 +302,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
         log.debug("Started DisplayController in \(mode.str) mode")
         updateDataPointObserver()
-        _ = displayController.adaptiveMode.watch()
         displayController.adaptBrightness()
     }
 
@@ -322,6 +321,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
+        _ = displayController.adaptiveMode.watch()
     }
 
     func initMenubarIcon() {
@@ -889,6 +889,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func buyMeACoffee(_: Any) {
         if let url = URL(string: "https://www.buymeacoffee.com/alin23") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @IBAction func joinCommunity(_: Any) {
+        if let url = URL(string: "https://discord.gg/dJPHpWgAhV") {
             NSWorkspace.shared.open(url)
         }
     }

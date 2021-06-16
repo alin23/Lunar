@@ -28,6 +28,8 @@ class ManualMode: AdaptiveMode {
 
     func stopWatching() {
         guard watching else { return }
+        log.verbose("Stop watching \(str)")
+
         for observer in displayObservers {
             observer.cancel()
         }
@@ -38,12 +40,14 @@ class ManualMode: AdaptiveMode {
 
     func watch() -> Bool {
         guard !watching else { return false }
+        log.verbose("Start watching \(str)")
+
         for display in displayController.displays.values {
             display.$brightness.receive(on: dataPublisherQueue).sink { value in
-                NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["brightness": value])
+                NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["manualBrightness": value])
             }.store(in: &displayObservers)
             display.$contrast.receive(on: dataPublisherQueue).sink { value in
-                NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["contrast": value])
+                NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["manualContrast": value])
             }.store(in: &displayObservers)
         }
         watching = true
