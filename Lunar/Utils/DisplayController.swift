@@ -53,18 +53,13 @@ class DisplayController {
 
     var activeDisplaysByReadableID: [String: Display] = [:]
 
-    var _adaptiveModeLock = NSRecursiveLock()
-    var _adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
-    var adaptiveMode: AdaptiveMode {
-        get { _adaptiveModeLock.around { _adaptiveMode } }
-        set {
-            _adaptiveModeLock.around { _adaptiveMode = newValue
-                if _adaptiveMode.key != .manual {
-                    lastNonManualAdaptiveMode = _adaptiveMode
-                }
-                _adaptiveMode.stopWatching()
-                _ = newValue.watch()
+    @AtomicLock var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+        didSet {
+            if adaptiveMode.key != .manual {
+                lastNonManualAdaptiveMode = adaptiveMode
             }
+            oldValue.stopWatching()
+            _ = adaptiveMode.watch()
         }
     }
 
@@ -150,6 +145,24 @@ class DisplayController {
                 CachedDefaults[.adaptiveBrightnessMode] = mode.key
             }
             return mode
+        }
+    }
+
+    var pausedAdaptiveModeObserver: Bool = false
+    var adaptiveModeObserver: Cancellable?
+
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
+            guard let self = self, !self.pausedAdaptiveModeObserver else {
+                return
+            }
+            Defaults.withoutPropagation {
+                mainThread {
+                    self.pausedAdaptiveModeObserver = true
+                    self.adaptiveMode = change.newValue.mode
+                    self.pausedAdaptiveModeObserver = false
+                }
+            }
         }
     }
 
@@ -316,7 +329,7 @@ class DisplayController {
     }
 
     var overrideAdaptiveModeObserver: Cancellable?
-    var pausedAdaptiveModeObserver: Bool = false
+    var pausedOverrideAdaptiveModeObserver: Bool = false
 
     func watchModeAvailability() {
         guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {
@@ -324,9 +337,9 @@ class DisplayController {
         }
 
         let startOrStopWatcher = { (shouldStop: Bool) in
-            guard !self.pausedAdaptiveModeObserver else { return }
+            guard !self.pausedOverrideAdaptiveModeObserver else { return }
 
-            self.pausedAdaptiveModeObserver = true
+            self.pausedOverrideAdaptiveModeObserver = true
             Defaults.withoutPropagation {
                 if shouldStop {
                     if let task = self.modeWatcherTask {
@@ -339,7 +352,7 @@ class DisplayController {
                     }
                 }
             }
-            self.pausedAdaptiveModeObserver = false
+            self.pausedOverrideAdaptiveModeObserver = false
         }
         startOrStopWatcher(CachedDefaults[.overrideAdaptiveMode])
         overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? overrideAdaptiveModePublisher
@@ -365,6 +378,7 @@ class DisplayController {
             name: NSWorkspace.screensDidSleepNotification,
             object: nil
         )
+//        listenForAdaptiveModeChange()
     }
 
     @objc func adaptToScreenConfiguration(notification: Notification) {

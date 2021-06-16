@@ -63,7 +63,7 @@ function make-installer -a ext
     cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
     if test "$ext" = pkg
         cd "$RELEASE_DIR"
-        zip "$APP_INSTALLER_ZIP" "$APP_INSTALLER"
+        zip "$APP_INSTALLER_ZIP" (basename "$APP_INSTALLER")
         cd -
     end
 end
