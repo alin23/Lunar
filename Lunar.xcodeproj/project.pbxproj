@@ -130,6 +130,7 @@
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; };
 		C7DED3662678E0DC002E0188 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7DED368267A0663002E0188 /* LaunchAtLoginController.m */; };
 		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
 		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
 		C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */; };
@@ -318,6 +319,8 @@
 		C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedButton.swift; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7DED3632678E0CD002E0188 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		C7DED367267A0639002E0188 /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
+		C7DED368267A0663002E0188 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
 		C7E07379259CB2C20019C9C2 /* ManualMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMode.swift; sourceTree = "<group>"; };
 		C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMode.swift; sourceTree = "<group>"; };
@@ -714,6 +717,8 @@
 			children = (
 				C7E896D82652C0F60079A328 /* CBBlueLightClient.h */,
 				C7E896D92652C0F60079A328 /* ExceptionCatcher.h */,
+				C7DED367267A0639002E0188 /* LaunchAtLoginController.h */,
+				C7DED368267A0663002E0188 /* LaunchAtLoginController.m */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -1018,6 +1023,7 @@
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
+				C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */,
 				C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
 				C7E80E2E2637060F004718A4 /* Agent.swift in Sources */,
