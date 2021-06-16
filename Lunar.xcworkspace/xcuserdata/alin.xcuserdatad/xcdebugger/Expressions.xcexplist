@@ -34,6 +34,17 @@
          contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
+         contextName = "static ParsableArguments.exit(withError:):ParsableArguments.swift">
+      </ContextState>
+      <ContextState
+         contextName = "main:AppDelegate.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "NSScreen.screens">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "DisplayViewController.display.didset:DisplayViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -48,10 +59,10 @@
          contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
       </ContextState>
       <ContextState
-         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
+         contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
+         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
       </ContextState>
       <ContextState
          contextName = "HotkeyButton.mouseDown(with:):HotkeyButton.swift">
