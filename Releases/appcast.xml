@@ -417,6 +417,7 @@
             <title>4.1.0</title>
             <pubDate>Tue, 15 Jun 2021 23:50:57 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <enclosure length="16973622" sparkle:dsaSignature="MEYCIQCL9RYnvVmty/YQAg4fzVYuQIIxiO7JZ+r7PkF+O0AhWQIhAISpJJU5OsJFy50rw3DiMp9Ua/nLS89k/IHhO/Uz3LWX" sparkle:edSignature="+oN4+SMF268T1CEEAbHa44RS7YcREyUkKYjZY17cIRSkzQdbxWAVpHpNAFCgvgvp1Aqqc4oXnLx9iBrLhxF7BQ==" sparkle:installationType="package" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.0" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.0.zip"/>
             <signature>Nrj3ej7qSUuDVS.+y7wKEYUfXEU=</signature>
             <signature>Nrj3ej7qSUuDVS/+y7wKEYUfXEU=</signature>
@@ -429,6 +430,7 @@
             <title>4.1.1</title>
             <pubDate>Wed, 16 Jun 2021 15:02:13 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <enclosure length="17145910" sparkle:dsaSignature="MEQCIFskQdyZBgQLyEal96ZzOCpwlzarCTqqKCV9Otp/kJWrAiAaDwZk+5S11++/v8wtV6Cu7dUOqOh0YINlZIQq4wTrEQ==" sparkle:edSignature="W5HR+NGPdw0bWZosHMYbbR+dEWYc1r5vq9E9xNjG7JwiJ4PQpDF0xJi2QhnV1dkcxivESv3hu69Jo4zTBAbBBw==" sparkle:installationType="package" sparkle:shortVersionString="4.1.1" sparkle:version="4.1.1" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.1.pkg"/>
             <sparkle:deltas>
                 <enclosure length="1706014" sparkle:deltaFrom="4.1.0" sparkle:dsaSignature="MEUCIQCW+S9U+PeyQLVejp6cp1e2Ja4LtOjxgX5aSuzNQ4mNEQIgNf+0RNmFhwiPBjjz8Cw6BvDQW33TkLhs0Jz4OJpqNYQ=" sparkle:edSignature="/RAu4B8lB6abHzd2Zf0oRl2s/wn/+rUQNtzNEGcJoZgKdMP4tjkdXPN8CSHNULaWl+TeJ0GBAU3ezjpM5JlJCg==" sparkle:shortVersionString="4.1.1" sparkle:version="4.1.1" type="application/octet-stream" url="https://lunar.fyi/delta/4.1.1/4.1.0"/>
@@ -443,6 +445,7 @@
             <title>4.1.2</title>
             <pubDate>Wed, 16 Jun 2021 17:37:54 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <enclosure length="16985401" sparkle:dsaSignature="MEQCIHd7Z5Y6oScTlqxXD31y30KxBJoJn8f+Ja+LF4OewuciAiBmzFJUA8RN4iKU2DF133IMxBJq8SoL+kk7Dqzdy5mTvA==" sparkle:edSignature="G5rjXXo0xkhCFptueVsEcAKcOSPNnPGkjaQcCHwBYtEaBRhVw6FHuyu/rzXPX724trTHLPJWgNv8tBpjhWN4DQ==" sparkle:installationType="package" sparkle:shortVersionString="4.1.2" sparkle:version="4.1.2" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.2.zip"/>
             <sparkle:deltas>
                 <enclosure length="1541094" sparkle:deltaFrom="4.1.1" sparkle:dsaSignature="MEUCIARKw9Hu8O2TI7SKiLepz2Q401xud1zwobicQ/rKzCKHAiEAiNX9S/n5Gl9P0PX1c17cgYTuBHnevyG08vvBi36PCbg=" sparkle:edSignature="bm1TKijQuQfDNEAUuiohVlXJDPC0iUBMru2j8iOdH/AAbfj7ZHf9nrTolj68uzsU71OAnK6mI20HQZFQTXjKCA==" sparkle:shortVersionString="4.1.2" sparkle:version="4.1.2" type="application/octet-stream" url="https://lunar.fyi/delta/4.1.2/4.1.1"/>
@@ -458,6 +461,7 @@
             <title>4.1.3</title>
             <pubDate>Wed, 16 Jun 2021 21:13:44 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <enclosure length="16983454" sparkle:dsaSignature="MEUCIQCZMSmOPf53VdkjXHfAgN+uJyS5K98FzTedAoJvVUTjRgIgItjuZWeiauN/nDC+DDjNYnsFM2YfI5ZTPE0ZY4gjIC0=" sparkle:edSignature="zQoni5i/XXGYhYKoplQz2+m07v6cOqb1ghfqOvhl/qIN+/3Ts5Km9KeQIyZAn12LW5JyXzQAEVmBvpkbuvRLAA==" sparkle:installationType="package" sparkle:shortVersionString="4.1.3" sparkle:version="4.1.3" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.3.zip"/>
             <sparkle:deltas>
                 <enclosure length="1358031" sparkle:deltaFrom="4.1.2" sparkle:dsaSignature="MEQCIHHM31dQHQ9dK8Y3jmieFr0QSTPbBBxZFLM3lIdonyOAAiAdUEl1udCuGE+gKeEdEqO4QejUBmP9SZexP9FmS4dPqg==" sparkle:edSignature="4p1Bp5g7Ltn9X9YgFZnKGI++JtyFYp5lg+y8ZKpMxzN2YyLlW/mMqD/s8LIG08NtlH3VxvuHf0blBzaxkPOLBw==" sparkle:shortVersionString="4.1.3" sparkle:version="4.1.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.1.3/4.1.2"/>
@@ -475,6 +479,7 @@
             <title>4.1.4</title>
             <pubDate>Wed, 16 Jun 2021 22:24:20 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <enclosure length="16999868" sparkle:dsaSignature="MEQCIHEMtcyozSDey3Wr68QLw/6QtlYuYrTbanzswfdmdaeyAiAFw88UnNBUF9fMbR7kVroSIrkYmmRGGBcNtkn8clTYyw==" sparkle:edSignature="paz94WrqgCMdoHZNIBIGmd5L3n00+7lvz2ailbASR3d8jBjvhIrZriYzxaoHftmNTGKCr5V47QXXnSGSmCakBA==" sparkle:installationType="package" sparkle:shortVersionString="4.1.4" sparkle:version="4.1.4" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.4.zip"/>
             <sparkle:deltas>
                 <enclosure length="1656383" sparkle:deltaFrom="4.1.3" sparkle:dsaSignature="MEUCIBGqkpyhohUkyOaCeP63xY05BoHoh3uyW7EL0yqW6OftAiEAknVlGTjLjgk4NkzND8T63vx6zJ2RsOLNcqLmgyrSRXE=" sparkle:edSignature="FUKL29bJ+387k5VIF66ssZo25xdua4FRMMsv/c6PdW/37CkiuN4oxq+yoNJlSjRntAlvhlYQlg5ogg8gm1dvAg==" sparkle:shortVersionString="4.1.4" sparkle:version="4.1.4" type="application/octet-stream" url="https://lunar.fyi/delta/4.1.4/4.1.3"/>
