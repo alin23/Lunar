@@ -734,6 +734,7 @@ class DisplayController {
 
     func manageClamshellMode() {
         lidClosed = IsLidClosed()
+        SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
         log.info("Lid closed: \(lidClosed)")
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self else { return }
