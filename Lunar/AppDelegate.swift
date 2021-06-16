@@ -420,7 +420,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.manageClamshellMode()
                 displayController.resetDisplayList()
 
-                asyncAfter(ms: 5000) {
+                asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
                     self.disableFaceLight()
                     NetworkControl.resetState()
                     DDCControl.resetState()

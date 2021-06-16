@@ -682,30 +682,46 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch flags {
         case [] where lidClosed:
+            log.info("No modifiers and lid closed, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.option, .shift] where lidClosed:
+            log.info("Option+Shift modifiers and lid closed, adjusting current display")
             adjust(mediaKey, by: 1, currentDisplay: true)
         case [] where allMonitors, [.option, .shift] where allMonitors:
+            log.info("All Monitors enabled, ignoring media key event")
             return event
 
         case []:
-            guard displayController.mainDisplay != nil else { return event }
+            guard displayController.mainDisplay != nil else {
+                log.info("No main display, ignoring media key event")
+                return event
+            }
+            log.info("No modifiers and lid open, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.option, .shift]:
-            guard displayController.mainDisplay != nil else { return event }
+            guard displayController.mainDisplay != nil else {
+                log.info("No main display, ignoring media key event")
+                return event
+            }
+            log.info("Option+Shift modifiers and lid open, adjusting current display")
             adjust(mediaKey, by: 1, currentDisplay: true)
 
         case [.control]:
+            log.info("Control modifier, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.control, .option]:
+            log.info("Control+Options modifiers, adjusting current display")
             adjust(mediaKey, by: 1, currentDisplay: true)
 
         case [.control, .shift]:
+            log.info("Control+Shift modifiers, adjusting current display")
             adjust(mediaKey, currentDisplay: true, contrast: true)
         case [.control, .shift, .option]:
+            log.info("Control+Shift+Option modifiers, adjusting current display")
             adjust(mediaKey, by: 1, currentDisplay: true, contrast: true)
 
         default:
+            log.info("Ignoring media key event")
             return event
         }
 
@@ -722,30 +738,40 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch flags {
         case [] where lidClosed:
+            log.info("No modifiers and lid closed, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, currentDisplay: !allMonitors)
         case [.option, .shift] where lidClosed:
+            log.info("Option+Shift modifiers and lid closed, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, by: 1, currentDisplay: !allMonitors)
 
         case [] where displayController.adaptiveModeKey == .sync,
              [.option, .shift] where displayController.adaptiveModeKey == .sync:
+            log.info("Sync Mode active, ignoring media key event")
             return event
 
         case [.control] where lidClosed:
+            log.info("Control modifier and lid closed, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.control, .option] where lidClosed:
+            log.info("Control+Option modifiers and lid closed, adjusting current display")
             adjust(mediaKey, by: 1, currentDisplay: true)
 
         case [.control]:
+            log.info("Control modifier and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, currentDisplay: !allMonitors)
         case [.control, .option]:
+            log.info("Control+Option modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, by: 1, currentDisplay: !allMonitors)
 
         case [.control, .shift]:
+            log.info("Control+Shift modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, currentDisplay: !allMonitors, contrast: true)
         case [.control, .shift, .option]:
+            log.info("Control+Shift+Option modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, by: 1, currentDisplay: !allMonitors, contrast: true)
 
         default:
+            log.info("Ignoring media key event")
             return event
         }
 

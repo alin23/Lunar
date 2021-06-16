@@ -1,3 +1,14 @@
+# 4.1.2
+## Fixes
+
+* Fix built-in display detection logic
+* Fix media key handler
+
+# 4.1.1
+## Fixes
+
+* Fix crash because of launch at login empty list
+
 # 4.1.0
 ## Features
 
