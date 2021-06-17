@@ -255,12 +255,18 @@ struct EDID {
 };
 
 bool logToFile(char* format, ...);
-bool DDCWrite(CGDirectDisplayID displayID, struct DDCWriteCommand *write, CFMutableDictionaryRef displayUUIDByEDID);
-bool DDCRead(CGDirectDisplayID displayID, struct DDCReadCommand *read, CFMutableDictionaryRef displayUUIDByEDID, long ddcMinReplyDelay);
-bool EDIDTest(CGDirectDisplayID displayID, struct EDID *edid, uint8_t edidData[256], CFMutableDictionaryRef displayUUIDByEDID);
+bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand *write);
+bool DDCRead(io_service_t framebuffer, struct DDCReadCommand *read, long ddcMinReplyDelay);
+bool EDIDTest(io_service_t framebuffer, struct EDID *edid, uint8_t edidData[256]);
 io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMutableDictionaryRef displayUUIDByEDID);
+io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID);
+io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID);
 UInt32 SupportedTransactionType(void);
 void setDebugMode(UInt8);
 void setLogPath(const char*, ssize_t);
 bool IsLidClosed(void);
+
+extern io_service_t CGDisplayIOServicePort(CGDirectDisplayID display) __attribute__((weak_import));
+extern void CGSServiceForDisplayNumber(CGDirectDisplayID display, io_service_t* service) __attribute__((weak_import));
+
 #endif
