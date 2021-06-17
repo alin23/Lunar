@@ -350,7 +350,7 @@ enum DDC {
                 DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
             }
 
-            if !result {
+            guard result else {
                 log.debug("Error writing \(controlID)", context: displayID)
                 guard let propertyFaults = DDC.writeFaults[displayID] else {
                     DDC.writeFaults[displayID] = [controlID: 1]
@@ -368,6 +368,10 @@ enum DDC {
                 }
 
                 return false
+            }
+
+            if let display = displayController.displays[displayID], !display.responsiveDDC {
+                display.responsiveDDC = true
             }
 
             return result
@@ -436,7 +440,7 @@ enum DDC {
                 DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
             }
 
-            if !command.success {
+            guard command.success else {
                 log.debug("Error reading \(controlID)", context: displayID)
                 guard let propertyFaults = DDC.readFaults[displayID] else {
                     DDC.readFaults[displayID] = [controlID: 1]
@@ -454,6 +458,10 @@ enum DDC {
                 }
 
                 return nil
+            }
+
+            if let display = displayController.displays[displayID], !display.responsiveDDC {
+                display.responsiveDDC = true
             }
 
             return DDCReadResult(
@@ -587,24 +595,24 @@ enum DDC {
         return queue.sync(flags: [.barrier]) {
             var fb = IOFramebufferPortFromCGSServiceForDisplayNumber(displayID)
             if fb != 0 {
-                log.debug("Got framebuffer using private CGSServiceForDisplayNumber: \(fb)", context: ["id": displayID])
+                log.verbose("Got framebuffer using private CGSServiceForDisplayNumber: \(fb)", context: ["id": displayID])
                 return fb
             }
-            log.debug("CGSServiceForDisplayNumber returned invalid framebuffer, trying CGDisplayIOServicePort", context: ["id": displayID])
+            log.verbose("CGSServiceForDisplayNumber returned invalid framebuffer, trying CGDisplayIOServicePort", context: ["id": displayID])
 
             fb = IOFramebufferPortFromCGDisplayIOServicePort(displayID)
             if fb != 0 {
-                log.debug("Got framebuffer using private CGDisplayIOServicePort: \(fb)", context: ["id": displayID])
+                log.verbose("Got framebuffer using private CGDisplayIOServicePort: \(fb)", context: ["id": displayID])
                 return fb
             }
-            log.debug("CGDisplayIOServicePort returned invalid framebuffer, trying manual search in IOKit registry", context: ["id": displayID])
+            log.verbose("CGDisplayIOServicePort returned invalid framebuffer, trying manual search in IOKit registry", context: ["id": displayID])
 
             let displayUUIDByEDIDCopy = displayUUIDByEDID
             let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
             fb = IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
 
             guard fb != 0 else {
-                log.debug("IOFramebufferPortFromCGDisplayID returned invalid framebuffer. This display can't be controlled through DDC.", context: ["id": displayID])
+                log.verbose("IOFramebufferPortFromCGDisplayID returned invalid framebuffer. This display can't be controlled through DDC.", context: ["id": displayID])
                 return nil
             }
 
@@ -615,7 +623,7 @@ enum DDC {
                 }
             }
 
-            log.debug("Got framebuffer using IOFramebufferPortFromCGDisplayID: \(fb)", context: ["id": displayID])
+            log.verbose("Got framebuffer using IOFramebufferPortFromCGDisplayID: \(fb)", context: ["id": displayID])
             return fb
         }
     }
