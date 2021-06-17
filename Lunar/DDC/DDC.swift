@@ -284,15 +284,10 @@ enum DDC {
     static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
     static var readFaults = [CGDirectDisplayID: [ControlID: Int]]()
     static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
-    // static let semaphore = DispatchSemaphore(value: 1, name: "DDC")
     static let lock = NSRecursiveLock()
 
     static func reset() {
-        // _ = semaphore.wait(for: 10.seconds)
-        // defer {
-        //     semaphore.signal()
-        // }
-        lock.around {
+        queue.sync(flags: [.barrier]) {
             DDC.displayPortByUUID.removeAll()
             DDC.displayUUIDByEDID.removeAll()
             DDC.skipReadingPropertyById.removeAll()
@@ -334,61 +329,48 @@ enum DDC {
             guard apply else { return true }
         #endif
 
-        return queue.sync {
-            // _ = semaphore.wait(for: 10.seconds)
-            // defer {
-            //     semaphore.signal()
-            // }
-            return lock.around {
-                if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
-                    log.debug("Skipping write for \(controlID)", context: displayID)
+        guard let fb = I2CController(displayID: displayID) else { return false }
+
+        return queue.sync(flags: [.barrier]) {
+            if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+                log.debug("Skipping write for \(controlID)", context: displayID)
+                return false
+            }
+
+            var command = DDCWriteCommand(
+                control_id: controlID.rawValue,
+                new_value: newValue
+            )
+
+            let writeStartedAt = DispatchTime.now()
+            let result = DDCWrite(fb, &command)
+            let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
+            if writeMs > MAX_WRITE_DURATION_MS {
+                log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
+                DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+            }
+
+            if !result {
+                log.debug("Error writing \(controlID)", context: displayID)
+                guard let propertyFaults = DDC.writeFaults[displayID] else {
+                    DDC.writeFaults[displayID] = [controlID: 1]
                     return false
                 }
+                guard var faults = propertyFaults[controlID] else {
+                    DDC.writeFaults[displayID]![controlID] = 1
+                    return false
+                }
+                faults += 1
+                DDC.writeFaults[displayID]![controlID] = faults
 
-                var command = DDCWriteCommand(
-                    control_id: controlID.rawValue,
-                    new_value: newValue
-                )
-                let displayUUIDByEDIDCopy = displayUUIDByEDID
-                let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
-
-                let writeStartedAt = DispatchTime.now()
-                let result = DDCWrite(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary)
-                let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
-                if writeMs > MAX_WRITE_DURATION_MS {
-                    log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
+                if faults > MAX_WRITE_FAULTS {
                     DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
                 }
 
-                displayUUIDByEDID.removeAll()
-                for (key, value) in nsDisplayUUIDByEDID {
-                    if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
-                        displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
-                    }
-                }
-
-                if !result {
-                    log.debug("Error writing \(controlID)", context: displayID)
-                    guard let propertyFaults = DDC.writeFaults[displayID] else {
-                        DDC.writeFaults[displayID] = [controlID: 1]
-                        return false
-                    }
-                    guard var faults = propertyFaults[controlID] else {
-                        DDC.writeFaults[displayID]![controlID] = 1
-                        return false
-                    }
-                    faults += 1
-                    DDC.writeFaults[displayID]![controlID] = faults
-
-                    if faults > MAX_WRITE_FAULTS {
-                        DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
-                    }
-
-                    return false
-                }
-
-                return result
+                return false
             }
+
+            return result
         }
     }
 
@@ -421,11 +403,9 @@ enum DDC {
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
         guard !isTestID(displayID) else { return nil }
-        // _ = semaphore.wait(for: 10.seconds)
-        // defer {
-        //     semaphore.signal()
-        // }
-        return lock.around {
+        guard let fb = I2CController(displayID: displayID) else { return nil }
+
+        return queue.sync(flags: [.barrier]) {
             if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
                 log.debug("Skipping read for \(controlID)", context: displayID)
                 return nil
@@ -437,8 +417,6 @@ enum DDC {
                 max_value: 0,
                 current_value: 0
             )
-            let displayUUIDByEDIDCopy = displayUUIDByEDID
-            let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
 
             let metalDevice = CGDirectDisplayCopyCurrentMetalDevice(displayID)
             var ddcDelay = DDC_MIN_REPLY_DELAY_INTEL
@@ -451,18 +429,11 @@ enum DDC {
             }
 
             let readStartedAt = DispatchTime.now()
-            DDCRead(displayID, &command, nsDisplayUUIDByEDID as CFMutableDictionary, ddcDelay)
+            DDCRead(fb, &command, ddcDelay)
             let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
             if readMs > MAX_READ_DURATION_MS {
                 log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
                 DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
-            }
-
-            displayUUIDByEDID.removeAll()
-            for (key, value) in nsDisplayUUIDByEDID {
-                if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
-                    displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
-                }
             }
 
             if !command.success {
@@ -495,24 +466,13 @@ enum DDC {
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
         guard !isTestID(displayID) else { return nil }
+        guard let fb = I2CController(displayID: displayID) else { return nil }
 
-        // _ = semaphore.wait(for: 10.seconds)
-        // defer {
-        //     semaphore.signal()
-        // }
-        return lock.around {
+        return queue.sync(flags: [.barrier]) {
             var edidData = [UInt8](repeating: 0, count: 256)
             var edid = EDID()
 
-            let displayUUIDByEDIDCopy = displayUUIDByEDID
-            let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
-            EDIDTest(displayID, &edid, &edidData, nsDisplayUUIDByEDID as CFMutableDictionary)
-            displayUUIDByEDID.removeAll()
-            for (key, value) in nsDisplayUUIDByEDID {
-                if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
-                    displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
-                }
-            }
+            EDIDTest(fb, &edid, &edidData)
 
             return (edid, Data(bytes: &edidData, count: 256))
         }
@@ -611,24 +571,52 @@ enum DDC {
 
     static func hasI2CController(displayID: CGDirectDisplayID) -> Bool {
         guard !isTestID(displayID) else { return false }
-        return I2CController(displayID: displayID) != 0
+        return I2CController(displayID: displayID) != nil
     }
 
-    static func I2CController(displayID: CGDirectDisplayID) -> io_service_t {
-        guard !isTestID(displayID) else { return 0 }
+    static func I2CController(displayID: CGDirectDisplayID) -> io_service_t? {
+        guard !isTestID(displayID) else { return nil }
 
         let activeIDs = NSScreen.screens
             .compactMap { screen in screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID }
-        guard activeIDs.contains(displayID) else { return 0 }
 
-        // _ = semaphore.wait(for: 10.seconds)
-        // defer {
-        //     semaphore.signal()
-        // }
-        return lock.around {
+        #if !DEBUG
+            guard activeIDs.contains(displayID) else { return nil }
+        #endif
+
+        return queue.sync(flags: [.barrier]) {
+            var fb = IOFramebufferPortFromCGSServiceForDisplayNumber(displayID)
+            if fb != 0 {
+                log.debug("Got framebuffer using private CGSServiceForDisplayNumber: \(fb)", context: ["id": displayID])
+                return fb
+            }
+            log.debug("CGSServiceForDisplayNumber returned invalid framebuffer, trying CGDisplayIOServicePort", context: ["id": displayID])
+
+            fb = IOFramebufferPortFromCGDisplayIOServicePort(displayID)
+            if fb != 0 {
+                log.debug("Got framebuffer using private CGDisplayIOServicePort: \(fb)", context: ["id": displayID])
+                return fb
+            }
+            log.debug("CGDisplayIOServicePort returned invalid framebuffer, trying manual search in IOKit registry", context: ["id": displayID])
+
             let displayUUIDByEDIDCopy = displayUUIDByEDID
             let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
-            return IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
+            fb = IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
+
+            guard fb != 0 else {
+                log.debug("IOFramebufferPortFromCGDisplayID returned invalid framebuffer. This display can't be controlled through DDC.", context: ["id": displayID])
+                return nil
+            }
+
+            displayUUIDByEDID.removeAll()
+            for (key, value) in nsDisplayUUIDByEDID {
+                if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                    displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+                }
+            }
+
+            log.debug("Got framebuffer using IOFramebufferPortFromCGDisplayID: \(fb)", context: ["id": displayID])
+            return fb
         }
     }
 

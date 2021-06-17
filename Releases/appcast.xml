@@ -489,6 +489,11 @@
             </sparkle:deltas>
             <signature>hSY1C5LQ6oVA1soe4jp6Kzu9Dcg=</signature>
             <signature>vCE6FJDo9eqxvWd5124nTKOFdJY=</signature>
+            <signature>o6O0MFWdEJl9QiQD4Wze51up2bI=</signature>
+            <signature>8pmA1PGwhG4.Q1hk2uDe0DW2ftE=</signature>
+            <signature>8pmA1PGwhG4/Q1hk2uDe0DW2ftE=</signature>
+            <signature>ZxKoXvWeZ62QvqvEuKIQY0HXJI8=</signature>
+            <signature>NWEawbyY3finD3xvkPf3xvXGAqE=</signature>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix changing modes would not stop/start the Sync/Location/Sensor listeners</li></ul><h2 id="improvements">Improvements</h2><ul><li>Show why Sync/Location/Sensor modes are disabled when Lunar Pro is not active </li><li>Add <strong>Join the community</strong> menu item</li></ul></div></div>]]>
             </description>

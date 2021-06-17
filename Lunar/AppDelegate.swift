@@ -573,7 +573,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         initCache()
-        curveFactor = CachedDefaults[.curveFactor]
+        curveFactor = CachedDefaults[.curveFactor] > 0 ? CachedDefaults[.curveFactor] : 1
+        CachedDefaults[.curveFactor] = curveFactor
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {

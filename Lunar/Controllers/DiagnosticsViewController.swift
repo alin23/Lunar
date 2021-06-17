@@ -168,7 +168,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 * ID: `\(display.id)`
                 * EDID Name: `\(display.edidName)`
                 * I2C Controller: `\(
-                    i2c == 0 ? "NONE" : i2c.s)`
+                    i2c == nil ? "NONE" : i2c!.s)`
                   * _This monitor \(
                       i2c == 0 ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
                 * Network Controller: `\(network == nil ? "NONE" : network!)`
@@ -476,19 +476,21 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 let coreDisplayControl = CoreDisplayControl(display: display)
                 let ddcControl = DDCControl(display: display)
 
-                let shouldStartTests = ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id) || coreDisplayControl
-                    .isAvailable() || display.isAppleDisplay() || networkControl.isAvailable()
+                let ddcAvailable = ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id)
+                let coreDisplayAvailable = coreDisplayControl.isAvailable() || display.isAppleDisplay()
+                let networkAvailable = networkControl.isAvailable()
+                let shouldStartTests = ddcAvailable || coreDisplayAvailable || networkAvailable
 
                 if shouldStartTests {
-                    self.renderSeparated(
-                        "_Press any key to start tests for this display..._"
-                    )
                     display.adaptivePaused = true
                     defer {
                         display.adaptivePaused = false
                         display.readapt(newValue: false, oldValue: true)
                     }
-                    if ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id) {
+                    self.renderSeparated(
+                        "_Press any key to start tests for this display..._"
+                    )
+                    if ddcAvailable {
                         tryBrightness(ddcControl)
                         setPercent(60)
                         guard !self.stopped else { return }
@@ -497,12 +499,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         setPercent(70)
                         guard !self.stopped else { return }
                     }
-                    if coreDisplayControl.isAvailable() || display.isAppleDisplay() {
+                    if coreDisplayAvailable {
                         tryBrightness(coreDisplayControl)
                         setPercent(80)
                         guard !self.stopped else { return }
                     }
-                    if networkControl.isAvailable() {
+                    if networkAvailable {
                         tryBrightness(networkControl)
                         setPercent(90)
                         guard !self.stopped else { return }

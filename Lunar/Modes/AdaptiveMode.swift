@@ -196,7 +196,8 @@ extension AdaptiveMode {
             dataPoint = datapointLock.around { contrastDataPoint }
         }
 
-        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: Float(factor ?? curveFactor), offset: offset?.f ?? 0.0)
+        let factor = Float(factor ?? curveFactor)
+        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: factor > 0 ? factor : 1, offset: offset?.f ?? 0.0)
 
         return mapNumberSIMD(
             curve,
@@ -241,7 +242,9 @@ extension AdaptiveMode {
                 newValue = externalLow
             } else {
                 newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
-                newValue = adjustCurve(newValue, factor: factor ?? curveFactor, minVal: externalLow, maxVal: externalHigh)
+
+                let factor = factor ?? curveFactor
+                newValue = adjustCurve(newValue, factor: factor > 0 ? factor : 1, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
                 log.error("NaN value!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
