@@ -1,3 +1,14 @@
+# 4.2.0
+## Fixes
+
+* Fix curve factor going to `0.00` on some systems
+
+## Improvements
+
+* Improve DDC framebuffer detection logic by using the private `CGSServiceForDisplayNumber` API
+* Add a way to enable verbose logging in Advanced settings
+* Set DDC back to responsive if any read/write succeeds
+
 # 4.1.4
 ## Fixes
 
