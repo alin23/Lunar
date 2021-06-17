@@ -290,7 +290,7 @@ class ConfigurationViewController: NSViewController {
     func listenForCurveFactorChange() {
         curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
-                self?.curveFactorField?.doubleValue = change.newValue
+                self?.curveFactorField?.doubleValue = change.newValue > 0 ? change.newValue : 1
             }
         }
     }

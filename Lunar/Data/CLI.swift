@@ -993,7 +993,8 @@ private func printDisplay(
     print("\(prefix)\(s("Red Gamma"))\(display.redMin) - \(display.redGamma) - \(display.redMax)")
     print("\(prefix)\(s("Green Gamma"))\(display.greenMin) - \(display.greenGamma) - \(display.greenMax)")
     print("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
-    print("\(prefix)\(s("I2C Controller"))\(String(describing: DDC.I2CController(displayID: display.id)))")
+    let i2c = DDC.I2CController(displayID: display.id)
+    print("\(prefix)\(s("I2C Controller"))\(i2c == nil ? "NONE" : i2c!.s)")
     if edid {
         print("\(prefix)\(s("EDID"))\(edidStr)")
     }
