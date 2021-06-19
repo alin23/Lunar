@@ -292,6 +292,19 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
             </description>
         </item>
+        <item>
+            <signature>test-signature</signature>
+            <signature>mA9+eGFVN.TqS2V4R.NHl3yyG1c=</signature>
+            <signature>mA9+eGFVN/TqS2V4R/NHl3yyG1c=</signature>
+            <title>4.2.0</title>
+            <pubDate>Tue, 22 Apr 2021 20:48:53 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
+            </description>
+        </item>
         <item signature='test.signature+3='>
             <signature>test.signature+3=</signature>
             <title>4.3.0</title>

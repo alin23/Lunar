@@ -72,7 +72,7 @@ extension BinaryInteger {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(self)
+        UInt8(cap(self, minVal: 0, maxVal: 255))
     }
 
     @inline(__always) var u16: UInt16 {
@@ -481,6 +481,51 @@ extension Int8 {
         } else {
             return String(format: "%02x", self)
         }
+    }
+}
+
+extension NSScreen {
+    static var withMouse: NSScreen? {
+        let mouseLocation = NSEvent.mouseLocation
+        return screens.first { NSMouseInRect(mouseLocation, $0.frame, false) }
+    }
+
+    var displayID: CGDirectDisplayID? {
+        guard let id = deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
+        else { return nil }
+        return CGDirectDisplayID(id.uint32Value)
+    }
+
+    var isBuiltin: Bool {
+        displayID != nil && SyncMode.isBuiltinDisplay(displayID!)
+    }
+
+    var isVirtual: Bool {
+        displayID != nil && SyncMode.isVirtualDisplay(displayID!)
+    }
+
+    var isScreen: Bool {
+        guard let isScreenStr = deviceDescription[NSDeviceDescriptionKey.isScreen] as? String else {
+            return false
+        }
+        return isScreenStr == "YES"
+    }
+
+    func hasDisplayID(_ id: CGDirectDisplayID) -> Bool {
+        guard let screenNumber = displayID else { return false }
+        return id == screenNumber
+    }
+}
+
+extension AnyBidirectionalCollection where Element: BinaryInteger {
+    var commaSeparatedString: String {
+        map(\.s).joined(separator: ", ")
+    }
+}
+
+extension Set where Element: BinaryInteger {
+    var commaSeparatedString: String {
+        map(\.s).joined(separator: ", ")
     }
 }
 

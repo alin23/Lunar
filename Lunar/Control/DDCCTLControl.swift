@@ -19,7 +19,7 @@ struct DDCCTLControl: Control {
     var displayControl: DisplayControl = .ddcctl
 
     var displayIndex: Int? {
-        display.screen != nil ? NSScreen.screens.firstIndex(of: display.screen!) : nil
+        display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
     }
 
     func propertyArg(_ property: ControlID) -> String {

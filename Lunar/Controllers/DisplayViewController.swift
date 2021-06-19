@@ -852,51 +852,46 @@ class DisplayViewController: NSViewController {
     @AtomicLock var gammaHighlighterTask: CFRunLoopTimer?
 
     func showGammaNotice() {
-        mainThreadSerial { [weak self] in
-            guard let self = self, gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), let w = view.window,
-                  w.isVisible
-            else {
+        let windowVisible = mainThread { view.window?.isVisible ?? false }
+        guard gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), windowVisible
+        else {
+            return
+        }
+
+        gammaHighlighterTask = realtimeQueue.async(every: 10.seconds) { [weak self] (_: CFRunLoopTimer?) in
+            guard let s = self else {
+                if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
                 return
             }
 
-            gammaHighlighterTask = realtimeQueue.async(every: 10.seconds) { [weak self] (_: CFRunLoopTimer?) in
-                guard let s = self else {
-                    if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                    return
-                }
+            let windowVisible: Bool = mainThread { s.view.window?.isVisible ?? false }
+            guard windowVisible, let gammaNotice = s.gammaNotice
+            else {
+                if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
 
-                var windowVisible: Bool = false
-                mainThreadSerial {
-                    windowVisible = s.view.window?.isVisible ?? false
-                }
-                guard windowVisible, let gammaNotice = s.gammaNotice
-                else {
-                    if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                    return
-                }
-
-                mainThreadSerial {
-                    if gammaNotice.alphaValue == 0 {
-                        gammaNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
-                        gammaNotice.alphaValue = 0.9
-                        gammaNotice.needsDisplay = true
-                    } else {
-                        gammaNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
-                        gammaNotice.alphaValue = 0.0
-                        gammaNotice.needsDisplay = true
-                    }
+            mainThread {
+                if gammaNotice.alphaValue == 0 {
+                    gammaNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                    gammaNotice.alphaValue = 0.9
+                    gammaNotice.needsDisplay = true
+                } else {
+                    gammaNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                    gammaNotice.alphaValue = 0.0
+                    gammaNotice.needsDisplay = true
                 }
             }
         }
     }
 
     func hideGammaNotice() {
-        mainThreadSerial { [weak self] in
-            if let timer = gammaHighlighterTask {
-                realtimeQueue.cancel(timer: timer)
-            }
-            gammaHighlighterTask = nil
+        if let timer = gammaHighlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        gammaHighlighterTask = nil
 
+        mainThread { [weak self] in
             guard let gammaNotice = self?.gammaNotice else { return }
             gammaNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
             gammaNotice.alphaValue = 0.0
@@ -907,52 +902,47 @@ class DisplayViewController: NSViewController {
     @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
     func showAdaptiveNotice() {
-        mainThreadSerial { [weak self] in
-            guard let self = self, adaptiveHighlighterTask == nil || !realtimeQueue.isValid(timer: adaptiveHighlighterTask!),
-                  let w = view.window,
-                  w.isVisible
-            else {
+        let windowVisible = mainThread { view.window?.isVisible ?? false }
+
+        guard adaptiveHighlighterTask == nil || !realtimeQueue.isValid(timer: adaptiveHighlighterTask!), windowVisible
+        else {
+            return
+        }
+
+        adaptiveHighlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
+            guard let s = self else {
+                if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
                 return
             }
 
-            adaptiveHighlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
-                guard let s = self else {
-                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                    return
-                }
+            let windowVisible: Bool = mainThread { s.view.window?.isVisible ?? false }
+            guard windowVisible, let adaptiveNotice = s.adaptiveNotice
+            else {
+                if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
 
-                var windowVisible: Bool = false
-                mainThreadSerial {
-                    windowVisible = s.view.window?.isVisible ?? false
-                }
-                guard windowVisible, let adaptiveNotice = s.adaptiveNotice
-                else {
-                    if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                    return
-                }
-
-                mainThreadSerial {
-                    if adaptiveNotice.alphaValue == 0 {
-                        adaptiveNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
-                        adaptiveNotice.alphaValue = 0.9
-                        adaptiveNotice.needsDisplay = true
-                    } else {
-                        adaptiveNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
-                        adaptiveNotice.alphaValue = 0.0
-                        adaptiveNotice.needsDisplay = true
-                    }
+            mainThread {
+                if adaptiveNotice.alphaValue == 0 {
+                    adaptiveNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                    adaptiveNotice.alphaValue = 0.9
+                    adaptiveNotice.needsDisplay = true
+                } else {
+                    adaptiveNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                    adaptiveNotice.alphaValue = 0.0
+                    adaptiveNotice.needsDisplay = true
                 }
             }
         }
     }
 
     func hideAdaptiveNotice() {
-        mainThreadSerial { [weak self] in
-            if let timer = adaptiveHighlighterTask {
-                realtimeQueue.cancel(timer: timer)
-            }
-            adaptiveHighlighterTask = nil
+        if let timer = adaptiveHighlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        adaptiveHighlighterTask = nil
 
+        mainThread { [weak self] in
             guard let adaptiveNotice = self?.adaptiveNotice else { return }
             adaptiveNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
             adaptiveNotice.alphaValue = 0.0

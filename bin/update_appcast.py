@@ -111,6 +111,14 @@ def main(
         sig = enclosure.attrib.get(sparkle("dsaSignature"))
         version = enclosure.attrib[sparkle("version")]
 
+        minimumAutoupdateVersion = item.findall(sparkle("minimumAutoupdateVersion"))
+        if version[0] == "4" and not minimumAutoupdateVersion:
+            el = etree.Element(
+                sparkle("minimumAutoupdateVersion"), nsmap={"sparkle": SPARKLE}
+            )
+            el.text = "4.0.0"
+            item.append(el)
+
         if app_signatures and app_version and app_version == version:
             for signature in signatures:
                 item.remove(signature)

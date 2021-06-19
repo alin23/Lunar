@@ -266,59 +266,59 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func highlight(message: String) {
-        mainThreadSerial {
-            guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
-                  let caption = self.caption, let w = window, w.isVisible
-            else {
+        let windowVisible: Bool = mainThread { window?.isVisible ?? false }
+
+        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
+              let caption = self.caption, windowVisible
+        else {
+            return
+        }
+
+        caption.stringValue = message
+        highlighterTask = realtimeQueue.async(every: 1.seconds) { [weak self] (_: CFRunLoopTimer?) in
+            guard let s = self else {
+                if let timer = self?.highlighterTask {
+                    realtimeQueue.cancel(timer: timer)
+                }
                 return
             }
 
-            caption.stringValue = message
-            highlighterTask = realtimeQueue.async(every: 1.seconds) { [weak self] (_: CFRunLoopTimer?) in
-                guard let s = self else {
-                    if let timer = self?.highlighterTask {
-                        realtimeQueue.cancel(timer: timer)
-                    }
-                    return
+            var windowVisible = false
+            var textColor: NSColor?
+            mainThread {
+                windowVisible = s.window?.isVisible ?? false
+                textColor = caption.textColor
+            }
+            guard windowVisible, let caption = s.caption, let currentColor = textColor
+            else {
+                if let timer = self?.highlighterTask {
+                    realtimeQueue.cancel(timer: timer)
                 }
+                return
+            }
 
-                var windowVisible = false
-                var textColor: NSColor?
-                mainThreadSerial {
-                    windowVisible = s.window?.isVisible ?? false
-                    textColor = caption.textColor
-                }
-                guard windowVisible, let caption = s.caption, let currentColor = textColor
-                else {
-                    if let timer = self?.highlighterTask {
-                        realtimeQueue.cancel(timer: timer)
-                    }
-                    return
-                }
+            mainThread {
+                caption.lightenUp(color: lunarYellow)
+                caption.needsDisplay = true
+            }
 
-                mainThreadSerial {
-                    caption.lightenUp(color: lunarYellow)
-                    caption.needsDisplay = true
-                }
+            Thread.sleep(forTimeInterval: 0.5)
 
-                Thread.sleep(forTimeInterval: 0.5)
-
-                mainThreadSerial {
-                    caption.darken(color: currentColor)
-                    caption.needsDisplay = true
-                }
+            mainThread {
+                caption.darken(color: currentColor)
+                caption.needsDisplay = true
             }
         }
     }
 
     func stopHighlighting() {
-        mainThreadSerial { [weak self] in
-            if let timer = highlighterTask {
-                realtimeQueue.cancel(timer: timer)
-            }
+        if let timer = highlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
 
-            highlighterTask = nil
+        highlighterTask = nil
 
+        mainThread { [weak self] in
             guard let caption = self?.caption else { return }
             caption.resetText()
             caption.needsDisplay = true
