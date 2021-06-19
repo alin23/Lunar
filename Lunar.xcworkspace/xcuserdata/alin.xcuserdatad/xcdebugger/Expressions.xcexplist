@@ -140,6 +140,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "AppDelegate.adaptToScreenConfiguration(notification:):AppDelegate.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "notification.name">
+            </PersistentString>
+            <PersistentString
+               value = "notification.userInfo">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #5 in DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
          <PersistentStrings>
             <PersistentString

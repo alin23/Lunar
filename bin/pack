@@ -45,8 +45,6 @@ set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resour
     $APP_TMP/Contents/Frameworks/*.framework \
     $APP_TMP/Contents/Frameworks/*.dylib \
     $APP_TMP/Contents/Resources/ddcctl \
-    # $APP_TMP/Contents/Library/LoginItems/LaunchAtLoginHelper.app/Contents/Frameworks/*.dylib \
-    # $APP_TMP/Contents/Library/LoginItems/LaunchAtLoginHelper.app \
     $APP_TMP
 
 for file in $filesToSign
@@ -71,11 +69,12 @@ if not set -q DISABLE_NOTARIZATION
     end
 end
 
-# exit 0
-set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
+if not set -q DISABLE_PACKING
+    set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
 
-./make-installer dmg
-./make-installer pkg
+    ./make-installer dmg
+    ./make-installer pkg
 
-export CONFIGURATION=$CONFIGURATION
-./update_appcast
+    export CONFIGURATION=$CONFIGURATION
+    ./update_appcast
+end

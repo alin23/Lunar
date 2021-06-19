@@ -692,11 +692,7 @@ enum ValueType {
 
     lazy var screen: NSScreen? = {
         guard !isForTesting else { return nil }
-        return NSScreen.screens.first(where: { screen in
-            guard let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
-            else { return false }
-            return id == CGDirectDisplayID(truncating: screenNumber)
-        })
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
     }()
 
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
