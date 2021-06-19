@@ -300,17 +300,12 @@ enum DDC {
     static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID] {
         var displayIDs = [CGDirectDisplayID]()
         for screen in NSScreen.screens {
-            if let isScreen = screen.deviceDescription[NSDeviceDescriptionKey.isScreen], let isScreenStr = isScreen as? String,
-               isScreenStr == "YES"
-            {
-                if let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
-                    let screenID = CGDirectDisplayID(screenNumber.uint32Value)
-                    if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
-                        continue
-                    }
-                    displayIDs.append(screenID)
-                }
+            guard screen.isScreen, let screenID = screen.displayID else { continue }
+
+            if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
+                continue
             }
+            displayIDs.append(screenID)
         }
         #if DEBUG
             if !displayIDs.isEmpty {
@@ -586,7 +581,7 @@ enum DDC {
         guard !isTestID(displayID) else { return nil }
 
         let activeIDs = NSScreen.screens
-            .compactMap { screen in screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID }
+            .compactMap { screen in screen.displayID }
 
         #if !DEBUG
             guard activeIDs.contains(displayID) else { return nil }

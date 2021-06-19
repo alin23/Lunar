@@ -612,14 +612,6 @@ func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     DispatchQueue.main.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-func getScreenWithMouse() -> NSScreen? {
-    let mouseLocation = NSEvent.mouseLocation
-    let screens = NSScreen.screens
-    let screenWithMouse = (screens.first { NSMouseInRect(mouseLocation, $0.frame, false) })
-
-    return screenWithMouse
-}
-
 func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
     if fromLow == fromHigh {
         log.warning("fromLow and fromHigh are both equal to \(fromLow)")
@@ -1215,8 +1207,5 @@ func notify(identifier: String, title: String, body: String) {
 
 func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
     guard !isTestID(displayID) else { return nil }
-    return NSScreen.screens.first(where: { screen in
-        guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
-        return CGDirectDisplayID(id.uint32Value) == displayID
-    })
+    return NSScreen.screens.first(where: { screen in screen.hasDisplayID(displayID) })
 }

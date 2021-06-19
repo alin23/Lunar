@@ -410,11 +410,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         )
     }
 
+    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.screens.compactMap(\.displayID))
+
     @objc func adaptToScreenConfiguration(notification: Notification) {
-        log.debug("Screen configuration notification: \(notification)")
+        log.debug("Screen configuration notification")
         switch notification.name {
         case NSApplication.didChangeScreenParametersNotification:
             log.debug("Screen configuration changed")
+
+            let newScreenIDs = Set(NSScreen.screens.compactMap(\.displayID))
+            let newLidClosed = IsLidClosed()
+            guard newScreenIDs != screenIDs || newLidClosed != displayController.lidClosed else { return }
+
+            if newScreenIDs != screenIDs {
+                log.info(
+                    "New screen IDs after screen configuration change",
+                    context: ["old": screenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
+                )
+                screenIDs = newScreenIDs
+            }
+            if newLidClosed != displayController.lidClosed {
+                log.info(
+                    "Lid state changed",
+                    context: [
+                        "old": displayController.lidClosed ? "closed" : "opened",
+                        "new": newLidClosed ? "closed" : "opened",
+                    ]
+                )
+                displayController.lidClosed = newLidClosed
+            }
+
             POPOVERS["menu"]!!.close()
             asyncAfter(ms: 2000, uniqueTaskKey: "didChangeScreenParametersHandler") {
                 displayController.manageClamshellMode()

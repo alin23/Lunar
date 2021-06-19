@@ -194,7 +194,7 @@ class SplitViewController: NSSplitViewController {
 
     func whiteBackground() {
         view.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
-        view.bg = white
+//        view.bg = white
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
@@ -211,7 +211,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func yellowBackground() {
-        view.bg = bgColor
+//        view.bg = bgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = bgColor
@@ -228,7 +228,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func mauveBackground() {
-        view.bg = hotkeysBgColor
+//        view.bg = hotkeysBgColor
         if let logo = logo {
             logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
             logo.textColor = logoColor
@@ -247,6 +247,7 @@ class SplitViewController: NSSplitViewController {
     override func viewDidLoad() {
         view.wantsLayer = true
         view.radius = 12.0.ns
+        view.bg = white
         whiteBackground()
         updateHelpButton()
         listenForAdaptiveModeChange()

@@ -92,8 +92,8 @@ class DisplayController {
     }
 
     var mainDisplay: Display? {
-        guard let screen = getScreenWithMouse(),
-              let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
+        guard let screen = NSScreen.withMouse,
+              let id = screen.displayID
         else { return nil }
 
         return activeDisplays[id]
