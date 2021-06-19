@@ -1,3 +1,9 @@
+# 4.2.1
+## Fixes
+
+* Fix flicker because of switching to/from fullscreen apps
+* Fix app not responding on startup because of blocking the main thread too early in the startup process
+
 # 4.2.0
 ## Fixes
 
