@@ -543,6 +543,29 @@ extension Encodable {
     }
 }
 
+extension NSWindow {
+    func shake(with intensity: CGFloat = 0.01, duration: Double = 0.3) {
+        let numberOfShakes = 3
+        let frame: CGRect = self.frame
+        let shakeAnimation = CAKeyframeAnimation()
+
+        let shakePath = CGMutablePath()
+        shakePath.move(to: CGPoint(x: NSMinX(frame), y: NSMinY(frame)))
+
+        for _ in 0 ... numberOfShakes - 1 {
+            shakePath.addLine(to: CGPoint(x: NSMinX(frame) - frame.size.width * intensity, y: NSMinY(frame)))
+            shakePath.addLine(to: CGPoint(x: NSMinX(frame) + frame.size.width * intensity, y: NSMinY(frame)))
+        }
+
+        shakePath.closeSubpath()
+        shakeAnimation.path = shakePath
+        shakeAnimation.duration = duration
+
+        animations = [NSAnimatablePropertyKey("frameOrigin"): shakeAnimation]
+        animator().setFrameOrigin(self.frame.origin)
+    }
+}
+
 extension NSView {
     func center(within rect: NSRect, horizontally: Bool = true, vertically: Bool = true) {
         setFrameOrigin(CGPoint(
