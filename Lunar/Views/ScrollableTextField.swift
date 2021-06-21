@@ -101,8 +101,10 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     var adaptToScrollingFinished: DispatchWorkItem?
+    lazy var lastValidValue: Double = doubleValue
 
     override func becomeFirstResponder() -> Bool {
+        lastValidValue = doubleValue
         refusesFirstResponder = false
         let success = super.becomeFirstResponder()
 
@@ -145,6 +147,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     override func cancelOperation(_: Any?) {
         darken(color: textFieldColor)
+        doubleValue = lastValidValue
         abortEditing()
     }
 
@@ -190,11 +193,16 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         switch commandSelector {
-        case #selector(insertNewline(_:)):
-            validateEditing()
-            if let editor = currentEditor(), textShouldEndEditing(editor) {
-                endEditing(editor)
+        case #selector(insertNewline(_:)), #selector(insertTab(_:)):
+            guard let editor = currentEditor() else {
+                return false
             }
+            guard textShouldEndEditing(editor) else {
+                window?.shake()
+                return true
+            }
+            validateEditing()
+            endEditing(editor)
             return true
         case #selector(moveUp(_:))
             where scrollableAdjustHotkeysEnabled && window != nil &&

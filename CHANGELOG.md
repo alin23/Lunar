@@ -1,3 +1,9 @@
+# 4.2.2
+## Fixes
+
+* Make sure brightness/contrast is not changed automatically when it is marked as locked
+* Make gamma operation highlighter async to avoid blocking the UI on rare occasions
+
 # 4.2.1
 ## Fixes
 
