@@ -29,6 +29,7 @@ function make-installer -a ext
     mkdir -p $TMP_INSTALLER_DIR || exit 1
 
     set APP_LATEST_INSTALLER "$RELEASE_DIR/Lunar.$ext"
+    set APP_LATEST_INSTALLER_ZIP "$RELEASE_DIR/Lunar.zip"
     set APP_INSTALLER "$RELEASE_DIR/Lunar-$APP_VERSION.$ext"
     set APP_INSTALLER_ZIP "$RELEASE_DIR/Lunar-$APP_VERSION.zip"
     set APP_TMP_INSTALLER "$TMP_INSTALLER_DIR/Lunar-$APP_VERSION.$ext"
@@ -64,6 +65,7 @@ function make-installer -a ext
     if test "$ext" = pkg
         cd "$RELEASE_DIR"
         zip "$APP_INSTALLER_ZIP" (basename "$APP_INSTALLER")
+        cp "$APP_INSTALLER_ZIP" "$APP_LATEST_INSTALLER_ZIP"
         cd -
     end
 end
