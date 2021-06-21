@@ -790,7 +790,7 @@ func createWindow(
 }
 
 func showOperationInProgress(screen: NSScreen? = nil) {
-    let c = mainThread { () -> GammaViewController? in
+    mainAsyncAfter(ms: 10) {
         createWindow(
             "gammaWindowController",
             controller: &gammaWindowController,
@@ -800,21 +800,15 @@ func showOperationInProgress(screen: NSScreen? = nil) {
             level: .popUpMenu
         )
 
-        guard let w = gammaWindowController?.window, let c = w.contentViewController as? GammaViewController else { return nil }
+        guard let w = gammaWindowController?.window, let c = w.contentViewController as? GammaViewController else { return }
         w.ignoresMouseEvents = true
-        return c
-    }
-    if let c = c {
         c.highlight()
     }
 }
 
 func hideOperationInProgress() {
-    let c = mainThread { () -> GammaViewController? in
-        guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return nil }
-        return c
-    }
-    if let c = c {
+    mainAsyncAfter(ms: 10) {
+        guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
         c.stopHighlighting()
     }
 }
