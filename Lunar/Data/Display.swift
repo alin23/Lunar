@@ -1585,7 +1585,7 @@ enum ValueType {
     }
 
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast: UInt8? = nil) {
-        guard !isForTesting, enabledControls[.gamma] ?? true else { return }
+        guard !isForTesting, enabledControls[.gamma] ?? false else { return }
         gammaLock()
 
         let newGamma = computeGamma(brightness: brightness, contrast: contrast)
