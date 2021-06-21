@@ -824,19 +824,25 @@ class DisplayController {
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         if let displays = displays {
-            displays.forEach { display in display.brightness = manualMode.compute(
-                percent: value,
-                minVal: display.minBrightness.intValue,
-                maxVal: display.maxBrightness.intValue
-            ) }
-        } else {
-            activeDisplays.values
-                .forEach { display in
+            displays.forEach { display in
+                if !display.lockedBrightness {
                     display.brightness = manualMode.compute(
                         percent: value,
                         minVal: display.minBrightness.intValue,
                         maxVal: display.maxBrightness.intValue
                     )
+                }
+            }
+        } else {
+            activeDisplays.values
+                .forEach { display in
+                    if !display.lockedBrightness {
+                        display.brightness = manualMode.compute(
+                            percent: value,
+                            minVal: display.minBrightness.intValue,
+                            maxVal: display.maxBrightness.intValue
+                        )
+                    }
                 }
         }
     }
@@ -846,20 +852,24 @@ class DisplayController {
         if let displays = displays {
             displays
                 .forEach { display in
-                    display.contrast = manualMode.compute(
-                        percent: value,
-                        minVal: display.minContrast.intValue,
-                        maxVal: display.maxContrast.intValue
-                    )
+                    if !display.lockedContrast {
+                        display.contrast = manualMode.compute(
+                            percent: value,
+                            minVal: display.minContrast.intValue,
+                            maxVal: display.maxContrast.intValue
+                        )
+                    }
                 }
         } else {
             activeDisplays.values
                 .forEach { display in
-                    display.contrast = manualMode.compute(
-                        percent: value,
-                        minVal: display.minContrast.intValue,
-                        maxVal: display.maxContrast.intValue
-                    )
+                    if !display.lockedContrast {
+                        display.contrast = manualMode.compute(
+                            percent: value,
+                            minVal: display.minContrast.intValue,
+                            maxVal: display.maxContrast.intValue
+                        )
+                    }
                 }
         }
     }
