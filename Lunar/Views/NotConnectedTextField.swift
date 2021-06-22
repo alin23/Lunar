@@ -30,7 +30,7 @@ class NotConnectedTextField: NSTextField {
         }
         hover = true
 
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         stringValue = "Click to remove"
         textColor = NSColor.labelColor
     }
@@ -41,7 +41,7 @@ class NotConnectedTextField: NSTextField {
         }
         hover = false
 
-        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+        transition(0.3)
         stringValue = "Not connected"
         textColor = NSColor.secondaryLabelColor
     }

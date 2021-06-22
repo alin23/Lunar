@@ -334,13 +334,13 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func lightenUp(color: NSColor) {
-        layer?.add(fadeTransition(duration: 0.15), forKey: "transition")
+        transition(0.15)
         textColor = color
         setBgAlpha()
     }
 
     func darken(color: NSColor) {
-        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+        transition(0.3)
         textColor = color
         setBgAlpha()
     }

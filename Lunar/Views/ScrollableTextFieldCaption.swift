@@ -40,17 +40,17 @@ class ScrollableTextFieldCaption: NSTextField {
     }
 
     func lightenUp(color: NSColor) {
-        layer?.add(fadeTransition(duration: 0.15), forKey: "transition")
+        transition(0.15)
         textColor = color
     }
 
     func darken(color: NSColor) {
-        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+        transition(0.3)
         textColor = color
     }
 
     func resetText() {
-        layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+        transition(0.3)
         textColor = initialColor
         stringValue = initialText
         alphaValue = initialAlphaValue
@@ -58,7 +58,7 @@ class ScrollableTextFieldCaption: NSTextField {
 
     override func mouseEntered(with _: NSEvent) {
         guard tag == 98 || tag == 99 else { return }
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
 //        stringValue = "Scroll, type or press ↑/↓"
         stringValue = "Scroll or click to edit"
         alphaValue = 0.5

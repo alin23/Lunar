@@ -46,11 +46,11 @@ class GammaViewController: NSViewController {
 
                 mainThread {
                     if dot.alphaValue == 0.0 {
-                        dot.layer?.add(fadeTransition(duration: 0.25), forKey: "transition")
+                        dot.transition(0.25)
                         dot.alphaValue = 0.8
                         dot.needsDisplay = true
                     } else {
-                        dot.layer?.add(fadeTransition(duration: 0.35), forKey: "transition")
+                        dot.transition(0.35)
                         dot.alphaValue = 0.0
                         dot.needsDisplay = true
                     }
@@ -68,7 +68,7 @@ class GammaViewController: NSViewController {
 
         mainThread { [weak self] in
             guard let dot = self?.dot else { return }
-            dot.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            dot.transition(0.2)
             dot.alphaValue = 0.0
             dot.needsDisplay = true
         }

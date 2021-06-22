@@ -205,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func showWindow() {
-        createAndShowWindow("windowController", controller: &windowController)
+        createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
     }
 
     @objc private func activate() {

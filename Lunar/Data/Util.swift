@@ -285,7 +285,7 @@ func createAndShowWindow(
         if show, let wc = controller {
             wc.initPopovers()
 
-            if let screen = screen, let w = wc.window {
+            if let screen = screen, let w = wc.window, w.screen != screen {
                 let size = w.frame.size
                 w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - size.width / 2, y: screen.visibleFrame.midY - size.height / 2))
             }

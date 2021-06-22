@@ -193,10 +193,10 @@ class SplitViewController: NSSplitViewController {
     }
 
     func whiteBackground() {
-        view.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        view.transition(0.2)
 //        view.bg = white
         if let logo = logo {
-            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.transition(0.2)
             logo.textColor = logoColor
             logo.stringValue = "LUNAR"
         }
@@ -213,7 +213,7 @@ class SplitViewController: NSSplitViewController {
     func yellowBackground() {
 //        view.bg = bgColor
         if let logo = logo {
-            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.transition(0.2)
             logo.textColor = bgColor
             logo.stringValue = "SETTINGS"
         }
@@ -230,7 +230,7 @@ class SplitViewController: NSSplitViewController {
     func mauveBackground() {
 //        view.bg = hotkeysBgColor
         if let logo = logo {
-            logo.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            logo.transition(0.2)
             logo.textColor = logoColor
             logo.stringValue = "HOTKEYS"
         }

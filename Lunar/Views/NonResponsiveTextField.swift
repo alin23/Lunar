@@ -42,7 +42,7 @@ class NonResponsiveTextField: NSTextField {
             }
             hover = true
 
-            layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+            transition(0.2)
             stringValue = "Click to reset"
             textColor = NSColor.systemRed.blended(withFraction: 0.3, of: .systemOrange) ?? NSColor.systemRed
         }
@@ -55,7 +55,7 @@ class NonResponsiveTextField: NSTextField {
             }
             hover = false
 
-            layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+            transition(0.3)
             stringValue = "Non-responsive"
             textColor = NSColor.systemRed
         }
