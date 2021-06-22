@@ -16,7 +16,7 @@ class PageButton: NSButton {
     var onMouseExit: (() -> Void)?
 
     func disable() {
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        transition(0.1)
 
         isHidden = true
         isEnabled = false
@@ -24,7 +24,7 @@ class PageButton: NSButton {
     }
 
     func enable(color _: NSColor? = nil) {
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        transition(0.1)
 
         isHidden = false
         isEnabled = true
@@ -57,7 +57,7 @@ class PageButton: NSButton {
     override func mouseEntered(with _: NSEvent) {
         if !isEnabled { return }
 
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        transition(0.1)
         alphaValue = 0.8
         shadow = buttonShadow
 
@@ -67,7 +67,7 @@ class PageButton: NSButton {
     override func mouseExited(with _: NSEvent) {
         if !isEnabled { return }
 
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         alphaValue = 0.4
         shadow = nil
 

@@ -873,11 +873,11 @@ class DisplayViewController: NSViewController {
 
             mainThread {
                 if gammaNotice.alphaValue == 0 {
-                    gammaNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                    gammaNotice.transition(1)
                     gammaNotice.alphaValue = 0.9
                     gammaNotice.needsDisplay = true
                 } else {
-                    gammaNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                    gammaNotice.transition(3)
                     gammaNotice.alphaValue = 0.0
                     gammaNotice.needsDisplay = true
                 }
@@ -893,7 +893,7 @@ class DisplayViewController: NSViewController {
 
         mainThread { [weak self] in
             guard let gammaNotice = self?.gammaNotice else { return }
-            gammaNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+            gammaNotice.transition(0.3)
             gammaNotice.alphaValue = 0.0
             gammaNotice.needsDisplay = true
         }
@@ -924,11 +924,11 @@ class DisplayViewController: NSViewController {
 
             mainThread {
                 if adaptiveNotice.alphaValue == 0 {
-                    adaptiveNotice.layer?.add(fadeTransition(duration: 1), forKey: "transition")
+                    adaptiveNotice.transition(1)
                     adaptiveNotice.alphaValue = 0.9
                     adaptiveNotice.needsDisplay = true
                 } else {
-                    adaptiveNotice.layer?.add(fadeTransition(duration: 3), forKey: "transition")
+                    adaptiveNotice.transition(3)
                     adaptiveNotice.alphaValue = 0.0
                     adaptiveNotice.needsDisplay = true
                 }
@@ -944,7 +944,7 @@ class DisplayViewController: NSViewController {
 
         mainThread { [weak self] in
             guard let adaptiveNotice = self?.adaptiveNotice else { return }
-            adaptiveNotice.layer?.add(fadeTransition(duration: 0.3), forKey: "transition")
+            adaptiveNotice.transition(0.3)
             adaptiveNotice.alphaValue = 0.0
             adaptiveNotice.needsDisplay = true
         }

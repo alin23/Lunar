@@ -567,6 +567,10 @@ extension NSWindow {
 }
 
 extension NSView {
+    @inline(__always) func transition(_ duration: TimeInterval = 0.2) {
+        layer?.add(fadeTransition(duration: duration), forKey: "transition")
+    }
+
     func center(within rect: NSRect, horizontally: Bool = true, vertically: Bool = true) {
         setFrameOrigin(CGPoint(
             x: horizontally ? rect.midX - frame.width / 2 : frame.origin.x,

@@ -145,7 +145,7 @@ class Button: NSButton {
         if !isEnabled { return }
         hover = true
 
-        layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        transition(0.1)
         alphaValue = hoverAlpha
         shadow = buttonShadow
 
@@ -156,7 +156,7 @@ class Button: NSButton {
         if !isEnabled { return }
         hover = false
 
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         alphaValue = alpha
         shadow = nil
 

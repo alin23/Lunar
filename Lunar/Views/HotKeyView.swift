@@ -160,7 +160,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     func transition() {
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         backgroundColor = hotkeyColor[hoverState]!["background"]!
         if isRecording {
             tintColor = hotkeyColor[hoverState]!["tintRecording"]!

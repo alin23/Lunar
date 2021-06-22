@@ -52,12 +52,12 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
         if !isEnabled || !isEditable {
             return
         }
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         bg = lunarYellow.withAlphaComponent(0.3)
     }
 
     override func mouseExited(with _: NSEvent) {
-        layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        transition(0.2)
         bg = NSColor.clear
     }
 
