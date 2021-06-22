@@ -571,25 +571,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         menu?.update()
     }
 
-    func acquirePrivileges(_ onAcquire: @escaping (() -> Void)) {
-        let options = [
-            kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
-        ]
-        let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
-
-        if accessEnabled {
-            onAcquire()
-            return
-        }
-
-        asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") {
-            if AXIsProcessTrusted() {
-                onAcquire()
-                cancelAsyncRecurringTask("AXPermissionsChecker")
-            }
-        }
-    }
-
     func onboard() {}
 
     func applicationWillFinishLaunching(_: Notification) {
@@ -645,9 +626,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
         }
 
-        acquirePrivileges {
-            self.startOrRestartMediaKeyTap()
-        }
+        startOrRestartMediaKeyTap()
 
         displayController.displays = displayController.getDisplaysLock.around { DisplayController.getDisplays() }
         displayController.addSentryData()
