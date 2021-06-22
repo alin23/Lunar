@@ -1586,7 +1586,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/MediaKeyTap";
 			requirement = {
-				branch = master;
+				branch = dev;
 				kind = branch;
 			};
 		};

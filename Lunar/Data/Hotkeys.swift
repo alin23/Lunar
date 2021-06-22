@@ -611,14 +611,14 @@ extension AppDelegate: MediaKeyTapDelegate {
                     for: [.brightnessUp, .brightnessDown],
                     observeBuiltIn: true
                 )
-                mediaKeyTapBrightness?.start()
+                mediaKeyTapBrightness?.start(tries: 0)
             }
 
             if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
                !audioDevice.canSetVirtualMasterVolume(scope: .output)
             {
                 mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
-                mediaKeyTapAudio?.start()
+                mediaKeyTapAudio?.start(tries: 0)
             }
         }
         concurrentQueue.async(execute: workItem.workItem)
