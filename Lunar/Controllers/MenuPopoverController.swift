@@ -95,7 +95,7 @@ class ModeButtonResponder: NSResponder {
             return
         }
 
-        button.layer?.add(fadeTransition(duration: 0.1), forKey: "transition")
+        button.transition(0.1)
 
         if button.state == .on {
             button.layer?
@@ -111,7 +111,7 @@ class ModeButtonResponder: NSResponder {
             return
         }
 
-        button.layer?.add(fadeTransition(duration: 0.2), forKey: "transition")
+        button.transition(0.2)
 
         if button.state == .on {
             button.bg = buttonBackgroundColor(mode: mode)
