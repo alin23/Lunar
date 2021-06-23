@@ -59,6 +59,10 @@ class GammaViewController: NSViewController {
         }
     }
 
+    var highlighting: Bool {
+        dot.alphaValue > 0
+    }
+
     func stopHighlighting() {
         // return
         if let timer = highlighterTask {

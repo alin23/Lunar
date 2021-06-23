@@ -443,7 +443,7 @@ let asyncUniqueLock = NSRecursiveLock()
 var asyncUniqueTasks = [String: DispatchWorkItem]()
 var asyncUniqueRecurringTasks = [String: Timer]()
 
-@discardableResult func asyncAfter(ms: Int, uniqueTaskKey: String? = nil, _ action: @escaping () -> Void) -> DispatchWorkItem {
+@discardableResult func asyncAfter(ms: Int, uniqueTaskKey: String? = nil, mainThread: Bool = false, _ action: @escaping () -> Void) -> DispatchWorkItem {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
     let task: DispatchWorkItem
@@ -465,7 +465,11 @@ var asyncUniqueRecurringTasks = [String: Timer]()
         }
     }
 
-    concurrentQueue.asyncAfter(deadline: deadline, execute: task.workItem)
+    if mainThread {
+        DispatchQueue.main.asyncAfter(deadline: deadline, execute: task.workItem)
+    } else {
+        concurrentQueue.asyncAfter(deadline: deadline, execute: task.workItem)
+    }
 
     return task
 }
@@ -790,7 +794,7 @@ func createWindow(
 }
 
 func showOperationInProgress(screen: NSScreen? = nil) {
-    mainAsyncAfter(ms: 10) {
+    asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
         createWindow(
             "gammaWindowController",
             controller: &gammaWindowController,
@@ -807,9 +811,11 @@ func showOperationInProgress(screen: NSScreen? = nil) {
 }
 
 func hideOperationInProgress() {
-    mainAsyncAfter(ms: 10) {
+    asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
         guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
-        c.stopHighlighting()
+        while c.highlighting {
+            c.stopHighlighting()
+        }
     }
 }
 
