@@ -34,15 +34,20 @@ CHANGELOG.md: $(RELEASE_NOTES_FILES)
 changelog: CHANGELOG.md
 dev: install-deps install-hooks codegen
 
-.PHONY: release
+.PHONY: release upload
+upload:
+	rsync -avzP Releases/*.delta noiseblend:/static/Lunar/deltas/
+	rsync -avzP Releases/*.{dmg,pkg,zip} noiseblend:/static/Lunar/releases/
+	upload -d Lunar Releases/appcast.xml
+	cfcli -d lunar.fyi purge
+
 release: changelog
 	echo "$(VERSION)" > /tmp/release_file_$(VERSION).md
 	echo "" >> /tmp/release_file_$(VERSION).md
 	echo "" >> /tmp/release_file_$(VERSION).md
 	cat ReleaseNotes/$(VERSION).md >> /tmp/release_file_$(VERSION).md
 	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
-# 	rsync -avz --remove-source-files -e ssh Releases/Lunar-$(VERSION).dmg Lunar.dmg noiseblend:/static/Lunar
-# 	rsync -avz -e ssh Releases/appcast.xml noiseblend:/static/Lunar
+
 sentry-release:
 	./release.sh
 
