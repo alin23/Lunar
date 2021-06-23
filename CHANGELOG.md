@@ -1,3 +1,11 @@
+# 4.2.3
+## Fixes
+
+* Shake window when trying to input an invalid field value
+* Revert all changes to a field when pressing escape
+* Pressing tab inside a field will commit the value
+* Show Lunar window on the screen where the cursor is
+* Hide yellow dot on operation end
 # 4.2.2
 ## Fixes
 
