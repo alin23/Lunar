@@ -170,7 +170,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 * I2C Controller: `\(
                     i2c == nil ? "NONE" : i2c!.s)`
                   * _This monitor \(
-                      i2c == 0 ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                      i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
                 * Network Controller: `\(network == nil ? "NONE" : network!)`
                   * _This monitor \(network == nil ?
                     "can't be controlled through the network" : "supports DDC through a network controller")_
