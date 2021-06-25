@@ -607,6 +607,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
         ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
+        ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
         SentrySDK.start { options in
