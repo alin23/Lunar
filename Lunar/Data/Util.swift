@@ -1056,6 +1056,11 @@ final class UnfairLock {
 }
 
 extension NSRecursiveLock {
+    @inline(__always) func aroundThrows<T>(timeout: TimeInterval = 10, _ closure: () throws -> T) throws -> T {
+        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
+        return try closure()
+    }
+
     /// Executes a closure returning a value while acquiring the lock.
     ///
     /// - Parameter closure: The closure to run.

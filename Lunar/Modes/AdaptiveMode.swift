@@ -161,16 +161,28 @@ extension AdaptiveMode {
     }
 
     func adjustCurve(_ value: Double, factor: Double, minVal: Double = MIN_BRIGHTNESS.d, maxVal: Double = MAX_BRIGHTNESS.d) -> Double {
+        guard maxVal != minVal else {
+            return value
+        }
+
         let diff = maxVal - minVal
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
 
     @inline(__always) func adjustCurveSIMD(_ value: [Double], factor: Double, minVal: Double = MIN_BRIGHTNESS.d, maxVal: Double = MAX_BRIGHTNESS.d) -> [Double] {
+        guard maxVal != minVal else {
+            return value
+        }
+
         let diff = maxVal - minVal
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
 
     @inline(__always) func adjustCurveSIMD(_ value: [Float], factor: Float, minVal: Float = MIN_BRIGHTNESS.f, maxVal: Float = MAX_BRIGHTNESS.f) -> [Float] {
+        guard maxVal != minVal else {
+            return value
+        }
+
         let diff = maxVal - minVal
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
@@ -247,14 +259,16 @@ extension AdaptiveMode {
                 newValue = adjustCurve(newValue, factor: factor > 0 ? factor : 1, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
-                log.error("NaN value!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+                log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+                newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
             }
         }
 
         newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
 
         if newValue.isNaN {
-            log.error("NaN value!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+            log.error("NaN value?? WHAAT?? AGAIN?!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+            newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
         }
 
         return mapNumber(
@@ -309,7 +323,7 @@ extension AdaptiveMode {
             lastTargetValue = targetValue
         }
 
-        if offset > 0 {
+        if offset != 0 {
             result += offset
         }
 
