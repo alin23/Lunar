@@ -11,9 +11,9 @@ import Cocoa
 import Defaults
 import Sentry
 
-let APP_MAX_BRIGHTNESS: UInt8 = 30
-let APP_MAX_CONTRAST: UInt8 = 30
-let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix"]
+let APP_MAX_BRIGHTNESS: Int8 = 30
+let APP_MAX_CONTRAST: Int8 = 30
+let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
 @objc class AppException: NSObject, Codable, Defaults.Serializable {
     @objc dynamic var identifier: String {
@@ -28,29 +28,26 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         }
     }
 
-    @objc dynamic var brightness: UInt8 {
+    @objc dynamic var brightness: Int8 {
         didSet {
             save()
-            addSentryData()
             log.verbose("\(name): Set brightness to \(brightness)")
         }
     }
 
-    @objc dynamic var contrast: UInt8 {
+    @objc dynamic var contrast: Int8 {
         didSet {
             save()
-            addSentryData()
             log.verbose("\(name): Set contrast to \(contrast)")
         }
     }
 
-    init(identifier: String, name: String, brightness: UInt8 = APP_MAX_BRIGHTNESS, contrast: UInt8 = APP_MAX_CONTRAST) {
+    init(identifier: String, name: String, brightness: Int8 = APP_MAX_BRIGHTNESS, contrast: Int8 = APP_MAX_CONTRAST) {
         self.identifier = identifier
         self.name = name
         self.brightness = brightness
         self.contrast = contrast
         super.init()
-        addSentryData()
     }
 
     func save() {
@@ -64,8 +61,8 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         return AppException(
             identifier: identifier,
             name: name,
-            brightness: (config["brightness"] as? UInt8) ?? APP_MAX_BRIGHTNESS,
-            contrast: (config["contrast"] as? UInt8) ?? APP_MAX_CONTRAST
+            brightness: (config["brightness"] as? Int8) ?? APP_MAX_BRIGHTNESS,
+            contrast: (config["contrast"] as? Int8) ?? APP_MAX_CONTRAST
         )
     }
 
@@ -73,24 +70,6 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         if var apps = CachedDefaults[.appExceptions] {
             apps.removeAll(where: { $0.identifier == identifier })
             CachedDefaults[.appExceptions] = apps
-        }
-        removeSentryData()
-    }
-
-    func addSentryData() {
-        SentrySDK.configureScope { [weak self] scope in
-            guard let self = self else { return }
-            scope.setExtra(value: [
-                "brightness": self.brightness,
-                "contrast": self.contrast,
-            ], key: "app-\(self.name)")
-        }
-    }
-
-    func removeSentryData() {
-        SentrySDK.configureScope { [weak self] scope in
-            guard let self = self else { return }
-            scope.setExtra(value: "DELETED", key: "app-\(self.name)")
         }
     }
 }

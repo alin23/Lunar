@@ -298,39 +298,45 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            let lock = locks[key.name] ?? Self.lock
-            return lock.around {
-                if let value = cache[key.name]?.value as? Value {
-                    return value
-                }
+            displayEncodingLock.around {
+                let lock = locks[key.name] ?? Self.lock
+                return lock.around {
+                    if let value = cache[key.name]?.value as? Value {
+                        return value
+                    }
 
-                return key.suite[key]
+                    return key.suite[key]
+                }
             }
         }
         set {
-            guard let lock = locks[key.name] else {
-                Self.lock.around {
-                    cache[key.name] = AnyCodable(newValue)
-                    key.suite[key] = newValue
-                }
-                return
-            }
-            lock.around {
-                cache[key.name] = AnyCodable(newValue)
-
-                if key == .displays, let displays = newValue as? [Display] {
-                    asyncNow { displaysPublisher.send(displays) }
-                    Defaults.withoutPropagation {
+            displayEncodingLock.around {
+                guard let lock = locks[key.name] else {
+                    Self.lock.around {
+                        cache[key.name] = AnyCodable(newValue)
                         key.suite[key] = newValue
                     }
                     return
                 }
+                lock.around {
+                    cache[key.name] = AnyCodable(newValue)
 
-                key.suite[key] = newValue
+                    if key == .displays, let displays = newValue as? [Display] {
+                        asyncNow { displaysPublisher.send(displays) }
+                        Defaults.withoutPropagation {
+                            key.suite[key] = newValue
+                        }
+                        return
+                    }
+
+                    key.suite[key] = newValue
+                }
             }
         }
     }
 }
+
+let displayEncodingLock = NSRecursiveLock()
 
 func cacheKey<Value>(_ key: Defaults.Key<Value>) {
     CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])

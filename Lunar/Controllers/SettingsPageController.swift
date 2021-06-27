@@ -27,8 +27,6 @@ class SettingsPageController: NSViewController {
     func updateDataset(
         display: Display,
         factor: Double? = nil,
-        daylightExtension _: Int? = nil,
-        noonDuration _: Int? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false,

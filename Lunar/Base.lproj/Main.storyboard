@@ -2123,14 +2123,14 @@ when dock and menubar icons are hidden</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="70" horizontalPageScroll="10" verticalLineScroll="70" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="uGn-PW-Pif">
-                                <rect key="frame" x="0.0" y="220" width="475" height="324"/>
+                                <rect key="frame" x="0.0" y="220" width="475" height="314"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="QLY-hc-WFL">
-                                    <rect key="frame" x="0.0" y="0.0" width="475" height="324"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="475" height="314"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="50" headerView="cFY-MQ-0nz" viewBased="YES" id="fw1-Tz-zwm" customClass="ExceptionsView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="475" height="299"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="475" height="289"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -2171,7 +2171,7 @@ when dock and menubar icons are hidden</string>
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn editable="NO" width="244" minWidth="244" maxWidth="244" id="Dt1-Ce-6Rl" userLabel="Name">
+                                                <tableColumn editable="NO" width="220" minWidth="220" maxWidth="220" id="Dt1-Ce-6Rl" userLabel="Name">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -2184,11 +2184,11 @@ when dock and menubar icons are hidden</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="RB2-V9-vwF">
-                                                            <rect key="frame" x="34" y="10" width="244" height="50"/>
+                                                            <rect key="frame" x="34" y="10" width="220" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bPk-JH-iHh">
-                                                                    <rect key="frame" x="4" y="5" width="240" height="30"/>
+                                                                    <rect key="frame" x="4" y="5" width="216" height="30"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="VLC" id="Gg9-5u-bvc">
                                                                         <font key="font" size="18" name="Menlo-Bold"/>
@@ -2210,7 +2210,7 @@ when dock and menubar icons are hidden</string>
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn editable="NO" width="90" minWidth="90" maxWidth="90" id="DLe-P9-tVg" userLabel="Brightness">
+                                                <tableColumn editable="NO" width="102" minWidth="102" maxWidth="102" id="DLe-P9-tVg" userLabel="Brightness">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Brightness">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -2223,20 +2223,20 @@ when dock and menubar icons are hidden</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="WvX-GE-Jy3">
-                                                            <rect key="frame" x="278" y="10" width="90" height="50"/>
+                                                            <rect key="frame" x="254" y="10" width="102" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbm-hq-sAY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="3" y="9" width="83" height="40"/>
+                                                                    <rect key="frame" x="0.0" y="9" width="97" height="40"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="rHW-2k-1pe" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="+100" usesSingleLineMode="YES" id="rHW-2k-1pe" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                                                         <font key="font" metaFont="systemHeavy" size="34"/>
                                                                         <color key="textColor" white="1" alpha="0.699768926056338" colorSpace="calibratedWhite"/>
-                                                                        <color key="backgroundColor" red="1" green="0.83529411760000005" blue="0.74041366549999998" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="backgroundColor" red="1" green="0.83529411764705885" blue="0.74117647058823533" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     </textFieldCell>
                                                                     <userDefinedRuntimeAttributes>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                                                            <integer key="value" value="0"/>
+                                                                            <real key="value" value="-100"/>
                                                                         </userDefinedRuntimeAttribute>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
                                                                             <integer key="value" value="100"/>
@@ -2253,29 +2253,24 @@ when dock and menubar icons are hidden</string>
                                                                         <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
                                                                             <color key="value" red="1" green="0.83529411760000005" blue="0.74041366549999998" alpha="1" colorSpace="calibratedRGB"/>
                                                                         </userDefinedRuntimeAttribute>
+                                                                        <userDefinedRuntimeAttribute type="color" keyPath="editingTextFieldColor">
+                                                                            <color key="value" red="0.24313725489999999" green="0.24313725489999999" blue="0.43921568630000002" alpha="0.49643004969999999" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
-                                                                        <binding destination="WvX-GE-Jy3" name="value" keyPath="objectValue.brightness" id="nfj-DL-Y78">
+                                                                        <binding destination="WvX-GE-Jy3" name="value" keyPath="objectValue.brightness" id="YMO-lc-khN">
                                                                             <dictionary key="options">
                                                                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                                                <string key="NSValueTransformerName">SignedIntTransformer</string>
                                                                             </dictionary>
                                                                         </binding>
                                                                     </connections>
-                                                                </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C68-N6-aA6" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="-5" y="-5" width="100" height="20"/>
-                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="9bg-Bk-YCG">
-                                                                        <font key="font" size="11" name="Menlo-Bold"/>
-                                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
                                                                 </textField>
                                                             </subviews>
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn editable="NO" width="80" minWidth="80" maxWidth="80" id="ZQc-qo-r6X" userLabel="Contrast">
+                                                <tableColumn editable="NO" width="102" minWidth="102" maxWidth="102" id="ZQc-qo-r6X" userLabel="Contrast">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Contrast">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -2288,13 +2283,13 @@ when dock and menubar icons are hidden</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="AbE-RR-q5I">
-                                                            <rect key="frame" x="368" y="10" width="86" height="50"/>
+                                                            <rect key="frame" x="356" y="10" width="108" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuS-ce-rej" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="1" y="9" width="84" height="40"/>
+                                                                    <rect key="frame" x="2" y="9" width="103" height="40"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="JvL-0T-le7" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="-100" usesSingleLineMode="YES" id="JvL-0T-le7" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                                                         <font key="font" metaFont="systemHeavy" size="34"/>
                                                                         <color key="textColor" white="1" alpha="0.70059419014084512" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                                         <color key="backgroundColor" red="1" green="0.83529411760000005" blue="0.74041366549999998" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
@@ -2310,28 +2305,26 @@ when dock and menubar icons are hidden</string>
                                                                             <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                         </userDefinedRuntimeAttribute>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                                                            <integer key="value" value="0"/>
+                                                                            <real key="value" value="-100"/>
                                                                         </userDefinedRuntimeAttribute>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
                                                                             <integer key="value" value="100"/>
                                                                         </userDefinedRuntimeAttribute>
+                                                                        <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
+                                                                            <color key="value" red="1" green="0.83529411764705885" blue="0.74117647058823533" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        </userDefinedRuntimeAttribute>
+                                                                        <userDefinedRuntimeAttribute type="color" keyPath="editingTextFieldColor">
+                                                                            <color key="value" red="0.24313725489999999" green="0.24313725489999999" blue="0.43921568630000002" alpha="0.49643004969999999" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
-                                                                        <binding destination="AbE-RR-q5I" name="value" keyPath="objectValue.contrast" id="ZHo-Or-VOg">
+                                                                        <binding destination="AbE-RR-q5I" name="value" keyPath="objectValue.contrast" id="GvQ-AC-zIN">
                                                                             <dictionary key="options">
                                                                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                                                <string key="NSValueTransformerName">SignedIntTransformer</string>
                                                                             </dictionary>
                                                                         </binding>
                                                                     </connections>
-                                                                </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mt6-ZS-1wJ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="-10" y="-5" width="106" height="20"/>
-                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="hOm-J9-pO3">
-                                                                        <font key="font" size="11" name="Menlo-Bold"/>
-                                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
                                                                 </textField>
                                                             </subviews>
                                                         </tableCellView>
@@ -2353,7 +2346,7 @@ when dock and menubar icons are hidden</string>
                                     <rect key="frame" x="-100" y="-100" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <tableHeaderView key="headerView" hidden="YES" wantsLayer="YES" id="cFY-MQ-0nz">
+                                <tableHeaderView key="headerView" hidden="YES" wantsLayer="YES" alphaValue="0.0" id="cFY-MQ-0nz">
                                     <rect key="frame" x="0.0" y="0.0" width="475" height="25"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
@@ -2393,6 +2386,24 @@ when dock and menubar icons are hidden</string>
                                     <action selector="addAppException:" target="v5h-uZ-R2O" id="ZTL-uU-Nmj"/>
                                 </connections>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ENC-nL-gtE">
+                                <rect key="frame" x="265" y="540" width="83" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness" id="erG-by-oaF">
+                                    <font key="font" size="13" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.24313725490196078" green="0.24313725490196078" blue="0.4392156862745098" alpha="0.49643004966887416" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vTy-8C-HpY">
+                                <rect key="frame" x="378" y="540" width="67" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Contrast" id="2pR-8e-dSI">
+                                    <font key="font" size="13" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.24313725490196078" green="0.24313725490196078" blue="0.4392156862745098" alpha="0.49643004966887416" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -3462,7 +3473,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="400" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -3482,7 +3493,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="HbC-w6-tw4">
-                                                            <rect key="frame" x="8" y="10" width="124" height="75"/>
+                                                            <rect key="frame" x="9" y="10" width="124" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbk-Gm-ehs" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -3545,7 +3556,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="sUH-3g-BTj">
-                                                            <rect key="frame" x="132" y="10" width="140" height="75"/>
+                                                            <rect key="frame" x="133" y="10" width="140" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">
@@ -4887,7 +4898,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G0C-wy-YwY" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="175" y="258" width="86" height="14"/>
+                                <rect key="frame" x="174" y="258" width="86" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset DDC" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="fa6-tN-dwu">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
