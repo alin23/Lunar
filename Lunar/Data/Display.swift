@@ -39,7 +39,14 @@ let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
     let TEST_DISPLAY_PERSISTENT2_ID: CGDirectDisplayID = UINT32_MAX / 4
     let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = UINT32_MAX / 5
     let TEST_DISPLAY_PERSISTENT4_ID: CGDirectDisplayID = UINT32_MAX / 6
-    let TEST_IDS = Set(arrayLiteral: GENERIC_DISPLAY_ID, TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID)
+    let TEST_IDS = Set(
+        arrayLiteral: GENERIC_DISPLAY_ID,
+        TEST_DISPLAY_ID,
+        TEST_DISPLAY_PERSISTENT_ID,
+        TEST_DISPLAY_PERSISTENT2_ID,
+        TEST_DISPLAY_PERSISTENT3_ID,
+        TEST_DISPLAY_PERSISTENT4_ID
+    )
 #endif
 
 let GENERIC_DISPLAY = Display(
@@ -1197,57 +1204,59 @@ enum ValueType {
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
-        var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
-        var enabledControlsContainer = container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
+        try displayEncodingLock.aroundThrows {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
+            var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
+            var enabledControlsContainer = container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
 
-        try container.encode(active, forKey: .active)
-        try container.encode(adaptive, forKey: .adaptive)
-        try container.encode(audioMuted, forKey: .audioMuted)
-        try container.encode(brightness.uint8Value, forKey: .brightness)
-        try container.encode(contrast.uint8Value, forKey: .contrast)
-        try container.encode(edidName, forKey: .edidName)
-        try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
-        try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
-        try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
-        try container.encode(id, forKey: .id)
-        try container.encode(lockedBrightness, forKey: .lockedBrightness)
-        try container.encode(lockedContrast, forKey: .lockedContrast)
-        try container.encode(maxBrightness.uint8Value, forKey: .maxBrightness)
-        try container.encode(maxContrast.uint8Value, forKey: .maxContrast)
-        try container.encode(minBrightness.uint8Value, forKey: .minBrightness)
-        try container.encode(minContrast.uint8Value, forKey: .minContrast)
-        try container.encode(name, forKey: .name)
-        try container.encode(responsiveDDC, forKey: .responsiveDDC)
-        try container.encode(serial, forKey: .serial)
-        try container.encode(volume.uint8Value, forKey: .volume)
-        try container.encode(input.uint8Value, forKey: .input)
-        try container.encode(hotkeyInput.uint8Value, forKey: .hotkeyInput)
-        try container.encode(brightnessOnInputChange.uint8Value, forKey: .brightnessOnInputChange)
-        try container.encode(contrastOnInputChange.uint8Value, forKey: .contrastOnInputChange)
+            try container.encode(active, forKey: .active)
+            try container.encode(adaptive, forKey: .adaptive)
+            try container.encode(audioMuted, forKey: .audioMuted)
+            try container.encode(brightness.uint8Value, forKey: .brightness)
+            try container.encode(contrast.uint8Value, forKey: .contrast)
+            try container.encode(edidName, forKey: .edidName)
+            try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
+            try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
+            try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
+            try container.encode(id, forKey: .id)
+            try container.encode(lockedBrightness, forKey: .lockedBrightness)
+            try container.encode(lockedContrast, forKey: .lockedContrast)
+            try container.encode(maxBrightness.uint8Value, forKey: .maxBrightness)
+            try container.encode(maxContrast.uint8Value, forKey: .maxContrast)
+            try container.encode(minBrightness.uint8Value, forKey: .minBrightness)
+            try container.encode(minContrast.uint8Value, forKey: .minContrast)
+            try container.encode(name, forKey: .name)
+            try container.encode(responsiveDDC, forKey: .responsiveDDC)
+            try container.encode(serial, forKey: .serial)
+            try container.encode(volume.uint8Value, forKey: .volume)
+            try container.encode(input.uint8Value, forKey: .input)
+            try container.encode(hotkeyInput.uint8Value, forKey: .hotkeyInput)
+            try container.encode(brightnessOnInputChange.uint8Value, forKey: .brightnessOnInputChange)
+            try container.encode(contrastOnInputChange.uint8Value, forKey: .contrastOnInputChange)
 
-        try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
-        try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
-        try userBrightnessContainer.encodeIfPresent(userBrightness[.location], forKey: .location)
-        try userBrightnessContainer.encodeIfPresent(userBrightness[.manual], forKey: .manual)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.location], forKey: .location)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual], forKey: .manual)
 
-        try userContrastContainer.encodeIfPresent(userContrast[.sync], forKey: .sync)
-        try userContrastContainer.encodeIfPresent(userContrast[.sensor], forKey: .sensor)
-        try userContrastContainer.encodeIfPresent(userContrast[.location], forKey: .location)
-        try userContrastContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
+            try userContrastContainer.encodeIfPresent(userContrast[.sync], forKey: .sync)
+            try userContrastContainer.encodeIfPresent(userContrast[.sensor], forKey: .sensor)
+            try userContrastContainer.encodeIfPresent(userContrast[.location], forKey: .location)
+            try userContrastContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
 
-        try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
-        try enabledControlsContainer.encodeIfPresent(enabledControls[.coreDisplay], forKey: .coreDisplay)
-        try enabledControlsContainer.encodeIfPresent(enabledControls[.ddc], forKey: .ddc)
-        try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
+            try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
+            try enabledControlsContainer.encodeIfPresent(enabledControls[.coreDisplay], forKey: .coreDisplay)
+            try enabledControlsContainer.encodeIfPresent(enabledControls[.ddc], forKey: .ddc)
+            try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
 
-        try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
-        try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
-        try container.encode(alwaysFallbackControl, forKey: .alwaysFallbackControl)
-        try container.encode(neverFallbackControl, forKey: .neverFallbackControl)
-        try container.encode(power, forKey: .power)
-        try container.encode(isSource, forKey: .isSource)
+            try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
+            try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
+            try container.encode(alwaysFallbackControl, forKey: .alwaysFallbackControl)
+            try container.encode(neverFallbackControl, forKey: .neverFallbackControl)
+            try container.encode(power, forKey: .power)
+            try container.encode(isSource, forKey: .isSource)
+        }
     }
 
     // MARK: Sentry

@@ -33,7 +33,7 @@ class GammaViewController: NSViewController {
                     return
                 }
 
-                var windowVisible: Bool = mainThread {
+                let windowVisible: Bool = mainThread {
                     s.view.window?.isVisible ?? false
                 }
                 guard windowVisible, let dot = s.dot

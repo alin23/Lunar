@@ -72,8 +72,29 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
     }
 }
 
+class SignedIntTransformer: ValueTransformer {
+    override class func transformedValueClass() -> AnyClass {
+        NSString.self
+    }
+
+    override class func allowsReverseTransformation() -> Bool {
+        true
+    }
+
+    override func transformedValue(_ value: Any?) -> Any? {
+        guard let intValue = value as? Int else { return "\(value)" }
+        return "\(intValue > 0 ? "+" : "")\(intValue)"
+    }
+
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
+        guard let value = value as? String else { return 0 }
+        return value.i ?? 0
+    }
+}
+
 extension NSValueTransformerName {
     static let appExceptionTransformerName = NSValueTransformerName(rawValue: "AppExceptionTransformer")
     static let displayTransformerName = NSValueTransformerName(rawValue: "DisplayTransformer")
     static let updateCheckIntervalTransformerName = NSValueTransformerName(rawValue: "UpdateCheckIntervalTransformer")
+    static let signedIntTransformerName = NSValueTransformerName(rawValue: "SignedIntTransformer")
 }

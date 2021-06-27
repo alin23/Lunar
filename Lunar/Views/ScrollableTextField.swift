@@ -31,10 +31,21 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
+    var editingTextFieldColorChanged = false
+    @IBInspectable var editingTextFieldColor: NSColor = scrollableTextFieldColor {
+        didSet {
+            textColor = editingTextFieldColor
+            editingTextFieldColorChanged = true
+        }
+    }
+
     @IBInspectable var textFieldColor: NSColor = scrollableTextFieldColor {
         didSet {
             if !hover {
                 textColor = textFieldColor
+            }
+            if !editingTextFieldColorChanged {
+                editingTextFieldColor = textFieldColor
             }
         }
     }
@@ -49,13 +60,40 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
-    var decimalPoints = 0
+//    var _stringValue: String = ""
+//    override var stringValue: String {
+//        get {
+//            _stringValue
+//        }
+//        set {
+//            let number = newValue.d ?? doubleValue
+//            if decimalPoints > 0 {
+//                _stringValue = String(format: "\(showPlusSign && number > 0 ? "+" : "")%.\(decimalPoints)f", number)
+//            } else {
+//                _stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+//            }
+//        }
+//    }
+
+    var decimalPoints: UInt8 = 0
     override var doubleValue: Double {
         didSet {
+            let number = doubleValue
             if decimalPoints > 0 {
-                stringValue = String(format: "%.\(decimalPoints)f", doubleValue)
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints))"
             } else {
-                stringValue = String(round(doubleValue).i)
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+            }
+        }
+    }
+
+    override var integerValue: Int {
+        didSet {
+            let number = integerValue
+            if decimalPoints > 0 {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints))"
+            } else {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number)"
             }
         }
     }
@@ -63,6 +101,12 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
+    var showPlusSign = false
+    var editing = false {
+        didSet {
+            log.debug("Editing: \(editing)")
+        }
+    }
 
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
@@ -104,6 +148,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     lazy var lastValidValue: Double = doubleValue
 
     override func becomeFirstResponder() -> Bool {
+        editing = true
         lastValidValue = doubleValue
         refusesFirstResponder = false
         let success = super.becomeFirstResponder()
@@ -115,6 +160,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                 fieldEditor.insertionPointColor = darkMauve
             }
         }
+        asyncAfter(ms: 200, mainThread: true) { self.lightenUp(color: self.editingTextFieldColor) }
         return success
     }
 
@@ -146,12 +192,14 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func cancelOperation(_: Any?) {
+        editing = false
         darken(color: textFieldColor)
         doubleValue = lastValidValue
         abortEditing()
     }
 
     override func textDidBeginEditing(_ notification: Notification) {
+        editing = true
         if let editor = currentEditor() as? NSTextView {
             editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
         }
@@ -166,15 +214,16 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func textShouldEndEditing(_ textObject: NSText) -> Bool {
-        if let val = Double(textObject.string), val >= lowerLimit, val <= upperLimit {
-            doubleValue = val
-            onValueChanged?(integerValue)
-            onValueChangedDouble?(doubleValue)
-            onValueChangedInstant?(integerValue)
-            onValueChangedInstantDouble?(doubleValue)
-            return true
+        guard let val = Double(textObject.string), val >= lowerLimit, val <= upperLimit else {
+            return false
         }
-        return false
+        doubleValue = val
+        onValueChanged?(integerValue)
+        onValueChangedDouble?(doubleValue)
+        onValueChangedInstant?(integerValue)
+        onValueChangedInstantDouble?(doubleValue)
+        editing = false
+        return true
     }
 
     override init(frame frameRect: NSRect) {
@@ -228,7 +277,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         guard isEnabled else { return }
 
         hover = true
-        lightenUp(color: textFieldColorHover)
+        if !editing { lightenUp(color: textFieldColorHover) }
 
         onMouseEnter?()
 
@@ -255,7 +304,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         finishScrolling()
 
         hover = false
-        darken(color: textFieldColor)
+        if !editing { darken(color: textFieldColor) }
 
         onMouseExit?()
     }
@@ -282,7 +331,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             return
         }
 
-        caption.stringValue = message
+        mainThread { caption.stringValue = message }
         highlighterTask = realtimeQueue.async(every: 1.seconds) { [weak self] (_: CFRunLoopTimer?) in
             guard let s = self else {
                 if let timer = self?.highlighterTask {
@@ -380,7 +429,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             log.verbose("Changed \(caption?.stringValue ?? "") to \(doubleValue)")
             onValueChanged?(integerValue)
             onValueChangedDouble?(doubleValue)
-            darken(color: textFieldColorHover)
+            if !editing { darken(color: textFieldColorHover) }
         }
     }
 
@@ -408,7 +457,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    lightenUp(color: textFieldColorLight)
+                    if !editing { lightenUp(color: textFieldColorLight) }
                 }
                 if event.isDirectionInvertedFromDevice {
                     increaseValue()
@@ -426,7 +475,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                 disableScrollHint()
                 if !scrolling {
                     scrolling = true
-                    lightenUp(color: textFieldColorLight)
+                    if !editing { lightenUp(color: textFieldColorLight) }
                 }
                 if event.isDirectionInvertedFromDevice {
                     decreaseValue()
