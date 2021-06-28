@@ -16,6 +16,10 @@ let APP_MAX_CONTRAST: Int8 = 30
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
 @objc class AppException: NSObject, Codable, Defaults.Serializable {
+    var runningApp: [NSRunningApplication]? {
+        NSRunningApplication.runningApplications(withBundleIdentifier: identifier)
+    }
+
     @objc dynamic var identifier: String {
         didSet {
             save()
