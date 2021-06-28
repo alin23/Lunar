@@ -21,7 +21,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .clamshellModeDetection,
     .contrastOnInputChange,
     .contrastStep,
-    .curveFactor,
+    .contrastCurveFactor,
+    .brightnessCurveFactor,
     .debug,
     .didScrollTextField,
     .didSwipeLeft,
@@ -352,7 +353,8 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>) {
 }
 
 func initCache() {
-    cacheKey(.curveFactor)
+    cacheKey(.contrastCurveFactor)
+    cacheKey(.brightnessCurveFactor)
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.volumeKeysEnabled)
@@ -409,7 +411,8 @@ extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
-    static let curveFactor = Key<Double>("curveFactor", default: 0.5)
+    static let contrastCurveFactor = Key<Double>("contrastCurveFactor", default: 0.5)
+    static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 0.5)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
@@ -489,7 +492,8 @@ enum AppSettings {
 
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates()
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates()
-let curveFactorPublisher = Defaults.publisher(.curveFactor).removeDuplicates()
+let contrastCurveFactorPublisher = Defaults.publisher(.contrastCurveFactor).removeDuplicates()
+let brightnessCurveFactorPublisher = Defaults.publisher(.brightnessCurveFactor).removeDuplicates()
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates()
 let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates()
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates()
