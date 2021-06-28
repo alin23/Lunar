@@ -85,7 +85,7 @@ class DisplayViewController: NSViewController {
 
     Looks like all available controls for this monitor have been disabled manually.
 
-    Click on the ⚙️ icon near the `RESET` button to enable a control.
+    Click on the ⚙️ icon near the `RESET` dropdown to enable a control.
     """
     let NETWORK_CONTROLS_HELP_TEXT = """
     ## Network control
@@ -129,8 +129,6 @@ class DisplayViewController: NSViewController {
             }
         }
     }
-
-    @IBOutlet var resetButton: ResetButton!
 
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
@@ -640,7 +638,91 @@ class DisplayViewController: NSViewController {
 //         }
 //     }
 
-    @IBAction func resetDisplay(_: ResetButton) {
+    enum ResetAction: Int {
+        case algorithmCurve = 0
+        case networkControl
+        case ddcState
+        case brightnessAndContrast
+        case fullReset
+        case reset = 99
+    }
+
+    func resetControl() {
+        guard let display = display else { return }
+        display.control = display.getBestControl()
+        display.onControlChange?(display.control)
+
+        if !(display.enabledControls[.gamma] ?? false) {
+            display.resetGamma()
+        }
+    }
+
+    func resetDDC() {
+        asyncAfter(ms: 10, uniqueTaskKey: "resetDDCTask") { [weak self] in
+            guard let self = self, let display = self.display else { return }
+            if display.control is DDCControl {
+                display.control.resetState()
+            } else {
+                DDCControl(display: display).resetState()
+            }
+
+            self.resetControl()
+
+            for _ in 1 ... 5 {
+                displayController.adaptBrightness(force: true)
+                sleep(3)
+            }
+        }
+    }
+
+    func resetNetworkController() {
+        asyncAfter(ms: 10, uniqueTaskKey: "resetNetworkControlTask") { [weak self] in
+            guard let self = self, let display = self.display else { return }
+            if display.control is NetworkControl {
+                display.control.resetState()
+            } else {
+                NetworkControl.resetState(serial: display.serial)
+            }
+
+            self.resetControl()
+
+            for _ in 1 ... 5 {
+                displayController.adaptBrightness(force: true)
+                sleep(3)
+            }
+        }
+    }
+
+    @IBAction func reset(_ sender: NSPopUpButton) {
+        guard let display = display, let action = ResetAction(rawValue: sender.selectedTag()) else { return }
+        switch action {
+        case .algorithmCurve:
+            display.adaptivePaused = true
+            defer {
+                display.adaptivePaused = false
+                display.readapt(newValue: false, oldValue: true)
+            }
+
+            display.userContrast[displayController.adaptiveModeKey]?.removeAll()
+            display.userBrightness[displayController.adaptiveModeKey]?.removeAll()
+            display.save()
+            updateDataset(force: true)
+        case .networkControl:
+            resetNetworkController()
+        case .ddcState:
+            resetDDC()
+        case .brightnessAndContrast:
+            display.adaptive = false
+            _ = display.control.reset()
+        case .fullReset:
+            resetDisplay()
+        default:
+            break
+        }
+        sender.selectItem(withTag: ResetAction.reset.rawValue)
+    }
+
+    func resetDisplay() {
         guard let display = display else { return }
 
         let resetHandler = { [weak self] (_: Bool) in
@@ -962,8 +1044,6 @@ class DisplayViewController: NSViewController {
 
             scrollableBrightness?.display = display
             scrollableContrast?.display = display
-
-            resetButton?.page = .displayReset
 
             if let inputDropdown = inputDropdown {
                 inputDropdown.appearance = NSAppearance(named: .vibrantLight)
