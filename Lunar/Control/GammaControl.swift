@@ -9,6 +9,7 @@
 import Cocoa
 import Defaults
 import Foundation
+import SwiftDate
 
 let FLUX_IDENTIFIER = "org.herf.Flux"
 
@@ -21,30 +22,40 @@ let NIGHT_SHIFT_TAB_SCRIPT =
     end tell
     """
 
-struct GammaControl: Control {
+var fluxPromptTime: Date?
+
+class GammaControl: Control {
     var displayControl: DisplayControl = .gamma
 
     weak var display: Display!
     let str = "Gamma Control"
 
+    init(display: Display) {
+        self.display = display
+    }
+
     func fluxChecker(flux: NSRunningApplication) {
-        guard !CachedDefaults[.neverAskAboutFlux] else { return }
+        guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),
+              fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
+        else { return }
+
+        fluxPromptTime = Date()
 
         let completionHandler = { (quitFlux: Bool) in
-            if quitFlux {
-                flux.terminate()
-                if CBBlueLightClient.supportsBlueLightReduction() {
-                    let client = CBBlueLightClient()
-                    client.setMode(1)
-                    client.setStrength(0.5, commit: true)
-                }
+            guard quitFlux else { return }
 
-                guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
-                var errorInfo: NSDictionary?
-                script.executeAndReturnError(&errorInfo)
-                if let errors = errorInfo as? [String: Any], errors.count > 0 {
-                    log.error("Error while executing Night Shift Tab script", context: errors)
-                }
+            flux.terminate()
+            if CBBlueLightClient.supportsBlueLightReduction() {
+                let client = CBBlueLightClient()
+                client.setMode(1)
+                client.setStrength(0.5, commit: true)
+            }
+
+            guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
+            var errorInfo: NSDictionary?
+            script.executeAndReturnError(&errorInfo)
+            if let errors = errorInfo as? [String: Any], errors.count > 0 {
+                log.error("Error while executing Night Shift Tab script", context: errors)
             }
         }
 
