@@ -22,6 +22,10 @@ struct DDCCTLControl: Control {
         display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
     }
 
+    init(display: Display) {
+        self.display = display
+    }
+
     func propertyArg(_ property: ControlID) -> String {
         switch property {
         case .BRIGHTNESS:

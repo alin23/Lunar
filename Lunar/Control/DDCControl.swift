@@ -9,11 +9,15 @@
 import Defaults
 import Foundation
 
-struct DDCControl: Control {
+class DDCControl: Control {
     var displayControl: DisplayControl = .ddc
 
     weak var display: Display!
     let str = "DDC Control"
+
+    init(display: Display) {
+        self.display = display
+    }
 
     func isAvailable() -> Bool {
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
@@ -60,9 +64,9 @@ struct DDCControl: Control {
 
                 log.debug(
                     "Writing brightness using \(self)",
-                    context: ["name": display.name, "id": display.id, "serial": display.serial]
+                    context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
                 )
-                if !DDC.setBrightness(for: display.id, brightness: brightness) {
+                if !DDC.setBrightness(for: self.display.id, brightness: brightness) {
                     faults += 1
                 }
             }
@@ -82,9 +86,9 @@ struct DDCControl: Control {
 
                 log.debug(
                     "Writing contrast using \(self)",
-                    context: ["name": display.name, "id": display.id, "serial": display.serial]
+                    context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
                 )
-                if !DDC.setContrast(for: display.id, contrast: contrast) {
+                if !DDC.setContrast(for: self.display.id, contrast: contrast) {
                     faults += 1
                 }
             }
