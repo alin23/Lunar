@@ -71,11 +71,21 @@ class DisplayController {
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
     var appBrightnessOffset: Int {
-        (runningAppExceptions?.last?.brightness ?? 0).i
+        guard let app = runningAppExceptions?.last else { return 0 }
+
+        #if DEBUG
+            if let apps = app.runningApp {
+                for app in apps {
+                    log.debug("App exception", context: ["name": app.localizedName, "isActive": app.isActive, "isHidden": app.isHidden, "PID": app.processIdentifier])
+                }
+            }
+        #endif
+        return app.brightness.i
     }
 
     var appContrastOffset: Int {
-        (runningAppExceptions?.last?.contrast ?? 0).i
+        guard let app = runningAppExceptions?.last else { return 0 }
+        return app.contrast.i
     }
 
     var firstDisplay: Display {
