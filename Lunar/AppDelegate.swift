@@ -97,7 +97,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var adaptiveBrightnessModeObserver: Cancellable?
     var startAtLoginObserver: Cancellable?
     var dayMomentsObserver: Cancellable?
-    var curveFactorObserver: Cancellable?
+    var contrastCurveFactorObserver: Cancellable?
+    var brightnessCurveFactorObserver: Cancellable?
     var refreshValuesObserver: Cancellable?
     var hotkeysObserver: Cancellable?
     var mediaKeysObserver: Cancellable?
@@ -222,6 +223,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             onAcquire()
             return
         }
+        CachedDefaults[.mediaKeysNotified] = false
 
         asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") {
             if AXIsProcessTrusted() {
@@ -432,6 +434,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.screens.compactMap(\.displayID))
 
     @objc func adaptToScreenConfiguration(notification: Notification) {
+//        #if DEBUG
+//        asyncAfter(ms: 100, uniqueTaskKey: "networkResetStressTest") {
+//            while true {
+//                NetworkControl.resetState()
+//                Thread.sleep(forTimeInterval: Double.random(in: 2...10))
+//            }
+//        }
+//        #endif
+
         log.debug("Screen configuration notification")
         switch notification.name {
         case NSApplication.didChangeScreenParametersNotification:
@@ -510,8 +521,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.adaptBrightness()
             }
         }
-        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { change in
-            curveFactor = change.newValue
+        contrastCurveFactorObserver = contrastCurveFactorObserver ?? contrastCurveFactorPublisher.sink { change in
+            contrastCurveFactor = change.newValue
+            displayController.adaptBrightness()
+        }
+        brightnessCurveFactorObserver = brightnessCurveFactorObserver ?? brightnessCurveFactorPublisher.sink { change in
+            brightnessCurveFactor = change.newValue
             displayController.adaptBrightness()
         }
 
@@ -596,8 +611,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         initCache()
-        curveFactor = CachedDefaults[.curveFactor] > 0 ? CachedDefaults[.curveFactor] : 1
-        CachedDefaults[.curveFactor] = curveFactor
+        contrastCurveFactor = CachedDefaults[.contrastCurveFactor] > 0 ? CachedDefaults[.contrastCurveFactor] : 1
+        CachedDefaults[.contrastCurveFactor] = contrastCurveFactor
+        brightnessCurveFactor = CachedDefaults[.brightnessCurveFactor] > 0 ? CachedDefaults[.brightnessCurveFactor] : 1
+        CachedDefaults[.brightnessCurveFactor] = brightnessCurveFactor
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {

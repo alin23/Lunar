@@ -161,13 +161,17 @@ class ConfigurationViewController: NSViewController {
         _helpButtonBottom as? HelpButton
     }
 
-    @IBOutlet var curveFactorField: ScrollableTextField!
-    @IBOutlet var curveFactorCaption: ScrollableTextFieldCaption!
+    @IBOutlet var brightnessCurveFactorField: ScrollableTextField!
+    @IBOutlet var brightnessCurveFactorCaption: ScrollableTextFieldCaption!
+    @IBOutlet var contrastCurveFactorField: ScrollableTextField!
+    @IBOutlet var contrastCurveFactorCaption: ScrollableTextFieldCaption!
     @IBOutlet var curveFactorLabel: NSTextField!
     var curveFactorVisible: Bool = false {
         didSet {
-            curveFactorField?.isHidden = !curveFactorVisible
-            curveFactorCaption?.isHidden = !curveFactorVisible
+            contrastCurveFactorField?.isHidden = !curveFactorVisible
+            contrastCurveFactorCaption?.isHidden = !curveFactorVisible
+            brightnessCurveFactorField?.isHidden = !curveFactorVisible
+            brightnessCurveFactorCaption?.isHidden = !curveFactorVisible
             curveFactorLabel?.isHidden = !curveFactorVisible
         }
     }
@@ -232,7 +236,8 @@ class ConfigurationViewController: NSViewController {
     weak var settingsController: SettingsPageController?
 
     var dayMomentsObserver: Cancellable?
-    var curveFactorObserver: Cancellable?
+    var contrastCurveFactorObserver: Cancellable?
+    var brightnessCurveFactorObserver: Cancellable?
     var locationObserver: Cancellable?
     var brightnessStepObserver: Cancellable?
     var syncPollingSecondsObserver: Cancellable?
@@ -256,7 +261,7 @@ class ConfigurationViewController: NSViewController {
         helpButtonStep?.helpText = HOTKEY_STEP_TOOLTIP
         helpButtonBottom?.helpText = SMOOTH_TRANSITION_TOOLTIP
 
-        let refFrame = curveFactorField.frame
+        let refFrame = contrastCurveFactorField.frame
         let refX = refFrame.maxX - (refFrame.width / 2)
 
         helpButton1?.helpText = CURVE_FACTOR_TOOLTIP
@@ -288,9 +293,14 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForCurveFactorChange() {
-        curveFactorObserver = curveFactorObserver ?? curveFactorPublisher.sink { [unowned self] change in
+        contrastCurveFactorObserver = contrastCurveFactorObserver ?? contrastCurveFactorPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
-                self?.curveFactorField?.doubleValue = change.newValue > 0 ? change.newValue : 1
+                self?.contrastCurveFactorField?.doubleValue = change.newValue > 0 ? change.newValue : 1
+            }
+        }
+        brightnessCurveFactorObserver = brightnessCurveFactorObserver ?? brightnessCurveFactorPublisher.sink { [unowned self] change in
+            mainThread { [weak self] in
+                self?.brightnessCurveFactorField?.doubleValue = change.newValue > 0 ? change.newValue : 1
             }
         }
     }
@@ -357,28 +367,50 @@ class ConfigurationViewController: NSViewController {
     }
 
     func setupCurveFactor() {
-        guard let field = curveFactorField, let caption = curveFactorCaption else { return }
+        guard let contrastField = contrastCurveFactorField, let contrastCaption = contrastCurveFactorCaption,
+              let brightnessField = brightnessCurveFactorField, let brightnessCaption = brightnessCurveFactorCaption else { return }
 
-        curveFactorField.decimalPoints = 1
-        curveFactorField.step = 0.1
+        contrastCurveFactorField.decimalPoints = 1
+        contrastCurveFactorField.step = 0.1
+        brightnessCurveFactorField.decimalPoints = 1
+        brightnessCurveFactorField.step = 0.1
 
         setupScrollableTextField(
-            field, caption: caption,
-            settingKeyDouble: Defaults.Keys.curveFactor,
+            contrastField, caption: contrastCaption,
+            settingKeyDouble: Defaults.Keys.contrastCurveFactor,
             lowerLimit: 0.1, upperLimit: 9.0,
             onMouseEnter: { [weak self] settingsController in
                 guard let self = self else { return }
                 settingsController?.updateDataset(
                     display: displayController.firstDisplay,
-                    factor: self.curveFactorField.doubleValue,
+                    contrastFactor: self.contrastCurveFactorField.doubleValue,
                     withAnimation: true
                 )
             },
             onValueChangedInstantDouble: { [weak self] value, settingsController in
-                settingsController?.updateDataset(display: displayController.firstDisplay, factor: value)
-                guard let field = self?.curveFactorField else { return }
-                field.step = value < 1 ? 0.01 : 0.1
-                field.decimalPoints = value < 1 ? 2 : 1
+                settingsController?.updateDataset(display: displayController.firstDisplay, contrastFactor: value)
+                guard let contrastField = self?.contrastCurveFactorField else { return }
+                contrastField.step = value < 1 ? 0.01 : 0.1
+                contrastField.decimalPoints = value < 1 ? 2 : 1
+            }
+        )
+        setupScrollableTextField(
+            brightnessField, caption: brightnessCaption,
+            settingKeyDouble: Defaults.Keys.brightnessCurveFactor,
+            lowerLimit: 0.1, upperLimit: 9.0,
+            onMouseEnter: { [weak self] settingsController in
+                guard let self = self else { return }
+                settingsController?.updateDataset(
+                    display: displayController.firstDisplay,
+                    brightnessFactor: self.brightnessCurveFactorField.doubleValue,
+                    withAnimation: true
+                )
+            },
+            onValueChangedInstantDouble: { [weak self] value, settingsController in
+                settingsController?.updateDataset(display: displayController.firstDisplay, brightnessFactor: value)
+                guard let brightnessField = self?.brightnessCurveFactorField else { return }
+                brightnessField.step = value < 1 ? 0.01 : 0.1
+                brightnessField.decimalPoints = value < 1 ? 2 : 1
             }
         )
     }
