@@ -14,6 +14,7 @@ import Defaults
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .appExceptions,
+    .mediaKeysNotified,
     .brightnessKeysEnabled,
     .brightnessOnInputChange,
     .brightnessStep,
@@ -353,6 +354,7 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>) {
 func initCache() {
     cacheKey(.curveFactor)
     cacheKey(.brightnessKeysEnabled)
+    cacheKey(.mediaKeysNotified)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
     cacheKey(.didScrollTextField)
@@ -409,6 +411,7 @@ extension Defaults.Keys {
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let curveFactor = Key<Double>("curveFactor", default: 0.5)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
+    static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)

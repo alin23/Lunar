@@ -212,6 +212,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
 
+    func acquirePrivileges(_ onAcquire: @escaping (() -> Void)) {
+        let options = [
+            kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
+        ]
+        let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
+
+        if accessEnabled {
+            onAcquire()
+            return
+        }
+
+        asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") {
+            if AXIsProcessTrusted() {
+                onAcquire()
+                cancelAsyncRecurringTask("AXPermissionsChecker")
+            }
+        }
+    }
+
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
             guard let appPath = Path(Bundle.main.bundlePath),
@@ -626,7 +645,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
         }
 
-        startOrRestartMediaKeyTap()
+        if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
+            acquirePrivileges {
+                guard !CachedDefaults[.mediaKeysNotified] else { return }
+                CachedDefaults[.mediaKeysNotified] = true
+
+                var body = "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
+
+                if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
+                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
+                } else if CachedDefaults[.brightnessKeysEnabled] {
+                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness")
+                } else {
+                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "volume")
+                }
+                notify(identifier: "mediaKeysListener", title: "Lunar is now listening for media keys", body: body)
+            }
+            startOrRestartMediaKeyTap()
+        }
 
         displayController.displays = displayController.getDisplaysLock.around { DisplayController.getDisplays() }
         displayController.addSentryData()
