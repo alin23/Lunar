@@ -469,7 +469,8 @@ class DisplayViewController: NSViewController {
         maxContrast: UInt8? = nil,
         currentBrightness: UInt8? = nil,
         currentContrast: UInt8? = nil,
-        factor: Double? = nil,
+        brightnessFactor: Double? = nil,
+        contrastFactor: Double? = nil,
         userBrightness: [Int: Int]? = nil,
         userContrast: [Int: Int]? = nil,
         force: Bool = false
@@ -483,7 +484,7 @@ class DisplayViewController: NSViewController {
         switch displayController.adaptiveMode {
         case let mode as LocationMode:
             let points = mode.getBrightnessContrastBatch(
-                display: display, factor: factor,
+                display: display, brightnessFactor: brightnessFactor, contrastFactor: contrastFactor,
                 minBrightness: minBrightness, maxBrightness: maxBrightness,
                 minContrast: minContrast, maxContrast: maxContrast,
                 userBrightness: userBrightness, userContrast: userContrast

@@ -124,7 +124,8 @@ struct DataPoint {
     var last: Int
 }
 
-var curveFactor: Double = 1
+var contrastCurveFactor: Double = 1
+var brightnessCurveFactor: Double = 1
 
 protocol AdaptiveMode: AnyObject {
     var force: Bool { get set }
@@ -200,16 +201,18 @@ extension AdaptiveMode {
         var userValues = userValues ?? displayUserValues
 
         var dataPoint: DataPoint
+        var curveFactor: Float
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
+            curveFactor = factor?.f ?? brightnessCurveFactor.f
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
+            curveFactor = factor?.f ?? contrastCurveFactor.f
         }
 
-        let factor = Float(factor ?? curveFactor)
-        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: factor > 0 ? factor : 1, offset: offset?.f ?? 0.0)
+        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: curveFactor > 0 ? curveFactor : 1, offset: offset?.f ?? 0.0)
 
         return mapNumberSIMD(
             curve,
@@ -224,12 +227,15 @@ extension AdaptiveMode {
         let (value, minValue, maxValue, userValues) = display.values(monitorValue, modeKey: key)
 
         var dataPoint: DataPoint
+        var curveFactor: Double
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
+            curveFactor = factor ?? brightnessCurveFactor
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
+            curveFactor = factor ?? contrastCurveFactor
         }
 
         var newValue: Double
@@ -254,9 +260,7 @@ extension AdaptiveMode {
                 newValue = externalLow
             } else {
                 newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
-
-                let factor = factor ?? curveFactor
-                newValue = adjustCurve(newValue, factor: factor > 0 ? factor : 1, minVal: externalLow, maxVal: externalHigh)
+                newValue = adjustCurve(newValue, factor: curveFactor > 0 ? curveFactor : 1, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
                 log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])

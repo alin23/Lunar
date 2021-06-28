@@ -26,7 +26,8 @@ class SettingsPageController: NSViewController {
 
     func updateDataset(
         display: Display,
-        factor: Double? = nil,
+        brightnessFactor: Double? = nil,
+        contrastFactor: Double? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false,
@@ -62,7 +63,7 @@ class SettingsPageController: NSViewController {
                     .brightness(0),
                     display: display,
                     offset: appBrightnessOffset.d,
-                    factor: factor
+                    factor: brightnessFactor
                 )
             ) {
                 brightnessChartEntry[x].y = b
@@ -73,14 +74,14 @@ class SettingsPageController: NSViewController {
                     .contrast(0),
                     display: display,
                     offset: appContrastOffset.d,
-                    factor: factor
+                    factor: contrastFactor
                 )
             ) {
                 contrastChartEntry[x].y = b
             }
         case let mode as LocationMode:
             let points = mode.getBrightnessContrastBatch(
-                display: display, factor: factor,
+                display: display, brightnessFactor: brightnessFactor, contrastFactor: contrastFactor,
                 appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
             )
             let maxValues = min(mode.maxChartDataPoints, points.brightness.count, points.contrast.count, brightnessChartEntry.count, contrastChartEntry.count)
@@ -102,7 +103,7 @@ class SettingsPageController: NSViewController {
                     .brightness(0),
                     display: display,
                     offset: appBrightnessOffset.d,
-                    factor: factor
+                    factor: brightnessFactor
                 )
             ) {
                 brightnessChartEntry[x].y = b
@@ -113,7 +114,7 @@ class SettingsPageController: NSViewController {
                     .contrast(0),
                     display: display,
                     offset: appContrastOffset.d,
-                    factor: factor
+                    factor: contrastFactor
                 )
             ) {
                 contrastChartEntry[x].y = b

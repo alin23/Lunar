@@ -125,27 +125,27 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     }
 
     public func netServiceBrowserWillSearch(_: NetServiceBrowser) {
-        Logger.info("Browser will search")
+//        Logger.info("Browser will search")
         browser?.isSearching = true
     }
 
     public func netServiceBrowserDidStopSearch(_: NetServiceBrowser) {
-        Logger.info("Browser stopped search")
+//        Logger.info("Browser stopped search")
         browser?.isSearching = false
     }
 
-    public func netServiceBrowser(_: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
-        Logger.debug("Browser didn't search \(errorDict)")
+    public func netServiceBrowser(_: NetServiceBrowser, didNotSearch _: [String: NSNumber]) {
+//        Logger.debug("Browser didn't search \(errorDict)")
         browser?.isSearching = false
     }
 
     public func netServiceBrowser(_: NetServiceBrowser, didRemove service: NetService, moreComing _: Bool) {
-        Logger.info("Service removed \(service)")
+//        Logger.info("Service removed \(service)")
         browser?.serviceRemoved(service)
     }
 
     public func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
-        Logger.info("Service updated txt records \(sender)")
+//        Logger.info("Service updated txt records \(sender)")
         browser?.serviceUpdatedTXT(sender, data)
     }
 }
