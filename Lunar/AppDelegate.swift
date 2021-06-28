@@ -444,12 +444,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             asyncAfter(ms: 2000, uniqueTaskKey: "didChangeScreenParametersHandler") {
                 displayController.manageClamshellMode()
                 displayController.resetDisplayList()
-
-                asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
-                    self.disableFaceLight()
-                    NetworkControl.resetState()
-                    DDCControl.resetState()
-                }
+            }
+            asyncAfter(ms: 5000, uniqueTaskKey: "resetStates") {
+                self.disableFaceLight()
+                NetworkControl.resetState()
+                DDCControl.resetState()
             }
         case NSWorkspace.screensDidWakeNotification:
             log.debug("Screens woke up")
@@ -460,16 +459,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     self.startValuesReaderThread()
                 }
                 _ = displayController.adaptiveMode.watch()
+            }
+            if CachedDefaults[.reapplyValuesAfterWake] {
+                asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
+                    NetworkControl.resetState()
+                    DDCControl.resetState()
 
-                if CachedDefaults[.reapplyValuesAfterWake] {
-                    asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-                        NetworkControl.resetState()
-                        DDCControl.resetState()
-
-                        for _ in 1 ... 5 {
-                            displayController.adaptBrightness(force: true)
-                            sleep(3)
-                        }
+                    for _ in 1 ... 5 {
+                        displayController.adaptBrightness(force: true)
+                        sleep(3)
                     }
                 }
             }

@@ -676,7 +676,7 @@ enum ValueType {
                     activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
                     hasNetworkControl = control is NetworkControl || alternativeControlForCoreDisplay is NetworkControl
                 }
-                if oldValue is GammaControl, !(control is GammaControl) {
+                if !(control is GammaControl) {
                     resetGamma()
                 }
                 if !(oldValue is GammaControl), control is GammaControl {

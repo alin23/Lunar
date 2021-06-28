@@ -265,7 +265,8 @@ class NetworkControl: Control {
             let displayService = controllersForDisplay.first(where: { _, displayService in
                 service == displayService.service
             })
-            if let serial = displayService?.key, let controller = displayService?.value,
+            if !screensSleeping.load(ordering: .relaxed),
+               let serial = displayService?.key, let controller = displayService?.value,
                let display = displayController.displays.values.first(where: { $0.serial == serial })
             {
                 let serviceName = controller.url?.absoluteString ?? "\(service.hostName ?? service.name):\(service.port)"
@@ -292,6 +293,7 @@ class NetworkControl: Control {
     }
 
     static func setDisplayPower(_ power: Bool) {
+        guard !screensSleeping.load(ordering: .relaxed) else { return }
         sendToAllControllers { url in
             _ = try? query(url: url / "display-power" / power.i, wait: false)
         }
@@ -340,7 +342,7 @@ class NetworkControl: Control {
         }
 
         let setter = DispatchWorkItem(name: "Network Control Setter \(controlID)(\(value)") { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, !screensSleeping.load(ordering: .relaxed) else { return }
 
             defer {
                 self.manageSendingState(for: controlID, sending: false)
@@ -378,6 +380,8 @@ class NetworkControl: Control {
     }
 
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
+        guard !screensSleeping.load(ordering: .relaxed) else { return nil }
+
         _ = setterTasksSemaphore.wait(for: 5.seconds)
 
         guard let controller = NetworkControl.controllersForDisplay[display.serial],

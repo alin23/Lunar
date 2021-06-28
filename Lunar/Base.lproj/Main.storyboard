@@ -2779,20 +2779,8 @@ when dock and menubar icons are hidden</string>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="eik-cf-0eC"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ABP-R2-5DB" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="857" y="198" width="66" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tWA-oD-hUK">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetDisplay:" target="1Bn-Ca-ETm" id="1OB-Uh-cKL"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Ykg-xh-Vyo"/>
-                                </connections>
-                            </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kAQ-3d-HnF" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="832" y="203" width="16" height="16"/>
+                                <rect key="frame" x="835" y="203" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2914,6 +2902,72 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE">
+                                <rect key="frame" x="861" y="197" width="73" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="99" imageScaling="proportionallyDown" inset="2" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="zQp-JQ-yds">
+                                        <items>
+                                            <menuItem title="Algorithm Curve" toolTip="Resets the learned luminance curve for both brightness and contrast for the current active mode." id="pOl-lx-hrI">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Network Control" tag="1" toolTip="Removes any associated network controllers and starts a new search for controllers on the local network." id="coO-XG-49E">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="DDC State" tag="2" toolTip="Resets any non-responsive read/write property counters and retries remaining DDC commands." id="fMG-Al-5It">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Brightness and Contrast" tag="3" toolTip="Resets brightness and contrast to whatever the monitor defines as the default value. Doesn't work on all monitors." id="8uU-Ru-ggC">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Full Reset" tag="4" id="AR5-5L-cEf">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="Full Reset">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.96781994047619047" green="0.25207270408163263" blue="0.17745535714285715" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <font key="NSFont" metaFont="systemBlack" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <string key="toolTip">This will reset the following settings for this display:
+  • Everything you have manually adjusted using the monitor's physical buttons/controls
+  • The algorithm curve that Lunar learned from your adjustments
+  • The enabled controls
+  • The "Always Use Network Control" setting
+  • The "Always Fallback to Gamma" setting
+  • The min/max brightness/contrast values</string>
+                                            </menuItem>
+                                            <menuItem title="Reset" state="on" tag="99" hidden="YES" id="RBL-6F-ZwG">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="Reset">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.0" green="0.2196078431372549" blue="0.31372549019607843" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <font key="NSFont" size="11" name="Menlo-Bold"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                    <connections>
+                                        <action selector="reset:" target="1Bn-Ca-ETm" id="TEo-OZ-X1P"/>
+                                    </connections>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="cdq-Z4-ngi"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="cdq-Z4-ngi" id="ZKW-cJ-S0o">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
@@ -2930,7 +2984,6 @@ and contrast to their highest values</string>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
                         <outlet property="inputDropdown" destination="brT-Q5-NwT" id="QQa-4u-t0q"/>
                         <outlet property="nonResponsiveTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
-                        <outlet property="resetButton" destination="ABP-R2-5DB" id="jNI-Hj-h3T"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                     </connections>
@@ -4700,7 +4753,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Tf-I7-BlT">
-                                <rect key="frame" x="64" y="45" width="149" height="17"/>
+                                <rect key="frame" x="64" y="65" width="149" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -4709,7 +4762,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-3U-xyN">
-                                <rect key="frame" x="66" y="18" width="49" height="16"/>
+                                <rect key="frame" x="66" y="38" width="49" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Paused" id="UE7-F8-Nxu">
                                     <font key="font" metaFont="system"/>
@@ -4718,7 +4771,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjJ-hC-owe">
-                                <rect key="frame" x="165" y="18" width="54" height="16"/>
+                                <rect key="frame" x="165" y="38" width="54" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Running" id="eLZ-QT-H2b">
                                     <font key="font" metaFont="system"/>
@@ -4727,7 +4780,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="YBv-Rr-ica" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="214" y="46" width="16" height="16"/>
+                                <rect key="frame" x="214" y="66" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -4740,7 +4793,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wv7-Y2-jNx" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="119" y="13" width="45" height="26"/>
+                                <rect key="frame" x="119" y="33" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -4755,7 +4808,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UZP-Jf-WqU">
-                                <rect key="frame" x="89" y="151" width="103" height="21"/>
+                                <rect key="frame" x="89" y="171" width="103" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC Limits" id="Aiw-fA-orj">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
@@ -4764,7 +4817,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="noT-O5-m43" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="199" y="159" width="16" height="16"/>
+                                <rect key="frame" x="199" y="179" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -4777,7 +4830,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7QF-Vo-iSl" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="1" y="105" width="88" height="40"/>
+                                <rect key="frame" x="1" y="125" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="SOB-uL-nRn" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -4803,7 +4856,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tGg-nq-Ydd" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="85" width="90" height="20"/>
+                                <rect key="frame" x="0.0" y="105" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="ZEw-Cm-Lau">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -4812,7 +4865,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VHh-df-D7y" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="97" y="105" width="88" height="40"/>
+                                <rect key="frame" x="97" y="125" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="d1b-V3-0eP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -4838,7 +4891,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Ds-JO-8Wh" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="96" y="85" width="90" height="20"/>
+                                <rect key="frame" x="96" y="105" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="cw1-KK-1ij">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -4847,7 +4900,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gvz-gU-x6v" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="193" y="105" width="88" height="40"/>
+                                <rect key="frame" x="193" y="125" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="42d-PT-EF3" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -4873,7 +4926,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KF3-iG-gwv" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="192" y="85" width="90" height="20"/>
+                                <rect key="frame" x="192" y="105" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="BYK-me-boa">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -4882,35 +4935,11 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5io-i4-3Yv">
-                                <rect key="frame" x="42" y="181" width="196" height="5"/>
+                                <rect key="frame" x="42" y="201" width="196" height="5"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j7Q-He-uc6" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="17" y="258" width="154" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset Network Control" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="SnN-YI-Ytn">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetNetworkController:" target="21a-h6-6He" id="vpo-fu-6jV"/>
-                                    <binding destination="21a-h6-6He" name="enabled" keyPath="self.networkEnabled" id="a0N-Yw-lPY"/>
-                                </connections>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G0C-wy-YwY" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="174" y="258" width="86" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset DDC" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="fa6-tN-dwu">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetDDC:" target="21a-h6-6He" id="0eq-A8-vgp"/>
-                                    <binding destination="21a-h6-6He" name="enabled" keyPath="self.ddcEnabled" id="lV8-Gt-GDp"/>
-                                </connections>
-                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
-                                <rect key="frame" x="82" y="233" width="117" height="17"/>
+                                <rect key="frame" x="82" y="253" width="117" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -4919,7 +4948,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
-                                <rect key="frame" x="59" y="206" width="47" height="16"/>
+                                <rect key="frame" x="59" y="226" width="47" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Target" id="tHM-5a-Ojq">
                                     <font key="font" metaFont="system"/>
@@ -4928,7 +4957,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
-                                <rect key="frame" x="158" y="206" width="43" height="16"/>
+                                <rect key="frame" x="158" y="226" width="43" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Source" id="KKZ-a3-9z1">
                                     <font key="font" metaFont="system"/>
@@ -4937,7 +4966,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EFB-4R-z3b" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="207" y="234" width="16" height="16"/>
+                                <rect key="frame" x="207" y="254" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -4950,7 +4979,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="112" y="201" width="45" height="26"/>
+                                <rect key="frame" x="112" y="221" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -4978,8 +5007,6 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                         <outlet property="maxDDCContrastField" destination="VHh-df-D7y" id="ZiJ-ZM-rhO"/>
                         <outlet property="maxDDCVolumeField" destination="Gvz-gU-x6v" id="kPF-df-ea4"/>
                         <outlet property="networkControlCheckbox" destination="Kap-E3-AbC" id="dmT-02-wDv"/>
-                        <outlet property="resetDDCButton" destination="G0C-wy-YwY" id="zVs-fW-A3r"/>
-                        <outlet property="resetNetworkControlButton" destination="j7Q-He-uc6" id="lzW-wj-Qbh"/>
                         <outlet property="syncModeRoleToggle" destination="VNJ-7E-pDo" id="cjW-cx-8Y7"/>
                     </connections>
                 </viewController>
