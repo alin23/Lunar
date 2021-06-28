@@ -46,8 +46,6 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var coreDisplayControlCheckbox: NSButton!
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
-    @IBOutlet var resetNetworkControlButton: ResetButton!
-    @IBOutlet var resetDDCButton: ResetButton!
 
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
@@ -175,42 +173,6 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
-    @IBAction func resetDDC(_: Any) {
-        asyncAfter(ms: 10, uniqueTaskKey: "resetDDCTask") { [weak self] in
-            guard let self = self, let display = self.display else { return }
-            if display.control is DDCControl {
-                display.control.resetState()
-            } else {
-                DDCControl(display: display).resetState()
-            }
-
-            self.resetControl()
-
-            for _ in 1 ... 5 {
-                displayController.adaptBrightness(force: true)
-                sleep(3)
-            }
-        }
-    }
-
-    @IBAction func resetNetworkController(_: Any) {
-        asyncAfter(ms: 10, uniqueTaskKey: "resetNetworkControlTask") { [weak self] in
-            guard let self = self, let display = self.display else { return }
-            if display.control is NetworkControl {
-                display.control.resetState()
-            } else {
-                NetworkControl.resetState(serial: display.serial)
-            }
-
-            self.resetControl()
-
-            for _ in 1 ... 5 {
-                displayController.adaptBrightness(force: true)
-                sleep(3)
-            }
-        }
-    }
-
     func ensureAtLeastOneControlEnabled() {
         guard let display = display else { return }
         if display.enabledControls.values.filter({ enabled in enabled }).count <= 1 {
@@ -270,8 +232,6 @@ class SettingsPopoverController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        resetNetworkControlButton?.page = .hotkeysReset
-        resetDDCButton?.page = .hotkeysReset
 
         syncModeRoleHelpButton?.helpText = SYNC_MODE_ROLE_HELP_TEXT
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
