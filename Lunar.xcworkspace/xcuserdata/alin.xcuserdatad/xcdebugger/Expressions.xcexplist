@@ -6,6 +6,9 @@
          contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
+         contextName = "activeWindow(on:):Util.swift">
+      </ContextState>
+      <ContextState
          contextName = "BrightnessContrastChartView.setup(mode:):BrightnessContrastChartView.swift">
          <PersistentStrings>
             <PersistentString
@@ -28,13 +31,16 @@
          contextName = "BrightnessContrastChartView.highlightCurrentValues(adaptiveMode:for:):BrightnessContrastChartView.swift">
       </ContextState>
       <ContextState
-         contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
-      </ContextState>
-      <ContextState
          contextName = "DisplayController.appBrightnessOffset.getter:DisplayController.swift">
       </ContextState>
       <ContextState
+         contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in windowList(for:onscreen:opaque:withTitle:levels:appException:runningApp:):Util.swift">
       </ContextState>
       <ContextState
          contextName = "static ParsableArguments.exit(withError:):ParsableArguments.swift">
@@ -44,6 +50,9 @@
          <PersistentStrings>
             <PersistentString
                value = "NSScreen.screens">
+            </PersistentString>
+            <PersistentString
+               value = "windowList(for: NSRunningApplication.runningApplications(withBundleIdentifier: &quot;org.videolan.vlc&quot;).first!)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -56,10 +65,13 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "DisplayController.appBrightnessContrastOffset(for:):DisplayController.swift">
+      </ContextState>
+      <ContextState
          contextName = "HotkeyView.recordView(_:didChangeKeyCombo:):HotKeyView.swift">
       </ContextState>
       <ContextState
-         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
+         contextName = "activeWindow():Util.swift">
       </ContextState>
       <ContextState
          contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
@@ -68,7 +80,7 @@
          contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
       </ContextState>
       <ContextState
-         contextName = "activeWindow():Util.swift">
+         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
       </ContextState>
       <ContextState
          contextName = "HotkeyButton.mouseDown(with:):HotkeyButton.swift">

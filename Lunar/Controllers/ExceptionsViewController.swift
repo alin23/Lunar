@@ -39,24 +39,24 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         dialog.treatsFilePackagesAsDirectories = false
         dialog.directoryURL = URL(string: "file:///Applications")
 
-        if dialog.runModal() == NSApplication.ModalResponse.OK {
-            let result = dialog.url
+        guard dialog.runModal() == NSApplication.ModalResponse.OK,
+              let res = dialog.url, let bundle = Bundle(url: res)
+        else { return }
 
-            if let res = result {
-                let bundle = Bundle(url: res)
-                guard let name = bundle?.infoDictionary?["CFBundleName"] as? String,
-                      let id = bundle?.bundleIdentifier
-                else {
-                    log.warning("Bundle for \(res.path) does not contain required fields")
-                    return
-                }
-                if !(CachedDefaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
-                    let app = AppException(identifier: id, name: name)
-                    DataStore.storeAppException(app: app)
-                }
-            }
-        } else {
+        guard let name = bundle.infoDictionary?["CFBundleName"] as? String,
+              let id = bundle.bundleIdentifier
+        else {
+            log.warning("Bundle for \(res.path) does not contain required fields")
             return
+        }
+
+        if !(CachedDefaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
+            let app = AppException(identifier: id, name: name)
+            DataStore.storeAppException(app: app)
+            appDelegate().acquirePrivileges(
+                notificationTitle: "Lunar can now watch for app exceptions",
+                notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+            )
         }
     }
 
@@ -73,7 +73,12 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             addAppButtonShadow = button.shadow
             button.shadow = nil
 
-            addAppButtonTrackingArea = NSTrackingArea(rect: button.visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+            addAppButtonTrackingArea = NSTrackingArea(
+                rect: button.visibleRect,
+                options: [.mouseEnteredAndExited, .activeInActiveApp],
+                owner: self,
+                userInfo: nil
+            )
             button.addTrackingArea(addAppButtonTrackingArea)
         }
     }
