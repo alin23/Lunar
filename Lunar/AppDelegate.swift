@@ -86,6 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var diagnosticsWindowController: ModernWindowController?
     var gammaWindowController: ModernWindowController?
 
+    var observers: Set<AnyCancellable> = []
     var secureObserver: Cancellable?
 
     var valuesReaderThread: CFRunLoopTimer?
@@ -415,6 +416,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             name: NSWorkspace.screensDidSleepNotification,
             object: nil
         )
+        NSWorkspace.shared.publisher(for: \.frontmostApplication).removeDuplicates().sink { _ in
+            displayController.adaptBrightness(force: true)
+        }.store(in: &observers)
     }
 
     func updateDataPointObserver() {
@@ -447,6 +451,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         switch notification.name {
         case NSApplication.didChangeScreenParametersNotification:
             log.debug("Screen configuration changed")
+
+            displayController.adaptBrightness(force: true)
 
             let newScreenIDs = Set(NSScreen.screens.compactMap(\.displayID))
             let newLidClosed = IsLidClosed()
@@ -667,7 +673,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 guard !CachedDefaults[.mediaKeysNotified] else { return }
                 CachedDefaults[.mediaKeysNotified] = true
 
-                var body = "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
+                var body =
+                    "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
 
                 if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
                     body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
@@ -689,6 +696,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             setLogPath(logPath, logPath.count)
         }
 
+        asyncEvery(3.seconds) {
+            #if DEBUG
+                log.debug("Active window", context: activeWindow())
+            #endif
+        }
         handleDaemon()
 
         initDisplayControllerActivity()

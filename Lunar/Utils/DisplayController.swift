@@ -70,22 +70,19 @@ class DisplayController {
     var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
-    var appBrightnessOffset: Int {
-        guard let app = runningAppExceptions?.last else { return 0 }
+    func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
+        guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
 
-        #if DEBUG
-            if let apps = app.runningApp {
-                for app in apps {
-                    log.debug("App exception", context: ["name": app.localizedName, "isActive": app.isActive, "isHidden": app.isHidden, "PID": app.processIdentifier])
-                }
-            }
-        #endif
-        return app.brightness.i
-    }
+        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
+            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
+            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
+                windowList(for: a, onscreen: true, opaque: true, levels: [.normal], appException: app)
+            }.joined()
+        }.joined()
 
-    var appContrastOffset: Int {
-        guard let app = runningAppExceptions?.last else { return 0 }
-        return app.contrast.i
+        guard let app = windows.first(where: { w in w.screen == screen })?.appException else { return (0, 0) }
+
+        return (app.brightness.i, app.contrast.i)
     }
 
     var firstDisplay: Display {
@@ -357,7 +354,8 @@ class DisplayController {
                     }
                 } else {
                     self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                        guard !screensSleeping.load(ordering: .relaxed), let self = self, !CachedDefaults[.overrideAdaptiveMode] else { return }
+                        guard !screensSleeping.load(ordering: .relaxed), let self = self,
+                              !CachedDefaults[.overrideAdaptiveMode] else { return }
                         self.autoAdaptMode()
                     }
                 }
