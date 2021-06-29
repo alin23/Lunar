@@ -31,6 +31,9 @@
          contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
       </ContextState>
       <ContextState
+         contextName = "DisplayController.appBrightnessOffset.getter:DisplayController.swift">
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
@@ -63,6 +66,9 @@
       </ContextState>
       <ContextState
          contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "activeWindow():Util.swift">
       </ContextState>
       <ContextState
          contextName = "HotkeyButton.mouseDown(with:):HotkeyButton.swift">
@@ -171,6 +177,14 @@
       </ContextState>
       <ContextState
          contextName = "static RelativeFormatter.format(date:to:style:locale:):RelativeFormatter.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Window.init(from:):Util.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dict[kCGWindowName as String]">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>

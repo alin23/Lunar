@@ -556,7 +556,6 @@ enum ValueType {
                 showOperationInProgress(screen: screen)
             }
             asyncAfter(ms: 5000, uniqueTaskKey: name) { [weak self] in
-
                 self?.setValue(false, forKey: name)
 
                 guard let condition = self?.value(
@@ -567,6 +566,7 @@ enum ValueType {
                     return
                 }
                 condition.broadcast()
+                hideOperationInProgress()
             }
         }
     }
