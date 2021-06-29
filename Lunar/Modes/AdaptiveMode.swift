@@ -170,7 +170,12 @@ extension AdaptiveMode {
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
 
-    @inline(__always) func adjustCurveSIMD(_ value: [Double], factor: Double, minVal: Double = MIN_BRIGHTNESS.d, maxVal: Double = MAX_BRIGHTNESS.d) -> [Double] {
+    @inline(__always) func adjustCurveSIMD(
+        _ value: [Double],
+        factor: Double,
+        minVal: Double = MIN_BRIGHTNESS.d,
+        maxVal: Double = MAX_BRIGHTNESS.d
+    ) -> [Double] {
         guard maxVal != minVal else {
             return value
         }
@@ -179,7 +184,12 @@ extension AdaptiveMode {
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
 
-    @inline(__always) func adjustCurveSIMD(_ value: [Float], factor: Float, minVal: Float = MIN_BRIGHTNESS.f, maxVal: Float = MAX_BRIGHTNESS.f) -> [Float] {
+    @inline(__always) func adjustCurveSIMD(
+        _ value: [Float],
+        factor: Float,
+        minVal: Float = MIN_BRIGHTNESS.f,
+        maxVal: Float = MAX_BRIGHTNESS.f
+    ) -> [Float] {
         guard maxVal != minVal else {
             return value
         }
@@ -197,7 +207,7 @@ extension AdaptiveMode {
         factor: Double? = nil,
         userValues: [Int: Int]? = nil
     ) -> [Double] {
-        let (_, minValue, maxValue, displayUserValues) = display.values(monitorValue, modeKey: key)
+        let (value, minValue, maxValue, displayUserValues) = display.values(monitorValue, modeKey: key)
         var userValues = userValues ?? displayUserValues
 
         var dataPoint: DataPoint
@@ -212,15 +222,38 @@ extension AdaptiveMode {
             curveFactor = factor?.f ?? contrastCurveFactor.f
         }
 
-        let curve = interpolate(values: &userValues, dataPoint: dataPoint, factor: curveFactor > 0 ? curveFactor : 1, offset: offset?.f ?? 0.0)
+        let curve = interpolate(
+            values: &userValues,
+            dataPoint: dataPoint,
+            factor: curveFactor > 0 ? curveFactor : 1,
+            offset: offset?.f ?? 0.0
+        )
 
-        return mapNumberSIMD(
+        #if DEBUG
+            if curve.contains(where: \.isNaN) {
+                log.error(
+                    "NaN value?? Whyy?? WHAT DID I DO??",
+                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+                )
+            }
+        #endif
+
+        let values = mapNumberSIMD(
             curve,
             fromLow: MIN_BRIGHTNESS.d,
             fromHigh: MAX_BRIGHTNESS.d,
             toLow: minVal ?? minValue,
             toHigh: maxVal ?? maxValue
         )
+        #if DEBUG
+            if values.contains(where: \.isNaN) {
+                log.error(
+                    "NaN value?? Whyy?? WHAT DID I DO??",
+                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+                )
+            }
+        #endif
+        return values
     }
 
     func interpolate(_ monitorValue: MonitorValue, display: Display, offset: Float = 0.0, factor: Double? = nil) -> Double {
@@ -263,7 +296,10 @@ extension AdaptiveMode {
                 newValue = adjustCurve(newValue, factor: curveFactor > 0 ? curveFactor : 1, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
-                log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+                log.error(
+                    "NaN value?? Whyy?? WHAT DID I DO??",
+                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+                )
                 newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
             }
         }
@@ -271,7 +307,10 @@ extension AdaptiveMode {
         newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
 
         if newValue.isNaN {
-            log.error("NaN value?? WHAAT?? AGAIN?!", context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset])
+            log.error(
+                "NaN value?? WHAAT?? AGAIN?!",
+                context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+            )
             newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
         }
 

@@ -300,7 +300,7 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            displayEncodingLock.around {
+            displayEncodingLock.around(ignoreMainThread: true) {
                 let lock = locks[key.name] ?? Self.lock
                 return lock.around {
                     if let value = cache[key.name]?.value as? Value {
@@ -312,7 +312,7 @@ enum CachedDefaults {
             }
         }
         set {
-            displayEncodingLock.around {
+            displayEncodingLock.around(ignoreMainThread: true) {
                 guard let lock = locks[key.name] else {
                     Self.lock.around {
                         cache[key.name] = AnyCodable(newValue)

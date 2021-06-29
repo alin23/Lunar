@@ -2996,14 +2996,6 @@ and contrast to their highest values</string>
                                         <action selector="reset:" target="1Bn-Ca-ETm" id="TEo-OZ-X1P"/>
                                     </connections>
                                 </popUpButtonCell>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="cdq-Z4-ngi" id="ZKW-cJ-S0o">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="cdq-Z4-ngi"/>
-                                </connections>
                             </popUpButton>
                         </subviews>
                     </view>
@@ -3563,7 +3555,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="400" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -3583,7 +3575,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="HbC-w6-tw4">
-                                                            <rect key="frame" x="8" y="10" width="124" height="75"/>
+                                                            <rect key="frame" x="9" y="10" width="124" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbk-Gm-ehs" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -3646,7 +3638,7 @@ and contrast to their highest values</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="sUH-3g-BTj">
-                                                            <rect key="frame" x="132" y="10" width="140" height="75"/>
+                                                            <rect key="frame" x="133" y="10" width="140" height="75"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">

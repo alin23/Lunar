@@ -13,6 +13,14 @@ class ExceptionsView: NSTableView {
         super.draw(dirtyRect)
     }
 
+    override func didRemove(_ rowView: NSTableRowView, forRow _: Int) {
+        guard let app = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? AppException
+        else { return }
+
+        displayController.runningAppExceptions.removeAll(where: { $0.identifier == app.identifier })
+        displayController.adaptBrightness(force: true)
+    }
+
     override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
         guard let app = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? AppException,
               let scrollableBrightness = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
@@ -35,50 +43,56 @@ class ExceptionsView: NSTableView {
         scrollableContrast.onValueChanged = { [weak app] value in
             app?.contrast = value.i8
         }
-        if let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController {
-            if let controller = exceptionsController.parent?.parent as? SettingsPageController {
-                scrollableBrightness.onValueChangedInstant = { [weak controller, weak scrollableContrast] value in
-                    guard let scrollableContrast = scrollableContrast, let controller = controller else { return }
-                    controller.updateDataset(
-                        display: displayController.firstDisplay,
-                        appBrightnessOffset: value,
-                        appContrastOffset: scrollableContrast.integerValue
-                    )
-                }
-                scrollableContrast.onValueChangedInstant = { [weak controller, weak scrollableBrightness] value in
-                    guard let scrollableBrightness = scrollableBrightness, let controller = controller else { return }
-                    controller.updateDataset(
-                        display: displayController.firstDisplay,
-                        appBrightnessOffset: scrollableBrightness.integerValue,
-                        appContrastOffset: value
-                    )
-                }
 
-                scrollableBrightness.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
-                          let controller = controller else { return }
-                    let brightnessOffset = scrollableBrightness.integerValue
-                    let contrastOffset = scrollableContrast.integerValue
-                    controller.updateDataset(
-                        display: displayController.firstDisplay,
-                        appBrightnessOffset: brightnessOffset,
-                        appContrastOffset: contrastOffset,
-                        withAnimation: true
-                    )
-                }
-                scrollableContrast.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-                    guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
-                          let controller = controller else { return }
-                    let brightnessOffset = scrollableBrightness.integerValue
-                    let contrastOffset = scrollableContrast.integerValue
-                    controller.updateDataset(
-                        display: displayController.firstDisplay,
-                        appBrightnessOffset: brightnessOffset,
-                        appContrastOffset: contrastOffset,
-                        withAnimation: true
-                    )
-                }
-            }
+        guard let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController,
+              let controller = exceptionsController.parent?.parent as? SettingsPageController else { return }
+
+        scrollableBrightness.onValueChangedInstant = { [weak controller, weak scrollableContrast] value in
+            guard let scrollableContrast = scrollableContrast, let controller = controller else { return }
+            controller.updateDataset(
+                display: displayController.firstDisplay,
+                appBrightnessOffset: value,
+                appContrastOffset: scrollableContrast.integerValue
+            )
+        }
+        scrollableContrast.onValueChangedInstant = { [weak controller, weak scrollableBrightness] value in
+            guard let scrollableBrightness = scrollableBrightness, let controller = controller else { return }
+            controller.updateDataset(
+                display: displayController.firstDisplay,
+                appBrightnessOffset: scrollableBrightness.integerValue,
+                appContrastOffset: value
+            )
+        }
+
+        scrollableBrightness.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
+            guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
+                  let controller = controller else { return }
+            let brightnessOffset = scrollableBrightness.integerValue
+            let contrastOffset = scrollableContrast.integerValue
+            controller.updateDataset(
+                display: displayController.firstDisplay,
+                appBrightnessOffset: brightnessOffset,
+                appContrastOffset: contrastOffset,
+                withAnimation: true
+            )
+        }
+        scrollableContrast.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
+            guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
+                  let controller = controller else { return }
+            let brightnessOffset = scrollableBrightness.integerValue
+            let contrastOffset = scrollableContrast.integerValue
+            controller.updateDataset(
+                display: displayController.firstDisplay,
+                appBrightnessOffset: brightnessOffset,
+                appContrastOffset: contrastOffset,
+                withAnimation: true
+            )
+        }
+
+        let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: app.identifier)
+        if !runningApps.isEmpty {
+            displayController.runningAppExceptions.append(app)
+            displayController.adaptBrightness(force: true)
         }
     }
 }

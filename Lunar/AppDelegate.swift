@@ -40,6 +40,7 @@ let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
+let timerQueue = DispatchQueue(label: "fyi.lunar.timer.queue", qos: .utility, attributes: .concurrent)
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
 let dataSerialQueue = DispatchQueue(label: "fyi.lunar.dataSerial.queue", qos: .utility, target: DispatchQueue.global(qos: .utility))
@@ -84,27 +85,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var sshWindowController: ModernWindowController?
     var updateInfoWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
-    var gammaWindowController: ModernWindowController?
 
     var observers: Set<AnyCancellable> = []
-    var secureObserver: Cancellable?
 
     var valuesReaderThread: CFRunLoopTimer?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
     var alamoFireManager = buildAlamofireSession(requestTimeout: 24.hours, resourceTimeout: 7.days)
-
-    var adaptiveBrightnessModeObserver: Cancellable?
-    var startAtLoginObserver: Cancellable?
-    var dayMomentsObserver: Cancellable?
-    var contrastCurveFactorObserver: Cancellable?
-    var brightnessCurveFactorObserver: Cancellable?
-    var refreshValuesObserver: Cancellable?
-    var hotkeysObserver: Cancellable?
-    var mediaKeysObserver: Cancellable?
-    var hideMenuBarIconObserver: Cancellable?
-    var showDockIconObserver: Cancellable?
 
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
@@ -169,7 +157,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? adaptiveBrightnessModePublisher.sink { change in
+        adaptiveBrightnessModePublisher.sink { change in
             SentrySDK.configureScope { scope in
                 scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
                 scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
@@ -183,20 +171,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.resetElements()
             }
             self.manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
-        }
+        }.store(in: &observers)
     }
 
     func listenForSettingsChange() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(adaptToSettingsChange(notification:)),
-            name: UserDefaults.didChangeNotification,
-            object: UserDefaults.standard
-        )
-    }
-
-    @objc func adaptToSettingsChange(notification _: Notification) {
-        displayController.addSentryData()
+        NotificationCenter.default
+            .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
+            .sink { _ in displayController.addSentryData() }
+            .store(in: &observers)
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -214,7 +196,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
 
-    func acquirePrivileges(_ onAcquire: @escaping (() -> Void)) {
+    func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
+        let onAcquire = {
+            guard !CachedDefaults[.mediaKeysNotified] else { return }
+            CachedDefaults[.mediaKeysNotified] = true
+
+            var body = notificationBody ??
+                "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
+
+            if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
+                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
+            } else if CachedDefaults[.brightnessKeysEnabled] {
+                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness")
+            } else {
+                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "volume")
+            }
+            notify(identifier: "mediaKeysListener", title: notificationTitle, body: body)
+        }
+
         let options = [
             kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
         ]
@@ -243,9 +242,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         handler(CachedDefaults[.startAtLogin])
-        startAtLoginObserver = startAtLoginObserver ?? startAtLoginPublisher.sink { change in
+        startAtLoginPublisher.sink { change in
             handler(change.newValue)
-        }
+        }.store(in: &observers)
     }
 
     func applicationDidResignActive(_: Notification) {
@@ -371,19 +370,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             POPOVERS["menu"]!!.contentViewController = storyboard
                 .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
             POPOVERS["menu"]!!.contentViewController!.loadView()
-
-            DistributedNotificationCenter.default().addObserver(
-                self,
-                selector: #selector(appleInterfaceThemeChangedNotification(notification:)),
-                name: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification),
-                object: nil
-            )
-            // adaptAppearance()
         }
-    }
-
-    @objc func appleInterfaceThemeChangedNotification(notification _: Notification) {
-        // adaptAppearance()
+        DistributedNotificationCenter.default()
+            .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
+            .removeDuplicates()
+            .sink { _ in self.adaptAppearance() }
+            .store(in: &observers)
     }
 
     func adaptAppearance() {
@@ -398,27 +390,101 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForScreenConfigurationChanged() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSApplication.didChangeScreenParametersNotification,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSWorkspace.screensDidWakeNotification,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSWorkspace.screensDidSleepNotification,
-            object: nil
-        )
-        NSWorkspace.shared.publisher(for: \.frontmostApplication).removeDuplicates().sink { _ in
-            displayController.adaptBrightness(force: true)
-        }.store(in: &observers)
+        NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.activeSpaceDidChangeNotification, object: nil)
+            .eraseToAnyPublisher().map { $0 as Any? }
+            .merge(with: NSWorkspace.shared.publisher(for: \.frontmostApplication).map { $0 as Any? }.eraseToAnyPublisher())
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .sink { _ in displayController.adaptBrightness(force: true) }
+            .store(in: &observers)
+
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { _ in
+                log.debug("Screen configuration changed")
+
+                displayController.adaptBrightness(force: true)
+
+                let newScreenIDs = Set(NSScreen.screens.compactMap(\.displayID))
+                let newLidClosed = IsLidClosed()
+                guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
+
+                if newScreenIDs != self.screenIDs {
+                    log.info(
+                        "New screen IDs after screen configuration change",
+                        context: ["old": self.screenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
+                    )
+                    self.screenIDs = newScreenIDs
+                }
+                if newLidClosed != displayController.lidClosed {
+                    log.info(
+                        "Lid state changed",
+                        context: [
+                            "old": displayController.lidClosed ? "closed" : "opened",
+                            "new": newLidClosed ? "closed" : "opened",
+                        ]
+                    )
+                    displayController.lidClosed = newLidClosed
+                }
+
+                POPOVERS["menu"]!!.close()
+
+                displayController.manageClamshellMode()
+                displayController.resetDisplayList()
+
+                asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
+                    self.disableFaceLight()
+                    NetworkControl.resetState()
+                    DDCControl.resetState()
+                }
+            }.store(in: &observers)
+
+        let wakePublisher = NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.screensDidWakeNotification, object: nil)
+        let sleepPublisher = NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.screensDidSleepNotification, object: nil)
+
+        wakePublisher.merge(with: sleepPublisher)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { notif in
+                switch notif.name {
+                case NSWorkspace.screensDidWakeNotification:
+                    log.debug("Screens woke up")
+                    screensSleeping.store(false, ordering: .sequentiallyConsistent)
+
+                    if CachedDefaults[.refreshValues] {
+                        self.startValuesReaderThread()
+                    }
+                    _ = displayController.adaptiveMode.watch()
+
+                    asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
+                        self.disableFaceLight()
+                        NetworkControl.resetState()
+                        DDCControl.resetState()
+                    }
+
+                    if CachedDefaults[.reapplyValuesAfterWake] {
+                        asyncAfter(ms: 2000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
+                            for _ in 1 ... 5 {
+                                displayController.adaptBrightness(force: true)
+                                sleep(3)
+                            }
+                        }
+                    }
+
+                case NSWorkspace.screensDidSleepNotification:
+                    log.debug("Screens gone to sleep")
+                    screensSleeping.store(true, ordering: .sequentiallyConsistent)
+
+                    if let task = self.valuesReaderThread {
+                        lowprioQueue.cancel(timer: task)
+                    }
+                    displayController.adaptiveMode.stopWatching()
+                default:
+                    break
+                }
+            }.store(in: &observers)
     }
 
     func updateDataPointObserver() {
@@ -437,113 +503,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.screens.compactMap(\.displayID))
 
-    @objc func adaptToScreenConfiguration(notification: Notification) {
-//        #if DEBUG
-//        asyncAfter(ms: 100, uniqueTaskKey: "networkResetStressTest") {
-//            while true {
-//                NetworkControl.resetState()
-//                Thread.sleep(forTimeInterval: Double.random(in: 2...10))
-//            }
-//        }
-//        #endif
-
-        log.debug("Screen configuration notification")
-        switch notification.name {
-        case NSApplication.didChangeScreenParametersNotification:
-            log.debug("Screen configuration changed")
-
-            displayController.adaptBrightness(force: true)
-
-            let newScreenIDs = Set(NSScreen.screens.compactMap(\.displayID))
-            let newLidClosed = IsLidClosed()
-            guard newScreenIDs != screenIDs || newLidClosed != displayController.lidClosed else { return }
-
-            if newScreenIDs != screenIDs {
-                log.info(
-                    "New screen IDs after screen configuration change",
-                    context: ["old": screenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
-                )
-                screenIDs = newScreenIDs
-            }
-            if newLidClosed != displayController.lidClosed {
-                log.info(
-                    "Lid state changed",
-                    context: [
-                        "old": displayController.lidClosed ? "closed" : "opened",
-                        "new": newLidClosed ? "closed" : "opened",
-                    ]
-                )
-                displayController.lidClosed = newLidClosed
-            }
-
-            POPOVERS["menu"]!!.close()
-            asyncAfter(ms: 2000, uniqueTaskKey: "didChangeScreenParametersHandler") {
-                displayController.manageClamshellMode()
-                displayController.resetDisplayList()
-            }
-            asyncAfter(ms: 5000, uniqueTaskKey: "resetStates") {
-                self.disableFaceLight()
-                NetworkControl.resetState()
-                DDCControl.resetState()
-            }
-        case NSWorkspace.screensDidWakeNotification:
-            log.debug("Screens woke up")
-            asyncAfter(ms: 2000, uniqueTaskKey: "screenWakeSleepHandler") {
-                screensSleeping.store(false, ordering: .sequentiallyConsistent)
-
-                if CachedDefaults[.refreshValues] {
-                    self.startValuesReaderThread()
-                }
-                _ = displayController.adaptiveMode.watch()
-            }
-            if CachedDefaults[.reapplyValuesAfterWake] {
-                asyncAfter(ms: 5000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-                    NetworkControl.resetState()
-                    DDCControl.resetState()
-
-                    for _ in 1 ... 5 {
-                        displayController.adaptBrightness(force: true)
-                        sleep(3)
-                    }
-                }
-            }
-        case NSWorkspace.screensDidSleepNotification:
-            log.debug("Screens gone to sleep")
-            asyncAfter(ms: 2000, uniqueTaskKey: "screenWakeSleepHandler") {
-                screensSleeping.store(true, ordering: .sequentiallyConsistent)
-                if let task = self.valuesReaderThread {
-                    lowprioQueue.cancel(timer: task)
-                }
-                displayController.adaptiveMode.stopWatching()
-            }
-        default:
-            return
-        }
-    }
-
     func addObservers() {
-        dayMomentsObserver = dayMomentsObserver ?? dayMomentsPublisher.sink {
+        dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
                 displayController.adaptBrightness()
             }
-        }
-        contrastCurveFactorObserver = contrastCurveFactorObserver ?? contrastCurveFactorPublisher.sink { change in
+        }.store(in: &observers)
+        contrastCurveFactorPublisher.sink { change in
             contrastCurveFactor = change.newValue
             displayController.adaptBrightness()
-        }
-        brightnessCurveFactorObserver = brightnessCurveFactorObserver ?? brightnessCurveFactorPublisher.sink { change in
+        }.store(in: &observers)
+        brightnessCurveFactorPublisher.sink { change in
             brightnessCurveFactor = change.newValue
             displayController.adaptBrightness()
-        }
+        }.store(in: &observers)
 
-        refreshValuesObserver = refreshValuesObserver ?? refreshValuesPublisher.sink { _ in
+        refreshValuesPublisher.sink { _ in
             if let task = self.valuesReaderThread {
                 lowprioQueue.cancel(timer: task)
             }
             if CachedDefaults[.refreshValues] {
                 self.startValuesReaderThread()
             }
-        }
+        }.store(in: &observers)
 
         // hotkeysObserver = hotkeysObserver ?? hotkeysPublisher.sink { _ in
         //     mainThread {
@@ -551,41 +533,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         //     }
         // }
 
-        mediaKeysObserver = mediaKeysObserver ?? mediaKeysPublisher.sink {
+        mediaKeysPublisher.sink {
             self.startOrRestartMediaKeyTap()
-        }
+        }.store(in: &observers)
 
-        hideMenuBarIconObserver = hideMenuBarIconObserver ?? hideMenuBarIconPublisher.sink { change in
+        hideMenuBarIconPublisher.sink { change in
             log.info("Hiding menu bar icon: \(change.newValue)")
             self.statusItem.isVisible = !change.newValue
-        }
+        }.store(in: &observers)
         statusItem.isVisible = !CachedDefaults[.hideMenuBarIcon]
 
-        showDockIconObserver = showDockIconObserver ?? showDockIconPublisher.sink { change in
+        showDockIconPublisher.sink { change in
             log.info("Showing dock icon: \(change.newValue)")
             NSApp.setActivationPolicy(change.newValue ? .regular : .accessory)
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
-        }
+        }.store(in: &observers)
         NSApp.setActivationPolicy(CachedDefaults[.showDockIcon] ? .regular : .accessory)
 
-        NotificationCenter.default.addObserver(
-            forName: .defaultOutputDeviceChanged,
-            object: nil,
-            queue: .main
-        ) { _ in
-            mainThread {
-                appDelegate().startOrRestartMediaKeyTap()
-            }
-        }
-        NotificationCenter.default.addObserver(
-            forName: .defaultSystemOutputDeviceChanged,
-            object: nil,
-            queue: .main
-        ) { _ in
-            mainThread {
-                appDelegate().startOrRestartMediaKeyTap()
-            }
-        }
+        NotificationCenter.default
+            .publisher(for: .defaultOutputDeviceChanged, object: nil)
+            .merge(
+                with: NotificationCenter.default
+                    .publisher(for: .defaultSystemOutputDeviceChanged, object: nil)
+            )
+            .receive(on: RunLoop.main)
+            .sink { _ in appDelegate().startOrRestartMediaKeyTap() }
+            .store(in: &observers)
     }
 
     func setKeyEquivalents(_ hotkeys: Set<PersistentHotkey>) {
@@ -615,12 +588,47 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         PFMoveToApplicationsFolderIfNecessary()
     }
 
+    func stopHighlighting() {
+        guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
+        while c.highlighting {
+            c.stopHighlighting()
+        }
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         initCache()
         contrastCurveFactor = CachedDefaults[.contrastCurveFactor] > 0 ? CachedDefaults[.contrastCurveFactor] : 1
         CachedDefaults[.contrastCurveFactor] = contrastCurveFactor
         brightnessCurveFactor = CachedDefaults[.brightnessCurveFactor] > 0 ? CachedDefaults[.brightnessCurveFactor] : 1
         CachedDefaults[.brightnessCurveFactor] = brightnessCurveFactor
+
+        operationHighlightPublisher
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { data in
+                if data.shouldHighlight {
+                    createWindow(
+                        "gammaWindowController",
+                        controller: &gammaWindowController,
+                        screen: data.screen,
+                        show: true,
+                        backgroundColor: .clear,
+                        level: .popUpMenu
+                    )
+
+                    guard let w = gammaWindowController?.window,
+                          let c = w.contentViewController as? GammaViewController else { return }
+                    w.ignoresMouseEvents = true
+                    c.highlight()
+                    asyncAfter(ms: 3000, uniqueTaskKey: "stopHighlighting", mainThread: true) {
+                        self.stopHighlighting()
+                    }
+                } else {
+                    asyncAfter(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
+                        self.stopHighlighting()
+                    }
+                }
+            }.store(in: &observers)
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
@@ -669,23 +677,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
-            acquirePrivileges {
-                guard !CachedDefaults[.mediaKeysNotified] else { return }
-                CachedDefaults[.mediaKeysNotified] = true
-
-                var body =
-                    "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
-
-                if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
-                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
-                } else if CachedDefaults[.brightnessKeysEnabled] {
-                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness")
-                } else {
-                    body = body.replacingOccurrences(of: "PLACEHOLDER", with: "volume")
-                }
-                notify(identifier: "mediaKeysListener", title: "Lunar is now listening for media keys", body: body)
-            }
             startOrRestartMediaKeyTap()
+        } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
+            acquirePrivileges(
+                notificationTitle: "Lunar can now watch for app exceptions",
+                notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+            )
         }
 
         displayController.displays = displayController.getDisplaysLock.around { DisplayController.getDisplays() }
@@ -696,11 +693,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             setLogPath(logPath, logPath.count)
         }
 
-        asyncEvery(3.seconds) {
-            #if DEBUG
-                log.debug("Active window", context: activeWindow())
-            #endif
-        }
+        #if DEBUG
+            asyncEvery(3.seconds) {
+                log.debug("Active window", context: activeWindow(on: displayController.currentDisplay?.screen))
+            }
+        #endif
         handleDaemon()
 
         initDisplayControllerActivity()

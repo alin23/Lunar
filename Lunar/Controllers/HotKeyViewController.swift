@@ -129,8 +129,6 @@ class HotkeyViewController: NSViewController {
         fnKeysNotice.isEnabled = false
     }
 
-    var fkeysSettingWatcher: Timer?
-
     @IBAction func howDoHotkeysWork(_: Any) {
         NSWorkspace.shared.open(try! "https://lunar.fyi/faq#hotkeys".asURL())
     }
@@ -156,7 +154,7 @@ class HotkeyViewController: NSViewController {
         handler()
         cachedFnState = Defaults[.fKeysAsFunctionKeys]
         setupFKeysNotice(asFunctionKeys: cachedFnState)
-        fkeysSettingWatcher = asyncEvery(10.seconds, handler)
+        asyncEvery(10.seconds, uniqueTaskKey: "fkeysSettingWatcher", handler)
     }
 
     deinit {
@@ -165,13 +163,11 @@ class HotkeyViewController: NSViewController {
             defer { log.verbose("END DEINIT") }
         #endif
 
-        fkeysSettingWatcher?.invalidate()
-        fkeysSettingWatcher = nil
+        cancelAsyncRecurringTask("fkeysSettingWatcher")
     }
 
     override func viewDidDisappear() {
-        fkeysSettingWatcher?.invalidate()
-        fkeysSettingWatcher = nil
+        cancelAsyncRecurringTask("fkeysSettingWatcher")
     }
 
     override func mouseDown(with event: NSEvent) {

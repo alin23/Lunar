@@ -1,7 +1,9 @@
 import Accelerate
 import Alamofire
 import Atomics
+import AXSwift
 import Cocoa
+import Combine
 import CryptorECC
 import Foundation
 import Surge
@@ -396,6 +398,11 @@ func mainThreadSerial<T>(_ action: () -> T) -> T {
 func mainThread(_ action: () -> Void) {
     if Thread.isMainThread {
         action()
+    } else if mainThreadLocked.load(ordering: .relaxed) {
+        #if DEBUG
+            log.error("DEADLOCK ON MAIN THREAD")
+        #endif
+        action()
     } else {
         DispatchQueue.main.sync {
             action()
@@ -407,23 +414,17 @@ func mainThread(_ action: () -> Void) {
 func mainThread<T>(_ action: () -> T) -> T {
     if Thread.isMainThread {
         return action()
+    } else if mainThreadLocked.load(ordering: .relaxed) {
+        #if DEBUG
+            log.error("DEADLOCK ON MAIN THREAD")
+        #endif
+        return action()
     } else {
         return DispatchQueue.main.sync {
             return action()
         }
     }
 }
-
-// func serialSync<T>(_ action: () -> T) -> T {
-//    action()
-//    if DispatchQueue.current == dataSerialQueue {
-//        return action()
-//    } else {
-//        return dataSerialQueue.sync(flags: [.barrier]) {
-//            return action()
-//        }
-//    }
-// }
 
 func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
@@ -480,7 +481,7 @@ var asyncUniqueRecurringTasks = [String: Timer]()
 }
 
 @discardableResult func asyncEvery(_ interval: DateComponents, uniqueTaskKey: String? = nil, _ action: @escaping () -> Void) -> Timer {
-    let timer = concurrentQueue.sync {
+    let timer = timerQueue.sync {
         Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { _ in
             action()
         }
@@ -798,30 +799,39 @@ func createWindow(
     }
 }
 
-func showOperationInProgress(screen: NSScreen? = nil) {
-    asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
-        createWindow(
-            "gammaWindowController",
-            controller: &gammaWindowController,
-            screen: screen,
-            show: true,
-            backgroundColor: .clear,
-            level: .popUpMenu
-        )
+struct OperationHighlightData: Equatable {
+    let shouldHighlight: Bool
+    let screen: NSScreen?
+}
 
-        guard let w = gammaWindowController?.window, let c = w.contentViewController as? GammaViewController else { return }
-        w.ignoresMouseEvents = true
-        c.highlight()
-    }
+let operationHighlightPublisher = PassthroughSubject<OperationHighlightData, Never>()
+
+func showOperationInProgress(screen: NSScreen? = nil) {
+    operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: true, screen: screen))
+    // asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
+    //     createWindow(
+    //         "gammaWindowController",
+    //         controller: &gammaWindowController,
+    //         screen: screen,
+    //         show: true,
+    //         backgroundColor: .clear,
+    //         level: .popUpMenu
+    //     )
+
+    //     guard let w = gammaWindowController?.window, let c = w.contentViewController as? GammaViewController else { return }
+    //     w.ignoresMouseEvents = true
+    //     c.highlight()
+    // }
 }
 
 func hideOperationInProgress() {
-    asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
-        guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
-        while c.highlighting {
-            c.stopHighlighting()
-        }
-    }
+    operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
+    // asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
+    //     guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
+    //     while c.highlighting {
+    //         c.stopHighlighting()
+    //     }
+    // }
 }
 
 // MARK: Dialogs
@@ -1060,9 +1070,29 @@ final class UnfairLock {
     }
 }
 
+var mainThreadLocked = ManagedAtomic<Bool>(false)
+
 extension NSRecursiveLock {
-    @inline(__always) func aroundThrows<T>(timeout: TimeInterval = 10, _ closure: () throws -> T) throws -> T {
-        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
+    @inline(__always) func aroundThrows<T>(
+        timeout: TimeInterval = 10,
+        ignoreMainThread: Bool = false,
+        _ closure: () throws -> T
+    ) throws -> T {
+        if ignoreMainThread, Thread.isMainThread {
+            return try closure()
+//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
+        }
+        let locked = lock(before: Date().addingTimeInterval(timeout))
+
+        defer {
+            if locked {
+                unlock()
+//                if Thread.isMainThread {
+//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
+//                }
+            }
+        }
+
         return try closure()
     }
 
@@ -1071,17 +1101,44 @@ extension NSRecursiveLock {
     /// - Parameter closure: The closure to run.
     ///
     /// - Returns:           The value the closure generated.
-    @inline(__always) func around<T>(timeout: TimeInterval = 10, _ closure: () -> T) -> T {
-        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
+    @inline(__always) func around<T>(timeout: TimeInterval = 10, ignoreMainThread: Bool = false, _ closure: () -> T) -> T {
+        if ignoreMainThread, Thread.isMainThread {
+            return closure()
+//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
+        }
+        let locked = lock(before: Date().addingTimeInterval(timeout))
+        defer {
+            if locked {
+                unlock()
+//                if Thread.isMainThread {
+//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
+//                }
+            }
+        }
+
         return closure()
     }
 
     /// Execute a closure while acquiring the lock.
     ///
     /// - Parameter closure: The closure to run.
-    @inline(__always) func around(timeout: TimeInterval = 10, _ closure: () -> Void) {
-        let locked = lock(before: Date().addingTimeInterval(timeout)); defer { if locked { unlock() } }
-        return closure()
+    @inline(__always) func around(timeout: TimeInterval = 10, ignoreMainThread: Bool = false, _ closure: () -> Void) {
+        if ignoreMainThread, Thread.isMainThread {
+            return closure()
+//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
+        }
+        let locked = lock(before: Date().addingTimeInterval(timeout))
+
+        defer {
+            if locked {
+                unlock()
+//                if Thread.isMainThread {
+//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
+//                }
+            }
+        }
+
+        closure()
     }
 }
 
@@ -1266,6 +1323,69 @@ struct Window {
     }
 }
 
+extension NSRect {
+    func intersectedArea(_ other: NSRect) -> CGFloat {
+        let i = intersection(other)
+        return i.height * i.width
+    }
+}
+
+struct AXWindow {
+    let frame: NSRect
+    let fullScreen: Bool
+    let title: String
+    let position: NSPoint
+    let main: Bool
+    let minimized: Bool
+    let focused: Bool
+    let size: NSSize
+    let identifier: String
+    let subrole: String
+    let role: String
+    let runningApp: NSRunningApplication?
+    let appException: AppException?
+    let screen: NSScreen?
+
+    init?(from window: UIElement, runningApp: NSRunningApplication? = nil, appException: AppException? = nil) {
+        guard let attrs = try? window.getMultipleAttributes(.frame, .fullScreen, .title, .position, .main, .minimized, .size, .identifier, .subrole, .role, .focused)
+        else {
+            return nil
+        }
+
+        let frame = attrs[.frame] as? NSRect ?? NSRect()
+
+        self.frame = frame
+        fullScreen = attrs[.fullScreen] as? Bool ?? false
+        title = attrs[.title] as? String ?? ""
+        position = attrs[.position] as? NSPoint ?? NSPoint()
+        main = attrs[.main] as? Bool ?? false
+        minimized = attrs[.minimized] as? Bool ?? false
+        focused = attrs[.focused] as? Bool ?? false
+        size = attrs[.size] as? NSSize ?? NSSize()
+        identifier = attrs[.identifier] as? String ?? ""
+        subrole = attrs[.subrole] as? String ?? ""
+        role = attrs[.role] as? String ?? ""
+
+        self.runningApp = runningApp
+        self.appException = appException
+        screen = NSScreen.screens.filter { !$0.isBuiltin && $0.frame.intersects(frame) }.max(by: { s1, s2 in
+            s1.frame.intersectedArea(frame) < s2.frame.intersectedArea(frame)
+        })
+    }
+}
+
+extension NSRunningApplication {
+    func windows(appException: AppException? = nil) -> [AXWindow]? {
+        guard let app = Application(self) else { return nil }
+        do {
+            return try app.windows()?.compactMap { AXWindow(from: $0, runningApp: self, appException: appException) }
+        } catch {
+            log.error("Can't get windows for app \(self): \(error)")
+            return nil
+        }
+    }
+}
+
 func windowList(
     for app: NSRunningApplication,
     onscreen: Bool? = nil,
@@ -1299,7 +1419,7 @@ func windowList(
         return nil
     }
 
-    return cgWindowListInfo.filter { windowDict in
+    let windows = cgWindowListInfo.filter { windowDict in
         guard let ownerProcessID = windowDict[kCGWindowOwnerPID as String] as? Int else { return false }
         if let opaque = opaque, (((windowDict[kCGWindowAlpha as String] as? Float) ?? 0) > 0) != opaque { return false }
         if let withTitle = withTitle, ((windowDict[kCGWindowName as String] as? String) ?? "").isEmpty != withTitle { return false }
@@ -1313,13 +1433,20 @@ func windowList(
     }.map {
         Window(from: $0, appException: appException, runningApp: runningApp)
     }
+
+    return windows
 }
 
-func activeWindow() -> Window? {
+func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
     guard let frontMostApp = NSWorkspace.shared.frontmostApplication else {
         return nil
     }
 
-    return windowList(for: frontMostApp, opaque: true, levels: [.normal, .modalPanel, .popUpMenu, .floating])?
-        .min { $0.layer < $1.layer && $0.isOnScreen.i >= $1.isOnScreen.i }
+    let appException = displayController.runningAppExceptions.first { $0.identifier == frontMostApp.bundleIdentifier }
+
+    return frontMostApp.windows(appException: appException)?.first(where: { $0.screen?.displayID == screen?.displayID })
+
+//    return windowList(for: frontMostApp, opaque: true, levels: [.normal, .modalPanel, .popUpMenu, .floating], appException: appException)?
+//        .filter { screen == nil || $0.screen?.displayID == screen!.displayID }
+//        .min { $0.layer < $1.layer && $0.isOnScreen.i >= $1.isOnScreen.i }
 }

@@ -7,6 +7,7 @@
 //
 
 import Alamofire
+import AXSwift
 import Cocoa
 import Combine
 import CoreLocation
@@ -73,14 +74,37 @@ class DisplayController {
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
         guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
 
-        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
+        if let app = activeWindow(on: screen)?.appException {
+            #if DEBUG
+                log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
+            #endif
+            return (app.brightness.i, app.contrast.i)
+        }
+
+        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[AXWindow]]>? in
             guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
-            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
-                windowList(for: a, onscreen: true, opaque: true, levels: [.normal], appException: app)
+            return runningApps.compactMap { (a: NSRunningApplication) -> [AXWindow]? in
+                a.windows(appException: app)?.filter { window in
+                    !window.minimized && window.size != .zero && window.screen != nil
+                }
             }.joined()
         }.joined()
 
-        guard let app = windows.first(where: { w in w.screen == screen })?.appException else { return (0, 0) }
+//        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
+//            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
+//            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
+//                windowList(for: a, opaque: true, levels: [.normal], appException: app)
+//            }.joined()
+//        }.joined()
+
+        let windowsOnScreen = windows.filter { w in w.screen?.displayID == screen.displayID }
+        guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
+              let app = focusedWindow.appException
+        else { return (0, 0) }
+
+        #if DEBUG
+            log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
+        #endif
 
         return (app.brightness.i, app.contrast.i)
     }
@@ -325,7 +349,7 @@ class DisplayController {
         }
     }
 
-    @objc func autoAdaptMode(notification _: Notification? = nil) {
+    func autoAdaptMode() {
         guard !CachedDefaults[.overrideAdaptiveMode] else { return }
 
         let mode = DisplayController.autoMode()
@@ -367,43 +391,30 @@ class DisplayController {
             .sink { startOrStopWatcher($0.newValue) }
     }
 
-    func initObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(autoAdaptMode(notification:)),
-            name: lunarProStateChanged,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSWorkspace.screensDidWakeNotification,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(adaptToScreenConfiguration(notification:)),
-            name: NSWorkspace.screensDidSleepNotification,
-            object: nil
-        )
-//        listenForAdaptiveModeChange()
-    }
+    var observers: Set<AnyCancellable> = []
 
-    @objc func adaptToScreenConfiguration(notification: Notification) {
-        switch notification.name {
-        case NSWorkspace.screensDidWakeNotification:
-            watchControlAvailability()
-            watchModeAvailability()
-        case NSWorkspace.screensDidSleepNotification:
-            if let task = controlWatcherTask {
+    func initObservers() {
+        NotificationCenter.default.publisher(for: lunarProStateChanged, object: nil).sink { _ in
+            self.autoAdaptMode()
+        }.store(in: &observers)
+
+        NSWorkspace.shared.notificationCenter.publisher(
+            for: NSWorkspace.screensDidWakeNotification, object: nil
+        ).sink { _ in
+            self.watchControlAvailability()
+            self.watchModeAvailability()
+        }.store(in: &observers)
+
+        NSWorkspace.shared.notificationCenter.publisher(
+            for: NSWorkspace.screensDidSleepNotification, object: nil
+        ).sink { _ in
+            if let task = self.controlWatcherTask {
                 lowprioQueue.cancel(timer: task)
             }
-            if let task = modeWatcherTask {
+            if let task = self.modeWatcherTask {
                 lowprioQueue.cancel(timer: task)
             }
-        default:
-            return
-        }
+        }.store(in: &observers)
     }
 
     init() {
@@ -793,9 +804,7 @@ class DisplayController {
             }
             if let identifiers = oldAppIdentifiers, let exceptions = datastore.appExceptions(identifiers: identifiers) {
                 for exception in exceptions {
-                    if let idx = self.runningAppExceptions.firstIndex(where: { app in app.identifier == exception.identifier }) {
-                        self.runningAppExceptions.remove(at: idx)
-                    }
+                    self.runningAppExceptions.removeAll(where: { $0.identifier == exception.identifier })
                 }
             }
             self.adaptBrightness()
@@ -812,21 +821,17 @@ class DisplayController {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-//        async(queue: dataPublisherQueue) {
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
-//        }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-//        async(queue: dataPublisherQueue) {
         for display in displays ?? Array(activeDisplays.values) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
             }
         }
-//        }
     }
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
