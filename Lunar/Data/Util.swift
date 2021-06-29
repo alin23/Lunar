@@ -443,7 +443,12 @@ let asyncUniqueLock = NSRecursiveLock()
 var asyncUniqueTasks = [String: DispatchWorkItem]()
 var asyncUniqueRecurringTasks = [String: Timer]()
 
-@discardableResult func asyncAfter(ms: Int, uniqueTaskKey: String? = nil, mainThread: Bool = false, _ action: @escaping () -> Void) -> DispatchWorkItem {
+@discardableResult func asyncAfter(
+    ms: Int,
+    uniqueTaskKey: String? = nil,
+    mainThread: Bool = false,
+    _ action: @escaping () -> Void
+) -> DispatchWorkItem {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
     let task: DispatchWorkItem
@@ -1213,4 +1218,108 @@ func notify(identifier: String, title: String, body: String) {
 func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
     guard !isTestID(displayID) else { return nil }
     return NSScreen.screens.first(where: { screen in screen.hasDisplayID(displayID) })
+}
+
+struct Window {
+    let storeType: Int
+    let isOnScreen: Bool
+    let layer: NSWindow.Level
+    let title: String
+    let ownerName: String
+    let alpha: Float
+    let bounds: NSRect
+    let id: Int
+    let ownerPID: Int
+    let sharingState: Int
+    let memoryUsage: Int
+    let screen: NSScreen?
+    let appException: AppException?
+    let runningApp: NSRunningApplication?
+
+    init(from dict: [String: AnyObject], appException: AppException? = nil, runningApp: NSRunningApplication? = nil) {
+        storeType = (dict[kCGWindowStoreType as String] as? Int) ?? 0
+        isOnScreen = (dict[kCGWindowIsOnscreen as String] as? Bool) ?? false
+        layer = NSWindow.Level(rawValue: (dict[kCGWindowLayer as String] as? Int) ?? NSWindow.Level.normal.rawValue)
+        title = (dict[kCGWindowName as String] as? String) ?? ""
+        ownerName = (dict[kCGWindowOwnerName as String] as? String) ?? ""
+        alpha = (dict[kCGWindowAlpha as String] as? Float) ?? 1
+
+        if let rectDict = dict[kCGWindowBounds as String], let rect = CGRect(dictionaryRepresentation: rectDict as! CFDictionary) {
+            bounds = rect as NSRect
+            screen = NSScreen.screens.first { NSRect(
+                x: $0.frame.origin.x,
+                y: $0.frame.origin.y - $0.frame.height,
+                width: $0.frame.width,
+                height: $0.frame.height
+            ).intersects(rect as NSRect) }
+        } else {
+            bounds = NSRect()
+            screen = nil
+        }
+
+        id = (dict[kCGWindowNumber as String] as? Int) ?? 0
+        ownerPID = (dict[kCGWindowOwnerPID as String] as? Int) ?? 0
+        sharingState = (dict[kCGWindowSharingState as String] as? Int) ?? 0
+        memoryUsage = (dict[kCGWindowMemoryUsage as String] as? Int) ?? 0
+        self.appException = appException
+        self.runningApp = runningApp
+    }
+}
+
+func windowList(
+    for app: NSRunningApplication,
+    onscreen: Bool? = nil,
+    opaque: Bool? = nil,
+    withTitle: Bool? = nil,
+    levels: Set<NSWindow.Level>? = nil,
+    appException: AppException? = nil
+) -> [Window]? {
+    windowList(
+        for: app.processIdentifier.i,
+        onscreen: onscreen,
+        opaque: opaque,
+        withTitle: withTitle,
+        levels: levels,
+        appException: appException,
+        runningApp: app
+    )
+}
+
+func windowList(
+    for pid: Int,
+    onscreen: Bool? = nil,
+    opaque: Bool? = nil,
+    withTitle: Bool? = nil,
+    levels: Set<NSWindow.Level>? = nil,
+    appException: AppException? = nil,
+    runningApp: NSRunningApplication? = nil
+) -> [Window]? {
+    let options: CGWindowListOption = (onscreen == true) ? [.excludeDesktopElements, .optionOnScreenOnly] : [.excludeDesktopElements]
+    guard let cgWindowListInfo = CGWindowListCopyWindowInfo(options, CGWindowID(0)) as NSArray? as? [[String: AnyObject]] else {
+        return nil
+    }
+
+    return cgWindowListInfo.filter { windowDict in
+        guard let ownerProcessID = windowDict[kCGWindowOwnerPID as String] as? Int else { return false }
+        if let opaque = opaque, (((windowDict[kCGWindowAlpha as String] as? Float) ?? 0) > 0) != opaque { return false }
+        if let withTitle = withTitle, ((windowDict[kCGWindowName as String] as? String) ?? "").isEmpty != withTitle { return false }
+        if let levels = levels, !levels.contains(
+            NSWindow.Level(rawValue: (windowDict[kCGWindowLayer as String] as? Int) ?? NSWindow.Level.normal.rawValue)
+        ) {
+            return false
+        }
+
+        return pid == ownerProcessID
+    }.map {
+        Window(from: $0, appException: appException, runningApp: runningApp)
+    }
+}
+
+func activeWindow() -> Window? {
+    guard let frontMostApp = NSWorkspace.shared.frontmostApplication else {
+        return nil
+    }
+
+    return windowList(for: frontMostApp, opaque: true, levels: [.normal, .modalPanel, .popUpMenu, .floating])?
+        .min { $0.layer < $1.layer && $0.isOnScreen.i >= $1.isOnScreen.i }
 }
