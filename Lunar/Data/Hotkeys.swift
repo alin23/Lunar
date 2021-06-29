@@ -598,6 +598,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(_ brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
+        acquirePrivileges()
+
         let workItem = DispatchWorkItem(name: "startOrRestartMediaKeyTap") {
             mediaKeyTapBrightness?.stop()
             mediaKeyTapBrightness = nil
