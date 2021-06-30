@@ -302,7 +302,7 @@ enum CachedDefaults {
         get {
             displayEncodingLock.around(ignoreMainThread: true) {
                 let lock = locks[key.name] ?? Self.lock
-                return lock.around {
+                return lock.around(ignoreMainThread: true) {
                     if let value = cache[key.name]?.value as? Value {
                         return value
                     }
@@ -314,13 +314,13 @@ enum CachedDefaults {
         set {
             displayEncodingLock.around(ignoreMainThread: true) {
                 guard let lock = locks[key.name] else {
-                    Self.lock.around {
+                    Self.lock.around(ignoreMainThread: true) {
                         cache[key.name] = AnyCodable(newValue)
                         key.suite[key] = newValue
                     }
                     return
                 }
-                lock.around {
+                lock.around(ignoreMainThread: true) {
                     cache[key.name] = AnyCodable(newValue)
 
                     if key == .displays, let displays = newValue as? [Display] {
