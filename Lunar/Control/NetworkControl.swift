@@ -548,7 +548,7 @@ class NetworkControl: Control {
     static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
 
     static func resetState(serial: String? = nil) {
-        asyncNow(timeout: 10.seconds, runLoopQueue: serviceBrowserQueue) {
+        asyncNow(runLoopQueue: serviceBrowserQueue) {
             if browserSemaphore.wait(for: 5) == .timedOut {
                 return
             }
@@ -559,7 +559,10 @@ class NetworkControl: Control {
                 _ = controllersForDisplay.removeValue(forKey: serial)
             }
             browser.reset()
-            browser.browse(type: ServiceType.tcp("ddcutil"))
+            browser.delegate.onStop = {
+                browser.browse(type: ServiceType.tcp("ddcutil"))
+                browser.delegate.onStop = nil
+            }
         }
     }
 
