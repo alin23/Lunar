@@ -85,10 +85,6 @@ public class CiaoBrowser {
         Logger.info("Resetting browser")
         stop()
         services.removeAll()
-        serviceBrowserQueue.sync {
-            self.netServiceBrowser.remove(from: RunLoop.current, forMode: .default)
-            self.netServiceBrowser.schedule(in: RunLoop.current, forMode: .default)
-        }
 
 //        netServiceBrowser.delegate = nil
 //        netServiceBrowser = NetServiceBrowser()
@@ -119,6 +115,7 @@ public class CiaoBrowser {
 
 public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     weak var browser: CiaoBrowser?
+    var onStop: (() -> Void)?
     public func netServiceBrowser(_: NetServiceBrowser, didFind service: NetService, moreComing _: Bool) {
         Logger.info("Service found \(service)")
         browser?.serviceFound(service)
@@ -132,6 +129,7 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     public func netServiceBrowserDidStopSearch(_: NetServiceBrowser) {
 //        Logger.info("Browser stopped search")
         browser?.isSearching = false
+        onStop?()
     }
 
     public func netServiceBrowser(_: NetServiceBrowser, didNotSearch _: [String: NSNumber]) {
