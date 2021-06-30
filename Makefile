@@ -38,7 +38,7 @@ dev: install-deps install-hooks codegen
 upload:
 	rsync -avzP Releases/*.delta noiseblend:/static/Lunar/deltas/
 	rsync -avzP Releases/*.{dmg,pkg,zip} noiseblend:/static/Lunar/releases/
-	upload -d Lunar Releases/appcast.xml
+	fish -c 'upload -d Lunar Releases/appcast.xml'
 	cfcli -d lunar.fyi purge
 
 release: changelog
