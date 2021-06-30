@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "enablePro():Pro.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "lunarProInvalidForVersion">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
