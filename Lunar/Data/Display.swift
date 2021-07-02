@@ -141,7 +141,7 @@ let GENERIC_DISPLAY = Display(
     }()
 #endif
 
-let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 10 * 1_000_000 // 10ms
+let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 70 * 1_000_000 // 70ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
@@ -291,6 +291,7 @@ enum ValueType {
             save()
 
             guard !lockedBrightness, force || brightness != oldValue else { return }
+            if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
                 guard checkRemainingAdjustments() else { return }
@@ -323,12 +324,17 @@ enum ValueType {
             }
 
             log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness)", context: context)
+            let startTime = DispatchTime.now()
+
             if !control.setBrightness(brightness, oldValue: oldBrightness) {
                 log.warning(
                     "Error writing brightness using \(control!.str)",
                     context: context
                 )
             }
+
+            let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
+            checkSlowWrite(elapsedNS: elapsedTime)
         }
     }
 
@@ -337,6 +343,7 @@ enum ValueType {
             save()
 
             guard !lockedContrast, force || contrast != oldValue else { return }
+            if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
                 guard checkRemainingAdjustments() else { return }
@@ -369,12 +376,17 @@ enum ValueType {
             }
 
             log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast)", context: context)
+            let startTime = DispatchTime.now()
+
             if !control.setContrast(contrast, oldValue: oldContrast) {
                 log.warning(
                     "Error writing contrast using \(control!.str)",
                     context: context
                 )
             }
+
+            let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
+            checkSlowWrite(elapsedNS: elapsedTime)
         }
     }
 
@@ -457,6 +469,10 @@ enum ValueType {
 
     @Published @objc dynamic var active: Bool = false {
         didSet {
+            if active {
+                startControls()
+            }
+
             save()
             mainThread {
                 activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
@@ -474,6 +490,18 @@ enum ValueType {
     }
 
     @Published @objc dynamic var activeAndResponsive: Bool = false
+
+    // var i2cController: io_service_t? = nil {
+    //     didSet {
+    //         hasI2C = i2cController != nil || avService != nil
+    //     }
+    // }
+
+    // var avService: IOAVService? = nil {
+    //     didSet {
+    //         hasI2C = i2cController != nil || avService != nil
+    //     }
+    // }
 
     @Published @objc dynamic var hasI2C: Bool = true {
         didSet {
@@ -555,10 +583,15 @@ enum ValueType {
             {
                 showOperationInProgress(screen: screen)
             }
-            asyncAfter(ms: 5000, uniqueTaskKey: name) { [weak self] in
-                self?.setValue(false, forKey: name)
+            let subscriberKey = "\(name)-\(serial)"
+            debounce(ms: 5000, uniqueTaskKey: name, subscriberKey: subscriberKey) { [weak self] in
+                guard let self = self else {
+                    cancelTask(name, subscriberKey: subscriberKey)
+                    return
+                }
+                self.setValue(false, forKey: name)
 
-                guard let condition = self?.value(
+                guard let condition = self.value(
                     forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
                 ) as? NSCondition
                 else {
@@ -697,7 +730,18 @@ enum ValueType {
 
     lazy var isForTesting = isTestID(id)
 
+    var observers: Set<AnyCancellable> = []
+
     lazy var screen: NSScreen? = {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) })
+            }
+            .store(in: &observers)
+
         guard !isForTesting else { return nil }
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
     }()
@@ -885,17 +929,61 @@ enum ValueType {
         }
 
         super.init()
-        refreshGamma()
-        #if DEBUG
-            hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
-        #else
-            hasI2C = DDC.hasI2CController(displayID: id)
-        #endif
+
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
+    }
+
+    func startControls() {
+        if !isGeneric(id) {
+            if CachedDefaults[.refreshValues] {
+                serialQueue.async { [weak self] in
+                    guard let self = self else { return }
+                    self.refreshBrightness()
+                    self.refreshContrast()
+                    self.refreshVolume()
+                    self.refreshInput()
+                }
+            }
+            refreshGamma()
+        }
+
+        startI2CDetection()
+        detectI2C()
 
         control = getBestControl()
+    }
+
+    func detectI2C() {
+        #if DEBUG
+            #if arch(arm64)
+                // avService = (id == TEST_DISPLAY_ID) ? (1 as IOAVService) : DDC.AVService(displayID: id, display: self)
+                hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
+            #else
+                // i2cController = (id == TEST_DISPLAY_ID) ? 1 : DDC.I2CController(displayID: id)
+                hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id, ignoreCache: true)
+            #endif
+        #else
+            #if arch(arm64)
+                // avService = DDC.AVService(displayID: id, display: self)
+                hasI2C = DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
+            #else
+                // i2cController = DDC.I2CController(displayID: id)
+                hasI2C = DDC.hasI2CController(displayID: id, ignoreCache: true)
+            #endif
+        #endif
+    }
+
+    func startI2CDetection() {
+        let taskKey = "i2c-detector-\(serial)"
+        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15) { [weak self] in
+            guard let self = self else { return }
+            self.detectI2C()
+            if self.hasI2C {
+                cancelTask(taskKey)
+            }
+        }
     }
 
     init(
@@ -977,28 +1065,11 @@ enum ValueType {
 
         super.init()
 
-        if !isGeneric(id) {
-            if CachedDefaults[.refreshValues] {
-                serialQueue.async { [weak self] in
-                    guard let self = self else { return }
-                    self.refreshBrightness()
-                    self.refreshContrast()
-                    self.refreshVolume()
-                    self.refreshInput()
-                }
-            }
-            refreshGamma()
-        }
-        #if DEBUG
-            hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id)
-        #else
-            hasI2C = DDC.hasI2CController(displayID: id)
-        #endif
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
 
-        control = getBestControl()
+        startControls()
     }
 
     static func fromDictionary(_ config: [String: Any]) -> Display? {
@@ -1044,8 +1115,8 @@ enum ValueType {
     }
 
     func save() {
-        asyncAfter(ms: 800, uniqueTaskKey: "displaySave") {
-            DataStore.storeDisplay(display: self)
+        debounce(ms: 800, uniqueTaskKey: "displaySave", value: self) { display in
+            DataStore.storeDisplay(display: display)
         }
     }
 
@@ -1287,8 +1358,13 @@ enum ValueType {
             {
                 dict["deviceDescription"] = compressed
             }
+            #if arch(arm64)
+                let avService = DDC.AVService(displayID: self.id)
+                dict["avService"] = avService == nil ? "NONE" : CFCopyDescription(avService!) as String
+            #else
+                dict["i2cController"] = DDC.I2CController(displayID: self.id)
+            #endif
 
-            dict["i2cController"] = DDC.I2CController(displayID: self.id)
             dict["hasNetworkControl"] = self.hasNetworkControl
             dict["hasI2C"] = self.hasI2C
             dict["hasDDC"] = self.hasDDC
@@ -1596,8 +1672,14 @@ enum ValueType {
         return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: contrast)
     }
 
+    var lastConnectionTime = Date()
+
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast: UInt8? = nil) {
-        guard !isForTesting, enabledControls[.gamma] ?? false else { return }
+        #if DEBUG
+            guard !isForTesting else { return }
+        #endif
+
+        guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) > 5 else { return }
         gammaLock()
 
         let newGamma = computeGamma(brightness: brightness, contrast: contrast)
@@ -1609,10 +1691,7 @@ enum ValueType {
         let id = self.id
 
         showOperationInProgress(screen: screen)
-        asyncNow {
-            _ = gammaSemaphore.wait(for: 1.8)
-            hideOperationInProgress()
-        }
+
         if oldBrightness != nil || oldContrast != nil {
             asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
                 guard let self = self else {
@@ -1651,7 +1730,7 @@ enum ValueType {
         asyncNow(runLoopQueue: lowprioQueue) { [weak self] in
             guard let self = self else { return }
             if oldBrightness != nil || oldContrast != nil {
-                gammaSemaphore.wait(for: nil)
+                gammaSemaphore.wait(for: 1.8)
             }
 
             let redGamma = self.initialRedGamma
@@ -1712,25 +1791,18 @@ enum ValueType {
     }
 
     @inline(__always) func withoutSmoothTransition(_ block: () -> Void) {
-        if !CachedDefaults[.smoothTransition] {
-            block()
-            return
-        }
-
-        CachedDefaults[.smoothTransition] = false
-        block()
-        CachedDefaults[.smoothTransition] = true
+        withSmoothTransition(false, block)
     }
 
-    @inline(__always) func withSmoothTransition(_ block: () -> Void) {
-        if CachedDefaults[.smoothTransition] {
+    @inline(__always) func withSmoothTransition(_ active: Bool = true, _ block: () -> Void) {
+        if CachedDefaults[.smoothTransition] == active {
             block()
             return
         }
 
-        CachedDefaults[.smoothTransition] = true
+        CachedDefaults[.smoothTransition] = active
         block()
-        CachedDefaults[.smoothTransition] = false
+        CachedDefaults[.smoothTransition] = !active
     }
 
     // MARK: Computing Values

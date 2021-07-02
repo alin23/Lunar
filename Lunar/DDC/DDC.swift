@@ -273,6 +273,19 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
     }
 }
 
+func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
+    #if arch(arm64)
+        DDC.avServiceCache.removeAll(keepingCapacity: true)
+    #else
+        DDC.i2cControllerCache.removeAll(keepingCapacity: true)
+    #endif
+
+    displayController.activeDisplays.values.forEach { display in
+        display.detectI2C()
+        display.startI2CDetection()
+    }
+}
+
 enum DDC {
     static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
     @Atomic static var apply = true
@@ -286,6 +299,70 @@ enum DDC {
     static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
     static let lock = NSRecursiveLock()
 
+    static var notifyPort: IONotificationPortRef?
+    static var addedIter: io_iterator_t = 0
+    static var runLoop: CFRunLoop?
+
+    static func setup() {
+        notifyPort = IONotificationPortCreate(kIOMasterPortDefault)
+        let runLoopSource = IONotificationPortGetRunLoopSource(notifyPort).takeUnretainedValue()
+
+        runLoop = CFRunLoopGetCurrent()
+        CFRunLoopAddSource(runLoop, runLoopSource, CFRunLoopMode.defaultMode)
+
+        #if arch(arm64)
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOPublishNotification,
+                IOServiceMatching("AppleCLCD2"),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOPublishNotification,
+                IOServiceMatching("DCPAVServiceProxy"),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOTerminatedNotification,
+                IOServiceMatching("AppleCLCD2"),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOTerminatedNotification,
+                IOServiceMatching("DCPAVServiceProxy"),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+        #else
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOPublishNotification,
+                IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+            _ = IOServiceAddMatchingNotification(
+                notifyPort,
+                kIOTerminatedNotification,
+                IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO),
+                IORegistryTreeChanged,
+                nil,
+                &addedIter
+            )
+        #endif
+    }
+
     static func reset() {
         queue.sync(flags: [.barrier]) {
             DDC.displayPortByUUID.removeAll()
@@ -294,6 +371,11 @@ enum DDC {
             DDC.skipWritingPropertyById.removeAll()
             DDC.readFaults.removeAll()
             DDC.writeFaults.removeAll()
+            #if arch(arm64)
+                DDC.avServiceCache.removeAll(keepingCapacity: true)
+            #else
+                DDC.i2cControllerCache.removeAll(keepingCapacity: true)
+            #endif
         }
     }
 
@@ -302,7 +384,7 @@ enum DDC {
         for screen in NSScreen.screens {
             guard screen.isScreen, let screenID = screen.displayID else { continue }
 
-            if SyncMode.isBuiltinDisplay(screenID) || (!includeVirtual && SyncMode.isVirtualDisplay(screenID)) {
+            if isBuiltinDisplay(screenID) || (!includeVirtual && isVirtualDisplay(screenID)) {
                 continue
             }
             displayIDs.append(screenID)
@@ -311,10 +393,39 @@ enum DDC {
             if !displayIDs.isEmpty {
                 return displayIDs
             }
-            return [TEST_DISPLAY_ID, TEST_DISPLAY_PERSISTENT_ID, TEST_DISPLAY_PERSISTENT2_ID, TEST_DISPLAY_PERSISTENT3_ID, TEST_DISPLAY_PERSISTENT4_ID]
+            return [
+                TEST_DISPLAY_ID,
+                TEST_DISPLAY_PERSISTENT_ID,
+                TEST_DISPLAY_PERSISTENT2_ID,
+                TEST_DISPLAY_PERSISTENT3_ID,
+                TEST_DISPLAY_PERSISTENT4_ID,
+            ]
         #else
             return displayIDs
         #endif
+    }
+
+    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
+
+    static func isVirtualDisplay(_ id: CGDirectDisplayID) -> Bool {
+        guard !isGeneric(id) else {
+            return false
+        }
+
+        guard let infoDictionary = displayInfoDictionary(id) else {
+            log.debug("No info dict for id \(id)")
+            return false
+        }
+
+        let isVirtualDevice = infoDictionary["kCGDisplayIsVirtualDevice"] as? Bool
+        let displayIsAirplay = infoDictionary["kCGDisplayIsAirPlay"] as? Bool
+
+        return isVirtualDevice ?? displayIsAirplay ?? false
+    }
+
+    static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
+        !isGeneric(id) &&
+            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || screen(for: id)?.localizedName == "Built-in Retina Display")
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
@@ -324,7 +435,11 @@ enum DDC {
             guard apply else { return true }
         #endif
 
-        guard let fb = I2CController(displayID: displayID) else { return false }
+        #if arch(arm64)
+            guard let avService = AVService(displayID: displayID) else { return false }
+        #else
+            guard let fb = I2CController(displayID: displayID) else { return false }
+        #endif
 
         return queue.sync(flags: [.barrier]) {
             if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
@@ -338,7 +453,13 @@ enum DDC {
             )
 
             let writeStartedAt = DispatchTime.now()
-            let result = DDCWrite(fb, &command)
+
+            #if arch(arm64)
+                let result = DDCWriteM1(avService, &command)
+            #else
+                let result = DDCWrite(fb, &command)
+            #endif
+
             let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
             if writeMs > MAX_WRITE_DURATION_MS {
                 log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
@@ -400,9 +521,14 @@ enum DDC {
         }
     }
 
-    static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
+    static func read(displayID: CGDirectDisplayID, controlID: ControlID, brightness _: Brightness? = nil) -> DDCReadResult? {
         guard !isTestID(displayID) else { return nil }
-        guard let fb = I2CController(displayID: displayID) else { return nil }
+
+        #if arch(arm64)
+            guard let avService = AVService(displayID: displayID) else { return nil }
+        #else
+            guard let fb = I2CController(displayID: displayID) else { return nil }
+        #endif
 
         return queue.sync(flags: [.barrier]) {
             if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
@@ -428,7 +554,13 @@ enum DDC {
             }
 
             let readStartedAt = DispatchTime.now()
-            DDCRead(fb, &command, ddcDelay)
+
+            #if arch(arm64)
+                DDCReadM1(avService, &command)
+            #else
+                DDCRead(fb, &command, ddcDelay)
+            #endif
+
             let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
             if readMs > MAX_READ_DURATION_MS {
                 log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
@@ -469,13 +601,22 @@ enum DDC {
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
         guard !isTestID(displayID) else { return nil }
-        guard let fb = I2CController(displayID: displayID) else { return nil }
+
+        #if arch(arm64)
+            guard let avService = AVService(displayID: displayID) else { return nil }
+        #else
+            guard let fb = I2CController(displayID: displayID) else { return nil }
+        #endif
 
         return queue.sync(flags: [.barrier]) {
             var edidData = [UInt8](repeating: 0, count: 256)
             var edid = EDID()
 
-            EDIDTest(fb, &edid, &edidData)
+            #if arch(arm64)
+                EDIDTestM1(avService, &edid, &edidData)
+            #else
+                EDIDTest(fb, &edid, &edidData)
+            #endif
 
             return (edid, Data(bytes: &edidData, count: 256))
         }
@@ -572,12 +713,47 @@ enum DDC {
         extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
 
-    static func hasI2CController(displayID: CGDirectDisplayID) -> Bool {
+    #if arch(arm64)
+        static var avServiceCache: [CGDirectDisplayID: IOAVService?] = Dictionary(minimumCapacity: 10)
+
+        static func hasAVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> Bool {
+            guard !isTestID(displayID) else { return false }
+            return AVService(displayID: displayID, display: display, ignoreCache: ignoreCache) != nil
+        }
+
+        static func AVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> IOAVService? {
+            guard !isTestID(displayID) else { return nil }
+
+            return queue.sync(flags: [.barrier]) {
+                if !ignoreCache, let service = avServiceCache[displayID] {
+                    return service
+                }
+                let service = displayController.avService(displayID: displayID, display: display)
+                avServiceCache[displayID] = service
+                return service
+            }
+        }
+    #endif
+
+    static var i2cControllerCache: [CGDirectDisplayID: io_service_t?] = Dictionary(minimumCapacity: 10)
+
+    static func hasI2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
         guard !isTestID(displayID) else { return false }
-        return I2CController(displayID: displayID) != nil
+        return I2CController(displayID: displayID, ignoreCache: ignoreCache) != nil
     }
 
-    static func I2CController(displayID: CGDirectDisplayID) -> io_service_t? {
+    static func I2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> io_service_t? {
+        queue.sync(flags: [.barrier]) {
+            if !ignoreCache, let controller = i2cControllerCache[displayID] {
+                return controller
+            }
+            let controller = I2CController(displayID)
+            i2cControllerCache[displayID] = controller
+            return controller
+        }
+    }
+
+    static func I2CController(_ displayID: CGDirectDisplayID) -> io_service_t? {
         guard !isTestID(displayID) else { return nil }
 
         let activeIDs = NSScreen.screens
@@ -587,40 +763,47 @@ enum DDC {
             guard activeIDs.contains(displayID) else { return nil }
         #endif
 
-        return queue.sync(flags: [.barrier]) {
-            var fb = IOFramebufferPortFromCGSServiceForDisplayNumber(displayID)
-            if fb != 0 {
-                log.verbose("Got framebuffer using private CGSServiceForDisplayNumber: \(fb)", context: ["id": displayID])
-                return fb
-            }
-            log.verbose("CGSServiceForDisplayNumber returned invalid framebuffer, trying CGDisplayIOServicePort", context: ["id": displayID])
-
-            fb = IOFramebufferPortFromCGDisplayIOServicePort(displayID)
-            if fb != 0 {
-                log.verbose("Got framebuffer using private CGDisplayIOServicePort: \(fb)", context: ["id": displayID])
-                return fb
-            }
-            log.verbose("CGDisplayIOServicePort returned invalid framebuffer, trying manual search in IOKit registry", context: ["id": displayID])
-
-            let displayUUIDByEDIDCopy = displayUUIDByEDID
-            let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
-            fb = IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
-
-            guard fb != 0 else {
-                log.verbose("IOFramebufferPortFromCGDisplayID returned invalid framebuffer. This display can't be controlled through DDC.", context: ["id": displayID])
-                return nil
-            }
-
-            displayUUIDByEDID.removeAll()
-            for (key, value) in nsDisplayUUIDByEDID {
-                if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
-                    displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
-                }
-            }
-
-            log.verbose("Got framebuffer using IOFramebufferPortFromCGDisplayID: \(fb)", context: ["id": displayID])
+        var fb = IOFramebufferPortFromCGSServiceForDisplayNumber(displayID)
+        if fb != 0 {
+            log.verbose("Got framebuffer using private CGSServiceForDisplayNumber: \(fb)", context: ["id": displayID])
             return fb
         }
+        log.verbose(
+            "CGSServiceForDisplayNumber returned invalid framebuffer, trying CGDisplayIOServicePort",
+            context: ["id": displayID]
+        )
+
+        fb = IOFramebufferPortFromCGDisplayIOServicePort(displayID)
+        if fb != 0 {
+            log.verbose("Got framebuffer using private CGDisplayIOServicePort: \(fb)", context: ["id": displayID])
+            return fb
+        }
+        log.verbose(
+            "CGDisplayIOServicePort returned invalid framebuffer, trying manual search in IOKit registry",
+            context: ["id": displayID]
+        )
+
+        let displayUUIDByEDIDCopy = displayUUIDByEDID
+        let nsDisplayUUIDByEDID = NSMutableDictionary(dictionary: displayUUIDByEDIDCopy)
+        fb = IOFramebufferPortFromCGDisplayID(displayID, nsDisplayUUIDByEDID as CFMutableDictionary)
+
+        guard fb != 0 else {
+            log.verbose(
+                "IOFramebufferPortFromCGDisplayID returned invalid framebuffer. This display can't be controlled through DDC.",
+                context: ["id": displayID]
+            )
+            return nil
+        }
+
+        displayUUIDByEDID.removeAll()
+        for (key, value) in nsDisplayUUIDByEDID {
+            if CFGetTypeID(key as CFTypeRef) == CFDataGetTypeID(), CFGetTypeID(value as CFTypeRef) == CFUUIDGetTypeID() {
+                displayUUIDByEDID[key as! CFData as NSData as Data] = (value as! CFUUID)
+            }
+        }
+
+        log.verbose("Got framebuffer using IOFramebufferPortFromCGDisplayID: \(fb)", context: ["id": displayID])
+        return fb
     }
 
     static func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
@@ -713,8 +896,14 @@ enum DDC {
         log.debug("DDC reading \(controlID) for \(displayID)")
 
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
+            #if DEBUG
+                log.debug("DDC read \(controlID) nil for \(displayID)")
+            #endif
             return nil
         }
+        #if DEBUG
+            log.debug("DDC read \(controlID) \(result.currentValue) for \(displayID)")
+        #endif
         return result.currentValue
     }
 

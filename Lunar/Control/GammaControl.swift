@@ -112,7 +112,7 @@ class GammaControl: Control {
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
-        if let oldValue = oldValue {
+        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue {
             display.setGamma(brightness: brightness, oldBrightness: oldValue)
             return true
         }
@@ -127,7 +127,7 @@ class GammaControl: Control {
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
-        if let oldValue = oldValue {
+        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue {
             display.setGamma(contrast: contrast, oldContrast: oldValue)
             return true
         }
@@ -181,7 +181,6 @@ class GammaControl: Control {
     }
 
     func reset() -> Bool {
-        CGDisplayRestoreColorSyncSettings()
         display.resetGamma()
         return true
     }

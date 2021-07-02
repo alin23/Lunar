@@ -14,13 +14,15 @@ public class RunloopQueue: NSObject {
     // MARK: - Code That Runs On The Main/Creating Thread
 
     private let thread: RunloopQueueThread
+    private var main: Bool
 
     /// Init a new queue with the given name.
     ///
     /// - Parameter name: The name of the queue.
-    @objc(initWithName:) public init(named name: String?) {
+    @objc(initWithName:main:) public init(named name: String?, main: Bool = false) {
         thread = RunloopQueueThread()
         thread.name = name
+        self.main = main
         super.init()
         startRunloop()
     }
@@ -41,6 +43,10 @@ public class RunloopQueue: NSObject {
     ///
     /// - Parameter block: The block of code to execute.
     @objc public func async(_ block: @escaping (() -> Void)) {
+        if main {
+            DispatchQueue.main.async(execute: block)
+            return
+        }
         CFRunLoopPerformBlock(runloop, CFRunLoopMode.defaultMode.rawValue, block)
         thread.awake()
     }
@@ -69,23 +75,38 @@ public class RunloopQueue: NSObject {
     /// a block previously passed to `sync()` will deadlock if the second call is made from a different thread.
     ///
     /// - Parameter block: The block of code to execute.
-    @objc public func sync(_ block: @escaping (() -> Void)) {
+    ///
+
+    func runSync<T>(_ block: @escaping (() -> T)) -> T {
+        if main {
+            return mainThread(block)
+        }
+
         if isRunningOnQueue() {
-            block()
-            return
+            return block()
         }
 
         let conditionLock = NSConditionLock(condition: 0)
-
+        var result: T!
         CFRunLoopPerformBlock(runloop, CFRunLoopMode.defaultMode.rawValue) {
             conditionLock.lock()
-            block()
+            result = block()
             conditionLock.unlock(withCondition: 1)
         }
 
         thread.awake()
         conditionLock.lock(whenCondition: 1)
         conditionLock.unlock()
+
+        return result
+    }
+
+    public func sync<T>(_ block: @escaping (() -> T)) -> T {
+        runSync(block)
+    }
+
+    public func sync(_ block: @escaping (() -> Void)) {
+        runSync(block)
     }
 
     /// Query if the caller is running on this queue.

@@ -53,7 +53,7 @@ class ScrollableBrightness: NSView {
             display?.minBrightness.intValue ?? 0
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.minBrightness = newValue.ns
         }
     }
@@ -63,7 +63,7 @@ class ScrollableBrightness: NSView {
             display?.maxBrightness.intValue ?? 100
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.maxBrightness = newValue.ns
         }
     }
@@ -73,12 +73,12 @@ class ScrollableBrightness: NSView {
             display?.brightness.intValue ?? 50
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.brightness = newValue.ns
         }
     }
 
-    var displayObservers = Set<AnyCancellable>()
+    var displayObservers = [String: AnyCancellable]()
 
     func addObserver(_ display: Display) {
         display.$brightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
@@ -90,7 +90,7 @@ class ScrollableBrightness: NSView {
             mainThread {
                 self?.currentValue?.stringValue = String(newBrightness)
             }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "brightness")
     }
 
     func update(from display: Display) {
@@ -119,7 +119,7 @@ class ScrollableBrightness: NSView {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        for observer in displayObservers {
+        for observer in displayObservers.values {
             observer.cancel()
         }
     }

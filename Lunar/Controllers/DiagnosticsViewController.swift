@@ -148,7 +148,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 setPercent(10)
                 guard !self.stopped else { return }
 
-                let i2c = DDC.I2CController(displayID: display.id)
+                #if arch(arm64)
+                    let avService = DDC.AVService(displayID: display.id, display: display, ignoreCache: true)
+                #else
+                    let i2c = DDC.I2CController(displayID: display.id, ignoreCache: true)
+                #endif
+
                 setPercent(20)
                 guard !self.stopped else { return }
 
@@ -164,13 +169,25 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                 var br: Float = 0.0
 
+                #if arch(arm64)
+                    let i2cMessage = """
+                    * AV Service: `\(
+                        avService == nil ? "NONE" : CFCopyDescription(avService!) as String)`
+                      * _This monitor \(
+                          avService == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    """
+                #else
+                    let i2cMessage = """
+                    * I2C Controller: `\(
+                        i2c == nil ? "NONE" : i2c!.s)`
+                      * _This monitor \(
+                          i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    """
+                #endif
                 self.render("""
                 * ID: `\(display.id)`
                 * EDID Name: `\(display.edidName)`
-                * I2C Controller: `\(
-                    i2c == nil ? "NONE" : i2c!.s)`
-                  * _This monitor \(
-                      i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                \(i2cMessage)
                 * Network Controller: `\(network == nil ? "NONE" : network!)`
                   * _This monitor \(network == nil ?
                     "can't be controlled through the network" : "supports DDC through a network controller")_
@@ -476,7 +493,11 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 let coreDisplayControl = CoreDisplayControl(display: display)
                 let ddcControl = DDCControl(display: display)
 
-                let ddcAvailable = ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id)
+                #if arch(arm64)
+                    let ddcAvailable = ddcControl.isAvailable() || DDC.hasAVService(displayID: display.id, ignoreCache: true)
+                #else
+                    let ddcAvailable = ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id, ignoreCache: true)
+                #endif
                 let coreDisplayAvailable = coreDisplayControl.isAvailable() || display.isAppleDisplay()
                 let networkAvailable = networkControl.isAvailable()
                 let shouldStartTests = ddcAvailable || coreDisplayAvailable || networkAvailable

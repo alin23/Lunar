@@ -163,11 +163,11 @@ class HotkeyViewController: NSViewController {
             defer { log.verbose("END DEINIT") }
         #endif
 
-        cancelAsyncRecurringTask("fkeysSettingWatcher")
+        cancelTask("fkeysSettingWatcher")
     }
 
     override func viewDidDisappear() {
-        cancelAsyncRecurringTask("fkeysSettingWatcher")
+        cancelTask("fkeysSettingWatcher")
     }
 
     override func mouseDown(with event: NSEvent) {
