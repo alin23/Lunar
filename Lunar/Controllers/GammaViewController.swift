@@ -57,6 +57,16 @@ class GammaViewController: NSViewController {
                 }
             }
         }
+
+        let key = "stopHighlighting"
+        let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
+        debounce(ms: 3000, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
+            guard let self = self else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
+            self.stopHighlighting()
+        }
     }
 
     var highlighting: Bool {

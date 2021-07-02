@@ -18,7 +18,7 @@ class QuickAdaptiveButton: NSButton {
         return displayController.displays[id]
     }
 
-    var displayObservers = Set<AnyCancellable>()
+    var displayObservers = [String: AnyCancellable]()
 
     func setup(displayID: CGDirectDisplayID) {
         self.displayID = displayID
@@ -74,7 +74,7 @@ class QuickAdaptiveButton: NSButton {
                 }
             }
             display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "adaptive")
     }
 
     deinit {
@@ -82,7 +82,7 @@ class QuickAdaptiveButton: NSButton {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        for observer in displayObservers {
+        for observer in displayObservers.values {
             observer.cancel()
         }
     }

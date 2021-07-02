@@ -28,7 +28,7 @@ class PageController: NSPageController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
+            do { log.verbose("END DEINIT") }
         #endif
     }
 

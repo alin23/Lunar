@@ -3,24 +3,30 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "enablePro():Pro.swift">
+         contextName = "DDCControl.setBrightness(_:oldValue:):DDCControl.swift">
          <PersistentStrings>
             <PersistentString
-               value = "lunarProInvalidForVersion">
+               value = "supportsSmoothTransition(for: .BRIGHTNESS)">
+            </PersistentString>
+            <PersistentString
+               value = "display.slowWrite">
+            </PersistentString>
+            <PersistentString
+               value = "CachedDefaults[.smoothTransition]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
+         contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "activeWindow(on:):Util.swift">
-      </ContextState>
-      <ContextState
-         contextName = "BrightnessContrastChartView.setup(mode:):BrightnessContrastChartView.swift">
+         contextName = "DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "brightnessGraph.entries.count">
+               value = "display.serial">
+            </PersistentString>
+            <PersistentString
+               value = "display.name">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -36,22 +42,16 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "BrightnessContrastChartView.highlightCurrentValues(adaptiveMode:for:):BrightnessContrastChartView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "DisplayController.appBrightnessOffset.getter:DisplayController.swift">
-      </ContextState>
-      <ContextState
          contextName = "static RelativeFormatter.suitableFlavour(inList:forLocale:):RelativeFormatter.swift">
-      </ContextState>
-      <ContextState
-         contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
          contextName = "closure #2 in windowList(for:onscreen:opaque:withTitle:levels:appException:runningApp:):Util.swift">
       </ContextState>
       <ContextState
-         contextName = "static ParsableArguments.exit(withError:):ParsableArguments.swift">
+         contextName = "HotkeyView.recordView(_:didChangeKeyCombo:):HotKeyView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
       </ContextState>
       <ContextState
          contextName = "main:AppDelegate.swift">
@@ -65,6 +65,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "DisplayController.appBrightnessOffset.getter:DisplayController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static DDC.AVService(displayID:):DDC.swift">
+      </ContextState>
+      <ContextState
+         contextName = "activeWindow(on:):Util.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static ParsableArguments.exit(withError:):ParsableArguments.swift">
+      </ContextState>
+      <ContextState
          contextName = "DisplayViewController.display.didset:DisplayViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -73,22 +85,21 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "ToggleButton.labelColor.getter:ToggleButton.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "title">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__40-[SentryCrashIntegration configureScope]_block_invoke_3:SentryCrashIntegration.m">
+      </ContextState>
+      <ContextState
+         contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
+      </ContextState>
+      <ContextState
          contextName = "DisplayController.appBrightnessContrastOffset(for:):DisplayController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "HotkeyView.recordView(_:didChangeKeyCombo:):HotKeyView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "activeWindow():Util.swift">
-      </ContextState>
-      <ContextState
-         contextName = "DisplayViewController.initHotkeys():DisplayViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "mapNumberSIMD(_:fromLow:fromHigh:toLow:toHigh:):Util.swift">
       </ContextState>
       <ContextState
          contextName = "HotkeyButton.mouseDown(with:):HotkeyButton.swift">
@@ -117,64 +128,15 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "DisplayViewController.update(_:):DisplayViewController.swift">
+         contextName = "Window.init(from:):Util.swift">
          <PersistentStrings>
             <PersistentString
-               value = "display.id">
-            </PersistentString>
-            <PersistentString
-               value = "GENERIC_DISPLAY_ID">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "display.serial">
-            </PersistentString>
-            <PersistentString
-               value = "display.name">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ToggleButton.labelColor.getter:ToggleButton.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "title">
+               value = "dict[kCGWindowName as String]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "Display.addObservers():Display.swift">
-      </ContextState>
-      <ContextState
-         contextName = "AdaptiveModeButton.setAutoModeItemTitle(modeKey:):AdaptiveModeButton.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "modeKey.str">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static Hotkey.setKeyEquivalent(_:menuItem:hotkeys:):Hotkeys.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "&quot;\(modifierChars)\(keyChar)&quot;">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AppDelegate.adaptToScreenConfiguration(notification:):AppDelegate.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "notification.name">
-            </PersistentString>
-            <PersistentString
-               value = "notification.userInfo">
-            </PersistentString>
-         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #5 in DisplayViewController.initHotkeys(from:):DisplayViewController.swift">
@@ -188,6 +150,25 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "BrightnessContrastChartView.highlightCurrentValues(adaptiveMode:for:):BrightnessContrastChartView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static Hotkey.setKeyEquivalent(_:menuItem:hotkeys:):Hotkeys.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "&quot;\(modifierChars)\(keyChar)&quot;">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "enablePro():Pro.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "lunarProInvalidForVersion">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveModeButton.update(modeKey:):AdaptiveModeButton.swift">
          <PersistentStrings>
             <PersistentString
@@ -196,15 +177,77 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "LocationMode.fetchMoments(again:):LocationMode.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DDCReadM1:DDC.c">
+      </ContextState>
+      <ContextState
+         contextName = "AdaptiveModeButton.setAutoModeItemTitle(modeKey:):AdaptiveModeButton.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "modeKey.str">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "encodeObject:SentryCrashJSONCodecObjC.m">
+      </ContextState>
+      <ContextState
+         contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
+      </ContextState>
+      <ContextState
+         contextName = "activeWindow():Util.swift">
+      </ContextState>
+      <ContextState
+         contextName = "AppDelegate.adaptToScreenConfiguration(notification:):AppDelegate.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "notification.name">
+            </PersistentString>
+            <PersistentString
+               value = "notification.userInfo">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DisplayViewController.update(_:):DisplayViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "display.id">
+            </PersistentString>
+            <PersistentString
+               value = "GENERIC_DISPLAY_ID">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Display.getBestControl():Display.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "name">
+            </PersistentString>
+            <PersistentString
+               value = "id">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:factor:userValues:):AdaptiveMode.swift">
+      </ContextState>
+      <ContextState
          contextName = "static RelativeFormatter.format(date:to:style:locale:):RelativeFormatter.swift">
       </ContextState>
       <ContextState
-         contextName = "Window.init(from:):Util.swift">
+         contextName = "BrightnessContrastChartView.setup(mode:):BrightnessContrastChartView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "dict[kCGWindowName as String]">
+               value = "brightnessGraph.entries.count">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "BrightnessContrastChartView.setupLimitLines(_:):BrightnessContrastChartView.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

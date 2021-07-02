@@ -865,44 +865,44 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func percent0HotkeyHandler() {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         setLightPercent(percent: 0)
         log.debug("0% Hotkey pressed")
     }
 
     @objc func percent25HotkeyHandler() {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         setLightPercent(percent: 25)
         log.debug("25% Hotkey pressed")
     }
 
     @objc func percent50HotkeyHandler() {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         setLightPercent(percent: 50)
         log.debug("50% Hotkey pressed")
     }
 
     @objc func percent75HotkeyHandler() {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         setLightPercent(percent: 75)
         log.debug("75% Hotkey pressed")
     }
 
     @objc func percent100HotkeyHandler() {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         setLightPercent(percent: 100)
         log.debug("100% Hotkey pressed")
     }
 
     @objc func faceLightHotkeyHandler() {
         guard lunarProActive else { return }
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")
     }
 
     func brightnessUpAction(offset: Int? = nil) {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         increaseBrightness(by: offset)
 
         for (_, display) in displayController.activeDisplays {
@@ -913,7 +913,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         decreaseBrightness(by: offset)
 
         for (_, display) in displayController.activeDisplays {
@@ -924,7 +924,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastUpAction(offset: Int? = nil) {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         increaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {
@@ -935,7 +935,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastDownAction(offset: Int? = nil) {
-        cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         decreaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {

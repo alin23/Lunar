@@ -233,7 +233,7 @@ extension AdaptiveMode {
             if curve.contains(where: \.isNaN) {
                 log.error(
                     "NaN value?? Whyy?? WHAT DID I DO??",
-                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset ?? 1]
                 )
             }
         #endif
@@ -249,7 +249,7 @@ extension AdaptiveMode {
             if values.contains(where: \.isNaN) {
                 log.error(
                     "NaN value?? Whyy?? WHAT DID I DO??",
-                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
+                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset ?? 1]
                 )
             }
         #endif

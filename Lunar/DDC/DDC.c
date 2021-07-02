@@ -146,24 +146,35 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     return NULL;
 }
 
-io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID) {
-    io_service_t framebuffer = 0;
-    if (CGSServiceForDisplayNumber != NULL) {
-         // private API func is aliased to SLServiceForDisplayNumber within Skylight.framework, which CoreGraphics.framework links to
-         // see https://objective-see.com/blog/blog_0x2C.html "reversing apple's 'screencapture' to programmatically grab desktop images"
-        CGSServiceForDisplayNumber(displayID, &framebuffer);
-     }
-     return framebuffer;
+IOAVServiceRef AVServiceFromDCPAVServiceProxy(io_service_t service)
+{
+    IOAVServiceRef avService = 0;
+   if (IOAVServiceCreateWithService != NULL) {
+        avService = IOAVServiceCreateWithService(kCFAllocatorDefault, service);
+    }
+    return avService;
 }
 
-io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID) {
+io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID)
+{
+    io_service_t framebuffer = 0;
+    if (CGSServiceForDisplayNumber != NULL) {
+        // private API func is aliased to SLServiceForDisplayNumber within Skylight.framework, which CoreGraphics.framework links to
+        // see https://objective-see.com/blog/blog_0x2C.html "reversing apple's 'screencapture' to programmatically grab desktop images"
+        CGSServiceForDisplayNumber(displayID, &framebuffer);
+    }
+    return framebuffer;
+}
+
+io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID)
+{
     io_service_t framebuffer = 0;
     if (CGDisplayIOServicePort != NULL) {
         // legacy API call to get the IOFB's service port, was deprecated after macOS 10.9:
         //     https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/index.html#//apple_ref/c/func/CGDisplayIOServicePort
         framebuffer = CGDisplayIOServicePort(displayID);
-     }
-     return framebuffer;
+    }
+    return framebuffer;
 }
 
 /*
@@ -182,7 +193,7 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
         return 0;
     }
 
-   kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO), &iter);
+    kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO), &iter);
 
     if (err != KERN_SUCCESS) {
         CFRelease(displayUUID);
@@ -285,9 +296,13 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
     return 0;
 }
 
-dispatch_semaphore_t I2CRequestQueue(io_service_t i2c_device_id) {
+dispatch_semaphore_t I2CRequestQueue(io_service_t i2c_device_id)
+{
     static UInt64 queueCount = 0;
-    static struct ReqQueue {uint32_t id; dispatch_semaphore_t queue;} *queues = NULL;
+    static struct ReqQueue {
+        uint32_t id;
+        dispatch_semaphore_t queue;
+    }* queues = NULL;
     dispatch_semaphore_t queue = NULL;
     if (!queues)
         queues = calloc(100, sizeof(*queues)); //FIXME: specify
@@ -300,11 +315,35 @@ dispatch_semaphore_t I2CRequestQueue(io_service_t i2c_device_id) {
     if (queues[i].id == i2c_device_id)
         queue = queues[i].queue;
     else
-        queues[queueCount++] = (struct ReqQueue){i2c_device_id, (queue = dispatch_semaphore_create(1))};
+        queues[queueCount++] = (struct ReqQueue) { i2c_device_id, (queue = dispatch_semaphore_create(1)) };
     return queue;
 }
 
-bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest *request) {
+dispatch_semaphore_t AVServiceI2CQueue(IOAVServiceRef i2c_device_id)
+{
+    static UInt64 queueCount = 0;
+    static struct AVReqQueue {
+        IOAVServiceRef id;
+        dispatch_semaphore_t queue;
+    }* queues = NULL;
+    dispatch_semaphore_t queue = NULL;
+    if (!queues)
+        queues = calloc(100, sizeof(*queues)); //FIXME: specify
+    UInt64 i = 0;
+    while (i < queueCount)
+        if (queues[i].id == i2c_device_id)
+            break;
+        else
+            i++;
+    if (queues[i].id == i2c_device_id)
+        queue = queues[i].queue;
+    else
+        queues[queueCount++] = (struct AVReqQueue) { i2c_device_id, (queue = dispatch_semaphore_create(1)) };
+    return queue;
+}
+
+bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
+{
     dispatch_semaphore_t queue = I2CRequestQueue(framebuffer);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
     bool result = false;
@@ -322,13 +361,49 @@ bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest *request) {
                 IOI2CInterfaceClose(connect, kNilOptions);
             }
             IOObjectRelease(interface);
-            if (result) break;
+            if (result)
+                break;
         }
     }
     if (request->replyTransactionType == kIOI2CNoTransactionType)
         usleep(20000);
     dispatch_semaphore_signal(queue);
     return result && request->result == KERN_SUCCESS;
+}
+
+bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write)
+{
+    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
+    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
+
+    IOReturn err;
+    UInt8 data[256];
+    bzero(&data, sizeof(data));
+
+    data[0] = 0x84;
+    data[1] = 0x03;
+    data[2] = write->control_id;
+    data[3] = (write->new_value) >> 8;
+    data[4] = write->new_value & 255;
+    data[5] = 0x6E ^ 0x51 ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4];
+
+    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
+    if (err) {
+        logToFile("E: DDCWriteM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), 1);
+        dispatch_semaphore_signal(queue);
+        return false;
+    }
+    usleep(32000);
+
+    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
+    if (err) {
+        logToFile("E: DDCWriteM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), 2);
+        dispatch_semaphore_signal(queue);
+        return false;
+    }
+
+    dispatch_semaphore_signal(queue);
+    return true;
 }
 
 bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
@@ -357,6 +432,96 @@ bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
     request.replyBytes = 0;
 
     bool result = FramebufferI2CRequest(framebuffer, &request);
+    return result;
+}
+
+bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
+{
+    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
+    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
+
+    IOReturn err;
+    UInt8 reply_data[11] = {};
+    UInt8 data[256];
+    bool result = false;
+    bzero(&data, sizeof(data));
+
+    data[0] = 0x84;
+    data[1] = 0x03;
+    data[2] = DPMS;
+    data[3] = (1) >> 8;
+    data[4] = 1 & 255;
+    data[5] = 0x6E ^ 0x51 ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4];
+
+    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
+    if (err) {
+        logToFile("E: Bogus Write: DDCReadM1.IOAVServiceWriteI2C error: %s\n", mach_error_string(err));
+        dispatch_semaphore_signal(queue);
+        return false;
+    }
+    usleep(32000);
+
+    data[0] = 0x82;
+    data[1] = 0x01;
+    data[2] = read->control_id;
+    data[3] = 0x6e ^ 0x51 ^ data[0] ^ data[1] ^ data[2];
+
+    for (int i = 1; i <= kMaxRequests; i++) {
+        bzero(&reply_data, sizeof(reply_data));
+
+        err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 4);
+        usleep(30000);
+        if (err) {
+            read->success = false;
+            read->max_value = 0;
+            read->current_value = 0;
+            logToFile("E: DDCReadM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), i);
+            dispatch_semaphore_signal(queue);
+            return false;
+        }
+
+        err = IOAVServiceReadI2C(avService, 0x37, 0x51, reply_data, 11);
+        if (err) {
+            read->success = false;
+            read->max_value = 0;
+            read->current_value = 0;
+            logToFile("E: DDCReadM1.IOAVServiceReadI2C error: %s try: %d\n", mach_error_string(err), i);
+            dispatch_semaphore_signal(queue);
+            return false;
+        }
+
+        result = (reply_data[0] == 0x6E && reply_data[2] == 0x2 && reply_data[4] == read->control_id && reply_data[10] == (0x6F ^ 0x51 ^ reply_data[1] ^ reply_data[2] ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
+
+        if (result) { // checksum is ok
+            if (i > 1) {
+                logToFile("D: Tries required to get data: %d \n", i);
+            }
+            break;
+        }
+
+#if DEBUG
+        if (!result) {
+            printf("%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X    ", reply_data[0], reply_data[1], reply_data[2], reply_data[3], reply_data[4], reply_data[5], reply_data[6], reply_data[7], reply_data[8], reply_data[9], reply_data[10]);
+            printf("Checksum: %02X   ", (0x6F ^ 0x51 ^ 0x88 ^ 0x2 ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
+            printf("Control ID: %02X <> %02X\n", reply_data[4], read->control_id);
+        }
+#endif
+
+        // reset values and return 0, if data reading fails
+        if (i >= kMaxRequests) {
+            read->success = false;
+            read->max_value = 0;
+            read->current_value = 0;
+            logToFile("E: No data after %d tries! \n", i);
+            dispatch_semaphore_signal(queue);
+            return false;
+        }
+        usleep(40000);
+    }
+    read->success = true;
+    read->max_value = reply_data[7];
+    read->current_value = reply_data[9];
+    dispatch_semaphore_signal(queue);
     return result;
 }
 
@@ -533,6 +698,53 @@ UInt32 SupportedTransactionType()
     }
 
     return supportedType;
+}
+
+bool EDIDTestM1(IOAVServiceRef avService, struct EDID* edid, uint8_t edidData[256])
+{
+    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
+    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
+
+    CFDataRef data;
+    IOReturn err = IOAVServiceCopyEDID(avService, &data);
+    if (err) {
+        logToFile("E: EDIDTestM1.IOAVServiceCopyEDID error: %s\n", mach_error_string(err));
+        dispatch_semaphore_signal(queue);
+        return false;
+    }
+
+    if (!data) {
+        logToFile("E: EDIDTestM1.IOAVServiceCopyEDID no edid\n");
+        dispatch_semaphore_signal(queue);
+        return false;
+    }
+
+    if (edid) {
+
+        #if DEBUG
+            UInt8 name[14];
+            bzero(&name, sizeof(name));
+            CFDataGetBytes(data, CFRangeMake(0x71, 13), name);
+            printf("EDID NAME: %s", name);
+        #endif
+
+        memcpy(edid, &data, 256);
+        memcpy(edidData, &data, 256);
+    }
+
+    UInt32 i = 0;
+    UInt8 sum = 0;
+    const UInt8* dataPtr = CFDataGetBytePtr(data);
+    while (i < 256) {
+        if (i % 256 == 0) {
+            if (sum)
+                break;
+            sum = 0;
+        }
+        sum += dataPtr[i++];
+    }
+    dispatch_semaphore_signal(queue);
+    return !sum;
 }
 
 bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256])

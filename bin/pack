@@ -65,15 +65,19 @@ if not set -q DISABLE_NOTARIZATION
             exit 1
         end
 
-        xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP" || exit 1
+        if set -q DISABLE_PACKING
+            xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP" || exit 1
+            ditto -c -k --keepParent /tmp/Lunar/Lunar.app /tmp/Lunar/Lunar.zip
+        end
     end
 end
 
 if not set -q DISABLE_PACKING
     set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
 
-    ./make-installer dmg
-    ./make-installer pkg
+    ./make-installer dmg &
+    ./make-installer pkg &
+    wait
 
     export CONFIGURATION=$CONFIGURATION
     ./update_appcast

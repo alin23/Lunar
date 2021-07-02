@@ -39,6 +39,8 @@ class DDCControl: Control {
             DDC.writeFaults[display.id]?.removeAll()
             DDC.readFaults[display.id]?.removeAll()
             display.responsiveDDC = true
+            display.startI2CDetection()
+            display.lastConnectionTime = Date()
         } else {
             DDC.skipWritingPropertyById.removeAll()
             DDC.skipReadingPropertyById.removeAll()
@@ -46,6 +48,8 @@ class DDCControl: Control {
             DDC.readFaults.removeAll()
             for display in displayController.activeDisplays.values {
                 display.responsiveDDC = true
+                display.startI2CDetection()
+                display.lastConnectionTime = Date()
             }
         }
     }
