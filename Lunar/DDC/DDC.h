@@ -254,10 +254,18 @@ struct EDID {
     } extensiondata;
 };
 
+typedef CFTypeRef IOAVServiceRef;
+
 bool logToFile(char* format, ...);
+
+bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand *write);
+bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand *read);
+bool EDIDTestM1(IOAVServiceRef avService, struct EDID *edid, uint8_t edidData[256]);
+
 bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand *write);
 bool DDCRead(io_service_t framebuffer, struct DDCReadCommand *read, long ddcMinReplyDelay);
 bool EDIDTest(io_service_t framebuffer, struct EDID *edid, uint8_t edidData[256]);
+IOAVServiceRef AVServiceFromDCPAVServiceProxy(io_service_t service);
 io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMutableDictionaryRef displayUUIDByEDID);
 io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID);
 io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID);
@@ -268,5 +276,12 @@ bool IsLidClosed(void);
 
 extern io_service_t CGDisplayIOServicePort(CGDirectDisplayID display) __attribute__((weak_import));
 extern void CGSServiceForDisplayNumber(CGDirectDisplayID display, io_service_t* service) __attribute__((weak_import));
+
+extern IOAVServiceRef IOAVServiceCreate(CFAllocatorRef allocator);
+extern IOAVServiceRef IOAVServiceCreateWithService(CFAllocatorRef allocator, io_service_t service);
+
+extern IOReturn IOAVServiceCopyEDID(IOAVServiceRef service, CFDataRef* x2);
+extern IOReturn IOAVServiceReadI2C(IOAVServiceRef service, uint32_t chipAddress, uint32_t offset, void* outputBuffer, uint32_t outputBufferSize);
+extern IOReturn IOAVServiceWriteI2C(IOAVServiceRef service, uint32_t chipAddress, uint32_t dataAddress, void* inputBuffer, uint32_t inputBufferSize);
 
 #endif

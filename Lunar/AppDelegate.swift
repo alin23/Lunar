@@ -35,12 +35,15 @@ private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .utility)
+let debounceQueue = RunloopQueue(named: "fyi.lunar.debounce.queue")
+let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
 let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
-let timerQueue = DispatchQueue(label: "fyi.lunar.timer.queue", qos: .utility, attributes: .concurrent)
+// let timerQueue = DispatchQueue(label: "fyi.lunar.timer.queue", qos: .utility, attributes: .concurrent)
+let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
 let dataSerialQueue = DispatchQueue(label: "fyi.lunar.dataSerial.queue", qos: .utility, target: DispatchQueue.global(qos: .utility))
@@ -228,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") {
             if AXIsProcessTrusted() {
                 onAcquire()
-                cancelAsyncRecurringTask("AXPermissionsChecker")
+                cancelTask("AXPermissionsChecker")
             }
         }
     }
@@ -433,8 +436,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.manageClamshellMode()
                 displayController.resetDisplayList()
 
-                asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
-                    self.disableFaceLight()
+                debounce(ms: 3000, uniqueTaskKey: "resetStates") {
+                    self.disableFaceLight(smooth: false)
                     NetworkControl.resetState()
                     DDCControl.resetState()
                 }
@@ -458,18 +461,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     }
                     _ = displayController.adaptiveMode.watch()
 
-                    asyncAfter(ms: 3000, uniqueTaskKey: "resetStates") {
-                        self.disableFaceLight()
+                    debounce(ms: 3000, uniqueTaskKey: "resetStates") {
+                        self.disableFaceLight(smooth: false)
                         NetworkControl.resetState()
                         DDCControl.resetState()
                     }
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        asyncAfter(ms: 2000, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-                            for _ in 1 ... 5 {
-                                displayController.adaptBrightness(force: true)
-                                sleep(3)
-                            }
+                        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+                            displayController.adaptBrightness(force: true)
                         }
                     }
 
@@ -533,7 +533,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         //     }
         // }
 
-        mediaKeysPublisher.sink {
+        brightnessKeysEnabledPublisher.sink { change in
+            if change.newValue {
+                self.startOrRestartMediaKeyTap()
+            }
+        }.store(in: &observers)
+        volumeKeysEnabledPublisher.sink { change in
+            if change.newValue {
+                self.startOrRestartMediaKeyTap()
+            }
+        }.store(in: &observers)
+        mediaKeysControlAllMonitorsPublisher.sink { _ in
             self.startOrRestartMediaKeyTap()
         }.store(in: &observers)
 
@@ -620,11 +630,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                           let c = w.contentViewController as? GammaViewController else { return }
                     w.ignoresMouseEvents = true
                     c.highlight()
-                    asyncAfter(ms: 3000, uniqueTaskKey: "stopHighlighting", mainThread: true) {
-                        self.stopHighlighting()
-                    }
                 } else {
-                    asyncAfter(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
+                    debounce(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
                         self.stopHighlighting()
                     }
                 }
@@ -649,7 +656,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         let nc = UNUserNotificationCenter.current()
-        nc.requestAuthorization(options: [.alert, .criticalAlert, .provisional], completionHandler: { _, _ in })
+        nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
 
         log.initLogger()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
@@ -676,6 +683,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
         }
 
+        DDC.setup()
+
+        hideYellowDotPublisher.sink { change in
+            if change.newValue {
+                debounce(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
+                    self.stopHighlighting()
+                }
+            }
+        }.store(in: &observers)
+
         if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
             startOrRestartMediaKeyTap()
         } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
@@ -693,11 +710,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             setLogPath(logPath, logPath.count)
         }
 
-        #if DEBUG
-            asyncEvery(3.seconds) {
-                log.debug("Active window", context: activeWindow(on: displayController.currentDisplay?.screen))
-            }
-        #endif
+        // #if DEBUG
+        //     asyncEvery(3.seconds) {
+        //         log.debug("Active window", context: activeWindow(on: displayController.currentDisplay?.screen))
+        //     }
+        // #endif
         handleDaemon()
 
         initDisplayControllerActivity()
@@ -730,11 +747,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.capture(message: "Launch")
         }
 
-        asyncAfter(ms: 200, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY) {
-            for _ in 1 ... 5 {
-                displayController.adaptBrightness(force: true)
-                sleep(3)
-            }
+        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+            displayController.adaptBrightness(force: true)
         }
 
         log.debug("App finished launching")
@@ -841,8 +855,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func resetElements() {
-        if let splitView = windowController?.window?.contentViewController as? SplitViewController {
-            splitView.activeModeButton?.needsDisplay = true
+        mainThread {
+            if let splitView = windowController?.window?.contentViewController as? SplitViewController {
+                splitView.activeModeButton?.needsDisplay = true
+            }
         }
     }
 
@@ -852,6 +868,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func setLightPercent(percent: Int8) {
         guard checkRemainingAdjustments() else { return }
+
         displayController.disable()
         displayController.setBrightnessPercent(value: percent)
         displayController.setContrastPercent(value: percent)
@@ -869,7 +886,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentAudioDisplay _: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
-        displayController.adjustVolume(by: amount, for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentDisplay)
+        serialQueue
+            .async {
+                displayController.adjustVolume(
+                    by: amount,
+                    for: displays,
+                    currentDisplay: currentDisplay,
+                    currentAudioDisplay: currentDisplay
+                )
+            }
     }
 
     func decreaseVolume(
@@ -879,7 +904,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentAudioDisplay _: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
-        displayController.adjustVolume(by: -amount, for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentDisplay)
+        serialQueue
+            .async {
+                displayController.adjustVolume(
+                    by: -amount,
+                    for: displays,
+                    currentDisplay: currentDisplay,
+                    currentAudioDisplay: currentDisplay
+                )
+            }
     }
 
     func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {

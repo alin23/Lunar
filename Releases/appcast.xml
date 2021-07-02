@@ -577,28 +577,18 @@
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>KPEcue3xzPduupE+6SRHDJZGAtE=</signature>
             <signature>7ZZJO5+kRc8EoYS6yv4kpm2B5n8=</signature>
-            <description>
-                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Shake window when trying to input an invalid field value</li><li>Revert all changes to a field when pressing escape</li><li>Pressing tab inside a field will commit the value</li><li>Show Lunar window on the screen where the cursor is</li><li>Hide yellow dot on operation end</li></ul></div></div>]]>
-            </description>
-        </item>
-        <item>
-            <title>4.3.0</title>
-            <pubDate>Wed, 30 Jun 2021 08:56:12 +0300</pubDate>
-            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure length="17196555" sparkle:dsaSignature="MEQCICRxorBHjmk8ud0nSQY2ehXMlG4IiJXcBwC1G3qSc/KNAiBr/3oEgRtvgkqRznUDWlze4+3kvefrX1Mh4Q1NWRT55A==" sparkle:edSignature="wgcGALnslO0Emg1Lz0vVwM18BJwy5HidFn2zr0MxYyPEoxkKeibeveY8OR89xDf1iDVUl6bjSmivzRvOxesTCQ==" sparkle:installationType="package" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.3.0.zip"/>
-            <sparkle:deltas>
-                <enclosure length="3444053" sparkle:deltaFrom="4.2.3" sparkle:dsaSignature="MEQCIFdAWkK4SolWRTqOaUAMPF+kq4+uZCGqkvYoGVibNFX7AiBj8J5N3jQhiq8ac29t4WmtKw9K2MnIh/ECq+QgEAiTQQ==" sparkle:edSignature="jWkxvfCEPt+cmi8qJI2I9e+uZ8pu5aDgk2eR/sso+rCZpFFf4mZVw6gEFFXF0yw9rKC90sEOFI5mU4u7IKBuAA==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.2.3"/>
-                <enclosure length="3570853" sparkle:deltaFrom="4.2.2" sparkle:dsaSignature="MEUCIC6Cu0xunE4vCnmE9uz/UCDwfBSU1Je/QR1O0/jf8+pWAiEAjdIapzzeJjJw9SY8AYoRJM/X/zEhKzJMIRB1LsSLMX8=" sparkle:edSignature="zFVM5Qf3TxskePcZFKmOWQDqpPTOEql93o++XJ+0jw73XhMRO+O0lU2x7vr9qomDS51UzpOZcN2j02V9jA8wAw==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.2.2"/>
-                <enclosure length="3574913" sparkle:deltaFrom="4.2.1" sparkle:dsaSignature="MEQCIE8WV3nPAci3MqKHS/vxeaKXrLRV+yxEPV/JucXCZuPKAiBDONPjhnlahBzvm88qLsNePFklBFoierkuRfxN/D2+cQ==" sparkle:edSignature="/AuX/16KBYbzvQCDH07HxlhcZAJOnRbEFzs5pQ69+YY5sjZd7kfFJ0uWe27ifP9CSuTDj1cvEhyREY0YP5mKAw==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.2.1"/>
-                <enclosure length="3553026" sparkle:deltaFrom="4.2.0" sparkle:dsaSignature="MEQCIE+0XMteOk+rt6Qt4vZGZyE8cnNSI15p6FpMTomHgbyIAiAZee/9iX/vroRhOs5Av9xmvrl75Z/Bixc4+LJC+v3lmA==" sparkle:edSignature="4a5tz4iQZiCKJGQ65WgYSBua3zChF2kR3uHzsT69qs9u7T+AoTraxAao6XlBxFNsEF3Io3+kzDOwZXCQ/Da4CQ==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.2.0"/>
-                <enclosure length="3666749" sparkle:deltaFrom="4.1.4" sparkle:dsaSignature="MEQCIHwoqb77E2Bms+DgbsqV9E9YUGxXDND4Kklz6ZwxHnjeAiBnQVQQtQX68CoB95ndGskPQb1pMohCbjKgPFn3vSD+8w==" sparkle:edSignature="lys2EeiIIylscTooLMjZekEm1tC23BFoCkdFvoRzrTAVloaZTAj9BEfu/4M4pZ6uw115te4ENvfAwxTWb9qNAg==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.1.4"/>
-                <enclosure length="3765212" sparkle:deltaFrom="4.1.3" sparkle:dsaSignature="MEQCIBJNP9dmzgNMOc500dlbAcG4rKhI/rJAJhbPcWZIrNJ0AiBfE3dlLuiX9W3QxGAOhvUZOQQNxMa1hWLhR1L0EDc53g==" sparkle:edSignature="yrTjjHxH9mwg7tm6epcoq/jQuINnCJSb+RfKH4X4pkOh2jF/BApn+KtF1tvIY6B2W/Vhy3+g7GIOgwrwxGBTBA==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/delta/4.3.0/4.1.3"/>
-            </sparkle:deltas>
-            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>Xs+TJI5D8jjsVd0nNhfmYLPTiIs=</signature>
             <signature>qe6uQ5co09IOnPNZOo4MIK0X4lA=</signature>
+            <signature>IUAmF1INj3tKq5cvoBMGakKmChc=</signature>
+            <signature>Qkn++e5Jd8KGrndWJDm9Ppraf4Y=</signature>
+            <signature>85UI+8wnnupe9HX+X1A0c4erGZE=</signature>
+            <signature>QP8nZmmIs72ytm4.zs0UtzGBkAU=</signature>
+            <signature>QP8nZmmIs72ytm4/zs0UtzGBkAU=</signature>
+            <signature>Mf86eWN+oqlceOcq9V.1Jkx2aY8=</signature>
+            <signature>Mf86eWN+oqlceOcq9V/1Jkx2aY8=</signature>
+            <signature>b4nzYB6PfMRvptZ1MJGjmZicIe8=</signature>
             <description>
-                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="features">Features</h2><ul><li>Allow negative offsets for app exceptions</li><li>Add separate curve factors for brightness and contrast</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add a way to change the automatic check for updates interval in Advanced settings</li><li>Isolate reset actions into a dropdown</li><li>App exceptions logic rewrite<ul><li>Now the offsets are only applied if the app has any visible window on an external monitor (in the past the offsets were applied on app launch/quit)</li><li>The offsets are also only applied to the monitor where the app is visible</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Always reset adjustment limit within 24 hours</li><li>Fix diagnostics message saying the monitor supports DDC when in fact it didn't support it</li></ul></div></div>]]>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Shake window when trying to input an invalid field value</li><li>Revert all changes to a field when pressing escape</li><li>Pressing tab inside a field will commit the value</li><li>Show Lunar window on the screen where the cursor is</li><li>Hide yellow dot on operation end</li></ul></div></div>]]>
             </description>
         </item>
     </channel>

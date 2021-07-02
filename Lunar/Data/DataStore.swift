@@ -16,6 +16,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .appExceptions,
     .mediaKeysNotified,
     .brightnessKeysEnabled,
+    .hideYellowDot,
     .brightnessOnInputChange,
     .brightnessStep,
     .clamshellModeDetection,
@@ -153,7 +154,7 @@ class DataStore: NSObject {
     @discardableResult
     func storeDisplays(_ displays: [Display]) -> [Display] {
         let displays = displays.filter {
-            display in !SyncMode.isBuiltinDisplay(display.id)
+            display in !DDC.isBuiltinDisplay(display.id)
         }
 
         guard let storedDisplays = self.displays() else {
@@ -172,7 +173,7 @@ class DataStore: NSObject {
         }
 
         let allDisplays = (inactiveDisplays + displays).filter {
-            display in !SyncMode.isBuiltinDisplay(display.id)
+            display in !DDC.isBuiltinDisplay(display.id)
         }
         CachedDefaults[.displays] = allDisplays
 
@@ -355,6 +356,7 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>) {
 func initCache() {
     cacheKey(.contrastCurveFactor)
     cacheKey(.brightnessCurveFactor)
+    cacheKey(.hideYellowDot)
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.volumeKeysEnabled)
@@ -413,6 +415,7 @@ extension Defaults.Keys {
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let contrastCurveFactor = Key<Double>("contrastCurveFactor", default: 0.5)
     static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 0.5)
+    static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
@@ -510,5 +513,9 @@ let securePublisher = Defaults.publisher(.secure).removeDuplicates()
 // let displaysPublisher = Defaults.publisher(.displays).removeDuplicates()
 let debugPublisher = Defaults.publisher(.debug).removeDuplicates()
 let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates()
+let hideYellowDotPublisher = Defaults.publisher(.hideYellowDot).removeDuplicates()
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
+let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates()
+let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates()
+let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates()
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)

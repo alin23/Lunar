@@ -100,6 +100,7 @@ class DisplayValuesView: NSTableView {
             for observer in observers {
                 observer.cancel()
             }
+            displayObservers.removeValue(forKey: display.id)
         }
 
         guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
@@ -171,7 +172,7 @@ class DisplayValuesView: NSTableView {
         scrollableContrastCaption.initialColor = white
 
         scrollableBrightness.onValueChangedInstant = { value in
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display.insertBrightnessUserDataPoint(
                 datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last },
                 value,
@@ -182,7 +183,7 @@ class DisplayValuesView: NSTableView {
             display.brightness = value.ns
         }
         scrollableContrast.onValueChangedInstant = { value in
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display.insertContrastUserDataPoint(
                 datapointLock.around { displayController.adaptiveMode.contrastDataPoint.last },
                 value,

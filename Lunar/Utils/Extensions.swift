@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Foundation
 import Surge
 
@@ -497,11 +498,11 @@ extension NSScreen {
     }
 
     var isBuiltin: Bool {
-        displayID != nil && SyncMode.isBuiltinDisplay(displayID!)
+        displayID != nil && DDC.isBuiltinDisplay(displayID!)
     }
 
     var isVirtual: Bool {
-        displayID != nil && SyncMode.isVirtualDisplay(displayID!)
+        displayID != nil && DDC.isVirtualDisplay(displayID!)
     }
 
     var isScreen: Bool {
@@ -529,7 +530,7 @@ extension Set where Element: BinaryInteger {
     }
 }
 
-extension Collection where Index: Comparable {
+extension Collection {
     subscript(back i: Int) -> Iterator.Element {
         let backBy = i + 1
         return self[index(endIndex, offsetBy: -backBy)]
@@ -754,5 +755,18 @@ extension NSAttributedString {
         let m = (this.mutableCopy() as! NSMutableAttributedString)
         m.append(other)
         this = m.copy() as! NSAttributedString
+    }
+}
+
+let storeLock = NSRecursiveLock()
+
+extension AnyCancellable {
+    func store(
+        in dictionary: inout [String: AnyCancellable],
+        for key: String
+    ) {
+        storeLock.around {
+            dictionary[key] = self
+        }
     }
 }

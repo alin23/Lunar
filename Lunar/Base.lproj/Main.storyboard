@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19115.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19115.3" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19115.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19115.3"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -1432,7 +1432,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a2D-AD-d28">
-                                <rect key="frame" x="510" y="504" width="300" height="24"/>
+                                <rect key="frame" x="510" y="419" width="300" height="24"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable verbose logging" id="cjJ-B0-iUQ">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1441,7 +1441,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dip-cE-zth">
-                                <rect key="frame" x="874" y="503" width="32" height="32"/>
+                                <rect key="frame" x="874" y="418" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="609-dX-Bnf">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1453,7 +1453,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7M-AW-ZKZ">
-                                <rect key="frame" x="510" y="480" width="431" height="26"/>
+                                <rect key="frame" x="510" y="395" width="431" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Log path: ~/Library/Caches/Lunar/swiftybeaver.log" id="Wmi-hJ-bx4">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1462,7 +1462,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kR7-Gd-eTC">
-                                <rect key="frame" x="510" y="457" width="177" height="24"/>
+                                <rect key="frame" x="510" y="504" width="177" height="24"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Check for updates" id="0aA-zQ-Df5">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1471,7 +1471,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BIY-9A-Ic3">
-                                <rect key="frame" x="717" y="460" width="188" height="24"/>
+                                <rect key="frame" x="717" y="507" width="188" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="cY7-O9-Smy">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1489,10 +1489,52 @@ when dock and menubar icons are hidden</string>
                                     </binding>
                                 </connections>
                             </segmentedControl>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yBe-aA-4ec">
+                                <rect key="frame" x="510" y="461" width="300" height="24"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Hide yellow dot" id="sZE-ZY-UXl">
+                                    <font key="font" size="15" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4MS-FX-KiE" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="685" y="466" width="152" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="What is the Yellow Dot?" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="XnS-dD-5Ys">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="whatIsTheYellowDotURL:" target="dda-PO-nVZ" id="EpU-XQ-nFr"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dKT-th-lWO">
+                                <rect key="frame" x="874" y="460" width="32" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="859-gh-33O">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.hideYellowDot" id="o1d-6z-HDt"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="846-rg-Gf2">
+                                <rect key="frame" x="510" y="437" width="431" height="26"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Note: makes Gamma smooth transition impossible" id="Vbr-YN-K1D">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="resetButton" destination="zXD-tN-N7i" id="ouf-PP-2eQ"/>
+                        <outlet property="whatIsTheYellowDot" destination="4MS-FX-KiE" id="FKN-5t-bbc"/>
                     </connections>
                 </viewController>
                 <customObject id="1Xr-ze-Y7B" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -3642,10 +3684,10 @@ and contrast to their highest values</string>
                                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S3N-hZ-p5E">
-                                                                    <rect key="frame" x="0.0" y="35" width="140" height="25"/>
+                                                                    <rect key="frame" x="0.0" y="29" width="140" height="28"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="LG UltraFine" usesSingleLineMode="YES" id="C0V-a0-Ryd" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                                                        <font key="font" size="18" name="Menlo-Bold"/>
+                                                                        <font key="font" size="17" name="Menlo-Bold"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>

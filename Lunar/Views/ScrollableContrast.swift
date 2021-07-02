@@ -53,7 +53,7 @@ class ScrollableContrast: NSView {
             display?.minContrast.intValue ?? 0
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.minContrast = newValue.ns
         }
     }
@@ -63,7 +63,7 @@ class ScrollableContrast: NSView {
             display?.maxContrast.intValue ?? 100
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.maxContrast = newValue.ns
         }
     }
@@ -73,12 +73,12 @@ class ScrollableContrast: NSView {
             display?.contrast.intValue ?? 50
         }
         set {
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
             display?.contrast = newValue.ns
         }
     }
 
-    var displayObservers = Set<AnyCancellable>()
+    var displayObservers = [String: AnyCancellable]()
 
     func addObserver(_ display: Display) {
         display.$contrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
@@ -90,7 +90,7 @@ class ScrollableContrast: NSView {
             mainThread {
                 self?.currentValue?.stringValue = String(newContrast)
             }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "contrast")
     }
 
     func update(from display: Display) {
@@ -119,7 +119,7 @@ class ScrollableContrast: NSView {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        for observer in displayObservers {
+        for observer in displayObservers.values {
             observer.cancel()
         }
     }

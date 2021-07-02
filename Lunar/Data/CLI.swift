@@ -664,15 +664,18 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             if let displayFilter = display {
-                try handleDisplay(
-                    displayFilter,
-                    displays: displays,
-                    property: property,
-                    value: value,
-                    json: json,
-                    controls: controls,
-                    read: read
-                )
+                let filters = displayFilter != "all" ? [displayFilter] : displays.map(\.serial)
+                for filter in filters {
+                    try handleDisplay(
+                        filter,
+                        displays: displays,
+                        property: property,
+                        value: value,
+                        json: json,
+                        controls: controls,
+                        read: read
+                    )
+                }
                 globalExit(0)
             }
 
@@ -993,8 +996,15 @@ private func printDisplay(
     print("\(prefix)\(s("Red Gamma"))\(display.redMin) - \(display.redGamma) - \(display.redMax)")
     print("\(prefix)\(s("Green Gamma"))\(display.greenMin) - \(display.greenGamma) - \(display.greenMax)")
     print("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
-    let i2c = DDC.I2CController(displayID: display.id)
-    print("\(prefix)\(s("I2C Controller"))\(i2c == nil ? "NONE" : i2c!.s)")
+
+    #if arch(arm64)
+        let avService = DDC.AVService(displayID: display.id, ignoreCache: true)
+        print("\(prefix)\(s("AVService"))\(avService == nil ? "NONE" : CFCopyDescription(avService!) as String)")
+    #else
+        let i2c = DDC.I2CController(displayID: display.id, ignoreCache: true)
+        print("\(prefix)\(s("I2C Controller"))\(i2c == nil ? "NONE" : i2c!.s)")
+    #endif
+
     if edid {
         print("\(prefix)\(s("EDID"))\(edidStr)")
     }

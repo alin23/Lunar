@@ -187,7 +187,7 @@ class DisplayViewController: NSViewController {
     var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var viewID: String?
-    var displayObservers = Set<AnyCancellable>()
+    var displayObservers = [String: AnyCancellable]()
 
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
@@ -355,6 +355,9 @@ class DisplayViewController: NSViewController {
         guard let display = display ?? self.display else { return }
 
         settingsButton?.display = display
+        scrollableBrightness?.display = display
+        scrollableContrast?.display = display
+
         updateControlsButton()
         updateNotificationObservers(for: display)
 
@@ -363,7 +366,7 @@ class DisplayViewController: NSViewController {
                 self?.updateDataset(currentBrightness: brightness.u8)
                 return
             }
-            cancelAsyncTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
 
             var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? [:]
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
@@ -427,6 +430,13 @@ class DisplayViewController: NSViewController {
         initHotkeys()
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
         refreshView()
+
+        listenForSendingBrightnessContrast()
+        listenForAdaptiveModeChange()
+        listenForDisplayBoolChange()
+        listenForBrightnessContrastChange()
+        updateControlsButton()
+        setupProButton()
     }
 
     func updateControlsButton(control: Control? = nil) {
@@ -591,7 +601,9 @@ class DisplayViewController: NSViewController {
             adaptiveMode: displayController.adaptiveMode, for: display,
             brightness: currentBrightness?.d, contrast: currentContrast?.d
         )
-        brightnessContrastChart.notifyDataSetChanged()
+        mainThread {
+            brightnessContrastChart.notifyDataSetChanged()
+        }
     }
 
 //     func demo() {
@@ -659,8 +671,13 @@ class DisplayViewController: NSViewController {
     }
 
     func resetDDC() {
-        asyncAfter(ms: 10, uniqueTaskKey: "resetDDCTask") { [weak self] in
-            guard let self = self, let display = self.display else { return }
+        let key = "resetDDCTask"
+        let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
+        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
+            guard let self = self, let display = self.display else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
             if display.control is DDCControl {
                 display.control.resetState()
             } else {
@@ -669,16 +686,20 @@ class DisplayViewController: NSViewController {
 
             self.resetControl()
 
-            for _ in 1 ... 5 {
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
                 displayController.adaptBrightness(force: true)
-                sleep(3)
             }
         }
     }
 
     func resetNetworkController() {
-        asyncAfter(ms: 10, uniqueTaskKey: "resetNetworkControlTask") { [weak self] in
-            guard let self = self, let display = self.display else { return }
+        let key = "resetNetworkControlTask"
+        let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
+        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
+            guard let self = self, let display = self.display else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
             if display.control is NetworkControl {
                 display.control.resetState()
             } else {
@@ -687,9 +708,8 @@ class DisplayViewController: NSViewController {
 
             self.resetControl()
 
-            for _ in 1 ... 5 {
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
                 displayController.adaptBrightness(force: true)
-                sleep(3)
             }
         }
     }
@@ -796,13 +816,13 @@ class DisplayViewController: NSViewController {
             defer { log.verbose("END DEINIT") }
         #endif
 
-        for observer in displayObservers {
+        for observer in displayObservers.values {
             observer.cancel()
         }
     }
 
     func listenForSendingBrightnessContrast() {
-        display?.$sendingContrast.receive(on: dataPublisherQueue).sink { [weak self] newValue in
+        display?.$sendingBrightness.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableBrightness?.currentValue.stopHighlighting()
                 return
@@ -815,7 +835,7 @@ class DisplayViewController: NSViewController {
                     self?.scrollableBrightness?.currentValue.highlight(message: "Not responding")
                 }
             }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "sendingBrightness")
         display?.$sendingContrast.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
                 self?.scrollableContrast?.currentValue.stopHighlighting()
@@ -828,18 +848,18 @@ class DisplayViewController: NSViewController {
                     self?.scrollableContrast?.currentValue.highlight(message: "Not responding")
                 }
             }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "sendingContrast")
     }
 
     func listenForBrightnessContrastChange() {
         display?.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
             mainThread { self.scrollableBrightness?.maxValue.integerValue = value.intValue }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "maxBrightness")
         display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
             mainThread { self.scrollableContrast?.maxValue.integerValue = value.intValue }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "maxContrast")
     }
 
     func listenForDisplayBoolChange() {
@@ -849,7 +869,7 @@ class DisplayViewController: NSViewController {
 
                 mainThread { textField.isHidden = newActiveAndResponsive }
             }
-        }.store(in: &displayObservers)
+        }.store(in: &displayObservers, for: "activeAndResponsive")
 
         if let display = display {
             if !display.adaptive {
@@ -865,7 +885,7 @@ class DisplayViewController: NSViewController {
                         }
                     }
                 }
-            }.store(in: &displayObservers)
+            }.store(in: &displayObservers, for: "adaptive")
 //            display.setObserver(
 //                prop: .adaptive,
 //                key: "displayViewController-\(viewID ?? "")",
@@ -1043,9 +1063,6 @@ class DisplayViewController: NSViewController {
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
 
-            scrollableBrightness?.display = display
-            scrollableContrast?.display = display
-
             if let inputDropdown = inputDropdown {
                 inputDropdown.appearance = NSAppearance(named: .vibrantLight)
 
@@ -1071,12 +1088,6 @@ class DisplayViewController: NSViewController {
         } else {
             setIsHidden(true)
         }
-        listenForSendingBrightnessContrast()
-        listenForAdaptiveModeChange()
-        listenForDisplayBoolChange()
-        listenForBrightnessContrastChange()
-        updateControlsButton()
-        setupProButton()
 
         // upHotkey = Magnet.HotKey(identifier: "LocationMode Demo", keyCombo: KeyCombo(key: .d, cocoaModifiers: [.option])!) { _ in
         //     log.debug("DEMO TIME!!")

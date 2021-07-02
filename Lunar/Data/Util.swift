@@ -28,7 +28,7 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-        return id == GENERIC_DISPLAY_ID
+        // return id == GENERIC_DISPLAY_ID
         return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
@@ -440,10 +440,6 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     serialQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-let asyncUniqueLock = NSRecursiveLock()
-var asyncUniqueTasks = [String: DispatchWorkItem]()
-var asyncUniqueRecurringTasks = [String: Timer]()
-
 @discardableResult func asyncAfter(
     ms: Int,
     uniqueTaskKey: String? = nil,
@@ -454,17 +450,21 @@ var asyncUniqueRecurringTasks = [String: Timer]()
 
     let task: DispatchWorkItem
     if let key = uniqueTaskKey {
+        taskQueue[key] = mainThread ? mainQueue : timerQueue
         task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
+            guard !isCancelled(key) else {
+                timerQueue.async { Thread.current.threadDictionary[key] = nil }
+                return
+            }
             action()
 
-            asyncUniqueLock.around { asyncUniqueTasks[key] = nil }
+            timerQueue.async { Thread.current.threadDictionary[key] = nil }
         }
 
-        asyncUniqueLock.around {
-            asyncUniqueTasks[key]?.cancel()
-            asyncUniqueTasks[key] = task
+        timerQueue.async {
+            (Thread.current.threadDictionary[key] as? DispatchWorkItem)?.cancel()
+            Thread.current.threadDictionary[key] = task
         }
-
     } else {
         task = DispatchWorkItem(name: "asyncAfter(\(ms) ms)") {
             action()
@@ -480,35 +480,66 @@ var asyncUniqueRecurringTasks = [String: Timer]()
     return task
 }
 
-@discardableResult func asyncEvery(_ interval: DateComponents, uniqueTaskKey: String? = nil, _ action: @escaping () -> Void) -> Timer {
-    let timer = timerQueue.sync {
-        Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { _ in
+func asyncEvery(
+    _ interval: DateComponents,
+    uniqueTaskKey: String? = nil,
+    runs: Int? = nil,
+    skipIfExists: Bool = false,
+    _ action: @escaping () -> Void
+) {
+    timerQueue.async {
+        if skipIfExists, let key = uniqueTaskKey, let timer = Thread.current.threadDictionary[key] as? Timer, timer.isValid {
+            return
+        }
+
+        let timer = Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { timer in
             action()
+            guard let key = uniqueTaskKey,
+                  let runs = Thread.current.threadDictionary["\(key)-runs"] as? Int,
+                  let maxRuns = Thread.current.threadDictionary["\(key)-maxRuns"] as? Int
+            else {
+                return
+            }
+
+            if runs >= maxRuns || isCancelled(key) {
+                timer.invalidate()
+                Thread.current.threadDictionary[key] = nil
+            } else {
+                Thread.current.threadDictionary["\(key)-runs"] = runs + 1
+            }
+        }
+
+        if let key = uniqueTaskKey {
+            taskQueue[key] = timerQueue
+            (Thread.current.threadDictionary[key] as? Timer)?.invalidate()
+            Thread.current.threadDictionary[key] = timer
+
+            if let runs = runs {
+                Thread.current.threadDictionary["\(key)-maxRuns"] = runs
+                Thread.current.threadDictionary["\(key)-runs"] = 0
+            }
         }
     }
+}
 
-    if let key = uniqueTaskKey {
-        asyncUniqueLock.around {
-            asyncUniqueRecurringTasks[key]?.invalidate()
-            asyncUniqueRecurringTasks[key] = timer
+func cancelTask(_ key: String, subscriberKey: String? = nil) {
+    guard let queue = taskQueue[key] else { return }
+
+    queue.async {
+        guard let task = Thread.current.threadDictionary[key] else { return }
+
+        Thread.current.threadDictionary["\(key)-cancelled"] = true
+        if let task = task as? DispatchWorkItem {
+            task.cancel()
+        } else if let task = task as? Timer {
+            task.invalidate()
         }
-    }
 
-    return timer
-}
+        if let subscriberKey = subscriberKey {
+            globalObservers.removeValue(forKey: subscriberKey)
+        }
 
-func cancelAsyncTask(_ key: String) {
-    asyncUniqueLock.around {
-        if asyncUniqueTasks[key] == nil { return }
-        asyncUniqueTasks[key]?.cancel()
-        asyncUniqueTasks.removeValue(forKey: key)
-    }
-}
-
-func cancelAsyncRecurringTask(_ key: String) {
-    asyncUniqueLock.around {
-        asyncUniqueRecurringTasks[key]?.invalidate()
-        asyncUniqueRecurringTasks.removeValue(forKey: key)
+        Thread.current.threadDictionary.removeObject(forKey: key)
     }
 }
 
@@ -600,6 +631,51 @@ func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ acti
 
     thread.start()
     return thread
+}
+
+var globalObservers: [String: AnyCancellable] = Dictionary(minimumCapacity: 100)
+var taskQueue: [String: RunloopQueue] = Dictionary(minimumCapacity: 100)
+
+func isCancelled(_ key: String) -> Bool {
+    Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
+}
+
+func debounce(ms: Int, uniqueTaskKey: String, queue: RunloopQueue = debounceQueue, mainThread: Bool = false, replace: Bool = false, subscriberKey: String? = nil, _ action: @escaping () -> Void) {
+    debounce(ms: ms, uniqueTaskKey: uniqueTaskKey, queue: queue, mainThread: mainThread, value: nil, replace: replace, subscriberKey: subscriberKey) { (_: Bool?) in action() }
+}
+
+func debounce<T: Equatable>(ms: Int, uniqueTaskKey: String, queue: RunloopQueue = debounceQueue, mainThread: Bool = false, value: T, replace: Bool = false, subscriberKey: String? = nil, _ action: @escaping (T) -> Void) {
+    taskQueue[uniqueTaskKey] = mainThread ? mainQueue : queue
+    queue.async {
+        Thread.current.threadDictionary["\(uniqueTaskKey)-cancelled"] = false
+        if Thread.current.threadDictionary[uniqueTaskKey] == nil || replace {
+            #if DEBUG
+                if replace {
+                    log.verbose("Replacing subscriber for '\(uniqueTaskKey)'. Current subscriber count: \(globalObservers.count)")
+                } else {
+                    log.verbose("Creating subscriber for '\(uniqueTaskKey)'. Current subscriber count: \(globalObservers.count)")
+                }
+            #endif
+
+            let pub = (Thread.current.threadDictionary[uniqueTaskKey] as? PassthroughSubject<T, Never>) ?? PassthroughSubject<T, Never>()
+            pub
+                .debounce(for: .milliseconds(ms), scheduler: mainThread ? RunLoop.main : RunLoop.current)
+                .sink(receiveValue: action)
+                .store(in: &globalObservers, for: subscriberKey ?? uniqueTaskKey)
+            Thread.current.threadDictionary[uniqueTaskKey] = pub
+
+            #if DEBUG
+                if replace {
+                    log.verbose("Replaced subscriber for '\(uniqueTaskKey)'. New subscriber count: \(globalObservers.count)")
+                } else {
+                    log.verbose("Created subscriber for '\(uniqueTaskKey)'. New subscriber count: \(globalObservers.count)")
+                }
+            #endif
+        }
+
+        guard let pub = Thread.current.threadDictionary[uniqueTaskKey] as? PassthroughSubject<T, Never> else { return }
+        pub.send(value)
+    }
 }
 
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
@@ -807,31 +883,15 @@ struct OperationHighlightData: Equatable {
 let operationHighlightPublisher = PassthroughSubject<OperationHighlightData, Never>()
 
 func showOperationInProgress(screen: NSScreen? = nil) {
+    guard !CachedDefaults[.hideYellowDot] else { return }
     operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: true, screen: screen))
-    // asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
-    //     createWindow(
-    //         "gammaWindowController",
-    //         controller: &gammaWindowController,
-    //         screen: screen,
-    //         show: true,
-    //         backgroundColor: .clear,
-    //         level: .popUpMenu
-    //     )
-
-    //     guard let w = gammaWindowController?.window, let c = w.contentViewController as? GammaViewController else { return }
-    //     w.ignoresMouseEvents = true
-    //     c.highlight()
-    // }
+    debounce(ms: 3000, uniqueTaskKey: "operationHighlightHandler") {
+        operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
+    }
 }
 
 func hideOperationInProgress() {
     operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
-    // asyncAfter(ms: 10, uniqueTaskKey: "operationHighlightHandler", mainThread: true) {
-    //     guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
-    //     while c.highlighting {
-    //         c.stopHighlighting()
-    //     }
-    // }
 }
 
 // MARK: Dialogs
@@ -1223,7 +1283,7 @@ public struct LazyAtomic<Value> {
 }
 
 func localNow() -> DateInRegion {
-    DateInRegion().convertTo(region: .local)
+    Region.local.nowInThisRegion()
 }
 
 func monospace(size: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
@@ -1347,7 +1407,19 @@ struct AXWindow {
     let screen: NSScreen?
 
     init?(from window: UIElement, runningApp: NSRunningApplication? = nil, appException: AppException? = nil) {
-        guard let attrs = try? window.getMultipleAttributes(.frame, .fullScreen, .title, .position, .main, .minimized, .size, .identifier, .subrole, .role, .focused)
+        guard let attrs = try? window.getMultipleAttributes(
+            .frame,
+            .fullScreen,
+            .title,
+            .position,
+            .main,
+            .minimized,
+            .size,
+            .identifier,
+            .subrole,
+            .role,
+            .focused
+        )
         else {
             return nil
         }

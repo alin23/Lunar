@@ -18,11 +18,11 @@
 		</data>
 		<key>Resources/Base.lproj/Sparkle.strings</key>
 		<data>
-		w9JL/448Oilj6DShUMLf2wtlVUA=
+		DxW8h4RJW9TAtrlRhVabvyKU2e8=
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		gbtwPr/twLYOrap+6fCd/7RP3vw=
+		/6Ouj1Fv2hdjcgN/eES7Q2JAEGs=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -418,7 +418,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wQ2VNRvmW2RNS0xsyQPMZoq7r8A=
+			w10YkX7gWClCJW8GUwnQwTW/Q1w=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -862,10 +862,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			Z+zTMYdkjKDvsaX7pIhtkVlVuP4=
+			hBaIDqyyWYwFfPy49Bt7BFjuIYU=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"b77bce669264cc899021c47855e7b04cb9144af1" or cdhash H"67ecd33187648ca0efb1a5fba4886d915955b8fe" or cdhash H"0ff4d077924df10a9f0ea8bf91d174e7b910073b" or cdhash H"79884286dde2a39fcf5a7444773fe0bc3547a1b0"</string>
+			<string>cdhash H"c48a1bde4a2aa5f68949d78e79e5ae632dc10f83" or cdhash H"8416880eacb2598c057cfcb8f41b7b0458ee2185" or cdhash H"7fb820ed4b1a102483cd3ff6445b75f75a9ed0b6" or cdhash H"02d884d71d01e057ff33d7cdbf8cdc525edd90e9"</string>
 		</dict>
 		<key>Headers/SPUDownloadData.h</key>
 		<dict>
@@ -882,11 +882,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			J7fmLYpFAmwKh2V/bCKF52QvFK4=
+			XJ3GhbrEH3fMp3tVRC6EdkWUTTI=
 			</data>
 			<key>hash2</key>
 			<data>
-			UE1oQInbeXh0V6926c/g3N63gssYlVqmTNBT/mi4y+8=
+			4Mylhg7D3AuvxGc/Xp18XcCLq7Hr34IJAbYXSWA4oHg=
 			</data>
 		</dict>
 		<key>Headers/SPUStandardUserDriver.h</key>
@@ -926,22 +926,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HFL/Um5p8ZjPIwUHDyvRjQ7YXcQ=
+			F3aCh4VvnVizbtvegicVEmEec+I=
 			</data>
 			<key>hash2</key>
 			<data>
-			iLWb8IwWsG7+n39PamVpXun/Z+vyAQW51uhAEprvHDU=
+			zc0oB4GdGa2c0+SDPgyPhIpVucU+DB964SxkYDrlIj0=
 			</data>
 		</dict>
 		<key>Headers/SPUUpdaterDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			g2j5IFcYqHZBy1lEkfTu0Au+8nw=
+			AUFAyEYMgEsmtjTA5iEjMdZmGGA=
 			</data>
 			<key>hash2</key>
 			<data>
-			cu6CzGE0b84DOzLlzD7d3dCufsULxU4Ta0vdDqiuFC0=
+			HcoupZNYvGQ1yrjAt3fNqWIgtvBV5Sg+y5ZvY6bpi/4=
 			</data>
 		</dict>
 		<key>Headers/SPUUpdaterSettings.h</key>
@@ -959,22 +959,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			rW3hDgAejV2TDw3aa8BPOmdEeyI=
+			20GYT586dOcfR3PZz44t+vvsALg=
 			</data>
 			<key>hash2</key>
 			<data>
-			D9pr9pSCX8GIDCYKFyMKXQe/PEiYLXneyaYPxltKokc=
+			xBUQkYXLU5TeeM3GQG3aSBxwsYk351UazuxcLMK+X+g=
 			</data>
 		</dict>
 		<key>Headers/SPUUserUpdateState.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			WjQz5P3l9bdj3MATd6SrEDSBq+Y=
+			KQuxnWrz33rQgL6RwgKHmjoyHcI=
 			</data>
 			<key>hash2</key>
 			<data>
-			7+QrmKTyML9NS6JKacTODNGFtp8Jux6u9xjlT7zs5zM=
+			GOFoEyLdpI8UcfuOA15pEfvvrzH76Imq14Tomm6Q5M8=
 			</data>
 		</dict>
 		<key>Headers/SUAppcast.h</key>
@@ -992,22 +992,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			ETwrnGZ92VYB6EasOgWWyIdOQtI=
+			pKI0nCYQjz7ZG3qkB0Dl6yHOCL4=
 			</data>
 			<key>hash2</key>
 			<data>
-			ybpdwmPwr1JrpfgFmey7Nrgm72HGp4/WWStKGWSmVqk=
+			WrrZFZPGCigw9ojeP0y/Vlz3DOe14mdifzgZeE52vx8=
 			</data>
 		</dict>
 		<key>Headers/SUErrors.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			srAovHB4tALHM226p49QEuuWL4U=
+			eiCRPEqCv4PP+TGc0/TusjimKis=
 			</data>
 			<key>hash2</key>
 			<data>
-			bkq9z70LfWLO/YvAC2aWpsHR7+WSzgnK/ZUrXRXdGow=
+			L5nRNFQ1RBW4uAh/4OKd5IPIuIKsx1AGElrpsY9K5eo=
 			</data>
 		</dict>
 		<key>Headers/SUExport.h</key>
@@ -1047,11 +1047,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			WD5FsxQWdm95rzM+fgbXBZLWc5A=
+			//iIhsFeSzCX88KGLMA/JGQU3lE=
 			</data>
 			<key>hash2</key>
 			<data>
-			2dSaP60+rhUocqzaeu18WB/Rz8HA5K5jvySndwHrs+0=
+			FKxW+iKyI8GtH21j8OsD/p6f8bEunqf9js5nsuf84LU=
 			</data>
 		</dict>
 		<key>Headers/SUUpdaterDelegate.h</key>
@@ -1109,6 +1109,28 @@
 			1TF+JZkzFr6n8oH4WItto+C5Vf3K12f0H9KjqD0A5QU=
 			</data>
 		</dict>
+		<key>PrivateHeaders/SPUAppcastItemStateResolver.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			zbmB418Venkqnl0xIG/7J7FywPQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			OU9sUW5dy3zrxGG4mYEyT911VCDpPhVvy/xYtrPc/RA=
+			</data>
+		</dict>
+		<key>PrivateHeaders/SUAppcastItem+Private.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			Fw93N6qzzu1twBnZ7KDIvL3qiNQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			fky5RZCuvPcwLbNknAIEJsKi5YOoKlKvMwfjHWNPo2w=
+			</data>
+		</dict>
 		<key>Resources/Base.lproj/SUUpdateAlert.nib</key>
 		<dict>
 			<key>hash</key>
@@ -1146,22 +1168,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			w9JL/448Oilj6DShUMLf2wtlVUA=
+			DxW8h4RJW9TAtrlRhVabvyKU2e8=
 			</data>
 			<key>hash2</key>
 			<data>
-			pQiDUg9vomp1/WISmjGaK003KLbvvvoM1z06+oaFbxk=
+			Ef6ZP9jL82mqiihRWtpM8iBC7p76LjE1+3mtIn+HYgY=
 			</data>
 		</dict>
 		<key>Resources/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			gbtwPr/twLYOrap+6fCd/7RP3vw=
+			/6Ouj1Fv2hdjcgN/eES7Q2JAEGs=
 			</data>
 			<key>hash2</key>
 			<data>
-			20tf7tuaRtI57DDfUWPXY5/Vlw9KpHWUHhn9/v/6I8Y=
+			Zjxyi3LmJ6S7wfcqqGpP+zigfWue4hl5XzGdfcan5HM=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -1747,11 +1769,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wQ2VNRvmW2RNS0xsyQPMZoq7r8A=
+			w10YkX7gWClCJW8GUwnQwTW/Q1w=
 			</data>
 			<key>hash2</key>
 			<data>
-			8PwaQH7V6OQZK5yPoj+SUTsCMQ3VyPLlBTq10A68d4g=
+			7eRGZA0jdvTJ8vuBEdTcUJTtkJC1RzUs+fJ416JIai4=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -2384,10 +2406,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			F7x4LiuEOgHSXtlbMYKxL0gA69w=
+			xomYg3/YtX4QwkIH22ctg432MRI=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"045bba991901ceca26d838349fbf296fd0132b76" or cdhash H"17bc782e2b843a01d25ed95b3182b12f4800ebdc" or cdhash H"d17e70139cfc00aeab2185622f657ac3b3458e5e" or cdhash H"df1c9383080561f4593e4669fa27599888f986a6"</string>
+			<string>cdhash H"cbb5533a3decd056719d75de544405ef61e1b979" or cdhash H"c68998837fd8b57e10c24207db672d838df63112" or cdhash H"e4c94aef8cc79161b94baecab192e59ff4342a6c" or cdhash H"e9d13f9ef8315a81195c288a065ca2ab509c0acd"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

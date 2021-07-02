@@ -122,10 +122,11 @@ class NetworkControl: Control {
     let str = "Network Control"
     weak var display: Display!
     var setterTasks = [ControlID: DispatchWorkItem]()
-    let setterTasksSemaphore = DispatchSemaphore(value: 1, name: "setterTasksSemaphore")
+    let getterTasksSemaphore = DispatchSemaphore(value: 1, name: "getterTasksSemaphore")
 
     init(display: Display) {
         self.display = display
+        listenForRequests()
     }
 
     static func setup() {
@@ -318,6 +319,74 @@ class NetworkControl: Control {
         }
     }
 
+    var requestsPublisher = PassthroughSubject<Request, Never>()
+    var responsiveCheckPublisher = PassthroughSubject<Bool, Never>()
+
+    struct Request: Equatable {
+        var url: URL
+        var controlID: ControlID
+        var timeout: TimeInterval
+        var value: UInt8
+    }
+
+    var observers = Set<AnyCancellable>()
+
+    func listenForRequests() {
+        serviceBrowserQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.requestsPublisher
+                .removeDuplicates()
+                .throttle(for: .milliseconds(500), scheduler: RunLoop.current, latest: true)
+                .sink { [weak self] request in
+                    guard let self = self, !screensSleeping.load(ordering: .relaxed) else { return }
+
+                    defer {
+                        self.manageSendingState(for: request.controlID, sending: false)
+                    }
+
+                    do {
+                        let resp = try query(url: request.url, timeout: request.timeout)
+                        guard let display = self.display else { return }
+                        log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)`", context: display.context)
+                    } catch {
+                        guard let display = self.display else { return }
+                        log.error(
+                            "Error sending \(request.controlID)=\(request.value): \(error)",
+                            context: display.context?.with(["url": request.url])
+                        )
+                    }
+                }.store(in: &self.observers)
+
+            self.responsiveCheckPublisher
+                .debounce(for: .milliseconds(500), scheduler: RunLoop.current)
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    guard let service = NetworkControl.controllersForDisplay[self.display.serial],
+                          let url = service.url, let newURL = service.getFirstRespondingURL(
+                              urls: service.urls,
+                              timeout: 600.milliseconds,
+                              retries: 1
+                          )
+                    else {
+                        self.responsiveTryCount += 1
+                        if self.responsiveTryCount > 10 {
+                            self.responsiveTryCount = 0
+                            self.resetState()
+                        }
+                        return
+                    }
+                    if newURL != url {
+                        service.url = newURL
+                        service.smoothTransitionUrl = service.getFirstRespondingURL(
+                            urls: service.smoothTransitionUrls,
+                            timeout: 600.milliseconds,
+                            retries: 1
+                        )
+                    }
+                }.store(in: &self.observers)
+        }
+    }
+
     func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
         guard let service = NetworkControl.controllersForDisplay[display.serial],
               let url = smooth ? service.smoothTransitionUrl : service.url,
@@ -341,40 +410,7 @@ class NetworkControl: Control {
             fullUrl = url / controlID / value
         }
 
-        let setter = DispatchWorkItem(name: "Network Control Setter \(controlID)(\(value)") { [weak self] in
-            guard let self = self, !screensSleeping.load(ordering: .relaxed) else { return }
-
-            defer {
-                self.manageSendingState(for: controlID, sending: false)
-            }
-
-            do {
-                let resp = try query(url: fullUrl, timeout: smooth ? 60 : 15)
-                guard let display = self.display else { return }
-                log.debug("Sent \(controlID)=\(value), received response `\(resp)`", context: display.context)
-            } catch {
-                guard let display = self.display else { return }
-                log.error("Error sending \(controlID)=\(value): \(error)", context: display.context?.with(["url": fullUrl]))
-            }
-
-            _ = self.setterTasksSemaphore.wait(for: 5.seconds)
-            defer {
-                self.setterTasksSemaphore.signal()
-            }
-
-            self.setterTasks.removeValue(forKey: controlID)
-        }
-
-        _ = setterTasksSemaphore.wait(for: 5.seconds)
-        defer {
-            self.setterTasksSemaphore.signal()
-        }
-
-        if let task = setterTasks[controlID] {
-            task.cancel()
-        }
-        setterTasks[controlID] = setter
-        asyncAfter(ms: 100, setter)
+        requestsPublisher.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60 : 15, value: value))
 
         return true
     }
@@ -382,17 +418,14 @@ class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
         guard !screensSleeping.load(ordering: .relaxed) else { return nil }
 
-        _ = setterTasksSemaphore.wait(for: 5.seconds)
+        _ = getterTasksSemaphore.wait(for: 5.seconds)
+        defer { getterTasksSemaphore.signal() }
 
         guard let controller = NetworkControl.controllersForDisplay[display.serial],
-              let url = max ? controller.maxValueUrl : controller.url,
-              setterTasks[controlID] == nil || setterTasks[controlID]!.isCancelled
+              let url = max ? controller.maxValueUrl : controller.url
         else {
-            setterTasksSemaphore.signal()
             return nil
         }
-
-        setterTasksSemaphore.signal()
 
         var value: UInt8?
         do {
@@ -512,31 +545,7 @@ class NetworkControl: Control {
             return false
         }
 
-        asyncAfter(ms: 100, uniqueTaskKey: "networkControlResponsiveChecker") { [weak self] in
-            guard let self = self else { return }
-            guard let service = NetworkControl.controllersForDisplay[self.display.serial],
-                  let url = service.url, let newURL = service.getFirstRespondingURL(
-                      urls: service.urls,
-                      timeout: 600.milliseconds,
-                      retries: 1
-                  )
-            else {
-                self.responsiveTryCount += 1
-                if self.responsiveTryCount > 10 {
-                    self.responsiveTryCount = 0
-                    self.resetState()
-                }
-                return
-            }
-            if newURL != url {
-                service.url = newURL
-                service.smoothTransitionUrl = service.getFirstRespondingURL(
-                    urls: service.smoothTransitionUrls,
-                    timeout: 600.milliseconds,
-                    retries: 1
-                )
-            }
-        }
+        responsiveCheckPublisher.send(true)
 
         return true
     }
@@ -557,6 +566,9 @@ class NetworkControl: Control {
             }
             if let serial = serial {
                 _ = controllersForDisplay.removeValue(forKey: serial)
+            }
+            for display in displayController.activeDisplays.values {
+                display.lastConnectionTime = Date()
             }
             browser.reset()
             browser.delegate.onStop = {

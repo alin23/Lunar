@@ -11,7 +11,7 @@ import Down
 
 let STYLESHEET = """
 p, ul, ol, li, a {
-    font-family: 'SF Compact Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Avenir, sans-serif;
+    font-family: 'SF Compact Text Regular', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Avenir, sans-serif;
 }
 
 ul, ol, li:last-child {
