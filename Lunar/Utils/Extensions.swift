@@ -410,8 +410,12 @@ extension UInt32 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF), UInt8((self >> 16) & 0xFF), UInt8((self >> 24) & 0xFF)]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ") -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(separator: separator)
     }
 }
 
@@ -420,8 +424,12 @@ extension UInt16 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF)]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ") -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(separator: separator)
     }
 }
 
@@ -510,6 +518,10 @@ extension NSScreen {
             return false
         }
         return isScreenStr == "YES"
+    }
+
+    static func forDisplayID(_ id: CGDirectDisplayID) -> NSScreen? {
+        NSScreen.screens.first { $0.hasDisplayID(id) }
     }
 
     func hasDisplayID(_ id: CGDirectDisplayID) -> Bool {
