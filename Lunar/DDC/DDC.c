@@ -149,7 +149,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
 IOAVServiceRef AVServiceFromDCPAVServiceProxy(io_service_t service)
 {
     IOAVServiceRef avService = 0;
-   if (IOAVServiceCreateWithService != NULL) {
+    if (&IOAVServiceCreateWithService != NULL) {
         avService = IOAVServiceCreateWithService(kCFAllocatorDefault, service);
     }
     return avService;

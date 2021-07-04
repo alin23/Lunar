@@ -597,10 +597,19 @@ class DisplayController {
             guard IORegistryEntryCreateCFProperties(clcd2Service, &clcd2ServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
                 KERN_SUCCESS,
                 let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any],
-                let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
-                let props = displayAttributes["ProductAttributes"] as? [String: Any],
-                let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
-                let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
+                let edidUUID = displayProps["EDID UUID"] as? String
+            else { return nil }
+
+            let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
+            if let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) {
+                log.info("Matched display \(display) EDID UUID: \(edidUUID)")
+                return display
+            }
+
+            guard let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
+                  let props = displayAttributes["ProductAttributes"] as? [String: Any],
+                  let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
+                  let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
             else { return nil }
 
             return getMatchingDisplay(
@@ -684,45 +693,12 @@ class DisplayController {
                 log.warning("No AVService for display with ID: \(displayID)")
                 return nil
             }
+            log
+                .info(
+                    "Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)"
+                )
 
             return ioAvService
-
-//            while case let (clcd2Service, dcpAvService) = (IOIteratorNext(clcd2Iterator), IOIteratorNext(dcpAvServiceIterator)),
-//                  clcd2Service != 0, dcpAvService != 0
-//            {
-//                var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
-//                var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-//                guard let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvService)?.takeRetainedValue(),
-//                      !CFEqual(ioAvService, 0 as IOAVService),
-//                      // Check if DCPAVServiceProxy belongs to an external monitor
-//                      IORegistryEntryCreateCFProperties(dcpAvService, &dcpAvServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
-//                      KERN_SUCCESS,
-//                      let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
-//                      let avServiceLocation = dcpAvProps["Location"] as? String, avServiceLocation == "External",
-//                      // Get monitor properties from the IORegistry
-//                      IORegistryEntryCreateCFProperties(clcd2Service, &clcd2ServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
-//                      KERN_SUCCESS,
-//                      let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any],
-//                      let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
-//                      let props = displayAttributes["ProductAttributes"] as? [String: Any],
-//                      let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
-//                      let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
-//                else { continue }
-//
-//                if let display = getMatchingDisplay(
-//                    name: name,
-//                    serial: serial,
-//                    productID: productID,
-//                    manufactureYear: manufactureYear,
-//                    manufacturer: props["ManufacturerID"] as? String,
-//                    vendorID: props["LegacyManufacturerID"] as? Int,
-//                    width: props["NativeFormatHorizontalPixels"] as? Int,
-//                    height: props["NativeFormatVerticalPixels"] as? Int
-//                ), display.id == displayID {
-//                    return ioAvService
-//                }
-//            }
-//            return nil
         }
     #endif
 
@@ -755,6 +731,15 @@ class DisplayController {
         // "DisplayAttributes" = {"ProductAttributes"={"ManufacturerID"="GSM","YearOfManufacture"=2017,"SerialNumber"=314041,"ProductName"="LG Ultra HD","LegacyManufacturerID"=7789,"ProductID"=23305,"WeekOfManufacture"=8}
 
         let allProps = allDisplayProperties()
+
+        if let display = allProps.first(where: { props in
+            guard let edidUUID = props["EDID UUID"] as? String else { return false }
+            return display.matchesEDIDUUID(edidUUID)
+        }) {
+            log.info("Found ARM properties for display \(display) by EDID UUID")
+            return display
+        }
+
         let fullyMatchedProps = allProps.first(where: { props in
             guard let attrs = props["DisplayAttributes"] as? [String: Any],
                   let productAttrs = attrs["ProductAttributes"] as? [String: Any],

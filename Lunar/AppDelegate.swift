@@ -45,6 +45,7 @@ let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .u
 // let timerQueue = DispatchQueue(label: "fyi.lunar.timer.queue", qos: .utility, attributes: .concurrent)
 let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
+let serialSyncQueue = DispatchQueue(label: "fyi.lunar.serialSync.queue", qos: .userInitiated)
 let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
 let dataSerialQueue = DispatchQueue(label: "fyi.lunar.dataSerial.queue", qos: .utility, target: DispatchQueue.global(qos: .utility))
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"

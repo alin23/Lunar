@@ -384,7 +384,7 @@ enum DDC {
         for screen in NSScreen.screens {
             guard screen.isScreen, let screenID = screen.displayID else { continue }
 
-            if isBuiltinDisplay(screenID) || (!includeVirtual && isVirtualDisplay(screenID)) {
+            if isBuiltinDisplay(screenID) || (!includeVirtual && isVirtualDisplay(screenID, name: screen.localizedName)) {
                 continue
             }
             displayIDs.append(screenID)
@@ -407,25 +407,26 @@ enum DDC {
 
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
-    static func isVirtualDisplay(_ id: CGDirectDisplayID) -> Bool {
+    static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil) -> Bool {
         guard !isGeneric(id) else {
             return false
         }
 
+        let result = (name ?? NSScreen.forDisplayID(id)?.localizedName ?? "").lowercased().contains("airplay")
         guard let infoDictionary = displayInfoDictionary(id) else {
             log.debug("No info dict for id \(id)")
-            return false
+            return result
         }
 
         let isVirtualDevice = infoDictionary["kCGDisplayIsVirtualDevice"] as? Bool
         let displayIsAirplay = infoDictionary["kCGDisplayIsAirPlay"] as? Bool
 
-        return isVirtualDevice ?? displayIsAirplay ?? false
+        return isVirtualDevice ?? displayIsAirplay ?? result
     }
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         !isGeneric(id) &&
-            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || screen(for: id)?.localizedName == "Built-in Retina Display")
+            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || screen(for: id)?.localizedName.stripped == "Built-in Retina Display")
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
