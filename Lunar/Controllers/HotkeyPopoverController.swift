@@ -28,8 +28,14 @@ class HotkeyPopoverController: NSViewController {
         self.display = display
         scrollableBrightnessField.integerValue = display.brightnessOnInputChange.intValue
         scrollableContrastField.integerValue = display.contrastOnInputChange.intValue
-        scrollableBrightnessField.onValueChanged = { display.brightnessOnInputChange = $0.ns }
-        scrollableContrastField.onValueChanged = { display.contrastOnInputChange = $0.ns }
+        scrollableBrightnessField.onValueChanged = { [weak self] value in
+            guard let self = self else { return }
+            self.display?.brightnessOnInputChange = value.ns
+        }
+        scrollableContrastField.onValueChanged = { [weak self] value in
+            guard let self = self else { return }
+            self.display?.contrastOnInputChange = value.ns
+        }
     }
 
     override func viewDidLoad() {

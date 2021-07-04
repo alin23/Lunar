@@ -183,6 +183,10 @@ enum ValueType {
 // MARK: Display Class
 
 @objc class Display: NSObject, Codable, Defaults.Serializable {
+    override var description: String {
+        "\(name)[\(serial): \(id)]"
+    }
+
     // MARK: Stored Properties
 
     var _idLock = NSRecursiveLock()
@@ -955,6 +959,43 @@ enum ValueType {
         control = getBestControl()
     }
 
+    func matchesEDIDUUID(_ edidUUID: String) -> Bool {
+        let uuids = possibleEDIDUUIDs()
+        guard !uuids.isEmpty else { return false }
+
+        return uuids.contains { uuid in
+            guard let uuidPattern = uuid.r else { return false }
+            return uuidPattern.matches(edidUUID)
+        }
+    }
+
+    func possibleEDIDUUIDs() -> [String] {
+        let infoDict = infoDictionary
+        guard let manufactureYear = infoDict[kDisplayYearOfManufacture] as? Int64, manufactureYear >= 1990,
+              let manufactureWeek = infoDict[kDisplayWeekOfManufacture] as? Int64,
+              let serialNumber = infoDict[kDisplaySerialNumber] as? Int64,
+              let productID = infoDict[kDisplayProductID] as? Int64,
+              let vendorID = infoDict[kDisplayVendorID] as? Int64,
+              let verticalPixels = infoDict[kDisplayVerticalImageSize] as? Int64,
+              let horizontalPixels = infoDict[kDisplayHorizontalImageSize] as? Int64
+        else { return [] }
+
+        let yearByte = (manufactureYear - 1990).u8.hex
+        let weekByte = manufactureWeek.u8.hex
+        let vendorBytes = vendorID.u16.str(reversed: true, separator: "")
+        let productBytes = productID.u16.str(reversed: false, separator: "")
+        let serialBytes = serialNumber.u32.str(reversed: false, separator: "")
+        let verticalBytes = (verticalPixels / 10).u8.hex
+        let horizontalBytes = (horizontalPixels / 10).u8.hex
+
+        return [
+            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78".uppercased(),
+            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78".uppercased(),
+            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}".uppercased(),
+            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}".uppercased(),
+        ]
+    }
+
     func detectI2C() {
         #if DEBUG
             #if arch(arm64)
@@ -1618,18 +1659,19 @@ enum ValueType {
 
     func resetGamma() {
         guard !isForTesting else { return }
-        CGSetDisplayTransferByFormula(
-            id,
-            initialRedMin,
-            initialRedMax,
-            initialRedGamma,
-            initialGreenMin,
-            initialGreenMax,
-            initialGreenGamma,
-            initialBlueMin,
-            initialBlueMax,
-            initialBlueGamma
-        )
+        CGSetDisplayTransferByFormula(id, 0, 1, 1, 0, 1, 1, 0, 1, 1)
+        // CGSetDisplayTransferByFormula(
+        //     id,
+        //     initialRedMin,
+        //     initialRedMax,
+        //     initialRedGamma,
+        //     initialGreenMin,
+        //     initialGreenMax,
+        //     initialGreenGamma,
+        //     initialBlueMin,
+        //     initialBlueMax,
+        //     initialBlueGamma
+        // )
     }
 
     lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
