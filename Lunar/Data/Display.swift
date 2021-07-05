@@ -155,6 +155,11 @@ var INITIAL_GAMMA_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MAX_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MIN_VALUES = [CGDirectDisplayID: Gamma]()
 
+struct Transport: Equatable {
+    var upstream: String
+    var downstream: String
+}
+
 struct Gamma: Equatable {
     var red: CGGammaValue
     var green: CGGammaValue
@@ -202,6 +207,8 @@ enum ValueType {
     //     }
     // }
 
+    var transport: Transport? = nil
+
     @objc dynamic var serial: String {
         didSet {
             save()
@@ -226,6 +233,105 @@ enum ValueType {
         didSet {
             save()
             readapt(newValue: adaptive, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaRedMin: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaRedMax: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaRedValue: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaGreenMin: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaGreenMax: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaGreenValue: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaBlueMin: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaBlueMax: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
+        }
+    }
+
+    @Published @objc dynamic var defaultGammaBlueValue: NSNumber {
+        didSet {
+            save()
+            if control is GammaControl {
+                setGamma()
+            } else {
+                resetGamma()
+            }
         }
     }
 
@@ -867,24 +973,39 @@ enum ValueType {
         serial = try container.decode(String.self, forKey: .serial)
 
         adaptive = try container.decode(Bool.self, forKey: .adaptive)
-        brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
-        contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
         name = try container.decode(String.self, forKey: .name)
         edidName = try container.decode(String.self, forKey: .edidName)
         active = try container.decode(Bool.self, forKey: .active)
+
+        brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
+        contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
         minBrightness = (try container.decode(UInt8.self, forKey: .minBrightness)).ns
         maxBrightness = (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
         minContrast = (try container.decode(UInt8.self, forKey: .minContrast)).ns
         maxContrast = (try container.decode(UInt8.self, forKey: .maxContrast)).ns
+
+        defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
+        defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
+        defaultGammaRedValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedValue)?.ns) ?? 1.ns
+        defaultGammaGreenMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMin)?.ns) ?? 0.ns
+        defaultGammaGreenMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMax)?.ns) ?? 1.ns
+        defaultGammaGreenValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenValue)?.ns) ?? 1.ns
+        defaultGammaBlueMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMin)?.ns) ?? 0.ns
+        defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
+        defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
+
         maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
         maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
         maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+
         lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
         lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
+
         alwaysUseNetworkControl = try container.decode(Bool.self, forKey: .alwaysUseNetworkControl)
         neverUseNetworkControl = try container.decode(Bool.self, forKey: .neverUseNetworkControl)
         alwaysFallbackControl = try container.decode(Bool.self, forKey: .alwaysFallbackControl)
         neverFallbackControl = try container.decode(Bool.self, forKey: .neverFallbackControl)
+
         volume = (try container.decode(UInt8.self, forKey: .volume)).ns
         audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
@@ -1056,15 +1177,36 @@ enum ValueType {
         neverFallbackControl: Bool = false,
         enabledControls: [DisplayControl: Bool]? = nil,
         brightnessOnInputChange: UInt8 = 100,
-        contrastOnInputChange: UInt8 = 75
+        contrastOnInputChange: UInt8 = 75,
+        defaultGammaRedMin: Float = 0.0,
+        defaultGammaRedMax: Float = 1.0,
+        defaultGammaRedValue: Float = 1.0,
+        defaultGammaGreenMin: Float = 0.0,
+        defaultGammaGreenMax: Float = 1.0,
+        defaultGammaGreenValue: Float = 1.0,
+        defaultGammaBlueMin: Float = 0.0,
+        defaultGammaBlueMax: Float = 1.0,
+        defaultGammaBlueValue: Float = 1.0
     ) {
         _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
+
+        self.defaultGammaRedMin = defaultGammaRedMin.ns
+        self.defaultGammaRedMax = defaultGammaRedMax.ns
+        self.defaultGammaRedValue = defaultGammaRedValue.ns
+        self.defaultGammaGreenMin = defaultGammaGreenMin.ns
+        self.defaultGammaGreenMax = defaultGammaGreenMax.ns
+        self.defaultGammaGreenValue = defaultGammaGreenValue.ns
+        self.defaultGammaBlueMin = defaultGammaBlueMin.ns
+        self.defaultGammaBlueMax = defaultGammaBlueMax.ns
+        self.defaultGammaBlueValue = defaultGammaBlueValue.ns
+
         self.maxDDCBrightness = maxDDCBrightness.ns
         self.maxDDCContrast = maxDDCContrast.ns
         self.maxDDCVolume = maxDDCVolume.ns
+
         self.lockedBrightness = lockedBrightness
         self.lockedContrast = lockedContrast
         self.audioMuted = audioMuted
@@ -1151,7 +1293,16 @@ enum ValueType {
                 .gamma: true,
             ],
             brightnessOnInputChange: (config["brightnessOnInputChange"] as? UInt8) ?? 100,
-            contrastOnInputChange: (config["contrastOnInputChange"] as? UInt8) ?? 75
+            contrastOnInputChange: (config["contrastOnInputChange"] as? UInt8) ?? 75,
+            defaultGammaRedMin: (config["defaultGammaRedMin"] as? Float) ?? 0.0,
+            defaultGammaRedMax: (config["defaultGammaRedMax"] as? Float) ?? 1.0,
+            defaultGammaRedValue: (config["defaultGammaRedValue"] as? Float) ?? 1.0,
+            defaultGammaGreenMin: (config["defaultGammaGreenMin"] as? Float) ?? 0.0,
+            defaultGammaGreenMax: (config["defaultGammaGreenMax"] as? Float) ?? 1.0,
+            defaultGammaGreenValue: (config["defaultGammaGreenValue"] as? Float) ?? 1.0,
+            defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
+            defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
+            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0
         )
     }
 
@@ -1236,6 +1387,15 @@ enum ValueType {
         case edidName
         case serial
         case adaptive
+        case defaultGammaRedMin
+        case defaultGammaRedMax
+        case defaultGammaRedValue
+        case defaultGammaGreenMin
+        case defaultGammaGreenMax
+        case defaultGammaGreenValue
+        case defaultGammaBlueMin
+        case defaultGammaBlueMax
+        case defaultGammaBlueValue
         case maxDDCBrightness
         case maxDDCContrast
         case maxDDCVolume
@@ -1277,6 +1437,15 @@ enum ValueType {
             [
                 .name,
                 .adaptive,
+                .defaultGammaRedMin,
+                .defaultGammaRedMax,
+                .defaultGammaRedValue,
+                .defaultGammaGreenMin,
+                .defaultGammaGreenMax,
+                .defaultGammaGreenValue,
+                .defaultGammaBlueMin,
+                .defaultGammaBlueMax,
+                .defaultGammaBlueValue,
                 .maxDDCBrightness,
                 .maxDDCContrast,
                 .maxDDCVolume,
@@ -1331,9 +1500,21 @@ enum ValueType {
             try container.encode(brightness.uint8Value, forKey: .brightness)
             try container.encode(contrast.uint8Value, forKey: .contrast)
             try container.encode(edidName, forKey: .edidName)
+
+            try container.encode(defaultGammaRedMin.floatValue, forKey: .defaultGammaRedMin)
+            try container.encode(defaultGammaRedMax.floatValue, forKey: .defaultGammaRedMax)
+            try container.encode(defaultGammaRedValue.floatValue, forKey: .defaultGammaRedValue)
+            try container.encode(defaultGammaGreenMin.floatValue, forKey: .defaultGammaGreenMin)
+            try container.encode(defaultGammaGreenMax.floatValue, forKey: .defaultGammaGreenMax)
+            try container.encode(defaultGammaGreenValue.floatValue, forKey: .defaultGammaGreenValue)
+            try container.encode(defaultGammaBlueMin.floatValue, forKey: .defaultGammaBlueMin)
+            try container.encode(defaultGammaBlueMax.floatValue, forKey: .defaultGammaBlueMax)
+            try container.encode(defaultGammaBlueValue.floatValue, forKey: .defaultGammaBlueValue)
+
             try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
             try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
             try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
+
             try container.encode(id, forKey: .id)
             try container.encode(lockedBrightness, forKey: .lockedBrightness)
             try container.encode(lockedContrast, forKey: .lockedContrast)
@@ -1412,15 +1593,15 @@ enum ValueType {
             dict["activeAndResponsive"] = self.activeAndResponsive
             dict["responsiveDDC"] = self.responsiveDDC
             dict["gamma"] = [
-                "redMin": Float(self.redMin),
-                "redMax": Float(self.redMax),
-                "redGamma": Float(self.redGamma),
-                "greenMin": Float(self.greenMin),
-                "greenMax": Float(self.greenMax),
-                "greenGamma": Float(self.greenGamma),
-                "blueMin": Float(self.blueMin),
-                "blueMax": Float(self.blueMax),
-                "blueGamma": Float(self.blueGamma),
+                "redMin": self.redMin,
+                "redMax": self.redMax,
+                "redGamma": self.redGamma,
+                "greenMin": self.greenMin,
+                "greenMax": self.greenMax,
+                "greenGamma": self.greenGamma,
+                "blueMin": self.blueMin,
+                "blueMax": self.blueMax,
+                "blueGamma": self.blueGamma,
             ]
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
@@ -1659,19 +1840,19 @@ enum ValueType {
 
     func resetGamma() {
         guard !isForTesting else { return }
-        CGSetDisplayTransferByFormula(id, 0, 1, 1, 0, 1, 1, 0, 1, 1)
-        // CGSetDisplayTransferByFormula(
-        //     id,
-        //     initialRedMin,
-        //     initialRedMax,
-        //     initialRedGamma,
-        //     initialGreenMin,
-        //     initialGreenMax,
-        //     initialGreenGamma,
-        //     initialBlueMin,
-        //     initialBlueMax,
-        //     initialBlueGamma
-        // )
+        // CGSetDisplayTransferByFormula(id, 0, 1, 1, 0, 1, 1, 0, 1, 1)
+        CGSetDisplayTransferByFormula(
+            id,
+            defaultGammaRedMin.floatValue,
+            defaultGammaRedMax.floatValue,
+            defaultGammaRedValue.floatValue,
+            defaultGammaGreenMin.floatValue,
+            defaultGammaGreenMax.floatValue,
+            defaultGammaGreenValue.floatValue,
+            defaultGammaBlueMin.floatValue,
+            defaultGammaBlueMax.floatValue,
+            defaultGammaBlueValue.floatValue
+        )
     }
 
     lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
@@ -1692,17 +1873,17 @@ enum ValueType {
         let redGamma = CGGammaValue(mapNumber(
             rawBrightness,
             fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: initialRedGamma
+            toLow: 0.3, toHigh: defaultGammaRedValue.floatValue
         ))
         let greenGamma = CGGammaValue(mapNumber(
             rawBrightness,
             fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: initialGreenGamma
+            toLow: 0.3, toHigh: defaultGammaGreenValue.floatValue
         ))
         let blueGamma = CGGammaValue(mapNumber(
             rawBrightness,
             fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: initialBlueGamma
+            toLow: 0.3, toHigh: defaultGammaBlueValue.floatValue
         ))
 
         let contrast = CGGammaValue(mapNumber(
@@ -1742,9 +1923,9 @@ enum ValueType {
                 }
                 Thread.sleep(forTimeInterval: 0.005)
 
-                let redGamma = self.initialRedGamma
-                let greenGamma = self.initialGreenGamma
-                let blueGamma = self.initialBlueGamma
+                let redGamma = self.defaultGammaRedValue.floatValue
+                let greenGamma = self.defaultGammaGreenValue.floatValue
+                let blueGamma = self.defaultGammaBlueValue.floatValue
 
                 let oldGamma = self.computeGamma(brightness: oldBrightness, contrast: oldContrast)
                 let maxDiff = max(
@@ -1754,13 +1935,13 @@ enum ValueType {
                 for gamma in oldGamma.stride(to: newGamma, samples: (maxDiff * 100).intround) {
                     CGSetDisplayTransferByFormula(
                         id,
-                        self.redMin,
+                        self.defaultGammaRedMin.floatValue,
                         gamma.red,
                         redGamma + gamma.contrast,
-                        self.greenMin,
+                        self.defaultGammaGreenMin.floatValue,
                         gamma.green,
                         greenGamma + gamma.contrast,
-                        self.blueMin,
+                        self.defaultGammaBlueMin.floatValue,
                         gamma.blue,
                         blueGamma + gamma.contrast
                     )
@@ -1775,19 +1956,19 @@ enum ValueType {
                 gammaSemaphore.wait(for: 1.8)
             }
 
-            let redGamma = self.initialRedGamma
-            let greenGamma = self.initialGreenGamma
-            let blueGamma = self.initialBlueGamma
+            let redGamma = self.defaultGammaRedValue.floatValue
+            let greenGamma = self.defaultGammaGreenValue.floatValue
+            let blueGamma = self.defaultGammaBlueValue.floatValue
 
             CGSetDisplayTransferByFormula(
                 id,
-                self.redMin,
+                self.defaultGammaRedMin.floatValue,
                 newGamma.red,
                 redGamma + newGamma.contrast,
-                self.greenMin,
+                self.defaultGammaGreenMin.floatValue,
                 newGamma.green,
                 greenGamma + newGamma.contrast,
-                self.blueMin,
+                self.defaultGammaBlueMin.floatValue,
                 newGamma.blue,
                 blueGamma + newGamma.contrast
             )

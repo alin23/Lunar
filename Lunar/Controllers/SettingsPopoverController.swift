@@ -42,6 +42,13 @@ class SettingsPopoverController: NSViewController {
     - `RUNNING` will **allow** Lunar to change the brightness and contrast automatically for this monitor
     - `PAUSED` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
     """
+    let GAMMA_HELP_TEXT = """
+    ## Description
+
+    How these gamma values are applied depends on how the monitor can be controlled:
+    - `Software Controls`: the values will be used in computing the gamma table for approximating brightness/contrast changes
+    - `Hardware/Native/Network Controls`: the values will be set exactly as they are
+    """
     @IBOutlet var networkControlCheckbox: NSButton!
     @IBOutlet var coreDisplayControlCheckbox: NSButton!
     @IBOutlet var ddcControlCheckbox: NSButton!
@@ -51,12 +58,27 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
 
+    @IBOutlet var gammaRedMin: ScrollableTextField!
+    @IBOutlet var gammaRedValue: ScrollableTextField!
+    @IBOutlet var gammaRedMax: ScrollableTextField!
+    @IBOutlet var gammaGreenMin: ScrollableTextField!
+    @IBOutlet var gammaGreenValue: ScrollableTextField!
+    @IBOutlet var gammaGreenMax: ScrollableTextField!
+    @IBOutlet var gammaBlueMin: ScrollableTextField!
+    @IBOutlet var gammaBlueValue: ScrollableTextField!
+    @IBOutlet var gammaBlueMax: ScrollableTextField!
+
     @IBOutlet var adaptAutoToggle: MacToggle!
     @IBOutlet var syncModeRoleToggle: MacToggle!
 
     @IBOutlet var _ddcLimitsHelpButton: NSButton!
     var ddcLimitsHelpButton: HelpButton? {
         _ddcLimitsHelpButton as? HelpButton
+    }
+
+    @IBOutlet var _gammaHelpButton: NSButton!
+    var gammaHelpButton: HelpButton? {
+        _gammaHelpButton as? HelpButton
     }
 
     @IBOutlet var _adaptAutomaticallyHelpButton: NSButton?
@@ -95,6 +117,7 @@ class SettingsPopoverController: NSViewController {
                 syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(display.id) || TEST_MODE
             }
             setupDDCLimits(display)
+            setupGamma(display)
         }
     }
 
@@ -228,6 +251,69 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
+    func setupGamma(_ display: Display? = nil) {
+        if let display = display ?? self.display {
+            mainThread {
+                gammaRedMin.floatValue = display.defaultGammaRedMin.floatValue
+                gammaRedMax.floatValue = display.defaultGammaRedMax.floatValue
+                gammaRedValue.floatValue = display.defaultGammaRedValue.floatValue
+                gammaGreenMin.floatValue = display.defaultGammaGreenMin.floatValue
+                gammaGreenMax.floatValue = display.defaultGammaGreenMax.floatValue
+                gammaGreenValue.floatValue = display.defaultGammaGreenValue.floatValue
+                gammaBlueMin.floatValue = display.defaultGammaBlueMin.floatValue
+                gammaBlueMax.floatValue = display.defaultGammaBlueMax.floatValue
+                gammaBlueValue.floatValue = display.defaultGammaBlueValue.floatValue
+
+                gammaRedMax.lowerLimit = gammaRedMin.doubleValue + 0.01
+                gammaRedMin.upperLimit = gammaRedMax.doubleValue - 0.01
+                gammaGreenMax.lowerLimit = gammaGreenMin.doubleValue + 0.01
+                gammaGreenMin.upperLimit = gammaGreenMax.doubleValue - 0.01
+                gammaBlueMax.lowerLimit = gammaBlueMin.doubleValue + 0.01
+                gammaBlueMin.upperLimit = gammaBlueMax.doubleValue - 0.01
+            }
+
+            gammaRedMin.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaRedMin = value.ns
+                self.gammaRedMax.lowerLimit = self.gammaRedMin.doubleValue + 0.01
+            }
+            gammaRedMax.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaRedMax = value.ns
+                self.gammaRedMin.upperLimit = self.gammaRedMax.doubleValue - 0.01
+            }
+            gammaRedValue.onValueChangedInstantDouble = { [weak self] value in
+                self?.display?.defaultGammaRedValue = value.ns
+            }
+            gammaGreenMin.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaGreenMin = value.ns
+                self.gammaGreenMax.lowerLimit = self.gammaGreenMin.doubleValue + 0.01
+            }
+            gammaGreenMax.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaGreenMax = value.ns
+                self.gammaGreenMin.upperLimit = self.gammaGreenMax.doubleValue - 0.01
+            }
+            gammaGreenValue.onValueChangedInstantDouble = { [weak self] value in
+                self?.display?.defaultGammaGreenValue = value.ns
+            }
+            gammaBlueMin.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaBlueMin = value.ns
+                self.gammaBlueMax.lowerLimit = self.gammaBlueMin.doubleValue + 0.01
+            }
+            gammaBlueMax.onValueChangedInstantDouble = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.defaultGammaBlueMax = value.ns
+                self.gammaBlueMin.upperLimit = self.gammaBlueMax.doubleValue - 0.01
+            }
+            gammaBlueValue.onValueChangedInstantDouble = { [weak self] value in
+                self?.display?.defaultGammaBlueValue = value.ns
+            }
+        }
+    }
+
     var displaysObserver: Cancellable?
 
     override func viewDidLoad() {
@@ -236,6 +322,17 @@ class SettingsPopoverController: NSViewController {
         syncModeRoleHelpButton?.helpText = SYNC_MODE_ROLE_HELP_TEXT
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
         ddcLimitsHelpButton?.helpText = DDC_LIMITS_HELP_TEXT
+        gammaHelpButton?.helpText = GAMMA_HELP_TEXT
+
+        gammaRedMin.decimalPoints = 2
+        gammaRedMax.decimalPoints = 2
+        gammaRedValue.decimalPoints = 2
+        gammaGreenMin.decimalPoints = 2
+        gammaGreenMax.decimalPoints = 2
+        gammaGreenValue.decimalPoints = 2
+        gammaBlueMin.decimalPoints = 2
+        gammaBlueMax.decimalPoints = 2
+        gammaBlueValue.decimalPoints = 2
 
         adaptAutoToggle.callback = { [weak self] isOn in
             self?.adaptive = isOn
@@ -260,6 +357,7 @@ class SettingsPopoverController: NSViewController {
             syncModeRoleToggle.isEnabled = false
         }
         setupDDCLimits()
+        setupGamma()
 
         displaysObserver = displaysObserver ?? CachedDefaults.displaysPublisher.sink { [weak self] displays in
             guard let self = self, let thisDisplay = self.display,
