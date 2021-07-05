@@ -687,6 +687,16 @@ class DisplayController {
                 }
             }
 
+            if Sysctl.isMacMini,
+               let display = matchedDisplay,
+               let transport = display.transport,
+               transport.upstream == "DP",
+               transport.downstream == "HDMI"
+            {
+                log.warning("Mac Mini HDMI doesn't support DDC, ignoring for display \(display)")
+                return nil
+            }
+
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
             guard let display = matchedDisplay, let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
                   let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
@@ -705,14 +715,6 @@ class DisplayController {
                 .info(
                     "Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)"
                 )
-
-            if Sysctl.isMacMini,
-               let transport = display.transport,
-               transport.upstream == "DP",
-               transport.downstream == "HDMI"
-            {
-                return nil
-            }
 
             return ioAvService
         }

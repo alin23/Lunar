@@ -131,31 +131,33 @@ public enum Sysctl {
 
     /// e.g. "MacPro4,1" or "iPhone8,1"
     /// NOTE: this is *corrected* on iOS devices to fetch hw.machine
-    public static var model: String {
+    public static var model: String = {
         #if os(iOS) && !arch(x86_64) && !arch(i386)
             return (try? Sysctl.string(for: [CTL_HW, HW_MACHINE])) ?? "Unknown"
         #else
             return (try? Sysctl.string(for: [CTL_HW, HW_MODEL])) ?? "Unknown"
         #endif
-    }
+    }()
 
-    public static var isMacMini = model.hasPrefix("MacMini")
+    public static var modelLowercased: String = model.lowercased()
+
+    public static var isMacMini = modelLowercased.hasPrefix("macmini")
 
     public static var device: String {
-        let model = self.model
-        if model.hasPrefix("MacPro") {
+        let model = modelLowercased
+        if model.hasPrefix("macpro") {
             return "Mac Pro"
-        } else if model.hasPrefix("iMac") {
+        } else if model.hasPrefix("imac") {
             return "iMac"
-        } else if model.hasPrefix("MacBookPro") {
+        } else if model.hasPrefix("macbookpro") {
             return "MacBook Pro"
-        } else if model.hasPrefix("MacBookAir") {
+        } else if model.hasPrefix("macbookair") {
             return "MacBook Air"
-        } else if model.hasPrefix("MacBook") {
+        } else if model.hasPrefix("macbook") {
             return "MacBook"
-        } else if model.hasPrefix("MacMini") {
+        } else if model.hasPrefix("macmini") {
             return "Mac Mini"
-        } else if model.hasPrefix("Xserve") {
+        } else if model.hasPrefix("xserve") {
             return "Xserve"
         }
         return model
