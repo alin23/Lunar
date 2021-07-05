@@ -69,6 +69,7 @@ and sending it to the external monitors.
 []()
 
 ## Settings
+
 - Adjusting the curve is as simple as changing the brightness of an external monitor to whatever you want it to be
     - Lunar will learn from that and adjust the curve accordingly
 - The `Curve Factor` on the `Configuration` page helps to adjust how fast the brightness should rise or fall between thresholds

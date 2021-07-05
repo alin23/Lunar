@@ -76,6 +76,17 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 //    }
 
     var decimalPoints: UInt8 = 0
+    override var floatValue: Float {
+        didSet {
+            let number = floatValue
+            if decimalPoints > 0 {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints))"
+            } else {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+            }
+        }
+    }
+
     override var doubleValue: Double {
         didSet {
             let number = doubleValue

@@ -57,10 +57,11 @@ class DisplayViewController: NSViewController {
     * Allows the monitor to consume less power on low brightness values
 
     ### Disadvantages
+    * Not supported by TVs
+    * Doesn't work on Mac Mini's HDMI port
+    * Can wear out the monitor flash memory
     * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
         - *Aim for using as little adapters as possible between your Mac device and your monitor*
-    * Can wear out the monitor flash memory
-    * Not supported by TVs
     """
     let SOFTWARE_CONTROLS_HELP_TEXT = """
     ## Gamma tables
@@ -70,7 +71,6 @@ class DisplayViewController: NSViewController {
 
     ### Advantages
     * It works on any monitor no matter what cable/adapter/connector you use
-    * Uhh.. the only thing that works out of the box on Apple Silicon for now
 
     ### Disadvantages
     * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**

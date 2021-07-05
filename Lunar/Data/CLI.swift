@@ -1139,6 +1139,10 @@ private func spaced(_ key: String, _ longestKeySize: Int) -> String {
 
 private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
     switch key {
+    case .defaultGammaRedMin, .defaultGammaRedMax, .defaultGammaRedValue,
+         .defaultGammaGreenMin, .defaultGammaGreenMax, .defaultGammaGreenValue,
+         .defaultGammaBlueMin, .defaultGammaBlueMax, .defaultGammaBlueValue:
+        return (value as! NSNumber).floatValue.str(decimals: 2)
     case .userBrightness, .userContrast:
         return (try! encoder.encode(value as! [String: [String: Int]])).str()
     case .enabledControls:
@@ -1148,7 +1152,9 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
     case .power:
         return (value as! Bool) ? "on" : "off"
     default:
-        if let v = value as? Bool {
+        if let v = value as? NSNumber {
+            return "\(v)"
+        } else if let v = value as? Bool {
             return "\(v)"
         } else {
             return "\(value)"
