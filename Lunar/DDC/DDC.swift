@@ -491,6 +491,10 @@ enum DDC {
                 display.responsiveDDC = true
             }
 
+            if let propertyFaults = DDC.writeFaults[displayID], let faults = propertyFaults[controlID] {
+                DDC.writeFaults[displayID]![controlID] = max(faults - 1, 0)
+            }
+
             return result
         }
     }
@@ -590,6 +594,10 @@ enum DDC {
 
             if let display = displayController.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
+            }
+
+            if let propertyFaults = DDC.readFaults[displayID], let faults = propertyFaults[controlID] {
+                DDC.readFaults[displayID]![controlID] = max(faults - 1, 0)
             }
 
             return DDCReadResult(

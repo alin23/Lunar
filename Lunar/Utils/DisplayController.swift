@@ -600,9 +600,15 @@ class DisplayController {
                 let edidUUID = displayProps["EDID UUID"] as? String
             else { return nil }
 
+            var transport: Transport?
+            if let transportDict = displayProps["Transport"] as? [String: String] {
+                transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
+            }
+
             let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
             if let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) {
                 log.info("Matched display \(display) EDID UUID: \(edidUUID)")
+                display.transport = transport
                 return display
             }
 
@@ -612,7 +618,7 @@ class DisplayController {
                   let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
             else { return nil }
 
-            return getMatchingDisplay(
+            guard let display = getMatchingDisplay(
                 name: name,
                 serial: serial,
                 productID: productID,
@@ -622,7 +628,9 @@ class DisplayController {
                 width: props["NativeFormatHorizontalPixels"] as? Int,
                 height: props["NativeFormatVerticalPixels"] as? Int,
                 displays: displays
-            )
+            ) else { return nil }
+            display.transport = transport
+            return display
         }
 
         func firstChildMatching(_ service: io_service_t, names: [String]) -> io_service_t? {
@@ -698,6 +706,14 @@ class DisplayController {
                     "Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)"
                 )
 
+            if Sysctl.isMacMini,
+               let transport = display.transport,
+               transport.upstream == "DP",
+               transport.downstream == "HDMI"
+            {
+                return nil
+            }
+
             return ioAvService
         }
     #endif
@@ -732,12 +748,12 @@ class DisplayController {
 
         let allProps = allDisplayProperties()
 
-        if let display = allProps.first(where: { props in
+        if let props = allProps.first(where: { props in
             guard let edidUUID = props["EDID UUID"] as? String else { return false }
             return display.matchesEDIDUUID(edidUUID)
         }) {
             log.info("Found ARM properties for display \(display) by EDID UUID")
-            return display
+            return props
         }
 
         let fullyMatchedProps = allProps.first(where: { props in

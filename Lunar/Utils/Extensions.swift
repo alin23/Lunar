@@ -374,8 +374,12 @@ extension Int {
         ]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -387,8 +391,12 @@ extension Int64 {
         ]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -400,8 +408,12 @@ extension UInt64 {
         ]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -410,12 +422,12 @@ extension UInt32 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF), UInt8((self >> 16) & 0xFF), UInt8((self >> 24) & 0xFF)]
     }
 
-    func str(reversed: Bool = false, separator: String = " ") -> String {
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
         var arr = toUInt8Array()
         if reversed {
             arr = arr.reversed()
         }
-        return arr.str(separator: separator)
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -424,12 +436,12 @@ extension UInt16 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF)]
     }
 
-    func str(reversed: Bool = false, separator: String = " ") -> String {
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
         var arr = toUInt8Array()
         if reversed {
             arr = arr.reversed()
         }
-        return arr.str(separator: separator)
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -458,8 +470,12 @@ extension Int32 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF), UInt8((self >> 16) & 0xFF), UInt8((self >> 24) & 0xFF)]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(hex: hex, separator: separator)
     }
 }
 
@@ -468,8 +484,12 @@ extension Int16 {
         [UInt8(self & 0xFF), UInt8((self >> 8) & 0xFF)]
     }
 
-    func str() -> String {
-        toUInt8Array().str()
+    func str(reversed: Bool = false, separator: String = " ", hex: Bool = true) -> String {
+        var arr = toUInt8Array()
+        if reversed {
+            arr = arr.reversed()
+        }
+        return arr.str(hex: hex, separator: separator)
     }
 }
 

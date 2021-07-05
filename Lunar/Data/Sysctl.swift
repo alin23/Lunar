@@ -139,6 +139,8 @@ public enum Sysctl {
         #endif
     }
 
+    public static var isMacMini = model.hasPrefix("MacMini")
+
     public static var device: String {
         let model = self.model
         if model.hasPrefix("MacPro") {
