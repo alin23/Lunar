@@ -449,7 +449,8 @@ class DisplayController {
         vendorID: Int? = nil,
         width: Int? = nil,
         height: Int? = nil,
-        displays: [Display]? = nil
+        displays: [Display]? = nil,
+        partial: Bool = true
     ) -> Display? {
         let displays = (displays ?? self.displays.values.map { $0 })
         let d = displays.first(where: { display in
@@ -469,6 +470,8 @@ class DisplayController {
         if let fullyMatchedDisplay = d {
             return fullyMatchedDisplay
         }
+
+        guard partial else {return nil}
 
         let displayScores = displays.map { display -> (Display, Int) in
             let score = DisplayController.displayInfoDictPartialMatchScore(
@@ -598,7 +601,10 @@ class DisplayController {
                 KERN_SUCCESS,
                 let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any],
                 let edidUUID = displayProps["EDID UUID"] as? String
-            else { return nil }
+            else {
+                log.info("No display matched for service \(service): (Can't find EDID UUID)")
+                return nil
+            }
 
             var transport: Transport?
             if let transportDict = displayProps["Transport"] as? [String: String] {
@@ -607,7 +613,7 @@ class DisplayController {
 
             let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
             if let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) {
-                log.info("Matched display \(display) EDID UUID: \(edidUUID)")
+                log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport))")
                 display.transport = transport
                 return display
             }
@@ -616,7 +622,10 @@ class DisplayController {
                   let props = displayAttributes["ProductAttributes"] as? [String: Any],
                   let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
                   let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
-            else { return nil }
+            else {
+                log.info("No display matched for service \(service): (displayProps: \(displayProps))")
+                return nil
+            }
 
             guard let display = getMatchingDisplay(
                 name: name,
@@ -627,8 +636,10 @@ class DisplayController {
                 vendorID: props["LegacyManufacturerID"] as? Int,
                 width: props["NativeFormatHorizontalPixels"] as? Int,
                 height: props["NativeFormatVerticalPixels"] as? Int,
-                displays: displays
+                displays: displays,
+                partial: false
             ) else { return nil }
+            log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
             display.transport = transport
             return display
         }
@@ -639,12 +650,14 @@ class DisplayController {
             guard IORegistryEntryCreateIterator(service, kIOServicePlane, IOOptionBits(kIORegistryIterateRecursively), &iterator) ==
                 KERN_SUCCESS
             else {
+                log.info("Can't create iterator for service \(service): (names: \(names))")
                 return nil
             }
 
             defer {
                 assert(IOObjectRelease(iterator) == KERN_SUCCESS)
             }
+            log.info("Looking for service (names: \(names)) in iterator \(iterator)")
             return firstServiceMatching(iterator, names: names)
         }
 
@@ -654,6 +667,7 @@ class DisplayController {
             while case let t810xIOChild = IOIteratorNext(iterator), t810xIOChild != 0 {
                 if IOServiceNameMatches(t810xIOChild, names: names) {
                     service = t810xIOChild
+                    log.info("Found service \(service) in iterator \(iterator): (names: \(names))")
                     break
                 }
             }
@@ -662,7 +676,12 @@ class DisplayController {
         }
 
         func avService(displayID: CGDirectDisplayID, display: Display? = nil) -> IOAVService? {
-            guard !isTestID(displayID), !DDC.isVirtualDisplay(displayID) else { return nil }
+            guard !isTestID(displayID), NSScreen.isOnline(displayID),
+                  !DDC.isVirtualDisplay(displayID, checkName: false)
+            else {
+                log.info("No AVService for display \(displayID): (isOnline: \(NSScreen.isOnline(displayID)), isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)))")
+                return nil
+            }
 
             var t810xIOIterator = io_iterator_t()
             let t810xIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
@@ -670,6 +689,7 @@ class DisplayController {
             guard t810xIOService != 0,
                   IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) == KERN_SUCCESS
             else {
+                log.info("No AVService for display \(displayID): (t810xIOService: \(t810xIOService), childIteratorErr: \((t810xIOService != 0) ? IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) : KERN_SUCCESS)))")
                 return nil
             }
 
@@ -687,8 +707,15 @@ class DisplayController {
                 }
             }
 
+            guard let display = matchedDisplay else {
+                log.info("No AVService for display \(displayID): (no matched display)")
+                return nil
+            }
+
+            log.info("Mac Mini HDMI Ignore: hw.model=\(Sysctl.modelLowercased)")
+            log.info("Mac Mini HDMI Ignore: isMacMini=\(Sysctl.isMacMini)")
+            log.info("Mac Mini HDMI Ignore: Transport=\(display.transport)")
             if Sysctl.isMacMini,
-               let display = matchedDisplay,
                let transport = display.transport,
                transport.upstream == "DP",
                transport.downstream == "HDMI"
@@ -698,7 +725,7 @@ class DisplayController {
             }
 
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard let display = matchedDisplay, let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
+            guard let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
                   let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
                   let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
                   !CFEqual(ioAvService, 0 as IOAVService),
@@ -843,7 +870,7 @@ class DisplayController {
             }
 
             display.id = newID
-            display.edidName = Display.printableName(id: newID)
+            display.edidName = Display.printableName(newID)
             if display.name.isEmpty {
                 display.name = display.edidName
             }

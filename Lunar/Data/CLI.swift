@@ -616,7 +616,7 @@ struct Lunar: ParsableCommand {
         @OptionGroup var globals: GlobalOptions
 
         static let configuration = CommandConfiguration(
-            abstract: "Lists currently active displays."
+            abstract: "Lists currently active displays and allows for more granular setting/getting of values."
         )
 
         @Flag(name: .shortAndLong, help: "If the output should be printed as JSON.")
@@ -842,8 +842,14 @@ struct Lunar: ParsableCommand {
         )
         var wait: Int = 0
 
+        @Flag(name: .shortAndLong, help: "Force gamma setting.")
+        var force = false
+
         @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, best-guess)")
         var display: String = "best-guess"
+
+        @Option(name: .long, help: "How often to send the gamma values to the monitor")
+        var refreshSeconds: Int = 1
 
         @Option(name: .long, help: "Minimum red gamma value")
         var redMin: Float = 0.0
@@ -881,7 +887,7 @@ struct Lunar: ParsableCommand {
             }
 
             let alreadyLocked = !display.gammaLock()
-            if alreadyLocked {
+            if alreadyLocked, !force {
                 throw CommandError
                     .gammaError(
                         "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete \(display.gammaLockPath) if you think this is incorrect)."
@@ -902,7 +908,7 @@ struct Lunar: ParsableCommand {
 
             showOperationInProgress(screen: display.screen)
             var stepsDone = 0
-            _ = asyncEvery(1.seconds, queue: realtimeQueue) { timer in
+            _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
                 display.gammaLock()
                 CGSetDisplayTransferByFormula(display.id, redMin, red, redMax, greenMin, green, greenMax, blueMin, blue, blueMax)
                 stepsDone += 1
@@ -914,7 +920,6 @@ struct Lunar: ParsableCommand {
                     globalExit(0)
                 }
             }
-            globalExit(0)
         }
     }
 }
@@ -962,6 +967,7 @@ private func printDisplay(
         }
         if edid {
             dict["edid"] = edidStr
+            dict["edidUUIDPatterns"] = display.possibleEDIDUUIDs()
         }
         let encodableDisplay = ForgivingEncodable(dict)
         print("\(prefix)\((try! encoder.encode(encodableDisplay)).str())", terminator: terminator)
@@ -1007,6 +1013,7 @@ private func printDisplay(
 
     if edid {
         print("\(prefix)\(s("EDID"))\(edidStr)")
+        print("\(prefix)\(s("EDID UUID Patterns"))\(display.possibleEDIDUUIDs())")
     }
 }
 

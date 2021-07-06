@@ -380,15 +380,13 @@ enum DDC {
     }
 
     static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID] {
-        var displayIDs = [CGDirectDisplayID]()
-        for screen in NSScreen.screens {
-            guard screen.isScreen, let screenID = screen.displayID else { continue }
-
-            if isBuiltinDisplay(screenID) || (!includeVirtual && isVirtualDisplay(screenID, name: screen.localizedName)) {
-                continue
-            }
-            displayIDs.append(screenID)
+        var displayIDs = NSScreen.onlineDisplayIDs.filter { id in
+            !isBuiltinDisplay(id) && (includeVirtual || !isVirtualDisplay(id, name: Display.printableName(id)))
         }
+
+        // for screen in NSScreen.screens {
+        //     guard screen.isScreen, let screenID = screen.displayID else { continue }
+
         #if DEBUG
             if !displayIDs.isEmpty {
                 return displayIDs
@@ -407,12 +405,16 @@ enum DDC {
 
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
-    static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil) -> Bool {
+    static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
+        var result = false
         guard !isGeneric(id) else {
-            return false
+            return result
         }
 
-        let result = (name ?? NSScreen.forDisplayID(id)?.localizedName ?? "").lowercased().contains("airplay")
+        if checkName {
+            result = (name ?? Display.printableName(id)).lowercased().contains("airplay")
+        }
+
         guard let infoDictionary = displayInfoDictionary(id) else {
             log.debug("No info dict for id \(id)")
             return result
@@ -426,7 +428,7 @@ enum DDC {
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         !isGeneric(id) &&
-            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || screen(for: id)?.localizedName.stripped == "Built-in Retina Display")
+            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || Display.printableName(id).stripped == "Built-in Retina Display")
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
@@ -765,8 +767,7 @@ enum DDC {
     static func I2CController(_ displayID: CGDirectDisplayID) -> io_service_t? {
         guard !isTestID(displayID) else { return nil }
 
-        let activeIDs = NSScreen.screens
-            .compactMap { screen in screen.displayID }
+        let activeIDs = NSScreen.onlineDisplayIDs
 
         #if !DEBUG
             guard activeIDs.contains(displayID) else { return nil }
@@ -816,14 +817,10 @@ enum DDC {
     }
 
     static func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
-        if let screen = screen(for: displayID) {
-            return screen.localizedName
-        } else {
-            guard let edid = DDC.getEdid(displayID: displayID) else {
-                return nil
-            }
-            return extractName(from: edid)
+        guard let edid = DDC.getEdid(displayID: displayID) else {
+            return nil
         }
+        return extractName(from: edid)
     }
 
     static func getDisplaySerial(for displayID: CGDirectDisplayID) -> String? {
