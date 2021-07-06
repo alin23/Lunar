@@ -410,7 +410,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                 displayController.adaptBrightness(force: true)
 
-                let newScreenIDs = Set(NSScreen.screens.compactMap(\.displayID))
+                let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
                 let newLidClosed = IsLidClosed()
                 guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
 
@@ -502,7 +502,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         )
     }
 
-    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.screens.compactMap(\.displayID))
+    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
     func addObservers() {
         dayMomentsPublisher.sink {
@@ -651,7 +651,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.initLogger(cli: true)
             asyncNow {
                 Lunar.main(Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count]))
-                exit(0)
             }
             return
         }

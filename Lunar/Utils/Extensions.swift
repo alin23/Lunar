@@ -513,10 +513,62 @@ extension Int8 {
     }
 }
 
+extension ArraySlice {
+    var arr: [Element] {
+        Array(self)
+    }
+}
+
 extension NSScreen {
+    static func isOnline(_ id: CGDirectDisplayID) -> Bool {
+        onlineDisplayIDs.contains(id)
+    }
+
+    static var onlineDisplayIDs: [CGDirectDisplayID] {
+        let maxDisplays: UInt32 = 16
+        var onlineDisplays = [CGDirectDisplayID](repeating: 0, count: maxDisplays.i)
+        var displayCount: UInt32 = 0
+
+        let err = CGGetOnlineDisplayList(maxDisplays, &onlineDisplays, &displayCount)
+        if err != .success {
+            log.error("Error on getting online displays: \(err)")
+        }
+
+        return onlineDisplays.prefix(displayCount.i).arr
+    }
+
+    static var onlyExternalScreen: NSScreen? {
+        let screens = externalScreens
+        guard screens.count == 1, let screen = screens.first else {
+            return nil
+        }
+
+        return screen
+    }
+
+    static var externalScreens: [NSScreen] {
+        screens.filter { !$0.isBuiltin }
+    }
+
     static var withMouse: NSScreen? {
         let mouseLocation = NSEvent.mouseLocation
-        return screens.first { NSMouseInRect(mouseLocation, $0.frame, false) }
+        guard let screen = screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) else {
+            if let event = CGEvent(source: nil) {
+                let maxDisplays: UInt32 = 1
+                var displaysWithCursor = [CGDirectDisplayID](repeating: 0, count: Int(maxDisplays))
+                var displayCount: UInt32 = 0
+
+                let err = CGGetDisplaysWithPoint(event.location, maxDisplays, &displaysWithCursor, &displayCount)
+                if err != .success {
+                    log.error("Error on getting displays with mouse location: \(err)")
+                }
+                if let id = displaysWithCursor.first {
+                    return forDisplayID(id) ?? onlyExternalScreen
+                }
+            }
+            return nil
+        }
+        return screen
     }
 
     var displayID: CGDirectDisplayID? {
