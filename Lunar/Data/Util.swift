@@ -1358,11 +1358,6 @@ func notify(identifier: String, title: String, body: String) {
     )
 }
 
-func screen(for displayID: CGDirectDisplayID) -> NSScreen? {
-    guard !isTestID(displayID) else { return nil }
-    return NSScreen.screens.first(where: { screen in screen.hasDisplayID(displayID) })
-}
-
 struct Window {
     let storeType: Int
     let isOnScreen: Bool

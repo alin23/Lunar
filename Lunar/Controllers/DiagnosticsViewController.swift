@@ -516,9 +516,11 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         setPercent(60)
                         guard !self.stopped else { return }
 
-                        tryBrightness(DDCCTLControl(display: display))
-                        setPercent(70)
-                        guard !self.stopped else { return }
+                        #if !arch(arm64)
+                            tryBrightness(DDCCTLControl(display: display))
+                            setPercent(70)
+                            guard !self.stopped else { return }
+                        #endif
                     }
                     if coreDisplayAvailable {
                         tryBrightness(coreDisplayControl)

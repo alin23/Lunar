@@ -848,12 +848,12 @@ enum ValueType {
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) })
+                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) }) ?? NSScreen.onlyExternalScreen
             }
             .store(in: &observers)
 
         guard !isForTesting else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) }) ?? NSScreen.onlyExternalScreen
     }()
 
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
@@ -1082,11 +1082,20 @@ enum ValueType {
 
     func matchesEDIDUUID(_ edidUUID: String) -> Bool {
         let uuids = possibleEDIDUUIDs()
-        guard !uuids.isEmpty else { return false }
+        guard !uuids.isEmpty else {
+            log.info("No EDID UUID pattern to test with \(edidUUID) for display \(self)")
+            return false
+        }
 
         return uuids.contains { uuid in
             guard let uuidPattern = uuid.r else { return false }
-            return uuidPattern.matches(edidUUID)
+            log.info("Testing EDID UUID pattern \(uuid) with \(edidUUID) for display \(self)")
+
+            let matched = uuidPattern.matches(edidUUID)
+            if matched {
+                log.info("Matched EDID UUID pattern \(uuid) with \(edidUUID) for display \(self)")
+            }
+            return matched
         }
     }
 
@@ -1101,19 +1110,19 @@ enum ValueType {
               let horizontalPixels = infoDict[kDisplayHorizontalImageSize] as? Int64
         else { return [] }
 
-        let yearByte = (manufactureYear - 1990).u8.hex
-        let weekByte = manufactureWeek.u8.hex
-        let vendorBytes = vendorID.u16.str(reversed: true, separator: "")
-        let productBytes = productID.u16.str(reversed: false, separator: "")
-        let serialBytes = serialNumber.u32.str(reversed: false, separator: "")
-        let verticalBytes = (verticalPixels / 10).u8.hex
-        let horizontalBytes = (horizontalPixels / 10).u8.hex
+        let yearByte = (manufactureYear - 1990).u8.hex.uppercased()
+        let weekByte = manufactureWeek.u8.hex.uppercased()
+        let vendorBytes = vendorID.u16.str(reversed: true, separator: "").uppercased()
+        let productBytes = productID.u16.str(reversed: false, separator: "").uppercased()
+        let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
+        let verticalBytes = (verticalPixels / 10).u8.hex.uppercased()
+        let horizontalBytes = (horizontalPixels / 10).u8.hex.uppercased()
 
         return [
-            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78".uppercased(),
-            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78".uppercased(),
-            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}".uppercased(),
-            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}".uppercased(),
+            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78",
+            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78",
+            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
+            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
         ]
     }
 
@@ -1238,7 +1247,7 @@ enum ValueType {
             self.userContrast = userContrast
         }
 
-        edidName = Display.printableName(id: id)
+        edidName = DDC.getDisplayName(for: id) ?? "Unknown"
         if let n = name, !n.isEmpty {
             self.name = n
         } else {
@@ -1314,7 +1323,7 @@ enum ValueType {
 
     // MARK: EDID
 
-    static func printableName(id: CGDirectDisplayID) -> String {
+    static func printableName(_ id: CGDirectDisplayID) -> String {
         #if DEBUG
             switch id {
             case TEST_DISPLAY_ID:
@@ -1331,6 +1340,16 @@ enum ValueType {
                 break
             }
         #endif
+
+        if let screen = NSScreen.forDisplayID(id) {
+            return screen.localizedName
+        }
+
+        if let infoDict = displayInfoDictionary(id), let names = infoDict["DisplayProductName"] as? [String: String],
+           let name = names[Locale.current.identifier] ?? names["en_US"] ?? names.first?.value
+        {
+            return name
+        }
 
         if var name = DDC.getDisplayName(for: id) {
             name = name.stripped
@@ -1376,7 +1395,7 @@ enum ValueType {
     }
 
     func resetName() {
-        name = Display.printableName(id: id)
+        name = Display.printableName(id)
     }
 
     // MARK: Codable
