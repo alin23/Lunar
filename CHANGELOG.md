@@ -1,3 +1,48 @@
+# 4.5.0
+## Features
+
+* **DDC support for M1 Macs** (beta)
+    * Only possible because of the great advice and example code from [Zhuowei Zhang](https://github.com/zhuowei) and the amazing work of [Davide Guerri](https://github.com/dguerri) and [Tao J](https://github.com/tao-j)
+    * **Mac Mini HDMI still not working**: [Mac Mini Github issue](https://github.com/alin23/Lunar/issues/125)
++ Add a way to set default gamma values when using Hardware/Native/Network controls
+
+## Improvements
+
+* Add "Hide yellow dot" checkbox in Advanced settings
+* Reset DDC write/read faults when a successful read is detected to avoid the incorrect marking of monitors as *Non-reponsive DDC*
+
+## Fixes
+
+* Fix license not being activated without an app restart
+* Fix Location Mode not fetching correct sunrise/sunset/noon when close to midnight
+* Don't reset ColorSync settings and hopefully respect calibration profiles in Gamma mode
+* Fix brightness flickering caused by Gamma controls kicking in faster than DDC/CoreDisplay/Network by adding a 5 second delay to the Gamma setter after:
+    * App launch
+    * System startup
+    * Login 
+    * Wake from standby
+    * Display connection/reconnection
+
+# Changes from 4.3.0
+
+## Features
+* Allow negative offsets for app exceptions
+* Add separate curve factors for brightness and contrast
+
+## Improvements
+
+* Add a way to change the automatic check for updates interval in Advanced settings
+* Isolate reset actions into a dropdown
+* App exceptions logic rewrite
+    * Now the offsets are only applied if the app has any visible window on an external monitor (in the past the offsets were applied on app launch/quit)
+    * The offsets are also only applied to the monitor where the app is visible
+
+## Fixes
+
+* Always reset adjustment limit within 24 hours
+* Fix diagnostics message saying the monitor supports DDC when in fact it didn't support it
+
+
 # 4.3.0
 ## Features
 * Allow negative offsets for app exceptions

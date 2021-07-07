@@ -11,11 +11,16 @@ import Cocoa
 class PageButton: NSButton {
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!
+    weak var notice: NSTextField?
 
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
 
+    var standardAlpha = 0.5
+    var visibleAlpha = 0.8
+
     func disable() {
+        stopHighlighting()
         transition(0.1)
 
         isHidden = true
@@ -29,7 +34,7 @@ class PageButton: NSButton {
         isHidden = false
         isEnabled = true
         if alphaValue == 0.0 {
-            alphaValue = 0.4
+            alphaValue = standardAlpha
         }
     }
 
@@ -47,6 +52,71 @@ class PageButton: NSButton {
 
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea)
+    }
+
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
+
+    func highlight() {
+        guard !isHidden else { return }
+
+        let windowVisible = mainThread { window?.isVisible ?? false }
+
+        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!), windowVisible
+        else {
+            return
+        }
+
+        highlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
+            guard let s = self else {
+                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
+
+            let windowVisible: Bool = mainThread { s.window?.isVisible ?? false }
+            guard windowVisible, let notice = s.notice else {
+                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
+
+            mainThread {
+                if notice.alphaValue <= 0.02 {
+                    notice.transition(1)
+                    notice.alphaValue = 0.9
+                    notice.needsDisplay = true
+
+                    s.transition(1)
+                    s.alphaValue = s.visibleAlpha
+                    s.needsDisplay = true
+                } else {
+                    notice.transition(3)
+                    notice.alphaValue = 0.01
+                    notice.needsDisplay = true
+
+                    s.transition(3)
+                    s.alphaValue = s.standardAlpha
+                    s.needsDisplay = true
+                }
+            }
+        }
+    }
+
+    func stopHighlighting() {
+        if let timer = highlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        highlighterTask = nil
+
+        mainThread {
+            if let notice = notice {
+                notice.transition(0.3)
+                notice.alphaValue = 0.0
+                notice.needsDisplay = true
+            }
+
+            transition(0.3)
+            alphaValue = 0.0
+            needsDisplay = true
+        }
     }
 
     override func resetCursorRects() {
@@ -68,7 +138,7 @@ class PageButton: NSButton {
         if !isEnabled { return }
 
         transition(0.2)
-        alphaValue = 0.4
+        alphaValue = standardAlpha
         shadow = nil
 
         onMouseExit?()

@@ -39,6 +39,7 @@ extension DispatchQueue {
             serialQueue,
             mainSerialQueue,
             dataSerialQueue,
+            DDC.queue,
         ]
         _registerDetection(of: queues, key: key)
     }

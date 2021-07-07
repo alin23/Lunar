@@ -25,21 +25,17 @@ With an external ambient light sensor
 let LOCATION_HELP_TEXT = """
 # Location Mode
 
-In `Location` mode, Lunar adjusts the brightness and contrast automatically
-based on the sun elevation in the sky, at your location.
+In `Location` mode, Lunar adjusts the brightness and contrast automatically based on the sun elevation in the sky, at your location.
 
-The location detection uses the system **Location Services**, but the user needs
-to give Lunar permission to access it.
+The location detection uses the system **Location Services**, but the user needs to give Lunar permission to access it.
 
 If this fails, Lunar will try to find a rough location through a **GeoIP** service like [ipstack.com](https://ipstack.com).
 
 ## Algorithm
 
 1. Lunar starts by setting the brightness to a minimum at night
-2. Then, from sunrise to noon, the brightness is raised gradually until it reaches the `MAX` setting at noon
-3. After noon, Lunar lowers the brightness gradually until it reaches the `MIN` setting again at sunset
-
-[]()
+1. Then, from sunrise to noon, the brightness is raised gradually until it reaches the `MAX` setting at noon
+1. After noon, Lunar lowers the brightness gradually until it reaches the `MIN` setting again at sunset
 
 ## Settings
 - Adjusting the curve is as simple as changing the brightness to whatever you want it to be at that time of the day
@@ -51,22 +47,17 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 let SYNC_HELP_TEXT = """
 # Sync Mode
 
-`Sync` refers to the algorithm that Lunar uses to synchronize the brightness
-from the built-in display of a Mac device to the external monitors' brightness.
+`Sync` refers to the algorithm that Lunar uses to synchronize the brightness from the built-in display of a Mac device to the external monitors' brightness.
 
-The built-in display of a Macbook is always adapted to the ambient light
-using the Ambient Light Sensor near the camera.
+The built-in display of a Macbook is always adapted to the ambient light using the Ambient Light Sensor near the camera.
 
-Lunar takes advantage of that by periodically reading the display brightness,
-and sending it to the external monitors.
+Lunar takes advantage of that by periodically reading the display brightness, and sending it to the external monitors.
 
 ## Algorithm
 
 1. Every second, Lunar reads the built-in display brightness and compares it to the monitor brightness
-2. If the built-in brightness has changed, the value is passed through an adaptive algorithm to bring it to a better suited value for each monitor
-3. After adapting the brightness value, Lunar will set the brightness for each monitor based on their settings
-
-[]()
+1. If the built-in brightness has changed, the value is passed through an adaptive algorithm to bring it to a better suited value for each monitor
+1. After adapting the brightness value, Lunar will set the brightness for each monitor based on their settings
 
 ## Settings
 
@@ -79,36 +70,32 @@ and sending it to the external monitors.
 let MANUAL_HELP_TEXT = """
 # Manual Mode
 
-The adaptive algorithm is disabled in `Manual` mode, but Lunar provides useful hotkeys
-to control all the monitors' brightness and contrast from your keyboard.
+The adaptive algorithm is disabled in `Manual` mode, but Lunar provides useful hotkeys to control all the monitors' brightness and contrast from your keyboard.
 
 This mode is the last resort for people that:
-1. Don't have a built-in display (*Mac Mini*)
-2. Don't use the built-in display (*Macbook with lid closed*)
-3. Work in an environment without much natural light (*where Location mode is useless*)
-4. Don't have an Ambient Light Sensor (*Hackintosh*)
-5. Don't trust machines to do their work `¯\\_(ツ)_/¯`
 
-[]()
+1. Don't have a built-in display (*Mac Mini*)
+1. Don't use the built-in display (*Macbook with lid closed*)
+1. Work in an environment without much natural light (*where Location mode is useless*)
+1. Don't have an Ambient Light Sensor (*Hackintosh*)
+1. Don't trust machines to do their work
 
 ## Algorithm
 
 1. Percentage Hotkeys: `0%`, `25%`, `50%`, `75%`, `100%`
-    - When one of these hotkeys is pressed, Lunar computes the brightness
-      by taking into account the `MIN` and `MAX` limits
-    - **Example:**
-        - `MIN` Brightness = 15
-        - `MAX` Brightness = 100
-        - `MIN` Contrast = 40
-        - `MAX` Contrast = 75
-        - `25%` hotkey is pressed
-    - **The monitor will get**:
-        - `brightness = 25% * (100 - 15) + 15 = ` **36**
-        - `contrast = 25% * (75 - 40) + 40 = ` **49**
-2. Brightness/Contrast Up/Down Hotkeys
-    - When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits
+	- When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
+1. Brightness/Contrast Up/Down Hotkeys
+	- When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
 
-[]()
+##### Percentage Hotkeys Example:
+- `MIN` Brightness = 15
+- `MAX` Brightness = 100
+- `MIN` Contrast = 40
+- `MAX` Contrast = 75
+- `25%` hotkey is pressed
+- **The monitor will get**:
+	- `brightness = 25% * (100 - 15) + 15 =` **36**
+	- `contrast = 25% * (75 - 40) + 40 =` **49**
 
 ## Settings
 - `Brightness/Contrast Step` adjusts how much to increase or decrease the values when using the up/down hotkeys
@@ -117,6 +104,8 @@ This mode is the last resort for people that:
 """
 
 let AUTO_MODE_TAG = 99
+var leftHintsShown = false
+var rightHintsShown = false
 
 class SplitViewController: NSSplitViewController {
     var adaptiveModeObserver: Cancellable?
@@ -134,6 +123,8 @@ class SplitViewController: NSSplitViewController {
 
     @IBOutlet var goLeftButton: PageButton!
     @IBOutlet var goRightButton: PageButton!
+    @IBOutlet var goLeftNotice: NSTextField!
+    @IBOutlet var goRightNotice: NSTextField!
 
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
@@ -191,11 +182,13 @@ class SplitViewController: NSSplitViewController {
     func lastPage() {
         goLeftButton.enable()
         goRightButton.disable()
+        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
+            rightHintsShown = true
+        }
     }
 
     func whiteBackground() {
         view.transition(0.2)
-//        view.bg = white
         if let logo = logo {
             logo.transition(0.2)
             logo.textColor = logoColor
@@ -207,12 +200,20 @@ class SplitViewController: NSSplitViewController {
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
+        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
+            if !leftHintsShown {
+                goLeftNotice.stringValue = "Click to go to the\nConfiguration page"
+            }
+            if !rightHintsShown {
+                goRightNotice.stringValue = "Click to configure\nthe next monitor"
+            }
+        }
+
         goLeftButton.enable()
         goRightButton.enable()
     }
 
     func yellowBackground() {
-//        view.bg = bgColor
         if let logo = logo {
             logo.transition(0.2)
             logo.textColor = bgColor
@@ -226,10 +227,19 @@ class SplitViewController: NSSplitViewController {
 
         goLeftButton.enable()
         goRightButton.enable()
+
+        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
+            if !leftHintsShown {
+                goLeftNotice.stringValue = "Click to go to the\nHotkeys page"
+            }
+            if !rightHintsShown {
+                goRightNotice.stringValue = "Click to go back to\nthe Display page"
+                goRightButton.highlight()
+            }
+        }
     }
 
     func mauveBackground() {
-//        view.bg = hotkeysBgColor
         if let logo = logo {
             logo.transition(0.2)
             logo.textColor = logoColor
@@ -241,14 +251,52 @@ class SplitViewController: NSSplitViewController {
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
 
+        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
+            if !leftHintsShown {
+                goLeftNotice.stringValue = ""
+                leftHintsShown = true
+            }
+            if !rightHintsShown {
+                goRightNotice.stringValue = "Click to go back to the\n Configuration page"
+            }
+        }
+
         goLeftButton.disable()
         goRightButton.enable(color: logoColor)
+    }
+
+    override func viewDidAppear() {
+        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
+            showNavigationHints()
+        }
+    }
+
+    override func viewDidDisappear() {
+        hideNavigationHints()
+    }
+
+    func showNavigationHints() {
+        if !leftHintsShown {
+            goLeftButton.highlight()
+        }
+        if !rightHintsShown {
+            goRightButton.highlight()
+        }
+    }
+
+    func hideNavigationHints() {
+        goLeftButton.stopHighlighting()
+        goRightButton.stopHighlighting()
     }
 
     override func viewDidLoad() {
         view.wantsLayer = true
         view.radius = 12.0.ns
         view.bg = white
+
+        goLeftButton.notice = goLeftNotice
+        goRightButton.notice = goRightNotice
+
         whiteBackground()
         updateHelpButton()
         listenForAdaptiveModeChange()

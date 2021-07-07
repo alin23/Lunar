@@ -68,6 +68,7 @@ var activeDisplay: Display?
 var thisIsFirstRun = false
 var thisIsFirstRunAfterLunar4Upgrade = false
 var thisIsFirstRunAfterDefaults5Upgrade = false
+var thisIsFirstRunAfterM1DDCUpgrade = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -535,14 +536,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         // }
 
         brightnessKeysEnabledPublisher.sink { change in
-            if change.newValue {
-                self.startOrRestartMediaKeyTap()
-            }
+            self.startOrRestartMediaKeyTap(brightnessKeysEnabled: change.newValue)
         }.store(in: &observers)
         volumeKeysEnabledPublisher.sink { change in
-            if change.newValue {
-                self.startOrRestartMediaKeyTap()
-            }
+            self.startOrRestartMediaKeyTap(volumeKeysEnabled: change.newValue)
         }.store(in: &observers)
         mediaKeysControlAllMonitorsPublisher.sink { _ in
             self.startOrRestartMediaKeyTap()
@@ -568,7 +565,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     .publisher(for: .defaultSystemOutputDeviceChanged, object: nil)
             )
             .receive(on: RunLoop.main)
-            .sink { _ in appDelegate().startOrRestartMediaKeyTap() }
+            .sink { _ in appDelegate.startOrRestartMediaKeyTap() }
             .store(in: &observers)
     }
 

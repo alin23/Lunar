@@ -400,7 +400,7 @@ enum ValueType {
         didSet {
             save()
 
-            guard !lockedBrightness, force || brightness != oldValue else { return }
+            guard DDC.apply, !lockedBrightness, force || brightness != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
@@ -416,7 +416,7 @@ enum ValueType {
             }
 
             var oldBrightness: UInt8 = oldValue.uint8Value
-            if maxDDCBrightness != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCBrightness != 100, !(control is GammaControl) {
                 oldBrightness = mapNumber(
                     oldBrightness.d,
                     fromLow: 0,
@@ -433,7 +433,7 @@ enum ValueType {
                 ).rounded().u8
             }
 
-            log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness)", context: context)
+            log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness))", context: context)
             let startTime = DispatchTime.now()
 
             if !control.setBrightness(brightness, oldValue: oldBrightness) {
@@ -452,7 +452,7 @@ enum ValueType {
         didSet {
             save()
 
-            guard !lockedContrast, force || contrast != oldValue else { return }
+            guard DDC.apply, !lockedContrast, force || contrast != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
@@ -468,7 +468,7 @@ enum ValueType {
             }
 
             var oldContrast: UInt8 = oldValue.uint8Value
-            if maxDDCContrast != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCContrast != 100, !(control is GammaControl) {
                 oldContrast = mapNumber(
                     oldContrast.d,
                     fromLow: 0,
@@ -485,7 +485,7 @@ enum ValueType {
                 ).rounded().u8
             }
 
-            log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast)", context: context)
+            log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast))", context: context)
             let startTime = DispatchTime.now()
 
             if !control.setContrast(contrast, oldValue: oldContrast) {
@@ -507,7 +507,7 @@ enum ValueType {
             guard !isForTesting else { return }
 
             var volume = self.volume.uint8Value
-            if maxDDCVolume != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCVolume != 100, !(control is GammaControl) {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: maxDDCVolume.doubleValue).rounded().u8
             }
 
@@ -891,10 +891,6 @@ enum ValueType {
         let ddcControl = DDCControl(display: self)
         let gammaControl = GammaControl(display: self)
 
-        if networkControl.isAvailable() {
-            resetGamma()
-            return networkControl
-        }
         if coreDisplayControl.isAvailable() {
             resetGamma()
             return coreDisplayControl
@@ -902,6 +898,10 @@ enum ValueType {
         if ddcControl.isAvailable() {
             resetGamma()
             return ddcControl
+        }
+        if networkControl.isAvailable() {
+            resetGamma()
+            return networkControl
         }
 
         return gammaControl
@@ -911,11 +911,11 @@ enum ValueType {
         let networkControl = NetworkControl(display: self)
         let ddcControl = DDCControl(display: self)
 
-        if networkControl.isAvailable() {
-            return networkControl
-        }
         if ddcControl.isAvailable() {
             return ddcControl
+        }
+        if networkControl.isAvailable() {
+            return networkControl
         }
 
         return nil
@@ -1665,7 +1665,11 @@ enum ValueType {
         }
     }
 
+    @Atomic var inSmoothTransition = false
+
     func smoothTransition(from currentValue: UInt8, to value: UInt8, adjust: @escaping ((UInt8) -> Void)) {
+        inSmoothTransition = true
+
         var steps = abs(value.distance(to: currentValue))
 
         var step: Int
@@ -1680,7 +1684,7 @@ enum ValueType {
             minVal = currentValue
             maxVal = value
         }
-        concurrentQueue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { [weak self] in
+        asyncNow(barrier: true) { [weak self] in
             guard let self = self else { return }
 
             let startTime = DispatchTime.now()
@@ -1721,6 +1725,8 @@ enum ValueType {
             log.debug("It took \(elapsedTime)ns (\(elapsedSeconds)s) to change brightness from \(currentValue) to \(value) by \(step)")
 
             self.checkSlowWrite(elapsedNS: elapsedTime)
+
+            self.inSmoothTransition = false
         }
     }
 
@@ -1756,13 +1762,13 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        guard !isUserAdjusting(), !sendingBrightness else { return }
+        guard !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !sendingBrightness else { return }
+        guard !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
@@ -1780,13 +1786,13 @@ enum ValueType {
     }
 
     func refreshContrast() {
-        guard !isUserAdjusting(), !sendingContrast else { return }
+        guard !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return
         }
 
-        guard !isUserAdjusting(), !sendingContrast else { return }
+        guard !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
@@ -2018,8 +2024,16 @@ enum ValueType {
 
     // MARK: "With/out" functions
 
+    @inline(__always) func withoutDDCLimits(_ block: () -> Void) {
+        DDC.sync {
+            DDC.applyLimits = false
+            block()
+            DDC.applyLimits = true
+        }
+    }
+
     @inline(__always) func withoutDDC(_ block: () -> Void) {
-        DDC.queue.sync {
+        DDC.sync {
             DDC.apply = false
             block()
             DDC.apply = true

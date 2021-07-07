@@ -393,8 +393,10 @@ bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write)
         dispatch_semaphore_signal(queue);
         return false;
     }
-    usleep(32000);
 
+    usleep(12000);
+
+    // Retry just in case
     err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
     if (err) {
         logToFile("E: DDCWriteM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), 2);
@@ -441,7 +443,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
 
     IOReturn err;
-    UInt8 reply_data[11] = {};
+    UInt8 reply_data[12] = {};
     UInt8 data[256];
     bool result = false;
     bzero(&data, sizeof(data));
@@ -464,13 +466,13 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
     data[0] = 0x82;
     data[1] = 0x01;
     data[2] = read->control_id;
-    data[3] = 0x6e ^ 0x51 ^ data[0] ^ data[1] ^ data[2];
+    data[3] = 0x6e ^ data[0] ^ data[1] ^ data[2];
 
     for (int i = 1; i <= kMaxRequests; i++) {
         bzero(&reply_data, sizeof(reply_data));
 
         err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 4);
-        usleep(30000);
+        usleep(5000);
         if (err) {
             read->success = false;
             read->max_value = 0;
@@ -480,7 +482,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
             return false;
         }
 
-        err = IOAVServiceReadI2C(avService, 0x37, 0x51, reply_data, 11);
+        err = IOAVServiceReadI2C(avService, 0x37, 0x51, reply_data, 12);
         if (err) {
             read->success = false;
             read->max_value = 0;

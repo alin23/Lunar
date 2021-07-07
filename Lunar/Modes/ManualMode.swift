@@ -55,9 +55,11 @@ class ManualMode: AdaptiveMode {
     }
 
     func adapt(_ display: Display) {
-        display.withForce(force || display.force) {
-            display.brightness = display.brightness.uint8Value.ns
-            display.contrast = display.contrast.uint8Value.ns
+        display.withoutDDCLimits {
+            display.withForce(force || display.force) {
+                display.brightness = display.brightness.uint8Value.ns
+                display.contrast = display.contrast.uint8Value.ns
+            }
         }
     }
 

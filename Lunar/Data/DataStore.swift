@@ -32,6 +32,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .disableControllerVideo,
     .firstRun,
     .firstRunAfterLunar4Upgrade,
+    .firstRunAfterM1DDCUpgrade,
     .firstRunAfterDefaults5Upgrade,
     .fKeysAsFunctionKeys,
     .hasActiveDisplays,
@@ -202,12 +203,16 @@ class DataStore: NSObject {
     static func firstRunAfterLunar4Upgrade() {
         thisIsFirstRunAfterLunar4Upgrade = true
         DataStore.reset()
-        mainThread { appDelegate().onboard() }
+        mainThread { appDelegate.onboard() }
     }
 
     static func firstRunAfterDefaults5Upgrade() {
         thisIsFirstRunAfterDefaults5Upgrade = true
         DataStore.reset()
+    }
+
+    static func firstRunAfterM1DDCUpgrade() {
+        thisIsFirstRunAfterM1DDCUpgrade = true
     }
 
     static func reset() {
@@ -234,7 +239,7 @@ class DataStore: NSObject {
                 storeAppException(app: AppException(identifier: id, name: name))
             }
         }
-        mainThread { appDelegate().onboard() }
+        mainThread { appDelegate.onboard() }
     }
 
     override init() {
@@ -247,6 +252,8 @@ class DataStore: NSObject {
             DataStore.firstRun()
             Defaults[.firstRun] = true
             Defaults[.firstRunAfterLunar4Upgrade] = true
+            Defaults[.firstRunAfterM1DDCUpgrade] = true
+            Defaults[.firstRunAfterDefaults5Upgrade] = true
         }
 
         if Defaults[.firstRunAfterLunar4Upgrade] == nil {
@@ -257,6 +264,11 @@ class DataStore: NSObject {
         if Defaults[.firstRunAfterDefaults5Upgrade] == nil {
             DataStore.firstRunAfterDefaults5Upgrade()
             Defaults[.firstRunAfterDefaults5Upgrade] = true
+        }
+
+        if Defaults[.firstRunAfterM1DDCUpgrade] == nil {
+            DataStore.firstRunAfterM1DDCUpgrade()
+            Defaults[.firstRunAfterM1DDCUpgrade] = true
         }
 
         Defaults[.toolTipDelay] = 1
@@ -317,7 +329,11 @@ enum CachedDefaults {
                 guard let lock = locks[key.name] else {
                     Self.lock.around(ignoreMainThread: true) {
                         cache[key.name] = AnyCodable(newValue)
-                        key.suite[key] = newValue
+                        asyncNow {
+                            Self.lock.around(ignoreMainThread: true) {
+                                key.suite[key] = newValue
+                            }
+                        }
                     }
                     return
                 }
@@ -326,13 +342,21 @@ enum CachedDefaults {
 
                     if key == .displays, let displays = newValue as? [Display] {
                         asyncNow { displaysPublisher.send(displays) }
-                        Defaults.withoutPropagation {
-                            key.suite[key] = newValue
+                        asyncNow {
+                            lock.around(ignoreMainThread: true) {
+                                Defaults.withoutPropagation {
+                                    key.suite[key] = newValue
+                                }
+                            }
                         }
                         return
                     }
 
-                    key.suite[key] = newValue
+                    asyncNow {
+                        lock.around(ignoreMainThread: true) {
+                            key.suite[key] = newValue
+                        }
+                    }
                 }
             }
         }
@@ -413,6 +437,7 @@ extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
+    static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
     static let contrastCurveFactor = Key<Double>("contrastCurveFactor", default: 0.5)
     static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 0.5)
     static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)

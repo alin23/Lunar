@@ -850,7 +850,7 @@
                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTp-EE-gEX" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="20" y="42" width="38" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CIExclusionBlendMode">
+                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
                                     <configuration>
                                         <null key="inputBackgroundImage"/>
                                         <null key="inputImage"/>
@@ -874,7 +874,7 @@
                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DOd-ks-yiz" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="882" y="41" width="38" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CIExclusionBlendMode">
+                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
                                     <configuration>
                                         <null key="inputBackgroundImage"/>
                                         <null key="inputImage"/>
@@ -1060,6 +1060,54 @@
                                     </menu>
                                 </popUpButtonCell>
                             </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="HbV-JR-nUQ">
+                                <rect key="frame" x="65" y="45" width="132" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
+                                    <configuration>
+                                        <null key="inputBackgroundImage"/>
+                                        <null key="inputImage"/>
+                                    </configuration>
+                                </ciFilter>
+                                <contentFilters>
+                                    <ciFilter name="CIColorInvert">
+                                        <configuration>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="4MO-wt-onU">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <string key="title">Click to go to the 
+Configuration page</string>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="hKB-Ol-MnX">
+                                <rect key="frame" x="723" y="45" width="151" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
+                                    <configuration>
+                                        <null key="inputBackgroundImage"/>
+                                        <null key="inputImage"/>
+                                    </configuration>
+                                </ciFilter>
+                                <contentFilters>
+                                    <ciFilter name="CIColorInvert">
+                                        <configuration>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="wp3-of-A9S">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <string key="title">Click to go back to the 
+Configuration page</string>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -1068,7 +1116,9 @@
                         <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
+                        <outlet property="goLeftNotice" destination="HbV-JR-nUQ" id="tVx-ID-CaM"/>
                         <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
+                        <outlet property="goRightNotice" destination="hKB-Ol-MnX" id="ejk-lb-7Dn"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
                     </connections>
                 </viewController>
@@ -3597,7 +3647,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="400" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>

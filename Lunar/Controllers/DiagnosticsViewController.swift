@@ -9,8 +9,8 @@
 import Carbon
 import Cocoa
 import Defaults
-import Down
 import Sentry
+import SwiftyMarkdown
 
 let FAQ_URL = try! "https://lunar.fyi/faq".asURL()
 
@@ -69,43 +69,17 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     }
 
     let continueTestCondition = NSCondition()
-    let style = """
-    \(STYLESHEET)
+    let markdown: SwiftyMarkdown = {
+        let md = getMD()
 
-    p, ul, ol, li, a {
-        margin: 0;
-        padding: 0;
-        font-size: 14px;
-    }
-    p, li {
-        color: #49435A;
-    }
+        md.body.color = mauve
+        md.h1.color = dullRed
+        md.h2.color = dullRed
+        md.h3.color = mauve.blended(withFraction: 0.3, of: red)!
+        md.h4.color = darkMauve
 
-    h1, h2 {
-        color: #D55D5C;
-    }
-    h2 {
-        color: #D55D5C;
-        font-size: 18px;
-    }
-    h3 {
-        color: #6C4159;
-        font-size: 17px;
-    }
-    h4 {
-        color: #3D3A47;
-        font-size: 15px;
-    }
-
-    ul, ol, li:last-child {
-        margin-bottom: 3px;
-    }
-
-    hr {
-        border-top: 1px solid #6C4159;
-    }
-
-    """
+        return md
+    }()
 
     func renderSeparated(_ str: String) {
         render("----\n\n\(str)\n\n----\n\n")
@@ -113,11 +87,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
     func render(_ str: String) {
         guard !stopped else { return }
-        let down = Down(markdownString: str)
         mainThread {
             guard let textView = outputScrollView.documentView as? NSTextView else { return }
 
-            self.info += ((try? down.toAttributedString(.hardBreaks, stylesheet: style)) ?? str.attributedString)
+            self.info += markdown.attributedString(from: str)
             textView.scrollToEndOfDocument(nil)
         }
     }
@@ -130,9 +103,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             let stepPercent = 90.0 / steps.d
 
             self.render("""
-            **Note: Don't copy/paste this output in an email as that is not enough.**
-            **Clicking the `Send Diagnostics` button will send more useful technical data.**
-            **If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by pressing the necessary keys when prompted.**
+            *Note: Don't copy/paste this output in an email as that is not enough.*
+            *Clicking the `Send Diagnostics` button will send more useful technical data.*
+            *If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by pressing the necessary keys when prompted.*
             """)
 
             for (i, display) in displayController.activeDisplays.values.enumerated() {
@@ -144,7 +117,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     Thread.sleep(forTimeInterval: 0.5)
                 }
 
-                self.render("## Diagnosing display \(display.name) [\(display.serial)]")
+                self.render("\n\n### Diagnosing display \(display.name) *[\(display.serial)]*")
                 setPercent(10)
                 guard !self.stopped else { return }
 
@@ -173,40 +146,41 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     let i2cMessage = """
                     * AV Service: `\(
                         avService == nil ? "NONE" : CFCopyDescription(avService!) as String)`
-                      * _This monitor \(
-                          avService == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    	* _This monitor \(
+                    	    avService == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
                     """
                 #else
                     let i2cMessage = """
                     * I2C Controller: `\(
                         i2c == nil ? "NONE" : i2c!.s)`
-                      * _This monitor \(
-                          i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    	* _This monitor \(
+                    	    i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
                     """
                 #endif
                 self.render("""
+
                 * ID: `\(display.id)`
                 * EDID Name: `\(display.edidName)`
                 \(i2cMessage)
                 * Network Controller: `\(network == nil ? "NONE" : network!)`
-                  * _This monitor \(network == nil ?
+                	* _This monitor \(network == nil ?
                     "can't be controlled through the network" : "supports DDC through a network controller")_
                 * DDC Status: `\(display.responsiveDDC ? "responsive" : "unresponsive")`
                 * Apple vendored: `\(appleDisplay ? "YES" : "NO")`
-                  * **DisplayServicesCanChangeBrightness: \(DisplayServicesCanChangeBrightness(display.id))**
-                  * **DisplayServicesHasAmbientLightCompensation: \(DisplayServicesHasAmbientLightCompensation(display.id))**
-                  * **DisplayServicesIsSmartDisplay: \(DisplayServicesIsSmartDisplay(display.id))**
-                  * **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
-                  * **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
-                  * _\(
-                      appleDisplay
-                          ?
-                          (
-                              coreDisplay ?
-                                  "Should support native control through CoreDisplay" :
-                                  "Should support CoreDisplay but doesn't"
-                          )
-                          : "Doesn't support CoreDisplay")_
+                	* **DisplayServicesCanChangeBrightness: \(DisplayServicesCanChangeBrightness(display.id))**
+                	* **DisplayServicesHasAmbientLightCompensation: \(DisplayServicesHasAmbientLightCompensation(display.id))**
+                	* **DisplayServicesIsSmartDisplay: \(DisplayServicesIsSmartDisplay(display.id))**
+                	* **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
+                	* **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
+                	* _\(
+                	    appleDisplay
+                	        ?
+                	        (
+                	            coreDisplay ?
+                	                "Should support native control through CoreDisplay" :
+                	                "Should support CoreDisplay but doesn't"
+                	        )
+                	        : "Doesn't support CoreDisplay")_
                 * Vendor ID: `\(CGDisplayVendorNumber(display.id))` \(display.isAppleVendorID() ? "_(seems to be an Apple vendor ID)_" : "")
                 """)
                 setPercent(50)
@@ -238,12 +212,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     self.render("-----------------------------")
                     self
                         .render(
-                            "### Testing \(control.str):\(control is DDCCTLControl ? "  [https://github.com/kfix/ddcctl](https://github.com/kfix/ddcctl)" : "")"
+                            "#### Testing \(control.str):\(control is DDCCTLControl ? "  [https://github.com/kfix/ddcctl](https://github.com/kfix/ddcctl)" : "")"
                         )
 
                     switch control {
                     case is CoreDisplayControl:
-                        self.render("#### Reading brightness...")
+                        self.render("##### Reading brightness...")
                         Thread.sleep(forTimeInterval: 0.5)
 
                         if let br = control.getBrightness() {
@@ -255,23 +229,23 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         Thread.sleep(forTimeInterval: 0.5)
 
                     case is DDCControl, is DDCCTLControl, is NetworkControl:
-                        self.render("**Do you want to test reading brightness?**")
+                        self.render("\nDo you want to test reading brightness?")
                         self.renderSeparated(
                             """
-                            ## Caution!! This can cause a kernel panic and you'll have to restart your \(
+                            `Caution!! This can cause a kernel panic and you'll have to restart your \(
                                 control is NetworkControl
                                     ? "Network Controller *(Raspberry Pi)*"
                                     : Sysctl.device
-                            ) if it happens!
+                            ) if it happens!`
                             """
                         )
                         self.renderSeparated(
-                            "_Press the `Enter` key to test reading.\nPress `any other key` to `skip reading test` and continue diagnostics..._"
+                            "_Press the `Enter` key to test reading._\n_Press `any other key` to `skip reading test` and continue diagnostics..._"
                         )
                         self.continueTestCondition.wait()
 
                         if self.keyPressed == kVK_Return {
-                            self.render("#### Reading brightness...")
+                            self.render("##### Reading brightness...")
                             Thread.sleep(forTimeInterval: 0.5)
 
                             if let br = control.getBrightness() {
@@ -305,7 +279,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         if let networkController = NetworkControl.controllersForDisplay[display.serial],
                            let url = networkController.url
                         {
-                            self.render("#### Detecting connected displays...")
+                            self.render("\n##### Detecting connected displays...")
                             if let resp = waitForResponse(
                                 from: url.deletingLastPathComponent().appendingPathComponent("displays"),
                                 timeoutPerTry: 2.seconds,
@@ -324,28 +298,28 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         }
                     }
 
-                    self.render("* _Setting brightness to `1`_")
+                    self.render("\n* _Setting brightness to `1`_")
                     let try1 = control.setBrightness(10, oldValue: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
-                    self.render("* _Setting brightness to `100`_")
+                    self.render("\n* _Setting brightness to `100`_")
                     let try2 = control.setBrightness(100, oldValue: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
-                    self.render("* _Setting brightness to `25`_")
+                    self.render("\n* _Setting brightness to `25`_")
                     let try3 = control.setBrightness(10, oldValue: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
-                    self.render("* _Setting brightness to `50`_")
+                    self.render("\n* _Setting brightness to `50`_")
                     let try4 = control.setBrightness(50, oldValue: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
                     let tries = [try1, try2, try3, try4]
-                    self.render("`\(tries.trueCount)` out of `4` tries seemed to reach the monitor")
+                    self.render("\n`\(tries.trueCount)` out of `4` tries seemed to reach the monitor")
 
                     Thread.sleep(forTimeInterval: 1.5)
                     guard !self.stopped else { return }
@@ -356,7 +330,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         cancelButton: "No",
                         window: self.view.window,
                         onCompletion: { (changed: Bool) in
-                            self.render("**Was there any noticeable change in brightness? : `\(changed ? "YES" : "NO")`**")
+                            self.render("\n\n**Was there any noticeable change in brightness? : `\(changed ? "YES" : "NO")`**")
 
                             switch control {
                             case is DDCCTLControl:
@@ -364,7 +338,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 if !ddcWorked {
                                     if !ddcctlWorked {
                                         self.renderSeparated("""
-                                        ### `ddcctl` wasn't able to control the monitor.
+                                        #### `ddcctl` wasn't able to control the monitor.
 
                                         --------
 
@@ -375,7 +349,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                         """)
                                     } else {
                                         self.renderSeparated("""
-                                        ### Looks like `ddcctl` was able to control the monitor, while Lunar failed.
+                                        #### Looks like `ddcctl` was able to control the monitor, while Lunar failed.
 
                                         --------
 
@@ -388,7 +362,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 coreDisplayWorked = changed
                                 if !coreDisplayWorked {
                                     self.renderSeparated("""
-                                    ### This monitor could not be controlled through Apple's native CoreDisplay framework.
+                                    #### This monitor could not be controlled through Apple's native CoreDisplay framework.
 
                                     --------
 
@@ -408,16 +382,16 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 networkWorked = changed
                                 if !networkWorked {
                                     self.renderSeparated("""
-                                    ### The assigned network controller wasn't able to control this monitor
+                                    #### The assigned network controller wasn't able to control this monitor
                                     """)
                                     if let networkController = NetworkControl.controllersForDisplay[display.serial],
                                        let url = networkController.url
                                     {
                                         self.render("""
-                                        #### If you have technical knowledge about `SSH` and `curl`, you can check the following:
+                                        ##### If you have technical knowledge about `SSH` and `curl`, you can check the following:
                                         * See if the controller is reachable using this curl command: `curl \(url.deletingLastPathComponent().appendingPathComponent("displays"))`
-                                          * You should get a response similar to the one below:
-                                          * ```
+                                        	* You should get a response similar to the one below:
+                                        	* ```
                                             Display 1
                                               I2C bus:  /dev/i2c-2
                                               EDID synopsis:
@@ -430,18 +404,18 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                                  EDID version:         1.3
                                               VCP version:         2.1
                                             ```
-                                          * If you get `Invalid Display` try turning your monitor off then turn it on after a few seconds
-                                          * If you get `Display not found`, make sure your Pi is running an OS with a desktop environment, and the desktop is visible when the Pi HDMI input is active
+                                        	* If you get `Invalid Display` try turning your monitor off then turn it on after a few seconds
+                                        	* If you get `Display not found`, make sure your Pi is running an OS with a desktop environment, and the desktop is visible when the Pi HDMI input is active
                                         * Check that the server is running
-                                          * SSH into your Pi
-                                          * Run `sudo systemctl status ddcutil-server`
+                                        	* SSH into your Pi
+                                        	* Run `sudo systemctl status ddcutil-server`
                                         * Check if `ddcutil` can correctly identify and control your monitor
-                                          * SSH into your Pi
-                                          * Run `ddcutil detect` _(you should get the same response as for the `curl` command)_
-                                          * Cycle through a few brightness values to see if there's any change:
-                                            * `ddcutil setvcp 0x10 25`
-                                            * `ddcutil setvcp 0x10 100`
-                                            * `ddcutil setvcp 0x10 50`
+                                        	* SSH into your Pi
+                                        	* Run `ddcutil detect` _(you should get the same response as for the `curl` command)_
+                                        	* Cycle through a few brightness values to see if there's any change:
+                                          		* `ddcutil setvcp 0x10 25`
+                                          		* `ddcutil setvcp 0x10 100`
+                                          		* `ddcutil setvcp 0x10 50`
                                         """)
                                     }
                                 }
@@ -449,12 +423,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 ddcWorked = changed
                                 if !ddcWorked {
                                     self.renderSeparated("""
-                                    ### Looks like your setup doesn't support DDC
-                                    #### This means Lunar won't be able to control the hardware values of your monitor through the connected cable
+                                    #### Looks like your setup doesn't support DDC
+                                    ##### This means Lunar won't be able to control the hardware values of your monitor through the connected cable
 
                                     --------
 
-                                    #### The following features won't be supported:
+                                    ##### The following features won't be supported:
                                     * Changing the hardware brightness _(hardware, as in, the same brightness you can change using the monitor's physical buttons)_
                                     * Changing the hardware contrast
                                     * Changing the monitor volume
@@ -468,15 +442,15 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                                     --------
 
-                                    #### If you think DDC should work, check the following:
+                                    ##### If you think DDC should work, check the following:
                                     * Is this an M1 Mac? **(M1 doesn't yet provide support for DDC)**
                                     * Are you using a hub/dock/adapter between this monitor and your Mac?
-                                      * Some of these devices can block DDC from reaching the monitor
-                                      * If possible, try connecting the monitor without the hub or using a different cable/connector
+                                    	* Some of these devices can block DDC from reaching the monitor
+                                    	* If possible, try connecting the monitor without the hub or using a different cable/connector
                                     * Are you using DisplayLink? **(DisplayLink doesn't provide support for DDC on macOS)**
                                     * Is DDC/CI enabled in your monitor settings?
                                     * Is this monitor connected to the HDMI output of a Mac Mini?
-                                      * This is a known hardware issue: [https://github.com/alin23/Lunar/issues/125](https://github.com/alin23/Lunar/issues/125)
+                                    	* This is a known hardware issue: [https://github.com/alin23/Lunar/issues/125](https://github.com/alin23/Lunar/issues/125)
                                     """)
                                 }
                             default:
@@ -539,10 +513,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                 if SyncMode.specific.available {
                     self.renderSeparated("### Sync Mode")
-                    self.render("**Do you want to test Sync Mode?**")
+                    self.render("Do you want to test Sync Mode?")
 
                     self.renderSeparated(
-                        "_Press the `Enter` key to test Sync Mode.\nPress `any other key` to `skip the Sync Mode test` and continue diagnostics..._"
+                        "_Press the `Enter` key to test Sync Mode._\n_Press `any other key` to `skip the Sync Mode test` and continue diagnostics..._"
                     )
                     self.continueTestCondition.wait()
                     guard !self.stopped else { return }
@@ -566,31 +540,31 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         let smoothTransitionActive = CachedDefaults[.smoothTransition]
                         defer {
                             if lastMode.key != .sync {
-                                self.render("Going back from Sync to \(lastMode.str) Mode")
+                                self.render("\nGoing back from Sync to \(lastMode.str) Mode")
                                 displayController.adaptiveMode = lastMode
                             }
                             if lastPollingInterval != 1 {
-                                self.render("Setting polling interval back to \(lastPollingInterval) seconds")
+                                self.render("\nSetting polling interval back to \(lastPollingInterval) seconds")
                                 SyncMode.pollingSeconds = lastPollingInterval
                             }
                             if smoothTransitionActive {
-                                self.render("Re-enabling smooth transition")
+                                self.render("\nRe-enabling smooth transition")
                                 CachedDefaults[.smoothTransition] = true
                             }
                         }
                         if lastMode.key != .sync {
-                            self.render("Changing from \(lastMode.str) to Sync Mode")
+                            self.render("\nChanging from \(lastMode.str) to Sync Mode")
                             displayController.adaptiveMode = SyncMode.shared
                         }
                         if lastPollingInterval != 1 {
-                            self.render("Setting polling interval to 1 second")
+                            self.render("\nSetting polling interval to 1 second")
                             SyncMode.pollingSeconds = 1
                             SyncMode.specific.stopWatching()
                             Thread.sleep(forTimeInterval: 1)
                             _ = SyncMode.specific.watch()
                         }
                         if smoothTransitionActive {
-                            self.render("Disabling smooth transition")
+                            self.render("\nDisabling smooth transition")
                             CachedDefaults[.smoothTransition] = false
                         }
 
@@ -638,7 +612,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                         let trySync = { (brightness: UInt8, method: CoreDisplayMethod) in
                             guard !self.stopped else { return }
-                            self.render("\n#### Setting built-in brightness to `\(brightness)` using `\(method)`")
+                            self.render("\n\n##### Setting built-in brightness to `\(brightness)` using `\(method)`")
                             SyncMode.setBuiltinDisplayBrightness(brightness, method: method)
                             Thread.sleep(forTimeInterval: 3)
                             guard !self.stopped else { return }
@@ -646,14 +620,14 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             Thread.sleep(forTimeInterval: 1)
                         }
 
-                        trySync(100, .coreDisplay)
-                        trySync(10, .coreDisplay)
-                        trySync(1, .coreDisplay)
+                        // trySync(100, .coreDisplay)
+                        // trySync(10, .coreDisplay)
+                        // trySync(1, .coreDisplay)
                         trySync(100, .displayServices)
                         trySync(10, .displayServices)
                         trySync(1, .displayServices)
                         if let oldBrightness = builtinBrightness {
-                            trySync(oldBrightness.u8, .coreDisplay)
+                            // trySync(oldBrightness.u8, .coreDisplay)
                             trySync(oldBrightness.u8, .displayServices)
                         }
                     }
