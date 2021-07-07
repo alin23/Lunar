@@ -289,6 +289,7 @@ func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
 enum DDC {
     static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
     @Atomic static var apply = true
+    @Atomic static var applyLimits = true
     static let requestDelay: useconds_t = 20000
     static let recoveryDelay: useconds_t = 40000
     static var displayPortByUUID = [CFUUID: io_service_t]()
@@ -364,7 +365,7 @@ enum DDC {
     }
 
     static func reset() {
-        queue.sync(flags: [.barrier]) {
+        sync(barrier: true) {
             DDC.displayPortByUUID.removeAll()
             DDC.displayUUIDByEDID.removeAll()
             DDC.skipReadingPropertyById.removeAll()
@@ -444,7 +445,7 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return false }
         #endif
 
-        return queue.sync(flags: [.barrier]) {
+        return sync(barrier: true) {
             if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
                 log.debug("Skipping write for \(controlID)", context: displayID)
                 return false
@@ -466,26 +467,12 @@ enum DDC {
             let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
             if writeMs > MAX_WRITE_DURATION_MS {
                 log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
-                DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+                writeFault(severity: 4, displayID: displayID, controlID: controlID)
             }
 
             guard result else {
                 log.debug("Error writing \(controlID)", context: displayID)
-                guard let propertyFaults = DDC.writeFaults[displayID] else {
-                    DDC.writeFaults[displayID] = [controlID: 1]
-                    return false
-                }
-                guard var faults = propertyFaults[controlID] else {
-                    DDC.writeFaults[displayID]![controlID] = 1
-                    return false
-                }
-                faults += 1
-                DDC.writeFaults[displayID]![controlID] = faults
-
-                if faults > MAX_WRITE_FAULTS {
-                    DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
-                }
-
+                writeFault(severity: 1, displayID: displayID, controlID: controlID)
                 return false
             }
 
@@ -498,6 +485,40 @@ enum DDC {
             }
 
             return result
+        }
+    }
+
+    static func readFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
+        guard let propertyFaults = DDC.readFaults[displayID] else {
+            DDC.readFaults[displayID] = [controlID: severity]
+            return
+        }
+        guard var faults = propertyFaults[controlID] else {
+            DDC.readFaults[displayID]![controlID] = severity
+            return
+        }
+        faults = min(severity + faults, MAX_READ_FAULTS + 1)
+        DDC.readFaults[displayID]![controlID] = faults
+
+        if faults > MAX_READ_FAULTS {
+            DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
+        }
+    }
+
+    static func writeFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
+        guard let propertyFaults = DDC.writeFaults[displayID] else {
+            DDC.writeFaults[displayID] = [controlID: severity]
+            return
+        }
+        guard var faults = propertyFaults[controlID] else {
+            DDC.writeFaults[displayID]![controlID] = severity
+            return
+        }
+        faults = min(severity + faults, MAX_WRITE_FAULTS + 1)
+        DDC.writeFaults[displayID]![controlID] = faults
+
+        if faults > MAX_WRITE_FAULTS {
+            DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
         }
     }
 
@@ -537,7 +558,7 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return nil }
         #endif
 
-        return queue.sync(flags: [.barrier]) {
+        return sync(barrier: true) {
             if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
                 log.debug("Skipping read for \(controlID)", context: displayID)
                 return nil
@@ -571,25 +592,12 @@ enum DDC {
             let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
             if readMs > MAX_READ_DURATION_MS {
                 log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
-                DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
+                readFault(severity: 4, displayID: displayID, controlID: controlID)
             }
 
             guard command.success else {
                 log.debug("Error reading \(controlID)", context: displayID)
-                guard let propertyFaults = DDC.readFaults[displayID] else {
-                    DDC.readFaults[displayID] = [controlID: 1]
-                    return nil
-                }
-                guard var faults = propertyFaults[controlID] else {
-                    DDC.readFaults[displayID]![controlID] = 1
-                    return nil
-                }
-                faults += 1
-                DDC.readFaults[displayID]![controlID] = faults
-
-                if faults > MAX_READ_FAULTS {
-                    DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
-                }
+                readFault(severity: 1, displayID: displayID, controlID: controlID)
 
                 return nil
             }
@@ -619,7 +627,7 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return nil }
         #endif
 
-        return queue.sync(flags: [.barrier]) {
+        return sync(barrier: true) {
             var edidData = [UInt8](repeating: 0, count: 256)
             var edid = EDID()
 
@@ -724,6 +732,14 @@ enum DDC {
         extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
 
+    static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
+        if let q = DispatchQueue.current, q == queue {
+            return action()
+        } else {
+            return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
+        }
+    }
+
     #if arch(arm64)
         static var avServiceCache: [CGDirectDisplayID: IOAVService?] = Dictionary(minimumCapacity: 10)
 
@@ -735,7 +751,7 @@ enum DDC {
         static func AVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> IOAVService? {
             guard !isTestID(displayID) else { return nil }
 
-            return queue.sync(flags: [.barrier]) {
+            return sync(barrier: true) {
                 if !ignoreCache, let service = avServiceCache[displayID] {
                     return service
                 }
@@ -754,7 +770,7 @@ enum DDC {
     }
 
     static func I2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> io_service_t? {
-        queue.sync(flags: [.barrier]) {
+        sync(barrier: true) {
             if !ignoreCache, let controller = i2cControllerCache[displayID] {
                 return controller
             }

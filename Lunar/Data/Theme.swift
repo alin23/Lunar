@@ -18,6 +18,7 @@ let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.505882
 let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
 let errorRed = #colorLiteral(red: 0.968627451, green: 0, blue: 0.01568627451, alpha: 1)
+let dullRed = #colorLiteral(red: 0.8352941275, green: 0.3647058904, blue: 0.360784322, alpha: 1)
 let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 let faceLightColor = white.blended(withFraction: 0.15, of: orange) ?? white

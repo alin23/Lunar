@@ -295,7 +295,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
                     self.adaptViewSize()
 //                    if CachedDefaults[.showQuickActions], displayController.displays.count > 1,
-//                       let statusButton = appDelegate().statusItem.button
+//                       let statusButton = appDelegate.statusItem.button
 //                    {
 //                        POPOVERS["menu"]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
 //                        closeMenuPopover(after: 2500)

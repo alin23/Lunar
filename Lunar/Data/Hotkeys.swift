@@ -92,7 +92,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
             oldValue.unregister()
             handleRegistration(persist: true)
             if HotkeyIdentifier(rawValue: identifier) != nil {
-                appDelegate().setKeyEquivalents(CachedDefaults[.hotkeys])
+                appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
             }
         }
     }
@@ -141,7 +141,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
             hotkey = Magnet.HotKey(
                 identifier: identifier,
                 keyCombo: keyCombo,
-                target: appDelegate(),
+                target: appDelegate,
                 action: Hotkey.handler(identifier: hkIdentifier),
                 actionQueue: .main
             )
@@ -159,7 +159,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
         hotkey = Magnet.HotKey(
             identifier: identifier,
             keyCombo: keyCombo,
-            target: appDelegate(),
+            target: appDelegate,
             action: #selector(AppDelegate.doNothing),
             actionQueue: .main
         )
@@ -323,7 +323,7 @@ enum Hotkey {
                 QWERTYKeyCode: kVK_ANSI_L,
                 cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option])
             )!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .toggle),
             actionQueue: .main
         )),
@@ -333,140 +333,140 @@ enum Hotkey {
                 QWERTYKeyCode: kVK_ANSI_L,
                 cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift])
             )!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .lunar),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent0.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .percent0),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent25.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .percent25),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent50.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .percent50),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent75.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_3, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .percent75),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent100.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_4, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .percent100),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.faceLight.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_5, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .faceLight),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseBrightnessUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseBrightnessDown),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseContrastUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseContrastUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseContrastDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseContrastDown),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseVolumeUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseVolumeUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseVolumeDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .preciseVolumeDown),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.brightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .brightnessUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.brightnessDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .brightnessDown),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.contrastUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .contrastUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.contrastDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .contrastDown),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.muteAudio.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F10, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .muteAudio),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.volumeUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .volumeUp),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.volumeDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate(),
+            target: appDelegate,
             action: handler(identifier: .volumeDown),
             actionQueue: .main
         )),
@@ -597,8 +597,12 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func startOrRestartMediaKeyTap(_ brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
-        acquirePrivileges()
+    func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
+        if let enabled = brightnessKeysEnabled, enabled {
+            acquirePrivileges()
+        } else if let enabled = volumeKeysEnabled, enabled {
+            acquirePrivileges()
+        }
 
         let workItem = DispatchWorkItem(name: "startOrRestartMediaKeyTap") {
             mediaKeyTapBrightness?.stop()

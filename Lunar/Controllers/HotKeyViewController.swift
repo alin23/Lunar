@@ -8,7 +8,6 @@
 
 import Cocoa
 import Defaults
-import Down
 import Magnet
 
 class HotkeyViewController: NSViewController {
@@ -124,8 +123,7 @@ class HotkeyViewController: NSViewController {
             You have to **hold `Fn`** to be able to activate any of the hotkeys containing keys like `F1,` `F2,` `F10` etc.
             """
         }
-        let down = Down(markdownString: notice)
-        fnKeysNotice.attributedStringValue = (try? down.toAttributedString(.smart, stylesheet: DARK_STYLESHEET)) ?? notice.attributedString
+        fnKeysNotice.attributedStringValue = DARK_MD.attributedString(from: notice) ?? notice.attributedString
         fnKeysNotice.isEnabled = false
     }
 

@@ -17,7 +17,7 @@ class SettingsPopoverController: NSViewController {
 
     `Available only for monitors with a built-in light sensor that are controllable using CoreDisplay`
 
-    This setting allows the user to choose a monitor to be used as the source when a built-in display is not available or can't be used (e.g. MacBook lid closed, Mac Mini).
+    This setting allows the user to choose a monitor to be used as the source when a built-in display is not available or can't be used (*e.g. MacBook lid closed, Mac Mini*).
 
     - `SOURCE`: Sync Mode will read this monitor's brightness/contrast and send it to the other external monitors
     - `TARGET`: Sync Mode will send brightness/contrast to this monitor after detecting a brightness change on the built-in/source monitor
@@ -33,14 +33,17 @@ class SettingsPopoverController: NSViewController {
     - `PAUSED` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
     """
     let DDC_LIMITS_HELP_TEXT = """
+    `Note: these are not soft limits.`
+
+    If your monitor accepts values `up to 100` but looks bad on large values, dont't change these limits. Use the `MAX` limits under the `BRIGHTNESS` and `CONTRAST`.
+
     ## Description
 
-    `Available only in Sync, Location and Sensor mode`
+    Most monitors accept brightness/contrast/volume values between `0` and `100`.
 
-    This setting allows the user to **pause** the adaptive algorithm on a **per-monitor** basis.
-
-    - `RUNNING` will **allow** Lunar to change the brightness and contrast automatically for this monitor
-    - `PAUSED` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
+    Some monitors don't abide to this rule and could accept:
+    - `Volume` values only up to 50 *(their 100% volume happens on the value 50 instead of 100)*
+    - `Brightness` values up to 255 *(these monitors have an extended range and their 100% brightness happens on the value 255 instead of 100)*
     """
     let GAMMA_HELP_TEXT = """
     ## Description

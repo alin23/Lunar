@@ -54,6 +54,7 @@
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
+		C75BFE962695FAE9005EADCA /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C75BFE952695FAE9005EADCA /* SwiftyMarkdown */; };
 		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
@@ -163,7 +164,6 @@
 		C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E896DC2652C37E0079A328 /* CoreBrightness.framework */; };
 		C7E99267260A90E70055370A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = C7E99266260A90E70055370A /* Solar */; };
 		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
-		C7F1B614264C527900F02D8A /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = C7F1B613264C527900F02D8A /* Down */; };
 		C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = C7F48C492657A258000715A8 /* DataCompression */; };
 		C7F862402608A34400704300 /* RunloopQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F8623F2608A34300704300 /* RunloopQueue.swift */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
@@ -369,6 +369,7 @@
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
+				C75BFE962695FAE9005EADCA /* SwiftyMarkdown in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
@@ -378,7 +379,6 @@
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
-				C7F1B614264C527900F02D8A /* Down in Frameworks */,
 				C7BADA0A26386E940058974C /* ZIPFoundation in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
 				C701A23C2546BA41004747B5 /* Magnet in Frameworks */,
@@ -807,10 +807,10 @@
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7E80E4526370780004718A4 /* Socket */,
 				C7BADA0926386E940058974C /* ZIPFoundation */,
-				C7F1B613264C527900F02D8A /* Down */,
 				C7F48C492657A258000715A8 /* DataCompression */,
 				C75FFA09266D24AA0034DDD6 /* Burritos */,
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
+				C75BFE952695FAE9005EADCA /* SwiftyMarkdown */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -872,10 +872,10 @@
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C7BADA0826386E940058974C /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				C7F1B612264C527900F02D8A /* XCRemoteSwiftPackageReference "Down" */,
 				C7F48C482657A258000715A8 /* XCRemoteSwiftPackageReference "DataCompression" */,
 				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
+				C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1176,7 +1176,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.4.1;
+				CURRENT_PROJECT_VERSION = 4.5.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1202,7 +1202,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.4.1;
+				MARKETING_VERSION = 4.5.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1288,7 +1288,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.4.1;
+				CURRENT_PROJECT_VERSION = 4.5.1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1314,7 +1314,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.4.1;
+				MARKETING_VERSION = 4.5.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1461,7 +1461,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.4.1;
+				CURRENT_PROJECT_VERSION = 4.5.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1487,7 +1487,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.4.1;
+				MARKETING_VERSION = 4.5.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1519,7 +1519,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.4.1;
+				CURRENT_PROJECT_VERSION = 4.5.1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1545,7 +1545,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.4.1;
+				MARKETING_VERSION = 4.5.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1710,6 +1710,14 @@
 				minimumVersion = 0.4.1;
 			};
 		};
+		C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimonFairbairn/SwiftyMarkdown";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/Burritos";
@@ -1796,14 +1804,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.1.1;
-			};
-		};
-		C7F1B612264C527900F02D8A /* XCRemoteSwiftPackageReference "Down" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/johnxnguyen/Down";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.11.0;
 			};
 		};
 		C7F48C482657A258000715A8 /* XCRemoteSwiftPackageReference "DataCompression" */ = {
@@ -1900,6 +1900,11 @@
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
+		C75BFE952695FAE9005EADCA /* SwiftyMarkdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */;
+			productName = SwiftyMarkdown;
+		};
 		C75FFA09266D24AA0034DDD6 /* Burritos */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */;
@@ -1954,11 +1959,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */;
 			productName = Solar;
-		};
-		C7F1B613264C527900F02D8A /* Down */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7F1B612264C527900F02D8A /* XCRemoteSwiftPackageReference "Down" */;
-			productName = Down;
 		};
 		C7F48C492657A258000715A8 /* DataCompression */ = {
 			isa = XCSwiftPackageProductDependency;

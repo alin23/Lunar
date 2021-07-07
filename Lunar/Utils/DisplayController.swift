@@ -254,7 +254,7 @@ class DisplayController {
             }
 
             mainThread {
-                let appd = appDelegate()
+                let appd = appDelegate
                 if appd.windowController?.window != nil {
                     appd.windowController?.close()
                     appd.windowController?.window = nil
@@ -311,7 +311,7 @@ class DisplayController {
                         return
                     }
 
-                    let window = mainThread { appDelegate().windowController?.window }
+                    let window = mainThread { appDelegate.windowController?.window }
 
                     let resp = ask(
                         message: "Non-responsive display \"\(display.name)\"",
@@ -471,7 +471,7 @@ class DisplayController {
             return fullyMatchedDisplay
         }
 
-        guard partial else {return nil}
+        guard partial else { return nil }
 
         let displayScores = displays.map { display -> (Display, Int) in
             let score = DisplayController.displayInfoDictPartialMatchScore(

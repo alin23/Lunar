@@ -7,117 +7,47 @@
 //
 
 import Cocoa
-import Down
+import SwiftyMarkdown
 
-let STYLESHEET = """
-p, ul, ol, li, a {
-    font-family: 'SF Compact Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Avenir, sans-serif;
-    font-size: 14px;
-}
+func getMD(dark: Bool = false) -> SwiftyMarkdown {
+    let md = SwiftyMarkdown(string: "")
 
-ul, ol, li:last-child {
-    margin-bottom: 10px;
-}
+    md.h1.fontSize = 24
+    md.h2.fontSize = 22
+    md.h3.fontSize = 20
+    md.h4.fontSize = 18
+    md.h5.fontSize = 17
+    md.h6.fontSize = 15
 
-div.spacer {
-    margin-top: 1px;
-    margin-bottom: 1px;
-    width: 100%;
-}
+    md.h1.fontName = "Menlo-Bold"
+    md.h2.fontName = "Menlo-Bold"
+    md.h3.fontName = "Menlo-Bold"
+    md.h4.fontName = "Menlo-Bold"
+    md.h5.fontName = "SFCompactText-Bold"
+    md.h6.fontName = "SFCompactText-Bold"
 
-div.spacer.h1 {
-    height: 1px;
-}
+    md.body.fontName = "SFCompactText-Regular"
+    md.body.fontSize = 14
 
-div.spacer.h2 {
-    height: 2px;
-}
+    md.bold.fontName = "SFCompactText-Bold"
+    md.bold.fontSize = 14
 
-div.spacer.h3 {
-    height: 3px;
-}
+    md.italic.fontName = "SFCompactText-MediumItalic"
+    if dark {
+        md.italic.color = lunarYellow
+    } else {
+        md.italic.color = violet
+    }
+    md.italic.fontSize = 13
 
-div.spacer.h4 {
-    height: 4px;
-}
+    md.code.fontName = "Menlo-Bold"
+    md.code.color = red
 
-div.spacer.h5 {
-    height: 5px;
-}
-
-div.spacer.h6 {
-    height: 6px;
+    return md
 }
 
-div.spacer.h7 {
-    height: 7px;
-}
-
-div.spacer.h8 {
-    height: 8px;
-}
-
-div.spacer.h9 {
-    height: 9px;
-}
-
-div.spacer.h10 {
-    height: 10px;
-}
-
-a {
-    margin-bottom: 1px;
-    margin-top: 1px;
-}
-
-h1 {
-    font-size: 24px;
-}
-h2 {
-    font-size: 22px;
-}
-h3 {
-    font-size: 20px;
-}
-h4 {
-    font-size: 18px;
-}
-h5 {
-    font-size: 17px;
-}
-h6 {
-    font-size: 15px;
-}
-
-h1, h2, h3, h4 {
-    margin-top: 10px;
-    margin-bottom: 8px;
-    font-family: Menlo, monospace;
-    font-weight: bold;
-}
-
-h3, h4 {
-    margin-bottom: 4px;
-}
-
-pre, code {
-    font-family: Menlo, monospace;
-    color: hsl(345, 80%, 42%);
-    font-weight: 600;
-}
-"""
-
-let DARK_STYLESHEET = """
-\(STYLESHEET)
-
-p, ul, ol, li, a, h1, h2, h3, h4, h5, h6 {
-    color: white !important;
-}
-
-pre, code {
-    color: hsl(345, 100%, 62%);
-}
-"""
+let MD: SwiftyMarkdown = getMD()
+let DARK_MD: SwiftyMarkdown = getMD(dark: true)
 
 class HelpButton: PopoverButton<HelpPopoverController> {
     var link: String?
@@ -130,17 +60,8 @@ class HelpButton: PopoverButton<HelpPopoverController> {
 
     func getParsedHelpText() -> NSAttributedString? {
         guard let popover = POPOVERS[popoverKey]! else { return nil }
-        let down = Down(markdownString: helpText)
 
-        do {
-            return try down.toAttributedString(
-                .smartUnsafe,
-                stylesheet: popover.appearance?.name == NSAppearance.Name.vibrantDark ? DARK_STYLESHEET : STYLESHEET
-            )
-        } catch {
-            log.error("Markdown error: \(error)")
-            return nil
-        }
+        return MD.attributedString(from: helpText)
     }
 
     override func mouseDown(with event: NSEvent) {

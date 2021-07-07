@@ -180,7 +180,7 @@ class NetworkControl: Control {
             return
         }
 
-        let window = mainThread { appDelegate().sshWindowController?.window ?? appDelegate().windowController?.window }
+        let window = mainThread { appDelegate.sshWindowController?.window ?? appDelegate.windowController?.window }
         let resp = ask(
             message: "Lunar Network Controller",
             info: """
@@ -444,14 +444,14 @@ class NetworkControl: Control {
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
+        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
             return set(brightness, for: .BRIGHTNESS, smooth: true, oldValue: oldValue)
         }
         return set(brightness, for: .BRIGHTNESS)
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
+        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue, oldValue != contrast {
             return set(contrast, for: .CONTRAST, smooth: true, oldValue: oldValue)
         }
         return set(contrast, for: .CONTRAST)
