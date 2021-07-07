@@ -96,6 +96,9 @@
          contextName = "__40-[SentryCrashIntegration configureScope]_block_invoke_3:SentryCrashIntegration.m">
       </ContextState>
       <ContextState
+         contextName = "DisplayController.avService(displayID:):DisplayController.swift">
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
       </ContextState>
       <ContextState
@@ -243,6 +246,14 @@
          <PersistentStrings>
             <PersistentString
                value = "brightnessGraph.entries.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Display.contrast.didset:Display.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "DDC.apply">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

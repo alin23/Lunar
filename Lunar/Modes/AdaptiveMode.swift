@@ -248,7 +248,7 @@ extension AdaptiveMode {
         #if DEBUG
             if values.contains(where: \.isNaN) {
                 log.error(
-                    "NaN value?? Whyy?? WHAT DID I DO??",
+                    "Whaat!? NaN value AGAIN?? Whyy?? WHAT DID I DO??",
                     context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset ?? 1]
                 )
             }

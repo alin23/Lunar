@@ -790,6 +790,12 @@ struct Lunar: ParsableCommand {
             abstract: "Sets a property to a specific value for the first active display."
         )
 
+        @Flag(
+            name: .shortAndLong,
+            help: "If <property> is passed, try to actively read the property instead of fetching it from cache. Caution: might cause a kernel panic if DDC is too slow to respond!"
+        )
+        var read = false
+
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
         var controls: [DisplayControl] = [.coreDisplay, .ddc, .network]
 
@@ -824,7 +830,7 @@ struct Lunar: ParsableCommand {
                 setupNetworkControls(displays: displays, waitms: waitms)
             }
 
-            try handleDisplay("first", displays: displays, property: property, value: value, controls: controls)
+            try handleDisplay("first", displays: displays, property: property, value: value, controls: controls, read: read)
             globalExit(0)
         }
     }

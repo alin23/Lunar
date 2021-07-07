@@ -59,7 +59,7 @@ class GammaControl: Control {
             }
         }
 
-        let window = mainThread { appDelegate().windowController?.window }
+        let window = mainThread { appDelegate.windowController?.window }
 
         let resp = ask(
             message: "F.lux app is conflicting with Lunar",
@@ -112,7 +112,7 @@ class GammaControl: Control {
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
-        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue {
+        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue, oldValue != brightness {
             display.setGamma(brightness: brightness, oldBrightness: oldValue)
             return true
         }
@@ -127,7 +127,7 @@ class GammaControl: Control {
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
-        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue {
+        if !CachedDefaults[.hideYellowDot], let oldValue = oldValue, oldValue != contrast {
             display.setGamma(contrast: contrast, oldContrast: oldValue)
             return true
         }

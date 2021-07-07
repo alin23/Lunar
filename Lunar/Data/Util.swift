@@ -248,9 +248,8 @@ let publicKey =
     -----END PUBLIC KEY-----
     """
 
-func appDelegate() -> AppDelegate {
+var appDelegate: AppDelegate =
     NSApplication.shared.delegate as! AppDelegate
-}
 
 func refreshScreen(refocus: Bool = true) {
     mainThread {
@@ -259,7 +258,7 @@ func refreshScreen(refocus: Bool = true) {
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
         }
 
-        if let w = appDelegate().windowController?.window?.contentViewController?.view {
+        if let w = appDelegate.windowController?.window?.contentViewController?.view {
             w.setNeedsDisplay(w.frame)
         }
 
@@ -548,6 +547,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     queue: DispatchQueue? = nil,
     runLoopQueue: RunloopQueue? = nil,
     threaded: Bool = false,
+    barrier: Bool = false,
     _ action: @escaping () -> Void
 ) -> DispatchTimeoutResult {
     if threaded {
@@ -593,7 +593,11 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
 
     let queue = queue ?? concurrentQueue
     guard let timeout = timeout else {
-        queue.async { action() }
+        if barrier {
+            queue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { action() }
+        } else {
+            queue.async { action() }
+        }
         return .success
     }
 

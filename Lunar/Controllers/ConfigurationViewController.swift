@@ -25,7 +25,7 @@ class ConfigurationViewController: NSViewController {
     Use one of the following gestures **while hovering on the value with your mouse or trackpad**
     - Scroll vertically using the mouse or trackpad
     - Click to edit text, press enter to set the value
-        - Press the up/down arrow keys on your keyboard to increment/decrement the value
+    	- Press the up/down arrow keys on your keyboard to increment/decrement the value
     """
     lazy var CURVE_FACTOR_TOOLTIP = """
     ## Description
@@ -38,16 +38,14 @@ class ConfigurationViewController: NSViewController {
     Value that describes how often Lunar should check for changes in the built-in display brightness.
 
     ## Effect
-    The adaptive algorithm synchronizes the monitors with the built-in display brightness
-    using the following steps:
+    The adaptive algorithm synchronizes the monitors with the built-in display brightness using the following steps:
         - Read built-in display brightness
         - Compute each monitor's brightness by taking into account the configured offsets
         - Apply the brightness for each monitor
         - *Sleep for `x` seconds*
 
     The last step uses this value to know how much to sleep.
-    If you experience lags and system freeze in Sync mode,
-    your monitor might have slow DDC response time.
+    If you experience lags and system freeze in Sync mode, your monitor might have slow DDC response time.
 
     In this case, you might benefit from a larger polling interval like 10 seconds.
 
@@ -65,40 +63,12 @@ class ConfigurationViewController: NSViewController {
 
     ## Effect
     When using the Brightness/Contrast/Volume Up/Down actions, the values will be computed using the following formulas:
-    * Brightness Up: ` brightness = oldValue + step `
-    * Brightness Down: ` brightness = oldValue - step `
-    * Contrast Up: ` contrast = oldValue + step `
-    * Contrast Down: ` contrast = oldValue - step `
-    * Volume Up: ` volume = oldValue + step `
-    * Volume Down: ` volume = oldValue - step `
-
-    \(ADJUSTING_VALUES_INFO)
-
-    \(UI_NOTE_INFO)
-    """
-    lazy var BRIGHTNESS_LIMIT_TOOLTIP = """
-    ## Description
-    Hard limits for brightness percentage adjustments through **hotkeys** or **menu items**.
-
-    ## Effect
-    When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the brightness will be computed using the following formula:
-    ```
-    percent / 100 * (max - min) + min
-    ```
-
-    \(ADJUSTING_VALUES_INFO)
-
-    \(UI_NOTE_INFO)
-    """
-    lazy var CONTRAST_LIMIT_TOOLTIP = """
-    ## Description
-    Hard limits for contrast percentage adjustments through **hotkeys** or **menu items**.
-
-    ## Effect
-    When using the percent settings (0%, 25%, etc.) or the increase/decrease hotkeys, the contrast will be computed using the following formula:
-    ```
-    percent / 100 * (max - min) + min
-    ```
+    * Brightness Up: `brightness = oldValue + step`
+    * Brightness Down: `brightness = oldValue - step`
+    * Contrast Up: `contrast = oldValue + step`
+    * Contrast Down: `contrast = oldValue - step`
+    * Volume Up: `volume = oldValue + step`
+    * Volume Down: `volume = oldValue - step`
 
     \(ADJUSTING_VALUES_INFO)
 
@@ -619,7 +589,7 @@ class ConfigurationViewController: NSViewController {
 
     @IBAction func resetLocation(_: Any?) {
         CachedDefaults[.manualLocation] = false
-        mainThread { appDelegate().startReceivingSignificantLocationChanges() }
+        mainThread { appDelegate.startReceivingSignificantLocationChanges() }
     }
 
     func setup() {

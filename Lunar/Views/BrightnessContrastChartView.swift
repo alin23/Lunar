@@ -253,6 +253,7 @@ class BrightnessContrastChartView: LineChartView {
         brightnessGraph.highlightLineWidth = 2
         brightnessGraph.highlightLineDashPhase = 3
         brightnessGraph.highlightLineDashLengths = [10, 6]
+        brightnessGraph.mode = .cubicBezier
 
         contrastGraph.colors = [NSColor.clear]
         contrastGraph.fillColor = contrastColor
@@ -263,6 +264,7 @@ class BrightnessContrastChartView: LineChartView {
         contrastGraph.highlightLineWidth = 2
         contrastGraph.highlightLineDashPhase = 10
         contrastGraph.highlightLineDashLengths = [10, 6]
+        contrastGraph.mode = .cubicBezier
 
         xAxis.labelTextColor = labelColor
         leftAxis.labelTextColor = labelColor

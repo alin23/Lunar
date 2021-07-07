@@ -94,7 +94,7 @@ class ModernWindowController: NSWindowController {
         mainThread {
             if let w = window as? ModernWindow {
                 if w.title == "Settings" {
-                    w.delegate = appDelegate()
+                    w.delegate = appDelegate
                 }
                 w.setup()
             } else {
