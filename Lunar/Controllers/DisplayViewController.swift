@@ -665,7 +665,7 @@ class DisplayViewController: NSViewController {
         display.control = display.getBestControl()
         display.onControlChange?(display.control)
 
-        if !(display.enabledControls[.gamma] ?? false) {
+        if !(display.enabledControls[.gamma] ?? false), display.applyGamma || display.gammaChanged {
             display.resetGamma()
         }
     }

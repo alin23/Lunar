@@ -1086,13 +1086,15 @@ private func handleDisplay(
     switch propertyValue {
     case is String:
         display.setValue(value, forKey: property.rawValue)
+        display.save(now: true)
     case is NSNumber where property == .input || property == .hotkeyInput:
         guard let input = InputSource(stringValue: value) else {
             throw CommandError.invalidValue("Unknown input \(value)")
         }
         display.setValue(input.rawValue.ns, forKey: property.rawValue)
+        display.save(now: true)
         display.control.write(property, input)
-    case let currentValue as Bool:
+    case let currentValue as Bool where Display.CodingKeys.bool.contains(property):
         var newValue = currentValue
         switch value {
         case "on", "1", "true", "yes", "t", "y":
@@ -1105,6 +1107,7 @@ private func handleDisplay(
             throw CommandError.invalidValue("\(value) is not a boolean")
         }
         display.setValue(newValue, forKey: property.rawValue)
+        display.save(now: true)
         if property == .power {
             display.control.write(property, newValue ? PowerState.on : PowerState.off)
         } else {
@@ -1131,6 +1134,7 @@ private func handleDisplay(
         }
 
         display.setValue(value, forKey: property.rawValue)
+        display.save(now: true)
         display.control.write(property, value.uint8Value)
     default:
         break
@@ -1165,9 +1169,9 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
     case .power:
         return (value as! Bool) ? "on" : "off"
     default:
-        if let v = value as? NSNumber {
+        if let v = value as? Bool, Display.CodingKeys.bool.contains(key) {
             return "\(v)"
-        } else if let v = value as? Bool {
+        } else if let v = value as? NSNumber {
             return "\(v)"
         } else {
             return "\(value)"
