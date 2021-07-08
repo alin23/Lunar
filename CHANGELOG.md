@@ -1,4 +1,15 @@
-# 4.5.0
+# 4.5.3
+## Improvements
+
+* Disable Gamma by default in Hardware/Native/Network controls
+* Add checkbox to enable Gamma in non-Software controls
+* Improve Mac Mini HDMI port detection to allow USB-C-to-HDMI adapters to work with DDC on the USB-C port
+
+## Fixes
+
+* Fix Boolean value handling in the CLI integration
+* Fix Quick Actions popover contents disappearing on some occasions
+# 4.5.1
 ## Features
 
 * **DDC support for M1 Macs** (beta)
