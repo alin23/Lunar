@@ -137,9 +137,10 @@ class DataStore: NSObject {
         return dict
     }
 
-    static func storeAppException(app: AppException) {
+    static func storeAppException(app: AppException, now: Bool = false) {
         guard var appExceptions = CachedDefaults[.appExceptions] else {
             CachedDefaults[.appExceptions] = [app]
+            if now { Defaults[.appExceptions] = [app] }
             return
         }
 
@@ -150,16 +151,18 @@ class DataStore: NSObject {
         }
 
         CachedDefaults[.appExceptions] = appExceptions
+        if now { Defaults[.appExceptions] = appExceptions }
     }
 
     @discardableResult
-    func storeDisplays(_ displays: [Display]) -> [Display] {
+    func storeDisplays(_ displays: [Display], now: Bool = false) -> [Display] {
         let displays = displays.filter {
             display in !DDC.isBuiltinDisplay(display.id)
         }
 
         guard let storedDisplays = self.displays() else {
             CachedDefaults[.displays] = displays
+            if now { Defaults[.displays] = displays }
             return displays
         }
         let newDisplaySerials = displays.map(\.serial)
@@ -177,17 +180,19 @@ class DataStore: NSObject {
             display in !DDC.isBuiltinDisplay(display.id)
         }
         CachedDefaults[.displays] = allDisplays
+        if now { Defaults[.displays] = allDisplays }
 
         return allDisplays
     }
 
-    static func storeDisplay(display: Display) {
+    static func storeDisplay(display: Display, now: Bool = false) {
         guard !isGeneric(display.id) else {
             return
         }
 
         guard var displays = CachedDefaults[.displays] else {
             CachedDefaults[.displays] = [display]
+            if now { Defaults[.displays] = [display] }
             return
         }
 
@@ -198,6 +203,7 @@ class DataStore: NSObject {
         }
 
         CachedDefaults[.displays] = displays
+        if now { Defaults[.displays] = displays }
     }
 
     static func firstRunAfterLunar4Upgrade() {

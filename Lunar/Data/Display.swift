@@ -223,6 +223,13 @@ enum ValueType {
         }
     }
 
+    @Published @objc dynamic var applyGamma: Bool {
+        didSet {
+            save()
+            readapt(newValue: applyGamma, oldValue: oldValue)
+        }
+    }
+
     @Published var adaptivePaused: Bool = false {
         didSet {
             readapt(newValue: adaptivePaused, oldValue: oldValue)
@@ -241,7 +248,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -252,7 +259,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -263,7 +270,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -274,7 +281,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -285,7 +292,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -296,7 +303,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -307,7 +314,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -318,7 +325,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -329,7 +336,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else {
+            } else if applyGamma || gammaChanged {
                 resetGamma()
             }
         }
@@ -659,7 +666,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var isSource: Bool = false {
+    @Published @objc dynamic var isSource: Bool {
         didSet {
             context = getContext()
         }
@@ -819,9 +826,6 @@ enum ValueType {
                     activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
                     hasNetworkControl = control is NetworkControl || alternativeControlForCoreDisplay is NetworkControl
                 }
-                if !(control is GammaControl) {
-                    resetGamma()
-                }
                 if !(oldValue is GammaControl), control is GammaControl {
                     if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
                         (control as! GammaControl).fluxChecker(flux: app)
@@ -882,6 +886,7 @@ enum ValueType {
             "neverUseNetworkControl": neverUseNetworkControl,
             "isAppleDisplay": isAppleDisplay(),
             "isSource": isSource,
+            "applyGamma": applyGamma,
         ]
     }
 
@@ -892,15 +897,15 @@ enum ValueType {
         let gammaControl = GammaControl(display: self)
 
         if coreDisplayControl.isAvailable() {
-            resetGamma()
+            if applyGamma || gammaChanged { resetGamma() }
             return coreDisplayControl
         }
         if ddcControl.isAvailable() {
-            resetGamma()
+            if applyGamma || gammaChanged { resetGamma() }
             return ddcControl
         }
         if networkControl.isAvailable() {
-            resetGamma()
+            if applyGamma || gammaChanged { resetGamma() }
             return networkControl
         }
 
@@ -1009,6 +1014,7 @@ enum ValueType {
         volume = (try container.decode(UInt8.self, forKey: .volume)).ns
         audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
+        applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decode(UInt8.self, forKey: .input)).ns
         hotkeyInput = (try container.decode(UInt8.self, forKey: .hotkeyInput)).ns
         brightnessOnInputChange = (try container.decode(UInt8.self, forKey: .brightnessOnInputChange)).ns
@@ -1195,12 +1201,17 @@ enum ValueType {
         defaultGammaGreenValue: Float = 1.0,
         defaultGammaBlueMin: Float = 0.0,
         defaultGammaBlueMax: Float = 1.0,
-        defaultGammaBlueValue: Float = 1.0
+        defaultGammaBlueValue: Float = 1.0,
+        isSource: Bool = false,
+        applyGamma: Bool = false
     ) {
         _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
+
+        self.isSource = isSource
+        self.applyGamma = applyGamma
 
         self.defaultGammaRedMin = defaultGammaRedMin.ns
         self.defaultGammaRedMax = defaultGammaRedMax.ns
@@ -1311,11 +1322,17 @@ enum ValueType {
             defaultGammaGreenValue: (config["defaultGammaGreenValue"] as? Float) ?? 1.0,
             defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
             defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
-            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0
+            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
+            isSource: (config["isSource"] as? Bool) ?? false,
+            applyGamma: (config["applyGamma"] as? Bool) ?? false
         )
     }
 
-    func save() {
+    func save(now: Bool = false) {
+        if now {
+            DataStore.storeDisplay(display: self, now: now)
+            return
+        }
         debounce(ms: 800, uniqueTaskKey: "displaySave", value: self) { display in
             DataStore.storeDisplay(display: display)
         }
@@ -1449,47 +1466,61 @@ enum ValueType {
         case sendingInput
         case sendingVolume
         case isSource
+        case applyGamma
         case brightnessOnInputChange
         case contrastOnInputChange
 
-        static var settable: [CodingKeys] {
-            [
-                .name,
-                .adaptive,
-                .defaultGammaRedMin,
-                .defaultGammaRedMax,
-                .defaultGammaRedValue,
-                .defaultGammaGreenMin,
-                .defaultGammaGreenMax,
-                .defaultGammaGreenValue,
-                .defaultGammaBlueMin,
-                .defaultGammaBlueMax,
-                .defaultGammaBlueValue,
-                .maxDDCBrightness,
-                .maxDDCContrast,
-                .maxDDCVolume,
-                .lockedBrightness,
-                .lockedContrast,
-                .minContrast,
-                .minBrightness,
-                .maxContrast,
-                .maxBrightness,
-                .contrast,
-                .brightness,
-                .volume,
-                .audioMuted,
-                .power,
-                .input,
-                .hotkeyInput,
-                .alwaysUseNetworkControl,
-                .neverUseNetworkControl,
-                .alwaysFallbackControl,
-                .neverFallbackControl,
-                .isSource,
-                .brightnessOnInputChange,
-                .contrastOnInputChange,
-            ]
-        }
+        static var bool: Set<CodingKeys> = [
+            .adaptive,
+            .lockedBrightness,
+            .lockedContrast,
+            .audioMuted,
+            .power,
+            .alwaysUseNetworkControl,
+            .neverUseNetworkControl,
+            .alwaysFallbackControl,
+            .neverFallbackControl,
+            .isSource,
+            .applyGamma,
+        ]
+
+        static var settable: Set<CodingKeys> = [
+            .name,
+            .adaptive,
+            .defaultGammaRedMin,
+            .defaultGammaRedMax,
+            .defaultGammaRedValue,
+            .defaultGammaGreenMin,
+            .defaultGammaGreenMax,
+            .defaultGammaGreenValue,
+            .defaultGammaBlueMin,
+            .defaultGammaBlueMax,
+            .defaultGammaBlueValue,
+            .maxDDCBrightness,
+            .maxDDCContrast,
+            .maxDDCVolume,
+            .lockedBrightness,
+            .lockedContrast,
+            .minContrast,
+            .minBrightness,
+            .maxContrast,
+            .maxBrightness,
+            .contrast,
+            .brightness,
+            .volume,
+            .audioMuted,
+            .power,
+            .input,
+            .hotkeyInput,
+            .alwaysUseNetworkControl,
+            .neverUseNetworkControl,
+            .alwaysFallbackControl,
+            .neverFallbackControl,
+            .isSource,
+            .applyGamma,
+            .brightnessOnInputChange,
+            .contrastOnInputChange,
+        ]
     }
 
     enum AdaptiveModeKeys: String, CodingKey {
@@ -1571,6 +1602,7 @@ enum ValueType {
             try container.encode(neverFallbackControl, forKey: .neverFallbackControl)
             try container.encode(power, forKey: .power)
             try container.encode(isSource, forKey: .isSource)
+            try container.encode(applyGamma, forKey: .applyGamma)
         }
     }
 
@@ -1865,7 +1897,6 @@ enum ValueType {
 
     func resetGamma() {
         guard !isForTesting else { return }
-        // CGSetDisplayTransferByFormula(id, 0, 1, 1, 0, 1, 1, 0, 1, 1)
         CGSetDisplayTransferByFormula(
             id,
             defaultGammaRedMin.floatValue,
@@ -1878,6 +1909,7 @@ enum ValueType {
             defaultGammaBlueMax.floatValue,
             defaultGammaBlueValue.floatValue
         )
+        gammaChanged = true
     }
 
     lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
@@ -1921,6 +1953,7 @@ enum ValueType {
     }
 
     var lastConnectionTime = Date()
+    @Atomic var gammaChanged = false
 
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast: UInt8? = nil) {
         #if DEBUG
@@ -1957,6 +1990,7 @@ enum ValueType {
                     abs(newGamma.red - oldGamma.red), abs(newGamma.green - oldGamma.green),
                     abs(newGamma.blue - oldGamma.blue), abs(newGamma.contrast - oldGamma.contrast)
                 )
+                self.gammaChanged = true
                 for gamma in oldGamma.stride(to: newGamma, samples: (maxDiff * 100).intround) {
                     CGSetDisplayTransferByFormula(
                         id,
@@ -1985,6 +2019,7 @@ enum ValueType {
             let greenGamma = self.defaultGammaGreenValue.floatValue
             let blueGamma = self.defaultGammaBlueValue.floatValue
 
+            self.gammaChanged = true
             CGSetDisplayTransferByFormula(
                 id,
                 self.defaultGammaRedMin.floatValue,
