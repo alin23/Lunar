@@ -3636,18 +3636,18 @@ and contrast to their highest values</string>
             <objects>
                 <viewController storyboardIdentifier="MenuPopoverController" id="gSj-O1-yaw" customClass="MenuPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="IUx-YV-nci">
-                        <rect key="frame" x="0.0" y="0.0" width="400" height="59"/>
+                        <rect key="frame" x="0.0" y="0.0" width="439" height="59"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="100" horizontalPageScroll="10" verticalLineScroll="100" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="qdl-Mx-ORq">
-                                <rect key="frame" x="0.0" y="6" width="400" height="70"/>
+                                <rect key="frame" x="13" y="6" width="412" height="70"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="XGg-NB-X6g">
-                                    <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="412" height="70"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="400" height="70"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="412" height="70"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -3867,7 +3867,7 @@ and contrast to their highest values</string>
                                 </scroller>
                             </scrollView>
                             <popUpButton focusRingType="none" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rrr-Xp-mku" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="145" y="15" width="105" height="15"/>
+                                <rect key="frame" x="165" y="15" width="105" height="15"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="⚫︎  Sensor Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" focusRingType="none" tag="2" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="uuH-GG-WeZ" id="25e-xa-UNC" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4032,7 +4032,7 @@ and contrast to their highest values</string>
                 </arrayController>
                 <userDefaultsController id="62J-rh-6Iu"/>
             </objects>
-            <point key="canvasLocation" x="-1602" y="3680.5"/>
+            <point key="canvasLocation" x="-1621.5" y="3680.5"/>
         </scene>
         <!--Hotkey Popover Controller-->
         <scene sceneID="u59-et-bo6">
