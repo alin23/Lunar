@@ -628,17 +628,26 @@ class DisplayController {
             }
 
             guard let display = getMatchingDisplay(
-                name: name,
-                serial: serial,
-                productID: productID,
-                manufactureYear: manufactureYear,
-                manufacturer: props["ManufacturerID"] as? String,
-                vendorID: props["LegacyManufacturerID"] as? Int,
-                width: props["NativeFormatHorizontalPixels"] as? Int,
-                height: props["NativeFormatVerticalPixels"] as? Int,
-                displays: displays,
-                partial: false
-            ) else { return nil }
+                name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
+                manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
+                width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
+                displays: activeDisplays, partial: false
+            ) else {
+                var allActiveDisplays = Set(displayController.activeDisplays.values.map { $0 })
+                if let displays = displays {
+                    allActiveDisplays.formUnion(displays)
+                }
+
+                let d = getMatchingDisplay(
+                    name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
+                    manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
+                    width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
+                    displays: Array(allActiveDisplays), partial: true
+                )
+
+                log.info("Partially matched display \(d) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
+                return d
+            }
             log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
             display.transport = transport
             return display

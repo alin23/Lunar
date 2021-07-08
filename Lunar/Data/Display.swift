@@ -192,6 +192,19 @@ enum ValueType {
         "\(name)[\(serial): \(id)]"
     }
 
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(serial)
+        return hasher.finalize()
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? Display else {
+            return false
+        }
+        return serial == other.serial
+    }
+
     // MARK: Stored Properties
 
     var _idLock = NSRecursiveLock()
