@@ -692,6 +692,7 @@ class DisplayController {
                 return nil
             }
 
+            var clcd2Num = 0
             var t810xIOIterator = io_iterator_t()
             let t810xIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
 
@@ -708,11 +709,13 @@ class DisplayController {
 
             var matchedDisplay: Display?
             while case let t810xIOChild = IOIteratorNext(t810xIOIterator), t810xIOChild != 0 {
-                if IOServiceNameMatches(t810xIOChild, names: ["dispext0", "disp0"]),
-                   let d = displayForIOService(t810xIOChild, displays: display != nil ? [display!] : nil), d.id == displayID
-                {
-                    matchedDisplay = d
-                    break
+                if IOServiceNameMatches(t810xIOChild, names: ["dispext0", "disp0"]) {
+                    clcd2Num += 1
+                    if let d = displayForIOService(t810xIOChild, displays: display != nil ? [display!] : nil), d.id == displayID
+                    {
+                        matchedDisplay = d
+                        break
+                    }
                 }
             }
 
@@ -724,7 +727,9 @@ class DisplayController {
             log.info("Mac Mini HDMI Ignore: hw.model=\(Sysctl.modelLowercased)")
             log.info("Mac Mini HDMI Ignore: isMacMini=\(Sysctl.isMacMini)")
             log.info("Mac Mini HDMI Ignore: Transport=\(display.transport)")
+            log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
             if Sysctl.isMacMini,
+               clcd2Num == 1,
                let transport = display.transport,
                transport.upstream == "DP",
                transport.downstream == "HDMI"
