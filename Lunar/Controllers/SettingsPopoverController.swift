@@ -50,7 +50,7 @@ class SettingsPopoverController: NSViewController {
 
     How these gamma values are applied depends on how the monitor can be controlled:
     - `Software Controls`: the values will be used in computing the gamma table for approximating brightness/contrast changes
-    - `Hardware/Native/Network Controls`: the values will be set exactly as they are
+    - `Hardware/Native/Network Controls`: the values will be set exactly as they are when `Apply gamma values` is checked
     """
     @IBOutlet var networkControlCheckbox: NSButton!
     @IBOutlet var coreDisplayControlCheckbox: NSButton!
@@ -118,6 +118,8 @@ class SettingsPopoverController: NSViewController {
                 adaptAutoToggle.isOn = display.adaptive
                 syncModeRoleToggle.isOn = display.isSource
                 syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(display.id) || TEST_MODE
+
+                applyGamma = display.applyGamma
             }
             setupDDCLimits(display)
             setupGamma(display)
@@ -125,6 +127,20 @@ class SettingsPopoverController: NSViewController {
     }
 
     @Atomic var applySettings = true
+
+    @objc dynamic var applyGamma = false {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.applyGamma = applyGamma
+            if !(display.control is GammaControl), display.applyGamma || display.gammaChanged {
+                display.resetGamma()
+            }
+            if !display.applyGamma {
+                display.gammaChanged = false
+            }
+            display.save()
+        }
+    }
 
     @objc dynamic var adaptive = true {
         didSet {
@@ -194,7 +210,7 @@ class SettingsPopoverController: NSViewController {
         display.control = display.getBestControl()
         display.onControlChange?(display.control)
 
-        if !gammaEnabled {
+        if !gammaEnabled, display.applyGamma || display.gammaChanged {
             display.resetGamma()
         }
     }
@@ -377,6 +393,7 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.adaptAutoToggle, value: display.adaptive)
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
             }
+            self.applyGamma = display.applyGamma
         }
     }
 

@@ -637,7 +637,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
-                display.resetGamma()
+                if display.gammaChanged {
+                    display.resetGamma()
+                }
+
                 display.gammaUnlock()
                 refreshScreen()
             }
