@@ -644,7 +644,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 display.gammaUnlock()
                 refreshScreen()
             }
-            exit(0)
+
+            globalExit(0)
         }
 
         if let idx = CommandLine.arguments.firstIndex(of: "@") {

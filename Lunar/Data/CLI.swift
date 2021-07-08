@@ -14,7 +14,12 @@ import Foundation
 import Regex
 import SwiftyJSON
 
-let globalExit = exit
+func globalExit(_ status: Int32) {
+    if fm.fileExists(atPath: "default.profraw") {
+        try? fm.removeItem(atPath: "default.profraw")
+    }
+    exit(status)
+}
 
 private let UPPERCASE_LETTER_NAMES = #"e\s?d\s?i\s?d|id|d\s?d\s?c"#.r!
 var encoder: JSONEncoder = {
@@ -159,6 +164,7 @@ struct Lunar: ParsableCommand {
 
             guard let sig = getCodeSignature(hex: hex) else {
                 globalExit(1)
+                return
             }
             print(sig)
             globalExit(0)
@@ -446,6 +452,7 @@ struct Lunar: ParsableCommand {
                     }
                 }
                 globalExit(0)
+                return
             }
 
             for display in displays {
@@ -482,6 +489,7 @@ struct Lunar: ParsableCommand {
             guard !json else {
                 print((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
                 globalExit(0)
+                return
             }
 
             let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
@@ -906,7 +914,10 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            guard let display = foundDisplay else { globalExit(0) }
+            guard let display = foundDisplay else {
+                globalExit(0)
+                return
+            }
 
             print(
                 "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
@@ -1189,5 +1200,9 @@ let LUNAR_CLI_SCRIPT =
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar"
     else
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ $@
+    fi
+
+    if [[ -f default.profraw ]]; then
+        rm default.profraw 2>/dev/null >/dev/null
     fi
     """
