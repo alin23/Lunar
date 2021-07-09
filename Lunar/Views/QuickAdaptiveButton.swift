@@ -8,6 +8,7 @@ let buttonLabelOn = darkMauve
 let buttonBgOff = gray
 let buttonBgOffHover = buttonBgOn
 let buttonLabelOff = darkMauve
+let buttonBgDisabled = gray.shadow(withLevel: 0.3)
 
 class QuickAdaptiveButton: NSButton {
     var adaptiveButtonTrackingArea: NSTrackingArea?
@@ -49,7 +50,9 @@ class QuickAdaptiveButton: NSButton {
             }
         }
 
-        if state == .on {
+        if !isEnabled {
+            bg = buttonBgDisabled
+        } else if state == .on {
             bg = buttonBgOn
         } else {
             bg = buttonBgOff
@@ -62,19 +65,25 @@ class QuickAdaptiveButton: NSButton {
         )
         addTrackingArea(adaptiveButtonTrackingArea!)
 
-        display?.$adaptive.receive(on: dataPublisherQueue).sink { [unowned self] newAdaptive in
-            guard let display = self.display else { return }
-            mainThread {
-                if newAdaptive {
-                    self.bg = buttonBgOn
-                    self.state = .on
-                } else {
-                    self.bg = buttonBgOff
-                    self.state = .off
+        display?.$adaptive
+            .receive(on: dataPublisherQueue)
+            .sink { [unowned self] newAdaptive in
+                guard let display = self.display else { return }
+                mainThread {
+                    if !isEnabled {
+                        self.bg = buttonBgDisabled
+                        self.state = newAdaptive ? .on : .off
+                    } else if newAdaptive {
+                        self.bg = buttonBgOn
+                        self.state = .on
+                    } else {
+                        self.bg = buttonBgOff
+                        self.state = .off
+                    }
                 }
+                display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
             }
-            display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
-        }.store(in: &displayObservers, for: "adaptive")
+            .store(in: &displayObservers, for: "adaptive")
     }
 
     deinit {
@@ -88,6 +97,7 @@ class QuickAdaptiveButton: NSButton {
     }
 
     override func mouseDown(with _: NSEvent) {
+        guard isEnabled else { return }
         switch state {
         case .on:
             refresh(adaptive: false)
@@ -99,6 +109,11 @@ class QuickAdaptiveButton: NSButton {
     }
 
     func refresh(adaptive: Bool) {
+        guard isEnabled else {
+            bg = buttonBgDisabled
+            return
+        }
+
         if adaptive {
             bg = buttonBgOn
             display?.adaptive = true
@@ -109,6 +124,7 @@ class QuickAdaptiveButton: NSButton {
     }
 
     override func mouseEntered(with _: NSEvent) {
+        guard isEnabled else { return }
         transition(0.1)
 
         if state == .on {
@@ -119,7 +135,15 @@ class QuickAdaptiveButton: NSButton {
     }
 
     override func mouseExited(with _: NSEvent) {
+        setColor()
+    }
+
+    func setColor() {
         transition(0.2)
+        guard isEnabled else {
+            bg = buttonBgDisabled
+            return
+        }
 
         if state == .on {
             bg = buttonBgOn

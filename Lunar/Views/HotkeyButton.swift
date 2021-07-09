@@ -42,12 +42,13 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         let inputContrast = display.contrastOnInputChange1
 
         display.withoutSmoothTransition {
+            display.adaptive = false
             display.withoutDDC {
                 display.brightness = inputBrightness
                 display.contrast = inputContrast
             }
-            _ = display.control.setBrightness(inputBrightness.uint8Value, oldValue: nil)
-            _ = display.control.setContrast(inputContrast.uint8Value, oldValue: nil)
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
             display.input = display.hotkeyInput1
         }
     }
@@ -59,12 +60,13 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         let inputContrast = display.contrastOnInputChange2
 
         display.withoutSmoothTransition {
+            display.adaptive = false
             display.withoutDDC {
                 display.brightness = inputBrightness
                 display.contrast = inputContrast
             }
-            _ = display.control.setBrightness(inputBrightness.uint8Value, oldValue: nil)
-            _ = display.control.setContrast(inputContrast.uint8Value, oldValue: nil)
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
             display.input = display.hotkeyInput2
         }
     }
@@ -76,12 +78,13 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         let inputContrast = display.contrastOnInputChange3
 
         display.withoutSmoothTransition {
+            display.adaptive = false
             display.withoutDDC {
                 display.brightness = inputBrightness
                 display.contrast = inputContrast
             }
-            _ = display.control.setBrightness(inputBrightness.uint8Value, oldValue: nil)
-            _ = display.control.setContrast(inputContrast.uint8Value, oldValue: nil)
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
             display.input = display.hotkeyInput3
         }
     }

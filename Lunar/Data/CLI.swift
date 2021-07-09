@@ -1074,7 +1074,7 @@ private func handleDisplay(
         // MARK: - Read display property
 
         log.debug("Reading value for \(property.rawValue)")
-        guard let readValue = display.control.read(property) else {
+        guard let readValue = display.control?.read(property) else {
             throw CommandError.cantReadProperty(property.rawValue)
         }
 
@@ -1095,7 +1095,7 @@ private func handleDisplay(
         }
         display.setValue(input.rawValue.ns, forKey: property.rawValue)
         display.save(now: true)
-        display.control.write(property, input)
+        display.control?.write(property, input)
     case let currentValue as Bool where Display.CodingKeys.bool.contains(property):
         var newValue = currentValue
         switch value {
@@ -1111,9 +1111,9 @@ private func handleDisplay(
         display.setValue(newValue, forKey: property.rawValue)
         display.save(now: true)
         if property == .power {
-            display.control.write(property, newValue ? PowerState.on : PowerState.off)
+            display.control?.write(property, newValue ? PowerState.on : PowerState.off)
         } else {
-            display.control.write(property, newValue)
+            display.control?.write(property, newValue)
         }
     case let currentValue as NSNumber:
         var operation = ""
@@ -1137,7 +1137,7 @@ private func handleDisplay(
 
         display.setValue(value, forKey: property.rawValue)
         display.save(now: true)
-        display.control.write(property, value.uint8Value)
+        display.control?.write(property, value.uint8Value)
     default:
         break
     }

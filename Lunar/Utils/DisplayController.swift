@@ -167,9 +167,10 @@ class DisplayController {
     var controlWatcherTask: CFRunLoopTimer?
     var modeWatcherTask: CFRunLoopTimer?
 
-    func removeDisplay(id _: CGDirectDisplayID) {
-        let nsDisplays = displays.values.map { $0 }
-        CachedDefaults[.displays] = nsDisplays
+    func removeDisplay(serial: String) {
+        guard let display = displays.values.first(where: { $0.serial == serial }) else { return }
+        displays.removeValue(forKey: display.id)
+        CachedDefaults[.displays] = displays.values.map { $0 }
     }
 
     static func getAdaptiveMode() -> AdaptiveMode {
@@ -276,7 +277,7 @@ class DisplayController {
         guard !display.neverFallbackControl else { return false }
 
         if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty,
-           !display.control.isResponsive()
+           !(display.control?.isResponsive() ?? true)
         {
             if let promptTime = fallbackPromptTime[display.id] {
                 return promptTime + 20.minutes < Date()
@@ -721,7 +722,10 @@ class DisplayController {
                   !(display?.macMiniHDMI ?? false),
                   !DDC.isVirtualDisplay(displayID, checkName: false)
             else {
-                log.info("No AVService for display \(displayID): (isOnline: \(NSScreen.isOnline(displayID)), isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)))")
+                log
+                    .info(
+                        "No AVService for display \(displayID): (isOnline: \(NSScreen.isOnline(displayID)), isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)))"
+                    )
                 return nil
             }
 
@@ -732,7 +736,10 @@ class DisplayController {
             guard t810xIOService != 0,
                   IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) == KERN_SUCCESS
             else {
-                log.info("No AVService for display \(displayID): (t810xIOService: \(t810xIOService), childIteratorErr: \((t810xIOService != 0) ? IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) : KERN_SUCCESS)))")
+                log
+                    .info(
+                        "No AVService for display \(displayID): (t810xIOService: \(t810xIOService), childIteratorErr: \((t810xIOService != 0) ? IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) : KERN_SUCCESS)))"
+                    )
                 return nil
             }
 

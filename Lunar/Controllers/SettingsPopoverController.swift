@@ -207,8 +207,9 @@ class SettingsPopoverController: NSViewController {
 
     func resetControl() {
         guard let display = display else { return }
-        display.control = display.getBestControl()
-        display.onControlChange?(display.control)
+        let control = display.getBestControl()
+        display.control = control
+        display.onControlChange?(control)
 
         if !gammaEnabled, display.applyGamma || display.gammaChanged {
             display.resetGamma()
