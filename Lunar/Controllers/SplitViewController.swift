@@ -121,10 +121,10 @@ class SplitViewController: NSSplitViewController {
         _activeHelpButton as? HelpButton
     }
 
-    @IBOutlet var goLeftButton: PageButton!
-    @IBOutlet var goRightButton: PageButton!
-    @IBOutlet var goLeftNotice: NSTextField!
-    @IBOutlet var goRightNotice: NSTextField!
+    @IBOutlet var goLeftButton: PageButton?
+    @IBOutlet var goRightButton: PageButton?
+    @IBOutlet var goLeftNotice: NSTextField?
+    @IBOutlet var goRightNotice: NSTextField?
 
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
@@ -180,8 +180,8 @@ class SplitViewController: NSSplitViewController {
     }
 
     func lastPage() {
-        goLeftButton.enable()
-        goRightButton.disable()
+        goLeftButton?.enable()
+        goRightButton?.disable()
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             rightHintsShown = true
         }
@@ -202,15 +202,15 @@ class SplitViewController: NSSplitViewController {
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
-                goLeftNotice.stringValue = "Click to go to the\nConfiguration page"
+                goLeftNotice?.stringValue = "Click to go to the\nConfiguration page"
             }
             if !rightHintsShown {
-                goRightNotice.stringValue = "Click to configure\nthe next monitor"
+                goRightNotice?.stringValue = "Click to configure\nthe next monitor"
             }
         }
 
-        goLeftButton.enable()
-        goRightButton.enable()
+        goLeftButton?.enable()
+        goRightButton?.enable()
     }
 
     func yellowBackground() {
@@ -225,16 +225,16 @@ class SplitViewController: NSSplitViewController {
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
-        goLeftButton.enable()
-        goRightButton.enable()
+        goLeftButton?.enable()
+        goRightButton?.enable()
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
-                goLeftNotice.stringValue = "Click to go to the\nHotkeys page"
+                goLeftNotice?.stringValue = "Click to go to the\nHotkeys page"
             }
             if !rightHintsShown {
-                goRightNotice.stringValue = "Click to go back to\nthe Display page"
-                goRightButton.highlight()
+                goRightNotice?.stringValue = "Click to go back to\nthe Display page"
+                goRightButton?.highlight()
             }
         }
     }
@@ -253,16 +253,16 @@ class SplitViewController: NSSplitViewController {
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
-                goLeftNotice.stringValue = ""
+                goLeftNotice?.stringValue = ""
                 leftHintsShown = true
             }
             if !rightHintsShown {
-                goRightNotice.stringValue = "Click to go back to the\n Configuration page"
+                goRightNotice?.stringValue = "Click to go back to the\n Configuration page"
             }
         }
 
-        goLeftButton.disable()
-        goRightButton.enable(color: logoColor)
+        goLeftButton?.disable()
+        goRightButton?.enable(color: logoColor)
     }
 
     override func viewDidAppear() {
@@ -277,16 +277,16 @@ class SplitViewController: NSSplitViewController {
 
     func showNavigationHints() {
         if !leftHintsShown {
-            goLeftButton.highlight()
+            goLeftButton?.highlight()
         }
         if !rightHintsShown {
-            goRightButton.highlight()
+            goRightButton?.highlight()
         }
     }
 
     func hideNavigationHints() {
-        goLeftButton.stopHighlighting()
-        goRightButton.stopHighlighting()
+        goLeftButton?.stopHighlighting()
+        goRightButton?.stopHighlighting()
     }
 
     override func viewDidLoad() {
@@ -294,8 +294,8 @@ class SplitViewController: NSSplitViewController {
         view.radius = 12.0.ns
         view.bg = white
 
-        goLeftButton.notice = goLeftNotice
-        goRightButton.notice = goRightNotice
+        goLeftButton?.notice = goLeftNotice
+        goRightButton?.notice = goRightNotice
 
         whiteBackground()
         updateHelpButton()
