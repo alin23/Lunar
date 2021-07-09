@@ -205,6 +205,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in closure #1 in DisplayValuesView.getDeleteAction(displayID:row:):DisplayValuesView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.nextResponder">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
       </ContextState>
       <ContextState

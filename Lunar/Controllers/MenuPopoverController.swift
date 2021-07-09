@@ -25,107 +25,10 @@ func buttonBackgroundColor(mode: AdaptiveModeKey) -> NSColor {
     buttonDotColor[mode]!.withAlphaComponent(0.9)
 }
 
-class ModeButtonResponder: NSResponder {
-    var mode: AdaptiveModeKey!
-    var button: NSButton!
-    var trackingArea: NSTrackingArea!
-
-    convenience init(button: NSButton, mode: AdaptiveModeKey) {
-        self.init()
-        self.button = button
-        self.mode = mode
-        initModeButton()
-    }
-
-    func disable(tooltipMessage: String) {
-        button.isEnabled = false
-        button.toolTip = tooltipMessage
-        button.layer?.backgroundColor = disabledColor
-        button.state = .off
-    }
-
-    func enable() {
-        button.isEnabled = true
-        button.toolTip = nil
-    }
-
-    func initModeButton() {
-        let buttonSize = button.frame
-        button.wantsLayer = true
-
-        if displayController.adaptiveModeKey == mode {
-            button.state = .on
-            button.bg = buttonBackgroundColor(mode: mode)
-        } else {
-            button.state = .off
-            button.layer?.backgroundColor = getOffColor(button)
-        }
-
-        let activeTitle = NSMutableAttributedString(attributedString: button.attributedAlternateTitle)
-        activeTitle.addAttribute(
-            NSAttributedString.Key.foregroundColor,
-            value: NSColor.black.withAlphaComponent(0.8),
-            range: NSMakeRange(0, activeTitle.length)
-        )
-        let inactiveTitle = NSMutableAttributedString(attributedString: button.attributedTitle)
-        inactiveTitle.addAttribute(
-            NSAttributedString.Key.foregroundColor,
-            value: NSColor.black.withAlphaComponent(0.8),
-            range: NSMakeRange(0, inactiveTitle.length)
-        )
-
-        button.attributedTitle = inactiveTitle
-        button.attributedAlternateTitle = activeTitle
-
-        button.setFrameSize(NSSize(width: buttonSize.width, height: 20))
-        button.radius = (button.frame.height / 2).ns
-
-        log.debug("Adding tracking area for quick actions: \(button.frame)")
-        trackingArea = NSTrackingArea(
-            rect: button.frame,
-            options: [.mouseEnteredAndExited, .activeInActiveApp],
-            owner: self,
-            userInfo: nil
-        )
-        button.addTrackingArea(trackingArea)
-    }
-
-    override func mouseEntered(with _: NSEvent) {
-        if !button.isEnabled {
-            return
-        }
-
-        button.transition(0.1)
-
-        if button.state == .on {
-            button.layer?
-                .backgroundColor = (buttonBackgroundColor(mode: mode).highlight(withLevel: 0.2) ?? buttonBackgroundColor(mode: mode))
-                .cgColor
-        } else {
-            button.bg = buttonBackgroundColor(mode: mode)
-        }
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if !button.isEnabled {
-            return
-        }
-
-        button.transition(0.2)
-
-        if button.state == .on {
-            button.bg = buttonBackgroundColor(mode: mode)
-        } else {
-            button.layer?.backgroundColor = getOffColor(button)
-        }
-    }
-}
-
 class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet var activeModeButton: PopUpButton!
 
     @IBOutlet var tableView: DisplayValuesView!
-    @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
@@ -135,29 +38,27 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var viewHeight: CGFloat?
 
     var trackingArea: NSTrackingArea?
-    var adaptiveModeObserver: Cancellable?
-    var displaysObserver: Cancellable!
-    var responsiveDDCObservers: [CGDirectDisplayID: NSKeyValueObservation] = [:]
+    var responsiveDDCObservers = [String: AnyCancellable](minimumCapacity: 10)
+    var observers = [String: AnyCancellable](minimumCapacity: 3)
 
     func listenForPopoverEvents() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(popoverDidShow(notification:)),
-            name: NSPopover.didShowNotification,
-            object: POPOVERS["menu"]!!
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(popoverWillShow(notification:)),
-            name: NSPopover.willShowNotification,
-            object: POPOVERS["menu"]!!
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(popoverDidClose(notification:)),
-            name: NSPopover.didCloseNotification,
-            object: POPOVERS["menu"]!!
-        )
+        NotificationCenter.default
+            .publisher(for: NSPopover.didShowNotification, object: POPOVERS["menu"]!!)
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.popoverDidShow() }
+            .store(in: &observers, for: "popoverDidShow")
+
+        NotificationCenter.default
+            .publisher(for: NSPopover.willShowNotification, object: POPOVERS["menu"]!!)
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.popoverWillShow() }
+            .store(in: &observers, for: "popoverWillShow")
+
+        NotificationCenter.default
+            .publisher(for: NSPopover.didCloseNotification, object: POPOVERS["menu"]!!)
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.popoverDidClose() }
+            .store(in: &observers, for: "popoverDidClose")
     }
 
     override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
@@ -185,34 +86,53 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func adaptViewSize() {
-        POPOVERS["menu"]!!.animates = false
+        #if DEBUG
+            log.verbose("Adapting Quick Actions view size")
+        #endif
 
-        let scrollFrame = scrollView.frame
         viewHeight = viewHeight ?? view.frame.size.height
-        let neededHeight = viewHeight! + tableView.fittingSize.height
-        if tableView.numberOfRows == 0 {
+
+        let neededHeight = 50 + tableView.fittingSize.height
+        #if DEBUG
+            log.verbose("Needed Height: \(neededHeight)")
+        #endif
+
+        if tableView.numberOfRows == 0, view.frame.size.height != viewHeight! {
+            POPOVERS["menu"]!!.animates = false
+            #if DEBUG
+                log.verbose("Zero rows, setting FrameSize to: \(NSSize(width: view.frame.size.width, height: viewHeight!))")
+            #endif
+
             view.setFrameSize(NSSize(width: view.frame.size.width, height: viewHeight!))
+            POPOVERS["menu"]!!.contentSize = view.frame.size
+            view.setNeedsDisplay(view.frame)
+
+            POPOVERS["menu"]!!.animates = true
         } else if view.frame.size.height != neededHeight {
+            POPOVERS["menu"]!!.animates = false
+            #if DEBUG
+                log
+                    .verbose(
+                        "\(tableView.numberOfRows) rows, setting FrameSize to: \(NSSize(width: view.frame.size.width, height: neededHeight))"
+                    )
+            #endif
+
             view.setFrameSize(NSSize(width: view.frame.size.width, height: neededHeight))
-        }
-        POPOVERS["menu"]!!.contentSize = view.frame.size
+            POPOVERS["menu"]!!.contentSize = view.frame.size
+            view.setNeedsDisplay(view.frame)
 
-        scrollView.setFrameSize(NSSize(width: scrollFrame.size.width, height: tableView.fittingSize.height))
-        scrollView.setFrameOrigin(scrollFrame.origin)
-
-        scrollView.setNeedsDisplay(scrollView.frame)
-        view.setNeedsDisplay(view.frame)
-
-        POPOVERS["menu"]!!.animates = true
-    }
-
-    @objc func popoverWillShow(notification _: Notification) {
-        mainThread {
-            adaptViewSize()
+            POPOVERS["menu"]!!.animates = true
         }
     }
 
-    @objc func popoverDidShow(notification _: Notification) {
+    func popoverWillShow() {
+        #if DEBUG
+            log.verbose("Calling adaptViewSize()")
+        #endif
+        adaptViewSize()
+    }
+
+    func popoverDidShow() {
         mainThread {
             if let area = trackingArea {
                 view.removeTrackingArea(area)
@@ -227,18 +147,13 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         }
     }
 
-    @objc func popoverDidClose(notification _: Notification) {
+    func popoverDidClose() {
         mainThread {
             if let area = trackingArea {
                 view.removeTrackingArea(area)
             }
             trackingArea = nil
         }
-    }
-
-    func sameDisplays() -> Bool {
-        let newDisplays = displayController.displays.values.map { $0 }
-        return newDisplays.count == displays.count && zip(displays, newDisplays).allSatisfy { d1, d2 in d1 === d2 }
     }
 
     override func flagsChanged(with event: NSEvent) {
@@ -258,128 +173,91 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func listenForDisplaysChange() {
-        displaysObserver = CachedDefaults.displaysPublisher.sink { [unowned self] _ in
-            mainAsyncAfter(ms: 2000) { [weak self] in
+        CachedDefaults.displaysPublisher
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] newDisplays in
                 guard let self = self else { return }
-                if !self.sameDisplays() {
-                    self.tableView.beginUpdates()
+
+                let sameDisplayCount = newDisplays.count == self.displays.count
+                let serial = { (d1: Display, d2: Display) -> Bool in d1.serial < d2.serial }
+                let sameDisplays = sameDisplayCount && zip(
+                    self.displays.sorted(by: serial), newDisplays.sorted(by: serial)
+                ).allSatisfy { d1, d2 in d1.serial == d2.serial && d1.adaptive == d2.adaptive }
+
+                if !sameDisplays {
                     self.setValue(
-                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
+                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
                         forKey: "displays"
                     )
                     self.tableView.reloadData()
-                    self.view.setNeedsDisplay(self.view.visibleRect)
-                    self.tableView.endUpdates()
+                    self.view.setNeedsDisplay(self.view.frame)
 
-                    self.adaptViewSize()
+                    #if DEBUG
+                        log.verbose("Calling adaptViewSize()")
+                    #endif
+
+                    if !sameDisplayCount {
+                        self.adaptViewSize()
+                    }
                     self.listenForResponsiveDDCChange()
                 }
             }
-        }
+            .store(in: &observers, for: "displays")
     }
 
     func listenForResponsiveDDCChange() {
-        responsiveDDCObservers.removeAll()
-        for (id, display) in displayController.activeDisplays {
-            responsiveDDCObservers[id] = display.observe(\.responsiveDDC, options: [.new], changeHandler: { [unowned self] _, _ in
-                mainAsyncAfter(ms: 1000) { [weak self] in
-                    guard let self = self else { return }
-                    self.tableView.beginUpdates()
-                    self.setValue(
-                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in !d1.active && d2.active }),
-                        forKey: "displays"
-                    )
-                    self.tableView.reloadData()
-                    self.view.setNeedsDisplay(self.view.visibleRect)
-                    self.tableView.endUpdates()
+        responsiveDDCObservers.removeAll(keepingCapacity: true)
 
-                    self.adaptViewSize()
-//                    if CachedDefaults[.showQuickActions], displayController.displays.count > 1,
-//                       let statusButton = appDelegate.statusItem.button
-//                    {
-//                        POPOVERS["menu"]!!.show(relativeTo: NSRect(), of: statusButton, preferredEdge: .maxY)
-//                        closeMenuPopover(after: 2500)
-//                    }
+        for display in displayController.activeDisplays.values {
+            display.$responsiveDDC
+                .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+                .removeDuplicates()
+                .sink { [weak self] _ in
+                    mainAsyncAfter(ms: 1000) { [weak self] in
+                        guard let self = self else { return }
+                        self.setValue(
+                            displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
+                            forKey: "displays"
+                        )
+                        self.tableView.reloadData()
+                        self.view.setNeedsDisplay(self.view.frame)
+                    }
                 }
-            })
+                .store(in: &observers, for: display.serial)
         }
     }
 
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
-                guard let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
-                    return
-                }
-
-                self.pausedAdaptiveModeObserver = true
-                Defaults.withoutPropagation {
-                    let adaptiveMode = change.newValue
-
-                    switch adaptiveMode {
-                    case .sensor:
-                        tableView.setAdaptiveButtonHidden(false)
-                    case .sync:
-                        tableView.setAdaptiveButtonHidden(false)
-                    case .location:
-                        tableView.setAdaptiveButtonHidden(false)
-                    case .manual:
-                        tableView.setAdaptiveButtonHidden(true)
+        adaptiveBrightnessModePublisher
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [unowned self] change in
+                mainThread { [weak self] in
+                    guard let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
+                        return
                     }
+
+                    self.pausedAdaptiveModeObserver = true
+                    Defaults.withoutPropagation {
+                        let adaptiveMode = change.newValue
+
+                        switch adaptiveMode {
+                        case .sensor:
+                            tableView.setAdaptiveButtonHidden(false)
+                        case .sync:
+                            tableView.setAdaptiveButtonHidden(false)
+                        case .location:
+                            tableView.setAdaptiveButtonHidden(false)
+                        case .manual:
+                            tableView.setAdaptiveButtonHidden(true)
+                        }
+                    }
+                    self.pausedAdaptiveModeObserver = false
                 }
-                self.pausedAdaptiveModeObserver = false
             }
-        }
+            .store(in: &observers, for: "adaptive")
     }
-
-//
-//    @IBAction func toggleMode(_ sender: PopUpButton) {
-//        let state = sender.state
-//        grayAllButtons()
-
-//        switch state {
-//        case .on:
-//            sender.state = .on
-//            if sender == syncModeButton {
-//                log.debug("SYNC")
-//                sender.bg = buttonBackgroundColor(mode: .sync)
-//                displayController.enable(mode: .sync)
-//            } else if sender == locationModeButton {
-//                log.debug("LOCATION")
-//                sender.bg = buttonBackgroundColor(mode: .location)
-//                displayController.enable(mode: .location)
-//            } else {
-//                log.debug("MANUAL")
-//                sender.bg = buttonBackgroundColor(mode: .manual)
-//                displayController.enable(mode: .manual)
-//            }
-//        case .off:
-//            guard let syncModeButton = syncModeButton, let locationModeButton = locationModeButton,
-//                  let manualModeButton = manualModeButton
-//            else {
-//                return
-//            }
-//            sender.layer?.backgroundColor = getOffColor(sender)
-//            if sender == manualModeButton {
-//                displayController.enable()
-//                if displayController.adaptiveModeKey == .location {
-//                    locationModeButton.state = .on
-//                    locationModeButton.bg = buttonBackgroundColor(mode: .location)
-//                } else if displayController.adaptiveModeKey == .sync {
-//                    syncModeButton.state = .on
-//                    syncModeButton.bg = buttonBackgroundColor(mode: .sync)
-//                }
-//            } else {
-//                displayController.disable()
-//                manualModeButton.state = .on
-//                manualModeButton.bg = buttonBackgroundColor(mode: .manual)
-//            }
-//        default:
-//            return
-//        }
-//    }
 
     override func mouseEntered(with _: NSEvent) {
         log.verbose("Mouse entered menu popover")
