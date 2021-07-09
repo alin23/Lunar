@@ -1297,7 +1297,7 @@ enum ValueType {
             self.userContrast = userContrast
         }
 
-        edidName = DDC.getDisplayName(for: id) ?? "Unknown"
+        edidName = Self.printableName(id)
         if let n = name, !n.isEmpty {
             self.name = n
         } else {

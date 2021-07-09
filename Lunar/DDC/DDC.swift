@@ -385,11 +385,9 @@ enum DDC {
             !isBuiltinDisplay(id) && (includeVirtual || !isVirtualDisplay(id, name: Display.printableName(id)))
         }
 
-        // for screen in NSScreen.screens {
-        //     guard screen.isScreen, let screenID = screen.displayID else { continue }
-
         #if DEBUG
             if !displayIDs.isEmpty {
+                // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
             }
             return [
