@@ -3647,7 +3647,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="412" height="70"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="412" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
                                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
@@ -4039,20 +4039,29 @@ and contrast to their highest values</string>
             <objects>
                 <viewController storyboardIdentifier="HotkeyPopoverController" id="VkT-77-mId" customClass="HotkeyPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="yV4-LC-kwE">
-                        <rect key="frame" x="0.0" y="0.0" width="400" height="249"/>
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="643"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hvo-Ym-RZd">
-                                <rect key="frame" x="-2" y="218" width="404" height="19"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Input Hotkey" id="IXT-tc-HgO">
-                                    <font key="font" size="13" name="Menlo-Regular"/>
-                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB">
-                                <rect key="frame" x="141" y="125" width="119" height="25"/>
+                            <box fixedFrame="YES" title="Input Hotkey 1" translatesAutoresizingMaskIntoConstraints="NO" id="TtZ-WU-d64">
+                                <rect key="frame" x="12" y="473" width="375" height="148"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="87T-n8-qsS">
+                                    <rect key="frame" x="3" y="3" width="369" height="124"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <font key="titleFont" metaFont="systemHeavy" size="15"/>
+                            </box>
+                            <box fixedFrame="YES" title="Input Hotkey 2" translatesAutoresizingMaskIntoConstraints="NO" id="AUg-hB-5hT">
+                                <rect key="frame" x="12" y="297" width="375" height="148"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="Oqw-0y-d8X">
+                                    <rect key="frame" x="3" y="3" width="369" height="124"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <font key="titleFont" metaFont="systemHeavy" size="15"/>
+                            </box>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB">
+                                <rect key="frame" x="141" y="505" width="119" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -4070,7 +4079,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </popUpButton>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dgm-ya-85K" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="89" y="179" width="220" height="34"/>
+                                <rect key="frame" x="89" y="559" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4079,7 +4088,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="01g-Q0-sDP" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="18" y="127" width="120" height="40"/>
+                                <rect key="frame" x="18" y="507" width="120" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="NkW-Jb-zuK" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="40"/>
@@ -4105,7 +4114,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IEB-qd-pyy" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="18" y="104" width="120" height="20"/>
+                                <rect key="frame" x="18" y="484" width="120" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="ieY-lE-ro8">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -4114,7 +4123,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qHL-wT-PQY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="262" y="127" width="120" height="40"/>
+                                <rect key="frame" x="262" y="507" width="120" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="dQh-Lu-fTP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="40"/>
@@ -4139,9 +4148,133 @@ and contrast to their highest values</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
-                            <customView fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="G9W-Iq-AuZ">
-                                <rect key="frame" x="15" y="20" width="368" height="71"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Enl-oT-vXM" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="262" y="484" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="iut-De-YrY">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gAC-ak-pIr">
+                                <rect key="frame" x="139" y="484" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="INPUT" id="Ttj-4m-0CK">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ygF-rE-Ln9">
+                                <rect key="frame" x="140" y="329" width="119" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="1Zo-rI-ste" id="IJw-8j-6p1">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="K8G-zX-yiU">
+                                        <items>
+                                            <menuItem title="Item" state="on" tag="246" hidden="YES" enabled="NO" id="1Zo-rI-ste">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="selectItem:" target="VkT-77-mId" id="kYc-QA-duL"/>
+                                </connections>
+                            </popUpButton>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YjI-T5-inx" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="88" y="383" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1LB-IV-a58" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="17" y="331" width="120" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="Qfa-b5-OiB" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="40"/>
+                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="100"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.99607843139999996" green="0.94901960780000005" blue="0.86666666670000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.99215686270000003" green="0.97647058819999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4tb-gE-ux3" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="17" y="308" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="ICu-2t-az8">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hdX-j6-7Mz" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="261" y="331" width="120" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="aFp-JB-3Yg" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="40"/>
+                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="100"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.99607843139999996" green="0.94901960780000005" blue="0.86666666670000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.99215686270000003" green="0.97647058819999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HP0-7G-YSE" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="261" y="308" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="esw-g4-JvX">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZG3-BZ-4Nh">
+                                <rect key="frame" x="138" y="308" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="INPUT" id="EhO-pc-cza">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="G9W-Iq-AuZ">
+                                <rect key="frame" x="15" y="23" width="368" height="71"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <shadow key="shadow" blurRadius="13">
                                     <size key="offset" width="0.0" height="-6"/>
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -4152,18 +4285,9 @@ and contrast to their highest values</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Enl-oT-vXM" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="262" y="104" width="120" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="iut-De-YrY">
-                                    <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xa0-I5-YhG">
-                                <rect key="frame" x="22" y="18" width="355" height="64"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <rect key="frame" x="22" y="21" width="355" height="64"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" selectable="YES" alignment="left" id="6a3-li-n7T">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <string key="title">When the Input Hotkey is pressed:
@@ -4173,10 +4297,116 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gAC-ak-pIr">
-                                <rect key="frame" x="139" y="104" width="120" height="20"/>
+                            <box fixedFrame="YES" title="Input Hotkey 3" translatesAutoresizingMaskIntoConstraints="NO" id="p6a-2M-XBu">
+                                <rect key="frame" x="11" y="121" width="375" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="INPUT" id="Ttj-4m-0CK">
+                                <view key="contentView" id="UeR-8a-f3r">
+                                    <rect key="frame" x="3" y="3" width="369" height="124"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <font key="titleFont" metaFont="systemHeavy" size="15"/>
+                            </box>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p">
+                                <rect key="frame" x="139" y="153" width="119" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="r6T-el-KBe" id="sg9-44-wbG">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="CrD-qm-seI">
+                                        <items>
+                                            <menuItem title="Item" state="on" tag="246" hidden="YES" enabled="NO" id="r6T-el-KBe">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="selectItem:" target="VkT-77-mId" id="zxT-4d-Blh"/>
+                                </connections>
+                            </popUpButton>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I9n-FC-OSN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="87" y="207" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EYA-rp-XKa" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="16" y="155" width="120" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="g0f-d1-JCa" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="40"/>
+                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="100"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.99607843139999996" green="0.94901960780000005" blue="0.86666666670000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.99215686270000003" green="0.97647058819999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kby-gI-DCw" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="16" y="132" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Tlr-IG-Qf8">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="32t-94-c7K" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="155" width="120" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="34c-e3-YT5" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="40"/>
+                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <integer key="value" value="100"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.99607843139999996" green="0.94901960780000005" blue="0.86666666670000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.99215686270000003" green="0.97647058819999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ddT-uM-4RA" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="260" y="132" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="QTK-Et-MRk">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mYt-lJ-VdR">
+                                <rect key="frame" x="137" y="132" width="120" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="INPUT" id="gdX-gn-SuI">
                                     <font key="font" size="11" name="Menlo-Bold"/>
                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -4186,19 +4416,33 @@ and contrast to their highest values</string>
                     </view>
                     <connections>
                         <outlet property="backingView" destination="G9W-Iq-AuZ" id="j0j-LY-Egq"/>
-                        <outlet property="dropdown" destination="TCb-EV-tNB" id="cT7-o9-BhC"/>
-                        <outlet property="hotkeyLabel" destination="hvo-Ym-RZd" id="hPa-AN-Z9d"/>
-                        <outlet property="hotkeyView" destination="dgm-ya-85K" id="twg-oy-b2M"/>
-                        <outlet property="scrollableBrightnessCaption" destination="IEB-qd-pyy" id="eqQ-lQ-Um9"/>
-                        <outlet property="scrollableBrightnessField" destination="01g-Q0-sDP" id="T5S-jR-opk"/>
-                        <outlet property="scrollableContrastCaption" destination="Enl-oT-vXM" id="TMe-lD-zo9"/>
-                        <outlet property="scrollableContrastField" destination="qHL-wT-PQY" id="f6M-ws-ihw"/>
+                        <outlet property="dropdown1" destination="TCb-EV-tNB" id="n3c-JX-0hC"/>
+                        <outlet property="dropdown2" destination="ygF-rE-Ln9" id="6nz-Ou-JLD"/>
+                        <outlet property="dropdown3" destination="FbZ-RW-w6p" id="UtO-qU-sq4"/>
+                        <outlet property="hotkeyLabel1" destination="TtZ-WU-d64" id="bkz-Rs-vkn"/>
+                        <outlet property="hotkeyLabel2" destination="AUg-hB-5hT" id="6lg-Xq-6N3"/>
+                        <outlet property="hotkeyLabel3" destination="p6a-2M-XBu" id="UTZ-8o-DdE"/>
+                        <outlet property="hotkeyView1" destination="dgm-ya-85K" id="8s4-X0-Ygp"/>
+                        <outlet property="hotkeyView2" destination="YjI-T5-inx" id="VlY-in-FVX"/>
+                        <outlet property="hotkeyView3" destination="I9n-FC-OSN" id="5LS-fC-reX"/>
+                        <outlet property="scrollableBrightnessCaption1" destination="IEB-qd-pyy" id="egv-Sz-GMz"/>
+                        <outlet property="scrollableBrightnessCaption2" destination="4tb-gE-ux3" id="rvp-aj-cLd"/>
+                        <outlet property="scrollableBrightnessCaption3" destination="kby-gI-DCw" id="cT5-qo-Lyb"/>
+                        <outlet property="scrollableBrightnessField1" destination="01g-Q0-sDP" id="Nue-6f-mkG"/>
+                        <outlet property="scrollableBrightnessField2" destination="1LB-IV-a58" id="mIA-LJ-jPe"/>
+                        <outlet property="scrollableBrightnessField3" destination="EYA-rp-XKa" id="PKg-hC-tD9"/>
+                        <outlet property="scrollableContrastCaption1" destination="Enl-oT-vXM" id="ufs-53-13e"/>
+                        <outlet property="scrollableContrastCaption2" destination="HP0-7G-YSE" id="P5k-LC-ep8"/>
+                        <outlet property="scrollableContrastCaption3" destination="ddT-uM-4RA" id="UdP-t5-h0f"/>
+                        <outlet property="scrollableContrastField1" destination="qHL-wT-PQY" id="zsi-YL-NZi"/>
+                        <outlet property="scrollableContrastField2" destination="hdX-j6-7Mz" id="xQZ-rr-paC"/>
+                        <outlet property="scrollableContrastField3" destination="32t-94-c7K" id="qdS-Ne-tIu"/>
                     </connections>
                 </viewController>
                 <customObject id="fTt-dS-Pne" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="VuP-ae-FBu"/>
             </objects>
-            <point key="canvasLocation" x="806" y="2880.5"/>
+            <point key="canvasLocation" x="839" y="2450.5"/>
         </scene>
         <!--Raspberry Page Controller-->
         <scene sceneID="XyP-0J-1Hw">

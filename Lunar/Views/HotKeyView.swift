@@ -74,7 +74,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
     }
 
     func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
-        log.debug("Changed hotkey for \(hotkey?.identifier ?? "") with \(keyCombo?.keyEquivalentModifierMaskString ?? "") \(keyCombo?.keyEquivalent ?? "no hotkey")")
+        log.debug("Changed hotkey for \(hotkey?.identifier ?? "")")
 
         guard let hotkey = hotkey else { return }
 

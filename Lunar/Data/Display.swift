@@ -557,23 +557,16 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var hotkeyInput: NSNumber {
-        didSet {
-            save()
-        }
-    }
+    @Published @objc dynamic var hotkeyInput1: NSNumber { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput2: NSNumber { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput3: NSNumber { didSet { save() } }
 
-    @Published @objc dynamic var brightnessOnInputChange: NSNumber {
-        didSet {
-            save()
-        }
-    }
-
-    @Published @objc dynamic var contrastOnInputChange: NSNumber {
-        didSet {
-            save()
-        }
-    }
+    @Published @objc dynamic var brightnessOnInputChange1: NSNumber { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange1: NSNumber { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange2: NSNumber { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange2: NSNumber { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange3: NSNumber { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange3: NSNumber { didSet { save() } }
 
     @Published @objc dynamic var audioMuted: Bool {
         didSet {
@@ -1030,9 +1023,18 @@ enum ValueType {
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decode(UInt8.self, forKey: .input)).ns
-        hotkeyInput = (try container.decode(UInt8.self, forKey: .hotkeyInput)).ns
-        brightnessOnInputChange = (try container.decode(UInt8.self, forKey: .brightnessOnInputChange)).ns
-        contrastOnInputChange = (try container.decode(UInt8.self, forKey: .contrastOnInputChange)).ns
+
+        hotkeyInput1 = try ((try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns)
+        hotkeyInput2 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
+        hotkeyInput3 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
+
+        brightnessOnInputChange1 = (try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns)
+        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
+        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
+
+        contrastOnInputChange1 = try ((try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns)
+        contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
+        contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
 
         if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
             userBrightness[.sync] = syncUserBrightness
@@ -1197,7 +1199,9 @@ enum ValueType {
         volume: UInt8 = 10,
         audioMuted: Bool = false,
         input: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput1: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput2: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput3: UInt8 = InputSource.unknown.rawValue,
         userBrightness: [AdaptiveModeKey: [Int: Int]]? = nil,
         userContrast: [AdaptiveModeKey: [Int: Int]]? = nil,
         alwaysUseNetworkControl: Bool = false,
@@ -1205,8 +1209,12 @@ enum ValueType {
         alwaysFallbackControl: Bool = false,
         neverFallbackControl: Bool = false,
         enabledControls: [DisplayControl: Bool]? = nil,
-        brightnessOnInputChange: UInt8 = 100,
-        contrastOnInputChange: UInt8 = 75,
+        brightnessOnInputChange1: UInt8 = 100,
+        brightnessOnInputChange2: UInt8 = 100,
+        brightnessOnInputChange3: UInt8 = 100,
+        contrastOnInputChange1: UInt8 = 75,
+        contrastOnInputChange2: UInt8 = 75,
+        contrastOnInputChange3: UInt8 = 75,
         defaultGammaRedMin: Float = 0.0,
         defaultGammaRedMax: Float = 1.0,
         defaultGammaRedValue: Float = 1.0,
@@ -1253,14 +1261,22 @@ enum ValueType {
         self.minContrast = minContrast.ns
         self.maxContrast = maxContrast.ns
         self.input = input.ns
-        self.hotkeyInput = hotkeyInput.ns
+
+        self.hotkeyInput1 = hotkeyInput1.ns
+        self.hotkeyInput2 = hotkeyInput2.ns
+        self.hotkeyInput3 = hotkeyInput3.ns
+
         self.alwaysUseNetworkControl = alwaysUseNetworkControl
         self.neverUseNetworkControl = neverUseNetworkControl
         self.alwaysFallbackControl = alwaysFallbackControl
         self.neverFallbackControl = neverFallbackControl
 
-        self.brightnessOnInputChange = brightnessOnInputChange.ns
-        self.contrastOnInputChange = contrastOnInputChange.ns
+        self.brightnessOnInputChange1 = brightnessOnInputChange1.ns
+        self.brightnessOnInputChange2 = brightnessOnInputChange2.ns
+        self.brightnessOnInputChange3 = brightnessOnInputChange3.ns
+        self.contrastOnInputChange1 = contrastOnInputChange1.ns
+        self.contrastOnInputChange2 = contrastOnInputChange2.ns
+        self.contrastOnInputChange3 = contrastOnInputChange3.ns
 
         if let enabledControls = enabledControls {
             self.enabledControls = enabledControls
@@ -1313,7 +1329,9 @@ enum ValueType {
             volume: (config["volume"] as? UInt8) ?? 10,
             audioMuted: (config["audioMuted"] as? Bool) ?? false,
             input: (config["input"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput: (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput1: (config["hotkeyInput1"] as? UInt8) ?? (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput2: (config["hotkeyInput2"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput3: (config["hotkeyInput3"] as? UInt8) ?? InputSource.unknown.rawValue,
             userBrightness: (config["userBrightness"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
             userContrast: (config["userContrast"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
             alwaysUseNetworkControl: (config["alwaysUseNetworkControl"] as? Bool) ?? false,
@@ -1326,8 +1344,12 @@ enum ValueType {
                 .ddc: true,
                 .gamma: true,
             ],
-            brightnessOnInputChange: (config["brightnessOnInputChange"] as? UInt8) ?? 100,
-            contrastOnInputChange: (config["contrastOnInputChange"] as? UInt8) ?? 75,
+            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ?? 100,
+            brightnessOnInputChange2: (config["brightnessOnInputChange2"] as? UInt8) ?? 100,
+            brightnessOnInputChange3: (config["brightnessOnInputChange3"] as? UInt8) ?? 100,
+            contrastOnInputChange1: (config["contrastOnInputChange1"] as? UInt8) ?? (config["contrastOnInputChange"] as? UInt8) ?? 75,
+            contrastOnInputChange2: (config["contrastOnInputChange2"] as? UInt8) ?? 75,
+            contrastOnInputChange3: (config["contrastOnInputChange3"] as? UInt8) ?? 75,
             defaultGammaRedMin: (config["defaultGammaRedMin"] as? Float) ?? 0.0,
             defaultGammaRedMax: (config["defaultGammaRedMax"] as? Float) ?? 1.0,
             defaultGammaRedValue: (config["defaultGammaRedValue"] as? Float) ?? 1.0,
@@ -1464,6 +1486,9 @@ enum ValueType {
         case responsiveDDC
         case input
         case hotkeyInput
+        case hotkeyInput1
+        case hotkeyInput2
+        case hotkeyInput3
         case userBrightness
         case userContrast
         case alwaysUseNetworkControl
@@ -1482,7 +1507,17 @@ enum ValueType {
         case isSource
         case applyGamma
         case brightnessOnInputChange
+        case brightnessOnInputChange1
+        case brightnessOnInputChange2
+        case brightnessOnInputChange3
         case contrastOnInputChange
+        case contrastOnInputChange1
+        case contrastOnInputChange2
+        case contrastOnInputChange3
+
+        var isHidden: Bool {
+            Self.hidden.contains(self)
+        }
 
         static var bool: Set<CodingKeys> = [
             .adaptive,
@@ -1496,6 +1531,12 @@ enum ValueType {
             .neverFallbackControl,
             .isSource,
             .applyGamma,
+        ]
+
+        static var hidden: Set<CodingKeys> = [
+            .hotkeyInput,
+            .brightnessOnInputChange,
+            .contrastOnInputChange,
         ]
 
         static var settable: Set<CodingKeys> = [
@@ -1525,15 +1566,21 @@ enum ValueType {
             .audioMuted,
             .power,
             .input,
-            .hotkeyInput,
+            .hotkeyInput1,
+            .hotkeyInput2,
+            .hotkeyInput3,
             .alwaysUseNetworkControl,
             .neverUseNetworkControl,
             .alwaysFallbackControl,
             .neverFallbackControl,
             .isSource,
             .applyGamma,
-            .brightnessOnInputChange,
-            .contrastOnInputChange,
+            .brightnessOnInputChange1,
+            .brightnessOnInputChange2,
+            .brightnessOnInputChange3,
+            .contrastOnInputChange1,
+            .contrastOnInputChange2,
+            .contrastOnInputChange3,
         ]
     }
 
@@ -1591,9 +1638,18 @@ enum ValueType {
             try container.encode(serial, forKey: .serial)
             try container.encode(volume.uint8Value, forKey: .volume)
             try container.encode(input.uint8Value, forKey: .input)
-            try container.encode(hotkeyInput.uint8Value, forKey: .hotkeyInput)
-            try container.encode(brightnessOnInputChange.uint8Value, forKey: .brightnessOnInputChange)
-            try container.encode(contrastOnInputChange.uint8Value, forKey: .contrastOnInputChange)
+
+            try container.encode(hotkeyInput1.uint8Value, forKey: .hotkeyInput1)
+            try container.encode(hotkeyInput2.uint8Value, forKey: .hotkeyInput2)
+            try container.encode(hotkeyInput3.uint8Value, forKey: .hotkeyInput3)
+
+            try container.encode(brightnessOnInputChange1.uint8Value, forKey: .brightnessOnInputChange1)
+            try container.encode(brightnessOnInputChange2.uint8Value, forKey: .brightnessOnInputChange2)
+            try container.encode(brightnessOnInputChange3.uint8Value, forKey: .brightnessOnInputChange3)
+
+            try container.encode(contrastOnInputChange1.uint8Value, forKey: .contrastOnInputChange1)
+            try container.encode(contrastOnInputChange2.uint8Value, forKey: .contrastOnInputChange2)
+            try container.encode(contrastOnInputChange3.uint8Value, forKey: .contrastOnInputChange3)
 
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)

@@ -654,6 +654,10 @@
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>6qW8UkPhOcThM44fjj2mYCekvxk=</signature>
             <signature>Ur8uoyh20qr0yLE7LpV+31t0VIw=</signature>
+
+            <signature>pB6HRsbvqUD+N+iPaP6Lcqh58Uo=</signature>
+            <signature>oWTbz48yrkwqltHgNxR+VtGJSqg=</signature>
+
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Disable Gamma by default in Hardware/Native/Network controls</li><li>Add checkbox to enable Gamma in non-Software controls</li><li>Improve Mac Mini HDMI port detection to allow USB-C-to-HDMI adapters to work with DDC on the USB-C port</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix Boolean value handling in the CLI integration</li><li>Fix Quick Actions popover contents disappearing on some occasions</li></ul></div></div>]]>
             </description>
