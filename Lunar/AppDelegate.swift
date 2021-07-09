@@ -1031,6 +1031,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             unique: true
         )
         if shouldInstall {
+            if !fm.fileExists(atPath: "/usr/local/bin") {
+                do {
+                    try fm.createDirectory(atPath: "/usr/local/bin", withIntermediateDirectories: false)
+                } catch {
+                    log.error("Error on creating /usr/local/bin: \(error)")
+                    dialog(
+                        message: "Lunar CLI could not be installed",
+                        info: "Error on creating the '/usr/local/bin' directory: \(error)"
+                    ).runModal()
+                    return
+                }
+            }
+
             fm.createFile(
                 atPath: "/usr/local/bin/lunar",
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),

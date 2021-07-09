@@ -27,8 +27,10 @@ class DisplayValuesView: NSTableView {
                let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
                display.active
             {
-                mainThread { [weak adaptiveButton] in
-                    adaptiveButton?.isHidden = hidden
+                mainThread {
+                    adaptiveButton.isEnabled = !hidden
+                    adaptiveButton.toolTip = hidden ? "Disabled in Manual Mode" : ""
+                    adaptiveButton.setColor()
                 }
             }
         }
@@ -56,7 +58,7 @@ class DisplayValuesView: NSTableView {
             else {
                 return
             }
-            notConnectedTextField.onClick = getDeleteAction(displayID: display.id, row: row)
+            notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
         }
     }
 
@@ -73,14 +75,12 @@ class DisplayValuesView: NSTableView {
         }
     }
 
-    func getDeleteAction(displayID: CGDirectDisplayID, row: Int) -> (() -> Void) {
-        return {
+    func getDeleteAction(displaySerial: String, row: Int) -> (() -> Void) {
+        let action = {
             mainThread { [weak self] in
                 guard let self = self else { return }
-                self.beginUpdates()
                 self.removeRows(at: [row], withAnimation: .effectFade)
-                self.endUpdates()
-                if let controller = self.superview?.superview?.nextResponder?.nextResponder as? MenuPopoverController {
+                if let controller = self.superview?.nextResponder as? MenuPopoverController {
                     mainAsyncAfter(ms: 200) {
                         POPOVERS["menu"]!!.animates = false
                         controller.adaptViewSize()
@@ -89,8 +89,10 @@ class DisplayValuesView: NSTableView {
                     }
                 }
             }
-            displayController.removeDisplay(id: displayID)
+            displayController.removeDisplay(serial: displaySerial)
         }
+
+        return action
     }
 
     func removeRow(_ rowView: NSTableRowView, forRow _: Int) {
@@ -138,14 +140,16 @@ class DisplayValuesView: NSTableView {
 
         let id = display.id
 
-        notConnectedTextField.onClick = getDeleteAction(displayID: id, row: row)
+        notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
+
+        adaptiveButton.isHidden = !display.active
+        adaptiveButton.isEnabled = display.active && displayController.adaptiveModeKey != .manual
         adaptiveButton.setup(displayID: id)
-        adaptiveButton.isHidden = !display.active || displayController.adaptiveModeKey == .manual
 
         scrollableBrightness.textFieldColor = textFieldColor
         scrollableBrightness.textFieldColorHover = textFieldColorHover
         scrollableBrightness.textFieldColorLight = textFieldColorLight
-        scrollableBrightness.doubleValue = display.brightness.doubleValue.rounded()
+        scrollableBrightness.integerValue = display.brightness.intValue
         scrollableBrightness.caption = scrollableBrightnessCaption
         scrollableBrightness.lowerLimit = display.minBrightness.doubleValue
         scrollableBrightness.upperLimit = display.maxBrightness.doubleValue
@@ -157,7 +161,7 @@ class DisplayValuesView: NSTableView {
         scrollableContrast.textFieldColor = textFieldColor
         scrollableContrast.textFieldColorHover = textFieldColorHover
         scrollableContrast.textFieldColorLight = textFieldColorLight
-        scrollableContrast.doubleValue = display.contrast.doubleValue.rounded()
+        scrollableContrast.integerValue = display.contrast.intValue
         scrollableContrast.caption = scrollableContrastCaption
         scrollableContrast.lowerLimit = display.minContrast.doubleValue
         scrollableContrast.upperLimit = display.maxContrast.doubleValue

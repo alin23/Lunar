@@ -417,7 +417,7 @@ class DisplayViewController: NSViewController {
             nonResponsiveTextField?.onClick = { [weak self] in
                 mainThread { [weak self] in
                     guard let self = self, let display = self.display else { return }
-                    display.control.resetState()
+                    display.control?.resetState()
                     self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
                     self.refreshView()
                 }
@@ -662,8 +662,9 @@ class DisplayViewController: NSViewController {
 
     func resetControl() {
         guard let display = display else { return }
-        display.control = display.getBestControl()
-        display.onControlChange?(display.control)
+        let control = display.getBestControl()
+        display.control = control
+        display.onControlChange?(control)
 
         if !(display.enabledControls[.gamma] ?? false), display.applyGamma || display.gammaChanged {
             display.resetGamma()
@@ -679,7 +680,7 @@ class DisplayViewController: NSViewController {
                 return
             }
             if display.control is DDCControl {
-                display.control.resetState()
+                display.control?.resetState()
             } else {
                 DDCControl(display: display).resetState()
             }
@@ -701,7 +702,7 @@ class DisplayViewController: NSViewController {
                 return
             }
             if display.control is NetworkControl {
-                display.control.resetState()
+                display.control?.resetState()
             } else {
                 NetworkControl.resetState(serial: display.serial)
             }
@@ -734,7 +735,7 @@ class DisplayViewController: NSViewController {
             resetDDC()
         case .brightnessAndContrast:
             display.adaptive = false
-            _ = display.control.reset()
+            _ = display.control?.reset()
         case .fullReset:
             resetDisplay()
         default:

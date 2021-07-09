@@ -456,9 +456,9 @@ enum ValueType {
             log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness))", context: context)
             let startTime = DispatchTime.now()
 
-            if !control.setBrightness(brightness, oldValue: oldBrightness) {
+            if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness) {
                 log.warning(
-                    "Error writing brightness using \(control!.str)",
+                    "Error writing brightness using \(control.str)",
                     context: context
                 )
             }
@@ -508,9 +508,9 @@ enum ValueType {
             log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast))", context: context)
             let startTime = DispatchTime.now()
 
-            if !control.setContrast(contrast, oldValue: oldContrast) {
+            if let control = control, !control.setContrast(contrast, oldValue: oldContrast) {
                 log.warning(
-                    "Error writing contrast using \(control!.str)",
+                    "Error writing contrast using \(control.str)",
                     context: context
                 )
             }
@@ -531,9 +531,9 @@ enum ValueType {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: maxDDCVolume.doubleValue).rounded().u8
             }
 
-            if !control.setVolume(volume) {
+            if let control = control, !control.setVolume(volume) {
                 log.warning(
-                    "Error writing volume using \(control!.str)",
+                    "Error writing volume using \(control.str)",
                     context: context
                 )
             }
@@ -548,9 +548,9 @@ enum ValueType {
                   let input = InputSource(rawValue: self.input.uint8Value),
                   input != .unknown
             else { return }
-            if !control.setInput(input) {
+            if let control = control, !control.setInput(input) {
                 log.warning(
-                    "Error writing input using \(control!.str)",
+                    "Error writing input using \(control.str)",
                     context: context
                 )
             }
@@ -573,9 +573,9 @@ enum ValueType {
             save()
 
             guard !isForTesting else { return }
-            if !control.setMute(audioMuted) {
+            if let control = control, !control.setMute(audioMuted) {
                 log.warning(
-                    "Error writing muted audio using \(control!.str)",
+                    "Error writing muted audio using \(control.str)",
                     context: context
                 )
             }
@@ -821,7 +821,7 @@ enum ValueType {
     }
 
     var onControlChange: ((Control) -> Void)? = nil
-    @AtomicLock var control: Control! = nil {
+    @AtomicLock var control: Control? = nil {
         didSet {
             context = getContext()
             if let control = control {
@@ -1024,15 +1024,24 @@ enum ValueType {
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decode(UInt8.self, forKey: .input)).ns
 
-        hotkeyInput1 = try ((try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns)
+        hotkeyInput1 = try (
+            (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
+        )
         hotkeyInput2 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
         hotkeyInput3 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
 
-        brightnessOnInputChange1 = (try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns)
+        brightnessOnInputChange1 = (
+            try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
+        )
         brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
         brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
 
-        contrastOnInputChange1 = try ((try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?.ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns)
+        contrastOnInputChange1 = try (
+            (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
+        )
         contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
         contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
 
@@ -1344,7 +1353,8 @@ enum ValueType {
                 .ddc: true,
                 .gamma: true,
             ],
-            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ?? 100,
+            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
+                100,
             brightnessOnInputChange2: (config["brightnessOnInputChange2"] as? UInt8) ?? 100,
             brightnessOnInputChange3: (config["brightnessOnInputChange3"] as? UInt8) ?? 100,
             contrastOnInputChange1: (config["contrastOnInputChange1"] as? UInt8) ?? (config["contrastOnInputChange"] as? UInt8) ?? 75,
@@ -1864,7 +1874,7 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        guard !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
+        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
@@ -1888,7 +1898,7 @@ enum ValueType {
     }
 
     func refreshContrast() {
-        guard !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
+        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
         guard let newContrast = readContrast() else {
             log.warning("Can't read contrast for \(name)")
             return
@@ -1912,6 +1922,7 @@ enum ValueType {
     }
 
     func refreshInput() {
+        guard !isTestID(id) else { return }
         guard let newInput = readInput() else {
             log.warning("Can't read input for \(name)")
             return
@@ -1928,6 +1939,7 @@ enum ValueType {
     }
 
     func refreshVolume() {
+        guard !isTestID(id) else { return }
         guard let newVolume = readVolume(), let newAudioMuted = readAudioMuted() else {
             log.warning("Can't read volume for \(name)")
             return
@@ -2123,7 +2135,7 @@ enum ValueType {
 
         save()
 
-        _ = control.reset()
+        _ = control?.reset()
         readapt(newValue: false, oldValue: true)
     }
 
