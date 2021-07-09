@@ -17,10 +17,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .mediaKeysNotified,
     .brightnessKeysEnabled,
     .hideYellowDot,
-    .brightnessOnInputChange,
     .brightnessStep,
     .clamshellModeDetection,
-    .contrastOnInputChange,
     .contrastStep,
     .contrastCurveFactor,
     .brightnessCurveFactor,
@@ -424,8 +422,6 @@ func initCache() {
     cacheKey(.dayLength)
     cacheKey(.hideMenuBarIcon)
     cacheKey(.showDockIcon)
-    cacheKey(.brightnessOnInputChange)
-    cacheKey(.contrastOnInputChange)
     cacheKey(.disableControllerVideo)
     cacheKey(.neverAskAboutFlux)
     cacheKey(.hasActiveDisplays)
@@ -488,8 +484,6 @@ extension Defaults.Keys {
     static let dayLength = Key<UInt64>("dayLength", default: 0)
     static let hideMenuBarIcon = Key<Bool>("hideMenuBarIcon", default: false)
     static let showDockIcon = Key<Bool>("showDockIcon", default: false)
-    static let brightnessOnInputChange = Key<Int>("brightnessOnInputChange", default: 100)
-    static let contrastOnInputChange = Key<Int>("contrastOnInputChange", default: 70)
     static let disableControllerVideo = Key<Bool>("disableControllerVideo", default: true)
     static let neverAskAboutFlux = Key<Bool>("neverAskAboutFlux", default: false)
     static let hasActiveDisplays = Key<Bool>("hasActiveDisplays", default: true)

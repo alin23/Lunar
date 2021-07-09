@@ -493,16 +493,7 @@ struct Lunar: ParsableCommand {
             }
 
             let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
-                let modifiers = hotkey.keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
-                    switch char {
-                    case "⌥": return "option"
-                    case "⌘": return "command"
-                    case "⌃": return "control"
-                    case "⇧": return "shift"
-                    default: return char
-                    }
-                }
-                return (hotkey.identifier, "\(String(modifiers.joined(by: "+")))-\(hotkey.keyChar)")
+                (hotkey.identifier, hotkey.hotkeyString)
             }, uniquingKeysWith: first(this:other:))
             printDictionary(hotkeys)
             globalExit(0)
@@ -655,7 +646,7 @@ struct Lunar: ParsableCommand {
         var display: String?
 
         @Argument(
-            help: "Display property to get or set. One of (\(Display.CodingKeys.allCases.map(\.rawValue).joined(separator: ", ")))"
+            help: "Display property to get or set. One of (\(Display.CodingKeys.allCases.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
         )
         var property: Display.CodingKeys?
 
@@ -773,7 +764,7 @@ struct Lunar: ParsableCommand {
         var controls: [DisplayControl] = [.coreDisplay, .ddc, .network]
 
         @Argument(
-            help: "Display property to get. One of (\(Display.CodingKeys.allCases.map(\.rawValue).joined(separator: ", ")))"
+            help: "Display property to get. One of (\(Display.CodingKeys.allCases.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
         )
         var property: Display.CodingKeys
 
@@ -1098,7 +1089,7 @@ private func handleDisplay(
     case is String:
         display.setValue(value, forKey: property.rawValue)
         display.save(now: true)
-    case is NSNumber where property == .input || property == .hotkeyInput:
+    case is NSNumber where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
         guard let input = InputSource(stringValue: value) else {
             throw CommandError.invalidValue("Unknown input \(value)")
         }
@@ -1175,7 +1166,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
         return (try! encoder.encode(value as! [String: [String: Int]])).str()
     case .enabledControls:
         return (try! encoder.encode(value as! [String: Bool])).str()
-    case .input, .hotkeyInput:
+    case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:
         return (InputSource(rawValue: value as! UInt8) ?? .unknown).str
     case .power:
         return (value as! Bool) ? "on" : "off"

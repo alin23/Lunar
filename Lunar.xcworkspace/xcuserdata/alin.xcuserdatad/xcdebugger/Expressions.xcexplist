@@ -6,13 +6,13 @@
          contextName = "DDCControl.setBrightness(_:oldValue:):DDCControl.swift">
          <PersistentStrings>
             <PersistentString
-               value = "supportsSmoothTransition(for: .BRIGHTNESS)">
-            </PersistentString>
-            <PersistentString
                value = "display.slowWrite">
             </PersistentString>
             <PersistentString
                value = "CachedDefaults[.smoothTransition]">
+            </PersistentString>
+            <PersistentString
+               value = "supportsSmoothTransition(for: .BRIGHTNESS)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -77,6 +77,9 @@
          contextName = "static ParsableArguments.exit(withError:):ParsableArguments.swift">
       </ContextState>
       <ContextState
+         contextName = "__40-[SentryCrashIntegration configureScope]_block_invoke_3:SentryCrashIntegration.m">
+      </ContextState>
+      <ContextState
          contextName = "DisplayViewController.display.didset:DisplayViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -85,18 +88,15 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "DisplayController.avService(displayID:):DisplayController.swift">
+      </ContextState>
+      <ContextState
          contextName = "ToggleButton.labelColor.getter:ToggleButton.swift">
          <PersistentStrings>
             <PersistentString
                value = "title">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "__40-[SentryCrashIntegration configureScope]_block_invoke_3:SentryCrashIntegration.m">
-      </ContextState>
-      <ContextState
-         contextName = "DisplayController.avService(displayID:):DisplayController.swift">
       </ContextState>
       <ContextState
          contextName = "AdaptiveMode.interpolateSIMD(_:display:minVal:maxVal:offset:userValues:):AdaptiveMode.swift">
@@ -164,6 +164,12 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "LocationMode.fetchMoments(again:):LocationMode.swift">
+      </ContextState>
+      <ContextState
+         contextName = "encodeObject:SentryCrashJSONCodecObjC.m">
+      </ContextState>
+      <ContextState
          contextName = "enablePro():Pro.swift">
          <PersistentStrings>
             <PersistentString
@@ -180,12 +186,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "LocationMode.fetchMoments(again:):LocationMode.swift">
-      </ContextState>
-      <ContextState
-         contextName = "DDCReadM1:DDC.c">
-      </ContextState>
-      <ContextState
          contextName = "AdaptiveModeButton.setAutoModeItemTitle(modeKey:):AdaptiveModeButton.swift">
          <PersistentStrings>
             <PersistentString
@@ -194,7 +194,15 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "encodeObject:SentryCrashJSONCodecObjC.m">
+         contextName = "DDCReadM1:DDC.c">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in static CachedDefaults.subscript.getter:DataStore.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "key.name">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "AdaptiveMode.interpolate(_:display:offset:):AdaptiveMode.swift">
