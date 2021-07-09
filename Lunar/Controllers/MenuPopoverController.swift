@@ -32,8 +32,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
-    @IBInspectable dynamic var displays: [Display] = displayController.displays.values.map { $0 }
-        .sorted(by: { d1, d2 in !d1.active && d2.active })
+    @IBInspectable dynamic lazy var displays: [Display] = displayController.displays.values.map { $0 }
+        .sorted(by: { d1, d2 in d1.active && !d2.active })
 
     var viewHeight: CGFloat?
 
@@ -178,11 +178,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             .sink { [weak self] newDisplays in
                 guard let self = self else { return }
 
-                let sameDisplayCount = newDisplays.count == self.displays.count
+                let currentDisplayCount = self.displays.count
+                let sameDisplayCount = newDisplays.count == currentDisplayCount
                 let serial = { (d1: Display, d2: Display) -> Bool in d1.serial < d2.serial }
                 let sameDisplays = sameDisplayCount && zip(
                     self.displays.sorted(by: serial), newDisplays.sorted(by: serial)
-                ).allSatisfy { d1, d2 in d1.serial == d2.serial && d1.adaptive == d2.adaptive }
+                ).allSatisfy { d1, d2 in d1.serial == d2.serial && d1.adaptive == d2.adaptive && d1.active == d2.active && d1.responsiveDDC == d2.responsiveDDC }
 
                 if !sameDisplays {
                     self.setValue(
@@ -197,6 +198,9 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     #endif
 
                     if !sameDisplayCount {
+                        if newDisplays.count == 1, currentDisplayCount > 1 {
+                            appDelegate.initMenuPopover()
+                        }
                         self.adaptViewSize()
                     }
                     self.listenForResponsiveDDCChange()
