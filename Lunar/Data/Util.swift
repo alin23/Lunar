@@ -1475,7 +1475,8 @@ extension NSRunningApplication {
     func windows(appException: AppException? = nil) -> [AXWindow]? {
         guard let app = Application(self) else { return nil }
         do {
-            return try app.windows()?.compactMap { AXWindow(from: $0, runningApp: self, appException: appException) }
+            let wins = try app.windows()
+            return wins?.compactMap { AXWindow(from: $0, runningApp: self, appException: appException) }
         } catch {
             log.error("Can't get windows for app \(self): \(error)")
             return nil

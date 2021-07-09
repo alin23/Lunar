@@ -350,6 +350,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         _ = displayController.adaptiveMode.watch()
     }
 
+    func initMenuPopover() {
+        guard let storyboard = NSStoryboard.main else { return }
+
+        POPOVERS["menu"]!!.contentViewController = storyboard
+            .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
+        POPOVERS["menu"]!!.contentViewController!.loadView()
+    }
+
     func initMenubarIcon() {
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("MenubarIcon"))
@@ -370,11 +378,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         statusItem.menu = menu
 
         if POPOVERS["menu"]!!.contentViewController == nil {
-            guard let storyboard = NSStoryboard.main else { return }
-
-            POPOVERS["menu"]!!.contentViewController = storyboard
-                .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
-            POPOVERS["menu"]!!.contentViewController!.loadView()
+            initMenuPopover()
         }
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
