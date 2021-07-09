@@ -755,7 +755,10 @@ enum DDC {
                 if !ignoreCache, let service = avServiceCache[displayID] {
                     return service
                 }
-                let service = displayController.avService(displayID: displayID, display: display)
+                let service = (
+                    displayController.avService(displayID: displayID, display: display, match: .byEDIDUUID) ??
+                        displayController.avService(displayID: displayID, display: display, match: .byProductAttributes)
+                )
                 avServiceCache[displayID] = service
                 return service
             }

@@ -19,6 +19,11 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
+enum AVServiceMatch {
+    case byEDIDUUID
+    case byProductAttributes
+}
+
 class DisplayController {
     let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = IsLidClosed()
@@ -593,14 +598,27 @@ class DisplayController {
     }
 
     #if arch(arm64)
-        func displayForIOService(_ service: io_service_t, displays: [Display]? = nil) -> Display? {
-            guard let clcd2Service = firstChildMatching(service, names: ["AppleCLCD2"]) else { return nil }
+        func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
+            guard let clcd2Service = firstChildMatching(dispService, names: ["AppleCLCD2"]) else { return nil }
 
             var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(clcd2Service, &clcd2ServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
-                KERN_SUCCESS,
-                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any],
-                let edidUUID = displayProps["EDID UUID"] as? String
+            guard IORegistryEntryCreateCFProperties(
+                clcd2Service,
+                &clcd2ServiceProperties,
+                kCFAllocatorDefault,
+                IOOptionBits()
+            ) == KERN_SUCCESS,
+                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any]
+            else {
+                log.info("No display props for service \(dispService)")
+                return nil
+            }
+            return displayProps
+        }
+
+        func matchDisplayByEDIDUUID(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
+            guard let displayProps = props ?? clcd2Properties(service) else { return nil }
+            guard let edidUUID = displayProps["EDID UUID"] as? String
             else {
                 log.info("No display matched for service \(service): (Can't find EDID UUID)")
                 return nil
@@ -612,10 +630,22 @@ class DisplayController {
             }
 
             let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
-            if let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) {
-                log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport))")
-                display.transport = transport
-                return display
+            guard let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) else {
+                log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport))")
+                return nil
+            }
+
+            log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport))")
+            display.transport = transport
+            return display
+        }
+
+        func matchDisplayByProductAttributes(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
+            guard let displayProps = props ?? clcd2Properties(service) else { return nil }
+
+            var transport: Transport?
+            if let transportDict = displayProps["Transport"] as? [String: String] {
+                transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
             }
 
             guard let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
@@ -627,30 +657,32 @@ class DisplayController {
                 return nil
             }
 
+            var allActiveDisplays = Set(displayController.activeDisplays.values.map { $0 })
+            if let displays = displays {
+                allActiveDisplays.formUnion(displays)
+            }
+
             guard let display = getMatchingDisplay(
                 name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
                 manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
                 width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
-                displays: activeDisplays, partial: false
+                displays: Array(allActiveDisplays)
             ) else {
-                var allActiveDisplays = Set(displayController.activeDisplays.values.map { $0 })
-                if let displays = displays {
-                    allActiveDisplays.formUnion(displays)
-                }
-
-                let d = getMatchingDisplay(
-                    name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
-                    manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
-                    width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
-                    displays: Array(allActiveDisplays), partial: true
-                )
-
-                log.info("Partially matched display \(d) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
-                return d
+                return nil
             }
+
             log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
             display.transport = transport
             return display
+        }
+
+        func displayForIOService(_ service: io_service_t, displays: [Display]? = nil, match: AVServiceMatch) -> Display? {
+            switch match {
+            case .byEDIDUUID:
+                return matchDisplayByEDIDUUID(service, displays: displays)
+            case .byProductAttributes:
+                return matchDisplayByProductAttributes(service, displays: displays)
+            }
         }
 
         func firstChildMatching(_ service: io_service_t, names: [String]) -> io_service_t? {
@@ -676,7 +708,7 @@ class DisplayController {
             while case let t810xIOChild = IOIteratorNext(iterator), t810xIOChild != 0 {
                 if IOServiceNameMatches(t810xIOChild, names: names) {
                     service = t810xIOChild
-                    log.info("Found service \(service) in iterator \(iterator): (names: \(names))")
+                    log.info("Found service \(t810xIOChild) in iterator \(iterator): (names: \(names))")
                     break
                 }
             }
@@ -684,8 +716,9 @@ class DisplayController {
             return service
         }
 
-        func avService(displayID: CGDirectDisplayID, display: Display? = nil) -> IOAVService? {
+        func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
+                  !(display?.macMiniHDMI ?? false),
                   !DDC.isVirtualDisplay(displayID, checkName: false)
             else {
                 log.info("No AVService for display \(displayID): (isOnline: \(NSScreen.isOnline(displayID)), isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)))")
@@ -711,8 +744,11 @@ class DisplayController {
             while case let t810xIOChild = IOIteratorNext(t810xIOIterator), t810xIOChild != 0 {
                 if IOServiceNameMatches(t810xIOChild, names: ["dispext0", "disp0"]) {
                     clcd2Num += 1
-                    if let d = displayForIOService(t810xIOChild, displays: display != nil ? [display!] : nil), d.id == displayID
-                    {
+                    if let d = displayForIOService(
+                        t810xIOChild,
+                        displays: display != nil ? [display!] : nil,
+                        match: match
+                    ), d.id == displayID {
                         matchedDisplay = d
                         break
                     }
@@ -735,6 +771,7 @@ class DisplayController {
                transport.downstream == "HDMI"
             {
                 log.warning("Mac Mini HDMI doesn't support DDC, ignoring for display \(display)")
+                display.macMiniHDMI = true
                 return nil
             }
 
