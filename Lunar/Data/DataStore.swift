@@ -291,9 +291,64 @@ extension Defaults.AnyKey: Hashable {
 
 extension AnyCodable: Defaults.Serializable {}
 
+class ThreadSafeDictionary<V: Hashable, T>: Collection {
+    private var dictionary: [V: T]
+    private let accessQueue = DispatchQueue(
+        label: "Dictionary Barrier Queue",
+        attributes: .concurrent
+    )
+    var startIndex: Dictionary<V, T>.Index {
+        dictionary.startIndex
+    }
+
+    var endIndex: Dictionary<V, T>.Index {
+        dictionary.endIndex
+    }
+
+    init(dict: [V: T] = [V: T]()) {
+        dictionary = dict
+    }
+
+    func index(after i: Dictionary<V, T>.Index) -> Dictionary<V, T>.Index {
+        dictionary.index(after: i)
+    }
+
+    subscript(key: V) -> T? {
+        set(newValue) {
+            accessQueue.async(flags: .barrier) { [weak self] in
+                self?.dictionary[key] = newValue
+            }
+        }
+        get {
+            accessQueue.sync {
+                self.dictionary[key]
+            }
+        }
+    }
+
+    // has implicity get
+    subscript(index: Dictionary<V, T>.Index) -> Dictionary<V, T>.Element {
+        accessQueue.sync {
+            self.dictionary[index]
+        }
+    }
+
+    func removeAll() {
+        accessQueue.async(flags: .barrier) { [weak self] in
+            self?.dictionary.removeAll()
+        }
+    }
+
+    func removeValue(forKey key: V) {
+        accessQueue.async(flags: .barrier) { [weak self] in
+            self?.dictionary.removeValue(forKey: key)
+        }
+    }
+}
+
 enum CachedDefaults {
     static var displaysPublisher = PassthroughSubject<[Display], Never>()
-    static var cache: [String: AnyCodable] = [:]
+    static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
     static var locks: [String: NSRecursiveLock] = [:]
     static var observers = Set<AnyCancellable>()
     static var lock = NSRecursiveLock()
