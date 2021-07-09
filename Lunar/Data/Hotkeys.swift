@@ -85,10 +85,29 @@ enum OSDImage: Int64 {
     case muted = 4
 }
 
-class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
+class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
+    var description: String {
+        "\(identifier)[\(hotkeyString)]"
+    }
+
+    var hotkeyString: String {
+        mainThread {
+            let modifiers = keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
+                switch char {
+                case "⌥": return "option"
+                case "⌘": return "command"
+                case "⌃": return "control"
+                case "⇧": return "shift"
+                default: return char
+                }
+            }
+            return "\(String(modifiers.joined(by: "+")))-\(keyChar)"
+        }
+    }
+
     var hotkey: HotKey {
         didSet {
-            log.debug("Reset hotkey with handler \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            log.debug("Reset hotkey with handler \(identifier)")
             oldValue.unregister()
             handleRegistration(persist: true)
             if HotkeyIdentifier(rawValue: identifier) != nil {
@@ -133,7 +152,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
             if isEnabled {
                 register()
             }
-            log.debug("Created hotkey with handler \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+            log.debug("Created hotkey with handler \(identifier)")
             return
         }
 
@@ -149,10 +168,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
             if isEnabled {
                 register()
             }
-            log
-                .debug(
-                    "Created hotkey with action/target \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)"
-                )
+            log.debug("Created hotkey with action/target \(identifier)")
             return
         }
 
@@ -178,9 +194,9 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     var isEnabled: Bool {
         didSet {
             if isEnabled {
-                log.debug("Enabled hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+                log.debug("Enabled hotkey \(identifier)")
             } else {
-                log.debug("Disabled hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+                log.debug("Disabled hotkey \(identifier)")
             }
             handleRegistration()
         }
@@ -191,7 +207,14 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     }
 
     var keyChar: String {
-        (Sauce.shared.character(for: Sauce.shared.keyCode(for: key).i, carbonModifiers: 0) ?? "").uppercased()
+        mainThread {
+            (
+                Sauce.shared.character(
+                    for: Sauce.shared.keyCode(for: key).i,
+                    carbonModifiers: 0
+                ) ?? ""
+            ).uppercased()
+        }
     }
 
     var keyCode: Int {
@@ -231,12 +254,12 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable {
     }
 
     func unregister() {
-        log.debug("Unregistered hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+        log.debug("Unregistered hotkey \(identifier)")
         hotkey.unregister()
     }
 
     func register() {
-        log.debug("Registered hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+        log.debug("Registered hotkey \(identifier)")
         hotkey.register()
     }
 
