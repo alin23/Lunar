@@ -810,6 +810,7 @@ enum ValueType {
 
     var slowRead = false
     var slowWrite = false
+    var macMiniHDMI = false
 
     var alternativeControlForCoreDisplay: Control? = nil {
         didSet {
