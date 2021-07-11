@@ -171,6 +171,13 @@ class DisplayController {
         guard let display = displays.values.first(where: { $0.serial == serial }) else { return }
         displays.removeValue(forKey: display.id)
         CachedDefaults[.displays] = displays.values.map { $0 }
+        CachedDefaults[.hotkeys] = CachedDefaults[.hotkeys].filter { hk in
+            if display.hotkeyIdentifiers.contains(hk.identifier) {
+                hk.unregister()
+                return false
+            }
+            return true
+        }
     }
 
     static func getAdaptiveMode() -> AdaptiveMode {

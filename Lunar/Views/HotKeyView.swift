@@ -56,12 +56,14 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
         log.debug("Begin hotkey recording: \(hotkey?.identifier ?? "")")
+        PersistentHotkey.isRecording = true
         transition()
         return true
     }
 
     func recordView(_: RecordView, canRecordKeyCombo combo: KeyCombo) -> Bool {
         log.debug("Can record combo: \(combo.QWERTYKeyCode) doubledMod: \(combo.doubledModifiers)")
+        PersistentHotkey.isRecording = true
         if combo.QWERTYKeyCode == Key.space.QWERTYKeyCode {
             return false
         }
@@ -70,6 +72,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     func recordViewDidEndRecording(_: RecordView) {
         log.debug("End hotkey recording: \(hotkey?.identifier ?? "")")
+        PersistentHotkey.isRecording = false
         transition()
     }
 
@@ -85,6 +88,17 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
             return
         }
+
+        if let oldHotkey = CachedDefaults[.hotkeys].first(where: {
+            $0.identifier != hotkey.identifier &&
+                $0.keyCombo == hotkey.keyCombo &&
+                $0.modifiers == hotkey.modifiers
+        }) {
+            log.info("Found another hotkey with the same combo, removing it: \(oldHotkey.identifier)")
+            oldHotkey.unregister()
+            CachedDefaults[.hotkeys] = CachedDefaults[.hotkeys].filter { $0.identifier != oldHotkey.identifier }
+        }
+
         if let target = hotkey.target, let action = hotkey.action {
             hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action, actionQueue: .main)
         } else {

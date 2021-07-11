@@ -457,9 +457,9 @@ enum DDC {
             let writeStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                let result = DDCWriteM1(avService, &command)
+                let result = DDCWriteM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
             #else
-                let result = DDCWrite(fb, &command)
+                let result = DDCWrite(fb, &command, CachedDefaults[.ddcSleepFactor].rawValue)
             #endif
 
             let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
@@ -582,9 +582,9 @@ enum DDC {
             let readStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                DDCReadM1(avService, &command)
+                DDCReadM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
             #else
-                DDCRead(fb, &command, ddcDelay)
+                DDCRead(fb, &command, ddcDelay, CachedDefaults[.ddcSleepFactor].rawValue)
             #endif
 
             let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
@@ -632,7 +632,7 @@ enum DDC {
             #if arch(arm64)
                 EDIDTestM1(avService, &edid, &edidData)
             #else
-                EDIDTest(fb, &edid, &edidData)
+                EDIDTest(fb, &edid, &edidData, CachedDefaults[.ddcSleepFactor].rawValue)
             #endif
 
             return (edid, Data(bytes: &edidData, count: 256))

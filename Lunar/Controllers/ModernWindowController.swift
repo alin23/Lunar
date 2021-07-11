@@ -81,7 +81,6 @@ class ModernWindowController: NSWindowController {
     func initPopovers() {
         guard let w = window, w.title == "Settings" else { return }
         initPopover("help", identifier: "HelpPopoverController", controllerType: HelpPopoverController.self)
-        initPopover("hotkey", identifier: "HotkeyPopoverController", controllerType: HotkeyPopoverController.self, appearance: .vibrantDark)
         initPopover("settings", identifier: "SettingsPopoverController", controllerType: SettingsPopoverController.self)
     }
 

@@ -85,9 +85,13 @@ enum OSDImage: Int64 {
     case muted = 4
 }
 
+var HOTKEY_HANDLERS = [String: (HotKey) -> Void](minimumCapacity: 10)
+
 class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
+    @Atomic static var isRecording = false
+
     var description: String {
-        "\(identifier)[\(hotkeyString)]"
+        "<PersistentHotkey \(identifier)[\(hotkeyString)]>"
     }
 
     var hotkeyString: String {
@@ -107,8 +111,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     var hotkey: HotKey {
         didSet {
-            log.debug("Reset hotkey with handler \(identifier)")
-            oldValue.unregister()
+            log.debug("Reset hotkey \(identifier) with [handler: \(handler), action: \(action)]")
+            HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
             handleRegistration(persist: true)
             if HotkeyIdentifier(rawValue: identifier) != nil {
                 appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
@@ -124,14 +128,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         hasher.combine(identifier)
     }
 
-    func with(target: AnyObject, action: Selector) -> PersistentHotkey {
-        hotkey = Magnet.HotKey(
-            identifier: identifier,
-            keyCombo: keyCombo,
-            target: target,
-            action: action,
-            actionQueue: .main
-        )
+    func with(handler: @escaping ((HotKey) -> Void)) -> PersistentHotkey {
+        HOTKEY_HANDLERS[identifier] = handler
         return self
     }
 
@@ -175,19 +173,30 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         hotkey = Magnet.HotKey(
             identifier: identifier,
             keyCombo: keyCombo,
-            target: appDelegate,
-            action: #selector(AppDelegate.doNothing),
-            actionQueue: .main
+            actionQueue: .main,
+            handler: { hk in
+                #if DEBUG
+                    log.verbose("Pressed hotkey \(hk.identifier)")
+                #endif
+                guard let handler = HOTKEY_HANDLERS[hk.identifier] else {
+                    if PersistentHotkey.isRecording {
+                        log.info("We're in the handler of another hotkey with the same combo, removing it: \(hk.identifier)")
+                        HotKeyCenter.shared.unregisterHotKey(with: hk.identifier)
+                        CachedDefaults[.hotkeys] = CachedDefaults[.hotkeys].filter { $0.identifier != hk.identifier }
+                    }
+                    return
+                }
+                handler(hk)
+            }
         )
         isEnabled = enabled == 1
     }
 
     deinit {
-//        #if DEBUG
-//            log.verbose("START DEINIT")
-//            defer { log.verbose("END DEINIT") }
-//        #endif
-//        log.debug("deinit hotkey \(identifier): \(keyCombo.keyEquivalentModifierMaskString) \(keyCombo.keyEquivalent)")
+        #if DEBUG
+            log.verbose("START DEINIT: \(identifier)")
+            defer { log.verbose("END DEINIT: \(identifier)") }
+        #endif
 //        hotkey.unregister()
     }
 
@@ -255,7 +264,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     func unregister() {
         log.debug("Unregistered hotkey \(identifier)")
-        hotkey.unregister()
+        HotKeyCenter.shared.unregisterHotKey(with: hotkey.identifier)
+//        hotkey.unregister()
     }
 
     func register() {
@@ -265,9 +275,9 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     func handleRegistration(persist: Bool = true) {
         if isEnabled {
-            hotkey.register()
+            register()
         } else {
-            hotkey.unregister()
+            unregister()
         }
 
         if persist {
@@ -300,10 +310,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     }
 
     required convenience init(from decoder: Decoder) throws {
+        log.debug("Initializing hotkey from decoder")
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let identifier = try container.decode(String.self, forKey: .identifier)
+        log.debug("Identifier: \(identifier)")
         let enabled = try container.decode(Bool.self, forKey: .enabled)
+        log.debug("Enabled: \(enabled)")
         let modifiers = try container.decode(Int.self, forKey: .modifiers)
         let keyCode = try container.decode(Int.self, forKey: .keyCode)
 
@@ -620,42 +633,39 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil) {
-        if let enabled = brightnessKeysEnabled, enabled {
+    func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil, checkPermissions: Bool = false) {
+        if checkPermissions {
+            acquirePrivileges()
+        } else if let enabled = brightnessKeysEnabled, enabled {
             acquirePrivileges()
         } else if let enabled = volumeKeysEnabled, enabled {
             acquirePrivileges()
         }
 
-        let workItem = DispatchWorkItem(name: "startOrRestartMediaKeyTap") {
-            mediaKeyTapBrightness?.stop()
-            mediaKeyTapBrightness = nil
+        asyncNow(runLoopQueue: mediaKeyStarterQueue) {
+            asyncNow(timeout: 5.seconds, queue: concurrentQueue) {
+                mediaKeyTapBrightness?.stop()
+                mediaKeyTapBrightness = nil
 
-            mediaKeyTapAudio?.stop()
-            mediaKeyTapAudio = nil
+                mediaKeyTapAudio?.stop()
+                mediaKeyTapAudio = nil
 
-            if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
-                mediaKeyTapBrightness = MediaKeyTap(
-                    delegate: self,
-                    for: [.brightnessUp, .brightnessDown],
-                    observeBuiltIn: true
-                )
-                mediaKeyTapBrightness?.start(tries: 0)
+                if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
+                    mediaKeyTapBrightness = MediaKeyTap(
+                        delegate: self,
+                        for: [.brightnessUp, .brightnessDown],
+                        observeBuiltIn: true
+                    )
+                    mediaKeyTapBrightness?.start(tries: 0)
+                }
+
+                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
+                   !audioDevice.canSetVirtualMasterVolume(scope: .output)
+                {
+                    mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
+                    mediaKeyTapAudio?.start(tries: 0)
+                }
             }
-
-            if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
-               !audioDevice.canSetVirtualMasterVolume(scope: .output)
-            {
-                mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
-                mediaKeyTapAudio?.start(tries: 0)
-            }
-        }
-        concurrentQueue.async(execute: workItem.workItem)
-        switch workItem.wait(for: 5) {
-        case .timedOut:
-            workItem.cancel()
-        default:
-            return
         }
     }
 
@@ -1056,5 +1066,9 @@ extension AppDelegate: MediaKeyTapDelegate {
         volumeDownAction(offset: 1)
     }
 
-    @objc func doNothing() {}
+    @objc func doNothing() {
+        #if DEBUG
+            log.debug("Doing precisely nothing.")
+        #endif
+    }
 }

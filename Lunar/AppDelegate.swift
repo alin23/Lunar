@@ -35,6 +35,7 @@ private let kAppleInterfaceStyle = "AppleInterfaceStyle"
 private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .utility)
+let mediaKeyStarterQueue = RunloopQueue(named: "fyi.lunar.mediaKeyStarter.queue")
 let debounceQueue = RunloopQueue(named: "fyi.lunar.debounce.queue")
 let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
 let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
@@ -158,7 +159,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         CachedDefaults[.hotkeys] = hotkeys
         setKeyEquivalents(hotkeys)
-        startOrRestartMediaKeyTap()
+        startOrRestartMediaKeyTap(checkPermissions: true)
     }
 
     func listenForAdaptiveModeChange() {
@@ -608,6 +609,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        if !CommandLine.arguments.contains("@") {
+            log.initLogger()
+        }
+
         initCache()
         contrastCurveFactor = CachedDefaults[.contrastCurveFactor] > 0 ? CachedDefaults[.contrastCurveFactor] : 1
         CachedDefaults[.contrastCurveFactor] = contrastCurveFactor
@@ -653,8 +658,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         if let idx = CommandLine.arguments.firstIndex(of: "@") {
-            log.initLogger(cli: true)
             asyncNow {
+                log.initLogger(cli: true)
                 Lunar.main(Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count]))
             }
             return
@@ -663,7 +668,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let nc = UNUserNotificationCenter.current()
         nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
 
-        log.initLogger()
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
         ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
@@ -699,7 +703,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
-            startOrRestartMediaKeyTap()
+            startOrRestartMediaKeyTap(checkPermissions: true)
         } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
             acquirePrivileges(
                 notificationTitle: "Lunar can now watch for app exceptions",
@@ -734,7 +738,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initLicensing()
         NetworkControl.setup()
         if thisIsFirstRun || TEST_MODE {
-            showWindow()
+            // showWindow()
         }
 
         if TEST_MODE {
