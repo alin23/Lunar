@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
-		C701A23C2546BA41004747B5 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23B2546BA41004747B5 /* Magnet */; };
 		C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23E2546C8BF004747B5 /* MediaKeyTap */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
 		C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DAE2440DBB0002289E5 /* Alamofire */; };
@@ -67,6 +66,7 @@
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C772BDD625E7A296006A1684 /* NetworkControl.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
+		C77AB65C269A032E0046BA78 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C77AB65B269A032E0046BA78 /* Magnet */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
@@ -371,6 +371,7 @@
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
 				C75BFE962695FAE9005EADCA /* SwiftyMarkdown in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
+				C77AB65C269A032E0046BA78 /* Magnet in Frameworks */,
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
 				C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */,
@@ -381,7 +382,6 @@
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C7BADA0A26386E940058974C /* ZIPFoundation in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
-				C701A23C2546BA41004747B5 /* Magnet in Frameworks */,
 				C78BD047259B30CA00FC823F /* EonilFSEvents in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
@@ -791,7 +791,6 @@
 				C73CC69E24615E9D003B2658 /* Sentry */,
 				C73CC6A4246161E6003B2658 /* Charts */,
 				C73CC6AD24616462003B2658 /* Sauce */,
-				C701A23B2546BA41004747B5 /* Magnet */,
 				C701A23E2546C8BF004747B5 /* MediaKeyTap */,
 				C7B5E8582548B3F900530B47 /* Defaults */,
 				C7B5E85C2548B5AC00530B47 /* AnyCodable */,
@@ -811,6 +810,7 @@
 				C75FFA09266D24AA0034DDD6 /* Burritos */,
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
 				C75BFE952695FAE9005EADCA /* SwiftyMarkdown */,
+				C77AB65B269A032E0046BA78 /* Magnet */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -856,7 +856,6 @@
 				C73CC69D24615E9D003B2658 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */,
 				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
-				C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */,
 				C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */,
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
 				C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */,
@@ -876,6 +875,7 @@
 				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
 				C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
+				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1176,7 +1176,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.5.5;
+				CURRENT_PROJECT_VERSION = 4.5.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1202,7 +1202,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.5.5;
+				MARKETING_VERSION = 4.5.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1288,7 +1288,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.5.5;
+				CURRENT_PROJECT_VERSION = 4.5.4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1314,7 +1314,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.5.5;
+				MARKETING_VERSION = 4.5.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1461,7 +1461,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.5.5;
+				CURRENT_PROJECT_VERSION = 4.5.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1487,7 +1487,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.5.5;
+				MARKETING_VERSION = 4.5.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1519,7 +1519,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.5.5;
+				CURRENT_PROJECT_VERSION = 4.5.4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1545,7 +1545,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.5.5;
+				MARKETING_VERSION = 4.5.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1590,14 +1590,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Clipy/Magnet";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/MediaKeyTap";
@@ -1726,6 +1718,14 @@
 				kind = branch;
 			};
 		};
+		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/Magnet";
+			requirement = {
+				branch = dev;
+				kind = branch;
+			};
+		};
 		C78BD045259B30CA00FC823F /* XCRemoteSwiftPackageReference "FSEvents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/eonil/FSEvents";
@@ -1825,11 +1825,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C701A23B2546BA41004747B5 /* Magnet */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C701A23A2546BA41004747B5 /* XCRemoteSwiftPackageReference "Magnet" */;
-			productName = Magnet;
-		};
 		C701A23E2546C8BF004747B5 /* MediaKeyTap */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */;
@@ -1909,6 +1904,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */;
 			productName = Burritos;
+		};
+		C77AB65B269A032E0046BA78 /* Magnet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */;
+			productName = Magnet;
 		};
 		C78BD046259B30CA00FC823F /* EonilFSEvents */ = {
 			isa = XCSwiftPackageProductDependency;

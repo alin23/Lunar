@@ -28,7 +28,7 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-        // return id == GENERIC_DISPLAY_ID
+//         return id == GENERIC_DISPLAY_ID
         return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
@@ -77,7 +77,14 @@ class DispatchWorkItem {
         #endif
 
         if timeout > 0 {
-            return workItem.wait(timeout: DispatchTime.now() + timeout)
+            let result = workItem.wait(timeout: DispatchTime.now() + timeout)
+            if result == .timedOut {
+                workItem.cancel()
+                #if DEBUG
+                    log.verbose("Timed out after \(timeout) seconds on \(name)")
+                #endif
+            }
+            return result
         } else {
             workItem.wait()
             return .success
@@ -397,6 +404,11 @@ func mainThreadSerial<T>(_ action: () -> T) -> T {
 func mainThread(_ action: () -> Void) {
     if Thread.isMainThread {
         action()
+        // } else if let label = DispatchQueue.currentQueueLabel, label == "Dictionary Barrier Queue" {
+        //     #if DEBUG
+        //         log.error("POSSIBLE DEADLOCK ON MAIN THREAD")
+        //     #endif
+        //     action()
     } else if mainThreadLocked.load(ordering: .relaxed) {
         #if DEBUG
             log.error("DEADLOCK ON MAIN THREAD")
@@ -413,6 +425,11 @@ func mainThread(_ action: () -> Void) {
 func mainThread<T>(_ action: () -> T) -> T {
     if Thread.isMainThread {
         return action()
+        // } else if let label = DispatchQueue.currentQueueLabel, label == "Dictionary Barrier Queue" {
+        //     #if DEBUG
+        //         log.error("POSSIBLE DEADLOCK ON MAIN THREAD")
+        //     #endif
+        //     return action()
     } else if mainThreadLocked.load(ordering: .relaxed) {
         #if DEBUG
             log.error("DEADLOCK ON MAIN THREAD")
@@ -601,7 +618,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
         return .success
     }
 
-    let task = DispatchWorkItem(name: "async(\(queue.label)") {
+    let task = DispatchWorkItem(name: "async(\(queue.label))") {
         action()
     }
     queue.async(execute: task.workItem)

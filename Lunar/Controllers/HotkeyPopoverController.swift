@@ -9,6 +9,7 @@
 import Cocoa
 import Defaults
 import Foundation
+import Magnet
 
 class HotkeyPopoverController: NSViewController {
     @IBOutlet var hotkeyLabel1: NSBox!
@@ -41,41 +42,209 @@ class HotkeyPopoverController: NSViewController {
     var onDropdownSelect: ((NSPopUpButton) -> Void)?
     weak var display: Display?
 
+    var hotkey1: PersistentHotkey?
+    var hotkey2: PersistentHotkey?
+    var hotkey3: PersistentHotkey?
+
+    @objc func handler1() {
+        // #if DEBUG
+        //     log.verbose("TRYING CHANGE TO INPUT 1 ON DISPLAY \(display)")
+        // #endif
+        guard let display = display, display.hotkeyInput1.uint8Value != InputSource.unknown.rawValue else { return }
+
+        let inputBrightness = display.brightnessOnInputChange1
+        let inputContrast = display.contrastOnInputChange1
+
+        // #if DEBUG
+        //     log.verbose("CHANGING TO INPUT 1 ON DISPLAY \(display)")
+        //     return
+        // #endif
+
+        display.withoutSmoothTransition {
+            display.withoutDDC {
+                display.brightness = inputBrightness
+                display.contrast = inputContrast
+            }
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
+            display.input = display.hotkeyInput1
+        }
+    }
+
+    @objc func handler2() {
+        // #if DEBUG
+        //     log.verbose("TRYING CHANGE TO INPUT 2 ON DISPLAY \(display)")
+        // #endif
+        guard let display = display, display.hotkeyInput2.uint8Value != InputSource.unknown.rawValue else { return }
+
+        let inputBrightness = display.brightnessOnInputChange2
+        let inputContrast = display.contrastOnInputChange2
+
+        // #if DEBUG
+        //     log.verbose("CHANGING TO INPUT 2 ON DISPLAY \(display)")
+        //     return
+        // #endif
+
+        display.withoutSmoothTransition {
+            display.withoutDDC {
+                display.brightness = inputBrightness
+                display.contrast = inputContrast
+            }
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
+            display.input = display.hotkeyInput2
+        }
+    }
+
+    @objc func handler3() {
+        // #if DEBUG
+        //     log.verbose("TRYING CHANGE TO INPUT 3 ON DISPLAY \(display)")
+        // #endif
+        guard let display = display, display.hotkeyInput3.uint8Value != InputSource.unknown.rawValue else { return }
+
+        let inputBrightness = display.brightnessOnInputChange3
+        let inputContrast = display.contrastOnInputChange3
+
+        // #if DEBUG
+        //     log.verbose("CHANGING TO INPUT 3 ON DISPLAY \(display)")
+        //     return
+        // #endif
+
+        display.withoutSmoothTransition {
+            display.withoutDDC {
+                display.brightness = inputBrightness
+                display.contrast = inputContrast
+            }
+            _ = display.control?.setBrightness(inputBrightness.uint8Value, oldValue: nil)
+            _ = display.control?.setContrast(inputContrast.uint8Value, oldValue: nil)
+            display.input = display.hotkeyInput3
+        }
+    }
+
     func setup(from display: Display) {
+        #if DEBUG
+            log.info("Trying to setup \(self) from \(display)")
+        #endif
         self.display = display
 
-        scrollableBrightnessField1.integerValue = display.brightnessOnInputChange1.intValue
-        scrollableContrastField1.integerValue = display.contrastOnInputChange1.intValue
-        scrollableBrightnessField1.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.brightnessOnInputChange1 = value.ns
-        }
-        scrollableContrastField1.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.contrastOnInputChange1 = value.ns
+        mainThread {
+            scrollableBrightnessField1?.integerValue = display.brightnessOnInputChange1.intValue
+            scrollableContrastField1?.integerValue = display.contrastOnInputChange1.intValue
+            scrollableBrightnessField1?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.brightnessOnInputChange1 = value.ns
+            }
+            scrollableContrastField1?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.contrastOnInputChange1 = value.ns
+            }
+
+            scrollableBrightnessField2?.integerValue = display.brightnessOnInputChange2.intValue
+            scrollableContrastField2?.integerValue = display.contrastOnInputChange2.intValue
+            scrollableBrightnessField2?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.brightnessOnInputChange2 = value.ns
+            }
+            scrollableContrastField2?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.contrastOnInputChange2 = value.ns
+            }
+
+            scrollableBrightnessField3?.integerValue = display.brightnessOnInputChange3.intValue
+            scrollableContrastField3?.integerValue = display.contrastOnInputChange3.intValue
+            scrollableBrightnessField3?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.brightnessOnInputChange3 = value.ns
+            }
+            scrollableContrastField3?.onValueChanged = { [weak self] value in
+                guard let self = self else { return }
+                self.display?.contrastOnInputChange3 = value.ns
+            }
+
+            hotkeyLabel1?.title = "Input Hotkey 1 for \(display.name)"
+            hotkeyLabel2?.title = "Input Hotkey 2 for \(display.name)"
+            hotkeyLabel3?.title = "Input Hotkey 3 for \(display.name)"
         }
 
-        scrollableBrightnessField2.integerValue = display.brightnessOnInputChange2.intValue
-        scrollableContrastField2.integerValue = display.contrastOnInputChange2.intValue
-        scrollableBrightnessField2.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.brightnessOnInputChange2 = value.ns
-        }
-        scrollableContrastField2.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.contrastOnInputChange2 = value.ns
+        let identifier1 = display.hotkeyIdentifiers[0]
+        log.debug("Setting identifier for \(display): \(identifier1)")
+
+        hotkey1 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier1 })?
+            .with(handler: { [weak self] _ in self?.handler1() }) ??
+            PersistentHotkey(
+                hotkey: Magnet.HotKey(
+                    identifier: identifier1,
+                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    target: self,
+                    action: #selector(HotkeyPopoverController.handler1),
+                    actionQueue: .main
+                ),
+                isEnabled: false
+            )
+        hotkey1?.handleRegistration(persist: false)
+        mainThread {
+            if let hotkeyView = hotkeyView1 {
+                hotkeyView.hotkey = hotkey1
+                hotkeyView.endRecording()
+            }
         }
 
-        scrollableBrightnessField3.integerValue = display.brightnessOnInputChange3.intValue
-        scrollableContrastField3.integerValue = display.contrastOnInputChange3.intValue
-        scrollableBrightnessField3.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.brightnessOnInputChange3 = value.ns
+        let identifier2 = display.hotkeyIdentifiers[1]
+        log.debug("Setting identifier for \(display): \(identifier2)")
+
+        hotkey2 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier2 })?
+            .with(handler: { [weak self] _ in self?.handler2() }) ??
+            PersistentHotkey(
+                hotkey: Magnet.HotKey(
+                    identifier: identifier2,
+                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    target: self,
+                    action: #selector(HotkeyPopoverController.handler2),
+                    actionQueue: .main
+                ),
+                isEnabled: false
+            )
+        hotkey2?.handleRegistration(persist: false)
+
+        mainThread {
+            if let hotkeyView = hotkeyView2 {
+                hotkeyView.hotkey = hotkey2
+                hotkeyView.endRecording()
+            }
         }
-        scrollableContrastField3.onValueChanged = { [weak self] value in
-            guard let self = self else { return }
-            self.display?.contrastOnInputChange3 = value.ns
+        let identifier3 = display.hotkeyIdentifiers[2]
+        log.debug("Setting identifier for \(display): \(identifier3)")
+
+        hotkey3 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier3 })?
+            .with(handler: { [weak self] _ in self?.handler3() }) ??
+            PersistentHotkey(
+                hotkey: Magnet.HotKey(
+                    identifier: identifier3,
+                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    target: self,
+                    action: #selector(HotkeyPopoverController.handler3),
+                    actionQueue: .main
+                ),
+                isEnabled: false
+            )
+        hotkey3?.handleRegistration(persist: false)
+        mainThread {
+            if let hotkeyView = hotkeyView3 {
+                hotkeyView.hotkey = hotkey3
+                hotkeyView.endRecording()
+            }
         }
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT: \(display?.description ?? "no display")")
+            do { log.verbose("END DEINIT: \(display?.description ?? "no display")") }
+        #endif
+
+        hotkey1?.unregister()
+        hotkey2?.unregister()
+        hotkey3?.unregister()
     }
 
     override func viewDidLoad() {
@@ -119,6 +288,10 @@ class HotkeyPopoverController: NSViewController {
             field!.textFieldColorHover = scrollableTextFieldColorHoverOnBlack
             field!.textFieldColorLight = scrollableTextFieldColorLightOnBlack
             field!.caption!.textColor = scrollableCaptionColorOnBlack
+        }
+
+        if let display = display {
+            setup(from: display)
         }
 
         super.viewDidLoad()

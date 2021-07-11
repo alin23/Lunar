@@ -212,7 +212,7 @@ class DisplayViewController: NSViewController {
 
     @discardableResult
     func initHotkeys() -> Bool {
-        guard let button = inputDropdownHotkeyButton, let display = display, button.popoverController != nil
+        guard let button = inputDropdownHotkeyButton, let display = display, display.hotkeyPopoverController != nil
         else {
             if let button = inputDropdownHotkeyButton {
                 button.onClick = { [weak self] in
@@ -427,6 +427,12 @@ class DisplayViewController: NSViewController {
         if let input = InputSource(rawValue: display.input.uint8Value) {
             inputDropdown?.selectItem(withTag: input.rawValue.i)
         }
+        display.$input.sink { [weak self] displayInput in
+            if let dropdown = self?.inputDropdown, let input = InputSource(rawValue: displayInput.uint8Value) {
+                dropdown.selectItem(withTag: input.rawValue.i)
+            }
+        }.store(in: &displayObservers, for: "input")
+
         initHotkeys()
         setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
         refreshView()
@@ -1089,13 +1095,5 @@ class DisplayViewController: NSViewController {
         } else {
             setIsHidden(true)
         }
-
-        // upHotkey = Magnet.HotKey(identifier: "LocationMode Demo", keyCombo: KeyCombo(key: .d, cocoaModifiers: [.option])!) { _ in
-        //     log.debug("DEMO TIME!!")
-        //     async(threaded: true) {
-        //         self.demo()
-        //     }
-        // }
-        // upHotkey?.register()
     }
 }
