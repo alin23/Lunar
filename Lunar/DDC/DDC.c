@@ -342,7 +342,7 @@ dispatch_semaphore_t AVServiceI2CQueue(IOAVServiceRef i2c_device_id)
     return queue;
 }
 
-bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
+bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request, uint8_t sleepFactor)
 {
     dispatch_semaphore_t queue = I2CRequestQueue(framebuffer);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
@@ -366,12 +366,12 @@ bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
         }
     }
     if (request->replyTransactionType == kIOI2CNoTransactionType)
-        usleep(20000);
+        usleep(20000 * (sleepFactor + 1));
     dispatch_semaphore_signal(queue);
     return result && request->result == KERN_SUCCESS;
 }
 
-bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write)
+bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write, uint8_t sleepFactor)
 {
     dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
@@ -394,7 +394,7 @@ bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write)
         return false;
     }
 
-    usleep(12000);
+    usleep(12000 * (sleepFactor + 1));
 
     // Retry just in case
     err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
@@ -408,7 +408,7 @@ bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write)
     return true;
 }
 
-bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
+bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write, uint8_t sleepFactor)
 {
     IOI2CRequest request;
     UInt8 data[256];
@@ -433,11 +433,11 @@ bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
     request.replyTransactionType = kIOI2CNoTransactionType;
     request.replyBytes = 0;
 
-    bool result = FramebufferI2CRequest(framebuffer, &request);
+    bool result = FramebufferI2CRequest(framebuffer, &request, sleepFactor);
     return result;
 }
 
-bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
+bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read, uint8_t sleepFactor)
 {
     dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
@@ -461,7 +461,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
         dispatch_semaphore_signal(queue);
         return false;
     }
-    usleep(32000);
+    usleep(32000 * (sleepFactor + 1));
 
     data[0] = 0x82;
     data[1] = 0x01;
@@ -472,7 +472,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
         bzero(&reply_data, sizeof(reply_data));
 
         err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 4);
-        usleep(5000);
+        usleep(5000 * (sleepFactor + 1));
         if (err) {
             read->success = false;
             read->max_value = 0;
@@ -518,7 +518,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
             dispatch_semaphore_signal(queue);
             return false;
         }
-        usleep(40000);
+        usleep(40000 * (sleepFactor + 1));
     }
     read->success = true;
     read->max_value = reply_data[7];
@@ -527,7 +527,7 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read)
     return result;
 }
 
-bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinReplyDelay)
+bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinReplyDelay, uint8_t sleepFactor)
 {
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
@@ -562,7 +562,7 @@ bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinR
         request.replyBuffer = (vm_address_t)reply_data;
         request.replyBytes = sizeof(reply_data);
 
-        result = FramebufferI2CRequest(framebuffer, &request);
+        result = FramebufferI2CRequest(framebuffer, &request, sleepFactor);
         result = (result && reply_data[0] == request.sendAddress && reply_data[2] == 0x2 && reply_data[4] == read->control_id && reply_data[10] == (request.replyAddress ^ request.replySubAddress ^ reply_data[1] ^ reply_data[2] ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
 
         if (result) { // checksum is ok
@@ -584,7 +584,7 @@ bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinR
             return 0;
         }
 
-        usleep(40000); // 40msec -> See DDC/CI Vesa Standard - 4.4.1 Communication Error Recovery
+        usleep(40000 * (sleepFactor + 1)); // 40msec -> See DDC/CI Vesa Standard - 4.4.1 Communication Error Recovery
     }
     read->success = true;
     read->max_value = reply_data[7];
@@ -749,7 +749,7 @@ bool EDIDTestM1(IOAVServiceRef avService, struct EDID* edid, uint8_t edidData[25
     return !sum;
 }
 
-bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256])
+bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256], uint8_t sleepFactor)
 {
     IOI2CRequest request = {};
     /*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
@@ -794,7 +794,7 @@ bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256]
     request.replyTransactionType = kIOI2CSimpleTransactionType;
     request.replyBuffer = (vm_address_t)data;
     request.replyBytes = sizeof(data);
-    if (!FramebufferI2CRequest(framebuffer, &request))
+    if (!FramebufferI2CRequest(framebuffer, &request, sleepFactor))
         return false;
     if (edid) {
         memcpy(edid, &data, 256);

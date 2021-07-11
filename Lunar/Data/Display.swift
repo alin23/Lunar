@@ -15,6 +15,7 @@ import CoreGraphics
 import DataCompression
 import Defaults
 import Foundation
+import Magnet
 import OSLog
 import Sentry
 import Surge
@@ -204,6 +205,28 @@ enum ValueType {
         }
         return serial == other.serial
     }
+
+    lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
+    lazy var hotkeyPopoverController: HotkeyPopoverController? = {
+        mainThread {
+            guard let popover = _hotkeyPopover else {
+                _hotkeyPopover = NSPopover()
+                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
+                   let controller = stb.instantiateController(
+                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
+                   ) as? HotkeyPopoverController
+                {
+                    POPOVERS[serial] = _hotkeyPopover
+                    popover.contentViewController = controller
+                    popover.contentViewController!.loadView()
+                    popover.appearance = NSAppearance(named: .vibrantDark)
+                }
+
+                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
+            }
+            return popover.contentViewController as? HotkeyPopoverController
+        }
+    }()
 
     // MARK: Stored Properties
 
@@ -594,6 +617,25 @@ enum ValueType {
         didSet {
             if active {
                 startControls()
+                if let controller = hotkeyPopoverController {
+                    #if DEBUG
+                        log.info("Display \(description) is now active, enabling hotkeys")
+                    #endif
+                    // if controller.display == nil || controller.display!.serial != serial {
+                    controller.setup(from: self)
+                    // }
+                    if let h = controller.hotkey1, h.isEnabled { h.register() }
+                    if let h = controller.hotkey2, h.isEnabled { h.register() }
+                    if let h = controller.hotkey3, h.isEnabled { h.register() }
+                }
+            } else if let controller = hotkeyPopoverController {
+                #if DEBUG
+                    log.info("Display \(description) is now inactive, disabling hotkeys")
+                #endif
+
+                controller.hotkey1?.unregister()
+                controller.hotkey2?.unregister()
+                controller.hotkey3?.unregister()
             }
 
             save()
@@ -613,18 +655,6 @@ enum ValueType {
     }
 
     @Published @objc dynamic var activeAndResponsive: Bool = false
-
-    // var i2cController: io_service_t? = nil {
-    //     didSet {
-    //         hasI2C = i2cController != nil || avService != nil
-    //     }
-    // }
-
-    // var avService: IOAVService? = nil {
-    //     didSet {
-    //         hasI2C = i2cController != nil || avService != nil
-    //     }
-    // }
 
     @Published @objc dynamic var hasI2C: Bool = true {
         didSet {
@@ -1089,6 +1119,8 @@ enum ValueType {
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
+
+        setupHotkeys()
     }
 
     func startControls() {
@@ -1161,10 +1193,10 @@ enum ValueType {
         #if DEBUG
             #if arch(arm64)
                 // avService = (id == TEST_DISPLAY_ID) ? (1 as IOAVService) : DDC.AVService(displayID: id, display: self)
-                hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
+                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
             #else
                 // i2cController = (id == TEST_DISPLAY_ID) ? 1 : DDC.I2CController(displayID: id)
-                hasI2C = (id == TEST_DISPLAY_ID) ? true : DDC.hasI2CController(displayID: id, ignoreCache: true)
+                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC.hasI2CController(displayID: id, ignoreCache: true)
             #endif
         #else
             #if arch(arm64)
@@ -1312,6 +1344,21 @@ enum ValueType {
         }
 
         startControls()
+        setupHotkeys()
+    }
+
+    func setupHotkeys() {
+        #if DEBUG
+            log.info("Trying to setup hotkeys for \(description)")
+        #endif
+        guard active else { return }
+
+        if let controller = hotkeyPopoverController {
+            controller.setup(from: self)
+            log.info("Initialized hotkeyPopoverController for \(description)")
+        } else {
+            log.info("Error initializing hotkeyPopoverController for \(description)")
+        }
     }
 
     static func fromDictionary(_ config: [String: Any]) -> Display? {
@@ -1609,7 +1656,7 @@ enum ValueType {
     }
 
     func encode(to encoder: Encoder) throws {
-        try displayEncodingLock.aroundThrows {
+        try displayEncodingLock.aroundThrows(ignoreMainThread: true) {
             var container = encoder.container(keyedBy: CodingKeys.self)
             var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
             var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
@@ -1921,8 +1968,28 @@ enum ValueType {
         }
     }
 
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT: \(description)")
+            log.verbose("popover: \(_hotkeyPopover)")
+            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
+            do { log.verbose("END DEINIT: \(description)") }
+        #endif
+    }
+
+    lazy var hotkeyIdentifiers = [
+        "toggle-last-input-\(serial)",
+        "toggle-last-input2-\(serial)",
+        "toggle-last-input3-\(serial)",
+    ]
+
     func refreshInput() {
-        guard !isTestID(id) else { return }
+        let hotkeys = CachedDefaults[.hotkeys]
+        let hotkeyInputEnabled = hotkeyIdentifiers.compactMap { identifier in
+            hotkeys.first { $0.identifier == identifier }
+        }.first { $0.isEnabled }?.isEnabled ?? false
+
+        guard !isTestID(id), !hotkeyInputEnabled else { return }
         guard let newInput = readInput() else {
             log.warning("Can't read input for \(name)")
             return

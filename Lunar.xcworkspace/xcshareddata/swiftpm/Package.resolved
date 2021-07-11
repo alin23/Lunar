@@ -102,10 +102,10 @@
       },
       {
         "package": "Magnet",
-        "repositoryURL": "https://github.com/Clipy/Magnet",
+        "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
-          "branch": "master",
-          "revision": "e719b5cae545a43e2965a3fbbdd42485c3a3abcb",
+          "branch": "dev",
+          "revision": "d876bb6f7661e81450aeb66432b1c0daa80b222c",
           "version": null
         }
       },

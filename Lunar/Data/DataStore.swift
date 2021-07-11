@@ -55,7 +55,14 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeKeysEnabled,
     .volumeStep,
     .reapplyValuesAfterWake,
+    .ddcSleepFactor,
 ]
+
+enum DDCSleepFactor: UInt8, DefaultsSerializable {
+    case short = 0
+    case medium = 1
+    case long = 2
+}
 
 let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
     .appExceptions,
@@ -293,7 +300,7 @@ extension AnyCodable: Defaults.Serializable {}
 
 class ThreadSafeDictionary<V: Hashable, T>: Collection {
     private var dictionary: [V: T]
-    private let accessQueue = DispatchQueue(
+    let accessQueue = DispatchQueue(
         label: "Dictionary Barrier Queue",
         attributes: .concurrent
     )
@@ -460,6 +467,7 @@ func initCache() {
     cacheKey(.contrastStep)
     cacheKey(.volumeStep)
     cacheKey(.syncPollingSeconds)
+    cacheKey(.ddcSleepFactor)
     cacheKey(.sensorPollingSeconds)
     cacheKey(.adaptiveBrightnessMode)
     cacheKey(.nonManualMode)
@@ -518,6 +526,7 @@ extension Defaults.Keys {
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 2)
+    static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)

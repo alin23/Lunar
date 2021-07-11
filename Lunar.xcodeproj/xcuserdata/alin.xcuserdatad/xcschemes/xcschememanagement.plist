@@ -38,12 +38,12 @@
 		<key>Lunar Test Mode.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>5</integer>
 		</dict>
 		<key>Lunar.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<key>LunarPlayground (Playground) 1.xcscheme</key>
 		<dict>
