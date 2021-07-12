@@ -1,0 +1,41 @@
+esphome:
+  name: lunarsensor
+  platform: ESP32
+  board: esp32dev
+
+wifi:
+  ssid: "WiFi name"
+  password: "WiFi password"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lunar Sensor Hotspot"
+    password: "lunarals23"
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: INFO
+
+# Enable Home Assistant API
+api:
+  reboot_timeout: 0s
+
+ota:
+
+sensor:
+  - platform: tsl2561
+    name: "Ambient Light"
+    address: 0x39
+    update_interval: 2s
+    gain: 16x
+
+i2c:
+  sda: 19
+  scl: 23
+  scan: False
+  id: bus_a
+
+web_server:
+  port: 80

@@ -551,10 +551,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
             task.invalidate()
         }
 
-        if let subscriberKey = subscriberKey {
-            globalObservers.removeValue(forKey: subscriberKey)
-        }
-
+        globalObservers.removeValue(forKey: subscriberKey ?? key)
         Thread.current.threadDictionary.removeObject(forKey: key)
     }
 }
@@ -1377,6 +1374,10 @@ func notify(identifier: String, title: String, body: String) {
         UNNotificationRequest(identifier: identifier, content: content, trigger: nil),
         withCompletionHandler: nil
     )
+}
+
+func removeNotifications(withIdentifiers ids: [String]) {
+    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
 }
 
 struct Window {

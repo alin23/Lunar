@@ -116,6 +116,7 @@
 		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
 		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
 		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
+		C7C43189269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */; };
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
@@ -396,6 +397,7 @@
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
+				C7C43189269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic in Frameworks */,
 				C72CFB982586B371005F0340 /* NSPageControl.framework in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
@@ -811,6 +813,7 @@
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
 				C75BFE952695FAE9005EADCA /* SwiftyMarkdown */,
 				C77AB65B269A032E0046BA78 /* Magnet */,
+				C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -876,6 +879,7 @@
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
 				C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
+				C7C43187269CBB1B00DCD0F5 /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1774,6 +1778,14 @@
 				minimumVersion = 5.2.0;
 			};
 		};
+		C7C43187269CBB1B00DCD0F5 /* XCRemoteSwiftPackageReference "swift-eventsource" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/launchdarkly/swift-eventsource";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/crossroadlabs/Regex";
@@ -1939,6 +1951,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */;
 			productName = SwiftyAttributes;
+		};
+		C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7C43187269CBB1B00DCD0F5 /* XCRemoteSwiftPackageReference "swift-eventsource" */;
+			productName = LDSwiftEventSourceStatic;
 		};
 		C7DA10F6259B8979006DD876 /* Regex */ = {
 			isa = XCSwiftPackageProductDependency;
