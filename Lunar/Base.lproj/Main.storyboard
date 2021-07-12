@@ -5129,7 +5129,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Tf-I7-BlT">
-                                <rect key="frame" x="64" y="52" width="149" height="17"/>
+                                <rect key="frame" x="65" y="52" width="149" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5138,18 +5138,18 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-3U-xyN">
-                                <rect key="frame" x="66" y="25" width="49" height="16"/>
+                                <rect key="frame" x="60" y="25" width="53" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Paused" id="UE7-F8-Nxu">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Paused" id="UE7-F8-Nxu">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjJ-hC-owe">
-                                <rect key="frame" x="165" y="25" width="54" height="16"/>
+                                <rect key="frame" x="163" y="25" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Running" id="eLZ-QT-H2b">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Running" id="eLZ-QT-H2b">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -5169,7 +5169,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wv7-Y2-jNx" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="119" y="20" width="45" height="26"/>
+                                <rect key="frame" x="117" y="20" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5315,7 +5315,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
-                                <rect key="frame" x="82" y="240" width="117" height="17"/>
+                                <rect key="frame" x="79" y="240" width="117" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5324,18 +5324,18 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
-                                <rect key="frame" x="59" y="213" width="47" height="16"/>
+                                <rect key="frame" x="59" y="213" width="52" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Target" id="tHM-5a-Ojq">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Target" id="tHM-5a-Ojq">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
-                                <rect key="frame" x="158" y="213" width="43" height="16"/>
+                                <rect key="frame" x="160" y="213" width="55" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Source" id="KKZ-a3-9z1">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Source" id="KKZ-a3-9z1">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -5355,7 +5355,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="112" y="208" width="45" height="26"/>
+                                <rect key="frame" x="115" y="208" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
