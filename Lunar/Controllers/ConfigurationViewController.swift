@@ -14,13 +14,9 @@ import Defaults
 class ConfigurationViewController: NSViewController {
     let CHART_LINK = "https://www.desmos.com/calculator/zciiqhtnov"
     let UI_NOTE_INFO = """
-    []()
-
     **Note:** Manual adjustments through the UI on the Display page of Lunar won't take these values into account.
     """
     let ADJUSTING_VALUES_INFO = """
-    []()
-
     ## Adjusting values
     Use one of the following gestures **while hovering on the value with your mouse or trackpad**
     - Scroll vertically using the mouse or trackpad
@@ -93,7 +89,6 @@ class ConfigurationViewController: NSViewController {
     A custom algorithm is used to auto-adapt the smoothing logic based on each monitor's response time.
 
     If the monitor isn't fast enough, changing the brightness/contrast may look jaggy or cause flashes.
-    []()
 
     **Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
     """

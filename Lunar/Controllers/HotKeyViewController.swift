@@ -152,7 +152,7 @@ class HotkeyViewController: NSViewController {
         handler()
         cachedFnState = Defaults[.fKeysAsFunctionKeys]
         setupFKeysNotice(asFunctionKeys: cachedFnState)
-        asyncEvery(10.seconds, uniqueTaskKey: "fkeysSettingWatcher", handler)
+        asyncEvery(10.seconds, uniqueTaskKey: F_KEYS_SETTING_WATCHER_KEY, handler)
     }
 
     deinit {
@@ -161,11 +161,11 @@ class HotkeyViewController: NSViewController {
             defer { log.verbose("END DEINIT") }
         #endif
 
-        cancelTask("fkeysSettingWatcher")
+        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
     }
 
     override func viewDidDisappear() {
-        cancelTask("fkeysSettingWatcher")
+        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -173,3 +173,5 @@ class HotkeyViewController: NSViewController {
         super.mouseDown(with: event)
     }
 }
+
+let F_KEYS_SETTING_WATCHER_KEY = "fkeysSettingWatcher"
