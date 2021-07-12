@@ -11,14 +11,29 @@ import Combine
 import Defaults
 
 let NOTE_TEXT = """
-[]()
-
 **Note:** The same logic applies for both brightness and contrast
 """
 let SENSOR_HELP_TEXT = """
 # Sensor Mode
 
-With an external ambient light sensor
+In `Sensor` mode, Lunar will read the ambient light from an external light sensor and adapt the brightness and contrast of the monitors based on the lux value.
+
+You can configure how often Lunar reacts to the ambient light changes by changing the `Polling Interval` on the `Configuration` page.
+
+## Algorithm
+
+1. **Every 2 seconds** the sensor will send the lux value of the ambient light to Lunar
+1. Lunar will compare the received lux to the last value
+1. If the new value is different, it is passed through the **Curve Algorithm** to compute the best brightness for each monitor
+1. After computing the monitor values, Lunar will set the brightness for each monitor based on their settings
+
+*The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
+
+## Settings
+
+- Adjusting the curve is as simple as changing the brightness of an external monitor to whatever you want it to be
+    - Lunar will learn from that and adjust the curve accordingly
+- The `Curve Factor` on the `Configuration` page helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """
@@ -38,6 +53,7 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 1. After noon, Lunar lowers the brightness gradually until it reaches the `MIN` setting again at sunset
 
 ## Settings
+
 - Adjusting the curve is as simple as changing the brightness to whatever you want it to be at that time of the day
     - Lunar will learn from that and adjust the curve accordingly
 - The `Curve Factor` on the `Configuration` page helps to adjust how fast the brightness should rise or fall between thresholds
@@ -55,9 +71,13 @@ Lunar takes advantage of that by periodically reading the display brightness, an
 
 ## Algorithm
 
-1. Every second, Lunar reads the built-in display brightness and compares it to the monitor brightness
-1. If the built-in brightness has changed, the value is passed through an adaptive algorithm to bring it to a better suited value for each monitor
-1. After adapting the brightness value, Lunar will set the brightness for each monitor based on their settings
+1. **Every 2 seconds** the display brightness is read and compared to the last value
+1. If the brightness has changed, Lunar starts a **fast polling** process where the brightness is read every **100ms**
+1. The built-in brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
+1. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
+1. If **no new brightness** change has been detected in the **last 3 seconds**, Lunar switches back to the efficient polling interval of **2 seconds**
+
+*The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
 
 ## Settings
 

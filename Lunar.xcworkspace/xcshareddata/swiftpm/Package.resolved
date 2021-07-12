@@ -209,6 +209,15 @@
         }
       },
       {
+        "package": "swift-eventsource",
+        "repositoryURL": "https://github.com/launchdarkly/swift-eventsource",
+        "state": {
+          "branch": "master",
+          "revision": "b0e979dc578e620bf9fd568e8e31985da9f34d35",
+          "version": null
+        }
+      },
+      {
         "package": "swift-numerics",
         "repositoryURL": "https://github.com/apple/swift-numerics",
         "state": {

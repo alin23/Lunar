@@ -180,7 +180,7 @@ def refresh_display():
 
 POLLING_TIME = 0.5
 POLLING_INTERVAL = 0.5
-MAX_NO_KEEP_ALIVE_SECONDS = 30
+MAX_NO_KEEP_ALIVE_SECONDS = 60
 LAST_KEEP_ALIVE_TIME = time.monotonic()
 
 als = lux_sensor(i2c)
@@ -205,7 +205,9 @@ while True:
         respond_to_serial_commands()
         seconds_since_last_keep_alive = time.monotonic() - LAST_KEEP_ALIVE_TIME
         if seconds_since_last_keep_alive > MAX_NO_KEEP_ALIVE_SECONDS:
-            print(f"{seconds_since_last_keep_alive} seconds passed since last keep alive. Resetting...")
+            print(
+                f"{seconds_since_last_keep_alive} seconds passed since last keep alive. Resetting..."
+            )
             supervisor.reload()
         time.sleep(POLLING_INTERVAL)
 
