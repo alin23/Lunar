@@ -117,6 +117,9 @@
 		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
 		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
 		C7C43189269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */; };
+		C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */; };
+		C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = C7C43190269DD9AE00DCD0F5 /* install.sh */; };
+		C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C7C43191269DD9AE00DCD0F5 /* lunar.yaml */; };
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
@@ -309,6 +312,9 @@
 		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
 		C7C1F7061FD6354C0039507C /* Geolocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geolocation.swift; sourceTree = "<group>"; };
 		C7C1F7081FD639970039507C /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALSInstallViewController.swift; sourceTree = "<group>"; };
+		C7C43190269DD9AE00DCD0F5 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		C7C43191269DD9AE00DCD0F5 /* lunar.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = lunar.yaml; sourceTree = "<group>"; };
 		C7C68F08201B75C700F49A2B /* DeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteButton.swift; sourceTree = "<group>"; };
 		C7C68F0A201D356800F49A2B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -491,6 +497,7 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
 				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
 				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
@@ -653,6 +660,8 @@
 		C7BAD9CE26386ABC0058974C /* ALS */ = {
 			isa = PBXGroup;
 			children = (
+				C7C43190269DD9AE00DCD0F5 /* install.sh */,
+				C7C43191269DD9AE00DCD0F5 /* lunar.yaml */,
 				C7BADA0326386BE40058974C /* als.zip */,
 				C7BAD9CF26386ABC0058974C /* boot.py */,
 				C7BAD9D026386ABC0058974C /* bootloader */,
@@ -930,6 +939,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C7BAD9EC26386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 in Resources */,
+				C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */,
 				C7BADA0426386BE40058974C /* als.zip in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
@@ -937,6 +947,7 @@
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 				C7BAD9C3263869920058974C /* Pro Meteor.png in Resources */,
 				C730421F2407E92C0016E591 /* Headers in Resources */,
+				C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1028,6 +1039,7 @@
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
 				C7E80E2B2637060F004718A4 /* Session.swift in Sources */,
 				C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */,
+				C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */,
 				C7683425245227290087946C /* DisplayName.swift in Sources */,
 				C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,

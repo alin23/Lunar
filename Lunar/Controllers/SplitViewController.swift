@@ -164,16 +164,32 @@ class SplitViewController: NSSplitViewController {
         #endif
     }
 
+    var overrideAdaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver: Bool = false
+
     func listenForAdaptiveModeChange() {
+        overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in
+            guard let self = self, let button = self.activeModeButton else { return }
+
+            mainThread {
+                Defaults.withoutPropagation {
+                    button.update()
+                    self.updateHelpButton()
+                }
+            }
+        }
+
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver else {
+            guard let self = self, !self.pausedAdaptiveModeObserver,
+                  let button = self.activeModeButton
+            else {
                 return
             }
+
             mainThread {
                 self.pausedAdaptiveModeObserver = true
                 Defaults.withoutPropagation {
-                    self.activeModeButton.update(modeKey: change.newValue)
+                    button.update(modeKey: change.newValue)
                     self.updateHelpButton(modeKey: change.newValue)
                 }
                 self.pausedAdaptiveModeObserver = false

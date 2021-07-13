@@ -485,6 +485,12 @@
                                                 <action selector="startDDCServerInstall:" target="Voe-Tx-rLC" id="4OC-db-oJJ"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Install firmware on Ambient Light Sensor" id="Sf0-qu-Q6J">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="startALSFirmwareInstall:" target="Voe-Tx-rLC" id="Wvl-bv-Qvu"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Install CLI integration" id="UWD-Sg-HSt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -718,10 +724,10 @@
         <scene sceneID="81y-vf-J25">
             <objects>
                 <windowController storyboardIdentifier="progressWindowController" showSeguePresentationStyle="single" id="Dvt-Cn-vO6" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Update Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="JWN-3a-SYi" userLabel="Operation Progress" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
+                    <window key="window" title="Progress" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="JWN-3a-SYi" userLabel="Operation Progress" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
                         <rect key="contentRect" x="561" y="439" width="500" height="200"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
                         <value key="minSize" type="size" width="500" height="200"/>
                         <value key="maxSize" type="size" width="500" height="200"/>
                         <view key="contentView" id="ZDY-xM-hTL">
@@ -748,7 +754,7 @@
                 </windowController>
                 <customObject id="vdh-kC-91u" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1355" y="775.5"/>
+            <point key="canvasLocation" x="-1366" y="716"/>
         </scene>
         <!--Progress View Controller-->
         <scene sceneID="FQj-jN-9Qd">
@@ -821,7 +827,7 @@
                 <customObject id="SpT-lJ-xtH" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="TYp-dE-pd7"/>
             </objects>
-            <point key="canvasLocation" x="-1355" y="1169"/>
+            <point key="canvasLocation" x="-1366" y="1158"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="cHE-73-x2e">
@@ -6173,6 +6179,203 @@ You can choose to send the diagnostics to the developer if you think this is not
                 <userDefaultsController id="VlC-PR-hTe"/>
             </objects>
             <point key="canvasLocation" x="-4316" y="3020"/>
+        </scene>
+        <!--Install View Controller-->
+        <scene sceneID="LAJ-7u-RVg">
+            <objects>
+                <viewController id="O9d-y6-vOC" customClass="ALSInstallViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" appearanceType="darkAqua" id="Xkk-ke-cVZ">
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="446"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVO-DE-ejt">
+                                <rect key="frame" x="0.0" y="371" width="500" height="39"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="Ambient Light Sensor" id="OSB-zJ-KqT">
+                                    <font key="font" metaFont="systemSemibold" size="20"/>
+                                    <color key="textColor" red="0.95671237244897955" green="0.8378557605447422" blue="0.71822069605803895" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.operationTitle" id="IHM-qt-B0f"/>
+                                </connections>
+                            </textField>
+                            <progressIndicator fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="K15-cf-9zB">
+                                <rect key="frame" x="110" y="12" width="280" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </progressIndicator>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jNh-EE-1UU">
+                                <rect key="frame" x="36" y="74" width="428" height="70"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <textFieldCell key="cell" refusesFirstResponder="YES" alignment="center" title="Operation description" id="oRF-dv-aa4">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" red="1" green="0.97013171298358203" blue="0.92174213435374153" alpha="0.90410285596026485" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.operationDescription" id="CfB-F5-hyD"/>
+                                </connections>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ACw-Vy-6XO" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="192" y="45" width="116" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Start" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" enabled="NO" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="kP4-kX-LF4">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.15865224380000001" green="0.1553739878" blue="0.22164647109999999" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onDoneClicked:" target="O9d-y6-vOC" id="lB6-iI-5fm"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" contentType="username" translatesAutoresizingMaskIntoConstraints="NO" id="3SH-TV-r9R" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="120" y="307" width="260" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="My WiFi" drawsBackground="YES" id="Z8l-bn-aim" customClass="PaddedTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.89784250830000001" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.ssid" id="KfV-fE-rjI"/>
+                                    <outlet property="delegate" destination="O9d-y6-vOC" id="Ha9-RV-vbq"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DYZ-cA-n1W">
+                                <rect key="frame" x="118" y="347" width="260" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Name" id="raA-dc-UTF">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lFv-oO-4p7">
+                                <rect key="frame" x="118" y="274" width="260" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Password" id="led-fS-0j4">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="Tah-jy-r4x">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <secureTextField verticalHuggingPriority="750" fixedFrame="YES" tag="2" contentType="password" translatesAutoresizingMaskIntoConstraints="NO" id="SOD-zT-RhJ" customClass="PaddedSecureTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="120" y="234" width="260" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="passw0rd" placeholderString="•••••••••" drawsBackground="YES" usesSingleLineMode="YES" id="USS-5e-ORa" customClass="PaddedSecureTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.89784250830000001" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <allowedInputSourceLocales>
+                                        <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                    </allowedInputSourceLocales>
+                                </secureTextFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.password" id="SCn-0c-V2n"/>
+                                    <outlet property="delegate" destination="O9d-y6-vOC" id="qVJ-Nq-oFh"/>
+                                </connections>
+                            </secureTextField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JBC-07-QzE">
+                                <rect key="frame" x="152" y="167" width="197" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Select a device" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="sdb-jG-nGo" id="nC4-NC-leG">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="OwA-fq-FT5">
+                                        <items>
+                                            <menuItem title="Select a device" state="on" tag="27" hidden="YES" enabled="NO" id="sdb-jG-nGo">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="selectedValue" keyPath="self.device" previousBinding="wKq-hV-GbM" id="lt2-rQ-2Zg"/>
+                                    <binding destination="O9d-y6-vOC" name="contentValues" keyPath="self.devices" id="wKq-hV-GbM"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EiP-Qd-5fN">
+                                <rect key="frame" x="192" y="198" width="115" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Device" id="iko-LP-qfn">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="6t8-QC-DOf">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="installButton" destination="ACw-Vy-6XO" id="Jt9-Px-Ocg"/>
+                        <outlet property="progressBar" destination="K15-cf-9zB" id="kgq-hj-4kD"/>
+                    </connections>
+                </viewController>
+                <customObject id="LEw-TQ-JgI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="Pi0-YM-0J1"/>
+                <userDefaultsController id="Re8-UY-BbK"/>
+            </objects>
+            <point key="canvasLocation" x="-817" y="1281"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="gAz-nZ-5HL">
+            <objects>
+                <windowController storyboardIdentifier="alsWindowController" showSeguePresentationStyle="single" id="cEG-5w-fOh" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Ambient Light Sensor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="D4S-dc-flG" userLabel="Operation Progress" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
+                        <rect key="contentRect" x="561" y="439" width="500" height="200"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+                        <value key="minSize" type="size" width="500" height="200"/>
+                        <value key="maxSize" type="size" width="500" height="200"/>
+                        <view key="contentView" id="s6v-TA-O8d">
+                            <rect key="frame" x="0.0" y="0.0" width="500" height="200"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticallyCenterTitle" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="centerTrafficLightButtons" value="YES"/>
+                            <userDefinedRuntimeAttribute type="number" keyPath="titleBarHeight">
+                                <real key="value" value="40"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="trafficLightButtonsLeftMargin">
+                                <real key="value" value="14"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="hideTitleBarInFullScreen" value="NO"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="hidesTitle" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticalTrafficLightButtons" value="NO"/>
+                        </userDefinedRuntimeAttributes>
+                    </window>
+                    <connections>
+                        <segue destination="O9d-y6-vOC" kind="relationship" relationship="window.shadowedContentViewController" id="uOO-6h-qZ9"/>
+                    </connections>
+                </windowController>
+                <customObject id="Q9k-lM-YRI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-817" y="716"/>
         </scene>
     </scenes>
     <resources>

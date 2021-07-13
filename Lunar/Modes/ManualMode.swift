@@ -38,6 +38,7 @@ class ManualMode: AdaptiveMode {
         watching = false
     }
 
+    @discardableResult
     func watch() -> Bool {
         guard !watching else { return false }
         log.verbose("Start watching \(str)")

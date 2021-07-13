@@ -693,7 +693,7 @@ class DisplayViewController: NSViewController {
 
             self.resetControl()
 
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
             }
         }
@@ -715,7 +715,7 @@ class DisplayViewController: NSViewController {
 
             self.resetControl()
 
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
             }
         }

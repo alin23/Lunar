@@ -9,6 +9,15 @@
 import Cocoa
 
 class PaddedButton: NSButton {
+    lazy var disabledBgColor = (bgColor?.blended(withFraction: 0.3, of: gray) ?? gray).withAlphaComponent(0.2)
+    lazy var hoverBgColor = bgColor?.blended(withFraction: 0.2, of: red) ?? bg
+    lazy var bgColor = bg {
+        didSet {
+            disabledBgColor = (bgColor?.blended(withFraction: 0.3, of: gray) ?? gray).withAlphaComponent(0.2)
+            hoverBgColor = bgColor?.blended(withFraction: 0.2, of: red) ?? bg
+        }
+    }
+
     override var isEnabled: Bool {
         didSet {
             if isEnabled {
@@ -71,15 +80,15 @@ class PaddedButton: NSButton {
     func setColors(fadeDuration: TimeInterval = 0.2) {
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
 
-        guard let bgColor = bg else { return }
+        guard let bgColor = bgColor else { return }
         if hoverState == .hover {
-            bg = bgColor.blended(withFraction: 0.2, of: red)
+            bg = hoverBgColor
 
         } else {
             if isEnabled {
                 bg = bgColor
             } else {
-                bg = (bgColor.blended(withFraction: 0.3, of: gray) ?? bgColor).withAlphaComponent(0.2)
+                bg = disabledBgColor
             }
         }
     }

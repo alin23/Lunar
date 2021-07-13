@@ -1211,7 +1211,7 @@ enum ValueType {
 
     func startI2CDetection() {
         let taskKey = "i2c-detector-\(serial)"
-        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15) { [weak self] in
+        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15) { [weak self] _ in
             guard let self = self else { return }
             self.detectI2C()
             if self.hasI2C {

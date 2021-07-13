@@ -1,11 +1,15 @@
+substitutions:
+  ssid: Wifi
+  password: password
+
 esphome:
   name: lunarsensor
   platform: ESP32
   board: esp32dev
 
 wifi:
-  ssid: "WiFi name"
-  password: "WiFi password"
+  ssid: $ssid
+  password: $password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -28,8 +32,21 @@ sensor:
   - platform: tsl2561
     name: "Ambient Light"
     address: 0x39
-    update_interval: 2s
+    update_interval: 1s
     gain: 16x
+    accuracy_decimals: 2
+    filters:
+      - calibrate_polynomial:
+          degree: 3
+          datapoints:
+            - 0.0 -> 0.0
+            - 36.4 -> 78
+            - 39.5 -> 86
+            - 59.0 -> 129
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 2
+          send_first_at: 2
 
 i2c:
   sda: 19

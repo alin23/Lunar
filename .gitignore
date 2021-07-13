@@ -43,3 +43,4 @@ Lunar/Modes/SensorMode.swift
 Lunar/Modes/SyncMode.swift
 Lunar/Modes/LocationMode.swift
 Lunar/Data/Pro.swift
+Lunar/ALS/lunarsensor/partitions.csv
