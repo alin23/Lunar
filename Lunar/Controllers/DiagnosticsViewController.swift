@@ -443,7 +443,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     --------
 
                                     ##### If you think DDC should work, check the following:
-                                    * Is this an M1 Mac? **(M1 doesn't yet provide support for DDC)**
+                                    * Is this a TV? **(TVs don't support DDC)**
                                     * Are you using a hub/dock/adapter between this monitor and your Mac?
                                     	* Some of these devices can block DDC from reaching the monitor
                                     	* If possible, try connecting the monitor without the hub or using a different cable/connector
@@ -561,7 +561,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             SyncMode.pollingSeconds = 1
                             SyncMode.specific.stopWatching()
                             Thread.sleep(forTimeInterval: 1)
-                            _ = SyncMode.specific.watch()
+                            if SyncMode.specific.available {
+                                SyncMode.specific.watching = SyncMode.specific.watch()
+                            }
                         }
                         if smoothTransitionActive {
                             self.render("\nDisabling smooth transition")

@@ -29,6 +29,7 @@ let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
 var screensSleeping = ManagedAtomic<Bool>(false)
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
+let CONTACT_URL = try! "https://alinpanaitiu.com/contact/".asURL()
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -88,6 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         set { _windowControllerLock.around { _windowController = newValue } }
     }
 
+    var alsWindowController: ModernWindowController?
     var sshWindowController: ModernWindowController?
     var updateInfoWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
@@ -231,7 +233,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         CachedDefaults[.mediaKeysNotified] = false
 
-        asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") {
+        asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") { _ in
             if AXIsProcessTrusted() {
                 onAcquire()
                 cancelTask("AXPermissionsChecker")
@@ -348,7 +350,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
-        _ = displayController.adaptiveMode.watch()
+        if displayController.adaptiveMode.available {
+            displayController.adaptiveMode.watching = displayController.adaptiveMode.watch()
+        }
     }
 
     func initMenuPopover() {
@@ -466,7 +470,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if CachedDefaults[.refreshValues] {
                         self.startValuesReaderThread()
                     }
-                    _ = displayController.adaptiveMode.watch()
+                    if displayController.adaptiveMode.available {
+                        displayController.adaptiveMode.watching = displayController.adaptiveMode.watch()
+                    }
 
                     debounce(ms: 3000, uniqueTaskKey: "resetStates") {
                         self.disableFaceLight(smooth: false)
@@ -475,7 +481,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     }
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+                        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                             displayController.adaptBrightness(force: true)
                         }
                     }
@@ -756,7 +762,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.capture(message: "Launch")
         }
 
-        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) {
+        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
             displayController.adaptBrightness(force: true)
         }
 
@@ -1009,9 +1015,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        if let url = URL(string: "https://alinpanaitiu.com/contact/") {
-            NSWorkspace.shared.open(url)
-        }
+        NSWorkspace.shared.open(CONTACT_URL)
     }
 
     @IBAction func faq(_: Any) {
@@ -1024,6 +1028,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if let url = URL(string: "https://lunar.fyi/faq#hotkeys") {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    @IBAction func startALSFirmwareInstall(_: Any) {
+        createAndShowWindow("alsWindowController", controller: &alsWindowController)
     }
 
     @IBAction func startDDCServerInstall(_: Any) {

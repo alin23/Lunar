@@ -187,7 +187,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
                     curl -v -O https://static.lunar.fyi/ddcutil-server-installer.tar.gz 2>&1;
                     tar -xzvf ddcutil-server-installer.tar.gz 2>&1
                 """, onChannelOpened: { channel in self.commandChannel = channel }) { output in
-                        log.verbose(output)
+                    log.verbose(output)
                 }
 
                 guard let channel = self.commandChannel, !channel.cancelled else {
