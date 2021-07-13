@@ -129,6 +129,7 @@ var brightnessCurveFactor: Double = 1
 
 protocol AdaptiveMode: AnyObject {
     var force: Bool { get set }
+    var watching: Bool { get set }
     var brightnessDataPoint: DataPoint { get set }
     var contrastDataPoint: DataPoint { get set }
     var maxChartDataPoints: Int { get set }
@@ -293,6 +294,9 @@ extension AdaptiveMode {
                 newValue = externalLow
             } else {
                 newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
+                if key == .sensor {
+                    newValue = adjustCurve(newValue, factor: 0.5, minVal: externalLow, maxVal: externalHigh)
+                }
                 newValue = adjustCurve(newValue, factor: curveFactor > 0 ? curveFactor : 1, minVal: externalLow, maxVal: externalHigh)
             }
             if newValue.isNaN {
@@ -359,6 +363,9 @@ extension AdaptiveMode {
                 lastTargetValue: &lastTargetValue,
                 samples: samples
             )
+            if key == .sensor {
+                control = adjustCurveSIMD(control, factor: 0.4, minVal: lastTargetValue, maxVal: targetValue)
+            }
             control = adjustCurveSIMD(control, factor: factor, minVal: lastTargetValue, maxVal: targetValue)
             result.append(contentsOf: control)
 

@@ -13,44 +13,50 @@ extension AppDelegate: NSWindowDelegate {
     func windowWillClose(_ n: Notification) {
         log.info("Window closing")
 
-        if let window = n.object as? ModernWindow {
-            log.debug("Got window while closing: \(window.title)")
-            guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
-                  let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
-                  let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
-                  let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
-                  let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
-                  let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
-                  let tableView = exceptionsViewController.tableView
-            else {
-                log.warning("No window found while closing")
-                return
-            }
-
-            configurationViewController.view.subviews.removeAll()
-            tableView.removeRows(at: .init(integersIn: 0 ..< tableView.numberOfRows), withAnimation: [])
-            exceptionsViewController.view.subviews.removeAll()
-
-            settingsViewController.splitViewItems.removeAll()
-            settingsViewController.view.subviews.removeAll()
-            for subview in settingsPageController.view.subviews {
-                subview.subviews.removeAll()
-            }
-            settingsPageController.view.subviews.removeAll()
-
-            for (key, controller) in pageController.viewControllers {
-                log.verbose("Removing subviews for \(key) controller")
-                controller.view.subviews.removeAll()
-            }
-            pageController.pageControl = nil
-            pageController.viewControllers.removeAll()
-            pageController.view.subviews.removeAll()
-
-            window.contentViewController = nil
-            window.contentView?.subviews.removeAll()
-            windowController?.window = nil
-            windowController = nil
+        if let window = n.object as? ModernWindow, window.title == "Ambient Light Sensor" {
+            appDelegate.alsWindowController = nil
+            return
         }
+
+        guard let window = n.object as? ModernWindow else {
+            return
+        }
+        log.debug("Got window while closing: \(window.title)")
+        guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
+              let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
+              let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
+              let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
+              let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
+              let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
+              let tableView = exceptionsViewController.tableView
+        else {
+            log.warning("No window found while closing")
+            return
+        }
+
+        configurationViewController.view.subviews.removeAll()
+        tableView.removeRows(at: .init(integersIn: 0 ..< tableView.numberOfRows), withAnimation: [])
+        exceptionsViewController.view.subviews.removeAll()
+
+        settingsViewController.splitViewItems.removeAll()
+        settingsViewController.view.subviews.removeAll()
+        for subview in settingsPageController.view.subviews {
+            subview.subviews.removeAll()
+        }
+        settingsPageController.view.subviews.removeAll()
+
+        for (key, controller) in pageController.viewControllers {
+            log.verbose("Removing subviews for \(key) controller")
+            controller.view.subviews.removeAll()
+        }
+        pageController.pageControl = nil
+        pageController.viewControllers.removeAll()
+        pageController.view.subviews.removeAll()
+
+        window.contentViewController = nil
+        window.contentView?.subviews.removeAll()
+        windowController?.window = nil
+        windowController = nil
     }
 }
 
@@ -92,7 +98,7 @@ class ModernWindowController: NSWindowController {
     func setupWindow() {
         mainThread {
             if let w = window as? ModernWindow {
-                if w.title == "Settings" {
+                if w.title == "Settings" || w.title == "Ambient Light Sensor" {
                     w.delegate = appDelegate
                 }
                 w.setup()

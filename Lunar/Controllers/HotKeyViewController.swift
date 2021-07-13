@@ -152,7 +152,7 @@ class HotkeyViewController: NSViewController {
         handler()
         cachedFnState = Defaults[.fKeysAsFunctionKeys]
         setupFKeysNotice(asFunctionKeys: cachedFnState)
-        asyncEvery(10.seconds, uniqueTaskKey: F_KEYS_SETTING_WATCHER_KEY, handler)
+        asyncEvery(10.seconds, uniqueTaskKey: F_KEYS_SETTING_WATCHER_KEY) { _ in handler() }
     }
 
     deinit {

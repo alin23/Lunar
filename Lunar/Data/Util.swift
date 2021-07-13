@@ -40,6 +40,82 @@ struct ResponseError: Error {
     var statusCode: Int
 }
 
+struct ProcessStatus {
+    var output: Data?
+    var success: Bool
+}
+
+func shell(_ launchPath: String = "/bin/bash", command: String, timeout: DateComponents? = nil, env _: [String: String]? = nil) -> ProcessStatus {
+    shell(launchPath, args: ["-c", command], timeout: timeout)
+}
+
+func shell(_ launchPath: String = "/bin/bash", args: [String], env: [String: String]? = nil) -> Process? {
+    let stdoutFilePath = fm.temporaryDirectory.appendingPathComponent(NanoID.new(alphabet: .lowercasedLatinLetters, size: 32)).path
+    fm.createFile(atPath: stdoutFilePath, contents: nil, attributes: nil)
+
+    let stderrFilePath = fm.temporaryDirectory.appendingPathComponent(NanoID.new(alphabet: .lowercasedLatinLetters, size: 32)).path
+    fm.createFile(atPath: stderrFilePath, contents: nil, attributes: nil)
+
+    guard let stdoutFile = FileHandle(forWritingAtPath: stdoutFilePath),
+          let stderrFile = FileHandle(forWritingAtPath: stderrFilePath)
+    else {
+        return nil
+    }
+
+    let task = Process()
+    task.standardOutput = stdoutFile
+    task.standardError = stderrFile
+    task.launchPath = launchPath
+    task.arguments = args
+    task.environment = env
+    do {
+        try task.run()
+    } catch {
+        log.error("Error running \(launchPath) \(args): \(error)")
+        return nil
+    }
+
+    return task
+}
+
+func stdout(of process: Process) -> Data? {
+    let stdout = process.standardOutput as! FileHandle
+    try? stdout.seek(toOffset: 0)
+    let data: Data?
+    if #available(macOS 10.15.4, *) {
+        data = try? stdout.readToEnd()
+    } else {
+        data = stdout.readDataToEndOfFile()
+    }
+    return data
+}
+
+func shell(_ launchPath: String = "/bin/bash", args: [String], timeout: DateComponents? = nil, env: [String: String]? = nil) -> ProcessStatus {
+    guard let task = shell(launchPath, args: args, env: env) else {
+        return ProcessStatus(output: nil, success: false)
+    }
+
+    guard let timeout = timeout else {
+        task.waitUntilExit()
+        return ProcessStatus(
+            output: stdout(of: task),
+            success: task.terminationStatus == 0
+        )
+    }
+
+    let result = asyncNow(timeout: timeout) {
+        task.waitUntilExit()
+    }
+    if result == .timedOut {
+        task.terminate()
+    }
+
+    return ProcessStatus(
+        output: stdout(of: task),
+        success: task.terminationStatus == 0
+    )
+}
+
 class DispatchWorkItem {
     var name: String = ""
     var workItem: Foundation.DispatchWorkItem
@@ -501,7 +577,7 @@ func asyncEvery(
     uniqueTaskKey: String? = nil,
     runs: Int? = nil,
     skipIfExists: Bool = false,
-    _ action: @escaping () -> Void
+    _ action: @escaping (Timer) -> Void
 ) {
     timerQueue.async {
         if skipIfExists, let key = uniqueTaskKey, let timer = Thread.current.threadDictionary[key] as? Timer, timer.isValid {
@@ -509,7 +585,7 @@ func asyncEvery(
         }
 
         let timer = Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { timer in
-            action()
+            action(timer)
             guard let key = uniqueTaskKey,
                   let runs = Thread.current.threadDictionary["\(key)-runs"] as? Int,
                   let maxRuns = Thread.current.threadDictionary["\(key)-maxRuns"] as? Int
@@ -1184,63 +1260,32 @@ extension NSRecursiveLock {
     ) throws -> T {
         if ignoreMainThread, Thread.isMainThread {
             return try closure()
-//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
         }
-        let locked = lock(before: Date().addingTimeInterval(timeout))
 
-        defer {
-            if locked {
-                unlock()
-//                if Thread.isMainThread {
-//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
-//                }
-            }
-        }
+        let locked = lock(before: Date().addingTimeInterval(timeout))
+        defer { if locked { unlock() } }
 
         return try closure()
     }
 
-    /// Executes a closure returning a value while acquiring the lock.
-    ///
-    /// - Parameter closure: The closure to run.
-    ///
-    /// - Returns:           The value the closure generated.
     @inline(__always) func around<T>(timeout: TimeInterval = 10, ignoreMainThread: Bool = false, _ closure: () -> T) -> T {
         if ignoreMainThread, Thread.isMainThread {
             return closure()
-//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
         }
+
         let locked = lock(before: Date().addingTimeInterval(timeout))
-        defer {
-            if locked {
-                unlock()
-//                if Thread.isMainThread {
-//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
-//                }
-            }
-        }
+        defer { if locked { unlock() } }
 
         return closure()
     }
 
-    /// Execute a closure while acquiring the lock.
-    ///
-    /// - Parameter closure: The closure to run.
     @inline(__always) func around(timeout: TimeInterval = 10, ignoreMainThread: Bool = false, _ closure: () -> Void) {
         if ignoreMainThread, Thread.isMainThread {
             return closure()
-//            mainThreadLocked.store(true, ordering: .sequentiallyConsistent)
         }
-        let locked = lock(before: Date().addingTimeInterval(timeout))
 
-        defer {
-            if locked {
-                unlock()
-//                if Thread.isMainThread {
-//                    mainThreadLocked.store(false, ordering: .sequentiallyConsistent)
-//                }
-            }
-        }
+        let locked = lock(before: Date().addingTimeInterval(timeout))
+        defer { if locked { unlock() } }
 
         closure()
     }
@@ -1565,4 +1610,43 @@ func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
 //    return windowList(for: frontMostApp, opaque: true, levels: [.normal, .modalPanel, .popUpMenu, .floating], appException: appException)?
 //        .filter { screen == nil || $0.screen?.displayID == screen!.displayID }
 //        .min { $0.layer < $1.layer && $0.isOnScreen.i >= $1.isOnScreen.i }
+}
+
+class LineReader {
+    let path: String
+
+    init?(path: String) {
+        self.path = path
+        guard let file = fopen(path, "r") else {
+            return nil
+        }
+        self.file = file
+    }
+
+    deinit {
+        fclose(file)
+    }
+
+    var nextLine: String? {
+        var line: UnsafeMutablePointer<CChar>?
+        var linecap = 0
+        defer {
+            free(line)
+        }
+        let status = getline(&line, &linecap, file)
+        guard status > 0, let unwrappedLine = line else {
+            return nil
+        }
+        return String(cString: unwrappedLine)
+    }
+
+    private let file: UnsafeMutablePointer<FILE>
+}
+
+extension LineReader: Sequence {
+    func makeIterator() -> AnyIterator<String> {
+        AnyIterator<String> {
+            self.nextLine
+        }
+    }
 }

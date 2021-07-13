@@ -65,7 +65,9 @@ class DisplayController {
                 lastNonManualAdaptiveMode = adaptiveMode
             }
             oldValue.stopWatching()
-            _ = adaptiveMode.watch()
+            if adaptiveMode.available {
+                adaptiveMode.watching = adaptiveMode.watch()
+            }
         }
     }
 
@@ -363,7 +365,14 @@ class DisplayController {
     }
 
     func autoAdaptMode() {
-        guard !CachedDefaults[.overrideAdaptiveMode] else { return }
+        guard !CachedDefaults[.overrideAdaptiveMode] else {
+            if adaptiveMode.available {
+                adaptiveMode.watching = adaptiveMode.watch()
+            } else {
+                adaptiveMode.stopWatching()
+            }
+            return
+        }
 
         let mode = DisplayController.autoMode()
         if mode.key != adaptiveMode.key {
@@ -380,28 +389,16 @@ class DisplayController {
             return
         }
 
-        let startOrStopWatcher = { (shouldStop: Bool) in
-            guard !self.pausedOverrideAdaptiveModeObserver else { return }
+        guard !pausedOverrideAdaptiveModeObserver else { return }
 
-            self.pausedOverrideAdaptiveModeObserver = true
-            Defaults.withoutPropagation {
-                if shouldStop {
-                    if let task = self.modeWatcherTask {
-                        lowprioQueue.cancel(timer: task)
-                    }
-                } else {
-                    self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                        guard !screensSleeping.load(ordering: .relaxed), let self = self,
-                              !CachedDefaults[.overrideAdaptiveMode] else { return }
-                        self.autoAdaptMode()
-                    }
-                }
+        pausedOverrideAdaptiveModeObserver = true
+        Defaults.withoutPropagation {
+            self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
+                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+                self.autoAdaptMode()
             }
-            self.pausedOverrideAdaptiveModeObserver = false
         }
-        startOrStopWatcher(CachedDefaults[.overrideAdaptiveMode])
-        overrideAdaptiveModeObserver = overrideAdaptiveModeObserver ?? overrideAdaptiveModePublisher
-            .sink { startOrStopWatcher($0.newValue) }
+        pausedOverrideAdaptiveModeObserver = false
     }
 
     var observers: Set<AnyCancellable> = []
@@ -1100,12 +1097,14 @@ class DisplayController {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
+        guard adaptiveMode.available else { return }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
+        guard adaptiveMode.available else { return }
         for display in displays ?? Array(activeDisplays.values) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
