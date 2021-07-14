@@ -1,3 +1,22 @@
+# 4.6.1
+## Features
+
+* Support for DIY Wireless Ambient Light Sensor
+    * Tutorial on how to create your own sensor is almost done
+    * Please check this page periodically for updates: [https://lunar.fyi/sensor](https://lunar.fyi/sensor)
+
+## Improvements
+
+* Update Paddle framework which fixes the creation of the file `default.profraw` on every run of the CLI
+* Show current version under the Lunar logo in the main window
+
+## Fixes
+
+* Fix crashes because of thread unsafe hotkeys cache
+* Fix crash because of accessing a nil variable
+* Fix brightness being set to max after sleep
+* Fix hotkey not being unregistered when clearing it using the `x` button
+
 # 4.5.5
 ## Improvements
 
