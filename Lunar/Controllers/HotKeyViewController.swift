@@ -74,7 +74,7 @@ class HotkeyViewController: NSViewController {
         }
 
         hk.isEnabled = sender.state == .on
-        CachedDefaults[.hotkeys].update(with: hk)
+        hk.save()
     }
 
     func setHotkeys() {

@@ -150,7 +150,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for identifierCase in HotkeyIdentifier.allCases {
             let identifier = identifierCase.rawValue
             if !existingIdentifiers.contains(identifier), let hotkey = Hotkey.defaults.first(where: { $0.identifier == identifier }) {
-                hotkeys.update(with: hotkey)
+                hotkeys.remove(hotkey)
+                hotkeys.insert(hotkey)
             }
         }
         for hotkey in Hotkey.defaults {

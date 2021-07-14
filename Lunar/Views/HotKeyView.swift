@@ -80,8 +80,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
         log.debug("Changed hotkey for \(hotkey?.identifier ?? "")")
 
         guard let hotkey = hotkey else { return }
-
-        hotkey.unregister()
         guard let keyCombo = keyCombo else {
             hotkey.isEnabled = false
             preciseHotkeyCheckbox?.isEnabled = false
@@ -89,6 +87,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
             return
         }
 
+        hotkey.unregister()
         if let oldHotkey = CachedDefaults[.hotkeys].first(where: {
             $0.identifier != hotkey.identifier &&
                 $0.keyCombo == hotkey.keyCombo &&
