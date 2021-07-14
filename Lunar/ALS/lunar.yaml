@@ -1,11 +1,22 @@
 substitutions:
   ssid: Wifi
   password: password
+  board: board
 
 esphome:
   name: lunarsensor
   platform: ESP32
   board: esp32dev
+  includes:
+    - tsl2591.h
+  libraries:
+    - "Adafruit TSL2591 Library"
+    - https://github.com/blackhack/ESPAsyncWebServer
+  platformio_options:
+    board: $board
+    platform: https://static.lunar.fyi/platform-espressif32-b331f75383faaa7bc8ee971b0cdb83177feb8284.zip
+    platform_packages:
+      - tool-esptoolpy @ https://static.lunar.fyi/esptool-dev.tar.gz
 
 wifi:
   ssid: $ssid
@@ -29,20 +40,28 @@ api:
 ota:
 
 sensor:
+  - platform: custom
+    lambda: |-
+      auto sensor = new Tsl2591();
+      App.register_component(sensor);
+      return {sensor};
+    sensors:
+      name: "Ambient Light TSL2591"
+      filters:
+        - filter_out: 65535
+        - filter_out: nan
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 2
+            send_first_at: 2
+
   - platform: tsl2561
-    name: "Ambient Light"
-    address: 0x39
+    name: "Ambient Light TSL2561"
     update_interval: 1s
     gain: 16x
-    accuracy_decimals: 2
     filters:
-      - calibrate_polynomial:
-          degree: 3
-          datapoints:
-            - 0.0 -> 0.0
-            - 36.4 -> 78
-            - 39.5 -> 86
-            - 59.0 -> 129
+      - filter_out: 65535
+      - filter_out: nan
       - sliding_window_moving_average:
           window_size: 15
           send_every: 2

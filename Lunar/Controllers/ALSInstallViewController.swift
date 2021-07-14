@@ -11,10 +11,32 @@ import Glob
 
 let NO_DEVICE_AVAILABLE_ITEM = "No device available"
 let SELECT_DEVICE_ITEM = "Select a device"
+let SELECT_BOARD_ITEM = "Select a dev board"
 let INSTALL_LOG_PATH = "/tmp/lunar-sensor-install.log"
 
 class ALSInstallViewController: NSViewController {
     @objc dynamic var operationTitle: String = "Ambient Light Sensor"
+    @objc dynamic var board: String = SELECT_BOARD_ITEM {
+        didSet {
+            setInstallButtonEnabled()
+        }
+    }
+
+    var boardID: String {
+        switch board {
+        case "Metro ESP32 S2":
+            return "metroesp32-s2"
+        case "WEMOS LOLIN32":
+            return "lolin32"
+        case "WEMOS LOLIN32 Lite":
+            return "lolin32_lite"
+        case "Generic ESP32":
+            return "esp32dev"
+        default:
+            return "esp32dev"
+        }
+    }
+
     @objc dynamic var device: String = SELECT_DEVICE_ITEM {
         didSet {
             setInstallButtonEnabled()
@@ -26,17 +48,22 @@ class ALSInstallViewController: NSViewController {
             if done {
                 mainThread {
                     stopped = true
-                    installButton.title = "Done"
+                    installButton?.attributedTitle = "Done".withAttribute(.textColor(white))
                     installButton.bgColor = blue
                     progressBar.stopAnimation(nil)
-                    operationDescription = DARK_MD.attributedString(from: "**Firmware was installed successfully!**\nIf the WiFi credentials were correct, Lunar should enable `Sensor Mode` when the sensor is detected on the local network.")
+                    operationDescription = DARK_MD
+                        .attributedString(
+                            from: "**Firmware was installed successfully!**\nIf the WiFi credentials were correct, Lunar should enable `Sensor Mode` when the sensor is detected on the local network."
+                        )
                 }
                 onClick = { [weak self] in self?.view.window?.close() }
             }
         }
     }
 
-    @objc dynamic var operationDescription: NSAttributedString = "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested.".attributedString
+    @objc dynamic var operationDescription: NSAttributedString =
+        "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
+            .attributedString
     @IBOutlet var progressBar: NSProgressIndicator!
     @IBOutlet var installButton: PaddedButton!
 
@@ -48,6 +75,10 @@ class ALSInstallViewController: NSViewController {
             !IGNORED_SERIAL_PORTS.contains(portPath)
         }
 
+        #if DEBUG
+            devicePaths.append("/dev/cu.usbserial-110")
+        #endif
+
         if shell("/sbin/ping", args: ["-o", "-t", "3", SENSOR_DEFAULT_HOSTNAME], timeout: 5.seconds).success {
             devicePaths.append(SENSOR_DEFAULT_HOSTNAME)
         }
@@ -58,13 +89,13 @@ class ALSInstallViewController: NSViewController {
         return devicePaths
     }()
 
-    @objc dynamic var ssid: String? = "My WiFi" {
+    @objc dynamic var ssid: String? = "WiFi" {
         didSet {
             setInstallButtonEnabled()
         }
     }
 
-    @objc dynamic var password: String? = "My WiFi Password" {
+    @objc dynamic var password: String? = "xxxxxxxxx" {
         didSet {
             setInstallButtonEnabled()
         }
@@ -79,7 +110,13 @@ class ALSInstallViewController: NSViewController {
     }
 
     func setInstallButtonEnabled() {
-        installButton.isEnabled = !(ssid?.isEmpty ?? true) && !(password?.isEmpty ?? true) && device != SELECT_DEVICE_ITEM && device != NO_DEVICE_AVAILABLE_ITEM
+        installButton.isEnabled = (
+            !(ssid?.isEmpty ?? true) &&
+                !(password?.isEmpty ?? true) &&
+                board != SELECT_BOARD_ITEM &&
+                device != SELECT_DEVICE_ITEM &&
+                device != NO_DEVICE_AVAILABLE_ITEM
+        )
         installButton.fade()
     }
 
@@ -89,7 +126,7 @@ class ALSInstallViewController: NSViewController {
 
         mainThread {
             stopped = true
-            installButton.title = "Start"
+            installButton?.attributedTitle = "Start".withAttribute(.textColor(mauve))
             installButton.bgColor = lunarYellow
             progressBar?.stopAnimation(nil)
         }
@@ -101,14 +138,18 @@ class ALSInstallViewController: NSViewController {
     func startFirmwareInstallation() {
         guard let ssid = ssid, let password = password,
               let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
-              let process = shell(args: [installScript], env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "LOG_PATH": INSTALL_LOG_PATH])
+              let process = shell(
+                  args: [installScript],
+                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH]
+              )
         else {
             mainThread {
                 stopped = true
-                installButton.title = "Error!"
+                installButton?.attributedTitle = "Error!".withAttribute(.textColor(mauve))
                 installButton.bgColor = red
                 progressBar?.stopAnimation(nil)
-                operationDescription = DARK_MD.attributedString(from: "Please contact the developer about this.\n[Contact Page](\(CONTACT_URL.absoluteString))")
+                operationDescription = DARK_MD
+                    .attributedString(from: "Please contact the developer about this.\n[Contact Page](\(CONTACT_URL.absoluteString))")
             }
             onClick = { NSWorkspace.shared.open(CONTACT_URL) }
             return
@@ -125,7 +166,7 @@ class ALSInstallViewController: NSViewController {
                 mainThread { self.done = true }
             } else {
                 mainThread {
-                    self.installButton.title = "View logs"
+                    self.installButton?.attributedTitle = "View logs".withAttribute(.textColor(mauve))
                     self.installButton.bgColor = red
                     self.operationDescription = "Error installing the firmware!\nCheck the logs for more details.".attributedString
                     self.progressBar?.stopAnimation(nil)
@@ -136,7 +177,7 @@ class ALSInstallViewController: NSViewController {
 
         mainThread {
             stopped = false
-            installButton.title = "Cancel"
+            installButton?.attributedTitle = "Cancel".withAttribute(.textColor(mauve))
             installButton.bgColor = red
             progressBar?.startAnimation(nil)
         }
@@ -177,7 +218,9 @@ class ALSInstallViewController: NSViewController {
         installButton?.radius = 10.ns
         installButton?.frame = NSRect(origin: installButton.frame.origin, size: CGSize(width: installButton.frame.width, height: 30))
         installButton?.attributedTitle = "Start".withAttribute(.textColor(mauve))
-        operationDescription = "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested.".attributedString
+        operationDescription =
+            "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
+                .attributedString
     }
 
     deinit {
@@ -188,6 +231,16 @@ class ALSInstallViewController: NSViewController {
 }
 
 extension ALSInstallViewController: NSControlTextEditingDelegate {
+    public func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        switch commandSelector {
+        case #selector(NSResponder.insertTab(_:)), #selector(NSResponder.moveDown(_:)):
+            control.window?.makeFirstResponder(control.nextKeyView)
+            return true
+        default:
+            return false
+        }
+    }
+
     func controlTextDidChange(_ notification: Notification) {
         guard let textField = notification.object as? NSTextField else {
             return

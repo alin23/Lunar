@@ -255,6 +255,14 @@ extension Array where Element == UInt8 {
 }
 
 extension Double {
+    @inline(__always) func rounded(to scale: Int) -> Double {
+        let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)
+
+        let roundedValue = NSDecimalNumber(value: self).rounding(accordingToBehavior: behavior)
+
+        return roundedValue.doubleValue
+    }
+
     @inline(__always) var ns: NSNumber {
         NSNumber(value: self)
     }
@@ -293,6 +301,14 @@ extension Double {
 }
 
 extension Float {
+    @inline(__always) func rounded(to scale: Int) -> Float {
+        let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)
+
+        let roundedValue = NSDecimalNumber(value: self).rounding(accordingToBehavior: behavior)
+
+        return roundedValue.floatValue
+    }
+
     @inline(__always) var ns: NSNumber {
         NSNumber(value: self)
     }

@@ -1114,6 +1114,18 @@ Configuration page</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="94s-ei-4SF">
+                                <rect key="frame" x="417" y="645" width="116" height="13"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="v4.5.5" id="Ulu-cW-ply">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.57923109907271086" green="0.55117466111125568" blue="0.60507015306122447" alpha="0.84705882352941175" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="cu7-9X-1cE" name="value" keyPath="self.version" id="3Wt-ej-pJv"/>
+                                </connections>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -1674,7 +1686,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </containerView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YP9-Eb-WEN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="430" y="623" width="90" height="14"/>
+                                <rect key="frame" x="430" y="618" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Advanced" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gCp-ah-VHk">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2972,7 +2984,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="447" y="628" width="53" height="18"/>
+                                <rect key="frame" x="447" y="623" width="53" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3679,7 +3691,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="95"/>
+                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4596,6 +4608,7 @@ The installation script will do the following steps:
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="bOz-xh-ozO" name="value" keyPath="self.hostname" id="t6r-Nl-RT3"/>
+                                    <outlet property="nextKeyView" destination="541-aZ-Ypo" id="e3a-wf-Xdo"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3hB-R3-IQL">
@@ -4617,6 +4630,7 @@ The installation script will do the following steps:
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="bOz-xh-ozO" name="value" keyPath="self.username" id="R1A-6k-Ujj"/>
+                                    <outlet property="nextKeyView" destination="ec0-W0-ujg" id="Hkv-5i-rEa"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVg-gD-3db">
@@ -4665,6 +4679,7 @@ The installation script will do the following steps:
                                 </buttonCell>
                                 <connections>
                                     <binding destination="bOz-xh-ozO" name="value" keyPath="self.sshKeySelected" id="HWL-fP-fz5"/>
+                                    <outlet property="nextKeyView" destination="Itz-tw-Cep" id="ITr-gf-PjP"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eWW-aR-ae2" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
@@ -4741,6 +4756,7 @@ The installation script will do the following steps:
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <outlet property="nextKeyView" destination="Fga-CS-2kO" id="JfK-FG-XCb"/>
                                 </connections>
                             </secureTextField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" contentType="oneTimeCode" translatesAutoresizingMaskIntoConstraints="NO" id="541-aZ-Ypo" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
@@ -4753,6 +4769,7 @@ The installation script will do the following steps:
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="bOz-xh-ozO" name="value" keyPath="self.port" id="PAV-wR-f8x"/>
+                                    <outlet property="nextKeyView" destination="Rkq-Od-JIp" id="jPb-V8-dyN"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7pe-Dr-Tfs">
@@ -6185,11 +6202,11 @@ You can choose to send the diagnostics to the developer if you think this is not
             <objects>
                 <viewController id="O9d-y6-vOC" customClass="ALSInstallViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" appearanceType="darkAqua" id="Xkk-ke-cVZ">
-                        <rect key="frame" x="0.0" y="0.0" width="500" height="446"/>
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="508"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVO-DE-ejt">
-                                <rect key="frame" x="0.0" y="371" width="500" height="39"/>
+                                <rect key="frame" x="0.0" y="433" width="500" height="39"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="Ambient Light Sensor" id="OSB-zJ-KqT">
                                     <font key="font" metaFont="systemSemibold" size="20"/>
@@ -6240,7 +6257,7 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" contentType="username" translatesAutoresizingMaskIntoConstraints="NO" id="3SH-TV-r9R" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="120" y="307" width="260" height="32"/>
+                                <rect key="frame" x="120" y="369" width="260" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="My WiFi" drawsBackground="YES" id="Z8l-bn-aim" customClass="PaddedTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -6250,10 +6267,11 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 <connections>
                                     <binding destination="O9d-y6-vOC" name="value" keyPath="self.ssid" id="KfV-fE-rjI"/>
                                     <outlet property="delegate" destination="O9d-y6-vOC" id="Ha9-RV-vbq"/>
+                                    <outlet property="nextKeyView" destination="SOD-zT-RhJ" id="gP1-XN-CSJ"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DYZ-cA-n1W">
-                                <rect key="frame" x="118" y="347" width="260" height="16"/>
+                                <rect key="frame" x="118" y="409" width="260" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Name" id="raA-dc-UTF">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -6262,7 +6280,7 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lFv-oO-4p7">
-                                <rect key="frame" x="118" y="274" width="260" height="16"/>
+                                <rect key="frame" x="118" y="336" width="260" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Password" id="led-fS-0j4">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -6278,7 +6296,7 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 </connections>
                             </textField>
                             <secureTextField verticalHuggingPriority="750" fixedFrame="YES" tag="2" contentType="password" translatesAutoresizingMaskIntoConstraints="NO" id="SOD-zT-RhJ" customClass="PaddedSecureTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="120" y="234" width="260" height="32"/>
+                                <rect key="frame" x="120" y="296" width="260" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="passw0rd" placeholderString="•••••••••" drawsBackground="YES" usesSingleLineMode="YES" id="USS-5e-ORa" customClass="PaddedSecureTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
@@ -6291,10 +6309,11 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 <connections>
                                     <binding destination="O9d-y6-vOC" name="value" keyPath="self.password" id="SCn-0c-V2n"/>
                                     <outlet property="delegate" destination="O9d-y6-vOC" id="qVJ-Nq-oFh"/>
+                                    <outlet property="nextKeyView" destination="JBC-07-QzE" id="8O3-tL-Y4y"/>
                                 </connections>
                             </secureTextField>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JBC-07-QzE">
-                                <rect key="frame" x="152" y="167" width="197" height="25"/>
+                                <rect key="frame" x="152" y="229" width="197" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Select a device" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="sdb-jG-nGo" id="nC4-NC-leG">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -6310,10 +6329,11 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 <connections>
                                     <binding destination="O9d-y6-vOC" name="selectedValue" keyPath="self.device" previousBinding="wKq-hV-GbM" id="lt2-rQ-2Zg"/>
                                     <binding destination="O9d-y6-vOC" name="contentValues" keyPath="self.devices" id="wKq-hV-GbM"/>
+                                    <outlet property="nextKeyView" destination="3cz-yU-8LZ" id="fCG-qS-vA2"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EiP-Qd-5fN">
-                                <rect key="frame" x="192" y="198" width="115" height="16"/>
+                                <rect key="frame" x="192" y="260" width="115" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Device" id="iko-LP-qfn">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -6322,6 +6342,53 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="6t8-QC-DOf">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cz-yU-8LZ">
+                                <rect key="frame" x="150" y="178" width="197" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="25" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="BQt-pf-ORw">
+                                        <items>
+                                            <menuItem title="Metro ESP32 S2" tag="25" identifier="metroesp32-s2" id="Qtb-lf-Oop">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="WEMOS LOLIN32" tag="27" identifier="lolin32" id="e7f-R5-jxy">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="WEMOS LOLIN32 Lite" tag="26" identifier="lolin32_lite" id="NPv-lT-HWN">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Generic ESP32" tag="24" identifier="esp32dev" id="hZE-8f-OhL">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Select a dev board" state="on" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="selectedValue" keyPath="self.board" id="Gtr-dm-44x"/>
+                                    <outlet property="nextKeyView" destination="ACw-Vy-6XO" id="Am5-3M-TEw"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kby-R2-kpV">
+                                <rect key="frame" x="190" y="209" width="115" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Board" id="5hg-Un-GSM">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="oKw-n9-meE">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
@@ -6339,7 +6406,7 @@ You can choose to send the diagnostics to the developer if you think this is not
                 <userDefaultsController id="Pi0-YM-0J1"/>
                 <userDefaultsController id="Re8-UY-BbK"/>
             </objects>
-            <point key="canvasLocation" x="-817" y="1281"/>
+            <point key="canvasLocation" x="-817" y="1312"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="gAz-nZ-5HL">
