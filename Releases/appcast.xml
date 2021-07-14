@@ -681,6 +681,10 @@
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>wKuRt1Yiie9g05LeYLSmoYGxl9o=</signature>
             <signature>Nn+z8+xwIiIAbZun+KoiW9JGoWk=</signature>
+
+            <signature>4+jNYp+D+ZTmqsq+lNifIOcmHcE=</signature>
+            <signature>NAMu5VYYjBb5tJq6BLAz+WiOwTU=</signature>
+
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Allow up to 3 input hotkeys per monitor</li><li>Improve AVService detection to allow even more monitors to be controlled through DDC on M1 Macs</li><li>Add configurable DDC Sleep Factor in Advanced Settings</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix crashes because of thread unsafe settings cache</li><li>Remove scrolling from Quick Actions popover to fix all the disappearing issues</li><li>Fix name being set to "Unknown" in some cases</li><li>Fix "License Verification failed after 5 days" appearing incorrectly</li><li>Fix input hotkeys not working anymore after a while</li><li>Fix input dropdown not being updated with latest selected input by hotkey</li></ul></div></div>]]>
             </description>

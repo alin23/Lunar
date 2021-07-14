@@ -10,6 +10,7 @@ import Cocoa
 
 class PaddedTextField: NSTextField {
     override func draw(_ dirtyRect: NSRect) {
+        appearance = appearance ?? NSAppearance(named: .aqua)
         super.draw(dirtyRect)
         wantsLayer = true
         if effectiveAppearance.name == NSAppearance.Name.darkAqua {
@@ -29,6 +30,7 @@ class PaddedSecureTextField: NSSecureTextField {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        appearance = appearance ?? NSAppearance(named: .aqua)
         super.draw(dirtyRect)
         wantsLayer = true
         if effectiveAppearance.name == NSAppearance.Name.darkAqua {

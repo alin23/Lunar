@@ -504,7 +504,7 @@ extension Defaults.Keys {
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
     static let contrastCurveFactor = Key<Double>("contrastCurveFactor", default: 0.5)
-    static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 0.5)
+    static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 3.0)
     static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
