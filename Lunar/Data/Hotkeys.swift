@@ -281,8 +281,15 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         }
 
         if persist {
-            CachedDefaults[.hotkeys].update(with: self)
+            save()
         }
+    }
+
+    func save() {
+        var hotkeys = CachedDefaults[.hotkeys]
+        hotkeys.remove(self)
+        hotkeys.insert(self)
+        CachedDefaults[.hotkeys] = hotkeys
     }
 
     func dict() -> [HotkeyPart: Int] {

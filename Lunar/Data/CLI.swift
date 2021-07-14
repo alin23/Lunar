@@ -14,12 +14,7 @@ import Foundation
 import Regex
 import SwiftyJSON
 
-func globalExit(_ status: Int32) {
-    if fm.fileExists(atPath: "default.profraw") {
-        try? fm.removeItem(atPath: "default.profraw")
-    }
-    exit(status)
-}
+let globalExit = exit
 
 private let UPPERCASE_LETTER_NAMES = #"e\s?d\s?i\s?d|id|d\s?d\s?c"#.r!
 var encoder: JSONEncoder = {
@@ -1191,9 +1186,5 @@ let LUNAR_CLI_SCRIPT =
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar"
     else
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ $@
-    fi
-
-    if [[ -f default.profraw ]]; then
-        rm default.profraw 2>/dev/null >/dev/null
     fi
     """

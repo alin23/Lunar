@@ -418,6 +418,17 @@ enum CachedDefaults {
                         return
                     }
 
+                    if key == .hotkeys {
+                        asyncNow {
+                            lock.around(ignoreMainThread: true) {
+                                Defaults.withoutPropagation {
+                                    key.suite[key] = newValue
+                                }
+                            }
+                        }
+                        return
+                    }
+
                     asyncNow {
                         lock.around(ignoreMainThread: true) {
                             key.suite[key] = newValue

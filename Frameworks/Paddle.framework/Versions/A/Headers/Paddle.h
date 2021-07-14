@@ -656,5 +656,10 @@ typedef NS_ENUM(NSInteger, PADTriggeredUIType) {
  */
 - (nonnull NSArray *)allProducts;
 
+/**
+ * Update all environment configuration to the sandbox environment.
+ */
++ (void)setEnvironmentToSandbox;
+
 
 @end
