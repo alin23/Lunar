@@ -128,6 +128,7 @@ var leftHintsShown = false
 var rightHintsShown = false
 
 class SplitViewController: NSSplitViewController {
+    @objc dynamic var version = "v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4")"
     var adaptiveModeObserver: Cancellable?
     var defaultAutoModeTitle: NSAttributedString?
 
