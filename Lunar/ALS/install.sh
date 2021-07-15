@@ -6,6 +6,8 @@ mkdir -p "/tmp/lunarsensor/$BOARD"
 cd "/tmp/lunarsensor/$BOARD"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
+
 echo "Installing latest Python pip..." > "$LOG_PATH"
 echo "" >> "$LOG_PATH"
 echo "" >> "$LOG_PATH"
