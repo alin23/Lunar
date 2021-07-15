@@ -1161,6 +1161,8 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
         return (try! encoder.encode(value as! [String: [String: Int]])).str()
     case .enabledControls:
         return (try! encoder.encode(value as! [String: Bool])).str()
+    case .brightnessCurveFactors, .contrastCurveFactors:
+        return (try! encoder.encode(value as! [String: Double])).str()
     case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:
         return (InputSource(rawValue: value as! UInt8) ?? .unknown).str
     case .power:

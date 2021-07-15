@@ -1794,47 +1794,12 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N8o-BV-pMP">
-                                <rect key="frame" x="30" y="497" width="300" height="30"/>
+                                <rect key="frame" x="30" y="497" width="177" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Curve factor" id="AWI-Wn-fEe">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m80-Et-ppU" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="504" width="106" height="40"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="VPq-3u-yvo" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" white="1" alpha="0.70059419010000001" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" white="1" alpha="0.69921875" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" white="1" alpha="0.89981294020000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <integer key="value" value="0"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <integer key="value" value="600"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ugZ-qJ-vyb" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="373" y="488" width="61" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="SDL-Nm-V8a">
-                                    <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bUO-Qi-56O">
@@ -2218,38 +2183,12 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iej-Y7-a5T" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="259" y="504" width="106" height="40"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MWB-Ly-buA">
+                                <rect key="frame" x="220" y="489" width="250" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="kfh-Pp-LKf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" white="1" alpha="0.70059419010000001" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" white="1" alpha="0.69921875" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" white="1" alpha="0.89981294020000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <integer key="value" value="0"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <integer key="value" value="600"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wQZ-xy-kCk" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="275" y="488" width="75" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Kge-3U-hX7">
-                                    <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="The setting has move into the gear ⚙️ menu on the display page" id="nOZ-bX-W6w">
+                                    <font key="font" metaFont="systemMedium" size="14"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -2262,12 +2201,8 @@ when dock and menubar icons are hidden</string>
                         <outlet property="_helpButton4" destination="aSp-kK-Lh9" id="xLg-PE-ebT"/>
                         <outlet property="_helpButtonBottom" destination="mGr-rx-1N2" id="TZg-Ke-zia"/>
                         <outlet property="_helpButtonStep" destination="Ttq-LW-8du" id="Nga-CD-AgV"/>
-                        <outlet property="brightnessCurveFactorCaption" destination="wQZ-xy-kCk" id="Byl-Il-Ti2"/>
-                        <outlet property="brightnessCurveFactorField" destination="Iej-Y7-a5T" id="ENg-Uy-cQM"/>
                         <outlet property="brightnessStepCaption" destination="flo-Nr-g61" id="uuw-QZ-P71"/>
                         <outlet property="brightnessStepField" destination="fCl-dS-CXv" id="0xf-ZI-EfT"/>
-                        <outlet property="contrastCurveFactorCaption" destination="ugZ-qJ-vyb" id="mFQ-ZP-uYm"/>
-                        <outlet property="contrastCurveFactorField" destination="m80-Et-ppU" id="faJ-iv-kPg"/>
                         <outlet property="contrastStepCaption" destination="f7A-iG-9Ye" id="reS-aB-2Lj"/>
                         <outlet property="contrastStepField" destination="3lx-5a-yKj" id="Lyl-Kv-F0g"/>
                         <outlet property="curveFactorLabel" destination="N8o-BV-pMP" id="FLi-rG-7XW"/>
@@ -3102,7 +3037,10 @@ and contrast to their highest values</string>
                                             <menuItem title="Brightness and Contrast" tag="3" toolTip="Resets brightness and contrast to whatever the monitor defines as the default value. Doesn't work on all monitors." id="8uU-Ru-ggC">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Full Reset" tag="4" id="AR5-5L-cEf">
+                                            <menuItem title="Settings for this display" tag="4" toolTip="Resets all Lunar settings for this display only." id="pe8-kU-1mJ">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Full Reset" tag="5" id="AR5-5L-cEf">
                                                 <attributedString key="attributedTitle">
                                                     <fragment content="Full Reset">
                                                         <attributes>
@@ -5095,11 +5033,11 @@ Click the button below to extend your license and keep using Lunar Pro</string>
             <objects>
                 <viewController storyboardIdentifier="SettingsPopoverController" id="21a-h6-6He" customClass="SettingsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" appearanceType="aqua" id="tQ8-3z-D4n">
-                        <rect key="frame" x="0.0" y="0.0" width="590" height="412"/>
+                        <rect key="frame" x="0.0" y="0.0" width="590" height="424"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
-                                <rect key="frame" x="22" y="375" width="157" height="21"/>
+                                <rect key="frame" x="22" y="387" width="157" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Enabled Controls" id="Ivu-gs-zlD">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
@@ -5108,7 +5046,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kap-E3-AbC">
-                                <rect key="frame" x="27" y="347" width="168" height="18"/>
+                                <rect key="frame" x="27" y="359" width="168" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Network (Raspberry Pi)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="zlB-32-Rul">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5119,7 +5057,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gQ1-Jv-FTC">
-                                <rect key="frame" x="27" y="325" width="151" height="18"/>
+                                <rect key="frame" x="27" y="337" width="151" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Native (CoreDisplay)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="ppm-z5-gWv">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5130,7 +5068,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YSi-X1-Nsf">
-                                <rect key="frame" x="27" y="303" width="126" height="18"/>
+                                <rect key="frame" x="27" y="315" width="126" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Hardware (DDC)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="BTR-Jw-BqR">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5141,7 +5079,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Tt-VZ-2bh">
-                                <rect key="frame" x="27" y="281" width="140" height="18"/>
+                                <rect key="frame" x="27" y="293" width="140" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Software (Gamma)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5152,7 +5090,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Tf-I7-BlT">
-                                <rect key="frame" x="65" y="52" width="149" height="17"/>
+                                <rect key="frame" x="65" y="64" width="149" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5161,7 +5099,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-3U-xyN">
-                                <rect key="frame" x="60" y="25" width="53" height="16"/>
+                                <rect key="frame" x="60" y="37" width="53" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Paused" id="UE7-F8-Nxu">
                                     <font key="font" metaFont="system"/>
@@ -5170,7 +5108,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjJ-hC-owe">
-                                <rect key="frame" x="163" y="25" width="60" height="16"/>
+                                <rect key="frame" x="163" y="37" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Running" id="eLZ-QT-H2b">
                                     <font key="font" metaFont="system"/>
@@ -5179,7 +5117,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="YBv-Rr-ica" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="214" y="53" width="16" height="16"/>
+                                <rect key="frame" x="214" y="65" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5192,7 +5130,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wv7-Y2-jNx" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="117" y="20" width="45" height="26"/>
+                                <rect key="frame" x="117" y="32" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5207,7 +5145,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UZP-Jf-WqU">
-                                <rect key="frame" x="89" y="158" width="103" height="21"/>
+                                <rect key="frame" x="89" y="170" width="103" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC Limits" id="Aiw-fA-orj">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
@@ -5216,7 +5154,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="noT-O5-m43" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="199" y="166" width="16" height="16"/>
+                                <rect key="frame" x="199" y="178" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5229,11 +5167,11 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7QF-Vo-iSl" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="1" y="112" width="88" height="40"/>
+                                <rect key="frame" x="1" y="124" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="SOB-uL-nRn" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5244,31 +5182,31 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.36368762655919407" green="0.27074560924231511" blue="0.37120004251700678" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.24705882352941178" green="0.23921568627450979" blue="0.25098039215686274" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" red="0.55047032779930694" green="0.48039707627111755" blue="0.61463647959183676" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.38431372549019605" green="0.33725490196078434" blue="0.34509803921568627" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130952380953" green="0.42270110995011845" blue="0.42270110995011845" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.63137254901960782" green="0.30980392156862746" blue="0.31372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tGg-nq-Ydd" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="90" height="20"/>
+                                <rect key="frame" x="0.0" y="104" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="ZEw-Cm-Lau">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VHh-df-D7y" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="97" y="112" width="88" height="40"/>
+                                <rect key="frame" x="97" y="124" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="d1b-V3-0eP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5279,31 +5217,31 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.36368762655919407" green="0.27074560924231511" blue="0.37120004251700678" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" red="0.55047032779930694" green="0.48039707627111755" blue="0.61463647959183676" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.38431372549019605" green="0.33725490196078434" blue="0.34509803921568627" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130952380953" green="0.42270110995011845" blue="0.42270110995011845" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.63137254901960782" green="0.30980392156862746" blue="0.31372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Ds-JO-8Wh" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="96" y="92" width="90" height="20"/>
+                                <rect key="frame" x="96" y="104" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="cw1-KK-1ij">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gvz-gU-x6v" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="193" y="112" width="88" height="40"/>
+                                <rect key="frame" x="193" y="124" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="42d-PT-EF3" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" white="1" alpha="0.69976892609999997" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5314,31 +5252,31 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.36368762655919407" green="0.27074560924231511" blue="0.37120004251700678" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" red="0.55047032779930694" green="0.48039707627111755" blue="0.61463647959183676" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.38431372549019605" green="0.33725490196078434" blue="0.34509803921568627" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130952380953" green="0.42270110995011845" blue="0.42270110995011845" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="0.63137254901960782" green="0.30980392156862746" blue="0.31372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KF3-iG-gwv" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="192" y="92" width="90" height="20"/>
+                                <rect key="frame" x="192" y="104" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="BYK-me-boa">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5io-i4-3Yv">
-                                <rect key="frame" x="42" y="188" width="196" height="5"/>
+                                <rect key="frame" x="42" y="200" width="196" height="5"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
-                                <rect key="frame" x="79" y="240" width="117" height="17"/>
+                                <rect key="frame" x="79" y="252" width="117" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5347,7 +5285,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
-                                <rect key="frame" x="59" y="213" width="52" height="16"/>
+                                <rect key="frame" x="59" y="225" width="52" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Target" id="tHM-5a-Ojq">
                                     <font key="font" metaFont="system"/>
@@ -5356,7 +5294,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
-                                <rect key="frame" x="160" y="213" width="55" height="16"/>
+                                <rect key="frame" x="160" y="225" width="55" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Source" id="KKZ-a3-9z1">
                                     <font key="font" metaFont="system"/>
@@ -5365,7 +5303,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EFB-4R-z3b" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="207" y="241" width="16" height="16"/>
+                                <rect key="frame" x="207" y="253" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5378,7 +5316,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="115" y="208" width="45" height="26"/>
+                                <rect key="frame" x="115" y="220" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5393,11 +5331,11 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Q18-Wf-Dsy">
-                                <rect key="frame" x="43" y="81" width="196" height="5"/>
+                                <rect key="frame" x="43" y="93" width="196" height="5"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhq-Ab-KP4" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="295" y="125" width="90" height="20"/>
+                                <rect key="frame" x="295" y="137" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="edA-1r-lXT">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5406,7 +5344,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xZd-OJ-2uO" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="384" y="125" width="90" height="20"/>
+                                <rect key="frame" x="384" y="137" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="gkg-NF-TG0">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5415,7 +5353,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hCW-oG-M4c" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="473" y="125" width="90" height="20"/>
+                                <rect key="frame" x="473" y="137" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="Rs4-bd-G86">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5424,7 +5362,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6In-IS-2sH">
-                                <rect key="frame" x="295" y="375" width="72" height="21"/>
+                                <rect key="frame" x="295" y="387" width="72" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Gamma" id="LZX-yU-Xih">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
@@ -5433,7 +5371,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="pjH-P3-asT" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="371" y="381" width="16" height="16"/>
+                                <rect key="frame" x="371" y="393" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5446,7 +5384,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <box fixedFrame="YES" title="Red" translatesAutoresizingMaskIntoConstraints="NO" id="h8T-CP-f3L">
-                                <rect key="frame" x="294" y="288" width="273" height="78"/>
+                                <rect key="frame" x="294" y="300" width="273" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="nPc-O4-QAv">
                                     <rect key="frame" x="3" y="3" width="267" height="57"/>
@@ -5459,7 +5397,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <font key="titleFont" metaFont="systemBold" size="14"/>
                             </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Nu-nd-J8V" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="298" y="307" width="88" height="40"/>
+                                <rect key="frame" x="298" y="319" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="NWR-St-EFT" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5488,7 +5426,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vZd-UR-hMd" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="297" y="291" width="90" height="20"/>
+                                <rect key="frame" x="297" y="303" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="qZa-78-cTd">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5497,7 +5435,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kxu-Lh-RaO" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="387" y="307" width="88" height="40"/>
+                                <rect key="frame" x="387" y="319" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="hTm-l1-nJ1" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5526,7 +5464,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Qv-hV-OI4" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="386" y="291" width="90" height="20"/>
+                                <rect key="frame" x="386" y="303" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="0UB-ah-eZG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5535,7 +5473,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nkC-Gv-ZiC" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="476" y="307" width="88" height="40"/>
+                                <rect key="frame" x="476" y="319" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="IBq-nX-MN6" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5564,7 +5502,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="msy-FO-NFg" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="475" y="291" width="90" height="20"/>
+                                <rect key="frame" x="475" y="303" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="OIX-G5-NwX">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5573,7 +5511,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Green" translatesAutoresizingMaskIntoConstraints="NO" id="BX5-j8-9Wb">
-                                <rect key="frame" x="292" y="205" width="273" height="78"/>
+                                <rect key="frame" x="292" y="217" width="273" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="zKf-m3-7Qj">
                                     <rect key="frame" x="3" y="3" width="267" height="57"/>
@@ -5586,7 +5524,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <font key="titleFont" metaFont="systemBold" size="14"/>
                             </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mws-vX-pYW" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="296" y="224" width="88" height="40"/>
+                                <rect key="frame" x="296" y="236" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="3BX-ck-5hm" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5615,7 +5553,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="94X-V1-Vv5" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="295" y="208" width="90" height="20"/>
+                                <rect key="frame" x="295" y="220" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="LPS-ak-LC4">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5624,7 +5562,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vsq-8g-RGu" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="385" y="224" width="88" height="40"/>
+                                <rect key="frame" x="385" y="236" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="3tf-GX-Q7n" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5653,7 +5591,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UhR-bp-tNd" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="384" y="208" width="90" height="20"/>
+                                <rect key="frame" x="384" y="220" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="XHU-lo-Ce4">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5662,7 +5600,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Ol-ka-1dl" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="474" y="224" width="88" height="40"/>
+                                <rect key="frame" x="474" y="236" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="pfW-az-168" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5691,7 +5629,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qal-rj-vaM" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="473" y="208" width="90" height="20"/>
+                                <rect key="frame" x="473" y="220" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="zRd-JW-o7h">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5700,7 +5638,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Blue" translatesAutoresizingMaskIntoConstraints="NO" id="OJz-Gx-Xju">
-                                <rect key="frame" x="292" y="122" width="273" height="78"/>
+                                <rect key="frame" x="292" y="134" width="273" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Tpd-8B-Xl2">
                                     <rect key="frame" x="3" y="3" width="267" height="57"/>
@@ -5713,7 +5651,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 <font key="titleFont" metaFont="systemBold" size="14"/>
                             </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7bg-0M-iil" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="296" y="141" width="88" height="40"/>
+                                <rect key="frame" x="296" y="153" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="89L-SF-JJy" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5742,7 +5680,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zCe-HU-tuS" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="385" y="141" width="88" height="40"/>
+                                <rect key="frame" x="385" y="153" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="Lz3-rk-1Aa" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5771,7 +5709,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l5z-Kf-6qv" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="474" y="141" width="88" height="40"/>
+                                <rect key="frame" x="474" y="153" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="hgp-AV-Qer" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -5800,7 +5738,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eDC-Mb-fDf">
-                                <rect key="frame" x="298" y="94" width="151" height="18"/>
+                                <rect key="frame" x="298" y="109" width="151" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Apply gamma values" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="RTo-Aw-rJh">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5810,6 +5748,115 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                     <binding destination="21a-h6-6He" name="value" keyPath="self.applyGamma" id="qSJ-o0-YvA"/>
                                 </connections>
                             </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bYX-UC-exN" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="422" y="24" width="106" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="2.0" usesSingleLineMode="YES" id="dkb-iT-CVj" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="35"/>
+                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <real key="value" value="9"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="step">
+                                        <real key="value" value="0.10000000000000001"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="lad-UK-RHV"/>
+                                    <binding destination="21a-h6-6He" name="value" keyPath="self.contrastCurveFactor" id="kxo-VW-kGW"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oge-E8-xk7" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="445" y="8" width="61" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="vfx-jc-5Zg">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="cYz-Hf-aCs"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdr-hu-ZjR" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="331" y="24" width="106" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.51" usesSingleLineMode="YES" id="JcN-LR-JfD" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="35"/>
+                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                        <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <integer key="value" value="0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <real key="value" value="9"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="step">
+                                        <real key="value" value="0.10000000000000001"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="Xys-RO-E7J"/>
+                                    <binding destination="21a-h6-6He" name="value" keyPath="self.brightnessCurveFactor" id="3sP-2a-sH8"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7y7-qg-Ocq" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="347" y="8" width="75" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Apc-ZL-xdF">
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="6IL-DR-0eF"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jgH-le-AsL">
+                                <rect key="frame" x="295" y="69" width="129" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Curve Factors" id="rgm-lf-XOv">
+                                    <font key="font" metaFont="systemHeavy" size="18"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="4CW-1B-wMk"/>
+                                </connections>
+                            </textField>
+                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ewy-wP-X2z">
+                                <rect key="frame" x="333" y="93" width="196" height="5"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="I5F-Qo-cxs"/>
+                                </connections>
+                            </box>
                         </subviews>
                     </view>
                     <connections>
@@ -5818,6 +5865,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                         <outlet property="_gammaHelpButton" destination="pjH-P3-asT" id="CNa-Lh-Uat"/>
                         <outlet property="_syncModeRoleHelpButton" destination="EFB-4R-z3b" id="0qj-Ba-X0T"/>
                         <outlet property="adaptAutoToggle" destination="wv7-Y2-jNx" id="lB7-pP-gR0"/>
+                        <outlet property="brightnessCurveFactorField" destination="jdr-hu-ZjR" id="Duo-hB-1Pf"/>
+                        <outlet property="contrastCurveFactorField" destination="bYX-UC-exN" id="exg-9T-jLp"/>
                         <outlet property="coreDisplayControlCheckbox" destination="gQ1-Jv-FTC" id="pKd-Wa-d2f"/>
                         <outlet property="ddcControlCheckbox" destination="YSi-X1-Nsf" id="MUA-dF-4ix"/>
                         <outlet property="gammaBlueMax" destination="l5z-Kf-6qv" id="68N-pI-EGc"/>
@@ -5839,8 +5888,10 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                 </viewController>
                 <customObject id="gdS-SJ-DKe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="acV-IR-6EQ"/>
+                <userDefaultsController id="hT5-7y-BjN"/>
+                <userDefaultsController id="MYZ-fE-EBq"/>
             </objects>
-            <point key="canvasLocation" x="899" y="3271"/>
+            <point key="canvasLocation" x="899" y="3277"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="ydf-Mv-Uuy">
@@ -6351,12 +6402,12 @@ You can choose to send the diagnostics to the developer if you think this is not
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cz-yU-8LZ">
                                 <rect key="frame" x="150" y="178" width="197" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="25" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
+                                <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="25" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="BQt-pf-ORw">
                                         <items>
-                                            <menuItem title="Metro ESP32 S2" tag="25" identifier="metroesp32-s2" id="Qtb-lf-Oop">
+                                            <menuItem title="Metro ESP32 S2" state="on" tag="25" identifier="metroesp32-s2" id="Qtb-lf-Oop">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="WEMOS LOLIN32" tag="27" identifier="lolin32" id="e7f-R5-jxy">
@@ -6368,7 +6419,7 @@ You can choose to send the diagnostics to the developer if you think this is not
                                             <menuItem title="Generic ESP32" tag="24" identifier="esp32dev" id="hZE-8f-OhL">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Select a dev board" state="on" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
+                                            <menuItem title="Select a dev board" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>

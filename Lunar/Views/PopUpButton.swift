@@ -51,9 +51,9 @@ class PopUpButton: NSPopUpButton {
         }
     }
 
-    var dotColor: NSColor {
-        if CachedDefaults[.overrideAdaptiveMode] {
-            return buttonDotColor[displayController.adaptiveModeKey]!
+    func dotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
+        if overrideMode ?? CachedDefaults[.overrideAdaptiveMode] {
+            return buttonDotColor[modeKey ?? displayController.adaptiveModeKey]!
         } else {
             return darkMauve
         }
@@ -77,16 +77,16 @@ class PopUpButton: NSPopUpButton {
         defocus()
     }
 
-    func setColors(fadeDuration: TimeInterval = 0.2) {
+    func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil) {
         if let cell = cell as? PopUpButtonCell {
             cell.textColor = labelColor
-            cell.dotColor = dotColor
+            cell.dotColor = dotColor(modeKey: modeKey)
         }
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         bg = bgColor
 
         let title = attributedTitle.withAttribute(.textColor(labelColor))
-        title.addAttributes([.textColor(dotColor)], range: 0 ..< 2)
+        title.addAttributes([.textColor(dotColor(modeKey: modeKey))], range: 0 ..< 2)
         attributedTitle = title
 
         attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
@@ -106,9 +106,9 @@ class PopUpButton: NSPopUpButton {
         setFrameSize(NSSize(width: width, height: frame.height))
     }
 
-    func fade() {
+    func fade(modeKey: AdaptiveModeKey? = nil) {
         mainThread {
-            setColors()
+            setColors(modeKey: modeKey)
             resizeToFitTitle()
         }
     }

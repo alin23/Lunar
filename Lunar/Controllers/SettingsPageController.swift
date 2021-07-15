@@ -26,8 +26,6 @@ class SettingsPageController: NSViewController {
 
     func updateDataset(
         display: Display,
-        brightnessFactor: Double? = nil,
-        contrastFactor: Double? = nil,
         appBrightnessOffset: Int = 0,
         appContrastOffset: Int = 0,
         withAnimation: Bool = false,
@@ -62,8 +60,7 @@ class SettingsPageController: NSViewController {
                 mode.interpolateSIMD(
                     .brightness(0),
                     display: display,
-                    offset: appBrightnessOffset.d,
-                    factor: brightnessFactor
+                    offset: appBrightnessOffset.d
                 )
             ) {
                 brightnessChartEntry[x].y = b
@@ -73,16 +70,16 @@ class SettingsPageController: NSViewController {
                 mode.interpolateSIMD(
                     .contrast(0),
                     display: display,
-                    offset: appContrastOffset.d,
-                    factor: contrastFactor
+                    offset: appContrastOffset.d
                 )
             ) {
                 contrastChartEntry[x].y = b
             }
         case let mode as LocationMode:
             let points = mode.getBrightnessContrastBatch(
-                display: display, brightnessFactor: brightnessFactor, contrastFactor: contrastFactor,
-                appBrightnessOffset: appBrightnessOffset, appContrastOffset: appContrastOffset
+                display: display,
+                appBrightnessOffset: appBrightnessOffset,
+                appContrastOffset: appContrastOffset
             )
             let maxValues = min(mode.maxChartDataPoints, points.brightness.count, points.contrast.count, brightnessChartEntry.count, contrastChartEntry.count)
             let xs = stride(from: 0, to: maxValues, by: 1)
@@ -102,8 +99,7 @@ class SettingsPageController: NSViewController {
                 mode.interpolateSIMD(
                     .brightness(0),
                     display: display,
-                    offset: appBrightnessOffset.d,
-                    factor: brightnessFactor
+                    offset: appBrightnessOffset.d
                 )
             ) {
                 brightnessChartEntry[x].y = b
@@ -113,8 +109,7 @@ class SettingsPageController: NSViewController {
                 mode.interpolateSIMD(
                     .contrast(0),
                     display: display,
-                    offset: appContrastOffset.d,
-                    factor: contrastFactor
+                    offset: appContrastOffset.d
                 )
             ) {
                 contrastChartEntry[x].y = b
