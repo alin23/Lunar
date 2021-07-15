@@ -532,11 +532,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             displayController.adaptBrightness()
         }.store(in: &observers)
 
-        refreshValuesPublisher.sink { _ in
+        refreshValuesPublisher.sink { change in
             if let task = self.valuesReaderThread {
                 lowprioQueue.cancel(timer: task)
             }
-            if CachedDefaults[.refreshValues] {
+            if change.newValue {
                 self.startValuesReaderThread()
             }
         }.store(in: &observers)
