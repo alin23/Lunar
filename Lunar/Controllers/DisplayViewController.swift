@@ -523,24 +523,26 @@ class DisplayViewController: NSViewController {
             let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
             let xs = stride(from: 0, to: maxValues, by: 1)
 
-            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil {
+            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil || brightnessFactor != nil {
                 let values = mode.interpolateSIMD(
                     .brightness(0),
                     display: display,
                     minVal: minBrightness?.d,
                     maxVal: maxBrightness?.d,
+                    factor: brightnessFactor,
                     userValues: userBrightness
                 )
                 for (x, b) in zip(xs, values) {
                     brightnessChartEntry[x].y = b
                 }
             }
-            if force || minContrast != nil || maxContrast != nil || userContrast != nil {
+            if force || minContrast != nil || maxContrast != nil || userContrast != nil || contrastFactor != nil {
                 let values = mode.interpolateSIMD(
                     .contrast(0),
                     display: display,
                     minVal: minContrast?.d,
                     maxVal: maxContrast?.d,
+                    factor: contrastFactor,
                     userValues: userContrast
                 )
                 for (x, b) in zip(xs, values) {
@@ -551,24 +553,26 @@ class DisplayViewController: NSViewController {
             let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
             let xs = stride(from: 0, to: maxValues, by: 1)
 
-            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil {
+            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil || brightnessFactor != nil {
                 let values = mode.interpolateSIMD(
                     .brightness(0),
                     display: display,
                     minVal: minBrightness?.d,
                     maxVal: maxBrightness?.d,
+                    factor: brightnessFactor,
                     userValues: userBrightness
                 )
                 for (x, b) in zip(xs, values) {
                     brightnessChartEntry[x].y = b
                 }
             }
-            if force || minContrast != nil || maxContrast != nil || userContrast != nil {
+            if force || minContrast != nil || maxContrast != nil || userContrast != nil || contrastFactor != nil {
                 let values = mode.interpolateSIMD(
                     .contrast(0),
                     display: display,
                     minVal: minContrast?.d,
                     maxVal: maxContrast?.d,
+                    factor: contrastFactor,
                     userValues: userContrast
                 )
                 for (x, b) in zip(xs, values) {
@@ -662,6 +666,7 @@ class DisplayViewController: NSViewController {
         case networkControl
         case ddcState
         case brightnessAndContrast
+        case lunarSettings
         case fullReset
         case reset = 99
     }
@@ -742,6 +747,8 @@ class DisplayViewController: NSViewController {
         case .brightnessAndContrast:
             display.adaptive = false
             _ = display.control?.reset()
+        case .lunarSettings:
+            resetDisplay(askBefore: false, resetControl: false)
         case .fullReset:
             resetDisplay()
         default:
@@ -750,20 +757,25 @@ class DisplayViewController: NSViewController {
         sender.selectItem(withTag: ResetAction.reset.rawValue)
     }
 
-    func resetDisplay() {
+    func resetDisplay(askBefore: Bool = true, resetControl: Bool = true) {
         guard let display = display else { return }
 
-        let resetHandler = { [weak self] (_: Bool) in
-            guard let display = self?.display, let self = self else { return }
+        let resetHandler = { [weak self] (shouldReset: Bool) in
+            guard shouldReset, let display = self?.display, let self = self else { return }
             display.adaptivePaused = true
             defer {
                 display.adaptivePaused = false
                 display.readapt(newValue: false, oldValue: true)
             }
 
-            display.reset()
+            display.reset(resetControl: resetControl)
             self.settingsButton?.popoverController?.display = display
             self.updateDataset(force: true)
+        }
+
+        guard askBefore else {
+            resetHandler(true)
+            return
         }
 
         if display.control is GammaControl {

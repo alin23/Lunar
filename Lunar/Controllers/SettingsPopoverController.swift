@@ -57,6 +57,9 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
 
+    @IBOutlet var brightnessCurveFactorField: ScrollableTextField!
+    @IBOutlet var contrastCurveFactorField: ScrollableTextField!
+
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
@@ -122,11 +125,29 @@ class SettingsPopoverController: NSViewController {
                 applyGamma = display.applyGamma
             }
             setupDDCLimits(display)
+            setupCurveFactors(display)
             setupGamma(display)
         }
     }
 
     @Atomic var applySettings = true
+
+    @objc dynamic var manualModeActive = displayController.adaptiveModeKey == .manual
+    @objc dynamic var brightnessCurveFactor = 1.0 {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.brightnessCurveFactor = brightnessCurveFactor
+            display.save()
+        }
+    }
+
+    @objc dynamic var contrastCurveFactor = 1.0 {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.contrastCurveFactor = contrastCurveFactor
+            display.save()
+        }
+    }
 
     @objc dynamic var applyGamma = false {
         didSet {
@@ -271,6 +292,36 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
+    func setupCurveFactors(_ display: Display? = nil) {
+        guard let display = display ?? self.display else { return }
+        mainThread {
+            applySettings = false
+            defer { applySettings = true }
+            brightnessCurveFactor = display.brightnessCurveFactor
+            contrastCurveFactor = display.contrastCurveFactor
+        }
+
+        brightnessCurveFactorField.onValueChangedDouble = { [weak self] value in
+            self?.display?.brightnessCurveFactor = value
+        }
+        brightnessCurveFactorField.onValueChangedInstantDouble = { [weak self] value in
+            // settingsController?.updateDataset(display: displayController.firstDisplay, brightnessFactor: value)
+            guard let brightnessField = self?.brightnessCurveFactorField else { return }
+            brightnessField.step = value < 1 ? 0.01 : 0.1
+            brightnessField.decimalPoints = value < 1 ? 2 : 1
+        }
+
+        contrastCurveFactorField.onValueChangedDouble = { [weak self] value in
+            self?.display?.contrastCurveFactor = value
+        }
+        contrastCurveFactorField.onValueChangedInstantDouble = { [weak self] value in
+            // settingsController?.updateDataset(display: displayController.firstDisplay, contrastFactor: value)
+            guard let contrastField = self?.contrastCurveFactorField else { return }
+            contrastField.step = value < 1 ? 0.01 : 0.1
+            contrastField.decimalPoints = value < 1 ? 2 : 1
+        }
+    }
+
     func setupGamma(_ display: Display? = nil) {
         if let display = display ?? self.display {
             mainThread {
@@ -335,6 +386,7 @@ class SettingsPopoverController: NSViewController {
     }
 
     var displaysObserver: Cancellable?
+    var adaptiveModeObserver: Cancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -377,7 +429,20 @@ class SettingsPopoverController: NSViewController {
             syncModeRoleToggle.isEnabled = false
         }
         setupDDCLimits()
+        setupCurveFactors()
         setupGamma()
+
+        adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
+            guard let self = self, let display = self.display else { return }
+            mainThread {
+                self.applySettings = false
+                defer { self.applySettings = true }
+
+                self.brightnessCurveFactor = display.brightnessCurveFactors[change.newValue] ?? 1.0
+                self.contrastCurveFactor = display.contrastCurveFactors[change.newValue] ?? 1.0
+                self.manualModeActive = change.newValue == .manual
+            }
+        }
 
         displaysObserver = displaysObserver ?? CachedDefaults.displaysPublisher.sink { [weak self] displays in
             guard let self = self, let thisDisplay = self.display,

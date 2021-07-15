@@ -33,6 +33,16 @@ let DEFAULT_MAX_BRIGHTNESS: UInt8 = 100
 let DEFAULT_MIN_CONTRAST: UInt8 = 50
 let DEFAULT_MAX_CONTRAST: UInt8 = 75
 
+let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
+let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 0.5
+let DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR = 1.0
+let DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR = 1.0
+
+let DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR = 0.2
+let DEFAULT_SYNC_CONTRAST_CURVE_FACTOR = 2.0
+let DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR = 0.8
+let DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR = 1.0
+
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
 #if DEBUG
     let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
@@ -715,6 +725,30 @@ enum ValueType {
         .gamma: true,
     ]
 
+    var brightnessCurveFactors: [AdaptiveModeKey: Double] = [
+        .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
+        .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
+        .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
+        .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
+    ]
+
+    var contrastCurveFactors: [AdaptiveModeKey: Double] = [
+        .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
+        .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
+        .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
+        .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
+    ]
+
+    @inline(__always) var brightnessCurveFactor: Double {
+        get { brightnessCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
+        set { brightnessCurveFactors[displayController.adaptiveModeKey] = newValue }
+    }
+
+    @inline(__always) var contrastCurveFactor: Double {
+        get { contrastCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
+        set { contrastCurveFactors[displayController.adaptiveModeKey] = newValue }
+    }
+
     // MARK: "Sending" states
 
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
@@ -1019,6 +1053,8 @@ enum ValueType {
         let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
         let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
         let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
+        let brightnessCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
+        let contrastCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
 
         _id = try container.decode(CGDirectDisplayID.self, forKey: .id)
         serial = try container.decode(String.self, forKey: .serial)
@@ -1123,6 +1159,32 @@ enum ValueType {
             enabledControls[.gamma] = gammaControlEnabled
         }
 
+        if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
+            brightnessCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let syncFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
+            brightnessCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let locationFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
+            brightnessCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let manualFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
+            brightnessCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
+        }
+
+        if let sensorFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
+            contrastCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
+        }
+        if let syncFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
+            contrastCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
+        }
+        if let locationFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
+            contrastCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
+        }
+        if let manualFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
+            contrastCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
+        }
+
         super.init()
 
         if let dict = displayInfoDictionary(id) {
@@ -1202,10 +1264,19 @@ enum ValueType {
         #if DEBUG
             #if arch(arm64)
                 // avService = (id == TEST_DISPLAY_ID) ? (1 as IOAVService) : DDC.AVService(displayID: id, display: self)
-                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
+                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
+                    .hasAVService(
+                        displayID: id,
+                        display: self,
+                        ignoreCache: true
+                    )
             #else
                 // i2cController = (id == TEST_DISPLAY_ID) ? 1 : DDC.I2CController(displayID: id)
-                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC.hasI2CController(displayID: id, ignoreCache: true)
+                hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
+                    .hasI2CController(
+                        displayID: id,
+                        ignoreCache: true
+                    )
             #endif
         #else
             #if arch(arm64)
@@ -1430,6 +1501,46 @@ enum ValueType {
         )
     }
 
+    func resetDefaultGamma() {
+        defaultGammaRedMin = 0.0
+        defaultGammaRedMax = 1.0
+        defaultGammaRedValue = 1.0
+        defaultGammaGreenMin = 0.0
+        defaultGammaGreenMax = 1.0
+        defaultGammaGreenValue = 1.0
+        defaultGammaBlueMin = 0.0
+        defaultGammaBlueMax = 1.0
+        defaultGammaBlueValue = 1.0
+    }
+
+    func resetBrightnessCurveFactor(mode: AdaptiveModeKey? = nil) {
+        let mode = mode ?? displayController.adaptiveModeKey
+        switch mode {
+        case .sensor:
+            brightnessCurveFactors[mode] = DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
+        case .sync:
+            brightnessCurveFactors[mode] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
+        case .location:
+            brightnessCurveFactors[mode] = DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
+        case .manual:
+            brightnessCurveFactors[mode] = DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
+        }
+    }
+
+    func resetContrastCurveFactor(mode: AdaptiveModeKey? = nil) {
+        let mode = mode ?? displayController.adaptiveModeKey
+        switch mode {
+        case .sensor:
+            contrastCurveFactors[mode] = DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
+        case .sync:
+            contrastCurveFactors[mode] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
+        case .location:
+            contrastCurveFactors[mode] = DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
+        case .manual:
+            contrastCurveFactors[mode] = DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
+        }
+    }
+
     func save(now: Bool = false) {
         if now {
             DataStore.storeDisplay(display: self, now: now)
@@ -1562,6 +1673,8 @@ enum ValueType {
         case alwaysFallbackControl
         case neverFallbackControl
         case enabledControls
+        case brightnessCurveFactors
+        case contrastCurveFactors
         case activeAndResponsive
         case hasDDC
         case hasI2C
@@ -1670,6 +1783,8 @@ enum ValueType {
             var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
             var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
             var enabledControlsContainer = container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
+            var brightnessCurveFactorsContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
+            var contrastCurveFactorsContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
 
             try container.encode(active, forKey: .active)
             try container.encode(adaptive, forKey: .adaptive)
@@ -1731,6 +1846,16 @@ enum ValueType {
             try enabledControlsContainer.encodeIfPresent(enabledControls[.coreDisplay], forKey: .coreDisplay)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.ddc], forKey: .ddc)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
+
+            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.sync], forKey: .sync)
+            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.sensor], forKey: .sensor)
+            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.location], forKey: .location)
+            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.manual], forKey: .manual)
+
+            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sync], forKey: .sync)
+            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sensor], forKey: .sensor)
+            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.location], forKey: .location)
+            try contrastCurveFactorsContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
 
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
             try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
@@ -2194,9 +2319,15 @@ enum ValueType {
         }
     }
 
-    func reset() {
+    func reset(resetControl: Bool = true) {
+        maxDDCBrightness = 100.ns
+        maxDDCContrast = 100.ns
+        maxDDCVolume = 100.ns
+
         userContrast[displayController.adaptiveModeKey]?.removeAll()
         userBrightness[displayController.adaptiveModeKey]?.removeAll()
+
+        resetDefaultGamma()
 
         alwaysFallbackControl = false
         neverFallbackControl = false
@@ -2208,10 +2339,25 @@ enum ValueType {
             .ddc: true,
             .gamma: true,
         ]
+        brightnessCurveFactors = [
+            .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
+            .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
+            .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
+            .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
+        ]
+
+        contrastCurveFactors = [
+            .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
+            .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
+            .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
+            .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
+        ]
 
         save()
 
-        _ = control?.reset()
+        if resetControl {
+            _ = control?.reset()
+        }
         readapt(newValue: false, oldValue: true)
     }
 

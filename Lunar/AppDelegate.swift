@@ -523,14 +523,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.adaptBrightness()
             }
         }.store(in: &observers)
-        contrastCurveFactorPublisher.sink { change in
-            contrastCurveFactor = change.newValue
-            displayController.adaptBrightness()
-        }.store(in: &observers)
-        brightnessCurveFactorPublisher.sink { change in
-            brightnessCurveFactor = change.newValue
-            displayController.adaptBrightness()
-        }.store(in: &observers)
 
         refreshValuesPublisher.sink { change in
             if let task = self.valuesReaderThread {
@@ -621,10 +613,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         initCache()
-        contrastCurveFactor = CachedDefaults[.contrastCurveFactor] > 0 ? CachedDefaults[.contrastCurveFactor] : 1
-        CachedDefaults[.contrastCurveFactor] = contrastCurveFactor
-        brightnessCurveFactor = CachedDefaults[.brightnessCurveFactor] > 0 ? CachedDefaults[.brightnessCurveFactor] : 1
-        CachedDefaults[.brightnessCurveFactor] = brightnessCurveFactor
 
         operationHighlightPublisher
             .receive(on: RunLoop.main)
@@ -745,7 +733,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initLicensing()
         NetworkControl.setup()
         if thisIsFirstRun || TEST_MODE {
-            // showWindow()
+            showWindow()
         }
 
         if TEST_MODE {

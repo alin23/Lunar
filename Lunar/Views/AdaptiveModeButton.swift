@@ -17,11 +17,11 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
     var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] _ in
+        adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
             guard let self = self, !self.pausedAdaptiveModeObserver else { return }
             mainThread {
                 self.pausedAdaptiveModeObserver = true
-                Defaults.withoutPropagation { self.update() }
+                Defaults.withoutPropagation { self.update(modeKey: change.newValue) }
                 self.pausedAdaptiveModeObserver = false
             }
         }
@@ -55,7 +55,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
             selectItem(withTag: AUTO_MODE_TAG)
         }
         setAutoModeItemTitle(modeKey: modeKey)
-        fade()
+        fade(modeKey: modeKey)
     }
 
     override func setup() {
@@ -89,7 +89,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
             CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
         button.setAutoModeItemTitle()
-        button.fade()
+        button.fade(modeKey: AdaptiveModeKey(rawValue: button.selectedTag()))
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
