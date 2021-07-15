@@ -100,6 +100,11 @@ protocol Control {
 }
 
 extension Control {
+    func reapply() {
+        _ = setBrightness(display.brightness.uint8Value, oldValue: nil)
+        _ = setContrast(display.contrast.uint8Value, oldValue: nil)
+    }
+
     func read(_ key: Display.CodingKeys) -> Any? {
         switch key {
         case .brightness:
