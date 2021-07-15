@@ -925,12 +925,6 @@ class DisplayViewController: NSViewController {
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
                 mainThread {
-                    if CachedDefaults[.overrideAdaptiveMode] {
-                        self.inputDropdown?.selectItem(withTag: adaptiveMode.rawValue)
-                    } else {
-                        self.inputDropdown?.selectItem(withTag: AUTO_MODE_TAG)
-                    }
-
                     if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
                         self.initGraph(mode: adaptiveMode.mode)
                     }
