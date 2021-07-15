@@ -934,15 +934,24 @@ enum ValueType {
         let gammaControl = GammaControl(display: self)
 
         if coreDisplayControl.isAvailable() {
-            if applyGamma || gammaChanged { resetGamma() }
+            if applyGamma || gammaChanged {
+                resetGamma()
+                coreDisplayControl.reapply()
+            }
             return coreDisplayControl
         }
         if ddcControl.isAvailable() {
-            if applyGamma || gammaChanged { resetGamma() }
+            if applyGamma || gammaChanged {
+                resetGamma()
+                ddcControl.reapply()
+            }
             return ddcControl
         }
         if networkControl.isAvailable() {
-            if applyGamma || gammaChanged { resetGamma() }
+            if applyGamma || gammaChanged {
+                resetGamma()
+                networkControl.reapply()
+            }
             return networkControl
         }
 
