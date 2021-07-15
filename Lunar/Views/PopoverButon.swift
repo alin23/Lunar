@@ -10,6 +10,12 @@ import Cocoa
 import Foundation
 
 class SettingsButton: PopoverButton<SettingsPopoverController> {
+    weak var displayViewController: DisplayViewController? {
+        didSet {
+            popoverController?.displayViewController = displayViewController
+        }
+    }
+
     weak var display: Display? {
         didSet {
             popoverController?.display = display
@@ -22,6 +28,7 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
 
     override func mouseDown(with event: NSEvent) {
         popoverController?.display = display
+        popoverController?.displayViewController = displayViewController
         super.mouseDown(with: event)
     }
 }
