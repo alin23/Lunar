@@ -2801,12 +2801,12 @@ when dock and menubar icons are hidden</string>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT">
                                 <rect key="frame" x="415" y="213" width="119" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="USB-C" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA">
+                                <popUpButtonCell key="cell" type="push" title="Unknown" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="IdB-fg-Bb3" id="tqJ-YD-mMA">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="mmT-ta-ING">
                                         <items>
-                                            <menuItem title="USB-C" state="on" tag="27" id="Ap5-ua-jqI">
+                                            <menuItem title="USB-C" tag="27" id="Ap5-ua-jqI">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="DisplayPort 1" tag="15" id="Ap1-ua-jqI">
@@ -2864,7 +2864,7 @@ when dock and menubar icons are hidden</string>
                                             <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="Ah9-ua-jqI">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Unknown" tag="246" hidden="YES" enabled="NO" id="IdB-fg-Bb3">
+                                            <menuItem title="Unknown" state="on" tag="246" hidden="YES" id="IdB-fg-Bb3">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
