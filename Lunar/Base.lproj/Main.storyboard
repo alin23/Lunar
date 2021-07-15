@@ -498,16 +498,24 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="DeQ-n5-ddV"/>
-                                        <menuItem title="Frequently Asked Questions (FAQ)" id="Som-uG-Ufi">
+                                        <menuItem title="Monitor turns off or loses signal?" id="XQp-Gz-GFr">
+                                            <attributedString key="attributedTitle">
+                                                <fragment content="Monitor turns off or loses signal?">
+                                                    <attributes>
+                                                        <font key="NSFont" metaFont="systemSemibold" size="14"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="faq:" target="Voe-Tx-rLC" id="Uen-4g-U5h"/>
+                                                <action selector="badDDC:" target="Voe-Tx-rLC" id="UEt-gD-qO1"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="How do hotkeys work?" id="XQp-Gz-GFr">
+                                        <menuItem title="How do hotkeys work?" id="RxR-cq-qd2">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="howDoHotkeysWork:" target="Voe-Tx-rLC" id="LPT-rg-jdF"/>
+                                                <action selector="howDoHotkeysWork:" target="Voe-Tx-rLC" id="dgR-kM-dTo"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Contact the developer" id="6xm-yP-myu">
@@ -520,6 +528,12 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="joinCommunity:" target="Voe-Tx-rLC" id="MWp-Kq-aZ0"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Frequently Asked Questions (FAQ)" id="Som-uG-Ufi">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="faq:" target="Voe-Tx-rLC" id="Uen-4g-U5h"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="GNT-HB-tbd"/>

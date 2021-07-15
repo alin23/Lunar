@@ -1012,6 +1012,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             NSWorkspace.shared.open(url)
         }
     }
+    
+    @IBAction func badDDC(_: Any) {
+        if let url = URL(string: "https://lunar.fyi/faq#bad-ddc") {
+            NSWorkspace.shared.open(url)
+        }
+    }
 
     @IBAction func howDoHotkeysWork(_: Any) {
         if let url = URL(string: "https://lunar.fyi/faq#hotkeys") {
