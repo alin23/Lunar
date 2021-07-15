@@ -124,9 +124,6 @@ struct DataPoint {
     var last: Int
 }
 
-var contrastCurveFactor: Double = 1
-var brightnessCurveFactor: Double = 1
-
 protocol AdaptiveMode: AnyObject {
     var force: Bool { get set }
     var watching: Bool { get set }
@@ -217,10 +214,10 @@ extension AdaptiveMode {
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
-            curveFactor = factor?.f ?? brightnessCurveFactor.f
+            curveFactor = factor?.f ?? display.brightnessCurveFactor.f
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
-            curveFactor = factor?.f ?? contrastCurveFactor.f
+            curveFactor = factor?.f ?? display.contrastCurveFactor.f
         }
 
         let curve = interpolate(
@@ -266,10 +263,10 @@ extension AdaptiveMode {
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
-            curveFactor = factor ?? brightnessCurveFactor
+            curveFactor = factor ?? display.brightnessCurveFactor
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
-            curveFactor = factor ?? contrastCurveFactor
+            curveFactor = factor ?? display.contrastCurveFactor
         }
 
         var newValue: Double

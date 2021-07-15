@@ -20,8 +20,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .brightnessStep,
     .clamshellModeDetection,
     .contrastStep,
-    .contrastCurveFactor,
-    .brightnessCurveFactor,
     .debug,
     .didScrollTextField,
     .didSwipeLeft,
@@ -455,8 +453,6 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>) {
 }
 
 func initCache() {
-    cacheKey(.contrastCurveFactor)
-    cacheKey(.brightnessCurveFactor)
     cacheKey(.hideYellowDot)
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
@@ -514,8 +510,6 @@ extension Defaults.Keys {
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
-    static let contrastCurveFactor = Key<Double>("contrastCurveFactor", default: 0.5)
-    static let brightnessCurveFactor = Key<Double>("brightnessCurveFactor", default: 3.0)
     static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
@@ -595,8 +589,6 @@ enum AppSettings {
 
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates()
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates()
-let contrastCurveFactorPublisher = Defaults.publisher(.contrastCurveFactor).removeDuplicates()
-let brightnessCurveFactorPublisher = Defaults.publisher(.brightnessCurveFactor).removeDuplicates()
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates()
 // let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates()
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates()
