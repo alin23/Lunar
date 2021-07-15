@@ -5767,7 +5767,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <integer key="value" value="0"/>
+                                        <real key="value" value="0.01"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
                                         <real key="value" value="9"/>
@@ -5777,8 +5777,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="lad-UK-RHV"/>
                                     <binding destination="21a-h6-6He" name="value" keyPath="self.contrastCurveFactor" id="kxo-VW-kGW"/>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="lad-UK-RHV"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oge-E8-xk7" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
@@ -5812,7 +5812,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                         <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <integer key="value" value="0"/>
+                                        <real key="value" value="0.01"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
                                         <real key="value" value="9"/>
@@ -5822,8 +5822,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="Xys-RO-E7J"/>
                                     <binding destination="21a-h6-6He" name="value" keyPath="self.brightnessCurveFactor" id="3sP-2a-sH8"/>
+                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.manualModeActive" id="Xys-RO-E7J"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7y7-qg-Ocq" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">

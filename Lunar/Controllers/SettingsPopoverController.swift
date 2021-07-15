@@ -103,6 +103,7 @@ class SettingsPopoverController: NSViewController {
     }
 
     var onClick: (() -> Void)?
+    weak var displayViewController: DisplayViewController?
     weak var display: Display? {
         didSet {
             guard let display = display else { return }
@@ -135,7 +136,11 @@ class SettingsPopoverController: NSViewController {
     @objc dynamic var manualModeActive = displayController.adaptiveModeKey == .manual
     @objc dynamic var brightnessCurveFactor = 1.0 {
         didSet {
+            brightnessCurveFactorField.step = brightnessCurveFactor < 1 ? 0.01 : 0.1
+            brightnessCurveFactorField.decimalPoints = brightnessCurveFactor < 1 ? 2 : 1
+
             guard applySettings, let display = display else { return }
+
             display.brightnessCurveFactor = brightnessCurveFactor
             display.save()
         }
@@ -143,7 +148,11 @@ class SettingsPopoverController: NSViewController {
 
     @objc dynamic var contrastCurveFactor = 1.0 {
         didSet {
+            contrastCurveFactorField.step = contrastCurveFactor < 1 ? 0.01 : 0.1
+            contrastCurveFactorField.decimalPoints = contrastCurveFactor < 1 ? 2 : 1
+
             guard applySettings, let display = display else { return }
+
             display.contrastCurveFactor = contrastCurveFactor
             display.save()
         }
@@ -305,7 +314,7 @@ class SettingsPopoverController: NSViewController {
             self?.display?.brightnessCurveFactor = value
         }
         brightnessCurveFactorField.onValueChangedInstantDouble = { [weak self] value in
-            // settingsController?.updateDataset(display: displayController.firstDisplay, brightnessFactor: value)
+            self?.displayViewController?.updateDataset(brightnessFactor: value)
             guard let brightnessField = self?.brightnessCurveFactorField else { return }
             brightnessField.step = value < 1 ? 0.01 : 0.1
             brightnessField.decimalPoints = value < 1 ? 2 : 1
@@ -315,7 +324,7 @@ class SettingsPopoverController: NSViewController {
             self?.display?.contrastCurveFactor = value
         }
         contrastCurveFactorField.onValueChangedInstantDouble = { [weak self] value in
-            // settingsController?.updateDataset(display: displayController.firstDisplay, contrastFactor: value)
+            self?.displayViewController?.updateDataset(contrastFactor: value)
             guard let contrastField = self?.contrastCurveFactorField else { return }
             contrastField.step = value < 1 ? 0.01 : 0.1
             contrastField.decimalPoints = value < 1 ? 2 : 1
