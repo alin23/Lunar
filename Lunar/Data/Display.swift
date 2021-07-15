@@ -741,12 +741,20 @@ enum ValueType {
 
     @inline(__always) var brightnessCurveFactor: Double {
         get { brightnessCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
-        set { brightnessCurveFactors[displayController.adaptiveModeKey] = newValue }
+        set {
+            let oldValue = brightnessCurveFactors[displayController.adaptiveModeKey]
+            brightnessCurveFactors[displayController.adaptiveModeKey] = newValue
+            readapt(newValue: newValue, oldValue: oldValue)
+        }
     }
 
     @inline(__always) var contrastCurveFactor: Double {
         get { contrastCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
-        set { contrastCurveFactors[displayController.adaptiveModeKey] = newValue }
+        set {
+            let oldValue = contrastCurveFactors[displayController.adaptiveModeKey]
+            contrastCurveFactors[displayController.adaptiveModeKey] = newValue
+            readapt(newValue: newValue, oldValue: oldValue)
+        }
     }
 
     // MARK: "Sending" states

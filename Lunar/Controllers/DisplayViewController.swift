@@ -355,6 +355,7 @@ class DisplayViewController: NSViewController {
         guard let display = display ?? self.display else { return }
 
         settingsButton?.display = display
+        settingsButton?.displayViewController = self
         scrollableBrightness?.display = display
         scrollableContrast?.display = display
 
