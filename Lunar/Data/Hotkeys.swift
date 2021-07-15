@@ -614,10 +614,11 @@ enum Hotkey {
         }
 
         let locked = display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false)
-
+        let mirroredID = CGDisplayMirrorsDisplay(display.id)
+        let osdID = mirroredID != kCGNullDirectDisplay ? mirroredID : display.id
         manager.showImage(
             osdImage.rawValue,
-            onDisplayID: display.id,
+            onDisplayID: osdID,
             priority: 0x1F4,
             msecUntilFade: 1500,
             filledChiclets: value,
