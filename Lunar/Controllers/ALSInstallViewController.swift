@@ -30,6 +30,8 @@ class ALSInstallViewController: NSViewController {
             return "lolin32"
         case "WEMOS LOLIN32 Lite":
             return "lolin32_lite"
+        case "NodeMCU ESP32":
+            return "nodemcu-32s"
         case "Generic ESP32":
             return "esp32dev"
         default:
