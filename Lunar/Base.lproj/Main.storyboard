@@ -5763,8 +5763,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bYX-UC-exN" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="422" y="24" width="106" height="41"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <rect key="frame" x="417" y="24" width="116" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="2.0" usesSingleLineMode="YES" id="dkb-iT-CVj" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
                                     <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -5796,8 +5796,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oge-E8-xk7" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="445" y="8" width="61" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <rect key="frame" x="444" y="8" width="61" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="vfx-jc-5Zg">
                                     <font key="font" size="11" name="Menlo-Bold"/>
                                     <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -5808,8 +5808,8 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdr-hu-ZjR" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="331" y="24" width="106" height="41"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <rect key="frame" x="311" y="24" width="116" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.51" usesSingleLineMode="YES" id="JcN-LR-JfD" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
                                     <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -5841,7 +5841,7 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7y7-qg-Ocq" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="347" y="8" width="75" height="20"/>
+                                <rect key="frame" x="331" y="8" width="75" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Apc-ZL-xdF">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -6416,21 +6416,24 @@ You can choose to send the diagnostics to the developer if you think this is not
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cz-yU-8LZ">
                                 <rect key="frame" x="150" y="178" width="197" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="25" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
+                                <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="30" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="BQt-pf-ORw">
                                         <items>
-                                            <menuItem title="Metro ESP32 S2" state="on" tag="25" identifier="metroesp32-s2" id="Qtb-lf-Oop">
+                                            <menuItem title="Metro ESP32 S2" state="on" tag="30" identifier="metroesp32-s2" id="Qtb-lf-Oop">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="WEMOS LOLIN32" tag="27" identifier="lolin32" id="e7f-R5-jxy">
+                                            <menuItem title="WEMOS LOLIN32" tag="29" identifier="lolin32" id="e7f-R5-jxy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="WEMOS LOLIN32 Lite" tag="26" identifier="lolin32_lite" id="NPv-lT-HWN">
+                                            <menuItem title="WEMOS LOLIN32 Lite" tag="28" identifier="lolin32_lite" id="NPv-lT-HWN">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Generic ESP32" tag="24" identifier="esp32dev" id="hZE-8f-OhL">
+                                            <menuItem title="NodeMCU ESP32" tag="27" identifier="nodemcu-32s" id="kZE-8f-OhL">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Generic ESP32" tag="26" identifier="esp32dev" id="hZE-8f-OhL">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="Select a dev board" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
