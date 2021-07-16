@@ -553,8 +553,14 @@ enum ValueType {
         }
     }
 
+    lazy var lastVolume: NSNumber = volume
+
     @Published @objc dynamic var volume: NSNumber {
         didSet {
+            if oldValue.uint8Value > 0 {
+                lastVolume = oldValue
+            }
+
             save()
 
             guard !isForTesting else { return }
@@ -612,6 +618,9 @@ enum ValueType {
                     context: context
                 )
             }
+
+            guard CachedDefaults[.muteVolumeZero] else { return }
+            volume = audioMuted ? 0 : lastVolume
         }
     }
 

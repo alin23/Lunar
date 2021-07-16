@@ -14,6 +14,7 @@ import Defaults
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .appExceptions,
+    .muteVolumeZero,
     .mediaKeysNotified,
     .brightnessKeysEnabled,
     .hideYellowDot,
@@ -456,6 +457,7 @@ func initCache() {
     cacheKey(.hideYellowDot)
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
+    cacheKey(.muteVolumeZero)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
     cacheKey(.didScrollTextField)
@@ -513,6 +515,7 @@ extension Defaults.Keys {
     static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
+    static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
