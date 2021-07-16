@@ -859,7 +859,7 @@
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="385" y="640" width="180" height="42"/>
+                                <rect key="frame" x="385" y="641" width="180" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -1132,8 +1132,8 @@ Configuration page</string>
                                 <rect key="frame" x="417" y="643" width="116" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="v4.5.5" id="Ulu-cW-ply">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.57923109907271086" green="0.55117466111125568" blue="0.60507015306122447" alpha="0.84705882352941175" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <font key="font" size="11" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.57923109907271086" green="0.55117466111125568" blue="0.60507015306122447" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
@@ -2200,7 +2200,7 @@ when dock and menubar icons are hidden</string>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MWB-Ly-buA">
                                 <rect key="frame" x="220" y="489" width="250" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="The setting has move into the gear ⚙️ menu on the display page" id="nOZ-bX-W6w">
+                                <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="This setting has moved into the gear ⚙️ menu on the display page" id="nOZ-bX-W6w">
                                     <font key="font" metaFont="systemMedium" size="14"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
