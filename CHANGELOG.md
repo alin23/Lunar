@@ -1,3 +1,22 @@
+# 4.6.2
+## Features
+
+* **Tutorial completed for DIY Wireless Ambient Light Sensor:** [https://lunar.fyi/sensor](https://lunar.fyi/sensor)
+* Add option to apply volume 0 on pressing mute in **Advanced** settings
+    * Some monitors don't accept the mute DDC control so this could be useful
+* Curve factors separated by display and mode
+    * The curve factors are now found in the gear icon menu and are stored on a per-monitor and per-mode basis
+    * If you set some curve factors while Lunar is in Sync Mode and then change to Location Mode for example, there will be different curve factor values
+    
+## Improvements
+
+* Re-apply brightness and contrast when the display control changes
+
+## Fixes
+
+* Correctly turn on/off the refresh values thread when checking/unchecking "Refresh values from monitor settings"
+* Turn on Sync Mode correctly on Lunar launch
+
 # 4.6.1
 ## Features
 
