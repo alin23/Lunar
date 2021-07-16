@@ -168,8 +168,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func listenForAdaptiveModeChange() {
         adaptiveBrightnessModePublisher.sink { change in
             SentrySDK.configureScope { scope in
-                scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
-                scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+                scope.setTag(value: change.newValue.str, key: "adaptiveMode")
+                scope.setTag(value: change.oldValue.str, key: "lastAdaptiveMode")
                 scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
 
@@ -179,7 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             mainThread {
                 self.resetElements()
             }
-            self.manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
+            self.manageDisplayControllerActivity(mode: change.newValue)
         }.store(in: &observers)
     }
 
