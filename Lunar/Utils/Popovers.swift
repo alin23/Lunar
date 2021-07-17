@@ -13,9 +13,11 @@ var POPOVERS: [String: NSPopover?] = [
     "help": nil,
     "hotkey": nil,
     "menu": {
-        let p = NSPopover()
-        p.appearance = NSAppearance(named: .vibrantDark)
-        return p
+        mainThread {
+            let p = NSPopover()
+            p.appearance = NSAppearance(named: .vibrantDark)
+            return p
+        }
     }(),
     "settings": nil,
 ]
