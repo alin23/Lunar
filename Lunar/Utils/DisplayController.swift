@@ -1209,7 +1209,11 @@ class DisplayController {
             display.brightness = value.ns
 
             if displayController.adaptiveModeKey != .manual {
-                display.insertBrightnessUserDataPoint(SyncMode.lastBuiltinBrightness.intround, value, modeKey: adaptiveModeKey)
+                display.insertBrightnessUserDataPoint(
+                    displayController.adaptiveModeKey.mode.brightnessDataPoint.last,
+                    value,
+                    modeKey: adaptiveModeKey
+                )
             }
         }
     }
@@ -1228,7 +1232,11 @@ class DisplayController {
             display.contrast = value.ns
 
             if displayController.adaptiveModeKey != .manual {
-                display.insertContrastUserDataPoint(SyncMode.lastBuiltinContrast.intround, value, modeKey: adaptiveModeKey)
+                display.insertContrastUserDataPoint(
+                    displayController.adaptiveModeKey.mode.contrastDataPoint.last,
+                    value,
+                    modeKey: adaptiveModeKey
+                )
             }
         }
     }

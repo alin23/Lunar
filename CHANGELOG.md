@@ -1,3 +1,10 @@
+# 4.6.3
+## Fixes
+
+* Fix [Auto-learning Curve](https://lunar.fyi/#curve) for **Location** and **Sensor** mode
+* Move some UI operations on the main thread to keep the window visually consistent
+* Check for possible clamshell mode while Sync Mode is adapting to avoid setting brightness to 0 before the `IsLidClosed` flag has been set
+
 # 4.6.2
 ## Features
 
