@@ -64,6 +64,12 @@ function make-installer -a ext
     cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
     if test "$ext" = pkg
         cd "$RELEASE_DIR"
+
+        if test -f "$APP_INSTALLER_ZIP"
+            echo (set_color red)"Deleting $APP_INSTALLER_ZIP"(set_color normal)
+            rm "$APP_INSTALLER_ZIP"
+        end
+
         zip "$APP_INSTALLER_ZIP" (basename "$APP_INSTALLER")
         cp "$APP_INSTALLER_ZIP" "$APP_LATEST_INSTALLER_ZIP"
         cd -
