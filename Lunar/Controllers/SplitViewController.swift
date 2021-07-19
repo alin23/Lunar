@@ -217,6 +217,8 @@ class SplitViewController: NSSplitViewController {
     }
 
     func lastPage() {
+        whiteBackground()
+
         goLeftButton?.enable()
         goRightButton?.disable()
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
