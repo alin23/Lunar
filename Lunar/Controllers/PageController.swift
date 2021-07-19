@@ -103,44 +103,39 @@ class PageController: NSPageController {
 
 extension PageController: NSPageControllerDelegate {
     func pageControllerWillStartLiveTransition(_: NSPageController) {
+        #if DEBUG
+            log.verbose("Will start live transition")
+        #endif
         for popover in POPOVERS.values {
             popover?.close()
         }
     }
 
     func pageControllerDidEndLiveTransition(_ c: NSPageController) {
+        #if DEBUG
+            log.verbose("Did end live transition")
+        #endif
         guard let c = c as? PageController else { return }
 
-        if let splitViewController = c.parent as? SplitViewController {
-            let identifier = pageController(c, identifierFor: c.arrangedObjects[c.selectedIndex])
-            let viewController = pageController(c, viewControllerForIdentifier: identifier)
-            if c.selectedIndex == 0 {
-                splitViewController.mauveBackground()
-            } else if c.selectedIndex == 1 {
-                splitViewController.yellowBackground()
-            } else {
-                splitViewController.whiteBackground()
-                if c.selectedIndex == c.pageControl.numberOfPages - 1 {
-                    splitViewController.lastPage()
-                }
-
-                // if let displayController = viewController as? DisplayViewController {
-                //     displayController.initGraph()
-                // }
-            }
-            // for object in c.arrangedObjects {
-            //     let otherIdentifier = pageController(c, identifierFor: object)
-            //     if identifier == otherIdentifier {
-            //         continue
-            //     }
-            //     let viewController = pageController(c, viewControllerForIdentifier: otherIdentifier)
-            //     if (viewController as? HotkeyViewController) != nil {
-            //         continue
-            //     } else if let viewController = viewController as? DisplayViewController {
-            //         viewController.zeroGraph()
-            //     }
-            // }
+        guard let splitViewController = c.parent as? SplitViewController else {
+            c.pageControl?.currentPage = c.selectedIndex
+            return
         }
+
+        let identifier = pageController(c, identifierFor: c.arrangedObjects[c.selectedIndex])
+        let viewController = pageController(c, viewControllerForIdentifier: identifier)
+
+        switch c.selectedIndex {
+        case 0:
+            splitViewController.mauveBackground()
+        case 1:
+            splitViewController.yellowBackground()
+        case c.pageControl.numberOfPages - 1:
+            splitViewController.lastPage()
+        default:
+            splitViewController.whiteBackground()
+        }
+
         c.pageControl?.currentPage = c.selectedIndex
     }
 
@@ -151,26 +146,26 @@ extension PageController: NSPageControllerDelegate {
         return NSPageController.ObjectIdentifier(String(describing: (object as! Display).serial))
     }
 
-    func pageController(
-        _ c: NSPageController,
-        viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier
-    ) -> NSViewController {
+    func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
         unowned let c = c as! PageController
 
         if c.viewControllers[identifier] == nil {
             switch identifier {
             case c.hotkeyViewControllerIdentifier:
                 c.viewControllers[identifier] = c.storyboard!
-                    .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")) as! HotkeyViewController
+                    .instantiateController(
+                        withIdentifier: NSStoryboard.SceneIdentifier("hotkeyViewController")
+                    ) as! HotkeyViewController
             case c.settingsPageControllerIdentifier:
                 c.viewControllers[identifier] = c.storyboard!
                     .instantiateController(
-                        withIdentifier: NSStoryboard
-                            .SceneIdentifier("settingsPageController")
+                        withIdentifier: NSStoryboard.SceneIdentifier("settingsPageController")
                     ) as! SettingsPageController
             default:
                 c.viewControllers[identifier] = c.storyboard!
-                    .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")) as! DisplayViewController
+                    .instantiateController(
+                        withIdentifier: NSStoryboard.SceneIdentifier("displayViewController")
+                    ) as! DisplayViewController
             }
         }
 
