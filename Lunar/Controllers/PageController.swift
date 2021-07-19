@@ -118,33 +118,28 @@ extension PageController: NSPageControllerDelegate {
                 splitViewController.mauveBackground()
             } else if c.selectedIndex == 1 {
                 splitViewController.yellowBackground()
-                if let settingsController = viewController as? SettingsPageController {
-                    settingsController.initGraph(display: displayController.firstDisplay)
-                }
             } else {
                 splitViewController.whiteBackground()
                 if c.selectedIndex == c.pageControl.numberOfPages - 1 {
                     splitViewController.lastPage()
                 }
 
-                if let displayController = viewController as? DisplayViewController {
-                    displayController.initGraph()
-                }
+                // if let displayController = viewController as? DisplayViewController {
+                //     displayController.initGraph()
+                // }
             }
-            for object in c.arrangedObjects {
-                let otherIdentifier = pageController(c, identifierFor: object)
-                if identifier == otherIdentifier {
-                    continue
-                }
-                let viewController = pageController(c, viewControllerForIdentifier: otherIdentifier)
-                if (viewController as? HotkeyViewController) != nil {
-                    continue
-                } else if let viewController = viewController as? SettingsPageController {
-                    viewController.zeroGraph()
-                } else if let viewController = viewController as? DisplayViewController {
-                    viewController.zeroGraph()
-                }
-            }
+            // for object in c.arrangedObjects {
+            //     let otherIdentifier = pageController(c, identifierFor: object)
+            //     if identifier == otherIdentifier {
+            //         continue
+            //     }
+            //     let viewController = pageController(c, viewControllerForIdentifier: otherIdentifier)
+            //     if (viewController as? HotkeyViewController) != nil {
+            //         continue
+            //     } else if let viewController = viewController as? DisplayViewController {
+            //         viewController.zeroGraph()
+            //     }
+            // }
         }
         c.pageControl?.currentPage = c.selectedIndex
     }
