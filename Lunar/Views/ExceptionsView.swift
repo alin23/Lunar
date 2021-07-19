@@ -47,48 +47,6 @@ class ExceptionsView: NSTableView {
         guard let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController,
               let controller = exceptionsController.parent?.parent as? SettingsPageController else { return }
 
-        scrollableBrightness.onValueChangedInstant = { [weak controller, weak scrollableContrast] value in
-            guard let scrollableContrast = scrollableContrast, let controller = controller else { return }
-            controller.updateDataset(
-                display: displayController.firstDisplay,
-                appBrightnessOffset: value,
-                appContrastOffset: scrollableContrast.integerValue
-            )
-        }
-        scrollableContrast.onValueChangedInstant = { [weak controller, weak scrollableBrightness] value in
-            guard let scrollableBrightness = scrollableBrightness, let controller = controller else { return }
-            controller.updateDataset(
-                display: displayController.firstDisplay,
-                appBrightnessOffset: scrollableBrightness.integerValue,
-                appContrastOffset: value
-            )
-        }
-
-        scrollableBrightness.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-            guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
-                  let controller = controller else { return }
-            let brightnessOffset = scrollableBrightness.integerValue
-            let contrastOffset = scrollableContrast.integerValue
-            controller.updateDataset(
-                display: displayController.firstDisplay,
-                appBrightnessOffset: brightnessOffset,
-                appContrastOffset: contrastOffset,
-                withAnimation: true
-            )
-        }
-        scrollableContrast.onMouseEnter = { [weak controller, weak scrollableBrightness, weak scrollableContrast] in
-            guard let scrollableBrightness = scrollableBrightness, let scrollableContrast = scrollableContrast,
-                  let controller = controller else { return }
-            let brightnessOffset = scrollableBrightness.integerValue
-            let contrastOffset = scrollableContrast.integerValue
-            controller.updateDataset(
-                display: displayController.firstDisplay,
-                appBrightnessOffset: brightnessOffset,
-                appContrastOffset: contrastOffset,
-                withAnimation: true
-            )
-        }
-
         let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: app.identifier)
         if !runningApps.isEmpty {
             displayController.runningAppExceptions.append(app)

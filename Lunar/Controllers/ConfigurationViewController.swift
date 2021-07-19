@@ -23,12 +23,6 @@ class ConfigurationViewController: NSViewController {
     - Click to edit text, press enter to set the value
     	- Press the up/down arrow keys on your keyboard to increment/decrement the value
     """
-    lazy var CURVE_FACTOR_TOOLTIP = """
-    ## Description
-    Value for adjusting the brightness/contrast curve.
-
-    [How does the curve factor affect brightness?](\(CHART_LINK))
-    """
     lazy var SYNC_POLLING_INTERVAL_TOOLTIP = """
     ## Description
     Value that describes how often Lunar should check for changes in the built-in display brightness.
@@ -126,13 +120,6 @@ class ConfigurationViewController: NSViewController {
         _helpButtonBottom as? HelpButton
     }
 
-    @IBOutlet var curveFactorLabel: NSTextField!
-    var curveFactorVisible: Bool = false {
-        didSet {
-            curveFactorLabel?.isHidden = !curveFactorVisible
-        }
-    }
-
     @IBOutlet var brightnessStepField: ScrollableTextField!
     @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastStepField: ScrollableTextField!
@@ -207,7 +194,6 @@ class ConfigurationViewController: NSViewController {
         let sensorMode = adaptiveMode == .sensor
         let manualMode = adaptiveMode == .manual
 
-        curveFactorVisible = !manualMode
         locationVisible = locationMode
         syncPollingIntervalVisible = syncMode
         sensorPollingIntervalVisible = sensorMode
@@ -216,34 +202,24 @@ class ConfigurationViewController: NSViewController {
         helpButtonStep?.helpText = HOTKEY_STEP_TOOLTIP
         helpButtonBottom?.helpText = SMOOTH_TRANSITION_TOOLTIP
 
-        helpButton1?.helpText = CURVE_FACTOR_TOOLTIP
-        helpButton1?.link = CHART_LINK
-
         switch adaptiveMode {
         case .location:
             helpButton4?.helpText = LOCATION_TOOLTIP
-            helpButton4?.link = nil
         case .sync:
-            helpButton2?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
-            helpButton2?.link = nil
+            helpButton1?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
         case .sensor:
-            helpButton2?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
-            helpButton2?.link = nil
+            helpButton1?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
         case .manual:
-            helpButton1?.link = nil
+            break
         }
 
-        helpButton1?.isHidden = !curveFactorVisible
-        helpButton2?.isHidden = !syncPollingIntervalVisible && !sensorPollingIntervalVisible
+        helpButton1?.isHidden = !syncPollingIntervalVisible && !sensorPollingIntervalVisible
+        helpButton2?.isHidden = true
         helpButton3?.isHidden = true
         helpButton4?.isHidden = !locationVisible
     }
 
     func listenForLocationChange() {
-        let updateDataset = { [unowned self] () -> Void in
-            self.settingsController?.updateDataset(display: displayController.firstDisplay, updateLimitLines: true)
-        }
-        dayMomentsObserver = dayMomentsObserver ?? dayMomentsPublisher.sink(receiveValue: updateDataset)
         locationObserver = locationObserver ?? locationPublisher.sink { [unowned self] change in
             mainThread { [weak self] in
                 self?.locationLatField?.doubleValue = change.newValue?.latitude ?? 0.0
@@ -373,9 +349,8 @@ class ConfigurationViewController: NSViewController {
 
         setupScrollableTextField(
             latField, caption: latCaption, lowerLimit: -90.00, upperLimit: 90.00,
-            onValueChangedDouble: { value, settingsController in
+            onValueChangedDouble: { value, _ in
                 CachedDefaults[.manualLocation] = true
-                settingsController?.updateDataset(display: displayController.firstDisplay)
 
                 let geolocation = Geolocation(
                     latitude: value,
@@ -388,9 +363,8 @@ class ConfigurationViewController: NSViewController {
         )
         setupScrollableTextField(
             lonField, caption: lonCaption, lowerLimit: -180.00, upperLimit: 180.00,
-            onValueChangedDouble: { value, settingsController in
+            onValueChangedDouble: { value, _ in
                 CachedDefaults[.manualLocation] = true
-                settingsController?.updateDataset(display: displayController.firstDisplay)
 
                 let geolocation = Geolocation(
                     latitude: LocationMode.specific.geolocation?.latitude ?? 0,
@@ -486,18 +460,6 @@ class ConfigurationViewController: NSViewController {
             field.onMouseEnter = { [weak self] in
                 guard let self = self else { return }
                 handler(self.settingsController)
-            }
-        } else {
-            field.onMouseEnter = { [weak self] in
-                guard let self = self else { return }
-                if displayController.adaptiveModeKey == .sync {
-                    self.settingsController?.updateDataset(
-                        display: displayController.firstDisplay,
-                        withAnimation: true
-                    )
-                } else {
-                    self.settingsController?.updateDataset(display: displayController.firstDisplay, withAnimation: true)
-                }
             }
         }
     }
