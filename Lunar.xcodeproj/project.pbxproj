@@ -43,6 +43,7 @@
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
+		C74665FD26A6A2910091EF19 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C74665FC26A6A2910091EF19 /* SimplyCoreAudio */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
 		C74D46F326357DD400B0CBAE /* UpdateInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D46F126357DD400B0CBAE /* UpdateInfoViewController.swift */; };
@@ -52,6 +53,8 @@
 		C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* DisplayController.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
+		C753799A26A5E6AD0017B784 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C753799826A5D8820017B784 /* Sparkle.framework */; };
+		C753799B26A5E6AD0017B784 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C753799826A5D8820017B784 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
 		C75BFE962695FAE9005EADCA /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C75BFE952695FAE9005EADCA /* SwiftyMarkdown */; };
 		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
@@ -133,10 +136,7 @@
 		C7DD62292612331700B07B31 /* PaddedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD62282612331700B07B31 /* PaddedTextField.swift */; };
 		C7DD622C261240A800B07B31 /* SSHConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */; };
 		C7DD622F2614CBAA00B07B31 /* PaddedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */; };
-		C7DD623726178C7100B07B31 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C7DD623626178C7100B07B31 /* SimplyCoreAudio */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
-		C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; };
-		C7DED3662678E0DC002E0188 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7DED3632678E0CD002E0188 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7DED368267A0663002E0188 /* LaunchAtLoginController.m */; };
 		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
 		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
@@ -209,7 +209,7 @@
 			files = (
 				C72CFB992586B371005F0340 /* NSPageControl.framework in Embed Frameworks */,
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
-				C7DED3662678E0DC002E0188 /* Sparkle.framework in Embed Frameworks */,
+				C753799B26A5E6AD0017B784 /* Sparkle.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
 				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
 			);
@@ -219,8 +219,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C705A03C268B4187001ABBA9 /* AXSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AXSwift; path = ../../Github/tmandry/AXSwift; sourceTree = "<group>"; };
-		C705A041268B437E001ABBA9 /* AXSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AXSwift; path = ../../Github/tmandry/AXSwift; sourceTree = "<group>"; };
 		C7138D952634B02900406EE3 /* Paddle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Paddle.framework; sourceTree = "<group>"; };
 		C7151941224E34BA0024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -250,6 +248,7 @@
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* DisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayController.swift; sourceTree = "<group>"; };
 		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC/DDC.c; sourceTree = SOURCE_ROOT; };
+		C753799826A5D8820017B784 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
 		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = gencode.sh; path = bin/gencode.sh; sourceTree = "<group>"; };
@@ -330,7 +329,6 @@
 		C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHConnectionViewController.swift; sourceTree = "<group>"; };
 		C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedButton.swift; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
-		C7DED3632678E0CD002E0188 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C7DED367267A0639002E0188 /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		C7DED368267A0663002E0188 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
@@ -383,7 +381,6 @@
 				C77AB65C269A032E0046BA78 /* Magnet in Frameworks */,
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
-				C7DED3652678E0DC002E0188 /* Sparkle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
 				C7E99267260A90E70055370A /* Solar in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
@@ -394,7 +391,6 @@
 				C78BD047259B30CA00FC823F /* EonilFSEvents in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
-				C7DD623726178C7100B07B31 /* SimplyCoreAudio in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C70EEF2625FFE8F2009C0C15 /* SwiftSerial in Frameworks */,
@@ -402,6 +398,7 @@
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
+				C753799A26A5E6AD0017B784 /* Sparkle.framework in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
@@ -410,6 +407,7 @@
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
+				C74665FD26A6A2910091EF19 /* SimplyCoreAudio in Frameworks */,
 				C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C7E80E4626370780004718A4 /* Socket in Frameworks */,
@@ -424,8 +422,6 @@
 		C705A03B268B4187001ABBA9 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				C705A03C268B4187001ABBA9 /* AXSwift */,
-				C705A041268B437E001ABBA9 /* AXSwift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -684,7 +680,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C7DED3632678E0CD002E0188 /* Sparkle.framework */,
+				C753799826A5D8820017B784 /* Sparkle.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,
 				C7138D952634B02900406EE3 /* Paddle.framework */,
@@ -815,7 +811,6 @@
 				C73B9A0C25FB9AD7003184FC /* Glob */,
 				C70EEF2525FFE8F2009C0C15 /* SwiftSerial */,
 				C7E99266260A90E70055370A /* Solar */,
-				C7DD623626178C7100B07B31 /* SimplyCoreAudio */,
 				C740A1F726249176004BC1C7 /* ArgumentParser */,
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7E80E4526370780004718A4 /* Socket */,
@@ -826,6 +821,7 @@
 				C75BFE952695FAE9005EADCA /* SwiftyMarkdown */,
 				C77AB65B269A032E0046BA78 /* Magnet */,
 				C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */,
+				C74665FC26A6A2910091EF19 /* SimplyCoreAudio */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -838,7 +834,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -881,7 +877,6 @@
 				C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */,
 				C70EEF2425FFE8F2009C0C15 /* XCRemoteSwiftPackageReference "SwiftSerial" */,
 				C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */,
-				C7DD623526178C7100B07B31 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */,
@@ -892,6 +887,7 @@
 				C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
 				C7C43187269CBB1B00DCD0F5 /* XCRemoteSwiftPackageReference "swift-eventsource" */,
+				C74665FB26A6A2910091EF19 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1722,6 +1718,14 @@
 				minimumVersion = 0.4.1;
 			};
 		};
+		C74665FB26A6A2910091EF19 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/SimplyCoreAudio";
+			requirement = {
+				branch = develop;
+				kind = branch;
+			};
+		};
 		C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimonFairbairn/SwiftyMarkdown";
@@ -1808,14 +1812,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.0;
-			};
-		};
-		C7DD623526178C7100B07B31 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rnine/SimplyCoreAudio";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.1;
 			};
 		};
 		C7E80E4426370780004718A4 /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
@@ -1923,6 +1919,11 @@
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
+		C74665FC26A6A2910091EF19 /* SimplyCoreAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C74665FB26A6A2910091EF19 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
+			productName = SimplyCoreAudio;
+		};
 		C75BFE952695FAE9005EADCA /* SwiftyMarkdown */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */;
@@ -1977,11 +1978,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */;
 			productName = Regex;
-		};
-		C7DD623626178C7100B07B31 /* SimplyCoreAudio */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7DD623526178C7100B07B31 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
-			productName = SimplyCoreAudio;
 		};
 		C7E80E4526370780004718A4 /* Socket */ = {
 			isa = XCSwiftPackageProductDependency;

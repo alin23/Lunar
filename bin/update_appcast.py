@@ -85,13 +85,13 @@ def get_eddsa_signature(file):
 
 # pylint: disable=too-many-locals,too-many-branches
 def main(
-    dsa_key_path: Path,
+    # dsa_key_path: Path,
     eddsa_key_path: Path,
     app_signatures=[],
     app_version="",
     app_configuration="",
 ):
-    dsa_key_path = Path(dsa_key_path)
+    # dsa_key_path = Path(dsa_key_path)
     eddsa_key_path = Path(eddsa_key_path)
 
     if app_configuration and app_configuration.lower() != "release":
@@ -108,8 +108,8 @@ def main(
         description = item.find("description")
         signatures = item.findall("signature")
 
-        sig = enclosure.attrib.get(sparkle("dsaSignature"))
-        version = enclosure.attrib[sparkle("version")]
+        sig = enclosure.attrib.get(sparkle("edSignature"))
+        version = enclosure.attrib[sparkle("version")] or item.find(sparkle("version"))
 
         minimumAutoupdateVersion = item.findall(sparkle("minimumAutoupdateVersion"))
         if version[0] == "4" and not minimumAutoupdateVersion:
@@ -144,10 +144,10 @@ def main(
             "url", f"{STATIC_LUNAR_SITE}/releases/Lunar-{version}{installer.suffix}"
         )
 
-        if dsa_key_path and not sig:
-            enclosure.set(
-                sparkle("dsaSignature"), get_dsa_signature(installer, dsa_key_path)
-            )
+        # if dsa_key_path and not sig:
+        #     enclosure.set(
+        #         sparkle("dsaSignature"), get_dsa_signature(installer, dsa_key_path)
+        #     )
         if eddsa_key_path and not sig:
             signature, length = get_eddsa_signature(installer)
             length = int(length)
@@ -156,10 +156,10 @@ def main(
         if installer in (pkg, pkgzip):
             enclosure.set(sparkle("installationType"), "package")
 
-        RELEASE_NOTES_file = RELEASE_NOTES / f"{version}.md"
-        if description is None and RELEASE_NOTES_file.exists():
+        releaseNotesFile = RELEASE_NOTES / f"{version}.md"
+        if description is None and releaseNotesFile.exists():
             changelog = html.fromstring(
-                markdown_path(str(RELEASE_NOTES_file), extras=["header-ids"])
+                markdown_path(str(releaseNotesFile), extras=["header-ids"])
             )
             description = E.description(
                 etree.CDATA(
@@ -174,17 +174,17 @@ def main(
             for enclosure in delta.findall("enclosure"):
                 new_version = enclosure.attrib[sparkle("version")]
                 old_version = enclosure.attrib[sparkle("deltaFrom")]
-                sig = enclosure.attrib.get(sparkle("dsaSignature"))
+                sig = enclosure.attrib.get(sparkle("edSignature"))
                 enclosure.set("url", f"{LUNAR_SITE}/delta/{new_version}/{old_version}")
 
                 delta_file = appcast_path.with_name(
                     f"Lunar{new_version}-{old_version}.delta"
                 )
-                if dsa_key_path and not sig:
-                    enclosure.set(
-                        sparkle("dsaSignature"),
-                        get_dsa_signature(delta_file, dsa_key_path),
-                    )
+                # if dsa_key_path and not sig:
+                #     enclosure.set(
+                #         sparkle("dsaSignature"),
+                #         get_dsa_signature(delta_file, dsa_key_path),
+                #     )
                 if eddsa_key_path and not sig:
                     signature, length = get_eddsa_signature(delta_file)
                     length = int(length)

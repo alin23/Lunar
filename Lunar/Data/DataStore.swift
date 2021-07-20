@@ -13,6 +13,7 @@ import Defaults
 
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
+    .advancedSettingsShown,
     .appExceptions,
     .muteVolumeZero,
     .mediaKeysNotified,
@@ -458,6 +459,7 @@ func initCache() {
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.muteVolumeZero)
+    cacheKey(.advancedSettingsShown)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
     cacheKey(.didScrollTextField)
@@ -516,6 +518,7 @@ extension Defaults.Keys {
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
+    static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
@@ -568,6 +571,9 @@ extension Defaults.Keys {
         default: true,
         suite: UserDefaults(suiteName: ".GlobalPreferences") ?? .standard
     )
+
+    static let silentUpdate = Key<Bool>("SUAutomaticallyUpdate", default: false)
+    static let checkForUpdate = Key<Bool>("SUEnableAutomaticChecks", default: true)
 }
 
 let datastore = DataStore()
@@ -592,6 +598,7 @@ enum AppSettings {
 
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates()
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates()
+let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates()
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates()
 // let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates()
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates()
@@ -614,3 +621,5 @@ let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates()
 let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates()
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
+let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates()
+let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates()

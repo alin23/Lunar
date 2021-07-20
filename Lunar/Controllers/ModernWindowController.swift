@@ -34,6 +34,7 @@ extension AppDelegate: NSWindowDelegate {
             return
         }
 
+        appDelegate.currentPage = Page.display.rawValue
         configurationViewController.view.subviews.removeAll()
         tableView.removeRows(at: .init(integersIn: 0 ..< tableView.numberOfRows), withAnimation: [])
         exceptionsViewController.view.subviews.removeAll()

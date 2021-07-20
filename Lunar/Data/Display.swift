@@ -2119,14 +2119,14 @@ enum ValueType {
         }
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT: \(description)")
-            log.verbose("popover: \(_hotkeyPopover)")
-            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
-            do { log.verbose("END DEINIT: \(description)") }
-        #endif
-    }
+//    deinit {
+//        #if DEBUG
+//            log.verbose("START DEINIT: \(description)")
+//            log.verbose("popover: \(_hotkeyPopover)")
+//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
+//            do { log.verbose("END DEINIT: \(description)") }
+//        #endif
+//    }
 
     lazy var hotkeyIdentifiers = [
         "toggle-last-input-\(serial)",
