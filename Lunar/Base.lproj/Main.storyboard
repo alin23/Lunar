@@ -572,11 +572,7 @@
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <binding destination="hYb-xA-BhZ" name="target" keyPath="self" id="u54-XU-zLW">
-                                                    <dictionary key="options">
-                                                        <string key="NSSelectorName">checkForUpdates:</string>
-                                                    </dictionary>
-                                                </binding>
+                                                <action selector="checkForUpdates:" target="Voe-Tx-rLC" id="ibT-20-cPp"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Quit Lunar" keyEquivalent="q" id="8Oe-Go-Jnc">
@@ -616,14 +612,12 @@
                         <outlet property="percent75MenuItem" destination="rXC-7i-Z75" id="rln-kM-6lF"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="resetTrialMenuItem" destination="v9d-uL-JbA" id="9bY-DS-tBe"/>
-                        <outlet property="updateController" destination="hYb-xA-BhZ" id="jlH-HQ-4vJ"/>
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
                         <outlet property="volumeDownMenuItem" destination="ORj-JY-7d6" id="bIx-iF-AnX"/>
                         <outlet property="volumeUpMenuItem" destination="91P-qR-leE" id="UjC-Dk-2b5"/>
                     </connections>
                 </customObject>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-                <customObject id="hYb-xA-BhZ" customClass="SPUStandardUpdaterController"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="3YV-ka-Eop"/>
                 <userDefaultsController id="u0a-cA-m1f"/>
@@ -1427,7 +1421,7 @@ Configuration page</string>
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="updater.automaticallyChecksForUpdates" id="OMN-47-Bbg"/>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.SUEnableAutomaticChecks" id="mRq-o2-jgL"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHC-2c-i2Q">
@@ -1448,7 +1442,7 @@ Configuration page</string>
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="nt4-Hn-Aot" name="value" keyPath="updater.automaticallyDownloadsUpdates" id="z1j-Mw-a6c"/>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.SUAutomaticallyUpdate" id="fkv-jd-lJp"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFM-4J-v5n">
@@ -1683,7 +1677,6 @@ when dock and menubar icons are hidden</string>
                     </connections>
                 </viewController>
                 <customObject id="1Xr-ze-Y7B" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="nt4-Hn-Aot" customClass="SPUStandardUpdaterController"/>
                 <userDefaultsController id="DNB-4H-88e"/>
                 <userDefaultsController id="2iU-q0-Za5"/>
             </objects>
@@ -5029,6 +5022,46 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QcF-6z-yIK" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="175" y="34" width="183" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="inline" title="Skip this update" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="8Ed-Fh-wiw">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="skipUpdate:" target="FZw-S1-5VI" id="LNG-sJ-Q9s"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="seW-uU-Bb3" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="592" y="34" width="183" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="inline" title="Update anyway" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="KKf-9R-y49">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="updateAnyway:" target="FZw-S1-5VI" id="kaG-a8-htl"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -5036,7 +5069,9 @@ Click the button below to extend your license and keep using Lunar Pro</string>
                         <outlet property="extendLicenseButton" destination="ocE-oP-1Kh" id="AvR-mH-DGH"/>
                         <outlet property="logo" destination="c7P-J4-2ts" id="jCx-dd-R4j"/>
                         <outlet property="outputScrollView" destination="8lx-y1-IRb" id="ssd-pC-l0d"/>
+                        <outlet property="skipUpdateButton" destination="QcF-6z-yIK" id="PHE-tH-ECb"/>
                         <outlet property="textView" destination="JSB-N2-n7L" id="cc1-00-KPe"/>
+                        <outlet property="updateAnywayButton" destination="seW-uU-Bb3" id="OQY-PB-xXl"/>
                     </connections>
                 </viewController>
                 <customObject id="VSR-XF-FC3" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

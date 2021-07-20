@@ -205,7 +205,6 @@ extension AdaptiveMode {
         factor: Double? = nil,
         userValues: [Int: Int]? = nil
     ) -> [Double] {
-//        return [Double](repeating: 0, count: maxChartDataPoints)
         let (value, minValue, maxValue, displayUserValues) = display.values(monitorValue, modeKey: key)
         var userValues = userValues ?? displayUserValues
 

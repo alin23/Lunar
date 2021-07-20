@@ -75,9 +75,11 @@ end
 if not set -q DISABLE_PACKING
     set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
 
-    ./make-installer dmg &
-    ./make-installer pkg &
-    wait
+    ./make-installer dmg
+
+    # ./make-installer dmg &
+    # ./make-installer pkg &
+    # wait
 
     export CONFIGURATION=$CONFIGURATION
     ./update_appcast

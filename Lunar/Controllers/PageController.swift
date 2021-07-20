@@ -83,7 +83,7 @@ class PageController: NSPageController {
             }
         }
 
-        selectedIndex = 2
+        selectedIndex = Page.display.rawValue
 
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
@@ -122,8 +122,7 @@ extension PageController: NSPageControllerDelegate {
             return
         }
 
-        let identifier = pageController(c, identifierFor: c.arrangedObjects[c.selectedIndex])
-        let viewController = pageController(c, viewControllerForIdentifier: identifier)
+        appDelegate.currentPage = c.selectedIndex
 
         switch c.selectedIndex {
         case 0:

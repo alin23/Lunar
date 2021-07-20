@@ -80,7 +80,7 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
 }
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUUpdaterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
@@ -123,7 +123,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var muteAudioMenuItem: NSMenuItem!
     @IBOutlet var resetTrialMenuItem: NSMenuItem!
     @IBOutlet var expireTrialMenuItem: NSMenuItem!
-    @IBOutlet var updateController: SPUStandardUpdaterController?
 
     @IBOutlet var lunarProMenuItem: NSMenuItem!
     @IBOutlet var activateLicenseMenuItem: NSMenuItem!
@@ -131,12 +130,50 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic var faceLightOn = false
 
+    lazy var updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil), delegate: self)
+
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
         initLicensingMenuItems(version)
+    }
+
+    @IBAction func checkForUpdates(_: Any) {
+        updater.checkForUpdates()
+    }
+
+    func application(_: NSApplication, open urls: [URL]) {
+        for url in urls {
+            guard let scheme = url.scheme, let host = url.host, scheme == "lunar" else { continue }
+
+            mainThread {
+                CachedDefaults[.advancedSettingsShown] = host == "advanced"
+            }
+
+            switch host {
+            case "checkout":
+                showCheckout()
+            case "advanced":
+                currentPage = Page.settings.rawValue
+                showWindow()
+            case "settings":
+                currentPage = Page.settings.rawValue
+                showWindow()
+            case "hotkeys":
+                currentPage = Page.hotkeys.rawValue
+                showWindow()
+            case "display":
+                currentPage = Page.display.rawValue
+                if let number = url.pathComponents.prefix(2).last?.i, number > 0, number <= displayController.activeDisplays.count {
+                    currentPage += (number - 1)
+                }
+                showWindow()
+            default:
+                continue
+            }
+        }
     }
 
     func initHotkeys() {
@@ -184,10 +221,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForSettingsChange() {
-        NotificationCenter.default
-            .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
-            .sink { _ in displayController.addSentryData() }
-            .store(in: &observers)
+        silentUpdatePublisher.sink { change in
+            self.updater.automaticallyDownloadsUpdates = change.newValue
+        }.store(in: &observers)
+        checkForUpdatePublisher.sink { change in
+            self.updater.automaticallyChecksForUpdates = change.newValue
+        }.store(in: &observers)
+        // NotificationCenter.default
+        //     .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
+        //     .sink { _ in displayController.addSentryData() }
+        //     .store(in: &observers)
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -282,6 +325,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             log.debug("Location authorized")
         @unknown default:
             log.debug("Location status unknown")
+        }
+        goToPage()
+        mainAsyncAfter(ms: 500) { [self] in
+            goToPage()
+        }
+    }
+
+    func goToPage() {
+        guard let view = windowController?.window?.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
+              let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
+              let splitViewController = pageController.parent as? SplitViewController,
+              pageController.selectedIndex != currentPage,
+              pageController.arrangedObjects.count > currentPage
+        else { return }
+
+        pageController.animator().selectedIndex = currentPage
+        switch currentPage {
+        case 0:
+            splitViewController.mauveBackground()
+        case 1:
+            splitViewController.yellowBackground()
+        case pageController.arrangedObjects.count - 1:
+            splitViewController.lastPage()
+        default:
+            splitViewController.whiteBackground()
         }
     }
 
@@ -726,6 +794,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initHotkeys()
 
         listenForAdaptiveModeChange()
+        listenForSettingsChange()
         listenForScreenConfigurationChanged()
         displayController.listenForRunningApps()
 
@@ -858,6 +927,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    var currentPage: Int = 2
     func resetElements() {
         mainThread {
             if let splitView = windowController?.window?.contentViewController as? SplitViewController {
