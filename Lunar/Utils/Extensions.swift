@@ -300,6 +300,14 @@ extension Double {
     }
 }
 
+extension NSAttributedString {
+    func appending(_ other: NSAttributedString) -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: self)
+        mutable.append(other)
+        return mutable
+    }
+}
+
 extension Float {
     @inline(__always) func rounded(to scale: Int) -> Float {
         let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)

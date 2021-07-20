@@ -209,7 +209,8 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  \param appcast The appcast that was downloaded from the remote server.
  \param updater The updater instance.
- \return The best valid appcast item, or nil if you don't want to be delegated this task.
+ \return The best valid appcast item. Return SUAppcastItem.emptyAppcastItem if no appcast item is valid. Return nil if you don't want to be delegated this task and
+         want to let Sparkle handle picking the best valid update.
  */
 - (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
 
@@ -220,6 +221,20 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
 - (void)updater:(SPUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+
+/*!
+ Called when a valid update is not found.
+ 
+ \param updater The updater instance.
+ \param error An error containing information on why a new valid update was not found
+    There are various reasons a new update is unavailable and can't be installed.
+    The userInfo dictionary on the error is also populated with three keys:
+    SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found. This will be nil if it's unavailable.
+    SPUNoUpdateFoundReasonKey: This will provide the SUNoUpdateFoundReason.
+    For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+    SPUNoUpdateFoundUserInitiatedKey: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
+ */
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error;
 
 /*!
  Called when a valid update is not found.

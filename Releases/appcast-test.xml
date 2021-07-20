@@ -305,15 +305,29 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
             </description>
         </item>
-        <item signature='test.signature+3='>
-            <signature>test.signature+3=</signature>
-            <title>4.3.0</title>
-            <pubDate>Tue, 29 May 2021 20:49:53 +0300</pubDate>
-            <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
+
+        <item>
+            <title>4.6.3</title>
+            <sparkle:shortVersionString>4.6.3</sparkle:shortVersionString>
+            <sparkle:version>4.6.3</sparkle:version>
+            <pubDate>Sat, 20 Jul 2021 19:18:09 +0300</pubDate>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure sparkle:edSignature="ImN8v8nPBmNIKY6wZkVpQy9IKKrLdK/4UQ0VqePHRMCAssL/9epQvLV1nmZHR+i+vxs7Ht6/chaEc92YqkN1DQ==" length="17115887" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.3.dmg"/>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
-            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="4.3.0" sparkle:version="4.3.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <signature>FX5mPojYbKdLChSLEHL077bB0ic=</signature>
+            <signature>nHyZHvDP.ODI0zLLwLCHPsnr.To=</signature>
+            <signature>nHyZHvDP/ODI0zLLwLCHPsnr/To=</signature>
+
+            <signature>Ijew7S2Z/gbZSKrZ2g5oQgGaBJs=</signature>
+            <signature>Ijew7S2Z.gbZSKrZ2g5oQgGaBJs=</signature>
+            <signature>RT9DQXG2rsyys71qG0Q/lyKlpFQ=</signature>
+            <signature>RT9DQXG2rsyys71qG0Q.lyKlpFQ=</signature>
+
+            <signature>5STM9tfcHN1yEbFKEdzPfAk191o=</signature>
+            <signature>qjMcZN41KlXxj86kr1YVk8duNDM=</signature>
+
             <description>
-                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li { font-size: 13; }</style><div><h2 id="features">Features</h2><ul><li>Add support for changing monitor volume and mute state</li><li>Show native OSD when changing monitor brightness, contrast and volume</li><li>Implement listeners for media keys<ul><li>Lunar will ask for accessibility permissions to enable this functionality</li><li>Instructions: <ul><li>Press keyboard brightness keys while the cursor is on an external monitor to change the brightness on that monitor </li><li>Press Control + keyboard brightness keys to adjust contrast </li><li>Press keyboard volume/mute keys while the audio output is set to the monitor audio device to adjust volume/mute</li><li>In multi-monitor setups, Lunar can't detect which monitor audio device is selected so it will change the volume of the display that the cursor is on</li></ul></li></ul></li><li>Many thanks to Hongfeng Xu (@Mic238) for helping me with extensive testing on these features!</li></ul><h2 id="improvements">Improvements</h2><ul><li>Detect non-responsive monitors and show that in the Quick Actions popover</li><li>Automatic detection of GPU for adaptive DDC reply delay<ul><li>This should minimize kernel panics and system freezes when reading values from the monitor</li></ul></li><li>Add special brightness implementation for <strong>LED Cinema</strong> monitors </li></ul><h2 id="fixes">Fixes</h2><ul><li>Fixed a typo that was preventing smooth transition to be disabled for contrast</li></ul></div></div>]]>
+                <![CDATA[<div><style>    * {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix <a href="https://lunar.fyi/#curve">Auto-learning Curve</a> for <strong>Location</strong> and <strong>Sensor</strong> mode</li><li>Move some UI operations on the main thread to keep the window visually consistent</li><li>Check for possible clamshell mode while Sync Mode is adapting to avoid setting brightness to 0 before the <code>IsLidClosed</code> flag has been set</li></ul></div></div>]]>
             </description>
         </item>
     </channel>
