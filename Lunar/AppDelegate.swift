@@ -91,7 +91,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var alsWindowController: ModernWindowController?
     var sshWindowController: ModernWindowController?
-    var updateInfoWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
 
     var observers: Set<AnyCancellable> = []

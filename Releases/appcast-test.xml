@@ -281,13 +281,13 @@
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Show built-in brightness in menu</li><li>Update hotkey libraries</li><li>Use Swift Package Manager for most of the frameworks</li><li>Use LaunchAtLogin framework to fix start at login</li></ul></div></div>]]>
             </description>
         </item>
-        <item signature='test-signature'>
+        <item signature="test-signature">
             <signature>test-signature</signature>
             <title>4.1.0</title>
             <pubDate>Tue, 22 Apr 2021 20:48:53 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
-            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:installationType="package" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.0" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.0.zip"/>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
             </description>
@@ -300,34 +300,44 @@
             <pubDate>Tue, 22 Apr 2021 20:48:53 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
-            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.0" type="application/octet-stream" url="https://lunar.fyi/download/3.2.3"/>
+            <enclosure length="9314658" sparkle:dsaSignature="MEYCIQChMTtKVKsAPg3hyQaOTLZWkPjt1I7ojRuPWvDDhwUOkQIhAItdtb8g1SqP2JeUcsJ7ASyMGqkCo9Vfu/dHvWIZOAVL" sparkle:edSignature="joruxfzJbRWDA1e7CDzBpUyqkZfSqkaNfO1OJpkBQawzQ7XwRTBFZZ8NUTSNjfJvWs7sST2gTgQMKNziVWk9Dw==" sparkle:installationType="package" sparkle:shortVersionString="4.1.0" sparkle:version="4.1.1" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.1.1.pkg"/>
             <description>
                 <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Lunar Pro</li></ul></div></div>]]>
             </description>
         </item>
-
         <item>
             <title>4.6.3</title>
             <sparkle:shortVersionString>4.6.3</sparkle:shortVersionString>
             <sparkle:version>4.6.3</sparkle:version>
             <pubDate>Sat, 20 Jul 2021 19:18:09 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure sparkle:edSignature="ImN8v8nPBmNIKY6wZkVpQy9IKKrLdK/4UQ0VqePHRMCAssL/9epQvLV1nmZHR+i+vxs7Ht6/chaEc92YqkN1DQ==" length="17115887" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.3.dmg"/>
+            <enclosure length="17115887" sparkle:edSignature="ImN8v8nPBmNIKY6wZkVpQy9IKKrLdK/4UQ0VqePHRMCAssL/9epQvLV1nmZHR+i+vxs7Ht6/chaEc92YqkN1DQ==" sparkle:installationType="package" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.3.dmg"/>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>FX5mPojYbKdLChSLEHL077bB0ic=</signature>
             <signature>nHyZHvDP.ODI0zLLwLCHPsnr.To=</signature>
             <signature>nHyZHvDP/ODI0zLLwLCHPsnr/To=</signature>
-
             <signature>Ijew7S2Z/gbZSKrZ2g5oQgGaBJs=</signature>
             <signature>Ijew7S2Z.gbZSKrZ2g5oQgGaBJs=</signature>
             <signature>RT9DQXG2rsyys71qG0Q/lyKlpFQ=</signature>
             <signature>RT9DQXG2rsyys71qG0Q.lyKlpFQ=</signature>
-
             <signature>5STM9tfcHN1yEbFKEdzPfAk191o=</signature>
             <signature>qjMcZN41KlXxj86kr1YVk8duNDM=</signature>
-
             <description>
-                <![CDATA[<div><style>    * {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix <a href="https://lunar.fyi/#curve">Auto-learning Curve</a> for <strong>Location</strong> and <strong>Sensor</strong> mode</li><li>Move some UI operations on the main thread to keep the window visually consistent</li><li>Check for possible clamshell mode while Sync Mode is adapting to avoid setting brightness to 0 before the <code>IsLidClosed</code> flag has been set</li></ul></div></div>]]>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix <a href="https://lunar.fyi/#curve">Auto-learning Curve</a>for <strong>Location</strong>and <strong>Sensor</strong>mode</li><li>Move some UI operations on the main thread to keep the window visually consistent</li><li>Check for possible clamshell mode while Sync Mode is adapting to avoid setting brightness to 0 before the <code>IsLidClosed</code>flag has been set</li></ul></div></div>]]>
+            </description>
+        </item>
+        <item>
+            <title>4.6.5</title>
+            <pubDate>Tue, 20 Jul 2021 16:12:02 +0300</pubDate>
+            <sparkle:version>4.6.5</sparkle:version>
+            <sparkle:shortVersionString>4.6.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure length="19895083" sparkle:edSignature="RSVE4msaMJowGYevKUkV0VdEfH/KgW+IzFndXb8CCUzoaa319AZreTJsGmhyIeRMXCwWsKGov4elhgqPu81kBw==" type="application/octet-stream" url="https://static.lunar.fyi/Lunar-4.6.5-test.dmg"/>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <signature>test-signature</signature>
+            <signature>test-signature</signature>
+            <description>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix Auto-learning for Location mode when the sun is below the horizon (negative degrees)</li><li>Fix silent automatic updates</li></ul><h2 id="improvements">Improvements</h2><ul><li>Make the main window interaction smoother by removing unnecessary charts</li><li>Make the paid updates message clearer when the free updates period expires</li></ul></div></div>]]>
             </description>
         </item>
     </channel>
