@@ -23,7 +23,7 @@ set INTEL_APP_SIGNATURE (arch -x86_64 "$APP_TMP"/Contents/MacOS/Lunar @ signatur
 echo Lunar $APP_VERSION \n\tARM signature: "$ARM_APP_SIGNATURE"\n\tINTEL signature: "$INTEL_APP_SIGNATURE"
 
 echo \n(set_color yellow)"Generating AppCast ($APPCAST)"(set_color normal)
-"$WORK_DIR/bin/generate_appcast" -f "$PRIV_KEY" -o "$APPCAST" "$RELEASE_DIR"
+"$WORK_DIR/bin/generate_appcast" -s (cat $ED_PRIV_KEY) -o "$APPCAST" "$RELEASE_DIR"
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
 "$WORK_DIR/bin/update_appcast.py" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) || exit 1

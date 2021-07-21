@@ -693,42 +693,6 @@
             <point key="canvasLocation" x="-3137" y="232"/>
         </scene>
         <!--Window Controller-->
-        <scene sceneID="wB2-Ex-Qif">
-            <objects>
-                <windowController storyboardIdentifier="updateInfoWindowController" showSeguePresentationStyle="single" id="YDX-AI-UAd" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Update Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" appearanceType="aqua" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="vxc-Um-t0t" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
-                        <rect key="contentRect" x="561" y="439" width="950" height="700"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
-                        <value key="minSize" type="size" width="950" height="700"/>
-                        <value key="maxSize" type="size" width="950" height="700"/>
-                        <view key="contentView" id="IY4-IA-f00">
-                            <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </view>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticallyCenterTitle" value="YES"/>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="centerTrafficLightButtons" value="YES"/>
-                            <userDefinedRuntimeAttribute type="number" keyPath="titleBarHeight">
-                                <real key="value" value="40"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="number" keyPath="trafficLightButtonsLeftMargin">
-                                <real key="value" value="14"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="hideTitleBarInFullScreen" value="NO"/>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="hidesTitle" value="YES"/>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="verticalTrafficLightButtons" value="NO"/>
-                        </userDefinedRuntimeAttributes>
-                    </window>
-                    <connections>
-                        <segue destination="FZw-S1-5VI" kind="relationship" relationship="window.shadowedContentViewController" id="uA0-Ox-YXg"/>
-                    </connections>
-                </windowController>
-                <customObject id="qFe-e4-MXI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-3189" y="2100"/>
-        </scene>
-        <!--Window Controller-->
         <scene sceneID="81y-vf-J25">
             <objects>
                 <windowController storyboardIdentifier="progressWindowController" showSeguePresentationStyle="single" id="Dvt-Cn-vO6" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
@@ -2882,7 +2846,7 @@ when dock and menubar icons are hidden</string>
                                 </popUpButtonCell>
                                 <connections>
                                     <action selector="setInput:" target="1Bn-Ca-ETm" id="CPa-dk-uc9"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="0Pp-lL-OYP" id="aVn-Q2-eTt">
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" previousBinding="0Pp-lL-OYP" id="12M-mJ-DK9">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
@@ -2948,9 +2912,12 @@ when dock and menubar icons are hidden</string>
                                     <action selector="proButtonClick:" target="1Bn-Ca-ETm" id="4yD-2G-3l1"/>
                                 </connections>
                             </button>
-                            <button toolTip="Power off the monitor. Works only if the monitor can be controlled through DDC." focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="591" y="495" width="26" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <string key="toolTip">Power off the monitor. Works only if the monitor can be controlled through DDC.
+
+Can't power on the monitor. When a monitor is turned off or in standby, it does not accept commands from a connected device</string>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
                                     <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
@@ -2971,7 +2938,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="powerOff:" target="1Bn-Ca-ETm" id="uwQ-Z4-n0a"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="fs1-ws-1sY">
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="ccV-9Q-Z6t">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
@@ -3087,6 +3054,9 @@ and contrast to their highest values</string>
                                         <action selector="reset:" target="1Bn-Ca-ETm" id="TEo-OZ-X1P"/>
                                     </connections>
                                 </popUpButtonCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
+                                </connections>
                             </popUpButton>
                         </subviews>
                     </view>
@@ -4899,186 +4869,6 @@ Lunar will continue to check in the background</string>
                 <userDefaultsController id="IrJ-es-cxF"/>
             </objects>
             <point key="canvasLocation" x="-2152" y="1033"/>
-        </scene>
-        <!--Update Info View Controller-->
-        <scene sceneID="0Wi-Ed-R1E">
-            <objects>
-                <viewController id="FZw-S1-5VI" customClass="UpdateInfoViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" appearanceType="aqua" id="rWp-Tl-TNp">
-                        <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <scrollView focusRingType="none" fixedFrame="YES" alphaValue="0.55000000000000004" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" scrollerKnobStyle="dark" translatesAutoresizingMaskIntoConstraints="NO" id="ETo-jn-cI4">
-                                <rect key="frame" x="102" y="141" width="750" height="415"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <clipView key="contentView" focusRingType="none" drawsBackground="NO" id="gCb-2Z-m4p">
-                                    <rect key="frame" x="0.0" y="0.0" width="750" height="415"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textView focusRingType="none" editable="NO" verticallyResizable="YES" smartInsertDelete="YES" id="9Yr-VH-gfe">
-                                            <rect key="frame" x="0.0" y="0.0" width="750" height="415"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="750" height="415"/>
-                                            <size key="maxSize" width="786" height="10000000"/>
-                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                        </textView>
-                                    </subviews>
-                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.65278352650000004" colorSpace="calibratedRGB"/>
-                                </clipView>
-                                <shadow key="shadow" blurRadius="45">
-                                    <size key="offset" width="0.0" height="16"/>
-                                    <color key="color" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="MBd-Hk-L3L">
-                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="lO7-jA-pPo">
-                                    <rect key="frame" x="-100" y="-100" width="16" height="415"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
-                            <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" scrollerKnobStyle="light" translatesAutoresizingMaskIntoConstraints="NO" id="8lx-y1-IRb" customClass="OutputScrollView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="84" y="132" width="782" height="450"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <clipView key="contentView" id="nDK-KV-uz9">
-                                    <rect key="frame" x="0.0" y="0.0" width="782" height="450"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="JSB-N2-n7L">
-                                            <rect key="frame" x="0.0" y="0.0" width="762" height="430"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="762" height="430"/>
-                                            <size key="maxSize" width="786" height="10000000"/>
-                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <connections>
-                                                <binding destination="FZw-S1-5VI" name="editable" keyPath="self.editable" id="uI1-CN-vLT"/>
-                                                <binding destination="FZw-S1-5VI" name="attributedString" keyPath="self.info" id="b9k-Xr-Uhr"/>
-                                            </connections>
-                                        </textView>
-                                    </subviews>
-                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.65278352650000004" colorSpace="calibratedRGB"/>
-                                </clipView>
-                                <edgeInsets key="contentInsets" left="10" right="10" top="10" bottom="10"/>
-                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="dKc-lA-WjK">
-                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="rf4-ve-7Or">
-                                    <rect key="frame" x="756" y="10" width="16" height="430"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="c7P-J4-2ts">
-                                <rect key="frame" x="385" y="640" width="180" height="42"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="zfn-FH-nVc">
-                                    <font key="font" size="25" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.89411764709999997" green="0.72941176470000002" blue="0.2666666667" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ocE-oP-1Kh" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="383.5" y="34" width="183" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="inline" title="Extend Lunar Pro license" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="c1c-rs-eQF">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="0.84999999999999998"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="extendLicense:" target="FZw-S1-5VI" id="ivT-fg-Vhi"/>
-                                </connections>
-                            </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pLG-Nw-SH3">
-                                <rect key="frame" x="84" y="599" width="364" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Your period of free updates has expired" id="0Z8-GJ-ETU">
-                                    <font key="font" metaFont="systemSemibold" size="20"/>
-                                    <color key="textColor" red="0.94901960780000005" green="0.20000000000000001" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cyF-Ps-RNl">
-                                <rect key="frame" x="0.0" y="67" width="950" height="43"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" selectable="YES" alignment="center" id="nsh-v9-d5g">
-                                    <font key="font" metaFont="systemMedium" size="13"/>
-                                    <string key="title">If you choose to update, you can continue using Lunar in free mode.
-Click the button below to extend your license and keep using Lunar Pro</string>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QcF-6z-yIK" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="175" y="34" width="183" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="inline" title="Skip this update" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="8Ed-Fh-wiw">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="0.84999999999999998"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="skipUpdate:" target="FZw-S1-5VI" id="LNG-sJ-Q9s"/>
-                                </connections>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="seW-uU-Bb3" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="592" y="34" width="183" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="inline" title="Update anyway" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="KKf-9R-y49">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="0.84999999999999998"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="updateAnyway:" target="FZw-S1-5VI" id="kaG-a8-htl"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                    </view>
-                    <connections>
-                        <outlet property="backingTextView" destination="9Yr-VH-gfe" id="wZh-08-pcc"/>
-                        <outlet property="extendLicenseButton" destination="ocE-oP-1Kh" id="AvR-mH-DGH"/>
-                        <outlet property="logo" destination="c7P-J4-2ts" id="jCx-dd-R4j"/>
-                        <outlet property="outputScrollView" destination="8lx-y1-IRb" id="ssd-pC-l0d"/>
-                        <outlet property="skipUpdateButton" destination="QcF-6z-yIK" id="PHE-tH-ECb"/>
-                        <outlet property="textView" destination="JSB-N2-n7L" id="cc1-00-KPe"/>
-                        <outlet property="updateAnywayButton" destination="seW-uU-Bb3" id="OQY-PB-xXl"/>
-                    </connections>
-                </viewController>
-                <customObject id="VSR-XF-FC3" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <userDefaultsController id="ekZ-By-8yJ"/>
-                <userDefaultsController id="hXG-oi-7qC"/>
-            </objects>
-            <point key="canvasLocation" x="-3189" y="3026"/>
         </scene>
         <!--Settings Popover Controller-->
         <scene sceneID="GTI-N2-9dZ">

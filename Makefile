@@ -3,6 +3,10 @@ define n
 
 endef
 
+DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
+DISABLE_PACKING := ${DISABLE_PACKING}
+ENV=Release
+
 RELEASE_NOTES_FILES := $(wildcard ReleaseNotes/*.md)
 TEMPLATE_FILES := $(wildcard Lunar/Templates/*.stencil)
 GENERATED_FILES=$(patsubst Lunar/Templates/%.stencil,Lunar/Generated/%.generated.swift,$(TEMPLATE_FILES))
@@ -52,3 +56,21 @@ sentry-release:
 	./release.sh
 
 print-%  : ; @echo $* = $($*)
+
+pkg: SHELL=/usr/local/bin/fish
+pkg:
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app CONFIGURATION=$(ENV) ./bin/make-installer pkg
+
+dmg: SHELL=/usr/local/bin/fish
+dmg:
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app CONFIGURATION=$(ENV) ./bin/make-installer dmg
+
+pack: SHELL=/usr/local/bin/fish
+pack:
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app CONFIGURATION=$(ENV) PROJECT_DIR=$$PWD ./bin/pack
+
+appcast:
+	env CONFIGURATION=$(ENV) ./bin/update_appcast
+
+build:
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO
