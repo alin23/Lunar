@@ -109,7 +109,11 @@ def main(
         signatures = item.findall("signature")
 
         sig = enclosure.attrib.get(sparkle("edSignature"))
-        version = enclosure.attrib[sparkle("version")] or item.find(sparkle("version"))
+        version = (
+            enclosure.attrib.get(sparkle("version"))
+            or item.find(sparkle("version")).text
+        )
+        print("Processing", version)
 
         minimumAutoupdateVersion = item.findall(sparkle("minimumAutoupdateVersion"))
         if version[0] == "4" and not minimumAutoupdateVersion:

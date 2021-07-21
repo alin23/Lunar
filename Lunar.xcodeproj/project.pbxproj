@@ -46,7 +46,6 @@
 		C74665FD26A6A2910091EF19 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C74665FC26A6A2910091EF19 /* SimplyCoreAudio */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
-		C74D46F326357DD400B0CBAE /* UpdateInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D46F126357DD400B0CBAE /* UpdateInfoViewController.swift */; };
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
@@ -242,7 +241,6 @@
 		C740A1F3262490E1004BC1C7 /* CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLI.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginServiceKit.swift; sourceTree = "<group>"; };
-		C74D46F126357DD400B0CBAE /* UpdateInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateInfoViewController.swift; sourceTree = "<group>"; };
 		C74F8DBE25EB94660077DF27 /* DisplayServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DisplayServices.framework; path = ../../../../../System/Library/PrivateFrameworks/DisplayServices.framework; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
@@ -514,7 +512,6 @@
 				C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */,
 				C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */,
 				C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */,
-				C74D46F126357DD400B0CBAE /* UpdateInfoViewController.swift */,
 				C7BADA11263889CD0058974C /* ProgressViewController.swift */,
 				C7E896D126500DFF0079A328 /* DiagnosticsViewController.swift */,
 				C71F8DB026542E1000C4648A /* GammaViewController.swift */,
@@ -1099,7 +1096,6 @@
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 				BF_746411459837 /* Secrets.generated.swift in Sources */,
-				C74D46F326357DD400B0CBAE /* UpdateInfoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
