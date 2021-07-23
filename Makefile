@@ -38,7 +38,7 @@ CHANGELOG.md: $(RELEASE_NOTES_FILES)
 changelog: CHANGELOG.md
 dev: install-deps install-hooks codegen
 
-.PHONY: release upload
+.PHONY: release upload build sentry-release pkg dmg pack appcast
 upload:
 	rsync -avzP Releases/*.delta noiseblend:/static/Lunar/deltas/
 	rsync -avzP Releases/*.{dmg,pkg,zip} noiseblend:/static/Lunar/releases/
