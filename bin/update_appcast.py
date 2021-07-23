@@ -85,13 +85,14 @@ def get_eddsa_signature(file):
 
 # pylint: disable=too-many-locals,too-many-branches
 def main(
-    # dsa_key_path: Path,
     eddsa_key_path: Path,
+    dsa_key_path: Path = None,
     app_signatures=[],
     app_version="",
     app_configuration="",
 ):
-    # dsa_key_path = Path(dsa_key_path)
+    if dsa_key_path:
+        dsa_key_path = Path(dsa_key_path)
     eddsa_key_path = Path(eddsa_key_path)
 
     if app_configuration and app_configuration.lower() != "release":
@@ -108,6 +109,7 @@ def main(
         description = item.find("description")
         signatures = item.findall("signature")
 
+        dsaSig = enclosure.attrib.get(sparkle("dsaSignature"))
         sig = enclosure.attrib.get(sparkle("edSignature"))
         version = (
             enclosure.attrib.get(sparkle("version"))
@@ -148,10 +150,10 @@ def main(
             "url", f"{STATIC_LUNAR_SITE}/releases/Lunar-{version}{installer.suffix}"
         )
 
-        # if dsa_key_path and not sig:
-        #     enclosure.set(
-        #         sparkle("dsaSignature"), get_dsa_signature(installer, dsa_key_path)
-        #     )
+        if dsa_key_path and not dsaSig:
+            enclosure.set(
+                sparkle("dsaSignature"), get_dsa_signature(installer, dsa_key_path)
+            )
         if eddsa_key_path and not sig:
             signature, length = get_eddsa_signature(installer)
             length = int(length)
@@ -176,19 +178,23 @@ def main(
 
         for delta in item.findall(sparkle("deltas")):
             for enclosure in delta.findall("enclosure"):
-                new_version = enclosure.attrib[sparkle("version")]
+                new_version = (
+                    enclosure.attrib.get(sparkle("version"))
+                    or item.find(sparkle("version")).text
+                )
                 old_version = enclosure.attrib[sparkle("deltaFrom")]
+                dsaSig = enclosure.attrib.get(sparkle("dsaSignature"))
                 sig = enclosure.attrib.get(sparkle("edSignature"))
                 enclosure.set("url", f"{LUNAR_SITE}/delta/{new_version}/{old_version}")
 
                 delta_file = appcast_path.with_name(
                     f"Lunar{new_version}-{old_version}.delta"
                 )
-                # if dsa_key_path and not sig:
-                #     enclosure.set(
-                #         sparkle("dsaSignature"),
-                #         get_dsa_signature(delta_file, dsa_key_path),
-                #     )
+                if dsa_key_path and not dsaSig:
+                    enclosure.set(
+                        sparkle("dsaSignature"),
+                        get_dsa_signature(delta_file, dsa_key_path),
+                    )
                 if eddsa_key_path and not sig:
                     signature, length = get_eddsa_signature(delta_file)
                     length = int(length)
