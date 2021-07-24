@@ -34,6 +34,21 @@ class ALSInstallViewController: NSViewController {
             return "nodemcu-32s"
         case "Generic ESP32":
             return "esp32dev"
+
+        case "NodeMCUV2 ESP8266":
+            return "nodemcuv2"
+        case "D1 Mini":
+            return "d1_mini"
+        case "D1 Mini Lite":
+            return "d1_mini_lite"
+        case "D1 Mini Pro":
+            return "d1_mini_pro"
+        case "SparkFun ESP8266 Thing":
+            return "thing"
+        case "NodeMCU V1 ESP8266":
+            return "nodemcu"
+        case "Generic ESP8266":
+            return "esp_wroom_02"
         default:
             return "esp32dev"
         }
