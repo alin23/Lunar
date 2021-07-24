@@ -2,11 +2,15 @@ substitutions:
   ssid: Wifi
   password: password
   board: board
+  platform: platform
+  platform_version: platform_version
+  sda: sda
+  scl: scl
 
 esphome:
   name: lunarsensor
-  platform: ESP32
-  board: esp32dev
+  platform: $platform
+  board: $board
   includes:
     - tsl2591.h
   libraries:
@@ -14,7 +18,7 @@ esphome:
     - https://github.com/blackhack/ESPAsyncWebServer
   platformio_options:
     board: $board
-    platform: https://static.lunar.fyi/platform-espressif32-b331f75383faaa7bc8ee971b0cdb83177feb8284.zip
+    platform: $platform_version
     platform_packages:
       - tool-esptoolpy @ https://static.lunar.fyi/esptool-dev.tar.gz
 
@@ -68,8 +72,8 @@ sensor:
           send_first_at: 2
 
 i2c:
-  sda: 19
-  scl: 23
+  sda: $sda
+  scl: $scl
   scan: False
   id: bus_a
 
