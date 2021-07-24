@@ -6263,13 +6263,13 @@ You can choose to send the diagnostics to the developer if you think this is not
                                             <menuItem title="NodeMCUV2 ESP8266" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="D1 Mini" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
+                                            <menuItem title="WEMOS D1 Mini" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="D1 Mini Lite" tag="43" identifier="d1_mini_lite" id="hZE-8f-Kh3">
+                                            <menuItem title="WEMOS D1 Mini Lite" tag="43" identifier="d1_mini_lite" id="hZE-8f-Kh3">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="D1 Mini Pro" tag="44" identifier="d1_mini_pro" id="hZE-8f-Kh4">
+                                            <menuItem title="WEMOS D1 Mini Pro" tag="44" identifier="d1_mini_pro" id="hZE-8f-Kh4">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="SparkFun ESP8266 Thing" tag="45" identifier="thing" id="hZE-8f-Kh5">
