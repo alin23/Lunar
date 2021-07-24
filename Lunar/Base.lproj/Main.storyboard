@@ -6134,13 +6134,6 @@ You can choose to send the diagnostics to the developer if you think this is not
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="0.84999999999999998"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" red="0.15865224380000001" green="0.1553739878" blue="0.22164647109999999" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
@@ -6264,6 +6257,31 @@ You can choose to send the diagnostics to the developer if you think this is not
                                             <menuItem title="Generic ESP32" tag="26" identifier="esp32dev" id="hZE-8f-OhL">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+
+                                            <menuItem isSeparatorItem="YES" id="Mv1-Ul-4bR"/>
+
+                                            <menuItem title="NodeMCUV2 ESP8266" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="D1 Mini" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="D1 Mini Lite" tag="43" identifier="d1_mini_lite" id="hZE-8f-Kh3">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="D1 Mini Pro" tag="44" identifier="d1_mini_pro" id="hZE-8f-Kh4">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="SparkFun ESP8266 Thing" tag="45" identifier="thing" id="hZE-8f-Kh5">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="NodeMCU V1 ESP8266" tag="46" identifier="nodemcu" id="hZE-8f-Kh6">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Generic ESP8266" tag="47" identifier="esp_wroom_02" id="hZE-8f-Kh7">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+
                                             <menuItem title="Select a dev board" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
