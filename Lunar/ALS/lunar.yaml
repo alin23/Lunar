@@ -3,7 +3,6 @@ substitutions:
   password: password
   board: board
   platform: platform
-  platform_version: platform_version
   sda: sda
   scl: scl
 
@@ -16,12 +15,6 @@ esphome:
   libraries:
     - "Adafruit TSL2591 Library"
     - https://github.com/blackhack/ESPAsyncWebServer
-  platformio_options:
-    board: $board
-    platform: $platform_version
-    platform_packages:
-      - tool-esptoolpy @ https://static.lunar.fyi/esptool-dev.tar.gz
-
 wifi:
   ssid: $ssid
   password: $password
