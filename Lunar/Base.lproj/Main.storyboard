@@ -2846,12 +2846,12 @@ when dock and menubar icons are hidden</string>
                                 </popUpButtonCell>
                                 <connections>
                                     <action selector="setInput:" target="1Bn-Ca-ETm" id="CPa-dk-uc9"/>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" previousBinding="0Pp-lL-OYP" id="12M-mJ-DK9">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
@@ -6257,31 +6257,28 @@ You can choose to send the diagnostics to the developer if you think this is not
                                             <menuItem title="Generic ESP32" tag="26" identifier="esp32dev" id="hZE-8f-OhL">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-
                                             <menuItem isSeparatorItem="YES" id="Mv1-Ul-4bR"/>
-
-                                            <menuItem title="NodeMCUV2 ESP8266" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
+                                            <menuItem title="NodeMCU v2 (ESP8266)" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="WEMOS D1 Mini" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
+                                            <menuItem title="WEMOS D1 Mini (ESP8266)" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="WEMOS D1 Mini Lite" tag="43" identifier="d1_mini_lite" id="hZE-8f-Kh3">
+                                            <menuItem title="WEMOS D1 Mini Lite (ESP8266)" tag="43" identifier="d1_mini_lite" id="hZE-8f-Kh3">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="WEMOS D1 Mini Pro" tag="44" identifier="d1_mini_pro" id="hZE-8f-Kh4">
+                                            <menuItem title="WEMOS D1 Mini Pro (ESP8266)" tag="44" identifier="d1_mini_pro" id="hZE-8f-Kh4">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="SparkFun ESP8266 Thing" tag="45" identifier="thing" id="hZE-8f-Kh5">
+                                            <menuItem title="SparkFun Thing (ESP8266)" tag="45" identifier="thing" id="hZE-8f-Kh5">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="NodeMCU V1 ESP8266" tag="46" identifier="nodemcu" id="hZE-8f-Kh6">
+                                            <menuItem title="NodeMCU v1 (ESP8266)" tag="46" identifier="nodemcu" id="hZE-8f-Kh6">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="Generic ESP8266" tag="47" identifier="esp_wroom_02" id="hZE-8f-Kh7">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-
                                             <menuItem title="Select a dev board" tag="99" hidden="YES" enabled="NO" identifier="select-device" id="yHJ-48-wYW">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
