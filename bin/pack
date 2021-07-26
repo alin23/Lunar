@@ -70,6 +70,8 @@ if not set -q DISABLE_NOTARIZATION
             ditto -c -k --keepParent /tmp/Lunar/Lunar.app /tmp/Lunar/Lunar.zip
         end
     end
+else if set -q DISABLE_PACKING
+    ditto -c -k --keepParent /tmp/Lunar/Lunar.app /tmp/Lunar/Lunar.zip
 end
 
 if not set -q DISABLE_PACKING
