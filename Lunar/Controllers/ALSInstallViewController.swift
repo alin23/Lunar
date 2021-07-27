@@ -14,6 +14,25 @@ let SELECT_DEVICE_ITEM = "Select a device"
 let SELECT_BOARD_ITEM = "Select a dev board"
 let INSTALL_LOG_PATH = "/tmp/lunar-sensor-install.log"
 
+func getDevices() -> [String] {
+    var devicePaths = Glob(pattern: "/dev/cu.usb*").filter { portPath in
+        !IGNORED_SERIAL_PORTS.contains(portPath)
+    }
+
+    #if DEBUG
+        devicePaths.append("/dev/cu.usbserial-110")
+    #endif
+
+    if shell("/sbin/ping", args: ["-o", "-t", "3", SENSOR_DEFAULT_HOSTNAME], timeout: 5.seconds).success {
+        devicePaths.append(SENSOR_DEFAULT_HOSTNAME)
+    }
+
+    guard !devicePaths.isEmpty else {
+        return [NO_DEVICE_AVAILABLE_ITEM]
+    }
+    return devicePaths
+}
+
 class ALSInstallViewController: NSViewController {
     @objc dynamic var operationTitle: String = "Ambient Light Sensor"
     @objc dynamic var board: String = SELECT_BOARD_ITEM {
@@ -87,24 +106,7 @@ class ALSInstallViewController: NSViewController {
     var installProcess: Process?
     var stopped = true
 
-    @objc dynamic lazy var devices: [String] = {
-        var devicePaths = Glob(pattern: "/dev/cu.usb*").filter { portPath in
-            !IGNORED_SERIAL_PORTS.contains(portPath)
-        }
-
-        #if DEBUG
-            devicePaths.append("/dev/cu.usbserial-110")
-        #endif
-
-        if shell("/sbin/ping", args: ["-o", "-t", "3", SENSOR_DEFAULT_HOSTNAME], timeout: 5.seconds).success {
-            devicePaths.append(SENSOR_DEFAULT_HOSTNAME)
-        }
-
-        guard !devicePaths.isEmpty else {
-            return [NO_DEVICE_AVAILABLE_ITEM]
-        }
-        return devicePaths
-    }()
+    @objc dynamic var devices: [String] = []
 
     @objc dynamic var ssid: String? = "WiFi" {
         didSet {
@@ -222,7 +224,8 @@ class ALSInstallViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        asyncNow { [weak self] in
+        mainAsyncAfter(ms: 100) { [weak self] in
+            self?.devices = getDevices()
             log.debug("Available sensor devices: \(self?.devices ?? [])")
         }
 
