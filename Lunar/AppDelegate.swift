@@ -150,6 +150,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     enum UIElement {
         case gear
+        case advancedSettingsButton
     }
 
     var uiElement: UIElement?
@@ -171,6 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             case "advanced":
                 currentPage = Page.settings.rawValue
+                uiElement = .advancedSettingsButton
                 showWindow(after: windowController == nil ? 2000 : nil)
             case "settings":
                 currentPage = Page.settings.rawValue
@@ -365,6 +367,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController else { return }
 
         switch uiElement {
+        case .advancedSettingsButton:
+            guard let settingsPageController = pageController
+                .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
+                let button = settingsPageController.advancedSettingsButton else { return }
+            button.highlight()
         case .gear:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
                   let displayViewController = pageController

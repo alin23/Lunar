@@ -25,7 +25,7 @@ extension AppDelegate: NSWindowDelegate {
         guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
-              let settingsViewController = settingsPageController.view.subviews[2].subviews[0].nextResponder as? SettingsViewController,
+              let settingsViewController = settingsPageController.view.subviews[1].subviews[0].nextResponder as? SettingsViewController,
               let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
               let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
               let tableView = exceptionsViewController.tableView
@@ -35,6 +35,9 @@ extension AppDelegate: NSWindowDelegate {
         }
 
         appDelegate.currentPage = Page.display.rawValue
+        if settingsPageController.advancedSettingsShown {
+            CachedDefaults[.advancedSettingsShown] = false
+        }
         configurationViewController.view.subviews.removeAll()
         tableView.removeRows(at: .init(integersIn: 0 ..< tableView.numberOfRows), withAnimation: [])
         exceptionsViewController.view.subviews.removeAll()

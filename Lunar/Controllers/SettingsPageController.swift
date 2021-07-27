@@ -14,12 +14,16 @@ class SettingsPageController: NSViewController {
     @IBOutlet var settingsContainerView: NSView!
     @IBOutlet var advancedSettingsContainerView: NSView!
     @IBOutlet var advancedSettingsButton: ToggleButton!
+    @IBOutlet var advancedSettingsNotice: NSTextField!
     @objc dynamic var advancedSettingsShown = CachedDefaults[.advancedSettingsShown]
 
     var advancedSettingsShownObserver: Cancellable?
 
     @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
         advancedSettingsShown = sender.state == .on
+        if advancedSettingsButton.highlighterTask != nil {
+            advancedSettingsButton.stopHighlighting()
+        }
     }
 
     override func viewDidLoad() {
@@ -38,5 +42,6 @@ class SettingsPageController: NSViewController {
         advancedSettingsButton.page = .settings
         advancedSettingsButton.isHidden = false
         advancedSettingsButton.state = advancedSettingsShown ? .on : .off
+        advancedSettingsButton.notice = advancedSettingsNotice
     }
 }
