@@ -1,3 +1,21 @@
+# 4.7.0
+# Features
+
+* Add support for ESP8266 sensor boards
+* Implement auto-gain and adaptive integration time for light sensors
+
+# Improvements
+
+* Make firmware installer window appear faster by looking for serial devices in the background
+* Highlight **Advanced** settings button
+* Add URL for opening the gear icon menu directly: [lunar://display/settings](lunar://display/settings)
+
+# Fixes
+
+* Fix support for Adafruit Metro ESP32 S2
+* Fix some unexpected crashes
+* Keep Lunar Pro active when license fails verification with Paddle for the first few times
+
 # 4.6.5
 ## Features
 
