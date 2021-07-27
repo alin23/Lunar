@@ -751,7 +751,7 @@ enum DDC {
             guard !isTestID(displayID) else { return nil }
 
             return sync(barrier: true) {
-                if !ignoreCache, let service = avServiceCache[displayID] {
+                if !ignoreCache, let serviceTemp = avServiceCache[displayID], let service = serviceTemp {
                     return service
                 }
                 let service = (
@@ -773,7 +773,7 @@ enum DDC {
 
     static func I2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> io_service_t? {
         sync(barrier: true) {
-            if !ignoreCache, let controller = i2cControllerCache[displayID] {
+            if !ignoreCache, let controllerTemp = i2cControllerCache[displayID], let controller = controllerTemp {
                 return controller
             }
             let controller = I2CController(displayID)
