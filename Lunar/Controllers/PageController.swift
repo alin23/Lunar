@@ -12,6 +12,8 @@ import Defaults
 import Foundation
 import Magnet
 
+var advancedSettingsHintShown = false
+
 class PageController: NSPageController {
     var pageControl: PageControl!
 
@@ -129,6 +131,12 @@ extension PageController: NSPageControllerDelegate {
             splitViewController.mauveBackground()
         case 1:
             splitViewController.yellowBackground()
+            if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade, !advancedSettingsHintShown,
+               let settingsPageController = c.viewControllers[c.settingsPageControllerIdentifier] as? SettingsPageController
+            {
+                advancedSettingsHintShown = true
+                settingsPageController.advancedSettingsButton.highlight()
+            }
         case c.pageControl.numberOfPages - 1:
             splitViewController.lastPage()
         default:
@@ -145,7 +153,10 @@ extension PageController: NSPageControllerDelegate {
         return NSPageController.ObjectIdentifier((object as! Display).serial)
     }
 
-    func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
+    func pageController(
+        _ c: NSPageController,
+        viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier
+    ) -> NSViewController {
         unowned let c = c as! PageController
 
         if c.viewControllers[identifier] == nil {
