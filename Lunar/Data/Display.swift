@@ -1278,6 +1278,8 @@ enum ValueType {
     }
 
     func detectI2C() {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled else { return }
+
         #if DEBUG
             #if arch(arm64)
                 // avService = (id == TEST_DISPLAY_ID) ? (1 as IOAVService) : DDC.AVService(displayID: id, display: self)
