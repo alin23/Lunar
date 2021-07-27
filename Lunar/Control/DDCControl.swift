@@ -74,7 +74,7 @@ class DDCControl: Control {
                     faults += 1
                 }
             }
-            return faults > 5
+            return faults <= 5
         }
 
         return DDC.setBrightness(for: display.id, brightness: brightness)
@@ -96,7 +96,7 @@ class DDCControl: Control {
                     faults += 1
                 }
             }
-            return faults > 5
+            return faults <= 5
         }
         return DDC.setContrast(for: display.id, contrast: contrast)
     }
