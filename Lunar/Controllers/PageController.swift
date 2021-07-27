@@ -142,7 +142,7 @@ extension PageController: NSPageControllerDelegate {
         if let identifier = object as? NSPageController.ObjectIdentifier {
             return identifier
         }
-        return NSPageController.ObjectIdentifier(String(describing: (object as! Display).serial))
+        return NSPageController.ObjectIdentifier((object as! Display).serial)
     }
 
     func pageController(_ c: NSPageController, viewControllerForIdentifier identifier: NSPageController.ObjectIdentifier) -> NSViewController {
