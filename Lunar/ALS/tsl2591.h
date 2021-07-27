@@ -15,7 +15,7 @@ public:
             ESP_LOGD("ERROR", "Could not find a TSL2591 Sensor. Did you configure I2C?");
         }
         tsl.setGain(TSL2591_GAIN_MED);
-        tsl.setTiming(TSL2591_INTEGRATIONTIME_600MS);
+        tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
     }
     void update() override
     {
@@ -24,6 +24,19 @@ public:
         uint16_t ch1 = full >> 16;
         float lux = tsl.calculateLux(ch0, ch1);
 
+        if (lux > 30000) {
+            tsl.setGain(TSL2591_GAIN_LOW);
+            tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);
+        } else if (lux > 500) {
+            tsl.setGain(TSL2591_GAIN_LOW);
+            tsl.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+        } else if (lux < 20) {
+            tsl.setGain(TSL2591_GAIN_HIGH);
+            tsl.setTiming(TSL2591_INTEGRATIONTIME_600MS);
+        } else {
+            tsl.setGain(TSL2591_GAIN_MED);
+            tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
+        }
         publish_state(lux);
     }
 };
