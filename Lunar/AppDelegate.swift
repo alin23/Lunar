@@ -129,7 +129,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic var faceLightOn = false
 
-    lazy var updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil), delegate: self)
+    lazy var updater = SPUUpdater(
+        hostBundle: Bundle.main,
+        applicationBundle: Bundle.main,
+        userDriver: SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil),
+        delegate: self
+    )
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -143,6 +148,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         updater.checkForUpdates()
     }
 
+    enum UIElement {
+        case gear
+    }
+
+    var uiElement: UIElement?
+
     func application(_: NSApplication, open urls: [URL]) {
         for url in urls {
             guard let scheme = url.scheme, let host = url.host, scheme == "lunar" else { continue }
@@ -153,22 +164,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             switch host {
             case "checkout":
-                showCheckout()
+                if windowController != nil {
+                    showCheckout()
+                } else {
+                    mainAsyncAfter(ms: 2000) { showCheckout() }
+                }
             case "advanced":
                 currentPage = Page.settings.rawValue
-                showWindow()
+                showWindow(after: windowController == nil ? 2000 : nil)
             case "settings":
                 currentPage = Page.settings.rawValue
-                showWindow()
+                showWindow(after: windowController == nil ? 2000 : nil)
             case "hotkeys":
                 currentPage = Page.hotkeys.rawValue
-                showWindow()
+                showWindow(after: windowController == nil ? 2000 : nil)
             case "display":
                 currentPage = Page.display.rawValue
-                if let number = url.pathComponents.prefix(2).last?.i, number > 0, number <= displayController.activeDisplays.count {
-                    currentPage += (number - 1)
+                if let firstPath = url.pathComponents.prefix(2).last, !firstPath.isEmpty,
+                   let lastPath = url.pathComponents.last, !lastPath.isEmpty
+                {
+                    if let number = firstPath.i, number > 0, number <= displayController.activeDisplays.count {
+                        currentPage += (number - 1)
+                    }
+
+                    if firstPath == "settings" || firstPath == "gear" || lastPath == "settings" || lastPath == "gear" {
+                        uiElement = .gear
+                    }
                 }
-                showWindow()
+                showWindow(after: windowController == nil ? 2000 : nil)
             default:
                 continue
             }
@@ -239,8 +262,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return mode.available
     }
 
-    func showWindow() {
-        createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
+    func showWindow(after ms: Int? = nil) {
+        guard let ms = ms else {
+            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
+            return
+        }
+        mainAsyncAfter(ms: ms) { [self] in
+            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
+        }
     }
 
     @objc private func activate() {
@@ -325,30 +354,65 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         @unknown default:
             log.debug("Location status unknown")
         }
-        goToPage()
+        goToPage(ignoreUIElement: true)
         mainAsyncAfter(ms: 500) { [self] in
             goToPage()
         }
     }
 
-    func goToPage() {
+    func activateUIElement(_ uiElement: UIElement, page: Int) {
+        guard let w = windowController?.window, let view = w.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
+              let pageController = view.subviews[0].subviews[0].nextResponder as? PageController else { return }
+
+        switch uiElement {
+        case .gear:
+            guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
+                  let displayViewController = pageController
+                  .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
+                  let button = displayViewController.settingsButton,
+                  let event = NSEvent.mouseEvent(
+                      with: .leftMouseDown,
+                      location: button.frame.origin.applying(.init(translationX: 2, y: 2)),
+                      modifierFlags: [],
+                      timestamp: ProcessInfo.processInfo.systemUptime,
+                      windowNumber: w.windowNumber,
+                      context: nil,
+                      eventNumber: 1,
+                      clickCount: 0,
+                      pressure: 0.0
+                  )
+            else { return }
+            log.debug("Clicking on settingsButton")
+            button.mouseDown(with: event)
+        }
+    }
+
+    func goToPage(ignoreUIElement: Bool = false) {
         guard let view = windowController?.window?.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let splitViewController = pageController.parent as? SplitViewController,
-              pageController.selectedIndex != currentPage,
               pageController.arrangedObjects.count > currentPage
         else { return }
 
-        pageController.animator().selectedIndex = currentPage
-        switch currentPage {
-        case 0:
-            splitViewController.mauveBackground()
-        case 1:
-            splitViewController.yellowBackground()
-        case pageController.arrangedObjects.count - 1:
-            splitViewController.lastPage()
-        default:
-            splitViewController.whiteBackground()
+        if pageController.selectedIndex != currentPage {
+            pageController.animator().selectedIndex = currentPage
+            switch currentPage {
+            case 0:
+                splitViewController.mauveBackground()
+            case 1:
+                splitViewController.yellowBackground()
+            case pageController.arrangedObjects.count - 1:
+                splitViewController.lastPage()
+            default:
+                splitViewController.whiteBackground()
+            }
+        }
+
+        if !ignoreUIElement, let uiElement = uiElement {
+            mainAsyncAfter(ms: 500) { [self] in
+                activateUIElement(uiElement, page: currentPage)
+                self.uiElement = nil
+            }
         }
     }
 
