@@ -840,8 +840,8 @@ enum ValueType {
 
     var infoDictionary: NSDictionary = [:]
 
-    var userBrightness: [AdaptiveModeKey: [Int: Int]] = [:]
-    var userContrast: [AdaptiveModeKey: [Int: Int]] = [:]
+    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
+    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
 
     var redMin: CGGammaValue = 0.0
     var redMax: CGGammaValue = 1.0
@@ -1032,32 +1032,32 @@ enum ValueType {
             value = brightness
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey] ?? [:]
+            userValues = userBrightness[modeKey]?.dictionary ?? [:]
         case let .preciseContrast(contrast):
             value = contrast
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey] ?? [:]
+            userValues = userContrast[modeKey]?.dictionary ?? [:]
         case let .brightness(brightness):
             value = brightness.d
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey] ?? [:]
+            userValues = userBrightness[modeKey]?.dictionary ?? [:]
         case let .contrast(contrast):
             value = contrast.d
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey] ?? [:]
+            userValues = userContrast[modeKey]?.dictionary ?? [:]
         case let .nsBrightness(brightness):
             value = brightness.doubleValue
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey] ?? [:]
+            userValues = userBrightness[modeKey]?.dictionary ?? [:]
         case let .nsContrast(contrast):
             value = contrast.doubleValue
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey] ?? [:]
+            userValues = userContrast[modeKey]?.dictionary ?? [:]
         }
 
         return (value, minValue, maxValue, userValues)
@@ -1138,29 +1138,29 @@ enum ValueType {
         contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
 
         if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userBrightness[.sync] = syncUserBrightness
+            userBrightness[.sync] = syncUserBrightness.threadSafe
         }
         if let sensorUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userBrightness[.sensor] = sensorUserBrightness
+            userBrightness[.sensor] = sensorUserBrightness.threadSafe
         }
         if let locationUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userBrightness[.location] = locationUserBrightness
+            userBrightness[.location] = locationUserBrightness.threadSafe
         }
         if let manualUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userBrightness[.manual] = manualUserBrightness
+            userBrightness[.manual] = manualUserBrightness.threadSafe
         }
 
         if let syncUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userContrast[.sync] = syncUserContrast
+            userContrast[.sync] = syncUserContrast.threadSafe
         }
         if let sensorUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userContrast[.sensor] = sensorUserContrast
+            userContrast[.sensor] = sensorUserContrast.threadSafe
         }
         if let locationUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userContrast[.location] = locationUserContrast
+            userContrast[.location] = locationUserContrast.threadSafe
         }
         if let manualUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userContrast[.manual] = manualUserContrast
+            userContrast[.manual] = manualUserContrast.threadSafe
         }
 
         if let networkControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .network) {
@@ -1422,10 +1422,10 @@ enum ValueType {
             self.enabledControls = enabledControls
         }
         if let userBrightness = userBrightness {
-            self.userBrightness = userBrightness
+            self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
         }
         if let userContrast = userContrast {
-            self.userContrast = userContrast
+            self.userContrast = userContrast.mapValues { $0.threadSafe }.threadSafe
         }
 
         edidName = Self.printableName(id)
@@ -1851,15 +1851,15 @@ enum ValueType {
             try container.encode(contrastOnInputChange2.uint8Value, forKey: .contrastOnInputChange2)
             try container.encode(contrastOnInputChange3.uint8Value, forKey: .contrastOnInputChange3)
 
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.location], forKey: .location)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual], forKey: .manual)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync]?.dictionary, forKey: .sync)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor]?.dictionary, forKey: .sensor)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.location]?.dictionary, forKey: .location)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual]?.dictionary, forKey: .manual)
 
-            try userContrastContainer.encodeIfPresent(userContrast[.sync], forKey: .sync)
-            try userContrastContainer.encodeIfPresent(userContrast[.sensor], forKey: .sensor)
-            try userContrastContainer.encodeIfPresent(userContrast[.location], forKey: .location)
-            try userContrastContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
+            try userContrastContainer.encodeIfPresent(userContrast[.sync]?.dictionary, forKey: .sync)
+            try userContrastContainer.encodeIfPresent(userContrast[.sensor]?.dictionary, forKey: .sensor)
+            try userContrastContainer.encodeIfPresent(userContrast[.location]?.dictionary, forKey: .location)
+            try userContrastContainer.encodeIfPresent(userContrast[.manual]?.dictionary, forKey: .manual)
 
             try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.coreDisplay], forKey: .coreDisplay)
@@ -1874,7 +1874,7 @@ enum ValueType {
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sync], forKey: .sync)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sensor], forKey: .sensor)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.location], forKey: .location)
-            try contrastCurveFactorsContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
+            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.manual], forKey: .manual)
 
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
             try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
@@ -2488,7 +2488,7 @@ enum ValueType {
 
     // MARK: User Data Points
 
-    static func insertDataPoint(values: inout [Int: Int], featureValue: Int, targetValue: Int, logValue: Bool = true) {
+    static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
         for (x, y) in values {
             if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
                 if logValue {
@@ -2506,7 +2506,7 @@ enum ValueType {
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
-            userBrightness[modeKey] = [:]
+            userBrightness[modeKey] = ThreadSafeDictionary()
         }
         let targetValue = mapNumber(
             targetValue.f,
@@ -2521,8 +2521,8 @@ enum ValueType {
                 self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
-            guard let self = self else { return }
-            Display.insertDataPoint(values: &self.userBrightness[modeKey]!, featureValue: featureValue, targetValue: targetValue)
+            guard let self = self, var userValues = self.userBrightness[modeKey] else { return }
+            Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
             self.save()
             self.brightnessDataPointInsertionTask = nil
         }
@@ -2536,7 +2536,7 @@ enum ValueType {
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {
-            userContrast[modeKey] = [:]
+            userContrast[modeKey] = ThreadSafeDictionary()
         }
         let targetValue = mapNumber(
             targetValue.f,
@@ -2551,8 +2551,8 @@ enum ValueType {
                 self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
-            guard let self = self else { return }
-            Display.insertDataPoint(values: &self.userContrast[modeKey]!, featureValue: featureValue, targetValue: targetValue)
+            guard let self = self, var userValues = self.userContrast[modeKey] else { return }
+            Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
             self.save()
             self.contrastDataPointInsertionTask = nil
         }

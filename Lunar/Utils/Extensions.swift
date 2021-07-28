@@ -308,6 +308,12 @@ extension NSAttributedString {
     }
 }
 
+extension Dictionary {
+    var threadSafe: ThreadSafeDictionary<Key, Value> {
+        ThreadSafeDictionary(dict: self)
+    }
+}
+
 extension Float {
     @inline(__always) func rounded(to scale: Int) -> Float {
         let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)
