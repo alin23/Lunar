@@ -6,6 +6,7 @@ endef
 DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
 DISABLE_PACKING := ${DISABLE_PACKING}
 ENV=Release
+DSA=0
 
 RELEASE_NOTES_FILES := $(wildcard ReleaseNotes/*.md)
 TEMPLATE_FILES := $(wildcard Lunar/Templates/*.stencil)
@@ -53,7 +54,7 @@ release: changelog
 	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
 
 sentry-release:
-	./release.sh
+	./bin/release.sh
 
 print-%  : ; @echo $* = $($*)
 
