@@ -369,7 +369,7 @@ class DisplayViewController: NSViewController {
             }
             cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
 
-            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? [:]
+            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             Display.insertDataPoint(
                 values: &userValues,
@@ -377,7 +377,7 @@ class DisplayViewController: NSViewController {
                 targetValue: brightness,
                 logValue: false
             )
-            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues)
+            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
@@ -386,7 +386,7 @@ class DisplayViewController: NSViewController {
                 return
             }
 
-            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? [:]
+            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
             Display.insertDataPoint(
                 values: &userValues,
@@ -394,7 +394,7 @@ class DisplayViewController: NSViewController {
                 targetValue: contrast,
                 logValue: false
             )
-            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues)
+            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues.dictionary)
             display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
         }
 

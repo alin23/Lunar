@@ -299,36 +299,41 @@ extension Defaults.AnyKey: Hashable {
 extension AnyCodable: Defaults.Serializable {}
 
 class ThreadSafeDictionary<V: Hashable, T>: Collection {
-    private var dictionary: [V: T]
+    private var mutableDictionary: [V: T]
+    var dictionary: [V: T] {
+        let dict = mutableDictionary
+        return dict
+    }
+
     let accessQueue = DispatchQueue(
         label: "Dictionary Barrier Queue",
         attributes: .concurrent
     )
     var startIndex: Dictionary<V, T>.Index {
-        dictionary.startIndex
+        mutableDictionary.startIndex
     }
 
     var endIndex: Dictionary<V, T>.Index {
-        dictionary.endIndex
+        mutableDictionary.endIndex
     }
 
     init(dict: [V: T] = [V: T]()) {
-        dictionary = dict
+        mutableDictionary = dict
     }
 
     func index(after i: Dictionary<V, T>.Index) -> Dictionary<V, T>.Index {
-        dictionary.index(after: i)
+        mutableDictionary.index(after: i)
     }
 
     subscript(key: V) -> T? {
         set(newValue) {
             accessQueue.async(flags: .barrier) { [weak self] in
-                self?.dictionary[key] = newValue
+                self?.mutableDictionary[key] = newValue
             }
         }
         get {
             accessQueue.sync {
-                self.dictionary[key]
+                self.mutableDictionary[key]
             }
         }
     }
@@ -336,19 +341,19 @@ class ThreadSafeDictionary<V: Hashable, T>: Collection {
     // has implicity get
     subscript(index: Dictionary<V, T>.Index) -> Dictionary<V, T>.Element {
         accessQueue.sync {
-            self.dictionary[index]
+            self.mutableDictionary[index]
         }
     }
 
     func removeAll() {
         accessQueue.async(flags: .barrier) { [weak self] in
-            self?.dictionary.removeAll()
+            self?.mutableDictionary.removeAll()
         }
     }
 
     func removeValue(forKey key: V) {
         accessQueue.async(flags: .barrier) { [weak self] in
-            self?.dictionary.removeValue(forKey: key)
+            self?.mutableDictionary.removeValue(forKey: key)
         }
     }
 }
