@@ -74,4 +74,4 @@ appcast:
 	env CONFIGURATION=$(ENV) ./bin/update_appcast
 
 build:
-	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
