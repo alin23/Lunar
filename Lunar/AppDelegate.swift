@@ -251,6 +251,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         checkForUpdatePublisher.sink { change in
             self.updater.automaticallyChecksForUpdates = change.newValue
         }.store(in: &observers)
+        showVirtualDisplaysPublisher.sink { change in
+            displayController.resetDisplayList()
+        }.store(in: &observers)
         // NotificationCenter.default
         //     .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
         //     .sink { _ in displayController.addSentryData() }

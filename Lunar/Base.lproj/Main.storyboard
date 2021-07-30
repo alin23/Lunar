@@ -1377,7 +1377,7 @@ Configuration page</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="bib-Lz-vQN">
-                                <rect key="frame" x="874" y="575" width="32" height="32"/>
+                                <rect key="frame" x="874" y="567" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="TI1-7k-1NT">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1398,7 +1398,7 @@ Configuration page</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="0Vq-QK-MWh">
-                                <rect key="frame" x="874" y="539" width="32" height="32"/>
+                                <rect key="frame" x="874" y="531" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="SK6-zt-3Tn">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1550,7 +1550,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dKT-th-lWO">
-                                <rect key="frame" x="874" y="460" width="32" height="32"/>
+                                <rect key="frame" x="874" y="452" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="859-gh-33O">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1562,7 +1562,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="846-rg-Gf2">
-                                <rect key="frame" x="510" y="427" width="431" height="26"/>
+                                <rect key="frame" x="510" y="419" width="431" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Note: makes Gamma smooth transition impossible" id="Vbr-YN-K1D">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1613,7 +1613,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="U8k-OB-lTB">
-                                <rect key="frame" x="874" y="312" width="32" height="32"/>
+                                <rect key="frame" x="874" y="304" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="RZu-P5-V5n">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1628,6 +1628,36 @@ when dock and menubar icons are hidden</string>
                                 <rect key="frame" x="510" y="277" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Useful if the mute button does nothing on your monitor" id="MQg-Bd-uww">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cAf-Xp-7jE">
+                                <rect key="frame" x="510" y="235" width="312" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show virtual displays" id="ENH-dw-pDI">
+                                    <font key="font" size="15" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Ch3-iB-ATV">
+                                <rect key="frame" x="874" y="244" width="32" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="r7k-gY-UJl">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.showVirtualDisplays" id="867-kb-nb0"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YTv-22-zky">
+                                <rect key="frame" x="510" y="217" width="360" height="26"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Enables iPad Sidecar and DisplayLink displays to appear in Lunar" id="BMv-Sc-gaI">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
