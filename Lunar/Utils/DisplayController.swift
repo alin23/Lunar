@@ -130,7 +130,7 @@ class DisplayController {
     }
 
     var mainDisplay: Display? {
-        guard let screen = NSScreen.withMouse,
+        guard let screen = NSScreen.withMouse ?? NSScreen.onlyExternalScreen,
               let id = screen.displayID
         else { return nil }
 
