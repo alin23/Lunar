@@ -2228,7 +2228,7 @@ enum ValueType {
     }
 
     func computeGamma(brightness: UInt8? = nil, contrast: UInt8? = nil) -> Gamma {
-        let rawBrightness = powf(Float(brightness ?? self.brightness.uint8Value) / 100.0, 0.3)
+        let rawBrightness = Float(brightness ?? self.brightness.uint8Value) / 100.0
         let redGamma = CGGammaValue(mapNumber(
             rawBrightness,
             fromLow: 0.0, fromHigh: 1.0,
@@ -2245,13 +2245,16 @@ enum ValueType {
             toLow: 0.3, toHigh: defaultGammaBlueValue.floatValue
         ))
 
-        let contrast = CGGammaValue(mapNumber(
-            powf(Float(contrast ?? self.contrast.uint8Value) / 100.0, 0.3),
-            fromLow: 0, fromHigh: 1.0,
-            toLow: -0.2, toHigh: 0.2
-        ))
+        var newContrast = CGGammaValue(0)
+        if contrast ?? self.contrast.uint8Value != 75 {
+            newContrast = CGGammaValue(mapNumber(
+                powf(Float(contrast ?? self.contrast.uint8Value) / 100.0, 2.4),
+                fromLow: 0, fromHigh: 1.0,
+                toLow: 0.2, toHigh: -0.2
+            ))
+        }
 
-        return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: contrast)
+        return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: newContrast)
     }
 
     var lastConnectionTime = Date()
@@ -2489,7 +2492,7 @@ enum ValueType {
     // MARK: User Data Points
 
     static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
-        for (x, y) in values {
+        for (x, y) in values.dictionary {
             if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
                 if logValue {
                     log.debug("Removing data point \(x) => \(y)")
