@@ -552,6 +552,10 @@ extension ArraySlice {
 }
 
 extension NSScreen {
+    override open var description: String {
+        "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"
+    }
+
     static func isOnline(_ id: CGDirectDisplayID) -> Bool {
         onlineDisplayIDs.contains(id)
     }
@@ -583,24 +587,31 @@ extension NSScreen {
     }
 
     static var withMouse: NSScreen? {
-        let mouseLocation = NSEvent.mouseLocation
-        guard let screen = screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) else {
-            if let event = CGEvent(source: nil) {
-                let maxDisplays: UInt32 = 1
-                var displaysWithCursor = [CGDirectDisplayID](repeating: 0, count: Int(maxDisplays))
-                var displayCount: UInt32 = 0
+        screens.first { $0.hasMouse }
+    }
 
-                let err = CGGetDisplaysWithPoint(event.location, maxDisplays, &displaysWithCursor, &displayCount)
-                if err != .success {
-                    log.error("Error on getting displays with mouse location: \(err)")
-                }
-                if let id = displaysWithCursor.first {
-                    return forDisplayID(id) ?? onlyExternalScreen
-                }
-            }
-            return nil
+    var hasMouse: Bool {
+        let mouseLocation = NSEvent.mouseLocation
+        if NSMouseInRect(mouseLocation, frame, false) {
+            return true
         }
-        return screen
+
+        guard let event = CGEvent(source: nil) else {
+            return false
+        }
+
+        let maxDisplays: UInt32 = 1
+        var displaysWithCursor = [CGDirectDisplayID](repeating: 0, count: Int(maxDisplays))
+        var displayCount: UInt32 = 0
+
+        let err = CGGetDisplaysWithPoint(event.location, maxDisplays, &displaysWithCursor, &displayCount)
+        if err != .success {
+            log.error("Error on getting displays with mouse location: \(err)")
+        }
+        guard let id = displaysWithCursor.first else {
+            return false
+        }
+        return id == displayID
     }
 
     var displayID: CGDirectDisplayID? {
