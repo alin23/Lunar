@@ -516,7 +516,7 @@ class DisplayController {
         width: Int? = nil,
         height: Int? = nil
     ) -> Int {
-        var score = (display.edidName == name).i
+        var score = (display.edidName.lowercased() == name.lowercased()).i
 
         let infoDict = display.infoDictionary
 
@@ -569,7 +569,7 @@ class DisplayController {
         else { return false }
 
         var matches = (
-            display.edidName == name &&
+            display.edidName.lowercased() == name.lowercased() &&
                 displayYearManufacture == manufactureYear &&
                 displaySerialNumber == serial &&
                 displayProductID == productID
@@ -899,7 +899,7 @@ class DisplayController {
     }
 
     static func getDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID: Display] {
-        let ids = DDC.findExternalDisplays(includeVirtual: includeVirtual || TEST_MODE)
+        let ids = DDC.findExternalDisplays(includeVirtual: includeVirtual || TEST_MODE || CachedDefaults[.showVirtualDisplays])
         var serials = ids.map { Display.uuid(id: $0) }
 
         // Make sure serials are unique
