@@ -1003,7 +1003,6 @@ struct OperationHighlightData: Equatable {
 let operationHighlightPublisher = PassthroughSubject<OperationHighlightData, Never>()
 
 func showOperationInProgress(screen: NSScreen? = nil) {
-    guard !CachedDefaults[.hideYellowDot] else { return }
     operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: true, screen: screen))
     debounce(ms: 3000, uniqueTaskKey: "operationHighlightHandler") {
         operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
@@ -1058,7 +1057,7 @@ func dialog(
             alert.suppressionButton?.title = suppressionText
         }
 
-        if let screen = screen {
+        if let screen = screen, !screen.isVirtual {
             let w = window ?? alert.window
 
             let alertSize = w.frame.size
@@ -1066,6 +1065,10 @@ func dialog(
             w.makeKeyAndOrderFront(nil)
             if window != nil {
                 NSApplication.shared.activate(ignoringOtherApps: true)
+            }
+            if w.occlusionState != .visible, let screen = NSScreen.main {
+                w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - alertSize.width / 2, y: screen.visibleFrame.midY - alertSize.height / 2))
+                w.makeKeyAndOrderFront(nil)
             }
         }
         return alert
