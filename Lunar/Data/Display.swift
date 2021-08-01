@@ -894,8 +894,9 @@ enum ValueType {
                     "Display got alternativeControlForCoreDisplay \(control.str)",
                     context: context
                 )
-                mainThread {
-                    hasNetworkControl = control is NetworkControl || alternativeControlForCoreDisplay is NetworkControl
+                mainAsyncAfter(ms: 1) { [weak self] in
+                    guard let self = self else { return }
+                    self.hasNetworkControl = control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
                 }
             }
         }
@@ -910,9 +911,10 @@ enum ValueType {
                     "Display got \(control.str)",
                     context: context
                 )
-                mainThread {
-                    activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
-                    hasNetworkControl = control is NetworkControl || alternativeControlForCoreDisplay is NetworkControl
+                mainAsyncAfter(ms: 1) { [weak self] in
+                    guard let self = self else { return }
+                    self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
+                    self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
                 }
                 if !(oldValue is GammaControl), control is GammaControl {
                     if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {

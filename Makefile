@@ -73,5 +73,10 @@ pack:
 appcast:
 	env CONFIGURATION=$(ENV) ./bin/update_appcast
 
+signatures: SHELL=/usr/local/bin/fish
+signatures:
+	echo '<signature>'(timeout 2 /tmp/Lunar/Lunar.app/Contents/MacOS/Lunar @ signature)'</signature>'\n'<signature>'(timeout 2 arch -x86_64 /tmp/Lunar/Lunar.app/Contents/MacOS/Lunar @ signature)'</signature>' | pbcopy
+	subl Releases/appcast.xml
+
 build:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
