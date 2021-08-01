@@ -19,7 +19,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showVirtualDisplays,
     .mediaKeysNotified,
     .brightnessKeysEnabled,
-    .hideYellowDot,
     .brightnessStep,
     .clamshellModeDetection,
     .contrastStep,
@@ -461,7 +460,6 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>) {
 }
 
 func initCache() {
-    cacheKey(.hideYellowDot)
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.muteVolumeZero)
@@ -521,7 +519,6 @@ extension Defaults.Keys {
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
-    static let hideYellowDot = Key<Bool>("hideYellowDot", default: false)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
@@ -623,7 +620,6 @@ let securePublisher = Defaults.publisher(.secure).removeDuplicates()
 // let displaysPublisher = Defaults.publisher(.displays).removeDuplicates()
 let debugPublisher = Defaults.publisher(.debug).removeDuplicates()
 let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates()
-let hideYellowDotPublisher = Defaults.publisher(.hideYellowDot).removeDuplicates()
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates()
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates()

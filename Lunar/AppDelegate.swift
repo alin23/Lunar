@@ -830,14 +830,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         DDC.setup()
 
-        hideYellowDotPublisher.sink { change in
-            if change.newValue {
-                debounce(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
-                    self.stopHighlighting()
-                }
-            }
-        }.store(in: &observers)
-
         if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
             startOrRestartMediaKeyTap(checkPermissions: true)
         } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
