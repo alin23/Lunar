@@ -736,7 +736,7 @@
             <title>4.6.3</title>
             <pubDate>Sat, 17 Jul 2021 19:18:09 +0300</pubDate>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure length="17115887" sparkle:dsaSignature="MEYCIQCcLi6X/amSyBMeDItdlZNXAw/NH7QN3V/0mOb2ZASS8QIhAJBrqbq2lZh6kEt5wij894V33cc7xDASp+/fgPNnnvfw" sparkle:edSignature="ImN8v8nPBmNIKY6wZkVpQy9IKKrLdK/4UQ0VqePHRMCAssL/9epQvLV1nmZHR+i+vxs7Ht6/chaEc92YqkN1DQ==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.3.dmg"/>
+            <enclosure length="17115887" sparkle:dsaSignature="MEQCIE7MgeujGICiIX0UJ/II0SJpTvdF+xIHH2Ym0ppqDEjZAiAPbHoRCNNtMj1/o4r8xMBkLYJu4x/VhS2Z95JgyBM5mA==" sparkle:edSignature="ImN8v8nPBmNIKY6wZkVpQy9IKKrLdK/4UQ0VqePHRMCAssL/9epQvLV1nmZHR+i+vxs7Ht6/chaEc92YqkN1DQ==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.3.dmg"/>
             <sparkle:deltas>
                 <enclosure length="1451473" sparkle:deltaFrom="4.6.2" sparkle:dsaSignature="MEUCICE2YKGvAn2xcTX96JGEfYoX1M7+faueYOuDvJOb8FCTAiEAh/l6H0VX6BPkpf7CBj7c4wY/5b75oOQZr6RdQxcORig=" sparkle:edSignature="ocwG0dqmeZGvrScrLiqa1BkGVK9KzNURApnQagWacb6EOy9jNehenqbtHfP0p4NN4UYRI8X6N6ik/peaH3V9Dg==" sparkle:shortVersionString="4.6.3" sparkle:version="4.6.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.6.3/4.6.2"/>
                 <enclosure length="2353795" sparkle:deltaFrom="4.6.1" sparkle:dsaSignature="MEQCIFZZYdgHC2bryYJIpIuh5RlFNgl1cyfkdSJ7YZjESGo5AiB91hnJFp/RGfhssSasl80gUN5+CgbTS36wt+/mT7XH1Q==" sparkle:edSignature="ua/T8iXObU3DthcanWqAmwZ+A0JbtLQ27o1A6z1MBpDipWqx9+azuyg7yj8lJg7mqHvBXAUGBl7UrTdSD0ppDA==" sparkle:shortVersionString="4.6.3" sparkle:version="4.6.3" type="application/octet-stream" url="https://lunar.fyi/delta/4.6.3/4.6.1"/>
@@ -771,7 +771,7 @@
             <sparkle:version>4.6.5</sparkle:version>
             <sparkle:shortVersionString>4.6.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure length="17135364" sparkle:dsaSignature="MEUCIQCZd2Erd8DhFR7oqqLa+RFPqfvJB8R5bRbmOCbCGUWGMAIgAzTS+WICM+rk3qiyEazEn8ZdWBJeU3A0jAVm1944RGA=" sparkle:edSignature="8XC3aeVOPGCCOiTWSSxZR5LbEK5i74+222D0YBCuMuR73eR6Uw5EUVMlVVJTv/SI7KzdA85Ri3S4YJbw6+J7Dw==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.5.dmg"/>
+            <enclosure length="17135364" sparkle:dsaSignature="MEUCIBmIWYBdCZCbfLPjyCattQlHXB+s8dmBfiaYU9koah9xAiEAnoqy9vBAIQPAPJzRP3CvQjKka2jljHdJRU9VLpTPi2E=" sparkle:edSignature="8XC3aeVOPGCCOiTWSSxZR5LbEK5i74+222D0YBCuMuR73eR6Uw5EUVMlVVJTv/SI7KzdA85Ri3S4YJbw6+J7Dw==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.6.5.dmg"/>
             <sparkle:deltas>
                 <enclosure length="3157753" sparkle:deltaFrom="4.6.3" sparkle:dsaSignature="MEUCIQCLTEoP5dWGwgnc0R50aWJo50jZnC5yphYPVWDwsG8ZXQIgZqNWBYlDFGVW12/CgzE3NQPYWYKa9xLiNRd8r29mPGg=" sparkle:edSignature="VcqoR9OitgMF0e3SyHzvGaC7Jg3lTJUp3+0b101bps8Ei9IV5atvxEWPIi9WM+VvVQnS3CB3s/ODqRMXnuiJCQ==" type="application/octet-stream" url="https://lunar.fyi/delta/4.6.5/4.6.3"/>
             </sparkle:deltas>
@@ -786,14 +786,14 @@
             <sparkle:version>4.7.0</sparkle:version>
             <sparkle:shortVersionString>4.7.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure length="17145868" sparkle:dsaSignature="MEUCIAw2cftymOGQFL+VQT72tUsw9V1xMGbtNRH8VpOjUjqvAiEApFGddo0DPQU+ROV8UUIyHMXtXEqr62VMRrUgGbp6o+s=" sparkle:edSignature="4D+4xq9dcVzevedHmma8P95Zrd12Qi+vXuLnccn1Bgh1gw1TLgqd2Fomee3+m2/fIoyqmSBXSURpT0uub4F3Bg==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.7.0.dmg"/>
+            <enclosure length="17145868" sparkle:dsaSignature="MEQCIEalWXzmAAq4+PERTpc9Iz6jJC/Wp/P1liLTu9WamfBAAiBIUtGrQ9s2Bbi/2JzNn95K0MoxKZrKMMnXA92tEBUK/Q==" sparkle:edSignature="4D+4xq9dcVzevedHmma8P95Zrd12Qi+vXuLnccn1Bgh1gw1TLgqd2Fomee3+m2/fIoyqmSBXSURpT0uub4F3Bg==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.7.0.dmg"/>
             <sparkle:deltas>
                 <enclosure length="2283621" sparkle:deltaFrom="4.6.5" sparkle:dsaSignature="MEUCIQCdDEiXHnROBme2VpsUh5CoBx+sB9Jtnn2B5BAkpCsEagIgHQXt5EfBae9FaFB99kKWKpWh67qg2K6dCG0CPfkpTvU=" sparkle:edSignature="eanV/4uYcQdyuZfvtsCJD5lMZnduzCgW4nkrMyDvqViUXPIkapckKovnNZtF18SjGEtLv1Zn2ObWI63W2S3mDQ==" type="application/octet-stream" url="https://lunar.fyi/delta/4.7.0/4.6.5"/>
                 <enclosure length="3223793" sparkle:deltaFrom="4.6.3" sparkle:dsaSignature="MEQCIGJjZV6TtWzVNXwrqC9Rbh96a9B6ruzEAZxgeqph10TnAiBBls1gXBBC0HQ5Oq9j0sEjYZ2uCjGAtMJh7Bkl3O1LFA==" sparkle:edSignature="IELvaFMLuWyQgjyXUrdhQXX5RDxV0HWesmsp6a0/ddNEFxtxLc8inAE2Lrhmos2PBgm6p+1qDWKVU+Z3NzfwAQ==" type="application/octet-stream" url="https://lunar.fyi/delta/4.7.0/4.6.3"/>
             </sparkle:deltas>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <description>
-                <![CDATA[<div><style>    * {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h1 id="features">Features</h1><ul><li>Add support for ESP8266 sensor boards</li><li>Implement auto-gain and adaptive integration time for light sensors</li></ul><h1 id="improvements">Improvements</h1><ul><li>Make firmware installer window appear faster by looking for serial devices in the background</li><li>Highlight <strong>Advanced</strong> settings button</li><li>Add URL for opening the gear icon menu directly: <a href="lunar://display/settings">lunar://display/settings</a></li></ul><h1 id="fixes">Fixes</h1><ul><li>Fix support for Adafruit Metro ESP32 S2</li><li>Fix some unexpected crashes</li><li>Keep Lunar Pro active when license fails verification with Paddle for the first few times</li></ul></div></div>]]>
+                <![CDATA[<div><style>* {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h1 id="features">Features</h1><ul><li>Add support for ESP8266 sensor boards</li><li>Implement auto-gain and adaptive integration time for light sensors</li></ul><h1 id="improvements">Improvements</h1><ul><li>Make firmware installer window appear faster by looking for serial devices in the background</li><li>Highlight <strong>Advanced</strong>settings button</li><li>Add URL for opening the gear icon menu directly: <a href="lunar://display/settings">lunar://display/settings</a></li></ul><h1 id="fixes">Fixes</h1><ul><li>Fix support for Adafruit Metro ESP32 S2</li><li>Fix some unexpected crashes</li><li>Keep Lunar Pro active when license fails verification with Paddle for the first few times</li></ul></div></div>]]>
             </description>
             <signature>VO8nzCP+rEKQX+vNtB2QBqpOOIA=</signature>
             <signature>QWidDsjS86S2yAlNZ2tsjMEGrGQ=</signature>
@@ -805,6 +805,25 @@
             <signature>tL8JEvvnWxz6MF6RddnRkK3JZHI=</signature>
             <signature>Qlpxm.xNDnyPEc441DNb6fvvN8U=</signature>
             <signature>Qlpxm/xNDnyPEc441DNb6fvvN8U=</signature>
+        </item>
+        <item>
+            <title>4.7.1</title>
+            <pubDate>Mon, 02 Aug 2021 15:43:43 +0300</pubDate>
+            <sparkle:version>4.7.1</sparkle:version>
+            <sparkle:shortVersionString>4.7.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure length="17172120" sparkle:dsaSignature="MEQCICNRd7fWvscheFSa2i+LaUnTPq74t6p+BbdDBJS6WPtdAiB6pSxzp6pW1TNCyXHurTNzaS7LZWiV2amcDBcvDdHaww==" sparkle:edSignature="3EtKx/5mExhomEn2YXJDu+NmcPTMi8hU4yYLG/dag6ybx0M7w+0OaBGzPBkeZeFH/VLoM9caTRllZoxOKqr+Cw==" type="application/octet-stream" url="https://static.lunar.fyi/releases/Lunar-4.7.1.dmg"/>
+            <sparkle:deltas>
+                <enclosure length="2759403" sparkle:deltaFrom="4.6.5" sparkle:dsaSignature="MEUCIBplZnnvTwcQ7Ip6AwVJP0TL4Byd+l6mwYpzPxTG1N97AiEAkOvO3AaoKL7RNaabyytKF8k4Sc5d/XWZ2ZumkCrctDQ=" sparkle:edSignature="7IRhAJS2oFpJGS8QnIYztKNGCyFq/4aEMMKy31Z78yYdkPwKLhr+46rsEuRXXXfO829MVXzJQGGsIOjLtmKuBw==" type="application/octet-stream" url="https://lunar.fyi/delta/4.7.1/4.6.5"/>
+                <enclosure length="2402983" sparkle:deltaFrom="4.7.0" sparkle:dsaSignature="MEUCIH/GR7ZtrWD9zQ8jp6TCyGKXKyavs7QOEOYl9/V+qojBAiEAqO8DbAa9Awm4kqT+y84J8hEXxl4QW0yOYeD+EFvVcj4=" sparkle:edSignature="aQMxkjZHKvibP2CSg2TDmC8+nj6vz0D+RAnkr0EPlH+VoFBaPIZkZqni8ypocXSZE0aqc6eNa6pGKKTjxO4nDA==" type="application/octet-stream" url="https://lunar.fyi/delta/4.7.1/4.7.0"/>
+                <enclosure length="3626519" sparkle:deltaFrom="4.6.3" sparkle:dsaSignature="MEYCIQCKbgAX0tmRfRSAay74VEwLbqAQxXcfI54HKfdE56fiAgIhAJAfUGLQLb6zTAfsArUcwBB5HUYohodm6bYF7GM43DC3" sparkle:edSignature="4NuSvfvdR0YR52FOCIBfD3UP/zgp3luc8VNFkb1i6T56M0FYGA919u16TJs1Cb40Wm3TQXp12CFw639bQ2x4Dw==" type="application/octet-stream" url="https://lunar.fyi/delta/4.7.1/4.6.3"/>
+            </sparkle:deltas>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <signature>wZppqPgQGcE2DhdzYmqX8pfS1KY=</signature>
+            <signature>N6FIAxlFunlJsrKmXlkldMDokr4=</signature>
+            <description>
+                <![CDATA[<div><style>    * {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Remove the need for a yellow dot in Gamma and Network control</li><li>Add <strong>Show virtual displays</strong> checkbox in <a href="lunar://advanced">Advanced settings</a><ul><li>Turns out DisplayLink monitors show up as virtual and you need this checked if you want Lunar to see the monitor </li></ul></li><li>Fix Gamma <strong>(Software Controls)</strong> curve calculation being skewed in the 0% to 10% range<ul><li>The zero point (no gamma changes) is now when BRIGHTNESS=100 and CONTRAST=75</li><li>Lightness change between brightness values should be more consistent with the human eye response to light</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Don't check for updates on launch if <strong>Check for updates automatically</strong> is disabled in <a href="lunar://advanced">Advanced settings</a></li><li>Fix some unexpected crashes</li><li>Fix license being disabled erroneously on network problems</li></ul></div></div>]]>
+            </description>
         </item>
     </channel>
 </rss>
