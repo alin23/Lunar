@@ -481,6 +481,7 @@ class DisplayController {
         })
 
         if let fullyMatchedDisplay = d {
+            log.info("Fully matched display \(d)")
             return fullyMatchedDisplay
         }
 
@@ -502,6 +503,7 @@ class DisplayController {
             return (display, score)
         }
 
+        log.info("Display scores: \(displayScores)")
         return displayScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
@@ -520,14 +522,14 @@ class DisplayController {
 
         let infoDict = display.infoDictionary
 
-        if let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64 {
+        if let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64, displayYearManufacture != 0 {
             score += (displayYearManufacture == manufactureYear).i
         }
         if let displaySerialNumber = infoDict[kDisplaySerialNumber] as? Int64, abs(displaySerialNumber.i - serial) < 3 {
             score += 3 - abs(displaySerialNumber.i - serial)
         }
         if let displayProductID = infoDict[kDisplayProductID] as? Int64, abs(displayProductID.i - productID) < 3 {
-            score += 3 - abs(displayProductID.i - serial)
+            score += 3 - abs(displayProductID.i - productID)
         }
         if let vendorID = vendorID, let displayVendorID = infoDict[kDisplayVendorID] as? Int64,
            abs(displayVendorID.i - vendorID) < 3
