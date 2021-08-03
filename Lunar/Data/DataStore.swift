@@ -601,30 +601,30 @@ enum AppSettings {
     static let beta = (infoDict[InfoPlistKey.beta] as! String) == "YES"
 }
 
-let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates()
-let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates()
-let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates()
-let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates()
-// let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates()
-let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates()
-let showDockIconPublisher = Defaults.publisher(.showDockIcon).removeDuplicates()
-let disableControllerVideoPublisher = Defaults.publisher(.disableControllerVideo).removeDuplicates()
-let locationPublisher = Defaults.publisher(.location).removeDuplicates()
-let brightnessStepPublisher = Defaults.publisher(.brightnessStep).removeDuplicates()
-let syncPollingSecondsPublisher = Defaults.publisher(.syncPollingSeconds).removeDuplicates()
-let sensorPollingSecondsPublisher = Defaults.publisher(.sensorPollingSeconds).removeDuplicates()
-let contrastStepPublisher = Defaults.publisher(.contrastStep).removeDuplicates()
-let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates()
-let appExceptionsPublisher = Defaults.publisher(.appExceptions).removeDuplicates()
-let securePublisher = Defaults.publisher(.secure).removeDuplicates()
-// let displaysPublisher = Defaults.publisher(.displays).removeDuplicates()
-let debugPublisher = Defaults.publisher(.debug).removeDuplicates()
-let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates()
+let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
+// let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showDockIconPublisher = Defaults.publisher(.showDockIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let disableControllerVideoPublisher = Defaults.publisher(.disableControllerVideo).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let locationPublisher = Defaults.publisher(.location).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let brightnessStepPublisher = Defaults.publisher(.brightnessStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let syncPollingSecondsPublisher = Defaults.publisher(.syncPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let sensorPollingSecondsPublisher = Defaults.publisher(.sensorPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let contrastStepPublisher = Defaults.publisher(.contrastStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let appExceptionsPublisher = Defaults.publisher(.appExceptions).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let securePublisher = Defaults.publisher(.secure).removeDuplicates().filter { $0.oldValue != $0.newValue }
+// let displaysPublisher = Defaults.publisher(.displays).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let debugPublisher = Defaults.publisher(.debug).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
-let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates()
-let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates()
-let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates()
+let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
-let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates()
-let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates()
-let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).removeDuplicates()
+let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).removeDuplicates().filter { $0.oldValue != $0.newValue }

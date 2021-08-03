@@ -185,14 +185,14 @@ class NetworkControl: Control {
             message: "Lunar Network Controller",
             info: """
                 Lunar found a network controller at \"\(service.urls.first!
-                .absoluteString)\" for this \"\(display.name)\" monitor.
+                .absoluteString)\" for the \"\(display.name)\" monitor.
 
                 Do you want to use it?
             """,
             okButton: "Yes",
             cancelButton: "Not now",
             thirdButton: "No, never ask again",
-            screen: display.screen,
+            screen: nil,
             window: window,
             suppressionText: "Always use network control for this display when possible",
             onSuppression: { useNetworkControl in

@@ -1739,6 +1739,15 @@ enum ValueType {
             .contrastOnInputChange,
         ]
 
+        static var settableWithControl: Set<CodingKeys> = [
+            .contrast,
+            .brightness,
+            .volume,
+            .audioMuted,
+            .power,
+            .input,
+        ]
+
         static var settable: Set<CodingKeys> = [
             .name,
             .adaptive,
