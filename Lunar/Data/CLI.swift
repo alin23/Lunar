@@ -1049,7 +1049,7 @@ private func handleDisplay(
         .gamma: controls.contains(.gamma),
     ]
     display.control = display.getBestControl()
-    if !display.enabledControls[.gamma]!, display.control is GammaControl {
+    if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!, display.control is GammaControl {
         throw CommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
     }
 

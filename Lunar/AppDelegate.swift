@@ -828,6 +828,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
         }
 
+        let runningApp = NSWorkspace.shared.runningApplications
+            .filter { item in item.bundleIdentifier == Bundle.main.bundleIdentifier }
+            .first { item in item.processIdentifier != getpid() }
+
+        if let app = runningApp, app.forceTerminate() {
+            notify(identifier: "lunar-single-instance", title: "Lunar was already running", body: "The other instance was terminated and this instance will now continue to run normally.")
+        }
+
         DDC.setup()
 
         if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
