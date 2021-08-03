@@ -821,6 +821,15 @@
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <signature>wZppqPgQGcE2DhdzYmqX8pfS1KY=</signature>
             <signature>N6FIAxlFunlJsrKmXlkldMDokr4=</signature>
+            <signature>YQxseXosP4TI08eVcfDxHlOR/ek=</signature>
+            <signature>YQxseXosP4TI08eVcfDxHlOR.ek=</signature>
+            <signature>g51mhwgR/RPu1v52rMnvVRQyl1k=</signature>
+            <signature>g51mhwgR.RPu1v52rMnvVRQyl1k=</signature>
+            <signature>afoG55rLG0auNvmK9dQiBsYgYLQ=</signature>
+            <signature>HU0Dk23LDOSGcDLwNtPvT2nSBO8=</signature>
+            <signature>+8pFU62BcA+eYzd.Gc5umav.1SY=</signature>
+            <signature>+8pFU62BcA+eYzd/Gc5umav/1SY=</signature>
+            <signature>yqBMH7IkqkMksCpu8f9wSURvee8=</signature>
             <description>
                 <![CDATA[<div><style>    * {        font-family: Menlo, monospace;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h2#features {        color: #EDB44B;    }    h2#improvements {        color: #515193;    }    h2#fixes {        color: #E14283;    }    li {        font-size: 13px;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Remove the need for a yellow dot in Gamma and Network control</li><li>Add <strong>Show virtual displays</strong> checkbox in <a href="lunar://advanced">Advanced settings</a><ul><li>Turns out DisplayLink monitors show up as virtual and you need this checked if you want Lunar to see the monitor </li></ul></li><li>Fix Gamma <strong>(Software Controls)</strong> curve calculation being skewed in the 0% to 10% range<ul><li>The zero point (no gamma changes) is now when BRIGHTNESS=100 and CONTRAST=75</li><li>Lightness change between brightness values should be more consistent with the human eye response to light</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Don't check for updates on launch if <strong>Check for updates automatically</strong> is disabled in <a href="lunar://advanced">Advanced settings</a></li><li>Fix some unexpected crashes</li><li>Fix license being disabled erroneously on network problems</li></ul></div></div>]]>
             </description>
