@@ -16,6 +16,7 @@ esphome:
   libraries:
     - "Adafruit TSL2591 Library"
     - https://github.com/blackhack/ESPAsyncWebServer
+    - SPI
   platformio_options:
     platform: $platform_version
 wifi:

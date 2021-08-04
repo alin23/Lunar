@@ -126,9 +126,8 @@ def main(
             item.append(el)
 
         if app_signatures and app_version and app_version == version:
-            for signature in signatures:
-                item.remove(signature)
-            for signature in app_signatures:
+            existing_signatures = {s.text for s in signatures}
+            for signature in set(app_signatures) - existing_signatures:
                 if "/" in signature:
                     item.append(E.signature(signature.replace("/", ".")))
                 item.append(E.signature(signature))

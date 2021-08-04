@@ -1,14 +1,29 @@
+# 4.7.2
+## Improvements
+
+* Add SPI as lib dependency for sensor firmware to avoid compilation errors in the future
+* Improve Network Control monitor matching in multi-monitor cases
+* Quit older instances if a user launches Lunar while it is already running
+* Always show Network Control prompt on the main monitor
+* Check if new value is different from old value when listening for settings changes to avoid duplicating events
+
+## Fixes
+
+* Don't check for updates on launch to avoid annoying people who don't like updates as much as I do
+* Fix typo which caused the monitor serial to be wrongly compared to the product ID when matching monitors
+* Allow CLI to set properties that don't need an available control
+
 # 4.7.1
-# Improvements
+## Improvements
 
 * Remove the need for a yellow dot in Gamma and Network control
 * Add **Show virtual displays** checkbox in [Advanced settings](lunar://advanced)
     * Turns out DisplayLink monitors show up as virtual and you need this checked if you want Lunar to see the monitor 
-* Fix Gamma **(Software Controls*)* curve calculation being skewed in the 0% to 10% range
+* Fix Gamma **(Software Controls)** curve calculation being skewed in the 0% to 10% range
     * The zero point (no gamma changes) is now when BRIGHTNESS=100 and CONTRAST=75
     * Lightness change between brightness values should be more consistent with the human eye response to light
 
-# Fixes
+## Fixes
 
 * Don't check for updates on launch if **Check for updates automatically** is disabled in [Advanced settings](lunar://advanced)
 * Fix some unexpected crashes
