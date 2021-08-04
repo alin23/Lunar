@@ -301,7 +301,7 @@ extension AnyCodable: Defaults.Serializable {}
 class ThreadSafeDictionary<V: Hashable, T>: Collection {
     private var mutableDictionary: [V: T]
     var dictionary: [V: T] {
-        let dict = mutableDictionary
+        let dict = Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
         return dict
     }
 
