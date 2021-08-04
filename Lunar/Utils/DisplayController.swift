@@ -481,7 +481,7 @@ class DisplayController {
         })
 
         if let fullyMatchedDisplay = d {
-            log.info("Fully matched display \(d)")
+            log.info("Fully matched display \(fullyMatchedDisplay)")
             return fullyMatchedDisplay
         }
 
