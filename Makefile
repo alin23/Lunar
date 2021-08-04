@@ -6,7 +6,8 @@ endef
 DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
 DISABLE_PACKING := ${DISABLE_PACKING}
 ENV=Release
-DSA=0
+DSA=1
+export DSA
 
 RELEASE_NOTES_FILES := $(wildcard ReleaseNotes/*.md)
 TEMPLATE_FILES := $(wildcard Lunar/Templates/*.stencil)
