@@ -45,3 +45,4 @@ Lunar/Modes/LocationMode.swift
 Lunar/Data/Pro.swift
 Lunar/ALS/lunarsensor/partitions.csv
 .pio
+*.bkp
