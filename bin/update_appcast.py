@@ -11,7 +11,7 @@ from markdown2 import markdown_path
 PROJECT_DIR = Path.cwd().parent
 RELEASE_NOTES = PROJECT_DIR / "ReleaseNotes"
 
-PARSER = etree.XMLParser(strip_cdata=False)
+PARSER = etree.XMLParser(strip_cdata=False, remove_blank_text=True)
 LUNAR_SITE = "https://lunar.fyi"
 STATIC_LUNAR_SITE = "https://static.lunar.fyi"
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -205,6 +205,7 @@ def main(
 
                     enclosure.set(sparkle("edSignature"), signature)
 
+    etree.indent(appcast, space="    ")
     appcast.write(
         str(appcast_path),
         pretty_print=True,
