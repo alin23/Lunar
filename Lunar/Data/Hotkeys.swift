@@ -111,7 +111,6 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     var hotkey: HotKey {
         didSet {
-            log.debug("Reset hotkey \(identifier) with [handler: \(handler), action: \(action)]")
             HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
             handleRegistration(persist: true)
             if HotkeyIdentifier(rawValue: identifier) != nil {
@@ -195,7 +194,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     deinit {
         #if DEBUG
             log.verbose("START DEINIT: \(identifier)")
-            defer { log.verbose("END DEINIT: \(identifier)") }
+            do { log.verbose("END DEINIT: \(identifier)") }
         #endif
 //        hotkey.unregister()
     }

@@ -44,9 +44,6 @@ class ExceptionsView: NSTableView {
             app?.contrast = value.i8
         }
 
-        guard let exceptionsController = superview?.superview?.nextResponder?.nextResponder as? ExceptionsViewController,
-              let controller = exceptionsController.parent?.parent as? SettingsPageController else { return }
-
         let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: app.identifier)
         if !runningApps.isEmpty {
             displayController.runningAppExceptions.append(app)

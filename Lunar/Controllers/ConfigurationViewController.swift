@@ -192,7 +192,7 @@ class ConfigurationViewController: NSViewController {
         let locationMode = adaptiveMode == .location
         let syncMode = adaptiveMode == .sync
         let sensorMode = adaptiveMode == .sensor
-        let manualMode = adaptiveMode == .manual
+        // let manualMode = adaptiveMode == .manual
 
         locationVisible = locationMode
         syncPollingIntervalVisible = syncMode

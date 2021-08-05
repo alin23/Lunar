@@ -166,7 +166,11 @@ var INITIAL_GAMMA_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MAX_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MIN_VALUES = [CGDirectDisplayID: Gamma]()
 
-struct Transport: Equatable {
+struct Transport: Equatable, CustomStringConvertible {
+    var description: String {
+        "Transport(up: \(upstream), down: \(downstream))"
+    }
+    
     var upstream: String
     var downstream: String
 }

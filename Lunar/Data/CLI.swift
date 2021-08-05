@@ -159,7 +159,6 @@ struct Lunar: ParsableCommand {
 
             guard let sig = getCodeSignature(hex: hex) else {
                 globalExit(1)
-                return
             }
             print(sig)
             globalExit(0)
@@ -447,7 +446,6 @@ struct Lunar: ParsableCommand {
                     }
                 }
                 globalExit(0)
-                return
             }
 
             for display in displays {
@@ -484,7 +482,6 @@ struct Lunar: ParsableCommand {
             guard !json else {
                 print((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
                 globalExit(0)
-                return
             }
 
             let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
@@ -902,7 +899,6 @@ struct Lunar: ParsableCommand {
 
             guard let display = foundDisplay else {
                 globalExit(0)
-                return
             }
 
             print(

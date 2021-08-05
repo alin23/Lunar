@@ -641,11 +641,11 @@ class DisplayController {
 
             let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
             guard let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) else {
-                log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport))")
+                log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
                 return nil
             }
 
-            log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport))")
+            log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
             display.transport = transport
             return display
         }
@@ -681,7 +681,7 @@ class DisplayController {
                 return nil
             }
 
-            log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport))")
+            log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport?.description ?? "Unknown"))")
             display.transport = transport
             return display
         }
@@ -778,7 +778,7 @@ class DisplayController {
 
             log.info("Mac Mini HDMI Ignore: hw.model=\(Sysctl.modelLowercased)")
             log.info("Mac Mini HDMI Ignore: isMacMini=\(Sysctl.isMacMini)")
-            log.info("Mac Mini HDMI Ignore: Transport=\(display.transport)")
+            log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
             log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
             if Sysctl.isMacMini,
                clcd2Num == 1,

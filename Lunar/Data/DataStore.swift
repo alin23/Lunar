@@ -39,6 +39,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .ignoredVolumes,
     .manualLocation,
     .mediaKeysControlAllMonitors,
+    .useAlternateBrightnessKeys,
     .neverAskAboutFlux,
     .nonManualMode,
     .overrideAdaptiveMode,
@@ -467,6 +468,7 @@ func initCache() {
     cacheKey(.advancedSettingsShown)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
+    cacheKey(.useAlternateBrightnessKeys)
     cacheKey(.didScrollTextField)
     cacheKey(.didSwipeToHotkeys)
     cacheKey(.didSwipeLeft)
@@ -526,6 +528,7 @@ extension Defaults.Keys {
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
+    static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: false)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
     static let didSwipeToHotkeys = Key<Bool>("didSwipeToHotkeys", default: false)
     static let didSwipeLeft = Key<Bool>("didSwipeLeft", default: false)
@@ -624,6 +627,7 @@ let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
