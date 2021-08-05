@@ -13,6 +13,7 @@ public:
     {
         if (!tsl.begin()) {
             ESP_LOGD("ERROR", "Could not find a TSL2591 Sensor. Did you configure I2C?");
+            return;
         }
         tsl.setGain(TSL2591_GAIN_MED);
         tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
