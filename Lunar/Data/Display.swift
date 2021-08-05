@@ -170,7 +170,7 @@ struct Transport: Equatable, CustomStringConvertible {
     var description: String {
         "Transport(up: \(upstream), down: \(downstream))"
     }
-    
+
     var upstream: String
     var downstream: String
 }

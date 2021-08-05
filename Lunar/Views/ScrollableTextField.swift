@@ -61,7 +61,15 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
 //    var _stringValue: String = ""
-//    override var stringValue: String {
+    override var stringValue: String {
+        didSet {
+            guard let number = NumberFormatter.shared.number(from: stringValue) else { return }
+            _floatValue = number.floatValue
+            _doubleValue = number.doubleValue
+            _integerValue = number.intValue
+        }
+    }
+
 //        get {
 //            _stringValue
 //        }
@@ -76,33 +84,54 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 //    }
 
     var decimalPoints: UInt8 = 0
+    var _floatValue: Float = 0
     override var floatValue: Float {
-        didSet {
-            let number = floatValue
-            if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints))"
+        get { _floatValue }
+        set {
+            _floatValue = newValue
+            _doubleValue = newValue.d
+            _integerValue = newValue.i
+            let number = newValue
+            if number <= 0.0001, number >= -0.0001 {
+                stringValue = 0.str(decimals: decimalPoints, localized: true)
+            } else if decimalPoints > 0 {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, localized: true))"
             } else {
                 stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
             }
         }
     }
 
+    var _doubleValue: Double = 0
     override var doubleValue: Double {
-        didSet {
-            let number = doubleValue
-            if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints))"
+        get { _doubleValue }
+        set {
+            _doubleValue = newValue
+            _floatValue = newValue.f
+            _integerValue = newValue.i
+            let number = newValue
+            if number <= 0.0001, number >= -0.0001 {
+                stringValue = 0.str(decimals: decimalPoints, localized: true)
+            } else if decimalPoints > 0 {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, localized: true))"
             } else {
                 stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
             }
         }
     }
 
+    var _integerValue: Int = 0
     override var integerValue: Int {
-        didSet {
-            let number = integerValue
-            if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints))"
+        get { _integerValue }
+        set {
+            _integerValue = newValue
+            _floatValue = newValue.f
+            _doubleValue = newValue.d
+            let number = newValue
+            if number == 0 {
+                stringValue = 0.str(decimals: decimalPoints, localized: true)
+            } else if decimalPoints > 0 {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints, localized: true))"
             } else {
                 stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number)"
             }
@@ -225,7 +254,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func textShouldEndEditing(_ textObject: NSText) -> Bool {
-        guard let val = Double(textObject.string), val >= lowerLimit, val <= upperLimit else {
+        guard let val = textObject.string.d, val >= lowerLimit, val <= upperLimit else {
             return false
         }
         doubleValue = val
@@ -286,29 +315,16 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     override func mouseEntered(with _: NSEvent) {
         log.verbose("mouseEntered: \(caption?.stringValue ?? stringValue)")
         guard isEnabled else { return }
+        stringValue = stringValue
 
         hover = true
         if !editing { lightenUp(color: textFieldColorHover) }
 
         onMouseEnter?()
-
-//        refusesFirstResponder = false
-//        window?.makeFirstResponder(self)
-
-//        if let editor = currentEditor() as? NSTextView {
-//            editor.selectedTextAttributes[.backgroundColor] = darkMauve.withAlphaComponent(0.05)
-//        }
     }
 
     override func mouseExited(with _: NSEvent) {
         log.verbose("mouseExited: \(caption?.stringValue ?? stringValue)")
-//        if let editor = currentEditor() as? NSTextView {
-//            validateEditing()
-//            endEditing(editor)
-//            editor.resignFirstResponder()
-//        }
-//        window?.makeFirstResponder(window)
-//        refusesFirstResponder = true
 
         guard isEnabled else { return }
 
