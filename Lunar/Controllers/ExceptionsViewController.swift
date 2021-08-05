@@ -43,7 +43,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
               let res = dialog.url, let bundle = Bundle(url: res)
         else { return }
 
-        guard let name = bundle.infoDictionary?["CFBundleName"] as? String,
+        guard let name = (bundle.infoDictionary?["CFBundleName"] as? String ?? bundle.infoDictionary?["CFBundleExecutable"] as? String),
               let id = bundle.bundleIdentifier
         else {
             log.warning("Bundle for \(res.path) does not contain required fields")
