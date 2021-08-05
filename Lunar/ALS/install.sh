@@ -15,17 +15,17 @@ if [[ "$BOARD" == "metroesp32-s2" ]]; then
     SDA="${SDA:-33}"
     SCL="${SCL:-34}"
 elif [[ "$BOARD" == "nodemcuv2" || "$BOARD" == "d1_mini" || "$BOARD" == "d1_mini_lite" || "$BOARD" == "d1_mini_pro" || "$BOARD" == "nodemcu" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@2.6.2}"
+    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@3.1.0}"
     PLATFORM="${PLATFORM:-ESP8266}"
     SDA="${SDA:-D2}"
     SCL="${SCL:-D1}"
 elif [[ "$BOARD" == "esp32dev" || "$BOARD" == "lolin32" || "$BOARD" == "lolin32_lite" || "$BOARD" == "nodemcu-32s" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@3.2.0}"
+    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@3.3.1}"
     PLATFORM="${PLATFORM:-ESP32}"
     SDA="${SDA:-19}"
     SCL="${SCL:-23}"
 else
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@2.6.2}"
+    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@3.1.0}"
     PLATFORM="${PLATFORM:-ESP8266}"
     SDA="${SDA:-GPIO4}"
     SCL="${SCL:-GPIO5}"
