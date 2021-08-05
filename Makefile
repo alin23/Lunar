@@ -3,11 +3,12 @@ define n
 
 endef
 
+.EXPORT_ALL_VARIABLES:
+
 DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
 DISABLE_PACKING := ${DISABLE_PACKING}
 ENV=Release
 DSA=1
-export DSA
 
 RELEASE_NOTES_FILES := $(wildcard ReleaseNotes/*.md)
 TEMPLATE_FILES := $(wildcard Lunar/Templates/*.stencil)
@@ -81,3 +82,10 @@ signatures:
 
 build:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+
+beta: SHELL=/usr/local/bin/fish
+beta: ENV=Release
+beta: DISABLE_PACKING=1
+beta: DSA=0
+beta: build appcast
+	upload -d lunar -n Lunar-(defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion).zip /tmp/Lunar/Lunar.zip

@@ -258,6 +258,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     ddcReadWorked = true
                                 case is DDCCTLControl:
                                     ddcctlReadWorked = true
+                                    log.debug("ddcctlReadWorked: \(ddcctlReadWorked)")
                                 case is NetworkControl:
                                     networkReadWorked = true
                                 default:

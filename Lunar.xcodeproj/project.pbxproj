@@ -1188,7 +1188,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.7.2;
+				CURRENT_PROJECT_VERSION = "4.7.2-beta1";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1214,7 +1214,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.7.2;
+				MARKETING_VERSION = "4.7.2-beta1";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1229,6 +1229,11 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				TEST_MODE = YES;
+				WARNING_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-incompatible-pointer-types-discards-qualifiers",
+					"-Wno-nonnull",
+				);
 			};
 			name = Test;
 		};
@@ -1300,7 +1305,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.7.2;
+				CURRENT_PROJECT_VERSION = "4.7.2-beta1";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1326,7 +1331,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.7.2;
+				MARKETING_VERSION = "4.7.2-beta1";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1341,6 +1346,11 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				TEST_MODE = NO;
+				WARNING_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-incompatible-pointer-types-discards-qualifiers",
+					"-Wno-nonnull",
+				);
 			};
 			name = Beta;
 		};
@@ -1473,7 +1483,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.7.2;
+				CURRENT_PROJECT_VERSION = "4.7.2-beta1";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1499,7 +1509,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.7.2;
+				MARKETING_VERSION = "4.7.2-beta1";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1514,6 +1524,11 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				TEST_MODE = NO;
+				WARNING_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-incompatible-pointer-types-discards-qualifiers",
+					"-Wno-nonnull",
+				);
 			};
 			name = Debug;
 		};
@@ -1531,7 +1546,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4.7.2;
+				CURRENT_PROJECT_VERSION = "4.7.2-beta1";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1557,7 +1572,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 4.7.2;
+				MARKETING_VERSION = "4.7.2-beta1";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1571,6 +1586,11 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				TEST_MODE = NO;
+				WARNING_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-incompatible-pointer-types-discards-qualifiers",
+					"-Wno-nonnull",
+				);
 			};
 			name = Release;
 		};

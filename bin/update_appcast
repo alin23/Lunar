@@ -8,7 +8,7 @@ set WORK_DIR (dirname "$DIR")
 echo WORK_DIR: $WORK_DIR
 
 set RELEASE_DIR "$WORK_DIR/Releases"
-set PRIV_KEY "$WORK_DIR/Lunar/Resources/dsa_priv.pem"
+set DSA_PRIV_KEY "$WORK_DIR/Lunar/Resources/dsa_priv.pem"
 set ED_PRIV_KEY "$WORK_DIR/Lunar/Resources/eddsa_priv"
 set APPCAST "$RELEASE_DIR/appcast.xml"
 if test "$CONFIGURATION" != Release
@@ -23,12 +23,12 @@ set INTEL_APP_SIGNATURE (arch -x86_64 "$APP_TMP"/Contents/MacOS/Lunar @ signatur
 echo Lunar $APP_VERSION \n\tARM signature: "$ARM_APP_SIGNATURE"\n\tINTEL signature: "$INTEL_APP_SIGNATURE"
 
 echo \n(set_color yellow)"Generating AppCast ($APPCAST)"(set_color normal)
-"$WORK_DIR/bin/generate_appcast" -s (cat $ED_PRIV_KEY) -o "$APPCAST" "$RELEASE_DIR"
+"$WORK_DIR/bin/generate_appcast" -f "$DSA_PRIV_KEY" -s (cat $ED_PRIV_KEY) -o "$APPCAST" "$RELEASE_DIR"
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
 if not set -q DSA; or test "$DSA" = 0
     "$WORK_DIR/bin/update_appcast.py" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
 else
-    "$WORK_DIR/bin/update_appcast.py" --dsa-key-path "$PRIV_KEY" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
+    "$WORK_DIR/bin/update_appcast.py" --dsa-key-path "$DSA_PRIV_KEY" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
 end
 subl "$APPCAST"

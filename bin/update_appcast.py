@@ -125,7 +125,12 @@ def main(
             el.text = "4.0.0"
             item.append(el)
 
-        if app_signatures and app_version and app_version == version:
+        if (
+            app_signatures
+            and app_version
+            and app_version == version
+            or re.sub(r"-beta\d+", "", app_version) == version
+        ):
             existing_signatures = {s.text for s in signatures}
             for signature in set(app_signatures) - existing_signatures:
                 if "/" in signature:

@@ -59,7 +59,7 @@ class HelpButton: PopoverButton<HelpPopoverController> {
     @IBInspectable var helpText: String = ""
 
     func getParsedHelpText() -> NSAttributedString? {
-        guard let popover = POPOVERS[popoverKey]! else { return nil }
+        guard POPOVERS[popoverKey]! != nil else { return nil }
 
         return MD.attributedString(from: helpText)
     }
