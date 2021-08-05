@@ -132,11 +132,11 @@ extension String {
     }
 
     @inline(__always) var d: Double? {
-        Double(self)
+        NumberFormatter().number(from: self)?.doubleValue
     }
 
     @inline(__always) var f: Float? {
-        Float(self)
+        NumberFormatter().number(from: self)?.floatValue
     }
 
     @inline(__always) var u: UInt? {
@@ -291,12 +291,44 @@ extension Double {
         rounded().i
     }
 
-    func str(decimals: UInt8) -> String {
-        String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, localized: Bool = false) -> String {
+        guard decimals > 0 else { return "\(intround)" }
+        guard localized else { return String(format: "%.\(decimals)f", self) }
+
+        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
         "\(((self / value) * 100.0).str(decimals: decimals))%"
+    }
+}
+
+extension NumberFormatter {
+    static let shared = NumberFormatter()
+    static let oneDecimalPoint = formatter(with: 1)
+    static let twoDecimalPoints = formatter(with: 2)
+    static let threeDecimalPoints = formatter(with: 3)
+
+    static func formatter(with _: Int) -> NumberFormatter {
+        let f = NumberFormatter()
+        f.alwaysShowsDecimalSeparator = true
+        f.maximumFractionDigits = 2
+        f.minimumFractionDigits = 2
+
+        return f
+    }
+
+    static func shared(decimals: Int) -> NumberFormatter {
+        switch decimals {
+        case 1:
+            return NumberFormatter.oneDecimalPoint
+        case 2:
+            return NumberFormatter.twoDecimalPoints
+        case 3:
+            return NumberFormatter.threeDecimalPoints
+        default:
+            return NumberFormatter.formatter(with: decimals)
+        }
     }
 }
 
@@ -351,8 +383,11 @@ extension Float {
         rounded().i
     }
 
-    func str(decimals: UInt8) -> String {
-        String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, localized: Bool = false) -> String {
+        guard decimals > 0 else { return "\(intround)" }
+        guard localized else { return String(format: "%.\(decimals)f", self) }
+
+        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
@@ -389,8 +424,11 @@ extension CGFloat {
         rounded().i
     }
 
-    func str(decimals: UInt8) -> String {
-        String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, localized: Bool = false) -> String {
+        guard decimals > 0 else { return "\(intround)" }
+        guard localized else { return String(format: "%.\(decimals)f", self) }
+
+        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
