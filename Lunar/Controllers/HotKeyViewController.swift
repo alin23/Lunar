@@ -123,8 +123,11 @@ class HotkeyViewController: NSViewController {
             You have to **hold `Fn`** to be able to activate any of the hotkeys containing keys like `F1,` `F2,` `F10` etc.
             """
         }
-        fnKeysNotice.attributedStringValue = DARK_MD.attributedString(from: notice) ?? notice.attributedString
-        fnKeysNotice.isEnabled = false
+        mainAsyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            self.fnKeysNotice.attributedStringValue = DARK_MD.attributedString(from: notice)
+            self.fnKeysNotice.isEnabled = false
+        }
     }
 
     @IBAction func howDoHotkeysWork(_: Any) {

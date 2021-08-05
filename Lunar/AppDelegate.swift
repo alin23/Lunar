@@ -16,6 +16,7 @@ import CoreLocation
 import Defaults
 import LetsMove
 import Magnet
+import MediaKeyTap
 import Path
 import Sauce
 import Sentry
@@ -205,6 +206,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             CachedDefaults[.hotkeys] = Hotkey.defaults
             return
         }
+        MediaKeyTap.useAlternateBrightnessKeys = CachedDefaults[.useAlternateBrightnessKeys]
+
         var hotkeys = CachedDefaults[.hotkeys]
         let existingIdentifiers = Set(hotkeys.map(\.identifier))
 
@@ -688,6 +691,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
         mediaKeysControlAllMonitorsPublisher.sink { _ in
             self.startOrRestartMediaKeyTap()
+        }.store(in: &observers)
+        useAlternateBrightnessKeysPublisher.sink { change in
+            MediaKeyTap.useAlternateBrightnessKeys = change.newValue
         }.store(in: &observers)
 
         hideMenuBarIconPublisher.sink { change in

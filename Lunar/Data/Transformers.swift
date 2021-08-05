@@ -82,7 +82,7 @@ class SignedIntTransformer: ValueTransformer {
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
-        guard let intValue = value as? Int else { return "\(value)" }
+        guard let intValue = value as? Int else { return String(describing: value) }
         return "\(intValue > 0 ? "+" : "")\(intValue)"
     }
 
