@@ -1209,6 +1209,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
                 attributes: [.posixPermissions: 0o755]
             )
+
+            guard fm.fileExists(atPath: "/usr/local/bin/lunar") else {
+                dialog(
+                    message: "Error installing Lunar CLI",
+                    info: """
+                    This is most likely a permissions problem.
+
+                    You can fix permissions by running the following commands in a terminal:
+
+                    sudo chown -R $(whoami) /usr/local/bin
+                    sudo chmod 755 /usr/local/bin
+                    """,
+                    cancelButton: nil
+                ).runModal()
+                return
+            }
             dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
         }
     }
