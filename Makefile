@@ -80,12 +80,24 @@ signatures:
 	echo '<signature>'(timeout 2 /tmp/Lunar/Lunar.app/Contents/MacOS/Lunar @ signature)'</signature>'\n'<signature>'(timeout 2 arch -x86_64 /tmp/Lunar/Lunar.app/Contents/MacOS/Lunar @ signature)'</signature>' | pbcopy
 	subl Releases/appcast.xml
 
-build:
+setversion: OLD_VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')
+setversion:
+ifneq (, $(VERSION))
+	sed -i .bkp 's/VERSION = "$(OLD_VERSION)"/VERSION = "$(VERSION)"/g' $$(rg -l 'VERSION = "$(OLD_VERSION)"')
+endif
+
+build: setversion
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+
+build-version:
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO MARKETING_VERSION=$(VERSION) CURRENT_PROJECT_VERSION=$(VERSION) | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
 
 beta: SHELL=/usr/local/bin/fish
 beta: ENV=Release
 beta: DISABLE_PACKING=1
 beta: DSA=0
-beta: build appcast
+beta: V=1
+beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$V
+beta: build-version appcast
 	upload -d lunar -n Lunar-(defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion).zip /tmp/Lunar/Lunar.zip
+	upload -d lunar Releases/appcast.xml
