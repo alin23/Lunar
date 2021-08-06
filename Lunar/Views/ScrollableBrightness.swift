@@ -115,14 +115,28 @@ class ScrollableBrightness: NSView {
                 self?.currentValue?.stringValue = String(newBrightness)
             }
         }.store(in: &displayObservers, for: "brightness")
+        display.$minBrightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
+            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+            mainThread {
+                self.minValue?.intValue = self.displayMinValue.i32
+                self.maxValue?.lowerLimit = (self.displayMinValue + 1).d
+            }
+        }.store(in: &displayObservers, for: "minBrightness")
+        display.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
+            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+            mainThread {
+                self.maxValue?.intValue = self.displayMaxValue.i32
+                self.minValue?.upperLimit = (self.displayMaxValue - 1).d
+            }
+        }.store(in: &displayObservers, for: "maxBrightness")
     }
 
     func update(from display: Display) {
-        minValue?.intValue = Int32(displayMinValue)
+        minValue?.intValue = displayMinValue.i32
         minValue?.upperLimit = (displayMaxValue - 1).d
-        maxValue?.intValue = Int32(displayMaxValue)
+        maxValue?.intValue = displayMaxValue.i32
         maxValue?.lowerLimit = (displayMinValue + 1).d
-        currentValue?.intValue = Int32(displayValue)
+        currentValue?.intValue = displayValue.i32
         currentValue?.lowerLimit = displayMinValue.d
         currentValue?.upperLimit = displayMaxValue.d
 
