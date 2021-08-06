@@ -62,6 +62,34 @@ class DDCControl: Control {
         DDC.setPower(for: display.id, power: power == .on)
     }
 
+    func setRedGain(_ gain: UInt8) -> Bool {
+        DDC.setRedGain(for: display.id, redGain: gain)
+    }
+
+    func setGreenGain(_ gain: UInt8) -> Bool {
+        DDC.setGreenGain(for: display.id, greenGain: gain)
+    }
+
+    func setBlueGain(_ gain: UInt8) -> Bool {
+        DDC.setBlueGain(for: display.id, blueGain: gain)
+    }
+
+    func getRedGain() -> UInt8? {
+        DDC.getRedGain(for: display.id)
+    }
+
+    func getGreenGain() -> UInt8? {
+        DDC.getGreenGain(for: display.id)
+    }
+
+    func getBlueGain() -> UInt8? {
+        DDC.getBlueGain(for: display.id)
+    }
+
+    func resetColors() -> Bool {
+        DDC.resetColors(for: display.id)
+    }
+
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
             var faults = 0

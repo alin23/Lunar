@@ -92,6 +92,14 @@ protocol Control {
     func setMute(_ muted: Bool) -> Bool
     func setPower(_ power: PowerState) -> Bool
 
+    func setRedGain(_ gain: UInt8) -> Bool
+    func setGreenGain(_ gain: UInt8) -> Bool
+    func setBlueGain(_ gain: UInt8) -> Bool
+
+    func getRedGain() -> UInt8?
+    func getGreenGain() -> UInt8?
+    func getBlueGain() -> UInt8?
+
     func getBrightness() -> Brightness?
     func getContrast() -> Contrast?
     func getVolume() -> UInt8?
@@ -103,6 +111,7 @@ protocol Control {
 
     func reset() -> Bool
     func resetState()
+    func resetColors() -> Bool
 
     func isAvailable() -> Bool
     func isResponsive() -> Bool

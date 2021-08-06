@@ -255,6 +255,7 @@ class SplitViewController: NSSplitViewController {
         }
 
         goLeftButton?.enable()
+        goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goRightButton?.enable()
     }
 
@@ -271,6 +272,7 @@ class SplitViewController: NSSplitViewController {
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
         goLeftButton?.enable()
+        goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goRightButton?.enable()
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
@@ -307,7 +309,8 @@ class SplitViewController: NSSplitViewController {
         }
 
         goLeftButton?.disable()
-        goRightButton?.enable(color: logoColor)
+        goRightButton?.compositingFilter = nil
+        goRightButton?.enable()
     }
 
     override func viewDidAppear() {

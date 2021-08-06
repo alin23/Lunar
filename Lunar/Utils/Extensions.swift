@@ -132,11 +132,13 @@ extension String {
     }
 
     @inline(__always) var d: Double? {
-        NumberFormatter().number(from: self)?.doubleValue
+        Double(replacingOccurrences(of: ",", with: "."))
+        // NumberFormatter.shared.number(from: self)?.doubleValue
     }
 
     @inline(__always) var f: Float? {
-        NumberFormatter().number(from: self)?.floatValue
+        Float(replacingOccurrences(of: ",", with: "."))
+        // NumberFormatter.shared.number(from: self)?.floatValue
     }
 
     @inline(__always) var u: UInt? {
