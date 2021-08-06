@@ -8,6 +8,8 @@
 
 import Cocoa
 
+// MARK: - RaspberryPageController
+
 class RaspberryPageController: NSPageController {
     @IBOutlet var logo: NSTextField?
 
@@ -38,6 +40,8 @@ class RaspberryPageController: NSPageController {
     override func scrollWheel(with _: NSEvent) {}
 }
 
+// MARK: NSPageControllerDelegate
+
 extension RaspberryPageController: NSPageControllerDelegate {
     func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {
         object as! NSPageController.ObjectIdentifier
@@ -59,7 +63,9 @@ extension RaspberryPageController: NSPageControllerDelegate {
             c.viewControllers[identifier] = controller
             controller.onInstall = { [weak self] (ssh: SSH) -> Void in
                 self?.navigateForward(nil)
-                if let installOutputController = c.viewControllers[c.installOutputViewControllerIdentifier] as? InstallOutputViewController {
+                if let installOutputController = c
+                    .viewControllers[c.installOutputViewControllerIdentifier] as? InstallOutputViewController
+                {
                     installOutputController.startInstall(ssh: ssh)
                 }
             }

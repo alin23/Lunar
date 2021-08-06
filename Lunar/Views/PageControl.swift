@@ -8,30 +8,21 @@
 
 import Cocoa
 
+// MARK: - PageControl
+
 public class PageControl: NSView {
-    public var numberOfPages: Int = 0
-    public var currentPage: Int = 2 {
-        didSet(oldValue) {
-            if currentPage < 0 {
-                currentPage = 0
-            }
-            if currentPage > numberOfPages - 1 {
-                currentPage = numberOfPages - 1
-            }
-            didSetCurrentPage(oldValue, newlySelectedPage: currentPage)
-        }
-    }
+    // MARK: Lifecycle
 
-    public var hidesForSinglePage: Bool = true
-    public var pageIndicatorTintColor = NSColor.darkGray
-    public var currentPageIndicatorTintColor = NSColor.white
-    public var animationDuration: CFTimeInterval = 0.04
-    public var dotLength: CGFloat = 8.0
-    public var dotMargin: CGFloat = 12.0
-
-    private var dotLayers: [CAShapeLayer] = []
-
-    init(frame: NSRect, numberOfPages: Int = 0, hidesForSinglePage: Bool = true, tintColor: NSColor = NSColor.darkGray, currentTintColor: NSColor = NSColor.white, animationDuration: CFTimeInterval = 0.04, dotLength: CGFloat = 8.0, dotMargin: CGFloat = 12.0) {
+    init(
+        frame: NSRect,
+        numberOfPages: Int = 0,
+        hidesForSinglePage: Bool = true,
+        tintColor: NSColor = NSColor.darkGray,
+        currentTintColor: NSColor = NSColor.white,
+        animationDuration: CFTimeInterval = 0.04,
+        dotLength: CGFloat = 8.0,
+        dotMargin: CGFloat = 12.0
+    ) {
         super.init(frame: frame)
         self.numberOfPages = numberOfPages
         self.hidesForSinglePage = hidesForSinglePage
@@ -46,7 +37,27 @@ public class PageControl: NSView {
         super.init(coder: decoder)
     }
 
-    // MARK: - lifecycle
+    // MARK: Public
+
+    public var numberOfPages: Int = 0
+    public var hidesForSinglePage: Bool = true
+    public var pageIndicatorTintColor = NSColor.darkGray
+    public var currentPageIndicatorTintColor = NSColor.white
+    public var animationDuration: CFTimeInterval = 0.04
+    public var dotLength: CGFloat = 8.0
+    public var dotMargin: CGFloat = 12.0
+
+    public var currentPage: Int = 2 {
+        didSet(oldValue) {
+            if currentPage < 0 {
+                currentPage = 0
+            }
+            if currentPage > numberOfPages - 1 {
+                currentPage = numberOfPages - 1
+            }
+            didSetCurrentPage(oldValue, newlySelectedPage: currentPage)
+        }
+    }
 
     override public func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
@@ -90,7 +101,9 @@ public class PageControl: NSView {
         }
     }
 
-    // MARK: - private
+    // MARK: Private
+
+    private var dotLayers: [CAShapeLayer] = []
 
     private func didSetCurrentPage(_ selectedPage: Int, newlySelectedPage: Int) {
         if selectedPage == newlySelectedPage {

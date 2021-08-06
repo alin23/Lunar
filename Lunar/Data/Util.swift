@@ -28,24 +28,36 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-//         return id == GENERIC_DISPLAY_ID
+        return id == GENERIC_DISPLAY_ID
         return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
     #endif
 }
 
+// MARK: - RequestTimeoutError
+
 class RequestTimeoutError: Error {}
+
+// MARK: - ResponseError
+
 struct ResponseError: Error {
     var statusCode: Int
 }
+
+// MARK: - ProcessStatus
 
 struct ProcessStatus {
     var output: Data?
     var success: Bool
 }
 
-func shell(_ launchPath: String = "/bin/bash", command: String, timeout: DateComponents? = nil, env _: [String: String]? = nil) -> ProcessStatus {
+func shell(
+    _ launchPath: String = "/bin/bash",
+    command: String,
+    timeout: DateComponents? = nil,
+    env _: [String: String]? = nil
+) -> ProcessStatus {
     shell(launchPath, args: ["-c", command], timeout: timeout)
 }
 
@@ -90,7 +102,12 @@ func stdout(of process: Process) -> Data? {
     return data
 }
 
-func shell(_ launchPath: String = "/bin/bash", args: [String], timeout: DateComponents? = nil, env: [String: String]? = nil) -> ProcessStatus {
+func shell(
+    _ launchPath: String = "/bin/bash",
+    args: [String],
+    timeout: DateComponents? = nil,
+    env: [String: String]? = nil
+) -> ProcessStatus {
     guard let task = shell(launchPath, args: args, env: env) else {
         return ProcessStatus(output: nil, success: false)
     }
@@ -116,13 +133,23 @@ func shell(_ launchPath: String = "/bin/bash", args: [String], timeout: DateComp
     )
 }
 
+// MARK: - DispatchWorkItem
+
 class DispatchWorkItem {
-    var name: String = ""
-    var workItem: Foundation.DispatchWorkItem
+    // MARK: Lifecycle
 
     init(name: String, flags: DispatchWorkItemFlags = [], block: @escaping @convention(block) () -> Void) {
         workItem = Foundation.DispatchWorkItem(flags: flags, block: block)
         self.name = name
+    }
+
+    // MARK: Internal
+
+    var name: String = ""
+    var workItem: Foundation.DispatchWorkItem
+
+    @inline(__always) var isCancelled: Bool {
+        workItem.isCancelled
     }
 
     @discardableResult
@@ -135,10 +162,6 @@ class DispatchWorkItem {
 
     @inline(__always) func cancel() {
         workItem.cancel()
-    }
-
-    @inline(__always) var isCancelled: Bool {
-        workItem.isCancelled
     }
 
     @discardableResult
@@ -168,14 +191,20 @@ class DispatchWorkItem {
     }
 }
 
+// MARK: - DispatchSemaphore
+
 class DispatchSemaphore {
-    var name: String = ""
-    var sem: Foundation.DispatchSemaphore
+    // MARK: Lifecycle
 
     init(value: Int, name: String) {
         sem = Foundation.DispatchSemaphore(value: value)
         self.name = name
     }
+
+    // MARK: Internal
+
+    var name: String = ""
+    var sem: Foundation.DispatchSemaphore
 
     @discardableResult
     @inline(__always) func wait(for timeout: DateComponents?, context: Any? = nil) -> DispatchTimeoutResult {
@@ -899,8 +928,10 @@ func ramp(targetValue: Float, lastTargetValue: inout Float, samples: Int, step _
     return reversed ? control.reversed() : control
 }
 
+// MARK: - Zip3Sequence
+
 struct Zip3Sequence<E1, E2, E3>: Sequence, IteratorProtocol {
-    private let _next: () -> (E1, E2, E3)?
+    // MARK: Lifecycle
 
     init<S1: Sequence, S2: Sequence, S3: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3) where S1.Element == E1, S2.Element == E2,
         S3.Element == E3
@@ -914,17 +945,25 @@ struct Zip3Sequence<E1, E2, E3>: Sequence, IteratorProtocol {
         }
     }
 
+    // MARK: Internal
+
     mutating func next() -> (E1, E2, E3)? {
         _next()
     }
+
+    // MARK: Private
+
+    private let _next: () -> (E1, E2, E3)?
 }
 
 func zip3<S1: Sequence, S2: Sequence, S3: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3) -> Zip3Sequence<S1.Element, S2.Element, S3.Element> {
     Zip3Sequence(s1, s2, s3)
 }
 
+// MARK: - Zip4Sequence
+
 struct Zip4Sequence<E1, E2, E3, E4>: Sequence, IteratorProtocol {
-    private let _next: () -> (E1, E2, E3, E4)?
+    // MARK: Lifecycle
 
     init<S1: Sequence, S2: Sequence, S3: Sequence, S4: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3, _ s4: S4) where S1.Element == E1,
         S2.Element == E2, S3.Element == E3, S4.Element == E4
@@ -939,9 +978,15 @@ struct Zip4Sequence<E1, E2, E3, E4>: Sequence, IteratorProtocol {
         }
     }
 
+    // MARK: Internal
+
     mutating func next() -> (E1, E2, E3, E4)? {
         _next()
     }
+
+    // MARK: Private
+
+    private let _next: () -> (E1, E2, E3, E4)?
 }
 
 func zip4<S1: Sequence, S2: Sequence, S3: Sequence, S4: Sequence>(
@@ -994,6 +1039,8 @@ func createWindow(
         }
     }
 }
+
+// MARK: - OperationHighlightData
 
 struct OperationHighlightData: Equatable {
     let shouldHighlight: Bool
@@ -1067,7 +1114,11 @@ func dialog(
                 NSApplication.shared.activate(ignoringOtherApps: true)
             }
             if w.occlusionState != .visible, let screen = NSScreen.main {
-                w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - alertSize.width / 2, y: screen.visibleFrame.midY - alertSize.height / 2))
+                w
+                    .setFrameOrigin(CGPoint(
+                        x: screen.visibleFrame.midX - alertSize.width / 2,
+                        y: screen.visibleFrame.midY - alertSize.height / 2
+                    ))
                 w.makeKeyAndOrderFront(nil)
             }
         }
@@ -1191,11 +1242,11 @@ func ask(
     return response
 }
 
-// MARK: Property Wrappers
+// MARK: - UnfairLock
 
 /// An `os_unfair_lock` wrapper.
 final class UnfairLock {
-    private let unfairLock: os_unfair_lock_t
+    // MARK: Lifecycle
 
     init() {
         unfairLock = .allocate(capacity: 1)
@@ -1211,9 +1262,33 @@ final class UnfairLock {
         unfairLock.deallocate()
     }
 
+    // MARK: Internal
+
     @Atomic var lockedInThread: Int32 = 0
 
     func locked() -> Bool { !os_unfair_lock_trylock(unfairLock) }
+
+    /// Executes a closure returning a value while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    ///
+    /// - Returns:           The value the closure generated.
+    @inline(__always) func around<T>(_ closure: () -> T) -> T {
+        let locked = lock(); defer { if locked { unlock() } }
+        return closure()
+    }
+
+    /// Execute a closure while acquiring the lock.
+    ///
+    /// - Parameter closure: The closure to run.
+    @inline(__always) func around(_ closure: () -> Void) {
+        let locked = lock(); defer { if locked { unlock() } }
+        return closure()
+    }
+
+    // MARK: Private
+
+    private let unfairLock: os_unfair_lock_t
 
     @discardableResult
     private func trylock() -> Bool {
@@ -1232,24 +1307,6 @@ final class UnfairLock {
     private func unlock() {
         os_unfair_lock_unlock(unfairLock)
         lockedInThread = 0
-    }
-
-    /// Executes a closure returning a value while acquiring the lock.
-    ///
-    /// - Parameter closure: The closure to run.
-    ///
-    /// - Returns:           The value the closure generated.
-    @inline(__always) func around<T>(_ closure: () -> T) -> T {
-        let locked = lock(); defer { if locked { unlock() } }
-        return closure()
-    }
-
-    /// Execute a closure while acquiring the lock.
-    ///
-    /// - Parameter closure: The closure to run.
-    @inline(__always) func around(_ closure: () -> Void) {
-        let locked = lock(); defer { if locked { unlock() } }
-        return closure()
     }
 }
 
@@ -1294,14 +1351,17 @@ extension NSRecursiveLock {
     }
 }
 
+// MARK: - AtomicLock
+
 @propertyWrapper
 public struct AtomicLock<Value> {
-    var value: Value
-    var lock = NSRecursiveLock()
+    // MARK: Lifecycle
 
     public init(wrappedValue: Value) {
         value = wrappedValue
     }
+
+    // MARK: Public
 
     public var wrappedValue: Value {
         get {
@@ -1311,15 +1371,24 @@ public struct AtomicLock<Value> {
             lock.around { value = newValue }
         }
     }
+
+    // MARK: Internal
+
+    var value: Value
+    var lock = NSRecursiveLock()
 }
+
+// MARK: - Atomic
 
 @propertyWrapper
 public struct Atomic<Value: AtomicValue> {
-    var value: ManagedAtomic<Value>
+    // MARK: Lifecycle
 
     public init(wrappedValue: Value) {
         value = ManagedAtomic<Value>(wrappedValue)
     }
+
+    // MARK: Public
 
     public var wrappedValue: Value {
         get {
@@ -1329,17 +1398,24 @@ public struct Atomic<Value: AtomicValue> {
             value.store(newValue, ordering: .sequentiallyConsistent)
         }
     }
+
+    // MARK: Internal
+
+    var value: ManagedAtomic<Value>
 }
+
+// MARK: - AtomicOptional
 
 @propertyWrapper
 public struct AtomicOptional<Value: AtomicValue & Equatable> {
-    var nilValue: Value
-    var value: ManagedAtomic<Value>
+    // MARK: Lifecycle
 
     public init(wrappedValue: Value?, nilValue: Value) {
         self.nilValue = nilValue
         value = ManagedAtomic<Value>(wrappedValue ?? nilValue)
     }
+
+    // MARK: Public
 
     public var wrappedValue: Value? {
         get {
@@ -1350,16 +1426,24 @@ public struct AtomicOptional<Value: AtomicValue & Equatable> {
             value.store(newValue ?? nilValue, ordering: .sequentiallyConsistent)
         }
     }
+
+    // MARK: Internal
+
+    var nilValue: Value
+    var value: ManagedAtomic<Value>
 }
+
+// MARK: - LazyAtomic
 
 @propertyWrapper
 public struct LazyAtomic<Value> {
-    var storage: Value?
-    let constructor: () -> Value
+    // MARK: Lifecycle
 
     public init(wrappedValue constructor: @autoclosure @escaping () -> Value) {
         self.constructor = constructor
     }
+
+    // MARK: Public
 
     public var wrappedValue: Value {
         mutating get {
@@ -1372,6 +1456,11 @@ public struct LazyAtomic<Value> {
             storage = newValue
         }
     }
+
+    // MARK: Internal
+
+    var storage: Value?
+    let constructor: () -> Value
 }
 
 func localNow() -> DateInRegion {
@@ -1392,11 +1481,15 @@ func displayInfoDictionary(_ id: CGDirectDisplayID) -> NSDictionary? {
     return dict
 }
 
+// MARK: - PlainTextPasteView
+
 class PlainTextPasteView: NSTextView, NSTextViewDelegate {
     override func paste(_ sender: Any?) {
         super.pasteAsPlainText(sender)
     }
 }
+
+// MARK: - PlainTextFieldCell
 
 class PlainTextFieldCell: NSTextFieldCell {
     static var plainTextView: PlainTextPasteView?
@@ -1428,21 +1521,10 @@ func removeNotifications(withIdentifiers ids: [String]) {
     UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
 }
 
+// MARK: - Window
+
 struct Window {
-    let storeType: Int
-    let isOnScreen: Bool
-    let layer: NSWindow.Level
-    let title: String
-    let ownerName: String
-    let alpha: Float
-    let bounds: NSRect
-    let id: Int
-    let ownerPID: Int
-    let sharingState: Int
-    let memoryUsage: Int
-    let screen: NSScreen?
-    let appException: AppException?
-    let runningApp: NSRunningApplication?
+    // MARK: Lifecycle
 
     init(from dict: [String: AnyObject], appException: AppException? = nil, runningApp: NSRunningApplication? = nil) {
         storeType = (dict[kCGWindowStoreType as String] as? Int) ?? 0
@@ -1472,6 +1554,23 @@ struct Window {
         self.appException = appException
         self.runningApp = runningApp
     }
+
+    // MARK: Internal
+
+    let storeType: Int
+    let isOnScreen: Bool
+    let layer: NSWindow.Level
+    let title: String
+    let ownerName: String
+    let alpha: Float
+    let bounds: NSRect
+    let id: Int
+    let ownerPID: Int
+    let sharingState: Int
+    let memoryUsage: Int
+    let screen: NSScreen?
+    let appException: AppException?
+    let runningApp: NSRunningApplication?
 }
 
 extension NSRect {
@@ -1481,21 +1580,10 @@ extension NSRect {
     }
 }
 
+// MARK: - AXWindow
+
 struct AXWindow {
-    let frame: NSRect
-    let fullScreen: Bool
-    let title: String
-    let position: NSPoint
-    let main: Bool
-    let minimized: Bool
-    let focused: Bool
-    let size: NSSize
-    let identifier: String
-    let subrole: String
-    let role: String
-    let runningApp: NSRunningApplication?
-    let appException: AppException?
-    let screen: NSScreen?
+    // MARK: Lifecycle
 
     init?(from window: UIElement, runningApp: NSRunningApplication? = nil, appException: AppException? = nil) {
         guard let attrs = try? window.getMultipleAttributes(
@@ -1535,6 +1623,23 @@ struct AXWindow {
             s1.frame.intersectedArea(frame) < s2.frame.intersectedArea(frame)
         })
     }
+
+    // MARK: Internal
+
+    let frame: NSRect
+    let fullScreen: Bool
+    let title: String
+    let position: NSPoint
+    let main: Bool
+    let minimized: Bool
+    let focused: Bool
+    let size: NSSize
+    let identifier: String
+    let subrole: String
+    let role: String
+    let runningApp: NSRunningApplication?
+    let appException: AppException?
+    let screen: NSScreen?
 }
 
 extension NSRunningApplication {
@@ -1615,8 +1720,10 @@ func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
 //        .min { $0.layer < $1.layer && $0.isOnScreen.i >= $1.isOnScreen.i }
 }
 
+// MARK: - LineReader
+
 class LineReader {
-    let path: String
+    // MARK: Lifecycle
 
     init?(path: String) {
         self.path = path
@@ -1629,6 +1736,10 @@ class LineReader {
     deinit {
         fclose(file)
     }
+
+    // MARK: Internal
+
+    let path: String
 
     var nextLine: String? {
         var line: UnsafeMutablePointer<CChar>?
@@ -1643,8 +1754,12 @@ class LineReader {
         return String(cString: unwrappedLine)
     }
 
+    // MARK: Private
+
     private let file: UnsafeMutablePointer<FILE>
 }
+
+// MARK: Sequence
 
 extension LineReader: Sequence {
     func makeIterator() -> AnyIterator<String> {

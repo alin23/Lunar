@@ -19,18 +19,72 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
+// MARK: - AVServiceMatch
+
 enum AVServiceMatch {
     case byEDIDUUID
     case byProductAttributes
 }
 
+// MARK: - DisplayController
+
 class DisplayController {
+    // MARK: Lifecycle
+
+    init() {
+        watchControlAvailability()
+        watchModeAvailability()
+        concurrentQueue.async {
+            log.info("Sensor initial serial port: \(SensorMode.validSensorSerialPort?.path ?? "none")")
+        }
+        initObservers()
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        if let task = controlWatcherTask {
+            lowprioQueue.cancel(timer: task)
+        }
+
+        if let task = modeWatcherTask {
+            lowprioQueue.cancel(timer: task)
+        }
+    }
+
+    // MARK: Internal
+
     let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
 
     var appObserver: NSKeyValueObservation?
     @AtomicLock var runningAppExceptions: [AppException]!
+
+    var onActiveDisplaysChange: (() -> Void)?
+    var _activeDisplaysLock = NSRecursiveLock()
+    var _activeDisplays: [CGDirectDisplayID: Display] = [:]
+    var activeDisplaysByReadableID: [String: Display] = [:]
+
+    var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
+    var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
+
+    var onAdapt: ((Any) -> Void)?
+
+    var controlWatcherTask: CFRunLoopTimer?
+    var modeWatcherTask: CFRunLoopTimer?
+
+    var pausedAdaptiveModeObserver: Bool = false
+    var adaptiveModeObserver: Cancellable?
+
+    var fallbackPromptTime = [CGDirectDisplayID: Date]()
+
+    var overrideAdaptiveModeObserver: Cancellable?
+    var pausedOverrideAdaptiveModeObserver: Bool = false
+
+    var observers: Set<AnyCancellable> = []
 
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
@@ -43,9 +97,6 @@ class DisplayController {
         }
     }
 
-    var onActiveDisplaysChange: (() -> Void)?
-    var _activeDisplaysLock = NSRecursiveLock()
-    var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around { _activeDisplays } }
         set {
@@ -56,8 +107,6 @@ class DisplayController {
             }
         }
     }
-
-    var activeDisplaysByReadableID: [String: Display] = [:]
 
     @AtomicLock var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
@@ -75,47 +124,6 @@ class DisplayController {
         adaptiveMode.key
     }
 
-    var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
-    var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
-
-    func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
-        guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
-
-        if let app = activeWindow(on: screen)?.appException {
-            #if DEBUG
-                log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
-            #endif
-            return (app.brightness.i, app.contrast.i)
-        }
-
-        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[AXWindow]]>? in
-            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
-            return runningApps.compactMap { (a: NSRunningApplication) -> [AXWindow]? in
-                a.windows(appException: app)?.filter { window in
-                    !window.minimized && window.size != .zero && window.screen != nil
-                }
-            }.joined()
-        }.joined()
-
-//        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
-//            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
-//            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
-//                windowList(for: a, opaque: true, levels: [.normal], appException: app)
-//            }.joined()
-//        }.joined()
-
-        let windowsOnScreen = windows.filter { w in w.screen?.displayID == screen.displayID }
-        guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
-              let app = focusedWindow.appException
-        else { return (0, 0) }
-
-        #if DEBUG
-            log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
-        #endif
-
-        return (app.brightness.i, app.contrast.i)
-    }
-
     var firstDisplay: Display {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
@@ -130,7 +138,15 @@ class DisplayController {
     }
 
     var mainDisplay: Display? {
-        guard let screen = NSScreen.withMouse ?? NSScreen.onlyExternalScreen,
+        guard let screen = NSScreen.externalWithMouse ?? NSScreen.onlyExternalScreen,
+              let id = screen.displayID
+        else { return nil }
+
+        return activeDisplays[id]
+    }
+
+    var cursorDisplay: Display? {
+        guard let screen = NSScreen.externalWithMouse,
               let id = screen.displayID
         else { return nil }
 
@@ -164,24 +180,6 @@ class DisplayController {
         return nil
     }
 
-    var onAdapt: ((Any) -> Void)?
-
-    var controlWatcherTask: CFRunLoopTimer?
-    var modeWatcherTask: CFRunLoopTimer?
-
-    func removeDisplay(serial: String) {
-        guard let display = displays.values.first(where: { $0.serial == serial }) else { return }
-        displays.removeValue(forKey: display.id)
-        CachedDefaults[.displays] = displays.values.map { $0 }
-        CachedDefaults[.hotkeys] = CachedDefaults[.hotkeys].filter { hk in
-            if display.hotkeyIdentifiers.contains(hk.identifier) {
-                hk.unregister()
-                return false
-            }
-            return true
-        }
-    }
-
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
@@ -191,24 +189,6 @@ class DisplayController {
                 CachedDefaults[.adaptiveBrightnessMode] = mode.key
             }
             return mode
-        }
-    }
-
-    var pausedAdaptiveModeObserver: Bool = false
-    var adaptiveModeObserver: Cancellable?
-
-    func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver else {
-                return
-            }
-            Defaults.withoutPropagation {
-                mainThread {
-                    self.pausedAdaptiveModeObserver = true
-                    self.adaptiveMode = change.newValue.mode
-                    self.pausedAdaptiveModeObserver = false
-                }
-            }
         }
     }
 
@@ -222,289 +202,6 @@ class DisplayController {
         } else {
             return ManualMode.shared
         }
-    }
-
-    func toggle() {
-        if adaptiveModeKey == .manual {
-            enable()
-        } else {
-            disable()
-        }
-    }
-
-    func disable() {
-        if adaptiveModeKey != .manual {
-            adaptiveMode = ManualMode.shared
-        }
-        if !CachedDefaults[.overrideAdaptiveMode] {
-            lastModeWasAuto = true
-            CachedDefaults[.overrideAdaptiveMode] = true
-        }
-        CachedDefaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
-    }
-
-    func enable(mode: AdaptiveModeKey? = nil) {
-        if let newMode = mode {
-            adaptiveMode = newMode.mode
-        } else if lastModeWasAuto {
-            CachedDefaults[.overrideAdaptiveMode] = false
-            adaptiveMode = DisplayController.getAdaptiveMode()
-        } else if lastNonManualAdaptiveMode.available {
-            adaptiveMode = lastNonManualAdaptiveMode
-        } else {
-            adaptiveMode = DisplayController.getAdaptiveMode()
-        }
-        CachedDefaults[.adaptiveBrightnessMode] = adaptiveMode.key
-        adaptBrightness(force: true)
-    }
-
-    func resetDisplayList() {
-        asyncNow {
-            self.getDisplaysLock.around {
-                DDC.reset()
-                self.displays = DisplayController.getDisplays()
-                SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
-                SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
-                self.addSentryData()
-            }
-
-            mainThread {
-                let appd = appDelegate
-                if appd.windowController?.window != nil {
-                    let shouldShow = appd.windowController!.window!.isVisible
-                    appd.windowController?.close()
-                    appd.windowController?.window = nil
-                    appd.windowController = nil
-                    if shouldShow {
-                        appd.showWindow()
-                    }
-                }
-            }
-        }
-    }
-
-    var fallbackPromptTime = [CGDirectDisplayID: Date]()
-
-    func shouldPromptAboutFallback(_ display: Display) -> Bool {
-        guard !display.neverFallbackControl else { return false }
-
-        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty,
-           !(display.control?.isResponsive() ?? true)
-        {
-            if let promptTime = fallbackPromptTime[display.id] {
-                return promptTime + 20.minutes < Date()
-            }
-            return true
-        }
-
-        return false
-    }
-
-    func watchControlAvailability() {
-        guard controlWatcherTask == nil || !lowprioQueue.isValid(timer: controlWatcherTask!) else {
-            return
-        }
-
-        controlWatcherTask = asyncEvery(15.seconds, queue: lowprioQueue) { [weak self] _ in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-            for display in self.activeDisplays.values {
-                display.control = display.getBestControl()
-                if self.shouldPromptAboutFallback(display) {
-                    log.warning("Non-responsive display", context: display.context)
-                    self.fallbackPromptTime[display.id] = Date()
-                    let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
-                    let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
-                        if fallbackToGamma == .alertFirstButtonReturn {
-                            display.control = GammaControl(display: display)
-                            display.setGamma()
-                        }
-                        if fallbackToGamma == .alertThirdButtonReturn {
-                            display.neverFallbackControl = true
-                        }
-                        semaphore.signal()
-                    }
-
-                    if display.alwaysFallbackControl {
-                        completionHandler(.alertFirstButtonReturn)
-                        return
-                    }
-
-                    let window = mainThread { appDelegate.windowController?.window }
-
-                    let resp = ask(
-                        message: "Non-responsive display \"\(display.name)\"",
-                        info: """
-                            This display is not responding to commands in
-                            \(display.control!.str) mode.
-
-                            Do you want to fallback to adjusting brightness in software?
-
-                            Note: adjust the monitor to [BRIGHTNESS: 100%, CONTRAST: 70%] manually
-                            using its physical buttons to allow for a full range in software.
-                        """,
-                        okButton: "Yes",
-                        cancelButton: "Not now",
-                        thirdButton: "No, never ask again",
-                        screen: display.screen,
-                        window: window,
-                        suppressionText: "Always fallback to software controls for this display when needed",
-                        onSuppression: { fallback in
-                            display.alwaysFallbackControl = fallback
-                            display.save()
-                        },
-                        onCompletion: completionHandler,
-                        unique: true,
-                        waitTimeout: 60.seconds,
-                        wide: true
-                    )
-                    if window == nil {
-                        completionHandler(resp)
-                    } else {
-                        semaphore.wait(for: nil)
-                    }
-                }
-            }
-        }
-    }
-
-    func autoAdaptMode() {
-        guard !CachedDefaults[.overrideAdaptiveMode] else {
-            if adaptiveMode.available {
-                adaptiveMode.watching = adaptiveMode.watch()
-            } else {
-                adaptiveMode.stopWatching()
-            }
-            return
-        }
-
-        let mode = DisplayController.autoMode()
-        if mode.key != adaptiveMode.key {
-            adaptiveMode = mode
-            CachedDefaults[.adaptiveBrightnessMode] = mode.key
-        }
-    }
-
-    var overrideAdaptiveModeObserver: Cancellable?
-    var pausedOverrideAdaptiveModeObserver: Bool = false
-
-    func watchModeAvailability() {
-        guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {
-            return
-        }
-
-        guard !pausedOverrideAdaptiveModeObserver else { return }
-
-        pausedOverrideAdaptiveModeObserver = true
-        Defaults.withoutPropagation {
-            self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-                self.autoAdaptMode()
-            }
-        }
-        pausedOverrideAdaptiveModeObserver = false
-    }
-
-    var observers: Set<AnyCancellable> = []
-
-    func initObservers() {
-        NotificationCenter.default.publisher(for: lunarProStateChanged, object: nil).sink { _ in
-            self.autoAdaptMode()
-        }.store(in: &observers)
-
-        NSWorkspace.shared.notificationCenter.publisher(
-            for: NSWorkspace.screensDidWakeNotification, object: nil
-        ).sink { _ in
-            self.watchControlAvailability()
-            self.watchModeAvailability()
-        }.store(in: &observers)
-
-        NSWorkspace.shared.notificationCenter.publisher(
-            for: NSWorkspace.screensDidSleepNotification, object: nil
-        ).sink { _ in
-            if let task = self.controlWatcherTask {
-                lowprioQueue.cancel(timer: task)
-            }
-            if let task = self.modeWatcherTask {
-                lowprioQueue.cancel(timer: task)
-            }
-        }.store(in: &observers)
-    }
-
-    init() {
-        watchControlAvailability()
-        watchModeAvailability()
-        concurrentQueue.async {
-            log.info("Sensor initial serial port: \(SensorMode.validSensorSerialPort?.path ?? "none")")
-        }
-        initObservers()
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        if let task = controlWatcherTask {
-            lowprioQueue.cancel(timer: task)
-        }
-
-        if let task = modeWatcherTask {
-            lowprioQueue.cancel(timer: task)
-        }
-    }
-
-    func getMatchingDisplay(
-        name: String,
-        serial: Int,
-        productID: Int,
-        manufactureYear: Int,
-        manufacturer: String? = nil,
-        vendorID: Int? = nil,
-        width: Int? = nil,
-        height: Int? = nil,
-        displays: [Display]? = nil,
-        partial: Bool = true
-    ) -> Display? {
-        let displays = (displays ?? self.displays.values.map { $0 })
-        let d = displays.first(where: { display in
-            DisplayController.displayInfoDictFullMatch(
-                display: display,
-                name: name,
-                serial: serial,
-                productID: productID,
-                manufactureYear: manufactureYear,
-                manufacturer: manufacturer,
-                vendorID: vendorID,
-                width: width,
-                height: height
-            )
-        })
-
-        if let fullyMatchedDisplay = d {
-            log.info("Fully matched display \(fullyMatchedDisplay)")
-            return fullyMatchedDisplay
-        }
-
-        guard partial else { return nil }
-
-        let displayScores = displays.map { display -> (Display, Int) in
-            let score = DisplayController.displayInfoDictPartialMatchScore(
-                display: display,
-                name: name,
-                serial: serial,
-                productID: productID,
-                manufactureYear: manufactureYear,
-                manufacturer: manufacturer,
-                vendorID: vendorID,
-                width: width,
-                height: height
-            )
-
-            return (display, score)
-        }
-
-        log.info("Display scores: \(displayScores)")
-        return displayScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
     static func displayInfoDictPartialMatchScore(
@@ -590,6 +287,118 @@ class DisplayController {
         }
 
         return matches
+    }
+
+    func autoAdaptMode() {
+        guard !CachedDefaults[.overrideAdaptiveMode] else {
+            if adaptiveMode.available {
+                adaptiveMode.watching = adaptiveMode.watch()
+            } else {
+                adaptiveMode.stopWatching()
+            }
+            return
+        }
+
+        let mode = DisplayController.autoMode()
+        if mode.key != adaptiveMode.key {
+            adaptiveMode = mode
+            CachedDefaults[.adaptiveBrightnessMode] = mode.key
+        }
+    }
+
+    func watchModeAvailability() {
+        guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {
+            return
+        }
+
+        guard !pausedOverrideAdaptiveModeObserver else { return }
+
+        pausedOverrideAdaptiveModeObserver = true
+        Defaults.withoutPropagation {
+            self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
+                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+                self.autoAdaptMode()
+            }
+        }
+        pausedOverrideAdaptiveModeObserver = false
+    }
+
+    func initObservers() {
+        NotificationCenter.default.publisher(for: lunarProStateChanged, object: nil).sink { _ in
+            self.autoAdaptMode()
+        }.store(in: &observers)
+
+        NSWorkspace.shared.notificationCenter.publisher(
+            for: NSWorkspace.screensDidWakeNotification, object: nil
+        ).sink { _ in
+            self.watchControlAvailability()
+            self.watchModeAvailability()
+        }.store(in: &observers)
+
+        NSWorkspace.shared.notificationCenter.publisher(
+            for: NSWorkspace.screensDidSleepNotification, object: nil
+        ).sink { _ in
+            if let task = self.controlWatcherTask {
+                lowprioQueue.cancel(timer: task)
+            }
+            if let task = self.modeWatcherTask {
+                lowprioQueue.cancel(timer: task)
+            }
+        }.store(in: &observers)
+    }
+
+    func getMatchingDisplay(
+        name: String,
+        serial: Int,
+        productID: Int,
+        manufactureYear: Int,
+        manufacturer: String? = nil,
+        vendorID: Int? = nil,
+        width: Int? = nil,
+        height: Int? = nil,
+        displays: [Display]? = nil,
+        partial: Bool = true
+    ) -> Display? {
+        let displays = (displays ?? self.displays.values.map { $0 })
+        let d = displays.first(where: { display in
+            DisplayController.displayInfoDictFullMatch(
+                display: display,
+                name: name,
+                serial: serial,
+                productID: productID,
+                manufactureYear: manufactureYear,
+                manufacturer: manufacturer,
+                vendorID: vendorID,
+                width: width,
+                height: height
+            )
+        })
+
+        if let fullyMatchedDisplay = d {
+            log.info("Fully matched display \(fullyMatchedDisplay)")
+            return fullyMatchedDisplay
+        }
+
+        guard partial else { return nil }
+
+        let displayScores = displays.map { display -> (Display, Int) in
+            let score = DisplayController.displayInfoDictPartialMatchScore(
+                display: display,
+                name: name,
+                serial: serial,
+                productID: productID,
+                manufactureYear: manufactureYear,
+                manufacturer: manufacturer,
+                vendorID: vendorID,
+                width: width,
+                height: height
+            )
+
+            return (display, score)
+        }
+
+        log.info("Display scores: \(displayScores)")
+        return displayScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
     func IOServiceNameMatches(_ service: io_service_t, names: [String]) -> Bool {
@@ -681,7 +490,10 @@ class DisplayController {
                 return nil
             }
 
-            log.info("Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport?.description ?? "Unknown"))")
+            log
+                .info(
+                    "Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport?.description ?? "Unknown"))"
+                )
             display.transport = transport
             return display
         }
@@ -726,6 +538,8 @@ class DisplayController {
             return service
         }
 
+        var clcd2Mapping: [Int: CGDirectDisplayID] = [:]
+
         func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
                   !(display?.macMiniHDMI ?? false),
@@ -760,6 +574,8 @@ class DisplayController {
             while case let t810xIOChild = IOIteratorNext(t810xIOIterator), t810xIOChild != 0 {
                 if IOServiceNameMatches(t810xIOChild, names: ["dispext0", "disp0"]) {
                     clcd2Num += 1
+                    guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
+
                     if let d = displayForIOService(
                         t810xIOChild,
                         displays: display != nil ? [display!] : nil,
@@ -810,6 +626,7 @@ class DisplayController {
                     "Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)"
                 )
 
+            clcd2Mapping[clcd2Num] = displayID
             return ioAvService
         }
     #endif
@@ -963,6 +780,213 @@ class DisplayController {
         #endif
 
         return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
+    }
+
+    func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
+        guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
+
+        if let app = activeWindow(on: screen)?.appException {
+            #if DEBUG
+                log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
+            #endif
+            return (app.brightness.i, app.contrast.i)
+        }
+
+        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[AXWindow]]>? in
+            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
+            return runningApps.compactMap { (a: NSRunningApplication) -> [AXWindow]? in
+                a.windows(appException: app)?.filter { window in
+                    !window.minimized && window.size != .zero && window.screen != nil
+                }
+            }.joined()
+        }.joined()
+
+//        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
+//            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
+//            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
+//                windowList(for: a, opaque: true, levels: [.normal], appException: app)
+//            }.joined()
+//        }.joined()
+
+        let windowsOnScreen = windows.filter { w in w.screen?.displayID == screen.displayID }
+        guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
+              let app = focusedWindow.appException
+        else { return (0, 0) }
+
+        #if DEBUG
+            log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
+        #endif
+
+        return (app.brightness.i, app.contrast.i)
+    }
+
+    func removeDisplay(serial: String) {
+        guard let display = displays.values.first(where: { $0.serial == serial }) else { return }
+        displays.removeValue(forKey: display.id)
+        CachedDefaults[.displays] = displays.values.map { $0 }
+        CachedDefaults[.hotkeys] = CachedDefaults[.hotkeys].filter { hk in
+            if display.hotkeyIdentifiers.contains(hk.identifier) {
+                hk.unregister()
+                return false
+            }
+            return true
+        }
+    }
+
+    func listenForAdaptiveModeChange() {
+        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
+            guard let self = self, !self.pausedAdaptiveModeObserver else {
+                return
+            }
+            Defaults.withoutPropagation {
+                mainThread {
+                    self.pausedAdaptiveModeObserver = true
+                    self.adaptiveMode = change.newValue.mode
+                    self.pausedAdaptiveModeObserver = false
+                }
+            }
+        }
+    }
+
+    func toggle() {
+        if adaptiveModeKey == .manual {
+            enable()
+        } else {
+            disable()
+        }
+    }
+
+    func disable() {
+        if adaptiveModeKey != .manual {
+            adaptiveMode = ManualMode.shared
+        }
+        if !CachedDefaults[.overrideAdaptiveMode] {
+            lastModeWasAuto = true
+            CachedDefaults[.overrideAdaptiveMode] = true
+        }
+        CachedDefaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
+    }
+
+    func enable(mode: AdaptiveModeKey? = nil) {
+        if let newMode = mode {
+            adaptiveMode = newMode.mode
+        } else if lastModeWasAuto {
+            CachedDefaults[.overrideAdaptiveMode] = false
+            adaptiveMode = DisplayController.getAdaptiveMode()
+        } else if lastNonManualAdaptiveMode.available {
+            adaptiveMode = lastNonManualAdaptiveMode
+        } else {
+            adaptiveMode = DisplayController.getAdaptiveMode()
+        }
+        CachedDefaults[.adaptiveBrightnessMode] = adaptiveMode.key
+        adaptBrightness(force: true)
+    }
+
+    func resetDisplayList() {
+        asyncNow {
+            self.getDisplaysLock.around {
+                DDC.reset()
+                self.displays = DisplayController.getDisplays()
+                SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
+                SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
+                self.addSentryData()
+            }
+
+            mainThread {
+                let appd = appDelegate
+                if appd.windowController?.window != nil {
+                    let shouldShow = appd.windowController!.window!.isVisible
+                    appd.windowController?.close()
+                    appd.windowController?.window = nil
+                    appd.windowController = nil
+                    if shouldShow {
+                        appd.showWindow()
+                    }
+                }
+            }
+        }
+    }
+
+    func shouldPromptAboutFallback(_ display: Display) -> Bool {
+        guard !display.neverFallbackControl else { return false }
+
+        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty,
+           !(display.control?.isResponsive() ?? true)
+        {
+            if let promptTime = fallbackPromptTime[display.id] {
+                return promptTime + 20.minutes < Date()
+            }
+            return true
+        }
+
+        return false
+    }
+
+    func watchControlAvailability() {
+        guard controlWatcherTask == nil || !lowprioQueue.isValid(timer: controlWatcherTask!) else {
+            return
+        }
+
+        controlWatcherTask = asyncEvery(15.seconds, queue: lowprioQueue) { [weak self] _ in
+            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+            for display in self.activeDisplays.values {
+                display.control = display.getBestControl()
+                if self.shouldPromptAboutFallback(display) {
+                    log.warning("Non-responsive display", context: display.context)
+                    self.fallbackPromptTime[display.id] = Date()
+                    let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
+                    let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
+                        if fallbackToGamma == .alertFirstButtonReturn {
+                            display.control = GammaControl(display: display)
+                            display.setGamma()
+                        }
+                        if fallbackToGamma == .alertThirdButtonReturn {
+                            display.neverFallbackControl = true
+                        }
+                        semaphore.signal()
+                    }
+
+                    if display.alwaysFallbackControl {
+                        completionHandler(.alertFirstButtonReturn)
+                        return
+                    }
+
+                    let window = mainThread { appDelegate.windowController?.window }
+
+                    let resp = ask(
+                        message: "Non-responsive display \"\(display.name)\"",
+                        info: """
+                            This display is not responding to commands in
+                            \(display.control!.str) mode.
+
+                            Do you want to fallback to adjusting brightness in software?
+
+                            Note: adjust the monitor to [BRIGHTNESS: 100%, CONTRAST: 70%] manually
+                            using its physical buttons to allow for a full range in software.
+                        """,
+                        okButton: "Yes",
+                        cancelButton: "Not now",
+                        thirdButton: "No, never ask again",
+                        screen: display.screen,
+                        window: window,
+                        suppressionText: "Always fallback to software controls for this display when needed",
+                        onSuppression: { fallback in
+                            display.alwaysFallbackControl = fallback
+                            display.save()
+                        },
+                        onCompletion: completionHandler,
+                        unique: true,
+                        waitTimeout: 60.seconds,
+                        wide: true
+                    )
+                    if window == nil {
+                        completionHandler(resp)
+                    } else {
+                        semaphore.wait(for: nil)
+                    }
+                }
+            }
+        }
     }
 
     func addSentryData() {

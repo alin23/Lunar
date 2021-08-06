@@ -11,6 +11,30 @@ import Combine
 import Defaults
 
 class ScrollableBrightness: NSView {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        for observer in displayObservers.values {
+            observer.cancel()
+        }
+    }
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     @IBOutlet var label: NSTextField!
     @IBOutlet var minValue: ScrollableTextField!
     @IBOutlet var maxValue: ScrollableTextField!
@@ -27,6 +51,8 @@ class ScrollableBrightness: NSView {
     var onMinValueChanged: ((Int) -> Void)?
     var onMaxValueChanged: ((Int) -> Void)?
     var onCurrentValueChanged: ((Int) -> Void)?
+    var displayObservers = [String: AnyCancellable]()
+
     var disabled = false {
         didSet {
             minValue.isEnabled = !disabled
@@ -78,8 +104,6 @@ class ScrollableBrightness: NSView {
         }
     }
 
-    var displayObservers = [String: AnyCancellable]()
-
     func addObserver(_ display: Display) {
         display.$brightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
             guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
@@ -103,7 +127,6 @@ class ScrollableBrightness: NSView {
         currentValue?.upperLimit = displayMaxValue.d
 
         if let button = lockButton {
-            button.setup(display.lockedBrightness)
             if display.lockedBrightness {
                 button.state = .on
             } else {
@@ -112,28 +135,6 @@ class ScrollableBrightness: NSView {
         }
 
         addObserver(display)
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        for observer in displayObservers.values {
-            observer.cancel()
-        }
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-        lockButton?.setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-        lockButton?.setup()
     }
 
     @IBAction func toggleLock(_ sender: LockButton) {

@@ -18,10 +18,73 @@ let FASTEST_SCROLL_Y_THRESHOLD: CGFloat = 0.1
 
 var scrollDeltaYThreshold: CGFloat = NORMAL_SCROLL_Y_THRESHOLD
 
+// MARK: - ScrollableTextField
+
 class ScrollableTextField: NSTextField, NSTextFieldDelegate {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     @IBInspectable var lowerLimit: Double = 0.0
     @IBInspectable var upperLimit: Double = 100.0
     @IBInspectable var step: Double = 1.0
+
+    var editingTextFieldColorChanged = false
+    @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
+
+//        get {
+//            _stringValue
+//        }
+//        set {
+//            let number = newValue.d ?? doubleValue
+//            if decimalPoints > 0 {
+//                _stringValue = String(format: "\(showPlusSign && number > 0 ? "+" : "")%.\(decimalPoints)f", number)
+//            } else {
+//                _stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+//            }
+//        }
+//    }
+
+    var decimalPoints: UInt8 = 0
+    var _floatValue: Float = 0
+    var _doubleValue: Double = 0
+    var _integerValue: Int = 0
+    let growPointSize: CGFloat = 2
+    var hover: Bool = false
+    var scrolling: Bool = false
+    var showPlusSign = false
+    var onValueChanged: ((Int) -> Void)?
+    var onValueChangedInstant: ((Int) -> Void)?
+    var onValueChangedDouble: ((Double) -> Void)?
+    var onValueChangedInstantDouble: ((Double) -> Void)?
+
+    var onMouseEnter: (() -> Void)?
+    var onMouseExit: (() -> Void)?
+
+    var centerAlign: NSParagraphStyle?
+    var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
+
+    var normalSize: CGSize?
+    var activeSize: CGSize?
+
+    var scrolledY: CGFloat = 0.0
+
+    var trackingArea: NSTrackingArea?
+    var captionTrackingArea: NSTrackingArea?
+    var adaptToScrollingFinished: DispatchWorkItem?
+    lazy var lastValidValue: Double = doubleValue
+
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     @IBInspectable var bgColor: NSColor = .clear {
         didSet {
@@ -31,7 +94,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    var editingTextFieldColorChanged = false
     @IBInspectable var editingTextFieldColor: NSColor = scrollableTextFieldColor {
         didSet {
             textColor = editingTextFieldColor
@@ -58,8 +120,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
-
 //    var _stringValue: String = ""
     override var stringValue: String {
         didSet {
@@ -70,21 +130,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-//        get {
-//            _stringValue
-//        }
-//        set {
-//            let number = newValue.d ?? doubleValue
-//            if decimalPoints > 0 {
-//                _stringValue = String(format: "\(showPlusSign && number > 0 ? "+" : "")%.\(decimalPoints)f", number)
-//            } else {
-//                _stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
-//            }
-//        }
-//    }
-
-    var decimalPoints: UInt8 = 0
-    var _floatValue: Float = 0
     override var floatValue: Float {
         get { _floatValue }
         set {
@@ -102,7 +147,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    var _doubleValue: Double = 0
     override var doubleValue: Double {
         get { _doubleValue }
         set {
@@ -120,7 +164,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    var _integerValue: Int = 0
     override var integerValue: Int {
         get { _integerValue }
         set {
@@ -138,34 +181,12 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    let growPointSize: CGFloat = 2
-    var hover: Bool = false
-    var scrolling: Bool = false
-    var showPlusSign = false
     var editing = false {
         didSet {
             log.debug("Editing: \(editing)")
         }
     }
 
-    var onValueChanged: ((Int) -> Void)?
-    var onValueChangedInstant: ((Int) -> Void)?
-    var onValueChangedDouble: ((Double) -> Void)?
-    var onValueChangedInstantDouble: ((Double) -> Void)?
-
-    var onMouseEnter: (() -> Void)?
-    var onMouseExit: (() -> Void)?
-
-    var centerAlign: NSParagraphStyle?
-    var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
-
-    var normalSize: CGSize?
-    var activeSize: CGSize?
-
-    var scrolledY: CGFloat = 0.0
-
-    var trackingArea: NSTrackingArea?
-    var captionTrackingArea: NSTrackingArea?
     weak var caption: ScrollableTextFieldCaption? {
         didSet {
             if didScrollTextField {
@@ -183,9 +204,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             addTrackingArea(captionTrackingArea!)
         }
     }
-
-    var adaptToScrollingFinished: DispatchWorkItem?
-    lazy var lastValidValue: Double = doubleValue
 
     override func becomeFirstResponder() -> Bool {
         editing = true
@@ -266,16 +284,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         return true
     }
 
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
@@ -346,8 +354,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             bg = bgColor.withAlphaComponent(0.05)
         }
     }
-
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func highlight(message: String) {
         let windowVisible: Bool = mainThread { window?.isVisible ?? false }

@@ -6,23 +6,31 @@
 //
 
 import Foundation
+
+// MARK: - Permissions
+
 // import CSSH
 
 public struct Permissions: OptionSet {
-    public let rawValue: UInt
+    // MARK: Lifecycle
+
     public init(rawValue: UInt) {
         self.rawValue = rawValue
     }
 
+    // MARK: Public
+
     public static let read = Permissions(rawValue: 1 << 1)
     public static let write = Permissions(rawValue: 1 << 2)
     public static let execute = Permissions(rawValue: 1 << 3)
+
+    public let rawValue: UInt
 }
 
+// MARK: - FilePermissions
+
 public struct FilePermissions: RawRepresentable {
-    public var owner: Permissions
-    public var group: Permissions
-    public var others: Permissions
+    // MARK: Lifecycle
 
     public init(owner: Permissions, group: Permissions, others: Permissions) {
         self.owner = owner
@@ -48,6 +56,14 @@ public struct FilePermissions: RawRepresentable {
         self.init(owner: owner, group: group, others: others)
     }
 
+    // MARK: Public
+
+    public static let `default` = FilePermissions(owner: [.read, .write], group: [.read], others: [.read])
+
+    public var owner: Permissions
+    public var group: Permissions
+    public var others: Permissions
+
     public var rawValue: Int32 {
         var flag: Int32 = 0
 
@@ -65,6 +81,4 @@ public struct FilePermissions: RawRepresentable {
 
         return flag
     }
-
-    public static let `default` = FilePermissions(owner: [.read, .write], group: [.read], others: [.read])
 }

@@ -11,20 +11,21 @@ import Foundation
 import Surge
 
 class ManualMode: AdaptiveMode {
+    static let shared: AdaptiveMode = ManualMode()
+    static var specific = shared as! ManualMode
+
     @Atomic var force = false
     var brightnessDataPoint = DataPoint(min: 0, max: 100, last: 0)
     var contrastDataPoint = DataPoint(min: 0, max: 100, last: 0)
     var maxChartDataPoints: Int = 101
 
-    static let shared: AdaptiveMode = ManualMode()
-    static var specific = shared as! ManualMode
-
     var key = AdaptiveModeKey.manual
 
-    var available: Bool { true }
     @Atomic var watching = false
 
     var displayObservers = Set<AnyCancellable>()
+
+    var available: Bool { true }
 
     func stopWatching() {
         guard watching else { return }
@@ -43,25 +44,20 @@ class ManualMode: AdaptiveMode {
         guard !watching else { return false }
         log.verbose("Start watching \(str)")
 
-        // for display in displayController.displays.values {
-        //     display.$brightness.receive(on: dataPublisherQueue).sink { value in
-        //         NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["manualBrightness": value])
-        //     }.store(in: &displayObservers)
-        //     display.$contrast.receive(on: dataPublisherQueue).sink { value in
-        //         NotificationCenter.default.post(name: currentDataPointChanged, object: display, userInfo: ["manualContrast": value])
-        //     }.store(in: &displayObservers)
-        // }
         watching = true
         return true
     }
 
     func adapt(_ display: Display) {
-        display.withoutDDCLimits {
-            display.withForce(force || display.force) {
-                display.brightness = display.brightness.uint8Value.ns
-                display.contrast = display.contrast.uint8Value.ns
-            }
+        // display.withoutDDCLimits {
+        display.withForce(force || display.force) {
+            #if DEBUG
+                log.debug("Setting brightness to \(display.brightness) for \(display)")
+            #endif
+            display.brightness = display.brightness.uint8Value.ns
+            display.contrast = display.contrast.uint8Value.ns
         }
+        // }
     }
 
     func compute(percent: Int8, minVal: Int, maxVal: Int) -> NSNumber {

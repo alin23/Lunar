@@ -10,22 +10,30 @@ import Defaults
 import Foundation
 import SwiftDate
 
+// MARK: - CoreDisplayMethod
+
 enum CoreDisplayMethod {
     case coreDisplay
     case displayServices
 }
 
+// MARK: - CoreDisplayControl
+
 class CoreDisplayControl: Control {
+    // MARK: Lifecycle
+
+    init(display: Display) {
+        self.display = display
+    }
+
+    // MARK: Internal
+
     var displayControl: DisplayControl = .coreDisplay
 
     weak var display: Display!
     lazy var responsive: Bool = testReadAndWrite(method: .displayServices) || testReadAndWrite(method: .coreDisplay)
     let str = "CoreDisplay Control"
     var method = CoreDisplayMethod.displayServices
-
-    init(display: Display) {
-        self.display = display
-    }
 
     func testReadAndWrite(method: CoreDisplayMethod) -> Bool {
         switch method {

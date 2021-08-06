@@ -59,6 +59,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .ddcSleepFactor,
 ]
 
+// MARK: - DDCSleepFactor
+
 enum DDCSleepFactor: UInt8, DefaultsSerializable {
     case short = 0
     case medium = 1
@@ -83,65 +85,44 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
     .secure,
 ]
 
+// MARK: - DataStore
+
 class DataStore: NSObject {
-    func displays(serials: [String]? = nil) -> [Display]? {
-        guard let displays = CachedDefaults[.displays] else { return nil }
-        if let serials = serials {
-            return displays.filter { display in serials.contains(display.serial) }
-        }
-        return displays
-    }
+    // MARK: Lifecycle
 
-    func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
-        guard let apps = CachedDefaults[.appExceptions] else { return nil }
-        if let ids = identifiers {
-            return apps.filter { app in ids.contains(app.identifier) }
-        }
-        return apps
-    }
+    override init() {
+        super.init()
 
-    func settingsDictionary() -> [String: String] {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
-        var dict: [String: String] = [:]
+        NSUserDefaultsController.shared.appliesImmediately = true
 
-        for key in APP_SETTINGS {
-            switch key {
-            case let boolKey as Defaults.Key<Bool>:
-                dict[key.name] = try! encoder.encode(Defaults[boolKey]).str()
-            case let boolKey as Defaults.Key<Bool?>:
-                dict[key.name] = try! encoder.encode(Defaults[boolKey]).str()
-            case let stringKey as Defaults.Key<String>:
-                dict[key.name] = try! encoder.encode(Defaults[stringKey]).str()
-            case let stringKey as Defaults.Key<String?>:
-                dict[key.name] = try! encoder.encode(Defaults[stringKey]).str()
-            case let valueKey as Defaults.Key<Double>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<Int>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<AdaptiveModeKey>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<[String]>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<[Display]>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<[AppException]?>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<Set<String>>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<Geolocation?>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<UInt64>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            case let valueKey as Defaults.Key<[PersistentHotkey]>:
-                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
-            default:
-                continue
-            }
+        log.debug("Checking First Run")
+        if Defaults[.firstRun] == nil {
+            DataStore.firstRun()
+            Defaults[.firstRun] = true
+            Defaults[.firstRunAfterLunar4Upgrade] = true
+            Defaults[.firstRunAfterM1DDCUpgrade] = true
+            Defaults[.firstRunAfterDefaults5Upgrade] = true
         }
 
-        return dict
+        if Defaults[.firstRunAfterLunar4Upgrade] == nil {
+            DataStore.firstRunAfterLunar4Upgrade()
+            Defaults[.firstRunAfterLunar4Upgrade] = true
+        }
+
+        if Defaults[.firstRunAfterDefaults5Upgrade] == nil {
+            DataStore.firstRunAfterDefaults5Upgrade()
+            Defaults[.firstRunAfterDefaults5Upgrade] = true
+        }
+
+        if Defaults[.firstRunAfterM1DDCUpgrade] == nil {
+            DataStore.firstRunAfterM1DDCUpgrade()
+            Defaults[.firstRunAfterM1DDCUpgrade] = true
+        }
+
+        Defaults[.toolTipDelay] = 1
     }
+
+    // MARK: Internal
 
     static func storeAppException(app: AppException, now: Bool = false) {
         guard var appExceptions = CachedDefaults[.appExceptions] else {
@@ -158,37 +139,6 @@ class DataStore: NSObject {
 
         CachedDefaults[.appExceptions] = appExceptions
         if now { Defaults[.appExceptions] = appExceptions }
-    }
-
-    @discardableResult
-    func storeDisplays(_ displays: [Display], now: Bool = false) -> [Display] {
-        let displays = displays.filter {
-            display in !DDC.isBuiltinDisplay(display.id)
-        }
-
-        guard let storedDisplays = self.displays() else {
-            CachedDefaults[.displays] = displays
-            if now { Defaults[.displays] = displays }
-            return displays
-        }
-        let newDisplaySerials = displays.map(\.serial)
-        let newDisplayIDs = displays.map(\.id)
-
-        let inactiveDisplays = storedDisplays.filter { d in !newDisplaySerials.contains(d.serial) }
-        for display in inactiveDisplays {
-            display.active = false
-            while newDisplayIDs.contains(display.id) {
-                display.id = UInt32.random(in: 100 ... 100_000)
-            }
-        }
-
-        let allDisplays = (inactiveDisplays + displays).filter {
-            display in !DDC.isBuiltinDisplay(display.id)
-        }
-        CachedDefaults[.displays] = allDisplays
-        if now { Defaults[.displays] = allDisplays }
-
-        return allDisplays
     }
 
     static func storeDisplay(display: Display, now: Bool = false) {
@@ -254,38 +204,98 @@ class DataStore: NSObject {
         mainThread { appDelegate.onboard() }
     }
 
-    override init() {
-        super.init()
+    func displays(serials: [String]? = nil) -> [Display]? {
+        guard let displays = CachedDefaults[.displays] else { return nil }
+        if let serials = serials {
+            return displays.filter { display in serials.contains(display.serial) }
+        }
+        return displays
+    }
 
-        NSUserDefaultsController.shared.appliesImmediately = true
+    func appExceptions(identifiers: [String]? = nil) -> [AppException]? {
+        guard let apps = CachedDefaults[.appExceptions] else { return nil }
+        if let ids = identifiers {
+            return apps.filter { app in ids.contains(app.identifier) }
+        }
+        return apps
+    }
 
-        log.debug("Checking First Run")
-        if Defaults[.firstRun] == nil {
-            DataStore.firstRun()
-            Defaults[.firstRun] = true
-            Defaults[.firstRunAfterLunar4Upgrade] = true
-            Defaults[.firstRunAfterM1DDCUpgrade] = true
-            Defaults[.firstRunAfterDefaults5Upgrade] = true
+    func settingsDictionary() -> [String: String] {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        var dict: [String: String] = [:]
+
+        for key in APP_SETTINGS {
+            switch key {
+            case let boolKey as Defaults.Key<Bool>:
+                dict[key.name] = try! encoder.encode(Defaults[boolKey]).str()
+            case let boolKey as Defaults.Key<Bool?>:
+                dict[key.name] = try! encoder.encode(Defaults[boolKey]).str()
+            case let stringKey as Defaults.Key<String>:
+                dict[key.name] = try! encoder.encode(Defaults[stringKey]).str()
+            case let stringKey as Defaults.Key<String?>:
+                dict[key.name] = try! encoder.encode(Defaults[stringKey]).str()
+            case let valueKey as Defaults.Key<Double>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<Int>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<AdaptiveModeKey>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<[String]>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<[Display]>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<[AppException]?>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<Set<String>>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<Geolocation?>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<UInt64>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<[PersistentHotkey]>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            default:
+                continue
+            }
         }
 
-        if Defaults[.firstRunAfterLunar4Upgrade] == nil {
-            DataStore.firstRunAfterLunar4Upgrade()
-            Defaults[.firstRunAfterLunar4Upgrade] = true
+        return dict
+    }
+
+    @discardableResult
+    func storeDisplays(_ displays: [Display], now: Bool = false) -> [Display] {
+        let displays = displays.filter {
+            display in !DDC.isBuiltinDisplay(display.id)
         }
 
-        if Defaults[.firstRunAfterDefaults5Upgrade] == nil {
-            DataStore.firstRunAfterDefaults5Upgrade()
-            Defaults[.firstRunAfterDefaults5Upgrade] = true
+        guard let storedDisplays = self.displays() else {
+            CachedDefaults[.displays] = displays
+            if now { Defaults[.displays] = displays }
+            return displays
+        }
+        let newDisplaySerials = displays.map(\.serial)
+        let newDisplayIDs = displays.map(\.id)
+
+        let inactiveDisplays = storedDisplays.filter { d in !newDisplaySerials.contains(d.serial) }
+        for display in inactiveDisplays {
+            display.active = false
+            while newDisplayIDs.contains(display.id) {
+                display.id = UInt32.random(in: 100 ... 100_000)
+            }
         }
 
-        if Defaults[.firstRunAfterM1DDCUpgrade] == nil {
-            DataStore.firstRunAfterM1DDCUpgrade()
-            Defaults[.firstRunAfterM1DDCUpgrade] = true
+        let allDisplays = (inactiveDisplays + displays).filter {
+            display in !DDC.isBuiltinDisplay(display.id)
         }
+        CachedDefaults[.displays] = allDisplays
+        if now { Defaults[.displays] = allDisplays }
 
-        Defaults[.toolTipDelay] = 1
+        return allDisplays
     }
 }
+
+// MARK: - Defaults.AnyKey + Hashable
 
 extension Defaults.AnyKey: Hashable {
     public func hash(into hasher: inout Hasher) {
@@ -297,29 +307,39 @@ extension Defaults.AnyKey: Hashable {
     }
 }
 
+// MARK: - AnyCodable + Defaults.Serializable
+
 extension AnyCodable: Defaults.Serializable {}
 
+// MARK: - ThreadSafeDictionary
+
 class ThreadSafeDictionary<V: Hashable, T>: Collection {
-    private var mutableDictionary: [V: T]
-    var dictionary: [V: T] {
-        let dict = Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
-        return dict
+    // MARK: Lifecycle
+
+    init(dict: [V: T] = [V: T]()) {
+        mutableDictionary = dict
     }
+
+    // MARK: Internal
 
     let accessQueue = DispatchQueue(
         label: "Dictionary Barrier Queue",
         attributes: .concurrent
     )
+
+    var dictionary: [V: T] {
+        accessQueue.sync {
+            let dict = Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
+            return dict
+        }
+    }
+
     var startIndex: Dictionary<V, T>.Index {
         mutableDictionary.startIndex
     }
 
     var endIndex: Dictionary<V, T>.Index {
         mutableDictionary.endIndex
-    }
-
-    init(dict: [V: T] = [V: T]()) {
-        mutableDictionary = dict
     }
 
     func index(after i: Dictionary<V, T>.Index) -> Dictionary<V, T>.Index {
@@ -357,31 +377,16 @@ class ThreadSafeDictionary<V: Hashable, T>: Collection {
             self?.mutableDictionary.removeValue(forKey: key)
         }
     }
+
+    // MARK: Private
+
+    private var mutableDictionary: [V: T]
 }
 
+// MARK: - CachedDefaults
+
 enum CachedDefaults {
-    static var displaysPublisher = PassthroughSubject<[Display], Never>()
-    static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
-    static var locks: [String: NSRecursiveLock] = [:]
-    static var observers = Set<AnyCancellable>()
-    static var lock = NSRecursiveLock()
-    static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
-
-    static func reset(_ keys: Defaults.AnyKey...) {
-        reset(keys)
-    }
-
-    static func reset(_ keys: [Defaults.AnyKey]) {
-        // semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
-        // defer { semaphore.signal() }
-
-        lock.around {
-            Defaults.reset(keys)
-            for key in keys {
-                cache.removeValue(forKey: key.name)
-            }
-        }
-    }
+    // MARK: Public
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
@@ -441,6 +446,31 @@ enum CachedDefaults {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // MARK: Internal
+
+    static var displaysPublisher = PassthroughSubject<[Display], Never>()
+    static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
+    static var locks: [String: NSRecursiveLock] = [:]
+    static var observers = Set<AnyCancellable>()
+    static var lock = NSRecursiveLock()
+    static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
+
+    static func reset(_ keys: Defaults.AnyKey...) {
+        reset(keys)
+    }
+
+    static func reset(_ keys: [Defaults.AnyKey]) {
+        // semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
+        // defer { semaphore.signal() }
+
+        lock.around {
+            Defaults.reset(keys)
+            for key in keys {
+                cache.removeValue(forKey: key.name)
             }
         }
     }
@@ -586,12 +616,23 @@ extension Defaults.Keys {
 
 let datastore = DataStore()
 
+// MARK: - InfoPlistKey
+
 enum InfoPlistKey {
     static let testMode = "TestMode"
     static let beta = "Beta"
 }
 
+// MARK: - AppSettings
+
 enum AppSettings {
+    // MARK: Internal
+
+    static let testMode = (infoDict[InfoPlistKey.testMode] as! String) == "YES"
+    static let beta = (infoDict[InfoPlistKey.beta] as! String) == "YES"
+
+    // MARK: Private
+
     private static var infoDict: [String: Any] {
         if let dict = Bundle.main.infoDictionary {
             return dict
@@ -599,9 +640,6 @@ enum AppSettings {
             fatalError("Info Plist file not found")
         }
     }
-
-    static let testMode = (infoDict[InfoPlistKey.testMode] as! String) == "YES"
-    static let beta = (infoDict[InfoPlistKey.beta] as! String) == "YES"
 }
 
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
@@ -626,8 +664,10 @@ let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).re
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }

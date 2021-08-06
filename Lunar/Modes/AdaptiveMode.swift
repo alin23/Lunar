@@ -15,16 +15,15 @@ import Surge
 
 let STRIDE = vDSP_Stride(1)
 
+// MARK: - AdaptiveModeKey
+
 enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
     case location = 1
     case sync = -1
     case manual = 0
     case sensor = 2
 
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(str)
-    }
+    // MARK: Lifecycle
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -37,6 +36,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
         self = AdaptiveModeKey.fromstr(strValue)
     }
 
+    // MARK: Internal
+
     var str: String {
         switch self {
         case .sensor:
@@ -47,21 +48,6 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return "Location"
         case .sync:
             return "Sync"
-        }
-    }
-
-    static func fromstr(_ strValue: String) -> Self {
-        switch strValue.lowercased().stripped {
-        case "sensor", AdaptiveModeKey.sensor.rawValue.s:
-            return .sensor
-        case "manual", AdaptiveModeKey.manual.rawValue.s:
-            return .manual
-        case "location", AdaptiveModeKey.location.rawValue.s:
-            return .location
-        case "sync", AdaptiveModeKey.sync.rawValue.s:
-            return .sync
-        default:
-            return .manual
         }
     }
 
@@ -116,13 +102,37 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return nil
         }
     }
+
+    static func fromstr(_ strValue: String) -> Self {
+        switch strValue.lowercased().stripped {
+        case "sensor", AdaptiveModeKey.sensor.rawValue.s:
+            return .sensor
+        case "manual", AdaptiveModeKey.manual.rawValue.s:
+            return .manual
+        case "location", AdaptiveModeKey.location.rawValue.s:
+            return .location
+        case "sync", AdaptiveModeKey.sync.rawValue.s:
+            return .sync
+        default:
+            return .manual
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(str)
+    }
 }
+
+// MARK: - DataPoint
 
 struct DataPoint {
     var min: Int
     var max: Int
     var last: Int
 }
+
+// MARK: - AdaptiveMode
 
 protocol AdaptiveMode: AnyObject {
     var force: Bool { get set }
@@ -231,7 +241,13 @@ extension AdaptiveMode {
             if curve.contains(where: \.isNaN) {
                 log.error(
                     "NaN value?? Whyy?? WHAT DID I DO??",
-                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset ?? 1]
+                    context: [
+                        "value": value,
+                        "minValue": minValue,
+                        "maxValue": maxValue,
+                        "monitorValue": monitorValue,
+                        "offset": offset ?? 1,
+                    ]
                 )
             }
         #endif
@@ -247,7 +263,13 @@ extension AdaptiveMode {
             if values.contains(where: \.isNaN) {
                 log.error(
                     "Whaat!? NaN value AGAIN?? Whyy?? WHAT DID I DO??",
-                    context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset ?? 1]
+                    context: [
+                        "value": value,
+                        "minValue": minValue,
+                        "maxValue": maxValue,
+                        "monitorValue": monitorValue,
+                        "offset": offset ?? 1,
+                    ]
                 )
             }
         #endif
@@ -383,6 +405,8 @@ extension Array where Element == Float {
         vDSP.floatToDouble(self)
     }
 }
+
+// MARK: - AdaptiveModeMenuValidator
 
 class AdaptiveModeMenuValidator: NSObject, NSMenuItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {

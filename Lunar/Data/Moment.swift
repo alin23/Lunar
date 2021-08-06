@@ -13,48 +13,7 @@ import SwiftDate
 import SwiftyJSON
 
 class Moment: NSObject {
-    let sunrise: DateInRegion
-    let sunset: DateInRegion
-    let solarNoon: DateInRegion
-    let dayLength: UInt64
-    let civilSunrise: DateInRegion
-    let civilSunset: DateInRegion
-    let nauticalSunrise: DateInRegion
-    let nauticalSunset: DateInRegion
-    let astronomicalSunrise: DateInRegion
-    let astronomicalSunset: DateInRegion
-
-    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
-    static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("moments")
-
-    var isToday: Bool {
-        sunrise.isToday && sunset.isToday && solarNoon.isToday
-    }
-
-    static func defaultMoments() -> (DateInRegion, DateInRegion, DateInRegion) {
-        guard let sevenAM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 7, min: 0, secs: 0),
-              let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0),
-              let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0)
-        else {
-            let today = Date.nowAt(.startOfDay)
-            return (
-                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 7, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local),
-                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 12, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local),
-                DateInRegion(Date(year: today.year, month: today.month, day: today.day, hour: 19, minute: 0, second: 0, nanosecond: 0, region: Region.local), region: Region.local)
-            )
-        }
-
-        return (sevenAM, noon, sevenPM)
-    }
-
-    static func defaultMomentsAsDates() -> (Date, Date, Date) {
-        let (sevenAM, noon, sevenPM) = defaultMoments()
-        return (
-            sevenAM.date,
-            noon.date,
-            sevenPM.date
-        )
-    }
+    // MARK: Lifecycle
 
     init(_ solar: inout Solar) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMomentsAsDates()
@@ -134,6 +93,87 @@ class Moment: NSObject {
         nauticalSunset = localTime(nauticalTwilightEnd) ?? sevenPM
         astronomicalSunrise = localTime(astronomicalTwilightBegin) ?? sevenAM
         astronomicalSunset = localTime(astronomicalTwilightEnd) ?? sevenPM
+    }
+
+    // MARK: Internal
+
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
+    static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("moments")
+
+    let sunrise: DateInRegion
+    let sunset: DateInRegion
+    let solarNoon: DateInRegion
+    let dayLength: UInt64
+    let civilSunrise: DateInRegion
+    let civilSunset: DateInRegion
+    let nauticalSunrise: DateInRegion
+    let nauticalSunset: DateInRegion
+    let astronomicalSunrise: DateInRegion
+    let astronomicalSunset: DateInRegion
+
+    var isToday: Bool {
+        sunrise.isToday && sunset.isToday && solarNoon.isToday
+    }
+
+    static func defaultMoments() -> (DateInRegion, DateInRegion, DateInRegion) {
+        guard let sevenAM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 7, min: 0, secs: 0),
+              let noon = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 12, min: 0, secs: 0),
+              let sevenPM = DateInRegion().convertTo(region: Region.local).dateBySet(hour: 19, min: 0, secs: 0)
+        else {
+            let today = Date.nowAt(.startOfDay)
+            return (
+                DateInRegion(
+                    Date(
+                        year: today.year,
+                        month: today.month,
+                        day: today.day,
+                        hour: 7,
+                        minute: 0,
+                        second: 0,
+                        nanosecond: 0,
+                        region: Region.local
+                    ),
+                    region: Region.local
+                ),
+                DateInRegion(
+                    Date(
+                        year: today.year,
+                        month: today.month,
+                        day: today.day,
+                        hour: 12,
+                        minute: 0,
+                        second: 0,
+                        nanosecond: 0,
+                        region: Region.local
+                    ),
+                    region: Region.local
+                ),
+                DateInRegion(
+                    Date(
+                        year: today.year,
+                        month: today.month,
+                        day: today.day,
+                        hour: 19,
+                        minute: 0,
+                        second: 0,
+                        nanosecond: 0,
+                        region: Region.local
+                    ),
+                    region: Region.local
+                )
+            )
+        }
+
+        return (sevenAM, noon, sevenPM)
+    }
+
+    static func defaultMomentsAsDates() -> (Date, Date, Date) {
+        let (sevenAM, noon, sevenPM) = defaultMoments()
+        return (
+            sevenAM.date,
+            noon.date,
+            sevenPM.date
+        )
     }
 
     func store() {

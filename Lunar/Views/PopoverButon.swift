@@ -9,6 +9,8 @@
 import Cocoa
 import Foundation
 
+// MARK: - SettingsButton
+
 class SettingsButton: PopoverButton<SettingsPopoverController> {
     weak var displayViewController: DisplayViewController? {
         didSet {
@@ -33,7 +35,11 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
     }
 }
 
+// MARK: - PopoverButton
+
 class PopoverButton<T: NSViewController>: Button {
+    @IBInspectable var showPopover = true
+
     var popoverKey: String {
         "help"
     }
@@ -42,8 +48,6 @@ class PopoverButton<T: NSViewController>: Button {
         guard let popover = POPOVERS[popoverKey]! else { return nil }
         return popover.contentViewController as? T
     }
-
-    @IBInspectable var showPopover = true
 
     override func mouseDown(with event: NSEvent) {
         guard let popover = POPOVERS[popoverKey]!, isEnabled else { return }
@@ -70,7 +74,31 @@ class PopoverButton<T: NSViewController>: Button {
     }
 }
 
+// MARK: - Button
+
 class Button: NSButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
+    var trackingArea: NSTrackingArea!
+    var buttonShadow: NSShadow!
+
+    var onMouseEnter: (() -> Void)?
+    var onMouseExit: (() -> Void)?
+    var onClick: (() -> Void)?
+    var hover = false
+
     @IBInspectable var circle: Bool = true {
         didSet {
             mainThread {
@@ -98,14 +126,6 @@ class Button: NSButton {
             }
         }
     }
-
-    var trackingArea: NSTrackingArea!
-    var buttonShadow: NSShadow!
-
-    var onMouseEnter: (() -> Void)?
-    var onMouseExit: (() -> Void)?
-    var onClick: (() -> Void)?
-    var hover = false
 
     func setShape() {
         mainThread {
@@ -168,16 +188,6 @@ class Button: NSButton {
         shadow = nil
 
         onMouseExit?()
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

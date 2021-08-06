@@ -23,6 +23,8 @@ var mediaKeyTapBrightness: MediaKeyTap?
 var mediaKeyTapAudio: MediaKeyTap?
 let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
 
+// MARK: - HotkeyIdentifier
+
 enum HotkeyIdentifier: String, CaseIterable, Codable {
     case toggle,
          lunar,
@@ -32,6 +34,7 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          percent75,
          percent100,
          faceLight,
+         blackOut,
          preciseBrightnessUp,
          preciseBrightnessDown,
          preciseContrastUp,
@@ -72,11 +75,15 @@ let preciseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.volumeDown.rawValue: HotkeyIdentifier.preciseVolumeDown.rawValue,
 ]
 
+// MARK: - HotkeyPart
+
 enum HotkeyPart: String, CaseIterable, Defaults.Serializable {
     case modifiers
     case keyCode
     case enabled
 }
+
+// MARK: - OSDImage
 
 enum OSDImage: Int64 {
     case brightness = 1
@@ -87,50 +94,10 @@ enum OSDImage: Int64 {
 
 var HOTKEY_HANDLERS = [String: (HotKey) -> Void](minimumCapacity: 10)
 
+// MARK: - PersistentHotkey
+
 class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
-    @Atomic static var isRecording = false
-
-    var description: String {
-        "<PersistentHotkey \(identifier)[\(hotkeyString)]>"
-    }
-
-    var hotkeyString: String {
-        mainThread {
-            let modifiers = keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
-                switch char {
-                case "⌥": return "option"
-                case "⌘": return "command"
-                case "⌃": return "control"
-                case "⇧": return "shift"
-                default: return char
-                }
-            }
-            return "\(String(modifiers.joined(by: "+")))-\(keyChar)"
-        }
-    }
-
-    var hotkey: HotKey {
-        didSet {
-            HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
-            handleRegistration(persist: true)
-            if HotkeyIdentifier(rawValue: identifier) != nil {
-                appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
-            }
-        }
-    }
-
-    static func == (lhs: PersistentHotkey, rhs: PersistentHotkey) -> Bool {
-        lhs.identifier == rhs.identifier
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
-    }
-
-    func with(handler: @escaping ((HotKey) -> Void)) -> PersistentHotkey {
-        HOTKEY_HANDLERS[identifier] = handler
-        return self
-    }
+    // MARK: Lifecycle
 
     init(_ identifier: String, handler: ((HotKey) -> Void)? = nil, dict hk: [HotkeyPart: Int]) {
         let keyCode = hk[.keyCode]!
@@ -199,6 +166,72 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 //        hotkey.unregister()
     }
 
+    init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
+        self.hotkey = hotkey
+        self.isEnabled = isEnabled
+        if register {
+            handleRegistration(persist: false)
+        }
+    }
+
+    required convenience init(from decoder: Decoder) throws {
+        log.debug("Initializing hotkey from decoder")
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let identifier = try container.decode(String.self, forKey: .identifier)
+        log.debug("Identifier: \(identifier)")
+        let enabled = try container.decode(Bool.self, forKey: .enabled)
+        log.debug("Enabled: \(enabled)")
+        let modifiers = try container.decode(Int.self, forKey: .modifiers)
+        let keyCode = try container.decode(Int.self, forKey: .keyCode)
+
+        self.init(identifier, dict: [
+            .enabled: enabled ? 1 : 0,
+            .keyCode: keyCode,
+            .modifiers: modifiers,
+        ])
+    }
+
+    // MARK: Internal
+
+    enum CodingKeys: String, CodingKey, CaseIterable {
+        case identifier
+        case keyCode
+        case enabled
+        case modifiers
+    }
+
+    @Atomic static var isRecording = false
+
+    var description: String {
+        "<PersistentHotkey \(identifier)[\(hotkeyString)]>"
+    }
+
+    var hotkeyString: String {
+        mainThread {
+            let modifiers = keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
+                switch char {
+                case "⌥": return "option"
+                case "⌘": return "command"
+                case "⌃": return "control"
+                case "⇧": return "shift"
+                default: return char
+                }
+            }
+            return "\(String(modifiers.joined(by: "+")))-\(keyChar)"
+        }
+    }
+
+    var hotkey: HotKey {
+        didSet {
+            HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
+            handleRegistration(persist: true)
+            if HotkeyIdentifier(rawValue: identifier) != nil {
+                appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+            }
+        }
+    }
+
     var isEnabled: Bool {
         didSet {
             if isEnabled {
@@ -253,12 +286,17 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         hotkey.callback
     }
 
-    init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
-        self.hotkey = hotkey
-        self.isEnabled = isEnabled
-        if register {
-            handleRegistration(persist: false)
-        }
+    static func == (lhs: PersistentHotkey, rhs: PersistentHotkey) -> Bool {
+        lhs.identifier == rhs.identifier
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+    }
+
+    func with(handler: @escaping ((HotKey) -> Void)) -> PersistentHotkey {
+        HOTKEY_HANDLERS[identifier] = handler
+        return self
     }
 
     func unregister() {
@@ -299,13 +337,6 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         ]
     }
 
-    enum CodingKeys: String, CodingKey, CaseIterable {
-        case identifier
-        case keyCode
-        case enabled
-        case modifiers
-    }
-
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -314,25 +345,9 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         try container.encode(modifiers, forKey: .modifiers)
         try container.encode(isEnabled, forKey: .enabled)
     }
-
-    required convenience init(from decoder: Decoder) throws {
-        log.debug("Initializing hotkey from decoder")
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        let identifier = try container.decode(String.self, forKey: .identifier)
-        log.debug("Identifier: \(identifier)")
-        let enabled = try container.decode(Bool.self, forKey: .enabled)
-        log.debug("Enabled: \(enabled)")
-        let modifiers = try container.decode(Int.self, forKey: .modifiers)
-        let keyCode = try container.decode(Int.self, forKey: .keyCode)
-
-        self.init(identifier, dict: [
-            .enabled: enabled ? 1 : 0,
-            .keyCode: keyCode,
-            .modifiers: modifiers,
-        ])
-    }
 }
+
+// MARK: - Hotkey
 
 enum Hotkey {
     static let functionKeyMapping: [Int: String] = [
@@ -419,6 +434,13 @@ enum Hotkey {
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_5, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
             target: appDelegate,
             action: handler(identifier: .faceLight),
+            actionQueue: .main
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.blackOut.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_6, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
+            target: appDelegate,
+            action: handler(identifier: .blackOut),
             actionQueue: .main
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
@@ -552,6 +574,8 @@ enum Hotkey {
             return #selector(AppDelegate.percent100HotkeyHandler)
         case .faceLight:
             return #selector(AppDelegate.faceLightHotkeyHandler)
+        case .blackOut:
+            return #selector(AppDelegate.blackOutHotkeyHandler)
         case .preciseBrightnessUp:
             return #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
         case .preciseBrightnessDown:
@@ -626,6 +650,8 @@ enum Hotkey {
         )
     }
 }
+
+// MARK: - AppDelegate + MediaKeyTapDelegate
 
 extension AppDelegate: MediaKeyTapDelegate {
     func volumeOsdImage(display: Display? = nil) -> OSDImage {
@@ -738,14 +764,14 @@ extension AppDelegate: MediaKeyTapDelegate {
             return event
 
         case []:
-            guard displayController.mainDisplay != nil else {
+            guard displayController.cursorDisplay != nil else {
                 log.info("No main display, ignoring media key event")
                 return event
             }
             log.info("No modifiers and lid open, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.option, .shift]:
-            guard displayController.mainDisplay != nil else {
+            guard displayController.cursorDisplay != nil else {
                 log.info("No main display, ignoring media key event")
                 return event
             }
@@ -943,6 +969,13 @@ extension AppDelegate: MediaKeyTapDelegate {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")
+    }
+
+    @objc func blackOutHotkeyHandler() {
+        guard lunarProActive else { return }
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        blackOut(self)
+        log.debug("BlackOut Hotkey pressed")
     }
 
     func brightnessUpAction(offset: Int? = nil) {

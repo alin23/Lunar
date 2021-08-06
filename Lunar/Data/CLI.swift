@@ -31,6 +31,8 @@ private var prettyEncoder: JSONEncoder = {
     return encoder
 }()
 
+// MARK: - CommandError
+
 private enum CommandError: Error {
     case displayNotFound(String)
     case propertyNotValid(String)
@@ -74,6 +76,8 @@ private func printDictionary(_ dict: [String: Any], level: Int = 0, longestKeySi
     }
 }
 
+// MARK: - NSDeviceDescriptionKey + Encodable
+
 extension NSDeviceDescriptionKey: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -81,12 +85,18 @@ extension NSDeviceDescriptionKey: Encodable {
     }
 }
 
+// MARK: - ForgivingEncodable
+
 struct ForgivingEncodable: Encodable {
-    var value: Any?
+    // MARK: Lifecycle
 
     init(_ value: Any?) {
         self.value = value
     }
+
+    // MARK: Internal
+
+    var value: Any?
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -130,6 +140,8 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
     }
 }
 
+// MARK: - Lunar
+
 struct Lunar: ParsableCommand {
     struct GlobalOptions: ParsableArguments {
         @Flag(name: .shortAndLong, help: "Log errors and warnings.")
@@ -142,14 +154,12 @@ struct Lunar: ParsableCommand {
         var verbose = false
     }
 
-    @OptionGroup var globals: GlobalOptions
-
     struct Signature: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Prints code signature of the app."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(help: "If the output should be printed as hex.")
         var hex = false
@@ -166,11 +176,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Lid: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Prints if lid is closed or opened."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -185,11 +195,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Lux: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Prints ambient light in lux (or -1 if the sensor can't be read)."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -199,11 +209,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Ddcctl: ParsableCommand {
-        @Argument var args: [String] = []
-
         static let configuration = CommandConfiguration(
             abstract: "Control monitors using the ddcctl utility: https://github.com/kfix/ddcctl"
         )
+
+        @Argument var args: [String] = []
 
         func run() throws {
             globalExit(0)
@@ -211,11 +221,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Launch: ParsableCommand {
-        @Argument var args: [String] = []
-
         static let configuration = CommandConfiguration(
             abstract: "Launch Lunar app"
         )
+
+        @Argument var args: [String] = []
 
         func run() throws {
             globalExit(0)
@@ -223,12 +233,6 @@ struct Lunar: ParsableCommand {
     }
 
     struct CoreDisplay: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
-        static let configuration = CommandConfiguration(
-            abstract: "Use CoreDisplay methods on monitors."
-        )
-
         enum CoreDisplayMethod: String, ExpressibleByArgument, CaseIterable {
             case GetUserBrightness
             case GetLinearBrightness
@@ -238,6 +242,12 @@ struct Lunar: ParsableCommand {
             case SetDynamicLinearBrightness
             case SetAutoBrightnessIsEnabled
         }
+
+        static let configuration = CommandConfiguration(
+            abstract: "Use CoreDisplay methods on monitors."
+        )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(CoreDisplayMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: CoreDisplayMethod
@@ -302,12 +312,6 @@ struct Lunar: ParsableCommand {
     }
 
     struct DisplayServices: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
-        static let configuration = CommandConfiguration(
-            abstract: "Use DisplayServices methods on monitors."
-        )
-
         enum DisplayServicesMethod: String, ExpressibleByArgument, CaseIterable {
             case GetLinearBrightness
             case SetLinearBrightness
@@ -320,6 +324,12 @@ struct Lunar: ParsableCommand {
             case IsSmartDisplay
             case BrightnessChanged
         }
+
+        static let configuration = CommandConfiguration(
+            abstract: "Use DisplayServices methods on monitors."
+        )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(DisplayServicesMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: DisplayServicesMethod
@@ -393,14 +403,14 @@ struct Lunar: ParsableCommand {
     }
 
     struct Ddc: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Send DDC messages to connected monitors."
         )
 
         static let controlStrings = ControlID.allCases.map { String(describing: $0) }.chunks(ofCount: 2)
         static let longestString = (controlStrings.compactMap(\.first).max(by: { $0.count <= $1.count })?.count ?? 1) + 2
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(help: "Fetch max value instead of current")
         var max: Bool = false
@@ -467,11 +477,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Hotkeys: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Prints information about Lunar hotkeys."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print response as JSON.")
         var json = false
@@ -493,18 +503,18 @@ struct Lunar: ParsableCommand {
     }
 
     struct Builtin: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
-        static let configuration = CommandConfiguration(
-            abstract: "Prints information about the built-in display (if it exists)."
-        )
-
         enum BuiltinDisplayProperty: String, ExpressibleByArgument, CaseIterable {
             case id
             case brightness
             case contrast
             case all
         }
+
+        static let configuration = CommandConfiguration(
+            abstract: "Prints information about the built-in display (if it exists)."
+        )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print raw values returned by the system.")
         var raw = false
@@ -569,11 +579,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct DisplayUuid: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Generates UUID for a display ID."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Fall back to EDID if UUID is not possible to generate")
         var fallback = false
@@ -604,11 +614,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Displays: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Lists currently active displays and allows for more granular setting/getting of values."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "If the output should be printed as JSON.")
         var json = false
@@ -698,53 +708,12 @@ struct Lunar: ParsableCommand {
         }
     }
 
-    static let configuration = CommandConfiguration(
-        abstract: "Lunar CLI.",
-        subcommands: [
-            Set.self,
-            Get.self,
-            Displays.self,
-            Builtin.self,
-            Ddc.self,
-            Ddcctl.self,
-            Lid.self,
-            Lux.self,
-            Signature.self,
-            Launch.self,
-            Gamma.self,
-            CoreDisplay.self,
-            DisplayServices.self,
-            Hotkeys.self,
-            DisplayUuid.self,
-        ]
-    )
-
-    static func configureLogging(options globals: GlobalOptions) {
-        if !globals.log, !globals.debug, !globals.verbose {
-            log.disable()
-        } else {
-            log.setMinLevel(
-                debug: globals.debug,
-                verbose: globals.verbose,
-                cloud: false,
-                cli: true
-            )
-        }
-    }
-
-    static func prettyKey(_ key: String) -> String {
-        UPPERCASE_LETTER_NAMES.replaceAll(
-            in: key.titleCase(),
-            using: { $0.matched.uppercased().replacingOccurrences(of: " ", with: "") }
-        )
-    }
-
     struct Get: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Gets a property from the first active display."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -775,11 +744,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Set: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Sets a property to a specific value for the first active display."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -827,11 +796,11 @@ struct Lunar: ParsableCommand {
     }
 
     struct Gamma: ParsableCommand {
-        @OptionGroup var globals: GlobalOptions
-
         static let configuration = CommandConfiguration(
             abstract: "Sets gamma values. The values can only be persisted while the program is running."
         )
+
+        @OptionGroup var globals: GlobalOptions
 
         @Option(
             name: .shortAndLong,
@@ -920,6 +889,49 @@ struct Lunar: ParsableCommand {
                 }
             }
         }
+    }
+
+    static let configuration = CommandConfiguration(
+        abstract: "Lunar CLI.",
+        subcommands: [
+            Set.self,
+            Get.self,
+            Displays.self,
+            Builtin.self,
+            Ddc.self,
+            Ddcctl.self,
+            Lid.self,
+            Lux.self,
+            Signature.self,
+            Launch.self,
+            Gamma.self,
+            CoreDisplay.self,
+            DisplayServices.self,
+            Hotkeys.self,
+            DisplayUuid.self,
+        ]
+    )
+
+    @OptionGroup var globals: GlobalOptions
+
+    static func configureLogging(options globals: GlobalOptions) {
+        if !globals.log, !globals.debug, !globals.verbose {
+            log.disable()
+        } else {
+            log.setMinLevel(
+                debug: globals.debug,
+                verbose: globals.verbose,
+                cloud: false,
+                cli: true
+            )
+        }
+    }
+
+    static func prettyKey(_ key: String) -> String {
+        UPPERCASE_LETTER_NAMES.replaceAll(
+            in: key.titleCase(),
+            using: { $0.matched.uppercased().replacingOccurrences(of: " ", with: "") }
+        )
     }
 }
 

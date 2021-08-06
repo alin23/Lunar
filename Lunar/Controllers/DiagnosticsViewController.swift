@@ -14,9 +14,54 @@ import SwiftyMarkdown
 
 let FAQ_URL = try! "https://lunar.fyi/faq".asURL()
 
+// MARK: - DiagnosticsViewController
+
 class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        stopped = true
+        continueTestCondition.signal()
+        for display in displayController.activeDisplays.values {
+            display.adaptivePaused = false
+        }
+    }
+
+    // MARK: Internal
+
     @Atomic @objc dynamic var editable = false
     @Atomic @objc dynamic var stopped = false
+    @objc dynamic var percentDone = 5
+    @objc dynamic var info = NSAttributedString()
+
+    @IBOutlet var outputScrollView: OutputScrollView!
+    @IBOutlet var logo: NSTextField!
+
+    @IBOutlet var sendButton: Button!
+    @IBOutlet var stopButton: Button!
+
+    @IBOutlet var backingTextView: NSTextView!
+    @IBOutlet var textView: NSTextView!
+
+    @Atomic var keyPressed: UInt16 = 0
+
+    let continueTestCondition = NSCondition()
+    let markdown: SwiftyMarkdown = {
+        let md = getMD()
+
+        md.body.color = mauve
+        md.h1.color = dullRed
+        md.h2.color = dullRed
+        md.h3.color = mauve.blended(withFraction: 0.3, of: red)!
+        md.h4.color = darkMauve
+
+        return md
+    }()
+
     @objc dynamic var sent = false {
         didSet {
             mainThread {
@@ -33,9 +78,6 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         }
     }
 
-    @objc dynamic var percentDone = 5
-    @objc dynamic var info = NSAttributedString()
-
     @objc dynamic var name: String? = lunarProProduct?.activationID {
         didSet {
             mainThread { setSendButtonEnabled() }
@@ -48,17 +90,6 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         }
     }
 
-    @IBOutlet var outputScrollView: OutputScrollView!
-    @IBOutlet var logo: NSTextField!
-
-    @IBOutlet var sendButton: Button!
-    @IBOutlet var stopButton: Button!
-
-    @IBOutlet var backingTextView: NSTextView!
-    @IBOutlet var textView: NSTextView!
-
-    @Atomic var keyPressed: UInt16 = 0
-
     func setSendButtonEnabled() {
         sendButton.isEnabled = !sent && !(name?.isEmpty ?? true) && !(email?.isEmpty ?? true) && stopped
         if sendButton.isEnabled {
@@ -67,19 +98,6 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             sendButton.toolTip = "Make sure the diagnostics process has finished."
         }
     }
-
-    let continueTestCondition = NSCondition()
-    let markdown: SwiftyMarkdown = {
-        let md = getMD()
-
-        md.body.color = mauve
-        md.h1.color = dullRed
-        md.h2.color = dullRed
-        md.h3.color = mauve.blended(withFraction: 0.3, of: red)!
-        md.h4.color = darkMauve
-
-        return md
-    }()
 
     func renderSeparated(_ str: String) {
         render("----\n\n\(str)\n\n----\n\n")
@@ -147,14 +165,16 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     * AV Service: `\(
                         avService == nil ? "NONE" : CFCopyDescription(avService!) as String)`
                     	* _This monitor \(
-                    	    avService == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    	    avService == nil ? "can't receive DDC control messages through a cable connection" :
+                    	        "should be controllable through DDC")_
                     """
                 #else
                     let i2cMessage = """
                     * I2C Controller: `\(
                         i2c == nil ? "NONE" : i2c!.s)`
                     	* _This monitor \(
-                    	    i2c == nil ? "can't receive DDC control messages through a cable connection" : "should be controllable through DDC")_
+                    	    i2c == nil ? "can't receive DDC control messages through a cable connection" :
+                    	        "should be controllable through DDC")_
                     """
                 #endif
                 self.render("""
@@ -170,8 +190,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 	* **DisplayServicesCanChangeBrightness: \(DisplayServicesCanChangeBrightness(display.id))**
                 	* **DisplayServicesHasAmbientLightCompensation: \(DisplayServicesHasAmbientLightCompensation(display.id))**
                 	* **DisplayServicesIsSmartDisplay: \(DisplayServicesIsSmartDisplay(display.id))**
-                	* **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
-                	* **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br.str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
+                	* **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br
+                    .str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
+                	* **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br
+                    .str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
                 	* _\(
                 	    appleDisplay
                 	        ?
@@ -390,7 +412,8 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     {
                                         self.render("""
                                         ##### If you have technical knowledge about `SSH` and `curl`, you can check the following:
-                                        * See if the controller is reachable using this curl command: `curl \(url.deletingLastPathComponent().appendingPathComponent("displays"))`
+                                        * See if the controller is reachable using this curl command: `curl \(url
+                                            .deletingLastPathComponent().appendingPathComponent("displays"))`
                                         	* You should get a response similar to the one below:
                                         	* ```
                                             Display 1
@@ -603,7 +626,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             }
                             if networkReadWorked {
                                 monitorBrightness = networkControl.getBrightness()?.s ?? "nil"
-                                self.render("**\(display.name) monitor brightness (as reported by NetworkControl): `\(monitorBrightness)`**")
+                                self
+                                    .render(
+                                        "**\(display.name) monitor brightness (as reported by NetworkControl): `\(monitorBrightness)`**"
+                                    )
                             }
                             if ddcReadWorked {
                                 monitorBrightness = ddcControl.getBrightness()?.s ?? "nil"
@@ -653,18 +679,6 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 self.textView.isEditable = true
                 self.setSendButtonEnabled()
             }
-        }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        stopped = true
-        continueTestCondition.signal()
-        for display in displayController.activeDisplays.values {
-            display.adaptivePaused = false
         }
     }
 

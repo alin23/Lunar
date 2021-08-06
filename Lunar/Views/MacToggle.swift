@@ -28,6 +28,27 @@ import Cocoa
 
 // @IBDesignable
 class MacToggle: NSView {
+    // MARK: Lifecycle
+
+    //================================================================================
+
+    // MARK: Initialization
+
+    //================================================================================
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        drawView()
+    }
+
+    required init(height: CGFloat = 44) {
+        self.height = height
+        super.init(frame: .zero)
+        drawView()
+    }
+
+    // MARK: Public
+
     //================================================================================
 
     // MARK: Properties
@@ -51,57 +72,6 @@ class MacToggle: NSView {
             }
         }
     }
-
-    fileprivate var height: CGFloat = 26
-    fileprivate var width: CGFloat { height + (height * 0.6) }
-
-    fileprivate var leftConstraint: NSLayoutConstraint?
-    fileprivate var heightConstraint: NSLayoutConstraint?
-    fileprivate var widthConstraint: NSLayoutConstraint?
-
-    fileprivate let backVw: NSView = {
-        let view = NSView()
-        view.wantsLayer = true
-        view.layer?.masksToBounds = false
-        return view
-    }()
-
-    fileprivate let circle: NSView = {
-        let view = NSView()
-
-        let shadow = NSShadow()
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
-        shadow.shadowOffset = CGSize(width: 0, height: -2)
-        shadow.shadowBlurRadius = 2
-
-        view.bg = .white
-        view.wantsLayer = true
-        view.shadow = shadow
-        view.layer?.borderWidth = 2
-        view.layer?.borderColor = NSColor.white.cgColor
-        return view
-    }()
-
-    fileprivate var _radius: CGFloat?
-    fileprivate var backRadius: CGFloat {
-        if let r = _radius { return r }
-        return height / 2
-    }
-
-    fileprivate var circleRadius: CGFloat {
-        if let r = _radius { return r - outlineWidth }
-        return (height - (outlineWidth * 2)) / 2
-    }
-
-    fileprivate var toggleSize: CGFloat { height - (outlineWidth * 2) }
-
-    //================================================================================
-
-    // MARK: Callback
-
-    //================================================================================
-
-    var callback: ((_ isOn: Bool) -> Void)?
 
     //================================================================================
 
@@ -163,22 +133,15 @@ class MacToggle: NSView {
         didSet { backVw.bg = backColor }
     }
 
-    //================================================================================
-
-    // MARK: Initialization
+    // MARK: Internal
 
     //================================================================================
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        drawView()
-    }
+    // MARK: Callback
 
-    required init(height: CGFloat = 44) {
-        self.height = height
-        super.init(frame: .zero)
-        drawView()
-    }
+    //================================================================================
+
+    var callback: ((_ isOn: Bool) -> Void)?
 
     override func mouseDown(with _: NSEvent) {
         guard isEnabled else { return }
@@ -204,6 +167,52 @@ class MacToggle: NSView {
 
         isOn = !isOn
     }
+
+    // MARK: Fileprivate
+
+    fileprivate var height: CGFloat = 26
+    fileprivate var leftConstraint: NSLayoutConstraint?
+    fileprivate var heightConstraint: NSLayoutConstraint?
+    fileprivate var widthConstraint: NSLayoutConstraint?
+
+    fileprivate let backVw: NSView = {
+        let view = NSView()
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
+        return view
+    }()
+
+    fileprivate let circle: NSView = {
+        let view = NSView()
+
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
+        shadow.shadowOffset = CGSize(width: 0, height: -2)
+        shadow.shadowBlurRadius = 2
+
+        view.bg = .white
+        view.wantsLayer = true
+        view.shadow = shadow
+        view.layer?.borderWidth = 2
+        view.layer?.borderColor = NSColor.white.cgColor
+        return view
+    }()
+
+    fileprivate var _radius: CGFloat?
+
+    fileprivate var width: CGFloat { height + (height * 0.6) }
+
+    fileprivate var backRadius: CGFloat {
+        if let r = _radius { return r }
+        return height / 2
+    }
+
+    fileprivate var circleRadius: CGFloat {
+        if let r = _radius { return r - outlineWidth }
+        return (height - (outlineWidth * 2)) / 2
+    }
+
+    fileprivate var toggleSize: CGFloat { height - (outlineWidth * 2) }
 
     //================================================================================
 

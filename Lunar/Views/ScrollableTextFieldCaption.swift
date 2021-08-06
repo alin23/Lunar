@@ -10,6 +10,20 @@ import Cocoa
 import Defaults
 
 class ScrollableTextFieldCaption: NSTextField {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
 
     var initialText: String!
@@ -23,16 +37,6 @@ class ScrollableTextFieldCaption: NSTextField {
         initialText = stringValue
         initialAlphaValue = alphaValue
         initialColor = textColor
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

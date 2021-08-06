@@ -10,16 +10,32 @@ let buttonBgOffHover = buttonBgOn
 let buttonLabelOff = darkMauve
 let buttonBgDisabled = gray.shadow(withLevel: 0.3)
 
+// MARK: - QuickAdaptiveButton
+
 class QuickAdaptiveButton: NSButton {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        for observer in displayObservers.values {
+            observer.cancel()
+        }
+    }
+
+    // MARK: Internal
+
     var adaptiveButtonTrackingArea: NSTrackingArea?
     var adaptiveObserver: ((Bool, Bool) -> Void)?
     var displayID: CGDirectDisplayID?
+    var displayObservers = [String: AnyCancellable]()
+
     weak var display: Display? {
         guard let id = displayID else { return nil }
         return displayController.displays[id]
     }
-
-    var displayObservers = [String: AnyCancellable]()
 
     func setup(displayID: CGDirectDisplayID) {
         self.displayID = displayID
@@ -84,16 +100,6 @@ class QuickAdaptiveButton: NSButton {
                 display.readapt(newValue: newAdaptive, oldValue: display.adaptive)
             }
             .store(in: &displayObservers, for: "adaptive")
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        for observer in displayObservers.values {
-            observer.cancel()
-        }
     }
 
     override func mouseDown(with _: NSEvent) {

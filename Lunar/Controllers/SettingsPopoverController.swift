@@ -78,21 +78,29 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var syncModeRoleToggle: MacToggle!
 
     @IBOutlet var _ddcLimitsHelpButton: NSButton!
+    @IBOutlet var _gammaHelpButton: NSButton!
+    @IBOutlet var _adaptAutomaticallyHelpButton: NSButton?
+    @IBOutlet var _syncModeRoleHelpButton: NSButton?
+    var onClick: (() -> Void)?
+    weak var displayViewController: DisplayViewController?
+    @Atomic var applySettings = true
+
+    @objc dynamic var manualModeActive = displayController.adaptiveModeKey == .manual
+    var displaysObserver: Cancellable?
+    var adaptiveModeObserver: Cancellable?
+
     var ddcLimitsHelpButton: HelpButton? {
         _ddcLimitsHelpButton as? HelpButton
     }
 
-    @IBOutlet var _gammaHelpButton: NSButton!
     var gammaHelpButton: HelpButton? {
         _gammaHelpButton as? HelpButton
     }
 
-    @IBOutlet var _adaptAutomaticallyHelpButton: NSButton?
     var adaptAutomaticallyHelpButton: HelpButton? {
         _adaptAutomaticallyHelpButton as? HelpButton
     }
 
-    @IBOutlet var _syncModeRoleHelpButton: NSButton?
     var syncModeRoleHelpButton: HelpButton? {
         _syncModeRoleHelpButton as? HelpButton
     }
@@ -102,8 +110,6 @@ class SettingsPopoverController: NSViewController {
             .first(where: { checkbox in checkbox!.state == .on })
     }
 
-    var onClick: (() -> Void)?
-    weak var displayViewController: DisplayViewController?
     weak var display: Display? {
         didSet {
             guard let display = display else { return }
@@ -131,9 +137,6 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
-    @Atomic var applySettings = true
-
-    @objc dynamic var manualModeActive = displayController.adaptiveModeKey == .manual
     @objc dynamic var brightnessCurveFactor = 1.0 {
         didSet {
             brightnessCurveFactorField.step = brightnessCurveFactor < 1 ? 0.01 : 0.1
@@ -175,9 +178,9 @@ class SettingsPopoverController: NSViewController {
     @objc dynamic var adaptive = true {
         didSet {
             guard applySettings, let display = display else { return }
-            if adaptive {
-                display.adaptivePaused = false
-            }
+//            if adaptive {
+//                display.adaptivePaused = false
+//            }
             display.adaptive = adaptive
             display.save()
         }
@@ -393,9 +396,6 @@ class SettingsPopoverController: NSViewController {
             }
         }
     }
-
-    var displaysObserver: Cancellable?
-    var adaptiveModeObserver: Cancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()

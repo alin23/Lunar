@@ -91,35 +91,11 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var smoothTransitionCheckbox: NSButton!
 
     @IBOutlet var _helpButton1: NSButton?
-    var helpButton1: HelpButton? {
-        _helpButton1 as? HelpButton
-    }
-
     @IBOutlet var _helpButton2: NSButton?
-    var helpButton2: HelpButton? {
-        _helpButton2 as? HelpButton
-    }
-
     @IBOutlet var _helpButton3: NSButton?
-    var helpButton3: HelpButton? {
-        _helpButton3 as? HelpButton
-    }
-
     @IBOutlet var _helpButton4: NSButton?
-    var helpButton4: HelpButton? {
-        _helpButton4 as? HelpButton
-    }
-
     @IBOutlet var _helpButtonStep: NSButton?
-    var helpButtonStep: HelpButton? {
-        _helpButtonStep as? HelpButton
-    }
-
     @IBOutlet var _helpButtonBottom: NSButton?
-    var helpButtonBottom: HelpButton? {
-        _helpButtonBottom as? HelpButton
-    }
-
     @IBOutlet var brightnessStepField: ScrollableTextField!
     @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastStepField: ScrollableTextField!
@@ -127,6 +103,52 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var volumeStepField: ScrollableTextField!
     @IBOutlet var volumeStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var hotkeyStepLabel: NSTextField!
+    @IBOutlet var pollingIntervalLabel: NSTextField!
+    @IBOutlet var syncPollingIntervalField: ScrollableTextField!
+    @IBOutlet var syncPollingIntervalCaption: ScrollableTextFieldCaption!
+    @IBOutlet var sensorPollingIntervalField: ScrollableTextField!
+    @IBOutlet var sensorPollingIntervalCaption: ScrollableTextFieldCaption!
+    @IBOutlet var locationLatField: ScrollableTextField!
+    @IBOutlet var locationLonField: ScrollableTextField!
+    @IBOutlet var locationLatCaption: ScrollableTextFieldCaption!
+    @IBOutlet var locationLonCaption: ScrollableTextFieldCaption!
+    @IBOutlet var locationLabel: NSTextField!
+    @IBOutlet var locationReset: TextButton!
+    weak var settingsController: SettingsPageController?
+
+    var dayMomentsObserver: Cancellable?
+    var locationObserver: Cancellable?
+    var brightnessStepObserver: Cancellable?
+    var syncPollingSecondsObserver: Cancellable?
+    var sensorPollingSecondsObserver: Cancellable?
+    var contrastStepObserver: Cancellable?
+    var volumeStepObserver: Cancellable?
+    var adaptiveBrightnessModeObserver: Cancellable?
+
+    var helpButton1: HelpButton? {
+        _helpButton1 as? HelpButton
+    }
+
+    var helpButton2: HelpButton? {
+        _helpButton2 as? HelpButton
+    }
+
+    var helpButton3: HelpButton? {
+        _helpButton3 as? HelpButton
+    }
+
+    var helpButton4: HelpButton? {
+        _helpButton4 as? HelpButton
+    }
+
+    var helpButtonStep: HelpButton? {
+        _helpButtonStep as? HelpButton
+    }
+
+    var helpButtonBottom: HelpButton? {
+        _helpButtonBottom as? HelpButton
+    }
+
     var hotkeyStepVisible: Bool = false {
         didSet {
             brightnessStepField?.isHidden = !hotkeyStepVisible
@@ -139,9 +161,6 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    @IBOutlet var pollingIntervalLabel: NSTextField!
-    @IBOutlet var syncPollingIntervalField: ScrollableTextField!
-    @IBOutlet var syncPollingIntervalCaption: ScrollableTextFieldCaption!
     var syncPollingIntervalVisible: Bool = false {
         didSet {
             syncPollingIntervalField?.isHidden = !syncPollingIntervalVisible
@@ -150,8 +169,6 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    @IBOutlet var sensorPollingIntervalField: ScrollableTextField!
-    @IBOutlet var sensorPollingIntervalCaption: ScrollableTextFieldCaption!
     var sensorPollingIntervalVisible: Bool = false {
         didSet {
             sensorPollingIntervalField?.isHidden = !sensorPollingIntervalVisible
@@ -160,12 +177,6 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    @IBOutlet var locationLatField: ScrollableTextField!
-    @IBOutlet var locationLonField: ScrollableTextField!
-    @IBOutlet var locationLatCaption: ScrollableTextFieldCaption!
-    @IBOutlet var locationLonCaption: ScrollableTextFieldCaption!
-    @IBOutlet var locationLabel: NSTextField!
-    @IBOutlet var locationReset: TextButton!
     var locationVisible: Bool = false {
         didSet {
             locationLatField?.isHidden = !locationVisible
@@ -176,17 +187,6 @@ class ConfigurationViewController: NSViewController {
             locationReset?.isHidden = !locationVisible
         }
     }
-
-    weak var settingsController: SettingsPageController?
-
-    var dayMomentsObserver: Cancellable?
-    var locationObserver: Cancellable?
-    var brightnessStepObserver: Cancellable?
-    var syncPollingSecondsObserver: Cancellable?
-    var sensorPollingSecondsObserver: Cancellable?
-    var contrastStepObserver: Cancellable?
-    var volumeStepObserver: Cancellable?
-    var adaptiveBrightnessModeObserver: Cancellable?
 
     func showRelevantSettings(_ adaptiveMode: AdaptiveModeKey) {
         let locationMode = adaptiveMode == .location

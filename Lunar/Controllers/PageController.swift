@@ -14,18 +14,10 @@ import Magnet
 
 var advancedSettingsHintShown = false
 
+// MARK: - PageController
+
 class PageController: NSPageController {
-    var pageControl: PageControl!
-
-    override var arrangedObjects: [Any] {
-        didSet {
-            pageControl?.numberOfPages = arrangedObjects.count
-        }
-    }
-
-    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("hotkey")
-    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("settings")
-    var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
+    // MARK: Lifecycle
 
     deinit {
         #if DEBUG
@@ -34,23 +26,24 @@ class PageController: NSPageController {
         #endif
     }
 
-    private func setupPageControl(size: Int) {
-        let width: CGFloat = 300
-        let x: CGFloat = (view.frame.width - width) / 2
+    // MARK: Internal
 
-        let frame = NSRect(x: x, y: 20, width: width, height: 20)
-        pageControl = PageControl(
-            frame: frame,
-            numberOfPages: size,
-            hidesForSinglePage: true,
-            tintColor: pageIndicatorTintColor,
-            currentTintColor: currentPageIndicatorTintColor
-        )
-        if !view.subviews.contains(pageControl) {
-            view.addSubview(pageControl)
+    var pageControl: PageControl!
+
+    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("hotkey")
+    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("settings")
+    var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
+
+    override var arrangedObjects: [Any] {
+        didSet {
+            pageControl?.numberOfPages = arrangedObjects.count
         }
+    }
 
-        pageControl.setNeedsDisplay(pageControl.frame)
+    override var representedObject: Any? {
+        didSet {
+            // Update the view, if already loaded.
+        }
     }
 
     func setup() {
@@ -96,12 +89,29 @@ class PageController: NSPageController {
         setup()
     }
 
-    override var representedObject: Any? {
-        didSet {
-            // Update the view, if already loaded.
+    // MARK: Private
+
+    private func setupPageControl(size: Int) {
+        let width: CGFloat = 300
+        let x: CGFloat = (view.frame.width - width) / 2
+
+        let frame = NSRect(x: x, y: 20, width: width, height: 20)
+        pageControl = PageControl(
+            frame: frame,
+            numberOfPages: size,
+            hidesForSinglePage: true,
+            tintColor: pageIndicatorTintColor,
+            currentTintColor: currentPageIndicatorTintColor
+        )
+        if !view.subviews.contains(pageControl) {
+            view.addSubview(pageControl)
         }
+
+        pageControl.setNeedsDisplay(pageControl.frame)
     }
 }
+
+// MARK: NSPageControllerDelegate
 
 extension PageController: NSPageControllerDelegate {
     func pageControllerWillStartLiveTransition(_: NSPageController) {

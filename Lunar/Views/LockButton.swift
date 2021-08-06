@@ -9,20 +9,48 @@
 import Cocoa
 
 class LockButton: NSButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     var lockButtonTrackingArea: NSTrackingArea!
+
+    override var state: NSControl.StateValue {
+        didSet {
+            bg = state == .on ? lockButtonBgOn : lockButtonBgOff
+        }
+    }
 
     func setup(_ locked: Bool = false) {
         wantsLayer = true
 
         let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
-        activeTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: lockButtonLabelOn, range: NSMakeRange(0, activeTitle.length))
+        activeTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: lockButtonLabelOn,
+            range: NSMakeRange(0, activeTitle.length)
+        )
         let inactiveTitle = NSMutableAttributedString(attributedString: attributedTitle)
-        inactiveTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: lockButtonLabelOff, range: NSMakeRange(0, inactiveTitle.length))
+        inactiveTitle.addAttribute(
+            NSAttributedString.Key.foregroundColor,
+            value: lockButtonLabelOff,
+            range: NSMakeRange(0, inactiveTitle.length)
+        )
 
         attributedTitle = inactiveTitle
         attributedAlternateTitle = activeTitle
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
+        setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * 0.7)))
         radius = (frame.height / 2).ns
         if locked {
             state = .on
@@ -31,7 +59,12 @@ class LockButton: NSButton {
             state = .off
             bg = lockButtonBgOff
         }
-        lockButtonTrackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        lockButtonTrackingArea = NSTrackingArea(
+            rect: visibleRect,
+            options: [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: self,
+            userInfo: nil
+        )
         addTrackingArea(lockButtonTrackingArea)
     }
 

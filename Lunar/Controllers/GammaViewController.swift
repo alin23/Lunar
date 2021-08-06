@@ -15,6 +15,10 @@ class GammaViewController: NSViewController {
     @AtomicLock var highlighterTask: CFRunLoopTimer?
     var highlighterLock = NSRecursiveLock()
 
+    var highlighting: Bool {
+        dot.alphaValue > 0
+    }
+
     func highlight() {
         // return
         let windowVisible = mainThread { view.window?.isVisible ?? false }
@@ -67,10 +71,6 @@ class GammaViewController: NSViewController {
             }
             self.stopHighlighting()
         }
-    }
-
-    var highlighting: Bool {
-        dot.alphaValue > 0
     }
 
     func stopHighlighting() {

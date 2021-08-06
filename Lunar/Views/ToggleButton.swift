@@ -10,10 +10,14 @@ import Cocoa
 import Defaults
 import SwiftyAttributes
 
+// MARK: - HoverState
+
 enum HoverState: Int {
     case hover
     case noHover
 }
+
+// MARK: - Page
 
 enum Page: Int {
     case hotkeys = 0
@@ -26,14 +30,34 @@ enum Page: Int {
     case displayAlgorithm
 }
 
+// MARK: - ToggleButton
+
 class ToggleButton: NSButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
+    var hoverState = HoverState.noHover
+    weak var notice: NSTextField?
+
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
+
     var page = Page.display {
         didSet {
             setColors()
         }
     }
 
-    var hoverState = HoverState.noHover
     var bgColor: NSColor {
         if !isEnabled {
             if highlighterTask != nil { stopHighlighting() }
@@ -52,20 +76,6 @@ class ToggleButton: NSButton {
             return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         }
     }
-
-    weak var notice: NSTextField?
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
-
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func highlight() {
         guard !isHidden else { return }

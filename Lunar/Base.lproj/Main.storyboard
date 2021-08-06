@@ -414,6 +414,14 @@
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
+                                        <menuItem title="BlackOut" keyEquivalent="6" id="yNB-Oq-RZ1">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="blackOut:" target="Voe-Tx-rLC" id="H0f-Ug-3J1"/>
+                                                <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="IDl-sw-lX1"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hCM-7b-68r"/>
                                         <menuItem title="Brightness Up" keyEquivalent="" id="jpb-NA-VFf">
                                             <attributedString key="attributedTitle"/>
@@ -595,6 +603,7 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
                         <outlet property="activateLicenseMenuItem" destination="f5h-jV-U1l" id="wMY-Ct-tBG"/>
+                        <outlet property="blackOutMenuItem" destination="yNB-Oq-RZ1" id="wQD-dU-hX3"/>
                         <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
                         <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
                         <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
@@ -2522,6 +2531,52 @@ when dock and menubar icons are hidden</string>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-25" y="-10" width="1000" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <subviews>
+                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="6nl-T1-C3E" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="126" y="31" width="73" height="8"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <ciFilter key="compositingFilter" name="CISubtractBlendMode">
+                                            <configuration>
+                                                <null key="inputBackgroundImage"/>
+                                                <null key="inputImage"/>
+                                            </configuration>
+                                        </ciFilter>
+                                        <buttonCell key="cell" type="inline" title="Lock Curve" alternateTitle="Locked Curve" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Ok9-tm-ojw">
+                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="miniSystemBold"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.lockedContrastCurve" id="Ph9-3O-XN0"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="e5b-ch-dPT">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
+                                    </button>
+                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="Z5X-YG-FjQ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="126" y="15" width="73" height="8"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <ciFilter key="compositingFilter" name="CISubtractBlendMode">
+                                            <configuration>
+                                                <null key="inputBackgroundImage"/>
+                                                <null key="inputImage"/>
+                                            </configuration>
+                                        </ciFilter>
+                                        <buttonCell key="cell" type="inline" title="Lock Curve" alternateTitle="Locked Curve" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="S7j-rX-ubt">
+                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="miniSystemBold"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.lockedBrightnessCurve" id="LDW-6C-Vfo"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="Gol-fQ-E4K">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
+                                    </button>
+                                </subviews>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="325" y="274" width="300" height="300"/>
@@ -3071,6 +3126,8 @@ and contrast to their highest values</string>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
                         <outlet property="inputDropdown" destination="brT-Q5-NwT" id="QQa-4u-t0q"/>
+                        <outlet property="lockBrightnessCurveButton" destination="Z5X-YG-FjQ" id="pOc-V1-hxI"/>
+                        <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
                         <outlet property="nonResponsiveTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
@@ -3090,7 +3147,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NFS-Qe-xXa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="543" width="220" height="34"/>
+                                <rect key="frame" x="695" y="568" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3099,7 +3156,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iJ1-yY-kOt">
-                                <rect key="frame" x="697" y="585" width="220" height="19"/>
+                                <rect key="frame" x="697" y="610" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="0% Brightness/Contrast" id="o19-LF-ZDK">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3108,7 +3165,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rE2-oz-MBj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="463" width="220" height="34"/>
+                                <rect key="frame" x="695" y="488" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3117,7 +3174,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mQ5-GB-kAw">
-                                <rect key="frame" x="697" y="505" width="220" height="19"/>
+                                <rect key="frame" x="697" y="530" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="25% Brightness/Contrast" id="9Hf-vd-KLe">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3126,7 +3183,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMg-N3-c8c" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="383" width="220" height="34"/>
+                                <rect key="frame" x="695" y="408" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3135,7 +3192,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9mU-Sj-Sma">
-                                <rect key="frame" x="697" y="425" width="220" height="19"/>
+                                <rect key="frame" x="697" y="450" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="50% Brightness/Contrast" id="4KO-fz-0yx">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3144,7 +3201,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pdK-Vf-9Uj" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="303" width="220" height="34"/>
+                                <rect key="frame" x="695" y="328" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3153,7 +3210,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UOh-D1-P9g">
-                                <rect key="frame" x="697" y="345" width="220" height="19"/>
+                                <rect key="frame" x="697" y="370" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="75% Brightness/Contrast" id="2QW-X6-kAU">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3162,7 +3219,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xwH-nW-wyC" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="223" width="220" height="34"/>
+                                <rect key="frame" x="695" y="248" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3171,7 +3228,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="efg-HE-aLk">
-                                <rect key="frame" x="697" y="265" width="220" height="19"/>
+                                <rect key="frame" x="697" y="290" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="100% Brightness/Contrast" id="7iI-aM-1Xk">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3180,7 +3237,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v3W-ni-TYa" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="543" width="220" height="34"/>
+                                <rect key="frame" x="365" y="568" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3189,7 +3246,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Qf-Fh-CXU">
-                                <rect key="frame" x="365" y="585" width="220" height="19"/>
+                                <rect key="frame" x="365" y="610" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Down" id="lku-B1-wcM">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3198,7 +3255,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fJo-VM-XnY" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="463" width="220" height="34"/>
+                                <rect key="frame" x="365" y="488" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3207,7 +3264,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ddz-Ba-c0d">
-                                <rect key="frame" x="365" y="505" width="220" height="19"/>
+                                <rect key="frame" x="365" y="530" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Brightness Up" id="0OD-28-VtF">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3216,7 +3273,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F4a-Ib-syq" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="383" width="220" height="34"/>
+                                <rect key="frame" x="365" y="408" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3225,7 +3282,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S9L-Dx-ksA">
-                                <rect key="frame" x="365" y="425" width="220" height="19"/>
+                                <rect key="frame" x="365" y="450" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Down" id="UFl-qA-DY8">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3234,7 +3291,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TJV-V1-URJ" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="303" width="220" height="34"/>
+                                <rect key="frame" x="365" y="328" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3243,7 +3300,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Obv-oP-JEe">
-                                <rect key="frame" x="365" y="345" width="220" height="19"/>
+                                <rect key="frame" x="365" y="370" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Contrast Up" id="nRU-mZ-43S">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3252,7 +3309,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Us2-PS-6r3" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="223" width="220" height="34"/>
+                                <rect key="frame" x="365" y="248" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3261,7 +3318,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q8C-C9-9hd">
-                                <rect key="frame" x="365" y="265" width="220" height="19"/>
+                                <rect key="frame" x="365" y="290" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Volume Down" id="pMz-dY-YOe">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3270,7 +3327,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0AC-Li-Jzu" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="143" width="220" height="34"/>
+                                <rect key="frame" x="365" y="168" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3279,7 +3336,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3B8-H3-sE9">
-                                <rect key="frame" x="365" y="185" width="220" height="19"/>
+                                <rect key="frame" x="365" y="210" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Volume Up" id="xfV-4O-86q">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3288,7 +3345,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ucS-rK-pL2" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="365" y="63" width="220" height="34"/>
+                                <rect key="frame" x="365" y="88" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3297,7 +3354,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZXp-8n-lcU">
-                                <rect key="frame" x="365" y="105" width="220" height="19"/>
+                                <rect key="frame" x="365" y="130" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Mute Audio" id="fTV-9X-Yi0">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3306,7 +3363,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="cbu-4B-iNu">
-                                <rect key="frame" x="616" y="544" width="32" height="32"/>
+                                <rect key="frame" x="616" y="569" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="gMi-FM-mm6">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3317,7 +3374,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qnb-ds-MlX">
-                                <rect key="frame" x="559" y="583" width="143" height="39"/>
+                                <rect key="frame" x="559" y="608" width="143" height="39"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" alignment="center" title="Hold Option for fine adjustments" id="RXL-yL-KzR">
                                     <font key="font" size="12" name="Menlo-Regular"/>
@@ -3326,7 +3383,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="s97-rH-1bw">
-                                <rect key="frame" x="616" y="464" width="32" height="32"/>
+                                <rect key="frame" x="616" y="489" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="jOV-d4-Dt1">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3337,7 +3394,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="b9Y-tb-MvW">
-                                <rect key="frame" x="616" y="384" width="32" height="32"/>
+                                <rect key="frame" x="616" y="409" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="55U-Ew-nSS">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3348,7 +3405,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="TCD-Wn-oty">
-                                <rect key="frame" x="616" y="304" width="32" height="32"/>
+                                <rect key="frame" x="616" y="329" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="Efi-TG-ecr">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3359,7 +3416,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="imC-3Y-Xhw">
-                                <rect key="frame" x="615" y="224" width="32" height="32"/>
+                                <rect key="frame" x="615" y="249" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="OWL-AI-BFH">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3370,7 +3427,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="3Qo-a9-prv">
-                                <rect key="frame" x="616" y="144" width="32" height="32"/>
+                                <rect key="frame" x="616" y="169" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="lt1-VG-o4O">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3381,7 +3438,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qpQ-sn-PDN" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="37" y="543" width="220" height="34"/>
+                                <rect key="frame" x="37" y="568" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3390,7 +3447,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJl-1a-wCR">
-                                <rect key="frame" x="37" y="585" width="220" height="19"/>
+                                <rect key="frame" x="37" y="610" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Toggle Adaptive Mode" id="VKy-Y3-qLI">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3399,7 +3456,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MQS-7I-I6a" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="37" y="463" width="220" height="34"/>
+                                <rect key="frame" x="37" y="488" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3408,7 +3465,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mRo-oA-SEK">
-                                <rect key="frame" x="37" y="505" width="220" height="19"/>
+                                <rect key="frame" x="37" y="530" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Show Lunar" id="clw-eG-154">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3417,7 +3474,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LsA-6Y-wu2" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="864" y="99" width="66" height="14"/>
+                                <rect key="frame" x="442" y="19" width="66" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="xya-5q-Etj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3428,7 +3485,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eOb-1m-497">
-                                <rect key="frame" x="35" y="357" width="249" height="30"/>
+                                <rect key="frame" x="35" y="397" width="249" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Listen for brightness keys" id="hgc-ES-LCI">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -3437,7 +3494,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-Sh-Lb8">
-                                <rect key="frame" x="303" y="362" width="32" height="32"/>
+                                <rect key="frame" x="303" y="402" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="3rc-5l-2Pq">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3449,7 +3506,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhI-ji-g4G">
-                                <rect key="frame" x="37" y="326" width="258" height="40"/>
+                                <rect key="frame" x="37" y="366" width="258" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Use Brightness keys with Lunar (no Touchbar sliders though)" id="gJE-aA-LcL">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3458,7 +3515,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="geo-a9-eER">
-                                <rect key="frame" x="37" y="297" width="247" height="30"/>
+                                <rect key="frame" x="37" y="337" width="247" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Listen for volume keys" id="3F0-l0-jmd">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -3467,7 +3524,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="7s5-Yx-s1J">
-                                <rect key="frame" x="303" y="302" width="32" height="32"/>
+                                <rect key="frame" x="303" y="342" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="dJ9-vv-gmE">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3479,7 +3536,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ts4-UD-dRd">
-                                <rect key="frame" x="37" y="266" width="239" height="40"/>
+                                <rect key="frame" x="37" y="306" width="239" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Control monitor audio output using volume keys" id="4qO-ts-X7U">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3497,7 +3554,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5lq-H3-GH5">
-                                <rect key="frame" x="37" y="237" width="258" height="30"/>
+                                <rect key="frame" x="37" y="277" width="258" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Send keys to all monitors" id="gLs-i4-pJc">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -3506,7 +3563,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="1wu-xI-g9J">
-                                <rect key="frame" x="303" y="242" width="32" height="32"/>
+                                <rect key="frame" x="303" y="282" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="6gy-Yw-hct">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3518,7 +3575,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0P4-lz-uH4">
-                                <rect key="frame" x="37" y="195" width="239" height="51"/>
+                                <rect key="frame" x="37" y="235" width="239" height="51"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="If unchecked, Brightness keys will only control the monitor where the cursor is placed" id="oBZ-yU-Ykc">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3527,7 +3584,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H7D-Tn-d6X">
-                                <rect key="frame" x="35" y="392" width="217" height="37"/>
+                                <rect key="frame" x="35" y="432" width="217" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="MEDIA KEYS" id="KWP-bv-hne">
                                     <font key="font" size="21" name="Menlo-Bold"/>
@@ -3536,7 +3593,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jyg-YU-sfm" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="695" y="143" width="220" height="34"/>
+                                <rect key="frame" x="695" y="168" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -3545,7 +3602,7 @@ and contrast to their highest values</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OUC-zB-brm">
-                                <rect key="frame" x="697" y="185" width="220" height="19"/>
+                                <rect key="frame" x="697" y="210" width="220" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="FaceLight" id="Ltg-0X-APU">
                                     <font key="font" size="13" name="Menlo-Regular"/>
@@ -3554,7 +3611,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tkE-A5-SEb" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="188" y="406" width="139" height="14"/>
+                                <rect key="frame" x="188" y="446" width="139" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="How do these work?" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="4xI-Bi-lOW">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3565,7 +3622,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3d3-dA-7PX">
-                                <rect key="frame" x="37" y="166" width="266" height="30"/>
+                                <rect key="frame" x="37" y="206" width="266" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Use alternate brightness keys" id="Fxa-wd-qGG">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -3574,7 +3631,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="rkY-Ya-r15">
-                                <rect key="frame" x="303" y="171" width="32" height="32"/>
+                                <rect key="frame" x="303" y="211" width="32" height="32"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="fhk-dJ-4xa">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3590,7 +3647,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
-                                <rect key="frame" x="37" y="124" width="239" height="51"/>
+                                <rect key="frame" x="37" y="164" width="239" height="51"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Frees up F14/F15 keys but might not work on all keyboards" id="kPG-QJ-rNC">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3598,9 +3655,28 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bvx-WR-knI" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="695" y="88" width="220" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z6Y-FD-Ot2">
+                                <rect key="frame" x="697" y="130" width="220" height="19"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="BlackOut" id="MGA-w5-BWM">
+                                    <font key="font" size="13" name="Menlo-Regular"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="blackOutHotkeyView" destination="Bvx-WR-knI" id="4r8-wQ-6TG"/>
                         <outlet property="brightnessDownHotkeyView" destination="v3W-ni-TYa" id="MJP-FQ-3cc"/>
                         <outlet property="brightnessUpHotkeyView" destination="fJo-VM-XnY" id="zjV-7s-A3N"/>
                         <outlet property="contrastDownHotkeyView" destination="F4a-Ib-syq" id="ZMX-Cv-IWz"/>
