@@ -280,6 +280,17 @@ class DisplayViewController: NSViewController {
         }
     }
 
+    @IBAction func lockCurve(_ sender: LockButton) {
+        switch sender.tag {
+        case 1:
+            lockedContrastCurve = sender.state == .on
+        case 2:
+            lockedBrightnessCurve = sender.state == .on
+        default:
+            break
+        }
+    }
+
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
             editor.selectedRange = NSMakeRange(0, 0)

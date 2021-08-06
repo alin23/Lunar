@@ -112,6 +112,14 @@ class GammaControl: Control {
 
     func resetState() {}
 
+    func setRedGain(_ gain: UInt8) -> Bool { true }
+    func setGreenGain(_ gain: UInt8) -> Bool { true }
+    func setBlueGain(_ gain: UInt8) -> Bool { true }
+    func getRedGain() -> UInt8? { nil }
+    func getGreenGain() -> UInt8? { nil }
+    func getBlueGain() -> UInt8? { nil }
+    func resetColors() -> Bool { true }
+
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return false

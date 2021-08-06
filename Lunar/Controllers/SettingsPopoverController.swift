@@ -32,6 +32,17 @@ class SettingsPopoverController: NSViewController {
     - `RUNNING` will **allow** Lunar to change the brightness and contrast automatically for this monitor
     - `PAUSED` will **restrict** Lunar from changing the brightness and contrast automatically for this monitor
     """
+    let DDC_COLOR_GAIN_HELP_TEXT = """
+    ## Description
+
+    These values correspond to the red/green/blue gain values in the monitor OSD.
+
+    The changes will persist even when you change the monitor input.
+
+    You can use them for:
+    - **Color Correction**
+    - **Warmer/Colder colours**
+    """
     let DDC_LIMITS_HELP_TEXT = """
     `Note: these are not soft limits.`
 
@@ -57,6 +68,10 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
 
+    @IBOutlet var resetLimitsButton: ResetButton!
+    @IBOutlet var resetColorsButton: ResetButton!
+    @IBOutlet var resetGammaButton: ResetButton!
+
     @IBOutlet var brightnessCurveFactorField: ScrollableTextField!
     @IBOutlet var contrastCurveFactorField: ScrollableTextField!
 
@@ -64,6 +79,9 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
 
+    @IBOutlet var blueGainField: ScrollableTextField!
+    @IBOutlet var greenGainField: ScrollableTextField!
+    @IBOutlet var redGainField: ScrollableTextField!
     @IBOutlet var gammaRedMin: ScrollableTextField!
     @IBOutlet var gammaRedValue: ScrollableTextField!
     @IBOutlet var gammaRedMax: ScrollableTextField!
@@ -89,8 +107,14 @@ class SettingsPopoverController: NSViewController {
     var displaysObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
 
+    @IBOutlet var _ddcColorGainHelpButton: NSButton?
+
     var ddcLimitsHelpButton: HelpButton? {
         _ddcLimitsHelpButton as? HelpButton
+    }
+
+    var ddcColorGainHelpButton: HelpButton? {
+        _ddcColorGainHelpButton as? HelpButton
     }
 
     var gammaHelpButton: HelpButton? {
@@ -132,6 +156,7 @@ class SettingsPopoverController: NSViewController {
                 applyGamma = display.applyGamma
             }
             setupDDCLimits(display)
+            setupDDCColorGain(display)
             setupCurveFactors(display)
             setupGamma(display)
         }
@@ -238,6 +263,42 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
+    @IBAction func resetLimits(_ sender: Any) {
+        guard let display = display else {
+            return
+        }
+
+        display.maxDDCBrightness = 100.ns
+        display.maxDDCContrast = 100.ns
+        display.maxDDCVolume = 100.ns
+
+        setupDDCLimits(display)
+    }
+
+    @IBAction func resetColors(_ sender: Any) {
+        guard let display = display, display.hasI2C, let control = display.control, !(control is GammaControl) else {
+            return
+        }
+
+        control.resetColors()
+        if !display.refreshColors() {
+            display.redGain = 90
+            display.greenGain = 90
+            display.blueGain = 90
+        }
+
+        setupDDCColorGain(display)
+    }
+
+    @IBAction func resetGamma(_ sender: Any) {
+        guard let display = display else {
+            return
+        }
+
+        display.resetDefaultGamma()
+        setupGamma(display)
+    }
+
     func resetControl() {
         guard let display = display else { return }
         let control = display.getBestControl()
@@ -301,6 +362,20 @@ class SettingsPopoverController: NSViewController {
             maxDDCBrightnessField.onValueChanged = { [weak self] value in self?.display?.maxDDCBrightness = value.ns }
             maxDDCContrastField.onValueChanged = { [weak self] value in self?.display?.maxDDCContrast = value.ns }
             maxDDCVolumeField.onValueChanged = { [weak self] value in self?.display?.maxDDCVolume = value.ns }
+        }
+    }
+
+    func setupDDCColorGain(_ display: Display? = nil) {
+        if let display = display ?? self.display {
+            mainThread {
+                redGainField.intValue = display.redGain.int32Value
+                greenGainField.intValue = display.greenGain.int32Value
+                blueGainField.intValue = display.blueGain.int32Value
+            }
+
+            redGainField.onValueChanged = { [weak self] value in self?.display?.redGain = value.ns }
+            greenGainField.onValueChanged = { [weak self] value in self?.display?.greenGain = value.ns }
+            blueGainField.onValueChanged = { [weak self] value in self?.display?.blueGain = value.ns }
         }
     }
 
@@ -403,7 +478,12 @@ class SettingsPopoverController: NSViewController {
         syncModeRoleHelpButton?.helpText = SYNC_MODE_ROLE_HELP_TEXT
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
         ddcLimitsHelpButton?.helpText = DDC_LIMITS_HELP_TEXT
+        ddcColorGainHelpButton?.helpText = DDC_COLOR_GAIN_HELP_TEXT
         gammaHelpButton?.helpText = GAMMA_HELP_TEXT
+
+        resetLimitsButton.page = .hotkeysReset
+        resetColorsButton.page = .hotkeysReset
+        resetGammaButton.page = .hotkeysReset
 
         gammaRedMin.decimalPoints = 2
         gammaRedMax.decimalPoints = 2
@@ -438,6 +518,7 @@ class SettingsPopoverController: NSViewController {
             syncModeRoleToggle.isEnabled = false
         }
         setupDDCLimits()
+        setupDDCColorGain()
         setupCurveFactors()
         setupGamma()
 

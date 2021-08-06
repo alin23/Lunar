@@ -482,6 +482,34 @@ class NetworkControl: Control {
         set(power == .on ? 1 : 5, for: .DPMS)
     }
 
+    func setRedGain(_ gain: UInt8) -> Bool {
+        set(gain, for: .RED_GAIN)
+    }
+
+    func setGreenGain(_ gain: UInt8) -> Bool {
+        set(gain, for: .GREEN_GAIN)
+    }
+
+    func setBlueGain(_ gain: UInt8) -> Bool {
+        set(gain, for: .BLUE_GAIN)
+    }
+
+    func getRedGain() -> UInt8? {
+        get(.RED_GAIN)
+    }
+
+    func getGreenGain() -> UInt8? {
+        get(.GREEN_GAIN)
+    }
+
+    func getBlueGain() -> UInt8? {
+        get(.BLUE_GAIN)
+    }
+
+    func resetColors() -> Bool {
+        set(1, for: .RESET_COLOR)
+    }
+
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
             return set(brightness, for: .BRIGHTNESS, smooth: true, oldValue: oldValue)
