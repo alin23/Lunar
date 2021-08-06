@@ -13,33 +13,7 @@ import Solar
 import SwiftyJSON
 
 class Geolocation: NSObject, Codable, Defaults.Serializable {
-    var altitude: Double
-    var latitude: Double
-    var longitude: Double
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-
-    func sun(date: Date? = nil) -> Sun? {
-        solar?.computeSunPosition(date: date)
-    }
-
-    lazy var _solar: Solar? = Solar(for: localNow().date, coordinate: coordinate)
-    var solar: Solar? {
-        get {
-            if let s = _solar, let noon = s.solarNoon, !noon.isToday {
-                _solar = Solar(for: localNow().date, coordinate: coordinate)
-            }
-            return _solar
-        }
-        set {
-            if let s = newValue, let noon = s.solarNoon, !noon.isToday {
-                _solar = Solar(for: localNow().date, coordinate: coordinate)
-            } else {
-                _solar = newValue
-            }
-        }
-    }
+    // MARK: Lifecycle
 
     init?(location: CLLocation) {
         guard location.coordinate.latitude != 0 || location.coordinate.longitude != 0 else { return nil }
@@ -72,11 +46,15 @@ class Geolocation: NSObject, Codable, Defaults.Serializable {
             )
     }
 
-    // MARK: UserDefaults
-
-    func store() {
-        CachedDefaults[.location] = self
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        latitude = try container.decode(Double.self, forKey: .latitude)
+        longitude = try container.decode(Double.self, forKey: .longitude)
+        altitude = try container.decode(Double.self, forKey: .altitude)
+        super.init()
     }
+
+    // MARK: Internal
 
     // MARK: Codable
 
@@ -86,12 +64,39 @@ class Geolocation: NSObject, Codable, Defaults.Serializable {
         case altitude
     }
 
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        latitude = try container.decode(Double.self, forKey: .latitude)
-        longitude = try container.decode(Double.self, forKey: .longitude)
-        altitude = try container.decode(Double.self, forKey: .altitude)
-        super.init()
+    var altitude: Double
+    var latitude: Double
+    var longitude: Double
+    lazy var _solar: Solar? = Solar(for: localNow().date, coordinate: coordinate)
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+
+    var solar: Solar? {
+        get {
+            if let s = _solar, let noon = s.solarNoon, !noon.isToday {
+                _solar = Solar(for: localNow().date, coordinate: coordinate)
+            }
+            return _solar
+        }
+        set {
+            if let s = newValue, let noon = s.solarNoon, !noon.isToday {
+                _solar = Solar(for: localNow().date, coordinate: coordinate)
+            } else {
+                _solar = newValue
+            }
+        }
+    }
+
+    func sun(date: Date? = nil) -> Sun? {
+        solar?.computeSunPosition(date: date)
+    }
+
+    // MARK: UserDefaults
+
+    func store() {
+        CachedDefaults[.location] = self
     }
 
     func encode(to encoder: Encoder) throws {

@@ -11,6 +11,8 @@ import Regex
 
 let NEW_HOSTNAME_PATTERN = try! Regex(pattern: "NEW_HOSTNAME=(\\S+)", groupNames: ["hostname"])
 
+// MARK: - OutputScrollView
+
 class OutputScrollView: NSScrollView {
     var onScroll: ((NSEvent) -> Void)?
     var onKeyDown: ((NSEvent) -> Void)?
@@ -36,7 +38,29 @@ class OutputScrollView: NSScrollView {
     }
 }
 
+// MARK: - InstallOutputViewController
+
 class InstallOutputViewController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        cancelInstall(self)
+    }
+
+    // MARK: Internal
+
+    var commandChannel: Channel?
+
+    @IBOutlet var outputScrollView: OutputScrollView!
+    @IBOutlet var scrollAutomaticallyCheckbox: NSButton!
+    @IBOutlet var waitingIndicator: NSProgressIndicator!
+    @IBOutlet var cancellingIndicator: NSProgressIndicator!
+    @IBOutlet var cancelButton: PaddedButton!
+
     @objc dynamic var scrollAutomatically: Bool = true {
         didSet {
             if scrollAutomatically, let textView = outputScrollView.documentView as? NSTextView {
@@ -64,14 +88,6 @@ class InstallOutputViewController: NSViewController {
             }
         }
     }
-
-    var commandChannel: Channel?
-
-    @IBOutlet var outputScrollView: OutputScrollView!
-    @IBOutlet var scrollAutomaticallyCheckbox: NSButton!
-    @IBOutlet var waitingIndicator: NSProgressIndicator!
-    @IBOutlet var cancellingIndicator: NSProgressIndicator!
-    @IBOutlet var cancelButton: PaddedButton!
 
     func printNewHostname(new: String, old: String, textView: NSTextView) {
         if new != old {
@@ -224,13 +240,5 @@ class InstallOutputViewController: NSViewController {
             textView.font = monospace(size: 13)
             textView.string = "\n"
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        cancelInstall(self)
     }
 }

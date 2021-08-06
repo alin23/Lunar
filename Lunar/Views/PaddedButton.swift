@@ -9,8 +9,24 @@
 import Cocoa
 
 class PaddedButton: NSButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     lazy var disabledBgColor = (bgColor?.blended(withFraction: 0.3, of: gray) ?? gray).withAlphaComponent(0.2)
     lazy var hoverBgColor = bgColor?.blended(withFraction: 0.2, of: red) ?? bg
+    var hoverState = HoverState.noHover
+
     lazy var bgColor = bg {
         didSet {
             disabledBgColor = (bgColor?.blended(withFraction: 0.3, of: gray) ?? gray).withAlphaComponent(0.2)
@@ -28,8 +44,6 @@ class PaddedButton: NSButton {
             fade()
         }
     }
-
-    var hoverState = HoverState.noHover
 
     @IBInspectable var textColor: NSColor? {
         didSet {
@@ -53,16 +67,6 @@ class PaddedButton: NSButton {
 
         let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(area)
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func mouseEntered(with _: NSEvent) {

@@ -29,12 +29,84 @@ public enum Sysctl {
         case posixError(POSIXErrorCode)
     }
 
+    /// e.g. "MacPro4,1" or "iPhone8,1"
+    /// NOTE: this is *corrected* on iOS devices to fetch hw.machine
+    public static var model: String = {
+        #if os(iOS) && !arch(x86_64) && !arch(i386)
+            return (try? Sysctl.string(for: [CTL_HW, HW_MACHINE])) ?? "Unknown"
+        #else
+            return (try? Sysctl.string(for: [CTL_HW, HW_MODEL])) ?? "Unknown"
+        #endif
+    }()
+
+    public static var modelLowercased: String = model.lowercased()
+
+    public static var isMacMini = modelLowercased.hasPrefix("macmini")
+    public static var isiMac = modelLowercased.hasPrefix("imac")
+
+    /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
+    /// "My-Name-iPhone" (from Settings -> General -> About -> Name)
+    public static var hostName: String { try! Sysctl.string(for: [CTL_KERN, KERN_HOSTNAME]) }
+
+    /// e.g. "x86_64" or "N71mAP"
+    /// NOTE: this is *corrected* on iOS devices to fetch hw.model
+    public static var machine: String {
+        #if os(iOS) && !arch(x86_64) && !arch(i386)
+            return try! Sysctl.string(for: [CTL_HW, HW_MODEL])
+        #else
+            return try! Sysctl.string(for: [CTL_HW, HW_MACHINE])
+        #endif
+    }
+
+    public static var device: String {
+        let model = modelLowercased
+        if model.hasPrefix("macpro") {
+            return "Mac Pro"
+        } else if model.hasPrefix("imac") {
+            return "iMac"
+        } else if model.hasPrefix("macbookpro") {
+            return "MacBook Pro"
+        } else if model.hasPrefix("macbookair") {
+            return "MacBook Air"
+        } else if model.hasPrefix("macbook") {
+            return "MacBook"
+        } else if model.hasPrefix("macmini") {
+            return "Mac Mini"
+        } else if model.hasPrefix("xserve") {
+            return "Xserve"
+        }
+        return model
+    }
+
+    /// e.g. "8" or "2"
+    public static var activeCPUs: Int32 { try! Sysctl.value(ofType: Int32.self, forKeys: [CTL_HW, HW_AVAILCPU]) }
+
+    /// e.g. "15.3.0" or "15.0.0"
+    public static var osRelease: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSRELEASE]) }
+
+    /// e.g. "Darwin" or "Darwin"
+    public static var osType: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSTYPE]) }
+
+    /// e.g. "15D21" or "13D20"
+    public static var osVersion: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSVERSION]) }
+
+    /// e.g. "Darwin Kernel Version 15.3.0: Thu Dec 10 18:40:58 PST 2015; root:xnu-3248.30.4~1/RELEASE_X86_64" or
+    /// "Darwin Kernel Version 15.0.0: Wed Dec  9 22:19:38 PST 2015; root:xnu-3248.31.3~2/RELEASE_ARM64_S8000"
+    public static var version: String { try! Sysctl.string(for: [CTL_KERN, KERN_VERSION]) }
+
     /// Access the raw data for an array of sysctl identifiers.
     public static func data(for keys: [Int32]) throws -> [Int8] {
         try keys.withUnsafeBufferPointer { keysPointer throws -> [Int8] in
             // Preflight the request to get the required data size
             var requiredSize = 0
-            let preFlightResult = Darwin.sysctl(UnsafeMutablePointer<Int32>(mutating: keysPointer.baseAddress), keys.count.u32, nil, &requiredSize, nil, 0)
+            let preFlightResult = Darwin.sysctl(
+                UnsafeMutablePointer<Int32>(mutating: keysPointer.baseAddress),
+                keys.count.u32,
+                nil,
+                &requiredSize,
+                nil,
+                0
+            )
             if preFlightResult != 0 {
                 throw POSIXErrorCode(rawValue: errno).map {
                     print($0.rawValue)
@@ -45,7 +117,14 @@ public enum Sysctl {
             // Run the actual request with an appropriately sized array buffer
             let data = [Int8](repeating: 0, count: requiredSize)
             let result = data.withUnsafeBufferPointer { dataBuffer -> Int32 in
-                Darwin.sysctl(UnsafeMutablePointer<Int32>(mutating: keysPointer.baseAddress), keys.count.u32, UnsafeMutableRawPointer(mutating: dataBuffer.baseAddress), &requiredSize, nil, 0)
+                Darwin.sysctl(
+                    UnsafeMutablePointer<Int32>(mutating: keysPointer.baseAddress),
+                    keys.count.u32,
+                    UnsafeMutableRawPointer(mutating: dataBuffer.baseAddress),
+                    &requiredSize,
+                    nil,
+                    0
+                )
             }
             if result != 0 {
                 throw POSIXErrorCode(rawValue: errno).map { Error.posixError($0) } ?? Error.unknown
@@ -114,70 +193,6 @@ public enum Sysctl {
     public static func string(for name: String) throws -> String {
         try string(for: keys(for: name))
     }
-
-    /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
-    /// "My-Name-iPhone" (from Settings -> General -> About -> Name)
-    public static var hostName: String { try! Sysctl.string(for: [CTL_KERN, KERN_HOSTNAME]) }
-
-    /// e.g. "x86_64" or "N71mAP"
-    /// NOTE: this is *corrected* on iOS devices to fetch hw.model
-    public static var machine: String {
-        #if os(iOS) && !arch(x86_64) && !arch(i386)
-            return try! Sysctl.string(for: [CTL_HW, HW_MODEL])
-        #else
-            return try! Sysctl.string(for: [CTL_HW, HW_MACHINE])
-        #endif
-    }
-
-    /// e.g. "MacPro4,1" or "iPhone8,1"
-    /// NOTE: this is *corrected* on iOS devices to fetch hw.machine
-    public static var model: String = {
-        #if os(iOS) && !arch(x86_64) && !arch(i386)
-            return (try? Sysctl.string(for: [CTL_HW, HW_MACHINE])) ?? "Unknown"
-        #else
-            return (try? Sysctl.string(for: [CTL_HW, HW_MODEL])) ?? "Unknown"
-        #endif
-    }()
-
-    public static var modelLowercased: String = model.lowercased()
-
-    public static var isMacMini = modelLowercased.hasPrefix("macmini")
-
-    public static var device: String {
-        let model = modelLowercased
-        if model.hasPrefix("macpro") {
-            return "Mac Pro"
-        } else if model.hasPrefix("imac") {
-            return "iMac"
-        } else if model.hasPrefix("macbookpro") {
-            return "MacBook Pro"
-        } else if model.hasPrefix("macbookair") {
-            return "MacBook Air"
-        } else if model.hasPrefix("macbook") {
-            return "MacBook"
-        } else if model.hasPrefix("macmini") {
-            return "Mac Mini"
-        } else if model.hasPrefix("xserve") {
-            return "Xserve"
-        }
-        return model
-    }
-
-    /// e.g. "8" or "2"
-    public static var activeCPUs: Int32 { try! Sysctl.value(ofType: Int32.self, forKeys: [CTL_HW, HW_AVAILCPU]) }
-
-    /// e.g. "15.3.0" or "15.0.0"
-    public static var osRelease: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSRELEASE]) }
-
-    /// e.g. "Darwin" or "Darwin"
-    public static var osType: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSTYPE]) }
-
-    /// e.g. "15D21" or "13D20"
-    public static var osVersion: String { try! Sysctl.string(for: [CTL_KERN, KERN_OSVERSION]) }
-
-    /// e.g. "Darwin Kernel Version 15.3.0: Thu Dec 10 18:40:58 PST 2015; root:xnu-3248.30.4~1/RELEASE_X86_64" or
-    /// "Darwin Kernel Version 15.0.0: Wed Dec  9 22:19:38 PST 2015; root:xnu-3248.31.3~2/RELEASE_ARM64_S8000"
-    public static var version: String { try! Sysctl.string(for: [CTL_KERN, KERN_VERSION]) }
 
     #if os(macOS)
         /// e.g. 199506 (not available on iOS)

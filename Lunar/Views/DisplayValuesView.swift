@@ -13,7 +13,26 @@ let textFieldColor = sunYellow
 let textFieldColorHover = sunYellow.blended(withFraction: 0.2, of: red) ?? textFieldColor
 let textFieldColorLight = sunYellow.blended(withFraction: 0.4, of: red) ?? textFieldColor
 
+// MARK: - DisplayValuesView
+
 class DisplayValuesView: NSTableView {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+
+        for (_, observers) in displayObservers {
+            for observer in observers {
+                observer.cancel()
+            }
+        }
+    }
+
+    // MARK: Internal
+
     var displayObservers: [CGDirectDisplayID: Set<AnyCancellable>] = [:]
 
     override func draw(_ dirtyRect: NSRect) {
@@ -32,19 +51,6 @@ class DisplayValuesView: NSTableView {
                     adaptiveButton.toolTip = hidden ? "Disabled in Manual Mode" : ""
                     adaptiveButton.setColor()
                 }
-            }
-        }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-
-        for (_, observers) in displayObservers {
-            for observer in observers {
-                observer.cancel()
             }
         }
     }

@@ -9,11 +9,7 @@
 import Cocoa
 
 class TextButton: NSButton {
-    @IBInspectable var bgColor: CGColor = NSColor(deviceWhite: 1.0, alpha: 0.25).cgColor
-    @IBInspectable var hoverBgColor: CGColor = mauve.withAlphaComponent(0.5).cgColor
-    @IBInspectable var clickColor: NSColor = lunarYellow
-    @IBInspectable var textColor = mauve.withAlphaComponent(0.4)
-    @IBInspectable var hoverTextColor = white
+    // MARK: Lifecycle
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -24,6 +20,14 @@ class TextButton: NSButton {
         super.init(coder: coder)
         setup()
     }
+
+    // MARK: Internal
+
+    @IBInspectable var bgColor: CGColor = NSColor(deviceWhite: 1.0, alpha: 0.25).cgColor
+    @IBInspectable var hoverBgColor: CGColor = mauve.withAlphaComponent(0.5).cgColor
+    @IBInspectable var clickColor: NSColor = lunarYellow
+    @IBInspectable var textColor = mauve.withAlphaComponent(0.4)
+    @IBInspectable var hoverTextColor = white
 
     func setTitleColor(color: NSColor) {
         let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))

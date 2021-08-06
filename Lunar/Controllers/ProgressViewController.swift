@@ -10,6 +10,10 @@ import Cocoa
 
 class ProgressViewController: NSViewController {
     @objc dynamic var operationTitle: String = ""
+    @objc dynamic var operationDescription: NSAttributedString = "".attributedString
+    @IBOutlet var progressBar: NSProgressIndicator!
+    @IBOutlet var doneButton: Button!
+
     @objc dynamic var done: Bool = false {
         didSet {
             if done {
@@ -17,10 +21,6 @@ class ProgressViewController: NSViewController {
             }
         }
     }
-
-    @objc dynamic var operationDescription: NSAttributedString = "".attributedString
-    @IBOutlet var progressBar: NSProgressIndicator!
-    @IBOutlet var doneButton: Button!
 
     @IBAction func onDoneClicked(_: Any) {
         view.window?.close()

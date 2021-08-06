@@ -80,16 +80,20 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
+// MARK: - AppDelegate
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
+    // MARK: Internal
+
+    enum UIElement {
+        case gear
+        case advancedSettingsButton
+    }
+
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
-    var windowController: ModernWindowController? {
-        get { _windowControllerLock.around { _windowController } }
-        set { _windowControllerLock.around { _windowController = newValue } }
-    }
-
     var alsWindowController: ModernWindowController?
     var sshWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
@@ -127,6 +131,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var lunarProMenuItem: NSMenuItem!
     @IBOutlet var activateLicenseMenuItem: NSMenuItem!
     @IBOutlet var faceLightMenuItem: NSMenuItem!
+    @IBOutlet var blackOutMenuItem: NSMenuItem!
 
     @Atomic var faceLightOn = false
 
@@ -139,6 +144,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
+    var uiElement: UIElement?
+
+    var didBecomeActiveAtLeastOnce = false
+    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
+
+    var currentPage: Int = 2
+
+    var windowController: ModernWindowController? {
+        get { _windowControllerLock.around { _windowController } }
+        set { _windowControllerLock.around { _windowController = newValue } }
+    }
+
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
@@ -148,13 +165,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func checkForUpdates(_: Any) {
         updater.checkForUpdates()
     }
-
-    enum UIElement {
-        case gear
-        case advancedSettingsButton
-    }
-
-    var uiElement: UIElement?
 
     func application(_: NSApplication, open urls: [URL]) {
         for url in urls {
@@ -278,10 +288,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         mainAsyncAfter(ms: ms) { [self] in
             createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
         }
-    }
-
-    @objc private func activate() {
-        NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
 
     func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
@@ -435,7 +441,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return true
     }
 
-    var didBecomeActiveAtLeastOnce = false
     func applicationDidBecomeActive(_: Notification) {
         if didBecomeActiveAtLeastOnce, CachedDefaults[.hideMenuBarIcon] {
             showWindow()
@@ -659,8 +664,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         )
     }
 
-    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
-
     func addObservers() {
         dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
@@ -839,7 +842,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .first { item in item.processIdentifier != getpid() }
 
         if let app = runningApp, app.forceTerminate() {
-            notify(identifier: "lunar-single-instance", title: "Lunar was already running", body: "The other instance was terminated and this instance will now continue to run normally.")
+            notify(
+                identifier: "lunar-single-instance",
+                title: "Lunar was already running",
+                body: "The other instance was terminated and this instance will now continue to run normally."
+            )
         }
 
         DDC.setup()
@@ -1006,7 +1013,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    var currentPage: Int = 2
     func resetElements() {
         mainThread {
             if let splitView = windowController?.window?.contentViewController as? SplitViewController {
@@ -1036,7 +1042,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        currentAudioDisplay _: Bool = true
+        currentAudioDisplay: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
         serialQueue
@@ -1045,7 +1051,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     by: amount,
                     for: displays,
                     currentDisplay: currentDisplay,
-                    currentAudioDisplay: currentDisplay
+                    currentAudioDisplay: currentAudioDisplay
                 )
             }
     }
@@ -1054,7 +1060,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        currentAudioDisplay _: Bool = true
+        currentAudioDisplay: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
         serialQueue
@@ -1063,7 +1069,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     by: -amount,
                     for: displays,
                     currentDisplay: currentDisplay,
-                    currentAudioDisplay: currentDisplay
+                    currentAudioDisplay: currentAudioDisplay
                 )
             }
     }
@@ -1227,5 +1233,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
         }
+    }
+
+    // MARK: Private
+
+    @objc private func activate() {
+        NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
 }

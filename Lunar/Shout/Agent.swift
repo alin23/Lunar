@@ -9,20 +9,7 @@
 
 /// Direct bindings to libssh2_agent
 class Agent {
-    class PublicKey: CustomStringConvertible {
-        fileprivate let cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>
-
-        var description: String {
-            "Public key: " + String(cString: cIdentity.pointee.comment)
-        }
-
-        init(cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>) {
-            self.cIdentity = cIdentity
-        }
-    }
-
-    private let cSession: OpaquePointer
-    private let cAgent: OpaquePointer
+    // MARK: Lifecycle
 
     init(cSession: OpaquePointer) throws {
         guard let cAgent = libssh2_agent_init(cSession) else {
@@ -30,6 +17,35 @@ class Agent {
         }
         self.cSession = cSession
         self.cAgent = cAgent
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        libssh2_agent_disconnect(cAgent)
+        libssh2_agent_free(cAgent)
+    }
+
+    // MARK: Internal
+
+    class PublicKey: CustomStringConvertible {
+        // MARK: Lifecycle
+
+        init(cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>) {
+            self.cIdentity = cIdentity
+        }
+
+        // MARK: Internal
+
+        var description: String {
+            "Public key: " + String(cString: cIdentity.pointee.comment)
+        }
+
+        // MARK: Fileprivate
+
+        fileprivate let cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>
     }
 
     func connect() throws {
@@ -64,12 +80,8 @@ class Agent {
         return code == 0
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        libssh2_agent_disconnect(cAgent)
-        libssh2_agent_free(cAgent)
-    }
+    // MARK: Private
+
+    private let cSession: OpaquePointer
+    private let cAgent: OpaquePointer
 }

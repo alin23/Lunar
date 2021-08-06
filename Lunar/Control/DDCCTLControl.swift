@@ -10,6 +10,14 @@ import Cocoa
 import Foundation
 
 struct DDCCTLControl: Control {
+    // MARK: Lifecycle
+
+    init(display: Display) {
+        self.display = display
+    }
+
+    // MARK: Internal
+
     static let ddcctlBinary = Bundle.main.path(forResource: "ddcctl", ofType: nil)!
 
     var display: Display!
@@ -20,10 +28,6 @@ struct DDCCTLControl: Control {
 
     var displayIndex: Int? {
         display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
-    }
-
-    init(display: Display) {
-        self.display = display
     }
 
     func propertyArg(_ property: ControlID) -> String {

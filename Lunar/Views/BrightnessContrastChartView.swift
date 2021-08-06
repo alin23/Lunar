@@ -11,6 +11,19 @@ import Cocoa
 import SwiftDate
 
 class BrightnessContrastChartView: LineChartView {
+    // MARK: Lifecycle
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+
+    // MARK: Internal
+
     let brightnessGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Brightness")
     let contrastGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Contrast")
     let graphData = LineChartData()
@@ -349,7 +362,7 @@ class BrightnessContrastChartView: LineChartView {
         legend.yOffset = 68.0
         legend.xOffset = 36.0
         legend.form = .square
-        legend.formSize = 14.0
+        legend.formSize = 18.0
         legend.orientation = .vertical
 
         legend.setCustom(entries: [
@@ -422,14 +435,5 @@ class BrightnessContrastChartView: LineChartView {
         noDataText = ""
         noDataTextColor = .clear
         animate(yAxisDuration: 1.5, easingOption: ChartEasingOption.easeOutExpo)
-    }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setup()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
     }
 }

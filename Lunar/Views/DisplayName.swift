@@ -9,6 +9,20 @@
 import Cocoa
 
 class DisplayName: NSTextField, NSTextFieldDelegate {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     var centerAlign: NSParagraphStyle?
     var trackingArea: NSTrackingArea?
 
@@ -36,16 +50,6 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
         needsDisplay = true
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func mouseEntered(with _: NSEvent) {

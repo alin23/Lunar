@@ -7,13 +7,17 @@
 
 import Foundation
 
+// MARK: - SSHAuthMethod
+
 public protocol SSHAuthMethod {
     func authenticate(ssh: SSH, username: String) throws
 }
 
+// MARK: - SSHPassword
+
 /// Password-based authentication method
 public struct SSHPassword: SSHAuthMethod {
-    let password: String
+    // MARK: Lifecycle
 
     /// Creates a new password-based authentication using the given password
     ///
@@ -22,15 +26,27 @@ public struct SSHPassword: SSHAuthMethod {
         self.password = password
     }
 
+    // MARK: Public
+
     public func authenticate(ssh: SSH, username: String) throws {
         try ssh.session.authenticate(username: username, password: password)
     }
+
+    // MARK: Internal
+
+    let password: String
 }
+
+// MARK: - SSHAgent
 
 /// Agent-based authentication method
 public struct SSHAgent: SSHAuthMethod {
+    // MARK: Lifecycle
+
     /// Creates a new agent-based authentication
     public init() {}
+
+    // MARK: Public
 
     public func authenticate(ssh: SSH, username: String) throws {
         let agent = try ssh.session.openAgent()
@@ -52,11 +68,11 @@ public struct SSHAgent: SSHAuthMethod {
     }
 }
 
+// MARK: - SSHKey
+
 /// Key-based authentication method
 public struct SSHKey: SSHAuthMethod {
-    public let privateKey: String
-    public let publicKey: String
-    public let passphrase: String?
+    // MARK: Lifecycle
 
     /// Creates a new key-based authentication
     ///
@@ -73,6 +89,12 @@ public struct SSHKey: SSHAuthMethod {
         }
         self.passphrase = passphrase
     }
+
+    // MARK: Public
+
+    public let privateKey: String
+    public let publicKey: String
+    public let passphrase: String?
 
     public func authenticate(ssh: SSH, username: String) throws {
         // If programatically given a passphrase, use it

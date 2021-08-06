@@ -22,16 +22,22 @@ let DDC_MIN_REPLY_DELAY_AMD = 30_000_000
 let DDC_MIN_REPLY_DELAY_INTEL = 1
 let DDC_MIN_REPLY_DELAY_NVIDIA = 1
 
+// MARK: - DDCReadResult
+
 struct DDCReadResult {
     var controlID: ControlID
     var maxValue: UInt8
     var currentValue: UInt8
 }
 
+// MARK: - EDIDTextType
+
 enum EDIDTextType: UInt8 {
     case name = 0xFC
     case serial = 0xFF
 }
+
+// MARK: - InputSource
 
 enum InputSource: UInt8, CaseIterable {
     case vga1 = 1
@@ -54,6 +60,53 @@ enum InputSource: UInt8, CaseIterable {
     case hdmi2 = 18
     case usbC = 27
     case unknown = 246
+
+    // MARK: Lifecycle
+
+    init?(stringValue: String) {
+        switch #"[^\w\s]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
+        case "vga": self = .vga1
+        case "vga1": self = .vga1
+        case "vga2": self = .vga2
+        case "dvi": self = .dvi1
+        case "dvi1": self = .dvi1
+        case "dvi2": self = .dvi2
+        case "composite": self = .compositeVideo1
+        case "compositevideo": self = .compositeVideo1
+        case "compositevideo1": self = .compositeVideo1
+        case "compositevideo2": self = .compositeVideo2
+        case "svideo": self = .sVideo1
+        case "svideo1": self = .sVideo1
+        case "svideo2": self = .sVideo2
+        case "tuner": self = .tuner1
+        case "tuner1": self = .tuner1
+        case "tuner2": self = .tuner2
+        case "tuner3": self = .tuner3
+        case "component": self = .componentVideoYPrPbYCrCb1
+        case "componentvideo": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb1": self = .componentVideoYPrPbYCrCb1
+        case "componentvideoyprpbycrcb2": self = .componentVideoYPrPbYCrCb2
+        case "componentvideoyprpbycrcb3": self = .componentVideoYPrPbYCrCb3
+        case "dp": self = .displayPort1
+        case "minidp": self = .displayPort1
+        case "minidisplayport": self = .displayPort1
+        case "displayport": self = .displayPort1
+        case "displayport1": self = .displayPort1
+        case "displayport2": self = .displayPort2
+        case "hdmi": self = .hdmi1
+        case "hdmi1": self = .hdmi1
+        case "hdmi2": self = .hdmi2
+        case "thunderbolt": self = .usbC
+        case "thunderbolt3": self = .usbC
+        case "usbc": self = .usbC
+        case "unknown": self = .unknown
+        default:
+            return nil
+        }
+    }
+
+    // MARK: Internal
 
     static var mostUsed: [InputSource] {
         [.usbC, .displayPort1, .displayPort2, .hdmi1, .hdmi2]
@@ -106,54 +159,13 @@ enum InputSource: UInt8, CaseIterable {
         case .unknown: return "Unknown"
         }
     }
-
-    init?(stringValue: String) {
-        switch #"[^\w\s]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
-        case "vga": self = .vga1
-        case "vga1": self = .vga1
-        case "vga2": self = .vga2
-        case "dvi": self = .dvi1
-        case "dvi1": self = .dvi1
-        case "dvi2": self = .dvi2
-        case "composite": self = .compositeVideo1
-        case "compositevideo": self = .compositeVideo1
-        case "compositevideo1": self = .compositeVideo1
-        case "compositevideo2": self = .compositeVideo2
-        case "svideo": self = .sVideo1
-        case "svideo1": self = .sVideo1
-        case "svideo2": self = .sVideo2
-        case "tuner": self = .tuner1
-        case "tuner1": self = .tuner1
-        case "tuner2": self = .tuner2
-        case "tuner3": self = .tuner3
-        case "component": self = .componentVideoYPrPbYCrCb1
-        case "componentvideo": self = .componentVideoYPrPbYCrCb1
-        case "componentvideoyprpbycrcb": self = .componentVideoYPrPbYCrCb1
-        case "componentvideoyprpbycrcb1": self = .componentVideoYPrPbYCrCb1
-        case "componentvideoyprpbycrcb2": self = .componentVideoYPrPbYCrCb2
-        case "componentvideoyprpbycrcb3": self = .componentVideoYPrPbYCrCb3
-        case "dp": self = .displayPort1
-        case "minidp": self = .displayPort1
-        case "minidisplayport": self = .displayPort1
-        case "displayport": self = .displayPort1
-        case "displayport1": self = .displayPort1
-        case "displayport2": self = .displayPort2
-        case "hdmi": self = .hdmi1
-        case "hdmi1": self = .hdmi1
-        case "hdmi2": self = .hdmi2
-        case "thunderbolt": self = .usbC
-        case "thunderbolt3": self = .usbC
-        case "usbc": self = .usbC
-        case "unknown": self = .unknown
-        default:
-            return nil
-        }
-    }
 }
 
 let inputSourceMapping: [String: InputSource] = Dictionary(uniqueKeysWithValues: InputSource.allCases.map { input in
     (input.displayName(), input)
 })
+
+// MARK: - ControlID
 
 enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
     case RESET = 0x04
@@ -203,6 +215,8 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
     case TOP_RIGHT_SCREEN_PURITY = 0xE9
     case BOTTOM_LEFT_SCREEN_PURITY = 0xEA
     case BOTTOM_RIGHT_SCREEN_PURITY = 0xEB
+
+    // MARK: Lifecycle
 
     init?(argument: String) {
         var arg = argument
@@ -276,6 +290,7 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
     #if arch(arm64)
         DDC.avServiceCache.removeAll(keepingCapacity: true)
+        displayController.clcd2Mapping.removeAll(keepingCapacity: true)
     #else
         DDC.i2cControllerCache.removeAll(keepingCapacity: true)
     #endif
@@ -285,6 +300,8 @@ func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
         display.startI2CDetection()
     }
 }
+
+// MARK: - DDC
 
 enum DDC {
     static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
@@ -303,6 +320,47 @@ enum DDC {
     static var notifyPort: IONotificationPortRef?
     static var addedIter: io_iterator_t = 0
     static var runLoop: CFRunLoop?
+
+    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
+
+    static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
+        extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
+    }
+
+    static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
+        if let q = DispatchQueue.current, q == queue {
+            return action()
+        } else {
+            return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
+        }
+    }
+
+    #if arch(arm64)
+        static var avServiceCache: [CGDirectDisplayID: IOAVService?] = Dictionary(minimumCapacity: 10)
+
+        static func hasAVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> Bool {
+            guard !isTestID(displayID) else { return false }
+            return AVService(displayID: displayID, display: display, ignoreCache: ignoreCache) != nil
+        }
+
+        static func AVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> IOAVService? {
+            guard !isTestID(displayID) else { return nil }
+
+            return sync(barrier: true) {
+                if !ignoreCache, let serviceTemp = avServiceCache[displayID], let service = serviceTemp {
+                    return service
+                }
+                let service = (
+                    displayController.avService(displayID: displayID, display: display, match: .byEDIDUUID) ??
+                        displayController.avService(displayID: displayID, display: display, match: .byProductAttributes)
+                )
+                avServiceCache[displayID] = service
+                return service
+            }
+        }
+    #endif
+
+    static var i2cControllerCache: [CGDirectDisplayID: io_service_t?] = Dictionary(minimumCapacity: 10)
 
     static func setup() {
         notifyPort = IONotificationPortCreate(kIOMasterPortDefault)
@@ -403,8 +461,6 @@ enum DDC {
         #endif
     }
 
-    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
-
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
         var result = false
         guard !isGeneric(id) else {
@@ -428,7 +484,10 @@ enum DDC {
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
         !isGeneric(id) &&
-            (CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || Display.printableName(id).stripped == "Built-in Retina Display")
+            (
+                CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || Display.printableName(id)
+                    .stripped == "Built-in Retina Display"
+            )
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
@@ -726,45 +785,6 @@ enum DDC {
     static func extractName(from edid: EDID, hex: Bool = false) -> String? {
         extractDescriptorText(from: edid, desType: EDIDTextType.name, hex: hex)
     }
-
-    static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
-        extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
-    }
-
-    static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
-        if let q = DispatchQueue.current, q == queue {
-            return action()
-        } else {
-            return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
-        }
-    }
-
-    #if arch(arm64)
-        static var avServiceCache: [CGDirectDisplayID: IOAVService?] = Dictionary(minimumCapacity: 10)
-
-        static func hasAVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> Bool {
-            guard !isTestID(displayID) else { return false }
-            return AVService(displayID: displayID, display: display, ignoreCache: ignoreCache) != nil
-        }
-
-        static func AVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> IOAVService? {
-            guard !isTestID(displayID) else { return nil }
-
-            return sync(barrier: true) {
-                if !ignoreCache, let serviceTemp = avServiceCache[displayID], let service = serviceTemp {
-                    return service
-                }
-                let service = (
-                    displayController.avService(displayID: displayID, display: display, match: .byEDIDUUID) ??
-                        displayController.avService(displayID: displayID, display: display, match: .byProductAttributes)
-                )
-                avServiceCache[displayID] = service
-                return service
-            }
-        }
-    #endif
-
-    static var i2cControllerCache: [CGDirectDisplayID: io_service_t?] = Dictionary(minimumCapacity: 10)
 
     static func hasI2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
         guard !isTestID(displayID) else { return false }

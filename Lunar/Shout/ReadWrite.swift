@@ -16,6 +16,12 @@ enum ReadWriteProcessor {
         case error(SSHError)
     }
 
+    enum WriteResult {
+        case written(Int)
+        case eagain
+        case error(SSHError)
+    }
+
     static func processRead(result: Int, buffer: inout [Int8], session: OpaquePointer) -> ReadResult {
         if result > 0 {
             let data = Data(bytes: &buffer, count: result)
@@ -27,12 +33,6 @@ enum ReadWriteProcessor {
         } else {
             return .error(SSHError.codeError(code: Int32(result), session: session))
         }
-    }
-
-    enum WriteResult {
-        case written(Int)
-        case eagain
-        case error(SSHError)
     }
 
     static func processWrite(result: Int, session: OpaquePointer) -> WriteResult {

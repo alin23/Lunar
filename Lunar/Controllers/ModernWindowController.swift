@@ -9,6 +9,8 @@
 import Cocoa
 import Magnet
 
+// MARK: - AppDelegate + NSWindowDelegate
+
 extension AppDelegate: NSWindowDelegate {
     func windowWillClose(_ n: Notification) {
         log.info("Window closing")
@@ -64,7 +66,20 @@ extension AppDelegate: NSWindowDelegate {
     }
 }
 
+// MARK: - ModernWindowController
+
 class ModernWindowController: NSWindowController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            do { log.verbose("END DEINIT") }
+        #endif
+    }
+
+    // MARK: Internal
+
     func initPopover<T: NSViewController>(
         _ popoverKey: String,
         identifier: String,
@@ -110,12 +125,5 @@ class ModernWindowController: NSWindowController {
                 log.warning("No window found")
             }
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            do { log.verbose("END DEINIT") }
-        #endif
     }
 }

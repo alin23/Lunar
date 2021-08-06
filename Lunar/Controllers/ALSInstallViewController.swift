@@ -33,8 +33,35 @@ func getDevices() -> [String] {
     return devicePaths
 }
 
+// MARK: - ALSInstallViewController
+
 class ALSInstallViewController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.debug("DEINIT")
+        #endif
+    }
+
+    // MARK: Internal
+
     @objc dynamic var operationTitle: String = "Ambient Light Sensor"
+    @objc dynamic var operationDescription: NSAttributedString =
+        "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
+            .attributedString
+    @IBOutlet var progressBar: NSProgressIndicator!
+    @IBOutlet var installButton: PaddedButton!
+
+    var installProcess: Process?
+    var stopped = true
+
+    @objc dynamic var devices: [String] = []
+
+    lazy var onClick: (() -> Void)? = { [weak self] in
+        self?.startFirmwareInstallation()
+    }
+
     @objc dynamic var board: String = SELECT_BOARD_ITEM {
         didSet {
             setInstallButtonEnabled()
@@ -97,17 +124,6 @@ class ALSInstallViewController: NSViewController {
         }
     }
 
-    @objc dynamic var operationDescription: NSAttributedString =
-        "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
-            .attributedString
-    @IBOutlet var progressBar: NSProgressIndicator!
-    @IBOutlet var installButton: PaddedButton!
-
-    var installProcess: Process?
-    var stopped = true
-
-    @objc dynamic var devices: [String] = []
-
     @objc dynamic var ssid: String? = "WiFi" {
         didSet {
             setInstallButtonEnabled()
@@ -118,10 +134,6 @@ class ALSInstallViewController: NSViewController {
         didSet {
             setInstallButtonEnabled()
         }
-    }
-
-    lazy var onClick: (() -> Void)? = { [weak self] in
-        self?.startFirmwareInstallation()
     }
 
     @IBAction func onDoneClicked(_: Any) {
@@ -242,13 +254,9 @@ class ALSInstallViewController: NSViewController {
             "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
                 .attributedString
     }
-
-    deinit {
-        #if DEBUG
-            log.debug("DEINIT")
-        #endif
-    }
 }
+
+// MARK: NSControlTextEditingDelegate
 
 extension ALSInstallViewController: NSControlTextEditingDelegate {
     public func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {

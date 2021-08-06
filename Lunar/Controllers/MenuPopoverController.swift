@@ -25,7 +25,29 @@ func buttonBackgroundColor(mode: AdaptiveModeKey) -> NSColor {
     buttonDotColor[mode]!.withAlphaComponent(0.9)
 }
 
+// MARK: - MenuPopoverController
+
 class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
+    // MARK: Lifecycle
+
+    override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        listenForPopoverEvents()
+        listenForAdaptiveModeChange()
+        listenForDisplaysChange()
+        listenForResponsiveDDCChange()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        listenForPopoverEvents()
+        listenForAdaptiveModeChange()
+        listenForDisplaysChange()
+        listenForResponsiveDDCChange()
+    }
+
+    // MARK: Internal
+
     @IBOutlet var activeModeButton: PopUpButton!
 
     @IBOutlet var tableView: DisplayValuesView!
@@ -40,6 +62,8 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var trackingArea: NSTrackingArea?
     var responsiveDDCObservers = [String: AnyCancellable](minimumCapacity: 10)
     var observers = [String: AnyCancellable](minimumCapacity: 3)
+
+    var pausedAdaptiveModeObserver: Bool = false
 
     func listenForPopoverEvents() {
         NotificationCenter.default
@@ -59,22 +83,6 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
             .sink { [weak self] _ in self?.popoverDidClose() }
             .store(in: &observers, for: "popoverDidClose")
-    }
-
-    override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        listenForPopoverEvents()
-        listenForAdaptiveModeChange()
-        listenForDisplaysChange()
-        listenForResponsiveDDCChange()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        listenForPopoverEvents()
-        listenForAdaptiveModeChange()
-        listenForDisplaysChange()
-        listenForResponsiveDDCChange()
     }
 
     override func viewDidLoad() {
@@ -182,8 +190,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 let sameDisplayCount = newDisplays.count == currentDisplayCount
                 let serial = { (d1: Display, d2: Display) -> Bool in d1.serial < d2.serial }
                 let sameDisplays = sameDisplayCount && zip(
-                    self.displays.sorted(by: serial), newDisplays.sorted(by: serial)
-                ).allSatisfy { d1, d2 in d1.serial == d2.serial && d1.adaptive == d2.adaptive && d1.active == d2.active && d1.responsiveDDC == d2.responsiveDDC }
+                    self.displays.sorted(by: serial),
+                    newDisplays.sorted(by: serial)
+                )
+                .allSatisfy { d1, d2 in
+                    d1.serial == d2.serial && d1.adaptive == d2.adaptive && d1.active == d2.active && d1.responsiveDDC == d2.responsiveDDC
+                }
 
                 if !sameDisplays {
                     self.setValue(
@@ -230,8 +242,6 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 .store(in: &observers, for: display.serial)
         }
     }
-
-    var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
         adaptiveBrightnessModePublisher

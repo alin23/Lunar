@@ -10,7 +10,22 @@ import Cocoa
 import Defaults
 import Magnet
 
+// MARK: - HotkeyViewController
+
 class HotkeyViewController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+
+        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
+    }
+
+    // MARK: Internal
+
     @IBOutlet var toggleHotkeyView: HotkeyView!
     @IBOutlet var lunarHotkeyView: HotkeyView!
     @IBOutlet var percent0HotkeyView: HotkeyView!
@@ -26,6 +41,7 @@ class HotkeyViewController: NSViewController {
     @IBOutlet var volumeUpHotkeyView: HotkeyView!
     @IBOutlet var muteAudioHotkeyView: HotkeyView!
     @IBOutlet var faceLightHotkeyView: HotkeyView!
+    @IBOutlet var blackOutHotkeyView: HotkeyView!
 
     @IBOutlet var preciseBrightnessUpCheckbox: NSButton!
     @IBOutlet var preciseBrightnessDownCheckbox: NSButton!
@@ -88,6 +104,7 @@ class HotkeyViewController: NSViewController {
         percent75HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent75.rawValue }
         percent100HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent100.rawValue }
         faceLightHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.faceLight.rawValue }
+        blackOutHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.blackOut.rawValue }
 
         brightnessUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessUp.rawValue }
         brightnessDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessDown.rawValue }
@@ -156,15 +173,6 @@ class HotkeyViewController: NSViewController {
         cachedFnState = Defaults[.fKeysAsFunctionKeys]
         setupFKeysNotice(asFunctionKeys: cachedFnState)
         asyncEvery(10.seconds, uniqueTaskKey: F_KEYS_SETTING_WATCHER_KEY) { _ in handler() }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-
-        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
     }
 
     override func viewDidDisappear() {

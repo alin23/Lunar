@@ -12,8 +12,37 @@ import Path
 let SSH_DIR = Path.home / ".ssh"
 let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
+// MARK: - SSHConnectionViewController
+
 @objc class SSHConnectionViewController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        cancel(self)
+    }
+
+    // MARK: Internal
+
     @IBOutlet var sshKeyCheckbox: NSButton!
+    var sshKey: String?
+    @objc dynamic var port: String = "22"
+    @objc dynamic var password: String? = "raspberry"
+    @objc dynamic var passphrase: String?
+    @objc dynamic var connectionMessage: String?
+
+    @IBOutlet var chooseSSHKeyButton: PaddedButton!
+    @IBOutlet var sshKeyMessage: NSTextField!
+    @IBOutlet var installButton: PaddedButton!
+    @IBOutlet var cancelButton: PaddedButton!
+    @IBOutlet var connectingIndicator: NSProgressIndicator!
+    var onInstall: ((SSH) -> Void)?
+    var commandChannel: Channel?
+    var cancelled = false
+
     @objc dynamic var sshKeySelected: Bool = false {
         didSet {
             setInstallButtonEnabled()
@@ -46,7 +75,6 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
         }
     }
 
-    var sshKey: String?
     var sshKeyPath: Path? {
         didSet {
             setInstallButtonEnabled()
@@ -65,20 +93,6 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
         }
     }
 
-    @objc dynamic var port: String = "22"
-    @objc dynamic var password: String? = "raspberry"
-    @objc dynamic var passphrase: String?
-    @objc dynamic var connectionMessage: String?
-
-    @IBOutlet var chooseSSHKeyButton: PaddedButton!
-    @IBOutlet var sshKeyMessage: NSTextField!
-    @IBOutlet var installButton: PaddedButton!
-    @IBOutlet var cancelButton: PaddedButton!
-    @IBOutlet var connectingIndicator: NSProgressIndicator!
-    var onInstall: ((SSH) -> Void)?
-    var commandChannel: Channel?
-    var cancelled = false
-
     override func viewDidLoad() {
         super.viewDidLoad()
         sshKeyCheckbox.attributedTitle = sshKeyCheckbox.title.withAttribute(.textColor(white))
@@ -86,7 +100,8 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
     }
 
     func setInstallButtonEnabled() {
-        installButton.isEnabled = !(hostname?.isEmpty ?? true) && !(username?.isEmpty ?? true) && (sshKeySelected ? sshKeyPath != nil : true)
+        installButton
+            .isEnabled = !(hostname?.isEmpty ?? true) && !(username?.isEmpty ?? true) && (sshKeySelected ? sshKeyPath != nil : true)
         installButton.fade()
     }
 
@@ -235,13 +250,5 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
                 self.cancellingCommand = false
             }
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        cancel(self)
     }
 }

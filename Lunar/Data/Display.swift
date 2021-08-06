@@ -166,14 +166,18 @@ var INITIAL_GAMMA_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MAX_VALUES = [CGDirectDisplayID: Gamma]()
 var INITIAL_MIN_VALUES = [CGDirectDisplayID: Gamma]()
 
+// MARK: - Transport
+
 struct Transport: Equatable, CustomStringConvertible {
+    var upstream: String
+    var downstream: String
+
     var description: String {
         "Transport(up: \(upstream), down: \(downstream))"
     }
-
-    var upstream: String
-    var downstream: String
 }
+
+// MARK: - Gamma
 
 struct Gamma: Equatable {
     var red: CGGammaValue
@@ -195,29 +199,466 @@ struct Gamma: Equatable {
     }
 }
 
+// MARK: - ValueType
+
 enum ValueType {
     case brightness
     case contrast
 }
 
-// MARK: Display Class
+// MARK: - Display
 
 @objc class Display: NSObject, Codable, Defaults.Serializable {
-    override var description: String {
-        "\(name)[\(serial): \(id)]"
-    }
+    // MARK: Lifecycle
 
-    override var hash: Int {
-        var hasher = Hasher()
-        hasher.combine(serial)
-        return hasher.finalize()
-    }
+    // MARK: Initializers
 
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? Display else {
-            return false
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
+        let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
+        let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
+        let brightnessCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
+        let contrastCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
+
+        _id = try container.decode(CGDirectDisplayID.self, forKey: .id)
+        serial = try container.decode(String.self, forKey: .serial)
+
+        adaptive = try container.decode(Bool.self, forKey: .adaptive)
+        name = try container.decode(String.self, forKey: .name)
+        edidName = try container.decode(String.self, forKey: .edidName)
+        active = try container.decode(Bool.self, forKey: .active)
+
+        brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
+        contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
+        minBrightness = (try container.decode(UInt8.self, forKey: .minBrightness)).ns
+        maxBrightness = (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
+        minContrast = (try container.decode(UInt8.self, forKey: .minContrast)).ns
+        maxContrast = (try container.decode(UInt8.self, forKey: .maxContrast)).ns
+
+        defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
+        defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
+        defaultGammaRedValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedValue)?.ns) ?? 1.ns
+        defaultGammaGreenMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMin)?.ns) ?? 0.ns
+        defaultGammaGreenMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMax)?.ns) ?? 1.ns
+        defaultGammaGreenValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenValue)?.ns) ?? 1.ns
+        defaultGammaBlueMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMin)?.ns) ?? 0.ns
+        defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
+        defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
+
+        maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
+        maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
+        maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+
+        lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
+        lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
+
+        lockedBrightnessCurve = try container.decode(Bool.self, forKey: .lockedBrightnessCurve)
+        lockedContrastCurve = try container.decode(Bool.self, forKey: .lockedContrastCurve)
+
+        alwaysUseNetworkControl = try container.decode(Bool.self, forKey: .alwaysUseNetworkControl)
+        neverUseNetworkControl = try container.decode(Bool.self, forKey: .neverUseNetworkControl)
+        alwaysFallbackControl = try container.decode(Bool.self, forKey: .alwaysFallbackControl)
+        neverFallbackControl = try container.decode(Bool.self, forKey: .neverFallbackControl)
+
+        volume = (try container.decode(UInt8.self, forKey: .volume)).ns
+        audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
+        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
+        applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
+        input = (try container.decode(UInt8.self, forKey: .input)).ns
+
+        hotkeyInput1 = try (
+            (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
+        )
+        hotkeyInput2 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
+        hotkeyInput3 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
+
+        brightnessOnInputChange1 = (
+            try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
+        )
+        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
+        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
+
+        contrastOnInputChange1 = try (
+            (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
+        )
+        contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
+        contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
+
+        if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
+            userBrightness[.sync] = syncUserBrightness.threadSafe
         }
-        return serial == other.serial
+        if let sensorUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
+            userBrightness[.sensor] = sensorUserBrightness.threadSafe
+        }
+        if let locationUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
+            userBrightness[.location] = locationUserBrightness.threadSafe
+        }
+        if let manualUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
+            userBrightness[.manual] = manualUserBrightness.threadSafe
+        }
+
+        if let syncUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
+            userContrast[.sync] = syncUserContrast.threadSafe
+        }
+        if let sensorUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
+            userContrast[.sensor] = sensorUserContrast.threadSafe
+        }
+        if let locationUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
+            userContrast[.location] = locationUserContrast.threadSafe
+        }
+        if let manualUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
+            userContrast[.manual] = manualUserContrast.threadSafe
+        }
+
+        if let networkControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .network) {
+            enabledControls[.network] = networkControlEnabled
+        }
+        if let coreDisplayControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .coreDisplay) {
+            enabledControls[.coreDisplay] = coreDisplayControlEnabled
+        }
+        if let ddcControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .ddc) {
+            enabledControls[.ddc] = ddcControlEnabled
+        }
+        if let gammaControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .gamma) {
+            enabledControls[.gamma] = gammaControlEnabled
+        }
+
+        if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
+            brightnessCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let syncFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
+            brightnessCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let locationFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
+            brightnessCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
+        }
+        if let manualFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
+            brightnessCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
+        }
+
+        if let sensorFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
+            contrastCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
+        }
+        if let syncFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
+            contrastCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
+        }
+        if let locationFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
+            contrastCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
+        }
+        if let manualFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
+            contrastCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
+        }
+
+        super.init()
+
+        if let dict = displayInfoDictionary(id) {
+            infoDictionary = dict
+        }
+
+        setupHotkeys()
+    }
+
+    init(
+        id: CGDirectDisplayID,
+        brightness: UInt8 = 50,
+        contrast: UInt8 = 50,
+        serial: String? = nil,
+        name: String? = nil,
+        active: Bool = false,
+        minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS,
+        maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS,
+        minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
+        maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
+        adaptive: Bool = true,
+        maxDDCBrightness: UInt8 = 100,
+        maxDDCContrast: UInt8 = 100,
+        maxDDCVolume: UInt8 = 100,
+        lockedBrightness: Bool = false,
+        lockedContrast: Bool = false,
+        lockedBrightnessCurve: Bool = false,
+        lockedContrastCurve: Bool = false,
+        volume: UInt8 = 10,
+        audioMuted: Bool = false,
+        input: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput1: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput2: UInt8 = InputSource.unknown.rawValue,
+        hotkeyInput3: UInt8 = InputSource.unknown.rawValue,
+        userBrightness: [AdaptiveModeKey: [Int: Int]]? = nil,
+        userContrast: [AdaptiveModeKey: [Int: Int]]? = nil,
+        alwaysUseNetworkControl: Bool = false,
+        neverUseNetworkControl: Bool = false,
+        alwaysFallbackControl: Bool = false,
+        neverFallbackControl: Bool = false,
+        enabledControls: [DisplayControl: Bool]? = nil,
+        brightnessOnInputChange1: UInt8 = 100,
+        brightnessOnInputChange2: UInt8 = 100,
+        brightnessOnInputChange3: UInt8 = 100,
+        contrastOnInputChange1: UInt8 = 75,
+        contrastOnInputChange2: UInt8 = 75,
+        contrastOnInputChange3: UInt8 = 75,
+        defaultGammaRedMin: Float = 0.0,
+        defaultGammaRedMax: Float = 1.0,
+        defaultGammaRedValue: Float = 1.0,
+        defaultGammaGreenMin: Float = 0.0,
+        defaultGammaGreenMax: Float = 1.0,
+        defaultGammaGreenValue: Float = 1.0,
+        defaultGammaBlueMin: Float = 0.0,
+        defaultGammaBlueMax: Float = 1.0,
+        defaultGammaBlueValue: Float = 1.0,
+        isSource: Bool = false,
+        applyGamma: Bool = false
+    ) {
+        _id = id
+        self.active = active
+        activeAndResponsive = active || id != GENERIC_DISPLAY_ID
+        self.adaptive = adaptive
+
+        self.isSource = isSource
+        self.applyGamma = applyGamma
+
+        self.defaultGammaRedMin = defaultGammaRedMin.ns
+        self.defaultGammaRedMax = defaultGammaRedMax.ns
+        self.defaultGammaRedValue = defaultGammaRedValue.ns
+        self.defaultGammaGreenMin = defaultGammaGreenMin.ns
+        self.defaultGammaGreenMax = defaultGammaGreenMax.ns
+        self.defaultGammaGreenValue = defaultGammaGreenValue.ns
+        self.defaultGammaBlueMin = defaultGammaBlueMin.ns
+        self.defaultGammaBlueMax = defaultGammaBlueMax.ns
+        self.defaultGammaBlueValue = defaultGammaBlueValue.ns
+
+        self.maxDDCBrightness = maxDDCBrightness.ns
+        self.maxDDCContrast = maxDDCContrast.ns
+        self.maxDDCVolume = maxDDCVolume.ns
+
+        self.lockedBrightness = lockedBrightness
+        self.lockedContrast = lockedContrast
+        self.lockedBrightnessCurve = lockedBrightnessCurve
+        self.lockedContrastCurve = lockedContrastCurve
+        self.audioMuted = audioMuted
+
+        self.brightness = brightness.ns
+        self.contrast = contrast.ns
+        self.volume = volume.ns
+        self.minBrightness = minBrightness.ns
+        self.maxBrightness = maxBrightness.ns
+        self.minContrast = minContrast.ns
+        self.maxContrast = maxContrast.ns
+        self.input = input.ns
+
+        self.hotkeyInput1 = hotkeyInput1.ns
+        self.hotkeyInput2 = hotkeyInput2.ns
+        self.hotkeyInput3 = hotkeyInput3.ns
+
+        self.alwaysUseNetworkControl = alwaysUseNetworkControl
+        self.neverUseNetworkControl = neverUseNetworkControl
+        self.alwaysFallbackControl = alwaysFallbackControl
+        self.neverFallbackControl = neverFallbackControl
+
+        self.brightnessOnInputChange1 = brightnessOnInputChange1.ns
+        self.brightnessOnInputChange2 = brightnessOnInputChange2.ns
+        self.brightnessOnInputChange3 = brightnessOnInputChange3.ns
+        self.contrastOnInputChange1 = contrastOnInputChange1.ns
+        self.contrastOnInputChange2 = contrastOnInputChange2.ns
+        self.contrastOnInputChange3 = contrastOnInputChange3.ns
+
+        if let enabledControls = enabledControls {
+            self.enabledControls = enabledControls
+        }
+        if let userBrightness = userBrightness {
+            self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
+        }
+        if let userContrast = userContrast {
+            self.userContrast = userContrast.mapValues { $0.threadSafe }.threadSafe
+        }
+
+        edidName = Self.printableName(id)
+        if let n = name, !n.isEmpty {
+            self.name = n
+        } else {
+            self.name = edidName
+        }
+        self.serial = (serial ?? Display.uuid(id: id))
+
+        super.init()
+
+        if let dict = displayInfoDictionary(id) {
+            infoDictionary = dict
+        }
+
+        startControls()
+        setupHotkeys()
+    }
+
+    // MARK: Internal
+
+    // MARK: Codable
+
+    enum CodingKeys: String, CodingKey, CaseIterable, ExpressibleByArgument {
+        case id
+        case name
+        case edidName
+        case serial
+        case adaptive
+        case defaultGammaRedMin
+        case defaultGammaRedMax
+        case defaultGammaRedValue
+        case defaultGammaGreenMin
+        case defaultGammaGreenMax
+        case defaultGammaGreenValue
+        case defaultGammaBlueMin
+        case defaultGammaBlueMax
+        case defaultGammaBlueValue
+        case maxDDCBrightness
+        case maxDDCContrast
+        case maxDDCVolume
+        case lockedBrightness
+        case lockedContrast
+        case lockedBrightnessCurve
+        case lockedContrastCurve
+        case minContrast
+        case minBrightness
+        case maxContrast
+        case maxBrightness
+        case contrast
+        case brightness
+        case volume
+        case audioMuted
+        case power
+        case active
+        case responsiveDDC
+        case input
+        case hotkeyInput
+        case hotkeyInput1
+        case hotkeyInput2
+        case hotkeyInput3
+        case userBrightness
+        case userContrast
+        case alwaysUseNetworkControl
+        case neverUseNetworkControl
+        case alwaysFallbackControl
+        case neverFallbackControl
+        case enabledControls
+        case brightnessCurveFactors
+        case contrastCurveFactors
+        case activeAndResponsive
+        case hasDDC
+        case hasI2C
+        case hasNetworkControl
+        case sendingBrightness
+        case sendingContrast
+        case sendingInput
+        case sendingVolume
+        case isSource
+        case applyGamma
+        case brightnessOnInputChange
+        case brightnessOnInputChange1
+        case brightnessOnInputChange2
+        case brightnessOnInputChange3
+        case contrastOnInputChange
+        case contrastOnInputChange1
+        case contrastOnInputChange2
+        case contrastOnInputChange3
+
+        // MARK: Internal
+
+        static var bool: Set<CodingKeys> = [
+            .adaptive,
+            .lockedBrightness,
+            .lockedContrast,
+            .lockedBrightnessCurve,
+            .lockedContrastCurve,
+            .audioMuted,
+            .power,
+            .alwaysUseNetworkControl,
+            .neverUseNetworkControl,
+            .alwaysFallbackControl,
+            .neverFallbackControl,
+            .isSource,
+            .applyGamma,
+        ]
+
+        static var hidden: Set<CodingKeys> = [
+            .hotkeyInput,
+            .brightnessOnInputChange,
+            .contrastOnInputChange,
+        ]
+
+        static var settableWithControl: Set<CodingKeys> = [
+            .contrast,
+            .brightness,
+            .volume,
+            .audioMuted,
+            .power,
+            .input,
+        ]
+
+        static var settable: Set<CodingKeys> = [
+            .name,
+            .adaptive,
+            .defaultGammaRedMin,
+            .defaultGammaRedMax,
+            .defaultGammaRedValue,
+            .defaultGammaGreenMin,
+            .defaultGammaGreenMax,
+            .defaultGammaGreenValue,
+            .defaultGammaBlueMin,
+            .defaultGammaBlueMax,
+            .defaultGammaBlueValue,
+            .maxDDCBrightness,
+            .maxDDCContrast,
+            .maxDDCVolume,
+            .lockedBrightness,
+            .lockedContrast,
+            .lockedBrightnessCurve,
+            .lockedContrastCurve,
+            .minContrast,
+            .minBrightness,
+            .maxContrast,
+            .maxBrightness,
+            .contrast,
+            .brightness,
+            .volume,
+            .audioMuted,
+            .power,
+            .input,
+            .hotkeyInput1,
+            .hotkeyInput2,
+            .hotkeyInput3,
+            .alwaysUseNetworkControl,
+            .neverUseNetworkControl,
+            .alwaysFallbackControl,
+            .neverFallbackControl,
+            .isSource,
+            .applyGamma,
+            .brightnessOnInputChange1,
+            .brightnessOnInputChange2,
+            .brightnessOnInputChange3,
+            .contrastOnInputChange1,
+            .contrastOnInputChange2,
+            .contrastOnInputChange3,
+        ]
+
+        var isHidden: Bool {
+            Self.hidden.contains(self)
+        }
+    }
+
+    enum AdaptiveModeKeys: String, CodingKey {
+        case sensor
+        case sync
+        case location
+        case manual
+    }
+
+    enum DisplayControlKeys: String, CodingKey {
+        case network
+        case coreDisplay
+        case ddc
+        case gamma
     }
 
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
@@ -246,11 +687,6 @@ enum ValueType {
 
     var _idLock = NSRecursiveLock()
     var _id: CGDirectDisplayID
-    var id: CGDirectDisplayID {
-        get { _idLock.around { _id } }
-        set { _idLock.around { _id = newValue } }
-    }
-
     // @AtomicLock @objc dynamic var id: CGDirectDisplayID {
     //     didSet {
     //         save()
@@ -259,13 +695,146 @@ enum ValueType {
 
     var transport: Transport? = nil
 
+    var edidName: String
+    lazy var lastVolume: NSNumber = volume
+
+    @Published @objc dynamic var activeAndResponsive: Bool = false
+
+    var enabledControls: [DisplayControl: Bool] = [
+        .network: true,
+        .coreDisplay: true,
+        .ddc: true,
+        .gamma: true,
+    ]
+
+    var brightnessCurveFactors: [AdaptiveModeKey: Double] = [
+        .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
+        .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
+        .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
+        .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
+    ]
+
+    var contrastCurveFactors: [AdaptiveModeKey: Double] = [
+        .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
+        .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
+        .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
+        .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
+    ]
+
+    @objc dynamic var sentBrightnessCondition = NSCondition()
+    @objc dynamic var sentContrastCondition = NSCondition()
+    @objc dynamic var sentInputCondition = NSCondition()
+    @objc dynamic var sentVolumeCondition = NSCondition()
+
+    // MARK: Gamma and User values
+
+    var infoDictionary: NSDictionary = [:]
+
+    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
+    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
+
+    var redMin: CGGammaValue = 0.0
+    var redMax: CGGammaValue = 1.0
+    var redGamma: CGGammaValue = 1.0
+
+    var greenMin: CGGammaValue = 0.0
+    var greenMax: CGGammaValue = 1.0
+    var greenGamma: CGGammaValue = 1.0
+
+    var blueMin: CGGammaValue = 0.0
+    var blueMax: CGGammaValue = 1.0
+    var blueGamma: CGGammaValue = 1.0
+
+    // MARK: Misc Properties
+
+    var onReadapt: (() -> Void)?
+    var smoothStep = 1
+    @AtomicLock var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
+    @AtomicLock var contrastDataPointInsertionTask: DispatchWorkItem? = nil
+
+    var slowRead = false
+    var slowWrite = false
+    var macMiniHDMI = false
+
+    var onControlChange: ((Control) -> Void)? = nil
+    @AtomicLock var context: [String: Any]? = nil
+
+    lazy var isForTesting = isTestID(id)
+
+    var observers: Set<AnyCancellable> = []
+
+    lazy var screen: NSScreen? = {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) }) ?? NSScreen.onlyExternalScreen
+            }
+            .store(in: &observers)
+
+        guard !isForTesting else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) }) ?? NSScreen.onlyExternalScreen
+    }()
+
+    lazy var armProps = DisplayController.armDisplayProperties(display: self)
+
+    @Atomic var force = false
+    @Atomic var faceLightEnabled = false
+    lazy var brightnessBeforeFacelight = brightness
+    lazy var contrastBeforeFacelight = contrast
+    lazy var maxBrightnessBeforeFacelight = maxBrightness
+    lazy var maxContrastBeforeFacelight = maxContrast
+
+    lazy var brightnessBeforeBlackout = brightness
+    lazy var contrastBeforeBlackout = contrast
+    lazy var minBrightnessBeforeBlackout = minBrightness
+    lazy var minContrastBeforeBlackout = minContrast
+
+    @Atomic var inSmoothTransition = false
+
+//    deinit {
+//        #if DEBUG
+//            log.verbose("START DEINIT: \(description)")
+//            log.verbose("popover: \(_hotkeyPopover)")
+//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
+//            do { log.verbose("END DEINIT: \(description)") }
+//        #endif
+//    }
+
+    lazy var hotkeyIdentifiers = [
+        "toggle-last-input-\(serial)",
+        "toggle-last-input2-\(serial)",
+        "toggle-last-input3-\(serial)",
+    ]
+
+    lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
+    lazy var gammaDistributedLock: NSDistributedLock? = NSDistributedLock(path: gammaLockPath)
+
+    var lastConnectionTime = Date()
+    @Atomic var gammaChanged = false
+
+    override var description: String {
+        "\(name)[\(serial): \(id)]"
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(serial)
+        return hasher.finalize()
+    }
+
+    var id: CGDirectDisplayID {
+        get { _idLock.around { _id } }
+        set { _idLock.around { _id = newValue } }
+    }
+
     @objc dynamic var serial: String {
         didSet {
             save()
         }
     }
 
-    var edidName: String
     @objc dynamic var name: String {
         didSet {
             context = getContext()
@@ -286,6 +855,7 @@ enum ValueType {
         }
     }
 
+    var shouldAdapt: Bool { adaptive && !adaptivePaused }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()
@@ -425,6 +995,18 @@ enum ValueType {
         }
     }
 
+    @Published @objc dynamic var lockedBrightnessCurve: Bool {
+        didSet {
+            save()
+        }
+    }
+
+    @Published @objc dynamic var lockedContrastCurve: Bool {
+        didSet {
+            save()
+        }
+    }
+
     @Published @objc dynamic var minBrightness: NSNumber {
         didSet {
             save()
@@ -557,8 +1139,6 @@ enum ValueType {
         }
     }
 
-    lazy var lastVolume: NSNumber = volume
-
     @Published @objc dynamic var volume: NSNumber {
         didSet {
             if oldValue.uint8Value > 0 {
@@ -677,8 +1257,6 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var activeAndResponsive: Bool = false
-
     @Published @objc dynamic var hasI2C: Bool = true {
         didSet {
             context = getContext()
@@ -731,27 +1309,6 @@ enum ValueType {
         }
     }
 
-    var enabledControls: [DisplayControl: Bool] = [
-        .network: true,
-        .coreDisplay: true,
-        .ddc: true,
-        .gamma: true,
-    ]
-
-    var brightnessCurveFactors: [AdaptiveModeKey: Double] = [
-        .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
-        .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
-        .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
-        .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
-    ]
-
-    var contrastCurveFactors: [AdaptiveModeKey: Double] = [
-        .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
-        .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
-        .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
-        .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
-    ]
-
     @inline(__always) var brightnessCurveFactor: Double {
         get { brightnessCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
         set {
@@ -768,6 +1325,252 @@ enum ValueType {
             contrastCurveFactors[displayController.adaptiveModeKey] = newValue
             readapt(newValue: newValue, oldValue: oldValue)
         }
+    }
+
+    @Published @objc dynamic var sendingBrightness: Bool = false {
+        didSet {
+            manageSendingValue(.sendingBrightness, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var sendingContrast: Bool = false {
+        didSet {
+            manageSendingValue(.sendingContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var sendingInput: Bool = false {
+        didSet {
+            manageSendingValue(.sendingInput, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var sendingVolume: Bool = false {
+        didSet {
+            manageSendingValue(.sendingVolume, oldValue: oldValue)
+        }
+    }
+
+    var initialRedMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.red ?? 1.0 }
+    var initialRedMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.red ?? 1.0 }
+    var initialRedGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.red ?? 1.0 }
+
+    var initialGreenMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.green ?? 1.0 }
+    var initialGreenMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.green ?? 1.0 }
+    var initialGreenGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.green ?? 1.0 }
+
+    var initialBlueMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.blue ?? 1.0 }
+    var initialBlueMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.blue ?? 1.0 }
+    var initialBlueGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.blue ?? 1.0 }
+
+    var readableID: String {
+        if name.isEmpty || name == "Unknown" {
+            return shortHash(string: serial)
+        }
+        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
+        return "\(safeName)-\(shortHash(string: serial))"
+    }
+
+    var alternativeControlForCoreDisplay: Control? = nil {
+        didSet {
+            context = getContext()
+            if let control = alternativeControlForCoreDisplay {
+                log.debug(
+                    "Display got alternativeControlForCoreDisplay \(control.str)",
+                    context: context
+                )
+                mainAsyncAfter(ms: 1) { [weak self] in
+                    guard let self = self else { return }
+                    self.hasNetworkControl = control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
+                }
+            }
+        }
+    }
+
+    @AtomicLock var control: Control? = nil {
+        didSet {
+            context = getContext()
+            if let control = control {
+                log.debug(
+                    "Display got \(control.str)",
+                    context: context
+                )
+                mainAsyncAfter(ms: 1) { [weak self] in
+                    guard let self = self else { return }
+                    self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
+                    self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
+                }
+                if !(oldValue is GammaControl), control is GammaControl {
+                    if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
+                        (control as! GammaControl).fluxChecker(flux: app)
+                    }
+                    setGamma()
+                }
+                if control is CoreDisplayControl {
+                    alternativeControlForCoreDisplay = getBestAlternativeControlForCoreDisplay()
+                }
+                onControlChange?(control)
+            }
+        }
+    }
+
+    static func fromDictionary(_ config: [String: Any]) -> Display? {
+        guard let id = config["id"] as? CGDirectDisplayID,
+              let serial = config["serial"] as? String else { return nil }
+
+        return Display(
+            id: id,
+            brightness: (config["brightness"] as? UInt8) ?? 50,
+            contrast: (config["contrast"] as? UInt8) ?? 50,
+            serial: serial,
+            name: config["name"] as? String,
+            active: (config["active"] as? Bool) ?? false,
+            minBrightness: (config["minBrightness"] as? UInt8) ?? DEFAULT_MIN_BRIGHTNESS,
+            maxBrightness: (config["maxBrightness"] as? UInt8) ?? DEFAULT_MAX_BRIGHTNESS,
+            minContrast: (config["minContrast"] as? UInt8) ?? DEFAULT_MIN_CONTRAST,
+            maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
+            adaptive: (config["adaptive"] as? Bool) ?? true,
+            maxDDCBrightness: (config["maxDDCBrightness"] as? UInt8) ?? 100,
+            maxDDCContrast: (config["maxDDCContrast"] as? UInt8) ?? 100,
+            maxDDCVolume: (config["maxDDCVolume"] as? UInt8) ?? 100,
+            lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
+            lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
+            lockedBrightnessCurve: (config["lockedBrightnessCurve"] as? Bool) ?? false,
+            lockedContrastCurve: (config["lockedContrastCurve"] as? Bool) ?? false,
+            volume: (config["volume"] as? UInt8) ?? 10,
+            audioMuted: (config["audioMuted"] as? Bool) ?? false,
+            input: (config["input"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput1: (config["hotkeyInput1"] as? UInt8) ?? (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput2: (config["hotkeyInput2"] as? UInt8) ?? InputSource.unknown.rawValue,
+            hotkeyInput3: (config["hotkeyInput3"] as? UInt8) ?? InputSource.unknown.rawValue,
+            userBrightness: (config["userBrightness"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
+            userContrast: (config["userContrast"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
+            alwaysUseNetworkControl: (config["alwaysUseNetworkControl"] as? Bool) ?? false,
+            neverUseNetworkControl: (config["neverUseNetworkControl"] as? Bool) ?? false,
+            alwaysFallbackControl: (config["alwaysFallbackControl"] as? Bool) ?? false,
+            neverFallbackControl: (config["neverFallbackControl"] as? Bool) ?? false,
+            enabledControls: (config["enabledControls"] as? [DisplayControl: Bool]) ?? [
+                .network: true,
+                .coreDisplay: true,
+                .ddc: true,
+                .gamma: true,
+            ],
+            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
+                100,
+            brightnessOnInputChange2: (config["brightnessOnInputChange2"] as? UInt8) ?? 100,
+            brightnessOnInputChange3: (config["brightnessOnInputChange3"] as? UInt8) ?? 100,
+            contrastOnInputChange1: (config["contrastOnInputChange1"] as? UInt8) ?? (config["contrastOnInputChange"] as? UInt8) ?? 75,
+            contrastOnInputChange2: (config["contrastOnInputChange2"] as? UInt8) ?? 75,
+            contrastOnInputChange3: (config["contrastOnInputChange3"] as? UInt8) ?? 75,
+            defaultGammaRedMin: (config["defaultGammaRedMin"] as? Float) ?? 0.0,
+            defaultGammaRedMax: (config["defaultGammaRedMax"] as? Float) ?? 1.0,
+            defaultGammaRedValue: (config["defaultGammaRedValue"] as? Float) ?? 1.0,
+            defaultGammaGreenMin: (config["defaultGammaGreenMin"] as? Float) ?? 0.0,
+            defaultGammaGreenMax: (config["defaultGammaGreenMax"] as? Float) ?? 1.0,
+            defaultGammaGreenValue: (config["defaultGammaGreenValue"] as? Float) ?? 1.0,
+            defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
+            defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
+            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
+            isSource: (config["isSource"] as? Bool) ?? false,
+            applyGamma: (config["applyGamma"] as? Bool) ?? false
+        )
+    }
+
+    // MARK: EDID
+
+    static func printableName(_ id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "Test Display"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "Persistent"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "Persistent v2"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "Persistent v3"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "Persistent v4"
+            default:
+                break
+            }
+        #endif
+
+        if let screen = NSScreen.forDisplayID(id) {
+            return screen.localizedName
+        }
+
+        if let infoDict = displayInfoDictionary(id), let names = infoDict["DisplayProductName"] as? [String: String],
+           let name = names[Locale.current.identifier] ?? names["en_US"] ?? names.first?.value
+        {
+            return name
+        }
+
+        if var name = DDC.getDisplayName(for: id) {
+            name = name.stripped
+            let minChars = floor(name.count.d * 0.8)
+            if name.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) >= minChars {
+                return name
+            }
+        }
+        return "Unknown"
+    }
+
+    static func uuid(id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "TEST_DISPLAY_SERIAL"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "TEST_DISPLAY_PERSISTENT_SERIAL"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "TEST_DISPLAY_PERSISTENT2_SERIAL"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "TEST_DISPLAY_PERSISTENT3_SERIAL"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "TEST_DISPLAY_PERSISTENT4_SERIAL"
+            default:
+                break
+            }
+        #endif
+
+        if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
+            let uuidValue = uuid.takeRetainedValue()
+            let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
+            return uuidString
+        }
+        if let edid = Display.edid(id: id) {
+            return edid
+        }
+        return String(describing: id)
+    }
+
+    static func edid(id: CGDirectDisplayID) -> String? {
+        DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
+    }
+
+    // MARK: User Data Points
+
+    static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
+        for (x, y) in values.dictionary {
+            if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
+                if logValue {
+                    log.debug("Removing data point \(x) => \(y)")
+                }
+                values.removeValue(forKey: x)
+            }
+        }
+        if logValue {
+            log.debug("Adding data point \(featureValue) => \(targetValue)")
+        }
+        values[featureValue] = targetValue
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? Display else {
+            return false
+        }
+        return serial == other.serial
     }
 
     // MARK: "Sending" states
@@ -811,157 +1614,6 @@ enum ValueType {
             }
         }
     }
-
-    @objc dynamic var sentBrightnessCondition = NSCondition()
-    @Published @objc dynamic var sendingBrightness: Bool = false {
-        didSet {
-            manageSendingValue(.sendingBrightness, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var sentContrastCondition = NSCondition()
-    @Published @objc dynamic var sendingContrast: Bool = false {
-        didSet {
-            manageSendingValue(.sendingContrast, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var sentInputCondition = NSCondition()
-    @Published @objc dynamic var sendingInput: Bool = false {
-        didSet {
-            manageSendingValue(.sendingInput, oldValue: oldValue)
-        }
-    }
-
-    @objc dynamic var sentVolumeCondition = NSCondition()
-    @Published @objc dynamic var sendingVolume: Bool = false {
-        didSet {
-            manageSendingValue(.sendingVolume, oldValue: oldValue)
-        }
-    }
-
-    // MARK: Gamma and User values
-
-    var infoDictionary: NSDictionary = [:]
-
-    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
-    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
-
-    var redMin: CGGammaValue = 0.0
-    var redMax: CGGammaValue = 1.0
-    var redGamma: CGGammaValue = 1.0
-
-    var initialRedMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.red ?? 1.0 }
-    var initialRedMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.red ?? 1.0 }
-    var initialRedGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.red ?? 1.0 }
-
-    var greenMin: CGGammaValue = 0.0
-    var greenMax: CGGammaValue = 1.0
-    var greenGamma: CGGammaValue = 1.0
-
-    var initialGreenMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.green ?? 1.0 }
-    var initialGreenMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.green ?? 1.0 }
-    var initialGreenGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.green ?? 1.0 }
-
-    var blueMin: CGGammaValue = 0.0
-    var blueMax: CGGammaValue = 1.0
-    var blueGamma: CGGammaValue = 1.0
-
-    var initialBlueMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.blue ?? 1.0 }
-    var initialBlueMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.blue ?? 1.0 }
-    var initialBlueGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.blue ?? 1.0 }
-
-    // MARK: Misc Properties
-
-    var onReadapt: (() -> Void)?
-    var smoothStep = 1
-    var readableID: String {
-        if name.isEmpty || name == "Unknown" {
-            return shortHash(string: serial)
-        }
-        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
-        return "\(safeName)-\(shortHash(string: serial))"
-    }
-
-    @AtomicLock var brightnessDataPointInsertionTask: DispatchWorkItem? = nil
-    @AtomicLock var contrastDataPointInsertionTask: DispatchWorkItem? = nil
-
-    var slowRead = false
-    var slowWrite = false
-    var macMiniHDMI = false
-
-    var alternativeControlForCoreDisplay: Control? = nil {
-        didSet {
-            context = getContext()
-            if let control = alternativeControlForCoreDisplay {
-                log.debug(
-                    "Display got alternativeControlForCoreDisplay \(control.str)",
-                    context: context
-                )
-                mainAsyncAfter(ms: 1) { [weak self] in
-                    guard let self = self else { return }
-                    self.hasNetworkControl = control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
-                }
-            }
-        }
-    }
-
-    var onControlChange: ((Control) -> Void)? = nil
-    @AtomicLock var control: Control? = nil {
-        didSet {
-            context = getContext()
-            if let control = control {
-                log.debug(
-                    "Display got \(control.str)",
-                    context: context
-                )
-                mainAsyncAfter(ms: 1) { [weak self] in
-                    guard let self = self else { return }
-                    self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
-                    self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForCoreDisplay is NetworkControl
-                }
-                if !(oldValue is GammaControl), control is GammaControl {
-                    if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
-                        (control as! GammaControl).fluxChecker(flux: app)
-                    }
-                    setGamma()
-                }
-                if control is CoreDisplayControl {
-                    alternativeControlForCoreDisplay = getBestAlternativeControlForCoreDisplay()
-                }
-                onControlChange?(control)
-            }
-        }
-    }
-
-    @AtomicLock var context: [String: Any]? = nil
-
-    lazy var isForTesting = isTestID(id)
-
-    var observers: Set<AnyCancellable> = []
-
-    lazy var screen: NSScreen? = {
-        NotificationCenter.default
-            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) }) ?? NSScreen.onlyExternalScreen
-            }
-            .store(in: &observers)
-
-        guard !isForTesting else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) }) ?? NSScreen.onlyExternalScreen
-    }()
-
-    lazy var armProps = DisplayController.armDisplayProperties(display: self)
-
-    @Atomic var force = false
-    @Atomic var faceLightEnabled = false
-    lazy var brightnessBeforeFacelight = brightness
-    lazy var contrastBeforeFacelight = contrast
-    lazy var maxBrightnessBeforeFacelight = maxBrightness
-    lazy var maxContrastBeforeFacelight = maxContrast
 
     // MARK: Functions
 
@@ -1067,154 +1719,6 @@ enum ValueType {
         }
 
         return (value, minValue, maxValue, userValues)
-    }
-
-    // MARK: Initializers
-
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
-        let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
-        let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
-        let brightnessCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
-        let contrastCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
-
-        _id = try container.decode(CGDirectDisplayID.self, forKey: .id)
-        serial = try container.decode(String.self, forKey: .serial)
-
-        adaptive = try container.decode(Bool.self, forKey: .adaptive)
-        name = try container.decode(String.self, forKey: .name)
-        edidName = try container.decode(String.self, forKey: .edidName)
-        active = try container.decode(Bool.self, forKey: .active)
-
-        brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
-        contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
-        minBrightness = (try container.decode(UInt8.self, forKey: .minBrightness)).ns
-        maxBrightness = (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
-        minContrast = (try container.decode(UInt8.self, forKey: .minContrast)).ns
-        maxContrast = (try container.decode(UInt8.self, forKey: .maxContrast)).ns
-
-        defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
-        defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
-        defaultGammaRedValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedValue)?.ns) ?? 1.ns
-        defaultGammaGreenMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMin)?.ns) ?? 0.ns
-        defaultGammaGreenMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMax)?.ns) ?? 1.ns
-        defaultGammaGreenValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenValue)?.ns) ?? 1.ns
-        defaultGammaBlueMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMin)?.ns) ?? 0.ns
-        defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
-        defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
-
-        maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
-        maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
-        maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
-
-        lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
-        lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
-
-        alwaysUseNetworkControl = try container.decode(Bool.self, forKey: .alwaysUseNetworkControl)
-        neverUseNetworkControl = try container.decode(Bool.self, forKey: .neverUseNetworkControl)
-        alwaysFallbackControl = try container.decode(Bool.self, forKey: .alwaysFallbackControl)
-        neverFallbackControl = try container.decode(Bool.self, forKey: .neverFallbackControl)
-
-        volume = (try container.decode(UInt8.self, forKey: .volume)).ns
-        audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
-        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
-        applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
-        input = (try container.decode(UInt8.self, forKey: .input)).ns
-
-        hotkeyInput1 = try (
-            (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
-        )
-        hotkeyInput2 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
-        hotkeyInput3 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
-
-        brightnessOnInputChange1 = (
-            try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
-        )
-        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
-        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
-
-        contrastOnInputChange1 = try (
-            (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
-        )
-        contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
-        contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
-
-        if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userBrightness[.sync] = syncUserBrightness.threadSafe
-        }
-        if let sensorUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userBrightness[.sensor] = sensorUserBrightness.threadSafe
-        }
-        if let locationUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userBrightness[.location] = locationUserBrightness.threadSafe
-        }
-        if let manualUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userBrightness[.manual] = manualUserBrightness.threadSafe
-        }
-
-        if let syncUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userContrast[.sync] = syncUserContrast.threadSafe
-        }
-        if let sensorUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userContrast[.sensor] = sensorUserContrast.threadSafe
-        }
-        if let locationUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userContrast[.location] = locationUserContrast.threadSafe
-        }
-        if let manualUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userContrast[.manual] = manualUserContrast.threadSafe
-        }
-
-        if let networkControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .network) {
-            enabledControls[.network] = networkControlEnabled
-        }
-        if let coreDisplayControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .coreDisplay) {
-            enabledControls[.coreDisplay] = coreDisplayControlEnabled
-        }
-        if let ddcControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .ddc) {
-            enabledControls[.ddc] = ddcControlEnabled
-        }
-        if let gammaControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .gamma) {
-            enabledControls[.gamma] = gammaControlEnabled
-        }
-
-        if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
-            brightnessCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let syncFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
-            brightnessCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let locationFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
-            brightnessCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let manualFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
-            brightnessCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
-        }
-
-        if let sensorFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
-            contrastCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
-        }
-        if let syncFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
-            contrastCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
-        }
-        if let locationFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
-            contrastCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
-        }
-        if let manualFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
-            contrastCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
-        }
-
-        super.init()
-
-        if let dict = displayInfoDictionary(id) {
-            infoDictionary = dict
-        }
-
-        setupHotkeys()
     }
 
     func startControls() {
@@ -1325,133 +1829,6 @@ enum ValueType {
         }
     }
 
-    init(
-        id: CGDirectDisplayID,
-        brightness: UInt8 = 50,
-        contrast: UInt8 = 50,
-        serial: String? = nil,
-        name: String? = nil,
-        active: Bool = false,
-        minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS,
-        maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS,
-        minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
-        maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
-        adaptive: Bool = true,
-        maxDDCBrightness: UInt8 = 100,
-        maxDDCContrast: UInt8 = 100,
-        maxDDCVolume: UInt8 = 100,
-        lockedBrightness: Bool = false,
-        lockedContrast: Bool = false,
-        volume: UInt8 = 10,
-        audioMuted: Bool = false,
-        input: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput1: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput2: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput3: UInt8 = InputSource.unknown.rawValue,
-        userBrightness: [AdaptiveModeKey: [Int: Int]]? = nil,
-        userContrast: [AdaptiveModeKey: [Int: Int]]? = nil,
-        alwaysUseNetworkControl: Bool = false,
-        neverUseNetworkControl: Bool = false,
-        alwaysFallbackControl: Bool = false,
-        neverFallbackControl: Bool = false,
-        enabledControls: [DisplayControl: Bool]? = nil,
-        brightnessOnInputChange1: UInt8 = 100,
-        brightnessOnInputChange2: UInt8 = 100,
-        brightnessOnInputChange3: UInt8 = 100,
-        contrastOnInputChange1: UInt8 = 75,
-        contrastOnInputChange2: UInt8 = 75,
-        contrastOnInputChange3: UInt8 = 75,
-        defaultGammaRedMin: Float = 0.0,
-        defaultGammaRedMax: Float = 1.0,
-        defaultGammaRedValue: Float = 1.0,
-        defaultGammaGreenMin: Float = 0.0,
-        defaultGammaGreenMax: Float = 1.0,
-        defaultGammaGreenValue: Float = 1.0,
-        defaultGammaBlueMin: Float = 0.0,
-        defaultGammaBlueMax: Float = 1.0,
-        defaultGammaBlueValue: Float = 1.0,
-        isSource: Bool = false,
-        applyGamma: Bool = false
-    ) {
-        _id = id
-        self.active = active
-        activeAndResponsive = active || id != GENERIC_DISPLAY_ID
-        self.adaptive = adaptive
-
-        self.isSource = isSource
-        self.applyGamma = applyGamma
-
-        self.defaultGammaRedMin = defaultGammaRedMin.ns
-        self.defaultGammaRedMax = defaultGammaRedMax.ns
-        self.defaultGammaRedValue = defaultGammaRedValue.ns
-        self.defaultGammaGreenMin = defaultGammaGreenMin.ns
-        self.defaultGammaGreenMax = defaultGammaGreenMax.ns
-        self.defaultGammaGreenValue = defaultGammaGreenValue.ns
-        self.defaultGammaBlueMin = defaultGammaBlueMin.ns
-        self.defaultGammaBlueMax = defaultGammaBlueMax.ns
-        self.defaultGammaBlueValue = defaultGammaBlueValue.ns
-
-        self.maxDDCBrightness = maxDDCBrightness.ns
-        self.maxDDCContrast = maxDDCContrast.ns
-        self.maxDDCVolume = maxDDCVolume.ns
-
-        self.lockedBrightness = lockedBrightness
-        self.lockedContrast = lockedContrast
-        self.audioMuted = audioMuted
-
-        self.brightness = brightness.ns
-        self.contrast = contrast.ns
-        self.volume = volume.ns
-        self.minBrightness = minBrightness.ns
-        self.maxBrightness = maxBrightness.ns
-        self.minContrast = minContrast.ns
-        self.maxContrast = maxContrast.ns
-        self.input = input.ns
-
-        self.hotkeyInput1 = hotkeyInput1.ns
-        self.hotkeyInput2 = hotkeyInput2.ns
-        self.hotkeyInput3 = hotkeyInput3.ns
-
-        self.alwaysUseNetworkControl = alwaysUseNetworkControl
-        self.neverUseNetworkControl = neverUseNetworkControl
-        self.alwaysFallbackControl = alwaysFallbackControl
-        self.neverFallbackControl = neverFallbackControl
-
-        self.brightnessOnInputChange1 = brightnessOnInputChange1.ns
-        self.brightnessOnInputChange2 = brightnessOnInputChange2.ns
-        self.brightnessOnInputChange3 = brightnessOnInputChange3.ns
-        self.contrastOnInputChange1 = contrastOnInputChange1.ns
-        self.contrastOnInputChange2 = contrastOnInputChange2.ns
-        self.contrastOnInputChange3 = contrastOnInputChange3.ns
-
-        if let enabledControls = enabledControls {
-            self.enabledControls = enabledControls
-        }
-        if let userBrightness = userBrightness {
-            self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
-        }
-        if let userContrast = userContrast {
-            self.userContrast = userContrast.mapValues { $0.threadSafe }.threadSafe
-        }
-
-        edidName = Self.printableName(id)
-        if let n = name, !n.isEmpty {
-            self.name = n
-        } else {
-            self.name = edidName
-        }
-        self.serial = (serial ?? Display.uuid(id: id))
-
-        super.init()
-
-        if let dict = displayInfoDictionary(id) {
-            infoDictionary = dict
-        }
-
-        startControls()
-        setupHotkeys()
-    }
-
     func setupHotkeys() {
         #if DEBUG
             log.info("Trying to setup hotkeys for \(description)")
@@ -1464,66 +1841,6 @@ enum ValueType {
         } else {
             log.info("Error initializing hotkeyPopoverController for \(description)")
         }
-    }
-
-    static func fromDictionary(_ config: [String: Any]) -> Display? {
-        guard let id = config["id"] as? CGDirectDisplayID,
-              let serial = config["serial"] as? String else { return nil }
-
-        return Display(
-            id: id,
-            brightness: (config["brightness"] as? UInt8) ?? 50,
-            contrast: (config["contrast"] as? UInt8) ?? 50,
-            serial: serial,
-            name: config["name"] as? String,
-            active: (config["active"] as? Bool) ?? false,
-            minBrightness: (config["minBrightness"] as? UInt8) ?? DEFAULT_MIN_BRIGHTNESS,
-            maxBrightness: (config["maxBrightness"] as? UInt8) ?? DEFAULT_MAX_BRIGHTNESS,
-            minContrast: (config["minContrast"] as? UInt8) ?? DEFAULT_MIN_CONTRAST,
-            maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
-            adaptive: (config["adaptive"] as? Bool) ?? true,
-            maxDDCBrightness: (config["maxDDCBrightness"] as? UInt8) ?? 100,
-            maxDDCContrast: (config["maxDDCContrast"] as? UInt8) ?? 100,
-            maxDDCVolume: (config["maxDDCVolume"] as? UInt8) ?? 100,
-            lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
-            lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
-            volume: (config["volume"] as? UInt8) ?? 10,
-            audioMuted: (config["audioMuted"] as? Bool) ?? false,
-            input: (config["input"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput1: (config["hotkeyInput1"] as? UInt8) ?? (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput2: (config["hotkeyInput2"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput3: (config["hotkeyInput3"] as? UInt8) ?? InputSource.unknown.rawValue,
-            userBrightness: (config["userBrightness"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
-            userContrast: (config["userContrast"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
-            alwaysUseNetworkControl: (config["alwaysUseNetworkControl"] as? Bool) ?? false,
-            neverUseNetworkControl: (config["neverUseNetworkControl"] as? Bool) ?? false,
-            alwaysFallbackControl: (config["alwaysFallbackControl"] as? Bool) ?? false,
-            neverFallbackControl: (config["neverFallbackControl"] as? Bool) ?? false,
-            enabledControls: (config["enabledControls"] as? [DisplayControl: Bool]) ?? [
-                .network: true,
-                .coreDisplay: true,
-                .ddc: true,
-                .gamma: true,
-            ],
-            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
-                100,
-            brightnessOnInputChange2: (config["brightnessOnInputChange2"] as? UInt8) ?? 100,
-            brightnessOnInputChange3: (config["brightnessOnInputChange3"] as? UInt8) ?? 100,
-            contrastOnInputChange1: (config["contrastOnInputChange1"] as? UInt8) ?? (config["contrastOnInputChange"] as? UInt8) ?? 75,
-            contrastOnInputChange2: (config["contrastOnInputChange2"] as? UInt8) ?? 75,
-            contrastOnInputChange3: (config["contrastOnInputChange3"] as? UInt8) ?? 75,
-            defaultGammaRedMin: (config["defaultGammaRedMin"] as? Float) ?? 0.0,
-            defaultGammaRedMax: (config["defaultGammaRedMax"] as? Float) ?? 1.0,
-            defaultGammaRedValue: (config["defaultGammaRedValue"] as? Float) ?? 1.0,
-            defaultGammaGreenMin: (config["defaultGammaGreenMin"] as? Float) ?? 0.0,
-            defaultGammaGreenMax: (config["defaultGammaGreenMax"] as? Float) ?? 1.0,
-            defaultGammaGreenValue: (config["defaultGammaGreenValue"] as? Float) ?? 1.0,
-            defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
-            defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
-            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
-            isSource: (config["isSource"] as? Bool) ?? false,
-            applyGamma: (config["applyGamma"] as? Bool) ?? false
-        )
     }
 
     func resetDefaultGamma() {
@@ -1576,239 +1893,8 @@ enum ValueType {
         }
     }
 
-    // MARK: EDID
-
-    static func printableName(_ id: CGDirectDisplayID) -> String {
-        #if DEBUG
-            switch id {
-            case TEST_DISPLAY_ID:
-                return "Test Display"
-            case TEST_DISPLAY_PERSISTENT_ID:
-                return "Persistent"
-            case TEST_DISPLAY_PERSISTENT2_ID:
-                return "Persistent v2"
-            case TEST_DISPLAY_PERSISTENT3_ID:
-                return "Persistent v3"
-            case TEST_DISPLAY_PERSISTENT4_ID:
-                return "Persistent v4"
-            default:
-                break
-            }
-        #endif
-
-        if let screen = NSScreen.forDisplayID(id) {
-            return screen.localizedName
-        }
-
-        if let infoDict = displayInfoDictionary(id), let names = infoDict["DisplayProductName"] as? [String: String],
-           let name = names[Locale.current.identifier] ?? names["en_US"] ?? names.first?.value
-        {
-            return name
-        }
-
-        if var name = DDC.getDisplayName(for: id) {
-            name = name.stripped
-            let minChars = floor(name.count.d * 0.8)
-            if name.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) >= minChars {
-                return name
-            }
-        }
-        return "Unknown"
-    }
-
-    static func uuid(id: CGDirectDisplayID) -> String {
-        #if DEBUG
-            switch id {
-            case TEST_DISPLAY_ID:
-                return "TEST_DISPLAY_SERIAL"
-            case TEST_DISPLAY_PERSISTENT_ID:
-                return "TEST_DISPLAY_PERSISTENT_SERIAL"
-            case TEST_DISPLAY_PERSISTENT2_ID:
-                return "TEST_DISPLAY_PERSISTENT2_SERIAL"
-            case TEST_DISPLAY_PERSISTENT3_ID:
-                return "TEST_DISPLAY_PERSISTENT3_SERIAL"
-            case TEST_DISPLAY_PERSISTENT4_ID:
-                return "TEST_DISPLAY_PERSISTENT4_SERIAL"
-            default:
-                break
-            }
-        #endif
-
-        if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
-            let uuidValue = uuid.takeRetainedValue()
-            let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
-            return uuidString
-        }
-        if let edid = Display.edid(id: id) {
-            return edid
-        }
-        return String(describing: id)
-    }
-
-    static func edid(id: CGDirectDisplayID) -> String? {
-        DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
-    }
-
     func resetName() {
         name = Display.printableName(id)
-    }
-
-    // MARK: Codable
-
-    enum CodingKeys: String, CodingKey, CaseIterable, ExpressibleByArgument {
-        case id
-        case name
-        case edidName
-        case serial
-        case adaptive
-        case defaultGammaRedMin
-        case defaultGammaRedMax
-        case defaultGammaRedValue
-        case defaultGammaGreenMin
-        case defaultGammaGreenMax
-        case defaultGammaGreenValue
-        case defaultGammaBlueMin
-        case defaultGammaBlueMax
-        case defaultGammaBlueValue
-        case maxDDCBrightness
-        case maxDDCContrast
-        case maxDDCVolume
-        case lockedBrightness
-        case lockedContrast
-        case minContrast
-        case minBrightness
-        case maxContrast
-        case maxBrightness
-        case contrast
-        case brightness
-        case volume
-        case audioMuted
-        case power
-        case active
-        case responsiveDDC
-        case input
-        case hotkeyInput
-        case hotkeyInput1
-        case hotkeyInput2
-        case hotkeyInput3
-        case userBrightness
-        case userContrast
-        case alwaysUseNetworkControl
-        case neverUseNetworkControl
-        case alwaysFallbackControl
-        case neverFallbackControl
-        case enabledControls
-        case brightnessCurveFactors
-        case contrastCurveFactors
-        case activeAndResponsive
-        case hasDDC
-        case hasI2C
-        case hasNetworkControl
-        case sendingBrightness
-        case sendingContrast
-        case sendingInput
-        case sendingVolume
-        case isSource
-        case applyGamma
-        case brightnessOnInputChange
-        case brightnessOnInputChange1
-        case brightnessOnInputChange2
-        case brightnessOnInputChange3
-        case contrastOnInputChange
-        case contrastOnInputChange1
-        case contrastOnInputChange2
-        case contrastOnInputChange3
-
-        var isHidden: Bool {
-            Self.hidden.contains(self)
-        }
-
-        static var bool: Set<CodingKeys> = [
-            .adaptive,
-            .lockedBrightness,
-            .lockedContrast,
-            .audioMuted,
-            .power,
-            .alwaysUseNetworkControl,
-            .neverUseNetworkControl,
-            .alwaysFallbackControl,
-            .neverFallbackControl,
-            .isSource,
-            .applyGamma,
-        ]
-
-        static var hidden: Set<CodingKeys> = [
-            .hotkeyInput,
-            .brightnessOnInputChange,
-            .contrastOnInputChange,
-        ]
-
-        static var settableWithControl: Set<CodingKeys> = [
-            .contrast,
-            .brightness,
-            .volume,
-            .audioMuted,
-            .power,
-            .input,
-        ]
-
-        static var settable: Set<CodingKeys> = [
-            .name,
-            .adaptive,
-            .defaultGammaRedMin,
-            .defaultGammaRedMax,
-            .defaultGammaRedValue,
-            .defaultGammaGreenMin,
-            .defaultGammaGreenMax,
-            .defaultGammaGreenValue,
-            .defaultGammaBlueMin,
-            .defaultGammaBlueMax,
-            .defaultGammaBlueValue,
-            .maxDDCBrightness,
-            .maxDDCContrast,
-            .maxDDCVolume,
-            .lockedBrightness,
-            .lockedContrast,
-            .minContrast,
-            .minBrightness,
-            .maxContrast,
-            .maxBrightness,
-            .contrast,
-            .brightness,
-            .volume,
-            .audioMuted,
-            .power,
-            .input,
-            .hotkeyInput1,
-            .hotkeyInput2,
-            .hotkeyInput3,
-            .alwaysUseNetworkControl,
-            .neverUseNetworkControl,
-            .alwaysFallbackControl,
-            .neverFallbackControl,
-            .isSource,
-            .applyGamma,
-            .brightnessOnInputChange1,
-            .brightnessOnInputChange2,
-            .brightnessOnInputChange3,
-            .contrastOnInputChange1,
-            .contrastOnInputChange2,
-            .contrastOnInputChange3,
-        ]
-    }
-
-    enum AdaptiveModeKeys: String, CodingKey {
-        case sensor
-        case sync
-        case location
-        case manual
-    }
-
-    enum DisplayControlKeys: String, CodingKey {
-        case network
-        case coreDisplay
-        case ddc
-        case gamma
     }
 
     func encode(to encoder: Encoder) throws {
@@ -1844,6 +1930,8 @@ enum ValueType {
             try container.encode(id, forKey: .id)
             try container.encode(lockedBrightness, forKey: .lockedBrightness)
             try container.encode(lockedContrast, forKey: .lockedContrast)
+            try container.encode(lockedBrightnessCurve, forKey: .lockedBrightnessCurve)
+            try container.encode(lockedContrastCurve, forKey: .lockedContrastCurve)
             try container.encode(maxBrightness.uint8Value, forKey: .maxBrightness)
             try container.encode(maxContrast.uint8Value, forKey: .maxContrast)
             try container.encode(minBrightness.uint8Value, forKey: .minBrightness)
@@ -1992,8 +2080,6 @@ enum ValueType {
         }
     }
 
-    @Atomic var inSmoothTransition = false
-
     func smoothTransition(from currentValue: UInt8, to value: UInt8, adjust: @escaping ((UInt8) -> Void)) {
         inSmoothTransition = true
 
@@ -2136,21 +2222,6 @@ enum ValueType {
         }
     }
 
-//    deinit {
-//        #if DEBUG
-//            log.verbose("START DEINIT: \(description)")
-//            log.verbose("popover: \(_hotkeyPopover)")
-//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
-//            do { log.verbose("END DEINIT: \(description)") }
-//        #endif
-//    }
-
-    lazy var hotkeyIdentifiers = [
-        "toggle-last-input-\(serial)",
-        "toggle-last-input2-\(serial)",
-        "toggle-last-input3-\(serial)",
-    ]
-
     func refreshInput() {
         let hotkeys = CachedDefaults[.hotkeys]
         let hotkeyInputEnabled = hotkeyIdentifiers.compactMap { identifier in
@@ -2229,9 +2300,6 @@ enum ValueType {
         gammaChanged = true
     }
 
-    lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
-    lazy var gammaDistributedLock: NSDistributedLock? = NSDistributedLock(path: gammaLockPath)
-
     @discardableResult func gammaLock() -> Bool {
         log.verbose("Locking gamma", context: context)
         return gammaDistributedLock?.try() ?? false
@@ -2271,9 +2339,6 @@ enum ValueType {
 
         return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: newContrast)
     }
-
-    var lastConnectionTime = Date()
-    @Atomic var gammaChanged = false
 
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast: UInt8? = nil) {
         #if DEBUG
@@ -2504,24 +2569,9 @@ enum ValueType {
         }
     }
 
-    // MARK: User Data Points
-
-    static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
-        for (x, y) in values.dictionary {
-            if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
-                if logValue {
-                    log.debug("Removing data point \(x) => \(y)")
-                }
-                values.removeValue(forKey: x)
-            }
-        }
-        if logValue {
-            log.debug("Adding data point \(featureValue) => \(targetValue)")
-        }
-        values[featureValue] = targetValue
-    }
-
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
+        guard !lockedBrightnessCurve else { return }
+
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
             userBrightness[modeKey] = ThreadSafeDictionary()
@@ -2552,6 +2602,8 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
+        guard !lockedContrastCurve else { return }
+
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {
             userContrast[modeKey] = ThreadSafeDictionary()

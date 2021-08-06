@@ -9,6 +9,20 @@
 import Cocoa
 
 class PageButton: NSButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!
     weak var notice: NSTextField?
@@ -18,6 +32,8 @@ class PageButton: NSButton {
 
     var standardAlpha = 0.5
     var visibleAlpha = 0.8
+
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func disable() {
         stopHighlighting()
@@ -53,8 +69,6 @@ class PageButton: NSButton {
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(trackingArea)
     }
-
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     func highlight() {
         guard !isHidden else { return }
@@ -142,16 +156,6 @@ class PageButton: NSButton {
         shadow = nil
 
         onMouseExit?()
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

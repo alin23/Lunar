@@ -48,6 +48,8 @@ let scrollableCaptionColorOnBlack = white
 
 let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
 
+// MARK: - ButtonColor
+
 enum ButtonColor: Int {
     case bgOn
     case bgOnHover

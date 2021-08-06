@@ -10,27 +10,18 @@ import Defaults
 import Foundation
 
 class DDCControl: Control {
-    var displayControl: DisplayControl = .ddc
-
-    weak var display: Display!
-    let str = "DDC Control"
+    // MARK: Lifecycle
 
     init(display: Display) {
         self.display = display
     }
 
-    func isAvailable() -> Bool {
-        guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
-        return display.hasI2C || display.isForTesting
-    }
+    // MARK: Internal
 
-    func isResponsive() -> Bool {
-        display.responsiveDDC
-    }
+    var displayControl: DisplayControl = .ddc
 
-    func resetState() {
-        Self.resetState(display: display)
-    }
+    weak var display: Display!
+    let str = "DDC Control"
 
     static func resetState(display: Display? = nil) {
         if let display = display {
@@ -52,6 +43,19 @@ class DDCControl: Control {
                 display.lastConnectionTime = Date()
             }
         }
+    }
+
+    func isAvailable() -> Bool {
+        guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
+        return display.hasI2C || display.isForTesting
+    }
+
+    func isResponsive() -> Bool {
+        display.responsiveDDC
+    }
+
+    func resetState() {
+        Self.resetState(display: display)
     }
 
     func setPower(_ power: PowerState) -> Bool {
