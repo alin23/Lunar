@@ -997,4 +997,8 @@ enum DDC {
     static func resetBrightnessAndContrast(for displayID: CGDirectDisplayID) -> Bool {
         DDC.write(displayID: displayID, controlID: .RESET_BRIGHTNESS_AND_CONTRAST, newValue: 1)
     }
+
+    static func resetColors(for displayID: CGDirectDisplayID) -> Bool {
+        DDC.write(displayID: displayID, controlID: .RESET_COLOR, newValue: 1)
+    }
 }

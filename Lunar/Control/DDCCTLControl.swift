@@ -46,6 +46,14 @@ struct DDCCTLControl: Control {
             return "-p"
         case .RESET_BRIGHTNESS_AND_CONTRAST:
             return "-rbc"
+        case .RED_GAIN:
+            return "-rg"
+        case .GREEN_GAIN:
+            return "-gg"
+        case .BLUE_GAIN:
+            return "-bg"
+        case .RESET_COLOR:
+            return "-rrgb"
         default:
             return ""
         }
@@ -85,6 +93,22 @@ struct DDCCTLControl: Control {
         return process.terminationStatus == 0
     }
 
+    func setRedGain(_ gain: UInt8) -> Bool {
+        ddcctlSet(.RED_GAIN, value: gain)
+    }
+
+    func setGreenGain(_ gain: UInt8) -> Bool {
+        ddcctlSet(.GREEN_GAIN, value: gain)
+    }
+
+    func setBlueGain(_ gain: UInt8) -> Bool {
+        ddcctlSet(.BLUE_GAIN, value: gain)
+    }
+
+    func resetColors() -> Bool {
+        ddcctlSet(.RESET_COLOR, value: 1)
+    }
+
     func setBrightness(_ value: Brightness, oldValue _: Brightness? = nil) -> Bool {
         ddcctlSet(.BRIGHTNESS, value: value)
     }
@@ -108,6 +132,10 @@ struct DDCCTLControl: Control {
     func setPower(_ value: PowerState) -> Bool {
         ddcctlSet(.DPMS, value: value == .on ? 1 : 5)
     }
+
+    func getRedGain() -> UInt8? { nil }
+    func getGreenGain() -> UInt8? { nil }
+    func getBlueGain() -> UInt8? { nil }
 
     func getBrightness() -> Brightness? {
         nil

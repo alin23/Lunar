@@ -906,8 +906,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.capture(message: "Launch")
         }
 
-        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
-            displayController.adaptBrightness(force: true)
+        if CachedDefaults[.reapplyValuesAfterWake] {
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
+                displayController.adaptBrightness(force: true)
+            }
         }
 
         log.debug("App finished launching")

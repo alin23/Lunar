@@ -44,7 +44,7 @@ class PageButton: NSButton {
         alphaValue = 0.0
     }
 
-    func enable(color _: NSColor? = nil) {
+    func enable() {
         transition(0.1)
 
         isHidden = false

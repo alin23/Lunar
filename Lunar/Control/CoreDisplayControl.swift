@@ -118,6 +118,41 @@ class CoreDisplayControl: Control {
         return control.setPower(power)
     }
 
+    func setRedGain(_ gain: UInt8) -> Bool {
+        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        return control.setRedGain(gain)
+    }
+
+    func setGreenGain(_ gain: UInt8) -> Bool {
+        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        return control.setGreenGain(gain)
+    }
+
+    func setBlueGain(_ gain: UInt8) -> Bool {
+        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        return control.setBlueGain(gain)
+    }
+
+    func getRedGain() -> UInt8? {
+        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        return control.getRedGain()
+    }
+
+    func getGreenGain() -> UInt8? {
+        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        return control.getGreenGain()
+    }
+
+    func getBlueGain() -> UInt8? {
+        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        return control.getBlueGain()
+    }
+
+    func resetColors() -> Bool {
+        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        return control.resetColors()
+    }
+
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         guard !display.isForTesting else { return false }
 

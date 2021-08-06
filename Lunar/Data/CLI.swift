@@ -135,7 +135,8 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
         if let id = filter.u32 {
             return displays.first(where: { $0.id == id })
         } else {
-            return displays.first(where: { $0.serial == filter || $0.name == filter })
+            return displays.first(where: { $0.serial == filter }) ?? displays
+                .min { $0.name.levenshtein(filter) < $1.name.levenshtein(filter) }
         }
     }
 }

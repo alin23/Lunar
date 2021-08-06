@@ -74,7 +74,7 @@ let GENERIC_DISPLAY = Display(
         let d = Display(
             id: TEST_DISPLAY_ID,
             serial: "TEST_DISPLAY_SERIAL",
-            name: "Test Display",
+            name: "LG Ultra HD",
             active: true,
             minBrightness: 0,
             maxBrightness: 60,
@@ -91,7 +91,7 @@ let GENERIC_DISPLAY = Display(
         let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT_ID,
             serial: "TEST_DISPLAY_PERSISTENT_SERIAL_PERSISTENT",
-            name: "Persistent",
+            name: "DELL U3419W",
             active: true,
             minBrightness: 0,
             maxBrightness: 100,
@@ -107,7 +107,7 @@ let GENERIC_DISPLAY = Display(
         let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT2_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT2_ID,
             serial: "TEST_DISPLAY_PERSISTENT2_SERIAL_PERSISTENT_TWO",
-            name: "Persistent v2",
+            name: "LG Ultrafine",
             active: true,
             minBrightness: 0,
             maxBrightness: 100,
@@ -123,7 +123,7 @@ let GENERIC_DISPLAY = Display(
         let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT3_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT3_ID,
             serial: "TEST_DISPLAY_PERSISTENT3_SERIAL_PERSISTENT_THREE",
-            name: "Persistent v3",
+            name: "Pro Display XDR",
             active: true,
             minBrightness: 0,
             maxBrightness: 100,
@@ -139,7 +139,7 @@ let GENERIC_DISPLAY = Display(
         let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT4_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT4_ID,
             serial: "TEST_DISPLAY_PERSISTENT4_SERIAL_PERSISTENT_FOUR",
-            name: "Persistent v4",
+            name: "Thunderbolt",
             active: true,
             minBrightness: 0,
             maxBrightness: 100,
@@ -249,6 +249,10 @@ enum ValueType {
         maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
         maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
         maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+
+        redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? 90.ns
+        greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? 90.ns
+        blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? 90.ns
 
         lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
         lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
@@ -377,6 +381,9 @@ enum ValueType {
         maxDDCBrightness: UInt8 = 100,
         maxDDCContrast: UInt8 = 100,
         maxDDCVolume: UInt8 = 100,
+        redGain: UInt8 = 90,
+        greenGain: UInt8 = 90,
+        blueGain: UInt8 = 90,
         lockedBrightness: Bool = false,
         lockedContrast: Bool = false,
         lockedBrightnessCurve: Bool = false,
@@ -433,6 +440,10 @@ enum ValueType {
         self.maxDDCBrightness = maxDDCBrightness.ns
         self.maxDDCContrast = maxDDCContrast.ns
         self.maxDDCVolume = maxDDCVolume.ns
+
+        self.redGain = redGain.ns
+        self.greenGain = greenGain.ns
+        self.blueGain = blueGain.ns
 
         self.lockedBrightness = lockedBrightness
         self.lockedContrast = lockedContrast
@@ -515,6 +526,9 @@ enum ValueType {
         case maxDDCBrightness
         case maxDDCContrast
         case maxDDCVolume
+        case redGain
+        case greenGain
+        case blueGain
         case lockedBrightness
         case lockedContrast
         case lockedBrightnessCurve
@@ -594,6 +608,9 @@ enum ValueType {
             .audioMuted,
             .power,
             .input,
+            .redGain,
+            .greenGain,
+            .blueGain,
         ]
 
         static var settable: Set<CodingKeys> = [
@@ -611,6 +628,9 @@ enum ValueType {
             .maxDDCBrightness,
             .maxDDCContrast,
             .maxDDCVolume,
+            .redGain,
+            .greenGain,
+            .blueGain,
             .lockedBrightness,
             .lockedContrast,
             .lockedBrightnessCurve,
@@ -962,6 +982,42 @@ enum ValueType {
         }
     }
 
+    @Published @objc dynamic var redGain: NSNumber {
+        didSet {
+            save()
+            if let control = control, !control.setRedGain(redGain.uint8Value) {
+                log.warning(
+                    "Error writing RedGain using \(control.str)",
+                    context: context
+                )
+            }
+        }
+    }
+
+    @Published @objc dynamic var greenGain: NSNumber {
+        didSet {
+            save()
+            if let control = control, !control.setGreenGain(greenGain.uint8Value) {
+                log.warning(
+                    "Error writing GreenGain using \(control.str)",
+                    context: context
+                )
+            }
+        }
+    }
+
+    @Published @objc dynamic var blueGain: NSNumber {
+        didSet {
+            save()
+            if let control = control, !control.setBlueGain(blueGain.uint8Value) {
+                log.warning(
+                    "Error writing BlueGain using \(control.str)",
+                    context: context
+                )
+            }
+        }
+    }
+
     @Published @objc dynamic var maxDDCBrightness: NSNumber {
         didSet {
             save()
@@ -1055,7 +1111,7 @@ enum ValueType {
             }
 
             var oldBrightness: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCBrightness != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCBrightness.uint8Value != 100, !(control is GammaControl) {
                 oldBrightness = mapNumber(
                     oldBrightness.d,
                     fromLow: 0,
@@ -1072,7 +1128,7 @@ enum ValueType {
                 ).rounded().u8
             }
 
-            log.verbose("Set BRIGHTNESS to \(brightness) (old: \(oldBrightness))", context: context)
+            log.verbose("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
             let startTime = DispatchTime.now()
 
             if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness) {
@@ -1107,7 +1163,7 @@ enum ValueType {
             }
 
             var oldContrast: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCContrast != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCContrast.uint8Value != 100, !(control is GammaControl) {
                 oldContrast = mapNumber(
                     oldContrast.d,
                     fromLow: 0,
@@ -1124,7 +1180,7 @@ enum ValueType {
                 ).rounded().u8
             }
 
-            log.verbose("Set CONTRAST to \(contrast) (old: \(oldContrast))", context: context)
+            log.verbose("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
             let startTime = DispatchTime.now()
 
             if let control = control, !control.setContrast(contrast, oldValue: oldContrast) {
@@ -1150,7 +1206,7 @@ enum ValueType {
             guard !isForTesting else { return }
 
             var volume = self.volume.uint8Value
-            if DDC.applyLimits, maxDDCVolume != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCVolume.uint8Value != 100, !(control is GammaControl) {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: maxDDCVolume.doubleValue).rounded().u8
             }
 
@@ -1433,6 +1489,9 @@ enum ValueType {
             maxDDCBrightness: (config["maxDDCBrightness"] as? UInt8) ?? 100,
             maxDDCContrast: (config["maxDDCContrast"] as? UInt8) ?? 100,
             maxDDCVolume: (config["maxDDCVolume"] as? UInt8) ?? 100,
+            redGain: (config["redGain"] as? UInt8) ?? 90,
+            greenGain: (config["greenGain"] as? UInt8) ?? 90,
+            blueGain: (config["blueGain"] as? UInt8) ?? 90,
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
             lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
             lockedBrightnessCurve: (config["lockedBrightnessCurve"] as? Bool) ?? false,
@@ -1730,6 +1789,7 @@ enum ValueType {
                     self.refreshContrast()
                     self.refreshVolume()
                     self.refreshInput()
+                    self.refreshColors()
                 }
             }
             refreshGamma()
@@ -1737,6 +1797,9 @@ enum ValueType {
 
         startI2CDetection()
         detectI2C()
+        if hasI2C {
+            refreshColors()
+        }
 
         control = getBestControl()
     }
@@ -1926,6 +1989,10 @@ enum ValueType {
             try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
             try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
             try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
+
+            try container.encode(redGain.uint8Value, forKey: .redGain)
+            try container.encode(greenGain.uint8Value, forKey: .greenGain)
+            try container.encode(blueGain.uint8Value, forKey: .blueGain)
 
             try container.encode(id, forKey: .id)
             try container.encode(lockedBrightness, forKey: .lockedBrightness)
@@ -2154,6 +2221,18 @@ enum ValueType {
 
     // MARK: Reading Functions
 
+    func readRedGain() -> UInt8? {
+        control?.getRedGain()
+    }
+
+    func readGreenGain() -> UInt8? {
+        control?.getGreenGain()
+    }
+
+    func readBlueGain() -> UInt8? {
+        control?.getBlueGain()
+    }
+
     func readAudioMuted() -> Bool? {
         control?.getMute()
     }
@@ -2172,6 +2251,33 @@ enum ValueType {
 
     func readBrightness() -> UInt8? {
         control?.getBrightness()
+    }
+
+    @discardableResult
+    func refreshColors() -> Bool {
+        guard !isTestID(id) else { return false }
+        guard let newRedGain = readRedGain(),
+              let newGreenGain = readGreenGain(),
+              let newBlueGain = readBlueGain()
+        else {
+            log.warning("Can't read color gain for \(description)")
+            return false
+        }
+
+        if newRedGain != redGain.uint8Value {
+            log.info("Refreshing red gain value: \(redGain.uint8Value) <> \(newRedGain)")
+            withoutSmoothTransition { withoutDDC { redGain = newRedGain.ns } }
+        }
+        if newGreenGain != greenGain.uint8Value {
+            log.info("Refreshing green gain value: \(greenGain.uint8Value) <> \(newGreenGain)")
+            withoutSmoothTransition { withoutDDC { greenGain = newGreenGain.ns } }
+        }
+        if newBlueGain != blueGain.uint8Value {
+            log.info("Refreshing blue gain value: \(blueGain.uint8Value) <> \(newBlueGain)")
+            withoutSmoothTransition { withoutDDC { blueGain = newBlueGain.ns } }
+        }
+
+        return true
     }
 
     func refreshBrightness() {
@@ -2598,7 +2704,7 @@ enum ValueType {
 
         var userValues = userBrightness[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
-        NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": userValues])
+        NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
@@ -2630,7 +2736,7 @@ enum ValueType {
 
         var userValues = userContrast[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
-        NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": userValues])
+        NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
     }
 
     func isUserAdjusting() -> Bool {
