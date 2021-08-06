@@ -115,14 +115,28 @@ class ScrollableContrast: NSView {
                 self?.currentValue?.stringValue = String(newContrast)
             }
         }.store(in: &displayObservers, for: "contrast")
+        display.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
+            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+            mainThread {
+                self.minValue?.intValue = self.displayMinValue.i32
+                self.maxValue?.lowerLimit = (self.displayMinValue + 1).d
+            }
+        }.store(in: &displayObservers, for: "minContrast")
+        display.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
+            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+            mainThread {
+                self.maxValue?.intValue = self.displayMaxValue.i32
+                self.minValue?.upperLimit = (self.displayMaxValue - 1).d
+            }
+        }.store(in: &displayObservers, for: "maxContrast")
     }
 
     func update(from display: Display) {
-        minValue?.intValue = Int32(displayMinValue)
+        minValue?.intValue = displayMinValue.i32
         minValue?.upperLimit = (displayMaxValue - 1).d
-        maxValue?.intValue = Int32(displayMaxValue)
+        maxValue?.intValue = displayMaxValue.i32
         maxValue?.lowerLimit = (displayMinValue + 1).d
-        currentValue?.intValue = Int32(displayValue)
+        currentValue?.intValue = displayValue.i32
         currentValue?.lowerLimit = displayMinValue.d
         currentValue?.upperLimit = displayMaxValue.d
 
