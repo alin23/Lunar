@@ -49,14 +49,16 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
 let MD: SwiftyMarkdown = getMD()
 let DARK_MD: SwiftyMarkdown = getMD(dark: true)
 
+// MARK: - HelpButton
+
 class HelpButton: PopoverButton<HelpPopoverController> {
     var link: String?
+
+    @IBInspectable var helpText: String = ""
 
     override var popoverKey: String {
         "help"
     }
-
-    @IBInspectable var helpText: String = ""
 
     func getParsedHelpText() -> NSAttributedString? {
         guard POPOVERS[popoverKey]! != nil else { return nil }

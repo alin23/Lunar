@@ -127,7 +127,20 @@ let AUTO_MODE_TAG = 99
 var leftHintsShown = false
 var rightHintsShown = false
 
+// MARK: - SplitViewController
+
 class SplitViewController: NSSplitViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            do { log.verbose("END DEINIT") }
+        #endif
+    }
+
+    // MARK: Internal
+
     @objc dynamic var version = "v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4")"
     var adaptiveModeObserver: Cancellable?
     var defaultAutoModeTitle: NSAttributedString?
@@ -138,10 +151,6 @@ class SplitViewController: NSSplitViewController {
 
     @IBOutlet var activeModeButton: AdaptiveModeButton!
     @IBOutlet var _activeHelpButton: NSButton!
-    var activeHelpButton: HelpButton? {
-        _activeHelpButton as? HelpButton
-    }
-
     @IBOutlet var goLeftButton: PageButton?
     @IBOutlet var goRightButton: PageButton?
     @IBOutlet var goLeftNotice: NSTextField?
@@ -150,6 +159,13 @@ class SplitViewController: NSSplitViewController {
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
 
+    var overrideAdaptiveModeObserver: Cancellable?
+    var pausedAdaptiveModeObserver: Bool = false
+
+    var activeHelpButton: HelpButton? {
+        _activeHelpButton as? HelpButton
+    }
+
     @IBAction func goRight(_: Any) {
         onRightButtonPress?()
     }
@@ -157,16 +173,6 @@ class SplitViewController: NSSplitViewController {
     @IBAction func goLeft(_: Any) {
         onLeftButtonPress?()
     }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            do { log.verbose("END DEINIT") }
-        #endif
-    }
-
-    var overrideAdaptiveModeObserver: Cancellable?
-    var pausedAdaptiveModeObserver: Bool = false
 
     func listenForAdaptiveModeChange() {
         overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in

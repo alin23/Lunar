@@ -24,15 +24,21 @@ let NIGHT_SHIFT_TAB_SCRIPT =
 
 var fluxPromptTime: Date?
 
-class GammaControl: Control {
-    var displayControl: DisplayControl = .gamma
+// MARK: - GammaControl
 
-    weak var display: Display!
-    let str = "Gamma Control"
+class GammaControl: Control {
+    // MARK: Lifecycle
 
     init(display: Display) {
         self.display = display
     }
+
+    // MARK: Internal
+
+    var displayControl: DisplayControl = .gamma
+
+    weak var display: Display!
+    let str = "Gamma Control"
 
     func fluxChecker(flux: NSRunningApplication) {
         guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),

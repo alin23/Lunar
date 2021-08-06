@@ -9,9 +9,7 @@
 import Cocoa
 
 class DeleteButton: NSButton {
-    func setup() {
-        alphaValue = 0.0
-    }
+    // MARK: Lifecycle
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -21,6 +19,12 @@ class DeleteButton: NSButton {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
+    }
+
+    // MARK: Internal
+
+    func setup() {
+        alphaValue = 0.0
     }
 
     override func mouseEntered(with _: NSEvent) {

@@ -13,13 +13,10 @@ import WAYWindow
 var navigationHotkeysEnabled = true
 var scrollableAdjustHotkeysEnabled = true
 
+// MARK: - ModernWindow
+
 class ModernWindow: WAYWindow {
-    var pageController: PageController? {
-        guard let contentView = contentView,
-              !contentView.subviews.isEmpty, !contentView.subviews[0].subviews.isEmpty,
-              let controller = contentView.subviews[0].subviews[0].nextResponder as? PageController else { return nil }
-        return controller
-    }
+    // MARK: Lifecycle
 
     override init(
         contentRect: NSRect,
@@ -29,6 +26,22 @@ class ModernWindow: WAYWindow {
     ) {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
         log.verbose("Created window '\(title)'")
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            do { log.verbose("END DEINIT") }
+        #endif
+    }
+
+    // MARK: Internal
+
+    var pageController: PageController? {
+        guard let contentView = contentView,
+              !contentView.subviews.isEmpty, !contentView.subviews[0].subviews.isEmpty,
+              let controller = contentView.subviews[0].subviews[0].nextResponder as? PageController else { return nil }
+        return controller
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -95,12 +108,5 @@ class ModernWindow: WAYWindow {
         backgroundColor = NSColor.clear
         makeKeyAndOrderFront(self)
         orderFrontRegardless()
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            do { log.verbose("END DEINIT") }
-        #endif
     }
 }

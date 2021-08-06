@@ -8,6 +8,9 @@
 
 import Charts
 import Foundation
+
+// MARK: - HourValueFormatter
+
 class HourValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         let value = value.i
@@ -26,6 +29,8 @@ class HourValueFormatter: AxisValueFormatter {
     }
 }
 
+// MARK: - ElevationValueFormatter
+
 class ElevationValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         guard LocationMode.specific.moment != nil, let chartEntry = LocationMode.specific.lastChartEntry
@@ -38,6 +43,8 @@ class ElevationValueFormatter: AxisValueFormatter {
     }
 }
 
+// MARK: - PercentValueFormatter
+
 class PercentValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         if value == 100.0 || value == 0.0 {
@@ -46,6 +53,8 @@ class PercentValueFormatter: AxisValueFormatter {
         return "\(value.i)%"
     }
 }
+
+// MARK: - LuxValueFormatter
 
 class LuxValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {

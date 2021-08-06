@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - AppExceptionTransformer
+
 class AppExceptionTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         AppException.self
@@ -19,6 +21,8 @@ class AppExceptionTransformer: ValueTransformer {
     }
 }
 
+// MARK: - DisplayTransformer
+
 class DisplayTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         Display.self
@@ -37,6 +41,8 @@ class DisplayTransformer: ValueTransformer {
         (value as? Display)?.dictionary
     }
 }
+
+// MARK: - UpdateCheckIntervalTransformer
 
 class UpdateCheckIntervalTransformer: ValueTransformer {
     static let WEEKLY = 604_800
@@ -71,6 +77,8 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
         }
     }
 }
+
+// MARK: - SignedIntTransformer
 
 class SignedIntTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {

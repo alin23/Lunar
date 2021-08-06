@@ -256,7 +256,14 @@ extension Array where Element == UInt8 {
 
 extension Double {
     @inline(__always) func rounded(to scale: Int) -> Double {
-        let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)
+        let behavior = NSDecimalNumberHandler(
+            roundingMode: .plain,
+            scale: scale.i16,
+            raiseOnExactness: false,
+            raiseOnOverflow: false,
+            raiseOnUnderflow: false,
+            raiseOnDivideByZero: true
+        )
 
         let roundedValue = NSDecimalNumber(value: self).rounding(accordingToBehavior: behavior)
 
@@ -348,7 +355,14 @@ extension Dictionary {
 
 extension Float {
     @inline(__always) func rounded(to scale: Int) -> Float {
-        let behavior = NSDecimalNumberHandler(roundingMode: .plain, scale: scale.i16, raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: true)
+        let behavior = NSDecimalNumberHandler(
+            roundingMode: .plain,
+            scale: scale.i16,
+            raiseOnExactness: false,
+            raiseOnOverflow: false,
+            raiseOnUnderflow: false,
+            raiseOnDivideByZero: true
+        )
 
         let roundedValue = NSDecimalNumber(value: self).rounding(accordingToBehavior: behavior)
 
@@ -628,6 +642,10 @@ extension NSScreen {
         screens.first { $0.hasMouse }
     }
 
+    static var externalWithMouse: NSScreen? {
+        screens.first { !$0.isBuiltin && $0.hasMouse }
+    }
+
     var hasMouse: Bool {
         let mouseLocation = NSEvent.mouseLocation
         if NSMouseInRect(mouseLocation, frame, false) {
@@ -798,6 +816,8 @@ typealias Contrast = UInt8
 
 typealias PreciseBrightness = Double
 typealias PreciseContrast = Double
+
+// MARK: - MonitorValue
 
 enum MonitorValue {
     case nsBrightness(NSBrightness)

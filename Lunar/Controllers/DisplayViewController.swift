@@ -15,6 +15,76 @@ import Sauce
 import SwiftDate
 
 class DisplayViewController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+
+        for observer in displayObservers.values {
+            observer.cancel()
+        }
+    }
+
+    // MARK: Internal
+
+//     func demo() {
+//         guard let solar = LocationMode.specific.geolocation?.solar,
+//               let sunrise = LocationMode.specific.moment?.sunrise,
+//               let sunset = LocationMode.specific.moment?.sunset,
+    // //              let sunrisePosition = solar.sunrisePosition,
+    // //              let sunsetPosition = solar.sunsetPosition,
+    // //              let solarNoonPosition = solar.solarNoonPosition,
+//               let display = display, let brightnessContrastChart = brightnessContrastChart
+//         else {
+//             return
+//         }
+//         scrollableBrightness?.onCurrentValueChanged = nil
+//         scrollableContrast?.onCurrentValueChanged = nil
+//         for hour in sunrise.hour ... sunset.hour {
+//             for minute in stride(from: 0, to: 60, by: 5) {
+//                 log.info("Setting time to \(hour):\(minute)")
+//                 let (brightness, contrast) = LocationMode.specific.getBrightnessContrast(
+//                     display: display, hour: hour, minute: minute
+//                 )
+//                 mainThread {
+//                     log.info("Brightness: \(brightness)    Contrast: \(contrast)")
+//                     scrollableBrightness!.currentValue.stringValue = brightness.intround.s
+//                     scrollableContrast!.currentValue.stringValue = contrast.intround.s
+//                     scrollableBrightness!.setNeedsDisplay(scrollableBrightness!.visibleRect)
+//                     scrollableContrast!.setNeedsDisplay(scrollableContrast!.visibleRect)
+
+//                     var now = DateInRegion().convertTo(region: Region.local)
+//                     now = now.dateBySet(hour: hour, min: minute, secs: 0)!
+
+//                     brightnessContrastChart.highlightCurrentValues(
+//                         adaptiveMode: displayController.adaptiveMode, for: display,
+//                         now: now.date
+//                     )
+//                     brightnessContrastChart.notifyDataSetChanged()
+//                     brightnessContrastChart.setNeedsDisplay(brightnessContrastChart.visibleRect)
+//                     view.setNeedsDisplay(view.visibleRect)
+//                 }
+    // //            let sleepTime = pow(0.01, 1 - (elevation / solarNoonPosition.elevation))
+    // //            log.info("Sleeping for \(sleepTime)")
+    // //            Thread.sleep(forTimeInterval: sleepTime)
+//                 Thread.sleep(forTimeInterval: 0.01)
+//             }
+//         }
+//     }
+
+    enum ResetAction: Int {
+        case algorithmCurve = 0
+        case networkControl
+        case ddcState
+        case brightnessAndContrast
+        case lunarSettings
+        case fullReset
+        case reset = 99
+    }
+
     let LOCK_BRIGHTNESS_HELP_TEXT = """
     ## Description
 
@@ -108,6 +178,37 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var displayView: DisplayView?
     @IBOutlet var displayName: DisplayName?
+    @IBOutlet var adaptiveNotice: NSTextField!
+    @IBOutlet var gammaNotice: NSTextField!
+    @IBOutlet var scrollableBrightness: ScrollableBrightness?
+    @IBOutlet var scrollableContrast: ScrollableContrast?
+
+    @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
+
+    @IBOutlet var _controlsButton: NSButton!
+    @IBOutlet var _proButton: NSButton!
+    @IBOutlet var _lockContrastHelpButton: NSButton?
+    @IBOutlet var _lockBrightnessHelpButton: NSButton?
+    @IBOutlet var _settingsButton: NSButton?
+    @IBOutlet var lockContrastCurveButton: LockButton!
+    @IBOutlet var lockBrightnessCurveButton: LockButton!
+
+    @objc dynamic var noDisplay: Bool = false
+
+    var adaptiveModeObserver: Cancellable?
+    var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
+    var sendingContrastObserver: ((Bool, Bool) -> Void)?
+    var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
+    var adaptiveObserver: ((Bool, Bool) -> Void)?
+    var viewID: String?
+    var displayObservers = [String: AnyCancellable]()
+
+    var pausedAdaptiveModeObserver: Bool = false
+
+    @AtomicLock var gammaHighlighterTask: CFRunLoopTimer?
+
+    @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
@@ -116,8 +217,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @IBOutlet var adaptiveNotice: NSTextField!
-    @IBOutlet var gammaNotice: NSTextField!
     var inputDropdownHotkeyButton: HotkeyButton? {
         _inputDropdownHotkeyButton as? HotkeyButton
     }
@@ -130,17 +229,10 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @IBOutlet var scrollableBrightness: ScrollableBrightness?
-    @IBOutlet var scrollableContrast: ScrollableContrast?
-
-    @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
-
-    @IBOutlet var _controlsButton: NSButton!
     var controlsButton: HelpButton? {
         _controlsButton as? HelpButton
     }
 
-    @IBOutlet var _proButton: NSButton!
     var proButton: Button? {
         _proButton as? Button
     }
@@ -155,17 +247,14 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @IBOutlet var _lockContrastHelpButton: NSButton?
     var lockContrastHelpButton: HelpButton? {
         _lockContrastHelpButton as? HelpButton
     }
 
-    @IBOutlet var _lockBrightnessHelpButton: NSButton?
     var lockBrightnessHelpButton: HelpButton? {
         _lockBrightnessHelpButton as? HelpButton
     }
 
-    @IBOutlet var _settingsButton: NSButton?
     var settingsButton: SettingsButton? {
         _settingsButton as? SettingsButton
     }
@@ -179,15 +268,17 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @objc dynamic var noDisplay: Bool = false
+    @objc dynamic var lockedBrightnessCurve: Bool = false {
+        didSet {
+            display?.lockedBrightnessCurve = lockedBrightnessCurve
+        }
+    }
 
-    var adaptiveModeObserver: Cancellable?
-    var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
-    var sendingContrastObserver: ((Bool, Bool) -> Void)?
-    var activeAndResponsiveObserver: ((Bool, Bool) -> Void)?
-    var adaptiveObserver: ((Bool, Bool) -> Void)?
-    var viewID: String?
-    var displayObservers = [String: AnyCancellable]()
+    @objc dynamic var lockedContrastCurve: Bool = false {
+        didSet {
+            display?.lockedContrastCurve = lockedContrastCurve
+        }
+    }
 
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
@@ -362,8 +453,13 @@ class DisplayViewController: NSViewController {
         updateControlsButton()
         updateNotificationObservers(for: display)
 
+        lockedBrightnessCurve = display.lockedBrightnessCurve
+        lockedContrastCurve = display.lockedContrastCurve
+
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
-            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual else {
+            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
+                  !display.lockedBrightnessCurve
+            else {
                 self?.updateDataset(currentBrightness: brightness.u8)
                 return
             }
@@ -381,7 +477,9 @@ class DisplayViewController: NSViewController {
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
-            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual else {
+            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
+                  !display.lockedContrastCurve
+            else {
                 self?.updateDataset(currentContrast: contrast.u8)
                 return
             }
@@ -617,61 +715,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-//     func demo() {
-//         guard let solar = LocationMode.specific.geolocation?.solar,
-//               let sunrise = LocationMode.specific.moment?.sunrise,
-//               let sunset = LocationMode.specific.moment?.sunset,
-    // //              let sunrisePosition = solar.sunrisePosition,
-    // //              let sunsetPosition = solar.sunsetPosition,
-    // //              let solarNoonPosition = solar.solarNoonPosition,
-//               let display = display, let brightnessContrastChart = brightnessContrastChart
-//         else {
-//             return
-//         }
-//         scrollableBrightness?.onCurrentValueChanged = nil
-//         scrollableContrast?.onCurrentValueChanged = nil
-//         for hour in sunrise.hour ... sunset.hour {
-//             for minute in stride(from: 0, to: 60, by: 5) {
-//                 log.info("Setting time to \(hour):\(minute)")
-//                 let (brightness, contrast) = LocationMode.specific.getBrightnessContrast(
-//                     display: display, hour: hour, minute: minute
-//                 )
-//                 mainThread {
-//                     log.info("Brightness: \(brightness)    Contrast: \(contrast)")
-//                     scrollableBrightness!.currentValue.stringValue = brightness.intround.s
-//                     scrollableContrast!.currentValue.stringValue = contrast.intround.s
-//                     scrollableBrightness!.setNeedsDisplay(scrollableBrightness!.visibleRect)
-//                     scrollableContrast!.setNeedsDisplay(scrollableContrast!.visibleRect)
-
-//                     var now = DateInRegion().convertTo(region: Region.local)
-//                     now = now.dateBySet(hour: hour, min: minute, secs: 0)!
-
-//                     brightnessContrastChart.highlightCurrentValues(
-//                         adaptiveMode: displayController.adaptiveMode, for: display,
-//                         now: now.date
-//                     )
-//                     brightnessContrastChart.notifyDataSetChanged()
-//                     brightnessContrastChart.setNeedsDisplay(brightnessContrastChart.visibleRect)
-//                     view.setNeedsDisplay(view.visibleRect)
-//                 }
-    // //            let sleepTime = pow(0.01, 1 - (elevation / solarNoonPosition.elevation))
-    // //            log.info("Sleeping for \(sleepTime)")
-    // //            Thread.sleep(forTimeInterval: sleepTime)
-//                 Thread.sleep(forTimeInterval: 0.01)
-//             }
-//         }
-//     }
-
-    enum ResetAction: Int {
-        case algorithmCurve = 0
-        case networkControl
-        case ddcState
-        case brightnessAndContrast
-        case lunarSettings
-        case fullReset
-        case reset = 99
-    }
-
     func resetControl() {
         guard let display = display else { return }
         let control = display.getBestControl()
@@ -830,17 +873,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-
-        for observer in displayObservers.values {
-            observer.cancel()
-        }
-    }
-
     func listenForSendingBrightnessContrast() {
         display?.$sendingBrightness.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
@@ -914,14 +946,16 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    var pausedAdaptiveModeObserver: Bool = false
-
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             guard let self = self, !self.pausedAdaptiveModeObserver else {
                 return
             }
             self.pausedAdaptiveModeObserver = true
+            mainThread {
+                self.lockBrightnessCurveButton.isHidden = change.newValue == .manual
+                self.lockContrastCurveButton.isHidden = change.newValue == .manual
+            }
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
                 mainThread {
@@ -965,8 +999,6 @@ class DisplayViewController: NSViewController {
         guard let display = display, let input = InputSource(rawValue: sender.selectedTag().u8) else { return }
         display.input = input.rawValue.ns
     }
-
-    @AtomicLock var gammaHighlighterTask: CFRunLoopTimer?
 
     func showGammaNotice() {
         let windowVisible = mainThread { view.window?.isVisible ?? false }
@@ -1015,8 +1047,6 @@ class DisplayViewController: NSViewController {
             gammaNotice.needsDisplay = true
         }
     }
-
-    @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
     func showAdaptiveNotice() {
         let windowVisible = mainThread { view.window?.isVisible ?? false }

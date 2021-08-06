@@ -11,66 +11,10 @@ import Defaults
 import Foundation
 import SwiftyBeaver
 
+// MARK: - Logger
+
 class Logger: SwiftyBeaver {
-    static let console = ConsoleDestination()
-    static let file = FileDestination()
-    static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
-    static var debugModeObserver: Cancellable?
-    @Atomic static var initialized = false
-
-    class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
-        defer { initialized = true }
-        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
-        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
-        Logger.addDestination(console)
-
-        let debugMode = { (enabled: Bool) in
-            enabled || TEST_MODE || AppSettings.beta
-        }
-
-        setMinLevel(
-            debug: debugMode(cli ? debug : Defaults[.debug]),
-            verbose: verbose || TEST_MODE || Defaults[.debug],
-            cloud: !cli && AppSettings.beta,
-            cli: cli
-        )
-        debugModeObserver = debugPublisher.sink { change in
-            guard !cli else { return }
-            self.setMinLevel(
-                debug: debugMode(change.newValue),
-                verbose: verbose || TEST_MODE || change.newValue,
-                cloud: !cli && AppSettings.beta
-            )
-        }
-
-        #if !DEBUG
-            Logger.addDestination(file)
-            if !cli, AppSettings.beta {
-                cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
-                Logger.addDestination(cloud)
-            }
-        #endif
-    }
-
-    class func disable() {
-        Logger.removeAllDestinations()
-    }
-
-    class func setMinLevel(debug: Bool, verbose: Bool = false, cloud: Bool = false, cli: Bool = false) {
-        if verbose {
-            console.minLevel = .verbose
-            file.minLevel = .verbose
-            if cloud { self.cloud.minLevel = .verbose }
-        } else if debug {
-            console.minLevel = .debug
-            file.minLevel = .debug
-            if cloud { self.cloud.minLevel = .debug }
-        } else {
-            console.minLevel = cli ? .warning : .info
-            file.minLevel = cli ? .warning : .info
-            if cloud { self.cloud.minLevel = cli ? .warning : .info }
-        }
-    }
+    // MARK: Open
 
     override open class func verbose(
         _ message: @autoclosure () -> Any,
@@ -129,6 +73,68 @@ class Logger: SwiftyBeaver {
     ) {
         guard initialized else { return }
         super.error(message(), file, function, line: line, context: context)
+    }
+
+    // MARK: Internal
+
+    static let console = ConsoleDestination()
+    static let file = FileDestination()
+    static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
+    static var debugModeObserver: Cancellable?
+    @Atomic static var initialized = false
+
+    class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
+        defer { initialized = true }
+        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
+        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
+        Logger.addDestination(console)
+
+        let debugMode = { (enabled: Bool) in
+            enabled || TEST_MODE || AppSettings.beta
+        }
+
+        setMinLevel(
+            debug: debugMode(cli ? debug : Defaults[.debug]),
+            verbose: verbose || TEST_MODE || Defaults[.debug],
+            cloud: !cli && AppSettings.beta,
+            cli: cli
+        )
+        debugModeObserver = debugPublisher.sink { change in
+            guard !cli else { return }
+            self.setMinLevel(
+                debug: debugMode(change.newValue),
+                verbose: verbose || TEST_MODE || change.newValue,
+                cloud: !cli && AppSettings.beta
+            )
+        }
+
+        #if !DEBUG
+            Logger.addDestination(file)
+            if !cli, AppSettings.beta {
+                cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
+                Logger.addDestination(cloud)
+            }
+        #endif
+    }
+
+    class func disable() {
+        Logger.removeAllDestinations()
+    }
+
+    class func setMinLevel(debug: Bool, verbose: Bool = false, cloud: Bool = false, cli: Bool = false) {
+        if verbose {
+            console.minLevel = .verbose
+            file.minLevel = .verbose
+            if cloud { self.cloud.minLevel = .verbose }
+        } else if debug {
+            console.minLevel = .debug
+            file.minLevel = .debug
+            if cloud { self.cloud.minLevel = .debug }
+        } else {
+            console.minLevel = cli ? .warning : .info
+            file.minLevel = cli ? .warning : .info
+            if cloud { self.cloud.minLevel = cli ? .warning : .info }
+        }
     }
 }
 

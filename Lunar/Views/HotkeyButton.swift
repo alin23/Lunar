@@ -11,6 +11,17 @@ import Foundation
 import Magnet
 
 class HotkeyButton: PopoverButton<HotkeyPopoverController> {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            do { log.verbose("END DEINIT") }
+        #endif
+    }
+
+    // MARK: Internal
+
     weak var display: Display?
 
     override var popoverController: HotkeyPopoverController? {
@@ -71,13 +82,6 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
                 break
             }
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            do { log.verbose("END DEINIT") }
-        #endif
     }
 
     override func mouseDown(with event: NSEvent) {

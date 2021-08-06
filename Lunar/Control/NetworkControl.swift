@@ -13,10 +13,10 @@ import Foundation
 import SwiftDate
 import UserNotifications
 
+// MARK: - Service
+
 class Service {
-    var scheme: String
-    var path: String
-    var service: NetService
+    // MARK: Lifecycle
 
     init(_ service: NetService, scheme: String = "http", path: String = "") {
         self.service = service
@@ -24,14 +24,11 @@ class Service {
         self.path = path
     }
 
-    func buildURL(_ addr: String, path: String? = nil) -> URL? {
-        var urlBuilder = URLComponents()
-        urlBuilder.scheme = scheme
-        urlBuilder.host = addr.contains(":") ? "[\(addr)]" : addr
-        urlBuilder.port = service.port
-        urlBuilder.path = path ?? self.path
-        return urlBuilder.url
-    }
+    // MARK: Internal
+
+    var scheme: String
+    var path: String
+    var service: NetService
 
     lazy var urls: [URL] = {
         guard let addresses = service.addresses else { return [] }
@@ -57,17 +54,13 @@ class Service {
         }
     }()
 
-    func getFirstRespondingURL(urls: [URL], timeout: DateComponents = 3.seconds, retries: UInt = 3) -> URL? {
-        for url in urls {
-            if waitForResponse(from: url, timeoutPerTry: timeout, retries: retries) != nil {
-                return url
-            }
-        }
-        return nil
-    }
-
     var urlInitialized = false
     @AtomicLock var _url: URL? = nil
+    var maxValueUrlInitialized = false
+    @AtomicLock var _maxValueUrl: URL? = nil
+    var smoothTransitionUrlInitialized = false
+    @AtomicLock var _smoothTransitionUrl: URL? = nil
+
     var url: URL? {
         get {
             if !urlInitialized {
@@ -81,8 +74,6 @@ class Service {
         }
     }
 
-    var maxValueUrlInitialized = false
-    @AtomicLock var _maxValueUrl: URL? = nil
     var maxValueUrl: URL? {
         get {
             if !maxValueUrlInitialized {
@@ -96,8 +87,6 @@ class Service {
         }
     }
 
-    var smoothTransitionUrlInitialized = false
-    @AtomicLock var _smoothTransitionUrl: URL? = nil
     var smoothTransitionUrl: URL? {
         get {
             if !smoothTransitionUrlInitialized {
@@ -110,24 +99,64 @@ class Service {
             _smoothTransitionUrl = newValue
         }
     }
+
+    func buildURL(_ addr: String, path: String? = nil) -> URL? {
+        var urlBuilder = URLComponents()
+        urlBuilder.scheme = scheme
+        urlBuilder.host = addr.contains(":") ? "[\(addr)]" : addr
+        urlBuilder.port = service.port
+        urlBuilder.path = path ?? self.path
+        return urlBuilder.url
+    }
+
+    func getFirstRespondingURL(urls: [URL], timeout: DateComponents = 3.seconds, retries: UInt = 3) -> URL? {
+        for url in urls {
+            if waitForResponse(from: url, timeoutPerTry: timeout, retries: retries) != nil {
+                return url
+            }
+        }
+        return nil
+    }
 }
 
-class NetworkControl: Control {
-    var displayControl: DisplayControl = .network
+// MARK: - NetworkControl
 
-    static var browser = CiaoBrowser()
-    static var controllersForDisplay: [String: Service] = [:]
-    static let alamoFireManager = buildAlamofireSession()
-    static var controllerVideoObserver: Cancellable?
-    let str = "Network Control"
-    weak var display: Display!
-    var setterTasks = [ControlID: DispatchWorkItem]()
-    let getterTasksSemaphore = DispatchSemaphore(value: 1, name: "getterTasksSemaphore")
+class NetworkControl: Control {
+    // MARK: Lifecycle
 
     init(display: Display) {
         self.display = display
         listenForRequests()
     }
+
+    // MARK: Internal
+
+    struct Request: Equatable {
+        var url: URL
+        var controlID: ControlID
+        var timeout: TimeInterval
+        var value: UInt8
+    }
+
+    static var browser = CiaoBrowser()
+    static var controllersForDisplay: [String: Service] = [:]
+    static let alamoFireManager = buildAlamofireSession()
+    static var controllerVideoObserver: Cancellable?
+    static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
+
+    var displayControl: DisplayControl = .network
+
+    let str = "Network Control"
+    weak var display: Display!
+    var setterTasks = [ControlID: DispatchWorkItem]()
+    let getterTasksSemaphore = DispatchSemaphore(value: 1, name: "getterTasksSemaphore")
+
+    var requestsPublisher = PassthroughSubject<Request, Never>()
+    var responsiveCheckPublisher = PassthroughSubject<Bool, Never>()
+
+    var observers = Set<AnyCancellable>()
+
+    var responsiveTryCount = 0
 
     static func setup() {
         displayController.onActiveDisplaysChange = {
@@ -300,6 +329,28 @@ class NetworkControl: Control {
         }
     }
 
+    static func resetState(serial: String? = nil) {
+        asyncNow(runLoopQueue: serviceBrowserQueue) {
+            if browserSemaphore.wait(for: 5) == .timedOut {
+                return
+            }
+            defer {
+                browserSemaphore.signal()
+            }
+            if let serial = serial {
+                _ = controllersForDisplay.removeValue(forKey: serial)
+            }
+            for display in displayController.activeDisplays.values {
+                display.lastConnectionTime = Date()
+            }
+            browser.reset()
+            browser.delegate.onStop = {
+                browser.browse(type: ServiceType.tcp("ddcutil"))
+                browser.delegate.onStop = nil
+            }
+        }
+    }
+
     func manageSendingState(for controlID: ControlID, sending: Bool) {
         switch controlID {
         case .BRIGHTNESS:
@@ -318,18 +369,6 @@ class NetworkControl: Control {
             }
         }
     }
-
-    var requestsPublisher = PassthroughSubject<Request, Never>()
-    var responsiveCheckPublisher = PassthroughSubject<Bool, Never>()
-
-    struct Request: Equatable {
-        var url: URL
-        var controlID: ControlID
-        var timeout: TimeInterval
-        var value: UInt8
-    }
-
-    var observers = Set<AnyCancellable>()
 
     func listenForRequests() {
         serviceBrowserQueue.async { [weak self] in
@@ -524,8 +563,6 @@ class NetworkControl: Control {
         return true
     }
 
-    var responsiveTryCount = 0
-
     func isResponsive() -> Bool {
         #if DEBUG
             if TEST_IDS.contains(display.id) {
@@ -552,30 +589,6 @@ class NetworkControl: Control {
 
     func resetState() {
         Self.resetState(serial: display.serial)
-    }
-
-    static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
-
-    static func resetState(serial: String? = nil) {
-        asyncNow(runLoopQueue: serviceBrowserQueue) {
-            if browserSemaphore.wait(for: 5) == .timedOut {
-                return
-            }
-            defer {
-                browserSemaphore.signal()
-            }
-            if let serial = serial {
-                _ = controllersForDisplay.removeValue(forKey: serial)
-            }
-            for display in displayController.activeDisplays.values {
-                display.lastConnectionTime = Date()
-            }
-            browser.reset()
-            browser.delegate.onStop = {
-                browser.browse(type: ServiceType.tcp("ddcutil"))
-                browser.delegate.onStop = nil
-            }
-        }
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {

@@ -10,19 +10,7 @@ import Socket
 
 /// Direct bindings to libssh2_session
 public class Session {
-    private static let initResult = libssh2_init(0)
-
-    private let cSession: OpaquePointer
-    private var agent: Agent?
-
-    var blocking: Int32 {
-        get {
-            libssh2_session_get_blocking(cSession)
-        }
-        set(newValue) {
-            libssh2_session_set_blocking(cSession, newValue)
-        }
-    }
+    // MARK: Lifecycle
 
     init() throws {
         guard Session.initResult == 0 else {
@@ -34,6 +22,25 @@ public class Session {
         }
 
         self.cSession = cSession
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        libssh2_session_free(cSession)
+    }
+
+    // MARK: Internal
+
+    var blocking: Int32 {
+        get {
+            libssh2_session_get_blocking(cSession)
+        }
+        set(newValue) {
+            libssh2_session_set_blocking(cSession, newValue)
+        }
     }
 
     func handshake(over socket: Socket) throws {
@@ -86,11 +93,10 @@ public class Session {
         return newAgent
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        libssh2_session_free(cSession)
-    }
+    // MARK: Private
+
+    private static let initResult = libssh2_init(0)
+
+    private let cSession: OpaquePointer
+    private var agent: Agent?
 }

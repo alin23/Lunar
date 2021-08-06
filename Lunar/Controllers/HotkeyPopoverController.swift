@@ -12,6 +12,21 @@ import Foundation
 import Magnet
 
 class HotkeyPopoverController: NSViewController {
+    // MARK: Lifecycle
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT: \(display?.description ?? "no display")")
+            do { log.verbose("END DEINIT: \(display?.description ?? "no display")") }
+        #endif
+
+        hotkey1?.unregister()
+        hotkey2?.unregister()
+        hotkey3?.unregister()
+    }
+
+    // MARK: Internal
+
     @IBOutlet var hotkeyLabel1: NSBox!
     @IBOutlet var hotkeyView1: HotkeyView!
     @IBOutlet var dropdown1: NSPopUpButton!
@@ -234,17 +249,6 @@ class HotkeyPopoverController: NSViewController {
                 hotkeyView.endRecording()
             }
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT: \(display?.description ?? "no display")")
-            do { log.verbose("END DEINIT: \(display?.description ?? "no display")") }
-        #endif
-
-        hotkey1?.unregister()
-        hotkey2?.unregister()
-        hotkey3?.unregister()
     }
 
     override func viewDidLoad() {

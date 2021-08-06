@@ -13,7 +13,30 @@ import Magnet
 import Sauce
 
 class HotkeyView: RecordView, RecordViewDelegate {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Open
+
+    override open func mouseDown(with _: NSEvent) {
+        log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
+        beginRecording()
+        transition()
+    }
+
+    // MARK: Internal
+
     var hoverState: HoverState = .noHover
+
     var hotkey: PersistentHotkey? {
         didSet {
             mainThread {
@@ -134,12 +157,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
         }
     }
 
-    override open func mouseDown(with _: NSEvent) {
-        log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
-        beginRecording()
-        transition()
-    }
-
     override func didChangeValue(forKey key: String) {
         if key == "recording" {
             transition()
@@ -192,16 +209,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
     override func mouseExited(with _: NSEvent) {
         hoverState = .noHover
         transition()
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

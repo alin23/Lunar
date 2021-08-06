@@ -15,7 +15,21 @@ let APP_MAX_BRIGHTNESS: Int8 = 30
 let APP_MAX_CONTRAST: Int8 = 30
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
+// MARK: - AppException
+
 @objc class AppException: NSObject, Codable, Defaults.Serializable {
+    // MARK: Lifecycle
+
+    init(identifier: String, name: String, brightness: Int8 = APP_MAX_BRIGHTNESS, contrast: Int8 = APP_MAX_CONTRAST) {
+        self.identifier = identifier
+        self.name = name
+        self.brightness = brightness
+        self.contrast = contrast
+        super.init()
+    }
+
+    // MARK: Internal
+
     override var description: String {
         "\(name)[\(identifier)]"
     }
@@ -50,18 +64,6 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         }
     }
 
-    init(identifier: String, name: String, brightness: Int8 = APP_MAX_BRIGHTNESS, contrast: Int8 = APP_MAX_CONTRAST) {
-        self.identifier = identifier
-        self.name = name
-        self.brightness = brightness
-        self.contrast = contrast
-        super.init()
-    }
-
-    func save() {
-        DataStore.storeAppException(app: self)
-    }
-
     static func fromDictionary(_ config: [String: Any]) -> AppException? {
         guard let identifier = config["identifier"] as? String,
               let name = config["name"] as? String else { return nil }
@@ -72,6 +74,10 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
             brightness: (config["brightness"] as? Int8) ?? APP_MAX_BRIGHTNESS,
             contrast: (config["contrast"] as? Int8) ?? APP_MAX_CONTRAST
         )
+    }
+
+    func save() {
+        DataStore.storeAppException(app: self)
     }
 
     @objc func remove() {

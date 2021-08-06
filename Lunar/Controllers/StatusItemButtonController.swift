@@ -11,14 +11,18 @@ import Cocoa
 import Defaults
 
 class StatusItemButtonController: NSView {
-    var statusButton: NSStatusBarButton?
-    var menuPopoverOpener: DispatchWorkItem?
-    @Atomic var clicked = false
+    // MARK: Lifecycle
 
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
         statusButton = button
     }
+
+    // MARK: Internal
+
+    var statusButton: NSStatusBarButton?
+    var menuPopoverOpener: DispatchWorkItem?
+    @Atomic var clicked = false
 
     override func mouseEntered(with event: NSEvent) {
         if !CachedDefaults[.showQuickActions] || displayController.displays.count == 0 || clicked {

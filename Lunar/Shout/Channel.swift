@@ -11,19 +11,40 @@ import struct Foundation.URL
 
 /// Direct bindings to libssh2_channel
 public class Channel {
+    // MARK: Lifecycle
+
+    private init(cSession: OpaquePointer, cChannel: OpaquePointer) {
+        self.cSession = cSession
+        self.cChannel = cChannel
+    }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        libssh2_channel_free(cChannel)
+        session = nil
+    }
+
+    // MARK: Public
+
     public var cancelled = false
     public var session: Session?
 
-    private static let session = "session"
-    private static let exec = "exec"
+    public func cancel() throws {
+        cancelled = true
+        _ = write(data: Data([3]), length: 1)
+        try sendEOF()
+        try close()
+        try waitClosed()
+    }
+
+    // MARK: Internal
 
     static let windowDefault: UInt32 = 2 * 1024 * 1024
     static let packetDefaultSize: UInt32 = 32768
     static let readBufferSize = 0x4000
-
-    private let cSession: OpaquePointer
-    private let cChannel: OpaquePointer
-    private var readBuffer = [Int8](repeating: 0, count: Channel.readBufferSize)
 
     static func createForCommand(cSession: OpaquePointer) throws -> Channel {
         guard let cChannel = libssh2_channel_open_ex(
@@ -46,19 +67,6 @@ public class Channel {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_scp_send64 failed")
         }
         return Channel(cSession: cSession, cChannel: cChannel)
-    }
-
-    private init(cSession: OpaquePointer, cChannel: OpaquePointer) {
-        self.cSession = cSession
-        self.cChannel = cChannel
-    }
-
-    public func cancel() throws {
-        cancelled = true
-        _ = write(data: Data([3]), length: 1)
-        try sendEOF()
-        try close()
-        try waitClosed()
     }
 
     func requestPty(type: String) throws {
@@ -131,12 +139,12 @@ public class Channel {
         libssh2_channel_get_exit_status(cChannel)
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        libssh2_channel_free(cChannel)
-        session = nil
-    }
+    // MARK: Private
+
+    private static let session = "session"
+    private static let exec = "exec"
+
+    private let cSession: OpaquePointer
+    private let cChannel: OpaquePointer
+    private var readBuffer = [Int8](repeating: 0, count: Channel.readBufferSize)
 }

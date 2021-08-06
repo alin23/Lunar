@@ -10,70 +10,7 @@ import Foundation
 
 /// Manages an SFTP session
 public class SFTP {
-    /// Direct bindings to libssh2_sftp
-    private class SFTPHandle {
-        // Recommended buffer size accordingly to the docs:
-        // https://www.libssh2.org/libssh2_sftp_write.html
-        fileprivate static let bufferSize = 32768
-
-        private let cSession: OpaquePointer
-        private let sftpHandle: OpaquePointer
-        private var buffer = [Int8](repeating: 0, count: SFTPHandle.bufferSize)
-
-        init(cSession: OpaquePointer, sftpSession: OpaquePointer, remotePath: String, flags: Int32, mode: Int32, openType: Int32 = LIBSSH2_SFTP_OPENFILE) throws {
-            guard let sftpHandle = libssh2_sftp_open_ex(
-                sftpSession,
-                remotePath,
-                UInt32(remotePath.count),
-                UInt(flags),
-                Int(mode),
-                openType
-            ) else {
-                throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_sftp_open_ex failed")
-            }
-            self.cSession = cSession
-            self.sftpHandle = sftpHandle
-        }
-
-        func read() -> ReadWriteProcessor.ReadResult {
-            let result = libssh2_sftp_read(sftpHandle, &buffer, SFTPHandle.bufferSize)
-            return ReadWriteProcessor.processRead(result: result, buffer: &buffer, session: cSession)
-        }
-
-        func write(_ data: Data) -> ReadWriteProcessor.WriteResult {
-            let result: Result<Int, SSHError> = data.withUnsafeBytes {
-                guard let unsafePointer = $0.bindMemory(to: Int8.self).baseAddress else {
-                    return .failure(SSHError.genericError("SFTP write failed to bind memory"))
-                }
-                return .success(libssh2_sftp_write(sftpHandle, unsafePointer, data.count))
-            }
-            switch result {
-            case let .failure(error):
-                return .error(error)
-            case let .success(value):
-                return ReadWriteProcessor.processWrite(result: value, session: cSession)
-            }
-        }
-
-        func readDir(_ attrs: inout LIBSSH2_SFTP_ATTRIBUTES) -> ReadWriteProcessor.ReadResult {
-            let result = libssh2_sftp_readdir_ex(sftpHandle, &buffer, SFTPHandle.bufferSize, nil, 0, &attrs)
-            return ReadWriteProcessor.processRead(result: Int(result), buffer: &buffer, session: cSession)
-        }
-
-        deinit {
-            #if DEBUG
-                log.verbose("START DEINIT")
-                defer { log.verbose("END DEINIT") }
-            #endif
-            libssh2_sftp_close_handle(sftpHandle)
-        }
-    }
-
-    private let cSession: OpaquePointer
-    private let sftpSession: OpaquePointer
-
-    // Retain session to ensure it is not freed before the sftp session is closed
-    private let session: Session
+    // MARK: Lifecycle
 
     init(session: Session, cSession: OpaquePointer) throws {
         guard let sftpSession = libssh2_sftp_init(cSession) else {
@@ -83,6 +20,16 @@ public class SFTP {
         self.sftpSession = sftpSession
         self.session = session
     }
+
+    deinit {
+        #if DEBUG
+            log.verbose("START DEINIT")
+            defer { log.verbose("END DEINIT") }
+        #endif
+        libssh2_sftp_shutdown(sftpSession)
+    }
+
+    // MARK: Public
 
     /// Download a file from the remote server to the local device
     ///
@@ -188,7 +135,12 @@ public class SFTP {
     /// - Throws: SSHError if folder can't be created
     public func createDirectory(_ path: String) throws {
         let result = path.withCString { (pointer: UnsafePointer<Int8>) -> Int32 in
-            libssh2_sftp_mkdir_ex(sftpSession, pointer, UInt32(strlen(pointer)), Int(LIBSSH2_SFTP_S_IRWXU | LIBSSH2_SFTP_S_IRGRP | LIBSSH2_SFTP_S_IXGRP | LIBSSH2_SFTP_S_IROTH | LIBSSH2_SFTP_S_IXOTH))
+            libssh2_sftp_mkdir_ex(
+                sftpSession,
+                pointer,
+                UInt32(strlen(pointer)),
+                Int(LIBSSH2_SFTP_S_IRWXU | LIBSSH2_SFTP_S_IRGRP | LIBSSH2_SFTP_S_IXGRP | LIBSSH2_SFTP_S_IROTH | LIBSSH2_SFTP_S_IXOTH)
+            )
         }
         try handleSFTPCommandResult(result)
     }
@@ -268,6 +220,88 @@ public class SFTP {
         return files
     }
 
+    // MARK: Private
+
+    /// Direct bindings to libssh2_sftp
+    private class SFTPHandle {
+        // MARK: Lifecycle
+
+        init(
+            cSession: OpaquePointer,
+            sftpSession: OpaquePointer,
+            remotePath: String,
+            flags: Int32,
+            mode: Int32,
+            openType: Int32 = LIBSSH2_SFTP_OPENFILE
+        ) throws {
+            guard let sftpHandle = libssh2_sftp_open_ex(
+                sftpSession,
+                remotePath,
+                UInt32(remotePath.count),
+                UInt(flags),
+                Int(mode),
+                openType
+            ) else {
+                throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_sftp_open_ex failed")
+            }
+            self.cSession = cSession
+            self.sftpHandle = sftpHandle
+        }
+
+        deinit {
+            #if DEBUG
+                log.verbose("START DEINIT")
+                defer { log.verbose("END DEINIT") }
+            #endif
+            libssh2_sftp_close_handle(sftpHandle)
+        }
+
+        // MARK: Internal
+
+        func read() -> ReadWriteProcessor.ReadResult {
+            let result = libssh2_sftp_read(sftpHandle, &buffer, SFTPHandle.bufferSize)
+            return ReadWriteProcessor.processRead(result: result, buffer: &buffer, session: cSession)
+        }
+
+        func write(_ data: Data) -> ReadWriteProcessor.WriteResult {
+            let result: Result<Int, SSHError> = data.withUnsafeBytes {
+                guard let unsafePointer = $0.bindMemory(to: Int8.self).baseAddress else {
+                    return .failure(SSHError.genericError("SFTP write failed to bind memory"))
+                }
+                return .success(libssh2_sftp_write(sftpHandle, unsafePointer, data.count))
+            }
+            switch result {
+            case let .failure(error):
+                return .error(error)
+            case let .success(value):
+                return ReadWriteProcessor.processWrite(result: value, session: cSession)
+            }
+        }
+
+        func readDir(_ attrs: inout LIBSSH2_SFTP_ATTRIBUTES) -> ReadWriteProcessor.ReadResult {
+            let result = libssh2_sftp_readdir_ex(sftpHandle, &buffer, SFTPHandle.bufferSize, nil, 0, &attrs)
+            return ReadWriteProcessor.processRead(result: Int(result), buffer: &buffer, session: cSession)
+        }
+
+        // MARK: Fileprivate
+
+        // Recommended buffer size accordingly to the docs:
+        // https://www.libssh2.org/libssh2_sftp_write.html
+        fileprivate static let bufferSize = 32768
+
+        // MARK: Private
+
+        private let cSession: OpaquePointer
+        private let sftpHandle: OpaquePointer
+        private var buffer = [Int8](repeating: 0, count: SFTPHandle.bufferSize)
+    }
+
+    private let cSession: OpaquePointer
+    private let sftpSession: OpaquePointer
+
+    // Retain session to ensure it is not freed before the sftp session is closed
+    private let session: Session
+
     private func handleSFTPCommandResult(_ result: Int32) throws {
         let processedResult = ReadWriteProcessor.processWrite(result: Int(result), session: cSession)
         switch processedResult {
@@ -278,13 +312,5 @@ public class SFTP {
         case let .error(error):
             throw error
         }
-    }
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-        libssh2_sftp_shutdown(sftpSession)
     }
 }

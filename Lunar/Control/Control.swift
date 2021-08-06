@@ -9,10 +9,14 @@
 import ArgumentParser
 import Foundation
 
+// MARK: - PowerState
+
 enum PowerState {
     case on
     case off
 }
+
+// MARK: - DisplayControl
 
 enum DisplayControl: Int, Codable, EnumerableFlag {
     case network
@@ -21,10 +25,7 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
     case gamma
     case ddcctl
 
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(str)
-    }
+    // MARK: Lifecycle
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -36,6 +37,8 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
 
         self = DisplayControl.fromstr(strValue)
     }
+
+    // MARK: Internal
 
     var str: String {
         switch self {
@@ -68,7 +71,14 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
             return .ddc
         }
     }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(str)
+    }
 }
+
+// MARK: - Control
 
 protocol Control {
     var display: Display! { get set }

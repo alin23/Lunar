@@ -10,37 +10,7 @@ import Socket
 
 /// Manages an SSH session
 public class SSH {
-    public let host: String
-    public let port: Int32
-
-    public enum PtyType: String {
-        case vanilla
-        case vt100
-        case vt102
-        case vt220
-        case ansi
-        case xterm
-    }
-
-    /// Connects to a remote server and opens an SSH session
-    ///
-    /// - Parameters:
-    ///   - host: the host to connect to
-    ///   - port: the port to connect to; default 22
-    ///   - username: the username to login with
-    ///   - authMethod: the authentication method to use while logging in
-    ///   - execution: the block executed with the open, authenticated SSH session
-    /// - Throws: SSHError if the session fails at any point
-    public static func connect(host: String, port: Int32 = 22, username: String, authMethod: SSHAuthMethod, execution: (_ ssh: SSH) throws -> Void) throws {
-        let ssh = try SSH(host: host, port: port)
-        try ssh.authenticate(username: username, authMethod: authMethod)
-        try execution(ssh)
-    }
-
-    let session: Session
-    private let sock: Socket
-
-    public var ptyType: PtyType?
+    // MARK: Lifecycle
 
     /// Creates a new SSH session
     ///
@@ -58,6 +28,43 @@ public class SSH {
         session.blocking = 1
         try sock.connect(to: host, port: port)
         try session.handshake(over: sock)
+    }
+
+    // MARK: Public
+
+    public enum PtyType: String {
+        case vanilla
+        case vt100
+        case vt102
+        case vt220
+        case ansi
+        case xterm
+    }
+
+    public let host: String
+    public let port: Int32
+
+    public var ptyType: PtyType?
+
+    /// Connects to a remote server and opens an SSH session
+    ///
+    /// - Parameters:
+    ///   - host: the host to connect to
+    ///   - port: the port to connect to; default 22
+    ///   - username: the username to login with
+    ///   - authMethod: the authentication method to use while logging in
+    ///   - execution: the block executed with the open, authenticated SSH session
+    /// - Throws: SSHError if the session fails at any point
+    public static func connect(
+        host: String,
+        port: Int32 = 22,
+        username: String,
+        authMethod: SSHAuthMethod,
+        execution: (_ ssh: SSH) throws -> Void
+    ) throws {
+        let ssh = try SSH(host: host, port: port)
+        try ssh.authenticate(username: username, authMethod: authMethod)
+        try execution(ssh)
     }
 
     /// Authenticate the session using a public/private key pair
@@ -138,7 +145,11 @@ public class SSH {
     ///   - output: block handler called every time a chunk of command output is received
     /// - Returns: exit code of the command
     /// - Throws: SSHError if the command couldn't be executed
-    public func execute(_ command: String, onChannelOpened: ((Channel) -> Void)? = nil, output: (_ output: String) -> Void) throws -> Int32 {
+    public func execute(
+        _ command: String,
+        onChannelOpened: ((Channel) -> Void)? = nil,
+        output: (_ output: String) -> Void
+    ) throws -> Int32 {
         let channel = try session.openCommandChannel()
 
         if let ptyType = ptyType {
@@ -239,4 +250,12 @@ public class SSH {
     public func openSftp() throws -> SFTP {
         try session.openSftp()
     }
+
+    // MARK: Internal
+
+    let session: Session
+
+    // MARK: Private
+
+    private let sock: Socket
 }

@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - NanoID
+
 /// USAGE
 ///
 /// Nano ID with default alphabet (0-9a-zA-Z_~) and length (21 chars)
@@ -24,9 +26,7 @@ import Foundation
 /// let idSecond = nanoID.new()
 
 class NanoID {
-    // Shared Parameters
-    private var size: Int
-    private var alphabet: String
+    // MARK: Lifecycle
 
     /// Inits an instance with Shared Parameters
     init(alphabet: NanoIDAlphabet..., size: Int) {
@@ -34,14 +34,7 @@ class NanoID {
         self.alphabet = NanoIDHelper.parse(alphabet)
     }
 
-    /// Generates a Nano ID using Shared Parameters
-    func new() -> String {
-        NanoIDHelper.generate(from: alphabet, of: size)
-    }
-
-    // Default Parameters
-    private static let defaultSize = 21
-    private static let defaultAphabet = NanoIDAlphabet.urlSafe.toString()
+    // MARK: Internal
 
     /// Generates a Nano ID using Default Parameters
     static func new() -> String {
@@ -58,7 +51,24 @@ class NanoID {
     static func new(_ size: Int) -> String {
         NanoIDHelper.generate(from: NanoID.defaultAphabet, of: size)
     }
+
+    /// Generates a Nano ID using Shared Parameters
+    func new() -> String {
+        NanoIDHelper.generate(from: alphabet, of: size)
+    }
+
+    // MARK: Private
+
+    // Default Parameters
+    private static let defaultSize = 21
+    private static let defaultAphabet = NanoIDAlphabet.urlSafe.toString()
+
+    // Shared Parameters
+    private var size: Int
+    private var alphabet: String
 }
+
+// MARK: - NanoIDHelper
 
 private enum NanoIDHelper {
     /// Parses input alphabets into a string
@@ -92,11 +102,15 @@ private enum NanoIDHelper {
     }
 }
 
+// MARK: - NanoIDAlphabet
+
 enum NanoIDAlphabet {
     case urlSafe
     case uppercasedLatinLetters
     case lowercasedLatinLetters
     case numbers
+
+    // MARK: Internal
 
     func toString() -> String {
         switch self {
@@ -108,6 +122,8 @@ enum NanoIDAlphabet {
             )
         }
     }
+
+    // MARK: Private
 
     private func chars() -> String {
         switch self {

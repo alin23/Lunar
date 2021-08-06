@@ -10,6 +10,8 @@ import Cocoa
 import Defaults
 import SwiftyAttributes
 
+// MARK: - PopUpButtonCell
+
 class PopUpButtonCell: NSPopUpButtonCell {
     var textColor: NSColor?
     var dotColor: NSColor?
@@ -27,14 +29,31 @@ class PopUpButtonCell: NSPopUpButtonCell {
     }
 }
 
+// MARK: - PopUpButton
+
 class PopUpButton: NSPopUpButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
+    var hoverState = HoverState.noHover
+
     var page = Page.display {
         didSet {
             setColors()
         }
     }
 
-    var hoverState = HoverState.noHover
     var bgColor: NSColor {
         if state == .off {
             return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
@@ -57,16 +76,6 @@ class PopUpButton: NSPopUpButton {
         } else {
             return darkMauve
         }
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func mouseEntered(with _: NSEvent) {

@@ -1,9 +1,24 @@
 import Cocoa
 
 class NonResponsiveTextField: NSTextField {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
     var hover: Bool = false
     var trackingArea: NSTrackingArea?
     var onClick: (() -> Void)?
+
     override var isHidden: Bool {
         didSet {
             mainThread {
@@ -19,16 +34,6 @@ class NonResponsiveTextField: NSTextField {
     func setup() {
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
         addTrackingArea(trackingArea!)
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
     }
 
     override func draw(_ dirtyRect: NSRect) {

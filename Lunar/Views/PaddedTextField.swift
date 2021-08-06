@@ -8,6 +8,8 @@
 
 import Cocoa
 
+// MARK: - PaddedTextField
+
 class PaddedTextField: NSTextField {
     override func draw(_ dirtyRect: NSRect) {
         appearance = appearance ?? NSAppearance(named: .aqua)
@@ -20,6 +22,8 @@ class PaddedTextField: NSTextField {
         }
     }
 }
+
+// MARK: - PaddedSecureTextField
 
 class PaddedSecureTextField: NSSecureTextField {
     override class var cellClass: AnyClass? {
@@ -41,6 +45,8 @@ class PaddedSecureTextField: NSSecureTextField {
     }
 }
 
+// MARK: - PaddedTextFieldCell
+
 class PaddedTextFieldCell: PlainTextFieldCell {
     @IBInspectable var padding = CGSize(width: 8.0, height: 4.0)
 
@@ -59,7 +65,14 @@ class PaddedTextFieldCell: PlainTextFieldCell {
         super.edit(withFrame: insetRect, in: controlView, editor: textObj, delegate: delegate, event: event)
     }
 
-    override func select(withFrame rect: NSRect, in controlView: NSView, editor textObj: NSText, delegate: Any?, start selStart: Int, length selLength: Int) {
+    override func select(
+        withFrame rect: NSRect,
+        in controlView: NSView,
+        editor textObj: NSText,
+        delegate: Any?,
+        start selStart: Int,
+        length selLength: Int
+    ) {
         let insetRect = rect.insetBy(dx: padding.width, dy: padding.height)
         super.select(withFrame: insetRect, in: controlView, editor: textObj, delegate: delegate, start: selStart, length: selLength)
     }
@@ -69,6 +82,8 @@ class PaddedTextFieldCell: PlainTextFieldCell {
         super.drawInterior(withFrame: insetRect, in: controlView)
     }
 }
+
+// MARK: - PaddedSecureTextFieldCell
 
 class PaddedSecureTextFieldCell: NSSecureTextFieldCell {
     @IBInspectable var padding = CGSize(width: 8.0, height: 4.0)
@@ -88,7 +103,14 @@ class PaddedSecureTextFieldCell: NSSecureTextFieldCell {
         super.edit(withFrame: insetRect, in: controlView, editor: textObj, delegate: delegate, event: event)
     }
 
-    override func select(withFrame rect: NSRect, in controlView: NSView, editor textObj: NSText, delegate: Any?, start selStart: Int, length selLength: Int) {
+    override func select(
+        withFrame rect: NSRect,
+        in controlView: NSView,
+        editor textObj: NSText,
+        delegate: Any?,
+        start selStart: Int,
+        length selLength: Int
+    ) {
         let insetRect = rect.insetBy(dx: padding.width, dy: padding.height)
         super.select(withFrame: insetRect, in: controlView, editor: textObj, delegate: delegate, start: selStart, length: selLength)
     }

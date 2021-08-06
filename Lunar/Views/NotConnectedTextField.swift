@@ -1,14 +1,7 @@
 import Cocoa
 
 class NotConnectedTextField: NSTextField {
-    var hover: Bool = false
-    var trackingArea: NSTrackingArea?
-    var onClick: (() -> Void)?
-
-    func setup() {
-        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
-        addTrackingArea(trackingArea!)
-    }
+    // MARK: Lifecycle
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -18,6 +11,17 @@ class NotConnectedTextField: NSTextField {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
+    }
+
+    // MARK: Internal
+
+    var hover: Bool = false
+    var trackingArea: NSTrackingArea?
+    var onClick: (() -> Void)?
+
+    func setup() {
+        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
+        addTrackingArea(trackingArea!)
     }
 
     override func draw(_ dirtyRect: NSRect) {
