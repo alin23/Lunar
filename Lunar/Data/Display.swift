@@ -254,22 +254,22 @@ enum ValueType {
         greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? 90.ns
         blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? 90.ns
 
-        lockedBrightness = try container.decode(Bool.self, forKey: .lockedBrightness)
-        lockedContrast = try container.decode(Bool.self, forKey: .lockedContrast)
+        lockedBrightness = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightness)) ?? false
+        lockedContrast = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrast)) ?? false
 
-        lockedBrightnessCurve = try container.decode(Bool.self, forKey: .lockedBrightnessCurve)
-        lockedContrastCurve = try container.decode(Bool.self, forKey: .lockedContrastCurve)
+        lockedBrightnessCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightnessCurve)) ?? false
+        lockedContrastCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrastCurve)) ?? false
 
-        alwaysUseNetworkControl = try container.decode(Bool.self, forKey: .alwaysUseNetworkControl)
-        neverUseNetworkControl = try container.decode(Bool.self, forKey: .neverUseNetworkControl)
-        alwaysFallbackControl = try container.decode(Bool.self, forKey: .alwaysFallbackControl)
-        neverFallbackControl = try container.decode(Bool.self, forKey: .neverFallbackControl)
+        alwaysUseNetworkControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysUseNetworkControl)) ?? false
+        neverUseNetworkControl = (try container.decodeIfPresent(Bool.self, forKey: .neverUseNetworkControl)) ?? false
+        alwaysFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysFallbackControl)) ?? false
+        neverFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .neverFallbackControl)) ?? false
 
-        volume = (try container.decode(UInt8.self, forKey: .volume)).ns
-        audioMuted = try container.decode(Bool.self, forKey: .audioMuted)
+        volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
+        audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
-        input = (try container.decode(UInt8.self, forKey: .input)).ns
+        input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? Input.unknown.rawValue.ns
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
