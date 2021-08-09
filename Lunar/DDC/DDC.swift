@@ -519,7 +519,7 @@ enum DDC {
             #if arch(arm64)
                 let result = DDCWriteM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
             #else
-                let result = DDCWrite(fb, &command, CachedDefaults[.ddcSleepFactor].rawValue)
+                let result = DDCWrite(fb, &command)
             #endif
 
             let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
@@ -607,7 +607,7 @@ enum DDC {
         }
     }
 
-    static func read(displayID: CGDirectDisplayID, controlID: ControlID, brightness _: Brightness? = nil) -> DDCReadResult? {
+    static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
         guard !isTestID(displayID) else { return nil }
 
         #if arch(arm64)
@@ -629,22 +629,12 @@ enum DDC {
                 current_value: 0
             )
 
-            let metalDevice = CGDirectDisplayCopyCurrentMetalDevice(displayID)
-            var ddcDelay = DDC_MIN_REPLY_DELAY_INTEL
-            if let gpu = metalDevice {
-                if gpu.name.lowercased().contains("amd") {
-                    ddcDelay = DDC_MIN_REPLY_DELAY_AMD
-                } else if gpu.name.lowercased().contains("nvidia") {
-                    ddcDelay = DDC_MIN_REPLY_DELAY_NVIDIA
-                }
-            }
-
             let readStartedAt = DispatchTime.now()
 
             #if arch(arm64)
                 DDCReadM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
             #else
-                DDCRead(fb, &command, ddcDelay, CachedDefaults[.ddcSleepFactor].rawValue)
+                DDCRead(fb, &command)
             #endif
 
             let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
@@ -692,7 +682,7 @@ enum DDC {
             #if arch(arm64)
                 EDIDTestM1(avService, &edid, &edidData)
             #else
-                EDIDTest(fb, &edid, &edidData, CachedDefaults[.ddcSleepFactor].rawValue)
+                EDIDTest(fb, &edid, &edidData)
             #endif
 
             return (edid, Data(bytes: &edidData, count: 256))

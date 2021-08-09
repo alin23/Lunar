@@ -342,7 +342,7 @@ dispatch_semaphore_t AVServiceI2CQueue(IOAVServiceRef i2c_device_id)
     return queue;
 }
 
-bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request, uint8_t sleepFactor)
+bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
 {
     dispatch_semaphore_t queue = I2CRequestQueue(framebuffer);
     dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
@@ -366,7 +366,7 @@ bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request, uint
         }
     }
     if (request->replyTransactionType == kIOI2CNoTransactionType)
-        usleep(20000 * (sleepFactor + 1));
+        usleep(20000);
     dispatch_semaphore_signal(queue);
     return result && request->result == KERN_SUCCESS;
 }
@@ -408,7 +408,7 @@ bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write, uint8_t
     return true;
 }
 
-bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write, uint8_t sleepFactor)
+bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
 {
     IOI2CRequest request;
     UInt8 data[256];
@@ -433,7 +433,7 @@ bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write, uint8_t s
     request.replyTransactionType = kIOI2CNoTransactionType;
     request.replyBytes = 0;
 
-    bool result = FramebufferI2CRequest(framebuffer, &request, sleepFactor);
+    bool result = FramebufferI2CRequest(framebuffer, &request);
     return result;
 }
 
@@ -527,12 +527,30 @@ bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read, uint8_t sl
     return result;
 }
 
-bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinReplyDelay, uint8_t sleepFactor)
+long DDCDelayBase = 1; // nanoseconds
+
+long DDCDelay(io_service_t framebuffer)
+{
+    // Certain displays / graphics cards require a long-enough delay to yield a response to DDC commands
+    // Relying on retry will not help if the delay is too short.
+    // kernel panics are possible if value is wrong
+    // https://developer.apple.com/documentation/iokit/ioi2crequest/1410394-minreplydelay?language=objc
+
+    CFStringRef ioRegPath = IORegistryEntryCopyPath(framebuffer, kIOServicePlane);
+    if (CFStringFind(ioRegPath, CFSTR("/AMD"), kCFCompareCaseInsensitive).location != kCFNotFound) {
+        return DDCDelayBase + 30000000; // Team Red needs more time, as usual!
+    }
+    return DDCDelayBase;
+}
+
+bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read)
 {
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
     bool result = false;
-    UInt8 data[256];
+    UInt8 data[128];
+
+    long reply_timeout = DDCDelay(framebuffer) * kNanosecondScale;
 
     for (int i = 1; i <= kMaxRequests; i++) {
         bzero(&request, sizeof(request));
@@ -542,7 +560,7 @@ bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinR
         request.sendTransactionType = kIOI2CSimpleTransactionType;
         request.sendBuffer = (vm_address_t)&data[0];
         request.sendBytes = 5;
-        request.minReplyDelay = ddcMinReplyDelay * kNanosecondScale;
+        request.minReplyDelay = reply_timeout;
 
         data[0] = 0x51;
         data[1] = 0x82;
@@ -562,7 +580,7 @@ bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinR
         request.replyBuffer = (vm_address_t)reply_data;
         request.replyBytes = sizeof(reply_data);
 
-        result = FramebufferI2CRequest(framebuffer, &request, sleepFactor);
+        result = FramebufferI2CRequest(framebuffer, &request);
         result = (result && reply_data[0] == request.sendAddress && reply_data[2] == 0x2 && reply_data[4] == read->control_id && reply_data[10] == (request.replyAddress ^ request.replySubAddress ^ reply_data[1] ^ reply_data[2] ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
 
         if (result) { // checksum is ok
@@ -584,7 +602,7 @@ bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read, long ddcMinR
             return 0;
         }
 
-        usleep(40000 * (sleepFactor + 1)); // 40msec -> See DDC/CI Vesa Standard - 4.4.1 Communication Error Recovery
+        usleep(40000); // 40msec -> See DDC/CI Vesa Standard - 4.4.1 Communication Error Recovery
     }
     read->success = true;
     read->max_value = reply_data[7];
@@ -723,12 +741,12 @@ bool EDIDTestM1(IOAVServiceRef avService, struct EDID* edid, uint8_t edidData[25
 
     if (edid) {
 
-        #if DEBUG
-            UInt8 name[14];
-            bzero(&name, sizeof(name));
-            CFDataGetBytes(data, CFRangeMake(0x71, 13), name);
-            printf("EDID NAME: %s", name);
-        #endif
+#if DEBUG
+        UInt8 name[14];
+        bzero(&name, sizeof(name));
+        CFDataGetBytes(data, CFRangeMake(0x71, 13), name);
+        printf("EDID NAME: %s", name);
+#endif
 
         memcpy(edid, &data, 256);
         memcpy(edidData, &data, 256);
@@ -749,7 +767,7 @@ bool EDIDTestM1(IOAVServiceRef avService, struct EDID* edid, uint8_t edidData[25
     return !sum;
 }
 
-bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256], uint8_t sleepFactor)
+bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256])
 {
     IOI2CRequest request = {};
     /*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
@@ -794,7 +812,7 @@ bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256]
     request.replyTransactionType = kIOI2CSimpleTransactionType;
     request.replyBuffer = (vm_address_t)data;
     request.replyBytes = sizeof(data);
-    if (!FramebufferI2CRequest(framebuffer, &request, sleepFactor))
+    if (!FramebufferI2CRequest(framebuffer, &request))
         return false;
     if (edid) {
         memcpy(edid, &data, 256);

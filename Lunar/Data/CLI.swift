@@ -1139,9 +1139,21 @@ private func handleDisplay(
             throw CommandError.invalidValue("Unknown operation \(operation) for value \(value)")
         }
 
-        display.setValue(value, forKey: property.rawValue)
+        switch property {
+        case .brightness:
+            display.brightness = value
+            display.control?.write(property, display.limitedBrightness)
+        case .contrast:
+            display.contrast = value
+            display.control?.write(property, display.limitedContrast)
+        case .volume:
+            display.volume = value
+            display.control?.write(property, display.limitedVolume)
+        default:
+            display.setValue(value, forKey: property.rawValue)
+            display.control?.write(property, value.uint8Value)
+        }
         display.save(now: true)
-        display.control?.write(property, value.uint8Value)
     default:
         break
     }
