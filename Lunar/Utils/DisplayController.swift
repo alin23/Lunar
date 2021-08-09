@@ -154,7 +154,7 @@ class DisplayController {
     }
 
     var currentAudioDisplay: Display? {
-        guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMasterVolume(scope: .output) else {
+        guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) else {
             return nil
         }
         return activeDisplays.values.map { $0 }.sorted(by: { d1, d2 in
@@ -937,6 +937,9 @@ class DisplayController {
                     let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
                     let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
                         if fallbackToGamma == .alertFirstButtonReturn {
+                            if let control = display.control?.displayControl {
+                                display.enabledControls[control] = false
+                            }
                             display.control = GammaControl(display: display)
                             display.setGamma()
                         }

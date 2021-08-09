@@ -269,7 +269,7 @@ enum ValueType {
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
-        input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? Input.unknown.rawValue.ns
+        input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
@@ -801,6 +801,7 @@ enum ValueType {
 
     @Atomic var force = false
     @Atomic var faceLightEnabled = false
+    @Atomic var blackOutEnabled = false
     lazy var brightnessBeforeFacelight = brightness
     lazy var contrastBeforeFacelight = contrast
     lazy var maxBrightnessBeforeFacelight = maxBrightness
@@ -888,7 +889,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -899,7 +900,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -910,7 +911,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -921,7 +922,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -932,7 +933,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -943,7 +944,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -954,7 +955,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -965,7 +966,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -976,7 +977,7 @@ enum ValueType {
             save()
             if control is GammaControl {
                 setGamma()
-            } else if applyGamma || gammaChanged {
+            } else if applyGamma || gammaChanged, !blackOutEnabled {
                 resetGamma()
             }
         }
@@ -1089,6 +1090,45 @@ enum ValueType {
             save()
             readapt(newValue: maxContrast, oldValue: oldValue)
         }
+    }
+
+    var limitedBrightness: UInt8 {
+        guard maxDDCBrightness.uint8Value != 100 else {
+            return brightness.uint8Value
+        }
+        return mapNumber(
+            brightness.doubleValue,
+            fromLow: 0,
+            fromHigh: 100,
+            toLow: 0,
+            toHigh: maxDDCBrightness.doubleValue
+        ).rounded().u8
+    }
+
+    var limitedContrast: UInt8 {
+        guard maxDDCContrast.uint8Value != 100 else {
+            return contrast.uint8Value
+        }
+        return mapNumber(
+            contrast.doubleValue,
+            fromLow: 0,
+            fromHigh: 100,
+            toLow: 0,
+            toHigh: maxDDCContrast.doubleValue
+        ).rounded().u8
+    }
+
+    var limitedVolume: UInt8 {
+        guard maxDDCVolume.uint8Value != 100 else {
+            return volume.uint8Value
+        }
+        return mapNumber(
+            volume.doubleValue,
+            fromLow: 0,
+            fromHigh: 100,
+            toLow: 0,
+            toHigh: maxDDCVolume.doubleValue
+        ).rounded().u8
     }
 
     @Published @objc dynamic var brightness: NSNumber {
@@ -1246,7 +1286,6 @@ enum ValueType {
     @Published @objc dynamic var contrastOnInputChange2: NSNumber { didSet { save() } }
     @Published @objc dynamic var brightnessOnInputChange3: NSNumber { didSet { save() } }
     @Published @objc dynamic var contrastOnInputChange3: NSNumber { didSet { save() } }
-
     @Published @objc dynamic var audioMuted: Bool {
         didSet {
             save()
@@ -1625,6 +1664,19 @@ enum ValueType {
         values[featureValue] = targetValue
     }
 
+    func thrice(_ action: @escaping ((Display) -> Void), onFinish: ((Display) -> Void)? = nil) {
+        asyncNow { [weak self] in
+            self?.withSmoothTransition(false) {
+                self?.withForce {
+                    for _ in 1 ... 3 { if let self = self { action(self) } }
+                    if let self = self {
+                        onFinish?(self)
+                    }
+                }
+            }
+        }
+    }
+
     override func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? Display else {
             return false
@@ -1703,21 +1755,21 @@ enum ValueType {
 
         if coreDisplayControl.isAvailable() {
             if applyGamma || gammaChanged {
-                resetGamma()
+                if !blackOutEnabled { resetGamma() }
                 coreDisplayControl.reapply()
             }
             return coreDisplayControl
         }
         if ddcControl.isAvailable() {
             if applyGamma || gammaChanged {
-                resetGamma()
+                if !blackOutEnabled { resetGamma() }
                 ddcControl.reapply()
             }
             return ddcControl
         }
         if networkControl.isAvailable() {
             if applyGamma || gammaChanged {
-                resetGamma()
+                if !blackOutEnabled { resetGamma() }
                 networkControl.reapply()
             }
             return networkControl
@@ -2676,7 +2728,7 @@ enum ValueType {
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve else { return }
+        guard !lockedBrightnessCurve, !adaptivePaused else { return }
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
@@ -2708,7 +2760,7 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve else { return }
+        guard !lockedContrastCurve, !adaptivePaused else { return }
 
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {

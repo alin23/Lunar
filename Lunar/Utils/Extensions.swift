@@ -123,6 +123,10 @@ extension Bool {
     @inline(__always) var i: Int {
         self ? 1 : 0
     }
+
+    @inline(__always) var state: NSControl.StateValue {
+        self ? .on : .off
+    }
 }
 
 let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")

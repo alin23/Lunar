@@ -107,6 +107,7 @@ class SettingsPopoverController: NSViewController {
     var displaysObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
 
+    @IBOutlet var applyGammaCheckbox: NSButton!
     @IBOutlet var _ddcColorGainHelpButton: NSButton?
 
     var ddcLimitsHelpButton: HelpButton? {
@@ -154,6 +155,7 @@ class SettingsPopoverController: NSViewController {
                 syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(display.id) || TEST_MODE
 
                 applyGamma = display.applyGamma
+                setupApplyGammaCheckbox()
             }
             setupDDCLimits(display)
             setupDDCColorGain(display)
@@ -263,7 +265,7 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
-    @IBAction func resetLimits(_ sender: Any) {
+    @IBAction func resetLimits(_: Any) {
         guard let display = display else {
             return
         }
@@ -275,12 +277,12 @@ class SettingsPopoverController: NSViewController {
         setupDDCLimits(display)
     }
 
-    @IBAction func resetColors(_ sender: Any) {
+    @IBAction func resetColors(_: Any) {
         guard let display = display, display.hasI2C, let control = display.control, !(control is GammaControl) else {
             return
         }
 
-        control.resetColors()
+        _ = control.resetColors()
         if !display.refreshColors() {
             display.redGain = 90
             display.greenGain = 90
@@ -290,7 +292,7 @@ class SettingsPopoverController: NSViewController {
         setupDDCColorGain(display)
     }
 
-    @IBAction func resetGamma(_ sender: Any) {
+    @IBAction func resetGamma(_: Any) {
         guard let display = display else {
             return
         }
@@ -307,6 +309,22 @@ class SettingsPopoverController: NSViewController {
 
         if !gammaEnabled, display.applyGamma || display.gammaChanged {
             display.resetGamma()
+        }
+        setupApplyGammaCheckbox()
+    }
+
+    func setupApplyGammaCheckbox() {
+        mainAsyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            if self.display?.control is GammaControl {
+                self.applyGammaCheckbox.state = .on
+                self.applyGammaCheckbox.isEnabled = false
+                self.applyGammaCheckbox.toolTip = "Always enabled when Software Controls is used."
+            } else {
+                self.applyGammaCheckbox.state = self.applyGamma.state
+                self.applyGammaCheckbox.isEnabled = true
+                self.applyGammaCheckbox.toolTip = nil
+            }
         }
     }
 
@@ -550,6 +568,7 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
             }
             self.applyGamma = display.applyGamma
+            self.setupApplyGammaCheckbox()
         }
     }
 

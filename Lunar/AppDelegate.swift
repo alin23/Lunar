@@ -780,6 +780,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                     guard let w = gammaWindowController?.window,
                           let c = w.contentViewController as? GammaViewController else { return }
+                    w.setFrameOrigin(NSPoint(x: 0, y: 0))
                     w.ignoresMouseEvents = true
                     c.highlight()
                 } else {

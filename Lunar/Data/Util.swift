@@ -29,7 +29,7 @@ import UserNotifications
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
         return id == GENERIC_DISPLAY_ID
-        return TEST_IDS.contains(id)
+//        return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
     #endif
@@ -606,6 +606,7 @@ func asyncEvery(
     uniqueTaskKey: String? = nil,
     runs: Int? = nil,
     skipIfExists: Bool = false,
+    eager: Bool = false,
     _ action: @escaping (Timer) -> Void
 ) {
     timerQueue.async {
@@ -629,6 +630,8 @@ func asyncEvery(
                 Thread.current.threadDictionary["\(key)-runs"] = runs + 1
             }
         }
+
+        if eager { action(timer) }
 
         if let key = uniqueTaskKey {
             taskQueueLock.around { taskQueue[key] = timerQueue }
