@@ -79,6 +79,10 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
 
+    @IBOutlet var minDDCBrightnessField: ScrollableTextField!
+    @IBOutlet var minDDCContrastField: ScrollableTextField!
+    @IBOutlet var minDDCVolumeField: ScrollableTextField!
+
     @IBOutlet var blueGainField: ScrollableTextField!
     @IBOutlet var greenGainField: ScrollableTextField!
     @IBOutlet var redGainField: ScrollableTextField!
@@ -270,6 +274,10 @@ class SettingsPopoverController: NSViewController {
             return
         }
 
+        display.minDDCBrightness = 0.ns
+        display.minDDCContrast = 0.ns
+        display.minDDCVolume = 0.ns
+
         display.maxDDCBrightness = 100.ns
         display.maxDDCContrast = 100.ns
         display.maxDDCVolume = 100.ns
@@ -372,14 +380,47 @@ class SettingsPopoverController: NSViewController {
     func setupDDCLimits(_ display: Display? = nil) {
         if let display = display ?? self.display {
             mainThread {
+                minDDCBrightnessField.intValue = display.minDDCBrightness.int32Value
+                minDDCContrastField.intValue = display.minDDCContrast.int32Value
+                minDDCVolumeField.intValue = display.minDDCVolume.int32Value
+
                 maxDDCBrightnessField.intValue = display.maxDDCBrightness.int32Value
                 maxDDCContrastField.intValue = display.maxDDCContrast.int32Value
                 maxDDCVolumeField.intValue = display.maxDDCVolume.int32Value
+
+                minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d - 1
+                maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d + 1
+                minDDCContrastField.upperLimit = maxDDCContrastField.intValue.d - 1
+                maxDDCContrastField.lowerLimit = minDDCContrastField.intValue.d + 1
+                minDDCVolumeField.upperLimit = maxDDCVolumeField.intValue.d - 1
+                maxDDCVolumeField.lowerLimit = minDDCVolumeField.intValue.d + 1
             }
 
-            maxDDCBrightnessField.onValueChanged = { [weak self] value in self?.display?.maxDDCBrightness = value.ns }
-            maxDDCContrastField.onValueChanged = { [weak self] value in self?.display?.maxDDCContrast = value.ns }
-            maxDDCVolumeField.onValueChanged = { [weak self] value in self?.display?.maxDDCVolume = value.ns }
+            minDDCBrightnessField.onValueChanged = { [weak self] value in
+                self?.display?.minDDCBrightness = value.ns
+                self?.maxDDCBrightnessField.lowerLimit = value.d
+            }
+            minDDCContrastField.onValueChanged = { [weak self] value in
+                self?.display?.minDDCContrast = value.ns
+                self?.maxDDCContrastField.lowerLimit = value.d
+            }
+            minDDCVolumeField.onValueChanged = { [weak self] value in
+                self?.display?.minDDCVolume = value.ns
+                self?.maxDDCVolumeField.lowerLimit = value.d
+            }
+
+            maxDDCBrightnessField.onValueChanged = { [weak self] value in
+                self?.display?.maxDDCBrightness = value.ns
+                self?.minDDCBrightnessField.upperLimit = value.d
+            }
+            maxDDCContrastField.onValueChanged = { [weak self] value in
+                self?.display?.maxDDCContrast = value.ns
+                self?.minDDCContrastField.upperLimit = value.d
+            }
+            maxDDCVolumeField.onValueChanged = { [weak self] value in
+                self?.display?.maxDDCVolume = value.ns
+                self?.minDDCVolumeField.upperLimit = value.d
+            }
         }
     }
 
