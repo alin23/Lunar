@@ -250,6 +250,10 @@ enum ValueType {
         maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
         maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
 
+        minDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
+        minDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
+        minDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
+
         redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? 90.ns
         greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? 90.ns
         blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? 90.ns
@@ -381,6 +385,9 @@ enum ValueType {
         maxDDCBrightness: UInt8 = 100,
         maxDDCContrast: UInt8 = 100,
         maxDDCVolume: UInt8 = 100,
+        minDDCBrightness: UInt8 = 0,
+        minDDCContrast: UInt8 = 0,
+        minDDCVolume: UInt8 = 0,
         redGain: UInt8 = 90,
         greenGain: UInt8 = 90,
         blueGain: UInt8 = 90,
@@ -440,6 +447,10 @@ enum ValueType {
         self.maxDDCBrightness = maxDDCBrightness.ns
         self.maxDDCContrast = maxDDCContrast.ns
         self.maxDDCVolume = maxDDCVolume.ns
+
+        self.minDDCBrightness = minDDCBrightness.ns
+        self.minDDCContrast = minDDCContrast.ns
+        self.minDDCVolume = minDDCVolume.ns
 
         self.redGain = redGain.ns
         self.greenGain = greenGain.ns
@@ -526,6 +537,9 @@ enum ValueType {
         case maxDDCBrightness
         case maxDDCContrast
         case maxDDCVolume
+        case minDDCBrightness
+        case minDDCContrast
+        case minDDCVolume
         case redGain
         case greenGain
         case blueGain
@@ -628,6 +642,9 @@ enum ValueType {
             .maxDDCBrightness,
             .maxDDCContrast,
             .maxDDCVolume,
+            .minDDCBrightness,
+            .minDDCContrast,
+            .minDDCVolume,
             .redGain,
             .greenGain,
             .blueGain,
@@ -1040,6 +1057,27 @@ enum ValueType {
         }
     }
 
+    @Published @objc dynamic var minDDCBrightness: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: minDDCBrightness, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var minDDCContrast: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: minDDCContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var minDDCVolume: NSNumber {
+        didSet {
+            save()
+            readapt(newValue: minDDCVolume, oldValue: oldValue)
+        }
+    }
+
     @Published @objc dynamic var lockedBrightness: Bool {
         didSet {
             save()
@@ -1093,40 +1131,40 @@ enum ValueType {
     }
 
     var limitedBrightness: UInt8 {
-        guard maxDDCBrightness.uint8Value != 100 else {
+        guard maxDDCBrightness.uint8Value != 100 || minDDCBrightness.uint8Value != 0 else {
             return brightness.uint8Value
         }
         return mapNumber(
             brightness.doubleValue,
             fromLow: 0,
             fromHigh: 100,
-            toLow: 0,
+            toLow: minDDCBrightness.doubleValue,
             toHigh: maxDDCBrightness.doubleValue
         ).rounded().u8
     }
 
     var limitedContrast: UInt8 {
-        guard maxDDCContrast.uint8Value != 100 else {
+        guard maxDDCContrast.uint8Value != 100 || minDDCContrast.uint8Value != 0 else {
             return contrast.uint8Value
         }
         return mapNumber(
             contrast.doubleValue,
             fromLow: 0,
             fromHigh: 100,
-            toLow: 0,
+            toLow: minDDCContrast.doubleValue,
             toHigh: maxDDCContrast.doubleValue
         ).rounded().u8
     }
 
     var limitedVolume: UInt8 {
-        guard maxDDCVolume.uint8Value != 100 else {
+        guard maxDDCVolume.uint8Value != 100 || minDDCVolume.uint8Value != 0 else {
             return volume.uint8Value
         }
         return mapNumber(
             volume.doubleValue,
             fromLow: 0,
             fromHigh: 100,
-            toLow: 0,
+            toLow: minDDCVolume.doubleValue,
             toHigh: maxDDCVolume.doubleValue
         ).rounded().u8
     }
@@ -1151,19 +1189,19 @@ enum ValueType {
             }
 
             var oldBrightness: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCBrightness.uint8Value != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCBrightness.uint8Value != 100 || minDDCBrightness.uint8Value != 0, !(control is GammaControl) {
                 oldBrightness = mapNumber(
                     oldBrightness.d,
                     fromLow: 0,
                     fromHigh: 100,
-                    toLow: 0,
+                    toLow: minDDCBrightness.doubleValue,
                     toHigh: maxDDCBrightness.doubleValue
                 ).rounded().u8
                 brightness = mapNumber(
                     brightness.d,
                     fromLow: 0,
                     fromHigh: 100,
-                    toLow: 0,
+                    toLow: minDDCBrightness.doubleValue,
                     toHigh: maxDDCBrightness.doubleValue
                 ).rounded().u8
             }
@@ -1203,19 +1241,19 @@ enum ValueType {
             }
 
             var oldContrast: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCContrast.uint8Value != 100, !(control is GammaControl) {
+            if DDC.applyLimits, maxDDCContrast.uint8Value != 100 || minDDCContrast.uint8Value != 0, !(control is GammaControl) {
                 oldContrast = mapNumber(
                     oldContrast.d,
                     fromLow: 0,
                     fromHigh: 100,
-                    toLow: 0,
+                    toLow: minDDCContrast.doubleValue,
                     toHigh: maxDDCContrast.doubleValue
                 ).rounded().u8
                 contrast = mapNumber(
                     contrast.d,
                     fromLow: 0,
                     fromHigh: 100,
-                    toLow: 0,
+                    toLow: minDDCContrast.doubleValue,
                     toHigh: maxDDCContrast.doubleValue
                 ).rounded().u8
             }
@@ -1246,8 +1284,9 @@ enum ValueType {
             guard !isForTesting else { return }
 
             var volume = self.volume.uint8Value
-            if DDC.applyLimits, maxDDCVolume.uint8Value != 100, !(control is GammaControl) {
-                volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: maxDDCVolume.doubleValue).rounded().u8
+            if DDC.applyLimits, maxDDCVolume.uint8Value != 100, minDDCVolume.uint8Value != 0, !(control is GammaControl) {
+                volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: minDDCVolume.doubleValue, toHigh: maxDDCVolume.doubleValue)
+                    .rounded().u8
             }
 
             if let control = control, !control.setVolume(volume) {
@@ -1528,6 +1567,9 @@ enum ValueType {
             maxDDCBrightness: (config["maxDDCBrightness"] as? UInt8) ?? 100,
             maxDDCContrast: (config["maxDDCContrast"] as? UInt8) ?? 100,
             maxDDCVolume: (config["maxDDCVolume"] as? UInt8) ?? 100,
+            minDDCBrightness: (config["minDDCBrightness"] as? UInt8) ?? 0,
+            minDDCContrast: (config["minDDCContrast"] as? UInt8) ?? 0,
+            minDDCVolume: (config["minDDCVolume"] as? UInt8) ?? 0,
             redGain: (config["redGain"] as? UInt8) ?? 90,
             greenGain: (config["greenGain"] as? UInt8) ?? 90,
             blueGain: (config["blueGain"] as? UInt8) ?? 90,
@@ -2041,6 +2083,10 @@ enum ValueType {
             try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
             try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
             try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
+
+            try container.encode(minDDCBrightness.uint8Value, forKey: .minDDCBrightness)
+            try container.encode(minDDCContrast.uint8Value, forKey: .minDDCContrast)
+            try container.encode(minDDCVolume.uint8Value, forKey: .minDDCVolume)
 
             try container.encode(redGain.uint8Value, forKey: .redGain)
             try container.encode(greenGain.uint8Value, forKey: .greenGain)
@@ -2583,6 +2629,10 @@ enum ValueType {
         maxDDCBrightness = 100.ns
         maxDDCContrast = 100.ns
         maxDDCVolume = 100.ns
+
+        minDDCBrightness = 0.ns
+        minDDCContrast = 0.ns
+        minDDCVolume = 0.ns
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()
         userBrightness[displayController.adaptiveModeKey]?.removeAll()
