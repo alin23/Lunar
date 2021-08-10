@@ -88,7 +88,7 @@ class ConfigurationViewController: NSViewController {
     """
 
     @IBOutlet var smoothTransitionLabel: NSTextField!
-    @IBOutlet var smoothTransitionCheckbox: NSButton!
+    @IBOutlet var smoothTransitionToggle: MacToggle!
 
     @IBOutlet var _helpButton1: NSButton?
     @IBOutlet var _helpButton2: NSButton?
@@ -477,8 +477,10 @@ class ConfigurationViewController: NSViewController {
         setupVolumeStep()
         setupLocation()
 
-        smoothTransitionCheckbox.needsDisplay = true
-
+        smoothTransitionToggle.isOn = CachedDefaults[.smoothTransition]
+        smoothTransitionToggle.callback = { isOn in
+            CachedDefaults[.smoothTransition] = isOn
+        }
         showRelevantSettings(CachedDefaults[.adaptiveBrightnessMode])
 
         listenForLocationChange()

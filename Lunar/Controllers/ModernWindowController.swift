@@ -74,40 +74,12 @@ class ModernWindowController: NSWindowController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
-            do { log.verbose("END DEINIT") }
+            defer { log.verbose("END DEINIT") }
         #endif
+        POPOVERS["settings"] = nil
     }
 
     // MARK: Internal
-
-    func initPopover<T: NSViewController>(
-        _ popoverKey: String,
-        identifier: String,
-        controllerType _: T.Type,
-        appearance: NSAppearance.Name = .vibrantLight
-    ) {
-        if POPOVERS[popoverKey]! == nil {
-            POPOVERS[popoverKey] = NSPopover()
-        }
-
-        guard let popover = POPOVERS[popoverKey]! else { return }
-
-        if popover.contentViewController == nil, let stb = storyboard,
-           let controller = stb.instantiateController(
-               withIdentifier: NSStoryboard.SceneIdentifier(identifier)
-           ) as? T
-        {
-            popover.contentViewController = controller
-            popover.contentViewController!.loadView()
-            popover.appearance = NSAppearance(named: appearance)
-        }
-    }
-
-    func initPopovers() {
-        guard let w = window, w.title == "Settings" else { return }
-        initPopover("help", identifier: "HelpPopoverController", controllerType: HelpPopoverController.self)
-        initPopover("settings", identifier: "SettingsPopoverController", controllerType: SettingsPopoverController.self)
-    }
 
     override func windowDidLoad() {
         super.windowDidLoad()
