@@ -1490,7 +1490,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a2D-AD-d28">
-                                <rect key="frame" x="510" y="454" width="300" height="24"/>
+                                <rect key="frame" x="510" y="424" width="300" height="24"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable verbose logging" id="cjJ-B0-iUQ">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1499,7 +1499,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dip-cE-zth">
-                                <rect key="frame" x="874" y="456" width="20" height="20"/>
+                                <rect key="frame" x="874" y="426" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="609-dX-Bnf">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1511,7 +1511,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7M-AW-ZKZ">
-                                <rect key="frame" x="510" y="430" width="431" height="26"/>
+                                <rect key="frame" x="510" y="400" width="431" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Log path: ~/Library/Caches/Lunar/swiftybeaver.log" id="Wmi-hJ-bx4">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1548,7 +1548,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </segmentedControl>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g4c-gx-vTg">
-                                <rect key="frame" x="510" y="400" width="177" height="24"/>
+                                <rect key="frame" x="510" y="370" width="177" height="24"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="DDC Sleep Factor" id="OyE-gl-bbK">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1557,7 +1557,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RIf-bz-NbR">
-                                <rect key="frame" x="753" y="403" width="152" height="24"/>
+                                <rect key="frame" x="753" y="373" width="152" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="Jha-W3-x0j">
                                     <font key="font" size="12" name="Menlo-Bold"/>
@@ -1572,7 +1572,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </segmentedControl>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xAc-d8-sVF">
-                                <rect key="frame" x="510" y="373" width="431" height="26"/>
+                                <rect key="frame" x="510" y="343" width="431" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Might help reduce flicker in Hardware/Native Controls" id="Ckv-cF-R4F">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1581,7 +1581,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p8d-0I-Cth">
-                                <rect key="frame" x="510" y="340" width="312" height="30"/>
+                                <rect key="frame" x="510" y="310" width="312" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Mute action applies volume 0" id="CLT-gK-BR6">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1590,7 +1590,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="U8k-OB-lTB">
-                                <rect key="frame" x="874" y="353" width="20" height="20"/>
+                                <rect key="frame" x="874" y="323" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="RZu-P5-V5n">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1602,7 +1602,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bLf-cr-AaM">
-                                <rect key="frame" x="510" y="322" width="360" height="26"/>
+                                <rect key="frame" x="510" y="292" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Useful if the mute button does nothing on your monitor" id="MQg-Bd-uww">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1611,7 +1611,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cAf-Xp-7jE">
-                                <rect key="frame" x="510" y="280" width="312" height="30"/>
+                                <rect key="frame" x="510" y="250" width="312" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show virtual displays" id="ENH-dw-pDI">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1620,7 +1620,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Ch3-iB-ATV">
-                                <rect key="frame" x="874" y="293" width="20" height="20"/>
+                                <rect key="frame" x="874" y="263" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="r7k-gY-UJl">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1632,7 +1632,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YTv-22-zky">
-                                <rect key="frame" x="510" y="262" width="360" height="26"/>
+                                <rect key="frame" x="510" y="232" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Enables iPad Sidecar and DisplayLink displays to appear in Lunar" id="BMv-Sc-gaI">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1640,6 +1640,34 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-c9-2b2">
+                                <rect key="frame" x="510" y="458" width="177" height="24"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Color scheme" id="iz9-yo-c9h">
+                                    <font key="font" size="15" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fIT-Hu-kH1">
+                                <rect key="frame" x="753" y="461" width="152" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="7ue-3B-86g">
+                                    <font key="font" size="12" name="Menlo-Bold"/>
+                                    <segments>
+                                        <segment label="System" toolTip="Follow the system theme"/>
+                                        <segment label="Light" toolTip="Always show the interface in light mode" selected="YES" tag="1"/>
+                                        <segment label="Dark" toolTip="Always show the interface in dark mode"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <binding destination="2iU-q0-Za5" name="selectedIndex" keyPath="values.colorScheme" id="rzJ-JD-xa0">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">ColorSchemeTransformer</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                     </view>
                     <connections>
@@ -3740,7 +3768,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="95"/>
+                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

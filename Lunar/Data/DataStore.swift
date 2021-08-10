@@ -13,6 +13,7 @@ import Defaults
 
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
+    .colorScheme,
     .advancedSettingsShown,
     .appExceptions,
     .muteVolumeZero,
@@ -518,6 +519,7 @@ func initCache() {
     cacheKey(.ddcSleepFactor)
     cacheKey(.sensorPollingSeconds)
     cacheKey(.adaptiveBrightnessMode)
+    cacheKey(.colorScheme)
     cacheKey(.nonManualMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
@@ -578,6 +580,7 @@ extension Defaults.Keys {
     static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
+    static let colorScheme = Key<ColorScheme>("colorScheme", default: .system)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
@@ -643,6 +646,7 @@ enum AppSettings {
 }
 
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }

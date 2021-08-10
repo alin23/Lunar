@@ -92,6 +92,9 @@ class ModernWindowController: NSWindowController {
                 if w.title == "Settings" || w.title == "Ambient Light Sensor" {
                     w.delegate = appDelegate
                 }
+                if w.title == "Settings" {
+                    w.appearance = appDelegate.darkMode ? NSAppearance(named: .darkAqua) : NSAppearance(named: .aqua)
+                }
                 w.setup()
             } else {
                 log.warning("No window found")
