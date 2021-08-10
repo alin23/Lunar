@@ -61,9 +61,10 @@ class HelpButton: PopoverButton<HelpPopoverController> {
     }
 
     func getParsedHelpText() -> NSAttributedString? {
-        guard POPOVERS[popoverKey]! != nil else { return nil }
+        guard let popover = POPOVERS[popoverKey]! else { return nil }
 
-        return MD.attributedString(from: helpText)
+        let md = (popover.appearance == nil || popover.appearance!.name == .vibrantLight) ? MD : DARK_MD
+        return md.attributedString(from: helpText)
     }
 
     override func mouseDown(with event: NSEvent) {

@@ -1119,15 +1119,16 @@ class DisplayViewController: NSViewController {
             update()
 
             if let inputDropdown = inputDropdown {
-                inputDropdown.appearance = NSAppearance(named: .vibrantLight)
-
+                // inputDropdown.appearance = NSAppearance(named: .vibrantLight)
+                let color = appDelegate.darkMode ? white.blended(withFraction: 0.1, of: darkMauve)! : darkMauve
+                    .blended(withFraction: 0.3, of: gray)!
                 for item in inputDropdown.itemArray {
                     var title = item.attributedTitle?.string ?? item.title
                     if title == "Unknown" {
                         title = "Input"
                     }
                     item.attributedTitle = title
-                        .withAttribute(.textColor(darkMauve.blended(withFraction: 0.3, of: gray)!))
+                        .withAttribute(.textColor(color))
                 }
             }
 

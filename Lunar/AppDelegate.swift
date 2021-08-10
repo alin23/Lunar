@@ -156,6 +156,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         set { _windowControllerLock.around { _windowController = newValue } }
     }
 
+    var darkMode: Bool { (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark" }
+
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
@@ -537,20 +539,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
-            .removeDuplicates()
-            .sink { _ in self.adaptAppearance() }
+            .sink { _ in self.recreateWindow() }
             .store(in: &observers)
-    }
-
-    func adaptAppearance() {
-        mainThread {
-            guard let menuPopover = POPOVERS["menu"]! else { return }
-            menuPopover.appearance = NSAppearance(named: .vibrantLight)
-            let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
-            if appearanceDescription.contains("dark") {
-                menuPopover.appearance = NSAppearance(named: .vibrantDark)
-            }
-        }
     }
 
     func listenForScreenConfigurationChanged() {
@@ -648,6 +638,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     break
                 }
             }.store(in: &observers)
+    }
+
+    func initPopover<T: NSViewController>(
+        _ popoverKey: String,
+        identifier: String,
+        controllerType _: T.Type,
+        appearance: NSAppearance.Name = .vibrantLight
+    ) {
+        if !POPOVERS.keys.contains(popoverKey) || POPOVERS[popoverKey]! == nil {
+            POPOVERS[popoverKey] = NSPopover()
+        }
+
+        guard let popover = POPOVERS[popoverKey]! else { return }
+
+        if popover.contentViewController == nil, let stb = NSStoryboard.main,
+           let controller = stb.instantiateController(
+               withIdentifier: NSStoryboard.SceneIdentifier(identifier)
+           ) as? T
+        {
+            popover.contentViewController = controller
+            popover.contentViewController!.loadView()
+            popover.appearance = NSAppearance(named: appearance)
+        }
+    }
+
+    func initPopovers() {
+        initPopover(
+            "help",
+            identifier: "HelpPopoverController",
+            controllerType: HelpPopoverController.self,
+            appearance: appDelegate.darkMode ? .vibrantDark : .vibrantLight
+        )
+        initPopover(
+            "settings",
+            identifier: "SettingsPopoverController",
+            controllerType: SettingsPopoverController.self,
+            appearance: appDelegate.darkMode ? .vibrantDark : .vibrantLight
+        )
+    }
+
+    func recreateWindow() {
+        if windowController?.window != nil {
+            let shouldShow = windowController!.window!.isVisible
+            windowController?.close()
+            windowController?.window = nil
+            windowController = nil
+            if shouldShow {
+                showWindow()
+            }
+        }
     }
 
     func updateDataPointObserver() {

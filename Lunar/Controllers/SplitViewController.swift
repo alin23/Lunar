@@ -103,9 +103,9 @@ This mode is the last resort for people that:
 ## Algorithm
 
 1. Percentage Hotkeys: `0%`, `25%`, `50%`, `75%`, `100%`
-	- When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
+    - When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
 1. Brightness/Contrast Up/Down Hotkeys
-	- When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
+    - When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
 
 ##### Percentage Hotkeys Example:
 - `MIN` Brightness = 15
@@ -114,8 +114,8 @@ This mode is the last resort for people that:
 - `MAX` Contrast = 75
 - `25%` hotkey is pressed
 - **The monitor will get**:
-	- `brightness = 25% * (100 - 15) + 15 =` **36**
-	- `contrast = 25% * (75 - 40) + 40 =` **49**
+    - `brightness = 25% * (100 - 15) + 15 =` **36**
+    - `contrast = 25% * (75 - 40) + 40 =` **49**
 
 ## Settings
 - `Brightness/Contrast Step` adjusts how much to increase or decrease the values when using the up/down hotkeys
@@ -240,11 +240,6 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "LUNAR"
         }
 
-        activeModeButton?.page = .display
-        activeModeButton?.fade()
-
-        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
-
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
                 goLeftNotice?.stringValue = "Click to go to the\nConfiguration page"
@@ -254,8 +249,26 @@ class SplitViewController: NSSplitViewController {
             }
         }
 
+        if appDelegate.darkMode {
+            activeModeButton?.page = .hotkeys
+            activeModeButton?.fade()
+
+            POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
+            POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantDark)
+            view.bg = darkMauve
+            goLeftButton?.compositingFilter = nil
+            goRightButton?.compositingFilter = nil
+        } else {
+            activeModeButton?.page = .display
+            activeModeButton?.fade()
+
+            POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
+            POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantLight)
+            view.bg = white
+            goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
+            goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
+        }
         goLeftButton?.enable()
-        goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goRightButton?.enable()
     }
 
@@ -271,6 +284,7 @@ class SplitViewController: NSSplitViewController {
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
 
+        goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goLeftButton?.enable()
         goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goRightButton?.enable()
