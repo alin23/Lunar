@@ -156,7 +156,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         set { _windowControllerLock.around { _windowController = newValue } }
     }
 
-    var darkMode: Bool { (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark" }
+    var darkMode: Bool {
+        switch CachedDefaults[.colorScheme] {
+        case .system:
+            return (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
+        case .light:
+            return false
+        case .dark:
+            return true
+        }
+    }
 
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
@@ -376,7 +385,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func activateUIElement(_ uiElement: UIElement, page: Int) {
+    func activateUIElement(_ uiElement: UIElement, page: Int, highlight: Bool = true) {
         guard let w = windowController?.window, let view = w.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController else { return }
 
@@ -385,7 +394,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             guard let settingsPageController = pageController
                 .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
                 let button = settingsPageController.advancedSettingsButton else { return }
-            button.highlight()
+            if highlight { button.highlight() }
         case .gear:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
                   let displayViewController = pageController
@@ -541,6 +550,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .sink { _ in self.recreateWindow() }
             .store(in: &observers)
+        colorSchemePublisher
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .sink { [self] _ in
+                recreateWindow()
+
+                CachedDefaults[.advancedSettingsShown] = true
+                currentPage = Page.settings.rawValue
+                activateUIElement(.advancedSettingsButton, page: currentPage, highlight: false)
+            }.store(in: &observers)
     }
 
     func listenForScreenConfigurationChanged() {
@@ -859,6 +877,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
         ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
         ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
+        ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
         SentrySDK.start { options in
