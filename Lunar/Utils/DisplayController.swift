@@ -893,16 +893,7 @@ class DisplayController {
             }
 
             mainThread {
-                let appd = appDelegate
-                if appd.windowController?.window != nil {
-                    let shouldShow = appd.windowController!.window!.isVisible
-                    appd.windowController?.close()
-                    appd.windowController?.window = nil
-                    appd.windowController = nil
-                    if shouldShow {
-                        appd.showWindow()
-                    }
-                }
+                appDelegate.recreateWindow()
             }
         }
     }

@@ -29,7 +29,7 @@ let settingsBgColor = lunarYellow
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
-let scrollableTextFieldCaptionColor = mauve.withAlphaComponent(0.7)
+var scrollableTextFieldCaptionColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.7) }
 
 let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow
 let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow
@@ -46,7 +46,7 @@ let scrollableTextFieldColorHoverOnBlack = lunarYellow
 let scrollableTextFieldColorLightOnBlack = white
 let scrollableCaptionColorOnBlack = white
 
-let scrollableViewLabelColor = mauve.withAlphaComponent(0.35)
+var scrollableViewLabelColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.9) : mauve.withAlphaComponent(0.35) }
 
 // MARK: - ButtonColor
 
@@ -61,12 +61,20 @@ enum ButtonColor: Int {
     case labelOffHover
 }
 
-let lockButtonBgOn = red.withAlphaComponent(0.8)
-let lockButtonBgOnHover = lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn
-let lockButtonLabelOn = white
-let lockButtonBgOff = gray.withAlphaComponent(0.8)
-let lockButtonBgOffHover = lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn
-let lockButtonLabelOff = mauve.withAlphaComponent(0.45)
+var lockButtonBgOn: NSColor { appDelegate.darkMode ? red.withAlphaComponent(0.8) : red.withAlphaComponent(0.8) }
+var lockButtonBgOnHover: NSColor {
+    appDelegate.darkMode ? lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn : lockButtonBgOn
+        .highlight(withLevel: 0.2) ?? lockButtonBgOn
+}
+
+var lockButtonLabelOn: NSColor { appDelegate.darkMode ? white : white }
+var lockButtonBgOff: NSColor { appDelegate.darkMode ? lunarYellow.withAlphaComponent(0.4) : gray.withAlphaComponent(0.8) }
+var lockButtonBgOffHover: NSColor {
+    appDelegate.darkMode ? lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn : lockButtonBgOn
+        .highlight(withLevel: 0.4) ?? lockButtonBgOn
+}
+
+var lockButtonLabelOff: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
 
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
@@ -195,7 +203,7 @@ let removeButtonColor = red.highlight(withLevel: 0.3) ?? red
 
 let contrastGraphColor = lunarYellow
 let brightnessGraphColor = violet
-let xAxisLabelColor = mauve.withAlphaComponent(0.5)
+var xAxisLabelColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.6) : mauve.withAlphaComponent(0.5) }
 
 let contrastGraphColorYellow = white
 let brightnessGraphColorYellow = lunarYellow.shadow(withLevel: 0.3) ?? lunarYellow

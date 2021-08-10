@@ -390,14 +390,15 @@ func createAndShowWindow(
     mainThread {
         guard let mainStoryboard = NSStoryboard.main else { return }
 
+        if identifier == "windowController" {
+            appDelegate.initPopovers()
+        }
         if controller == nil {
             controller = mainStoryboard
                 .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(identifier)) as? ModernWindowController
         }
 
         if show, let wc = controller {
-            wc.initPopovers()
-
             if let screen = screen, let w = wc.window, w.screen != screen {
                 let size = w.frame.size
                 w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - size.width / 2, y: screen.visibleFrame.midY - size.height / 2))

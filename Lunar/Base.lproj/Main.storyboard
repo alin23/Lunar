@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19142.2"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -646,7 +647,7 @@
             <objects>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <windowController storyboardIdentifier="windowController" showSeguePresentationStyle="single" id="B8D-0N-5wS" customClass="ModernWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" appearanceType="aqua" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
+                    <window key="window" title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="ModernWindow" customModule="Lunar" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
                         <rect key="contentRect" x="561" y="439" width="950" height="700"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
@@ -826,7 +827,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <containerView appearanceType="aqua" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mMS-bl-7KZ">
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mMS-bl-7KZ">
                                 <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <connections>
@@ -1108,7 +1109,7 @@ Configuration page</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="v4.5.5" id="Ulu-cW-ply">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.57923109907271086" green="0.55117466111125568" blue="0.60507015306122447" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="textColor" name="Gray"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
@@ -1933,17 +1934,39 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4tb-kQ-mbr">
-                                <rect key="frame" x="384" y="185" width="32" height="32"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="ueH-KN-tis">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bif-J2-zQD">
+                                <rect key="frame" x="323" y="197" width="52" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Off" id="rnQ-BR-CdR">
                                     <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="hWD-oU-Uq8" name="value" keyPath="values.smoothTransition" id="mRD-Fw-dz0"/>
-                                </connections>
-                            </button>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vm8-ej-UNg">
+                                <rect key="frame" x="422" y="197" width="55" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="On" id="SXN-o3-o1q">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YJh-qf-Vrr" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="377" y="192" width="45" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                                        <color key="value" red="0.28884991496598639" green="0.20765883329551976" blue="0.25867695004965729" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
+                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J3H-YT-CPY">
                                 <rect key="frame" x="30" y="297" width="99" height="32"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -2205,8 +2228,8 @@ when dock and menubar icons are hidden</string>
                         <outlet property="pollingIntervalLabel" destination="ptg-bU-WRA" id="fUW-7h-nmJ"/>
                         <outlet property="sensorPollingIntervalCaption" destination="oe4-fW-vjY" id="yKQ-m1-net"/>
                         <outlet property="sensorPollingIntervalField" destination="T9n-Uo-gx1" id="tfp-Di-Omp"/>
-                        <outlet property="smoothTransitionCheckbox" destination="4tb-kQ-mbr" id="SXN-IS-eQL"/>
                         <outlet property="smoothTransitionLabel" destination="osm-bT-7sA" id="OU8-18-fgX"/>
+                        <outlet property="smoothTransitionToggle" destination="YJh-qf-Vrr" id="e0U-6h-zew"/>
                         <outlet property="syncPollingIntervalCaption" destination="uAE-HJ-vLk" id="FDe-as-tMB"/>
                         <outlet property="syncPollingIntervalField" destination="TI6-iY-nn0" id="5rX-3X-ca7"/>
                         <outlet property="volumeStepCaption" destination="TaK-4f-5Y3" id="nv1-L7-jMW"/>
@@ -2532,7 +2555,7 @@ when dock and menubar icons are hidden</string>
         <scene sceneID="XpM-oo-Jy5">
             <objects>
                 <viewController storyboardIdentifier="displayViewController" id="1Bn-Ca-ETm" customClass="DisplayViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" focusRingType="none" appearanceType="aqua" id="PXe-go-kYm">
+                    <view key="view" wantsLayer="YES" focusRingType="none" id="PXe-go-kYm">
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
@@ -2620,7 +2643,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Scm-pa-EMP">
                                             <font key="font" size="14" name="Menlo-Bold"/>
-                                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="Gray"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2638,7 +2661,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="yxN-eN-fTW">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2647,7 +2670,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="kl2-hg-amy">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2723,7 +2746,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="fSu-Aa-UGk">
                                             <font key="font" size="14" name="Menlo-Bold"/>
-                                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="Gray"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2741,7 +2764,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="j1k-jz-zl9">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2750,7 +2773,7 @@ when dock and menubar icons are hidden</string>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="Dyb-7m-YDq">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333333333325" green="0.010000000000000009" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2822,7 +2845,7 @@ when dock and menubar icons are hidden</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" size="28" name="Menlo-Bold"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Inverted"/>
                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 </textFieldCell>
                                 <connections>
@@ -3017,7 +3040,7 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                 </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="contentTintColor" name="Caption"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
                                         <real key="value" value="0.59999999999999998"/>
@@ -3098,15 +3121,7 @@ and contrast to their highest values</string>
   • The min/max brightness/contrast values</string>
                                             </menuItem>
                                             <menuItem title="Reset" state="on" tag="99" hidden="YES" id="RBL-6F-ZwG">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="Reset">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.0" green="0.2196078431372549" blue="0.31372549019607843" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="11" name="Menlo-Bold"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
@@ -4990,16 +5005,55 @@ Lunar will continue to check in the background</string>
         <scene sceneID="GTI-N2-9dZ">
             <objects>
                 <viewController storyboardIdentifier="SettingsPopoverController" id="21a-h6-6He" customClass="SettingsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" appearanceType="aqua" id="tQ8-3z-D4n">
+                    <view key="view" wantsLayer="YES" id="tQ8-3z-D4n">
                         <rect key="frame" x="0.0" y="0.0" width="590" height="554"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <box fixedFrame="YES" alphaValue="0.69999999999999996" title="Blue" translatesAutoresizingMaskIntoConstraints="NO" id="OJz-Gx-Xju">
+                                <rect key="frame" x="292" y="264" width="273" height="78"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="Tpd-8B-Xl2">
+                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <shadow key="shadow" blurRadius="3">
+                                    <size key="offset" width="0.0" height="-2"/>
+                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <font key="titleFont" metaFont="systemBold" size="14"/>
+                            </box>
+                            <box fixedFrame="YES" alphaValue="0.69999999999999996" title="Green" translatesAutoresizingMaskIntoConstraints="NO" id="BX5-j8-9Wb">
+                                <rect key="frame" x="292" y="347" width="273" height="78"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="zKf-m3-7Qj">
+                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <shadow key="shadow" blurRadius="3">
+                                    <size key="offset" width="0.0" height="-2"/>
+                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <font key="titleFont" metaFont="systemBold" size="14"/>
+                            </box>
+                            <box fixedFrame="YES" alphaValue="0.69999999999999996" title="Red" translatesAutoresizingMaskIntoConstraints="NO" id="h8T-CP-f3L">
+                                <rect key="frame" x="294" y="430" width="273" height="78"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="nPc-O4-QAv">
+                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <shadow key="shadow" blurRadius="3">
+                                    <size key="offset" width="0.0" height="-2"/>
+                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <font key="titleFont" metaFont="systemBold" size="14"/>
+                            </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
                                 <rect key="frame" x="22" y="517" width="157" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Enabled Controls" id="Ivu-gs-zlD">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5052,7 +5106,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5107,7 +5161,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5166,7 +5220,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="edA-1r-lXT">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5175,7 +5229,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="gkg-NF-TG0">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5184,7 +5238,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="Rs4-bd-G86">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5193,7 +5247,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Gamma" id="LZX-yU-Xih">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5210,25 +5264,12 @@ Lunar will continue to check in the background</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
-                            <box fixedFrame="YES" title="Red" translatesAutoresizingMaskIntoConstraints="NO" id="h8T-CP-f3L">
-                                <rect key="frame" x="294" y="430" width="273" height="78"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <view key="contentView" id="nPc-O4-QAv">
-                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                                <shadow key="shadow" blurRadius="3">
-                                    <size key="offset" width="0.0" height="-2"/>
-                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <font key="titleFont" metaFont="systemBold" size="14"/>
-                            </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Nu-nd-J8V" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="298" y="449" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="NWR-St-EFT" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5239,13 +5280,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.87547831629999995" green="0.31788200770000002" blue="0.32717527950000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5257,7 +5298,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="qZa-78-cTd">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5266,7 +5307,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="hTm-l1-nJ1" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5277,13 +5318,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="3"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.87547831629999995" green="0.31788200770000002" blue="0.32717527950000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5295,7 +5336,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="0UB-ah-eZG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5304,7 +5345,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="IBq-nX-MN6" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5315,13 +5356,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.42745098039215684" green="0.26666666666666666" blue="0.27058823529411763" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.87547831629999995" green="0.31788200770000002" blue="0.32717527950000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5333,29 +5374,16 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="OIX-G5-NwX">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <box fixedFrame="YES" title="Green" translatesAutoresizingMaskIntoConstraints="NO" id="BX5-j8-9Wb">
-                                <rect key="frame" x="292" y="347" width="273" height="78"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <view key="contentView" id="zKf-m3-7Qj">
-                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                                <shadow key="shadow" blurRadius="3">
-                                    <size key="offset" width="0.0" height="-2"/>
-                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <font key="titleFont" metaFont="systemBold" size="14"/>
-                            </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mws-vX-pYW" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="296" y="366" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="3BX-ck-5hm" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5366,13 +5394,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5384,7 +5412,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="LPS-ak-LC4">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5393,7 +5421,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="3tf-GX-Q7n" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5404,13 +5432,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="3"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5422,7 +5450,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="XHU-lo-Ce4">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5431,7 +5459,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="pfW-az-168" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5442,13 +5470,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.30980392156862746" green="0.33333333333333331" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5460,29 +5488,16 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="zRd-JW-o7h">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <box fixedFrame="YES" title="Blue" translatesAutoresizingMaskIntoConstraints="NO" id="OJz-Gx-Xju">
-                                <rect key="frame" x="292" y="264" width="273" height="78"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <view key="contentView" id="Tpd-8B-Xl2">
-                                    <rect key="frame" x="3" y="3" width="267" height="57"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                                <shadow key="shadow" blurRadius="3">
-                                    <size key="offset" width="0.0" height="-2"/>
-                                    <color key="color" red="0.20595298042075422" green="0.17553444019907072" blue="0.23352465986394558" alpha="0.44634726819602638" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <font key="titleFont" metaFont="systemBold" size="14"/>
-                            </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7bg-0M-iil" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="296" y="283" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="89L-SF-JJy" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5493,13 +5508,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5511,7 +5526,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="Lz3-rk-1Aa" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5522,13 +5537,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="3"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5540,7 +5555,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="hgp-AV-Qer" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
-                                    <color key="textColor" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5551,13 +5566,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.34509803921568627" green="0.3411764705882353" blue="0.41568627450980389" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.55047032780000005" green="0.4803970763" blue="0.61463647960000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.73921130950000002" green="0.42270110999999999" blue="0.42270110999999999" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="step">
                                         <real key="value" value="0.01"/>
@@ -5580,18 +5595,18 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="2.0" usesSingleLineMode="YES" id="dkb-iT-CVj" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
                                         <real key="value" value="0.01"/>
@@ -5613,7 +5628,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="vfx-jc-5Zg">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
@@ -5625,18 +5640,18 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.51" usesSingleLineMode="YES" id="JcN-LR-JfD" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
                                         <real key="value" value="0.01"/>
@@ -5658,7 +5673,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Apc-ZL-xdF">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
@@ -5670,7 +5685,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Curve Factors" id="rgm-lf-XOv">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
@@ -5686,7 +5701,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC Limits" id="xeh-Bb-8ot">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5703,7 +5718,7 @@ Lunar will continue to check in the background</string>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
-                            <box fixedFrame="YES" title="Maximum Values" translatesAutoresizingMaskIntoConstraints="NO" id="BYa-Mm-kwq">
+                            <box fixedFrame="YES" alphaValue="0.69999999999999996" title="Maximum Values" translatesAutoresizingMaskIntoConstraints="NO" id="BYa-Mm-kwq">
                                 <rect key="frame" x="16" y="203" width="273" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="GKa-mr-1rV">
@@ -5721,7 +5736,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="AGQ-Fk-XB3" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5732,13 +5747,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5747,7 +5762,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="H0n-oK-GN9">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5756,7 +5771,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="4zG-BD-c1U" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5767,13 +5782,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5782,7 +5797,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="iN9-jX-XMa">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5791,7 +5806,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="8d7-y1-giq" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5802,13 +5817,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5817,7 +5832,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="FfQ-gy-R0h">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5830,7 +5845,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC Color Gain" id="lHa-d5-pMl">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5852,7 +5867,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="6px-22-0zb" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5863,13 +5878,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5878,7 +5893,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="RED" id="ogO-ji-Cti">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5887,7 +5902,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="v7b-f9-gd3" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5898,13 +5913,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5913,7 +5928,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="GREEN" id="ZM1-j3-MOX">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5922,7 +5937,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="Tja-Kb-6t0" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -5933,13 +5948,13 @@ Lunar will continue to check in the background</string>
                                         <integer key="value" value="255"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -5948,7 +5963,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BLUE" id="mjv-lI-Wg0">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -5985,7 +6000,7 @@ Lunar will continue to check in the background</string>
                                     <action selector="resetGamma:" target="21a-h6-6He" id="CE5-r8-n3C"/>
                                 </connections>
                             </button>
-                            <box fixedFrame="YES" title="Minimum Values" translatesAutoresizingMaskIntoConstraints="NO" id="PgX-EJ-Aeh">
+                            <box fixedFrame="YES" alphaValue="0.69999999999999996" title="Minimum Values" translatesAutoresizingMaskIntoConstraints="NO" id="PgX-EJ-Aeh">
                                 <rect key="frame" x="16" y="293" width="273" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="pRL-Y7-hsJ">
@@ -6003,7 +6018,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="gBa-kJ-r0a" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -6014,13 +6029,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="99"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -6029,7 +6044,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="SgS-UD-nyb">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -6038,7 +6053,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="ME5-vT-2Qa" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -6049,13 +6064,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="99"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -6064,7 +6079,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="K1K-Du-X0V">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -6073,7 +6088,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="e1s-dZ-2jw" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
-                                    <color key="textColor" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
@@ -6084,13 +6099,13 @@ Lunar will continue to check in the background</string>
                                         <real key="value" value="99"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" red="0.2470588235" green="0.23921568630000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" red="0.38431372549999998" green="0.33725490200000002" blue="0.34509803919999998" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" red="0.63137254899999995" green="0.30980392159999998" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -6099,7 +6114,7 @@ Lunar will continue to check in the background</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="Ivj-9X-iFt">
                                     <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
@@ -6782,5 +6797,14 @@ You can choose to send the diagnostics to the developer if you think this is not
         <image name="arrow.left.circle.fill" width="48" height="48"/>
         <image name="arrow.right.circle.fill" width="48" height="48"/>
         <image name="power" width="96" height="96"/>
+        <namedColor name="Caption">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Gray">
+            <color red="0.49399998784065247" green="0.46599999070167542" blue="0.49399998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Inverted">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>
