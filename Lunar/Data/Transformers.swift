@@ -1,4 +1,5 @@
 import Cocoa
+import Defaults
 import Foundation
 
 // MARK: - AppExceptionTransformer
@@ -79,6 +80,42 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
     }
 }
 
+// MARK: - ColorScheme
+
+enum ColorScheme: Int, DefaultsSerializable {
+    case system
+    case light
+    case dark
+}
+
+// MARK: - ColorSchemeTransformer
+
+class ColorSchemeTransformer: ValueTransformer {
+    override class func transformedValueClass() -> AnyClass {
+        NSNumber.self
+    }
+
+    override class func allowsReverseTransformation() -> Bool {
+        true
+    }
+
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
+        guard let segmentIndex = value as? Int,
+              segmentIndex == 0 || segmentIndex == 1 || segmentIndex == 2 else { return ColorScheme.system.rawValue }
+        switch segmentIndex {
+        case 0: return ColorScheme.system.rawValue
+        case 1: return ColorScheme.light.rawValue
+        case 2: return ColorScheme.dark.rawValue
+        default: return ColorScheme.system.rawValue
+        }
+    }
+
+    override func transformedValue(_ value: Any?) -> Any? {
+        guard let colorScheme = value as? Int else { return 0 }
+        return colorScheme.ns
+    }
+}
+
 // MARK: - SignedIntTransformer
 
 class SignedIntTransformer: ValueTransformer {
@@ -106,4 +143,5 @@ extension NSValueTransformerName {
     static let displayTransformerName = NSValueTransformerName(rawValue: "DisplayTransformer")
     static let updateCheckIntervalTransformerName = NSValueTransformerName(rawValue: "UpdateCheckIntervalTransformer")
     static let signedIntTransformerName = NSValueTransformerName(rawValue: "SignedIntTransformer")
+    static let colorSchemeTransformerName = NSValueTransformerName(rawValue: "ColorSchemeTransformer")
 }
