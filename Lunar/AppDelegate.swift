@@ -642,9 +642,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                             displayController.adaptBrightness(force: true)
                             for display in displayController.activeDisplays.values {
-                                if display.redGain != 90 { _ = display.control?.setRedGain(display.redGain.uint8Value) }
-                                if display.greenGain != 90 { _ = display.control?.setGreenGain(display.greenGain.uint8Value) }
-                                if display.blueGain != 90 { _ = display.control?.setBlueGain(display.blueGain.uint8Value) }
+                                if display.redGain.uint8Value != DEFAULT_COLOR_GAIN {
+                                    _ = display.control?.setRedGain(display.redGain.uint8Value)
+                                }
+                                if display.greenGain.uint8Value != DEFAULT_COLOR_GAIN {
+                                    _ = display.control?.setGreenGain(display.greenGain.uint8Value)
+                                }
+                                if display.blueGain.uint8Value != DEFAULT_COLOR_GAIN {
+                                    _ = display.control?.setBlueGain(display.blueGain.uint8Value)
+                                }
                             }
                         }
                     }
@@ -980,9 +986,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
                 for display in displayController.activeDisplays.values {
-                    if display.redGain != 90 { _ = display.control?.setRedGain(display.redGain.uint8Value) }
-                    if display.greenGain != 90 { _ = display.control?.setGreenGain(display.greenGain.uint8Value) }
-                    if display.blueGain != 90 { _ = display.control?.setBlueGain(display.blueGain.uint8Value) }
+                    if display.redGain.uint8Value != DEFAULT_COLOR_GAIN {
+                        _ = display.control?.setRedGain(display.redGain.uint8Value)
+                    }
+                    if display.greenGain.uint8Value != DEFAULT_COLOR_GAIN {
+                        _ = display.control?.setGreenGain(display.greenGain.uint8Value)
+                    }
+                    if display.blueGain.uint8Value != DEFAULT_COLOR_GAIN {
+                        _ = display.control?.setBlueGain(display.blueGain.uint8Value)
+                    }
                 }
             }
         }
