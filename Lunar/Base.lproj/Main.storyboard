@@ -2917,12 +2917,12 @@ when dock and menubar icons are hidden</string>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT">
                                 <rect key="frame" x="389" y="213" width="173" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Thunderbolt 3 (DDC 27)" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA">
+                                <popUpButtonCell key="cell" type="push" title="Thunderbolt 3 (DDC 27)" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="mmT-ta-ING">
                                         <items>
-                                            <menuItem title="Thunderbolt 3 (DDC 27)" tag="27" id="Ap5-ua-jqI">
+                                            <menuItem title="Thunderbolt 3 (DDC 27)" state="on" tag="27" id="Ap5-ua-jqI">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="Thunderbolt 3 (DDC 25)" tag="25" id="gOH-M4-eWp">
@@ -2983,7 +2983,7 @@ when dock and menubar icons are hidden</string>
                                             <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="Ah9-ua-jqI">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Unknown" state="on" tag="246" hidden="YES" id="IdB-fg-Bb3">
+                                            <menuItem title="Unknown" tag="246" hidden="YES" id="IdB-fg-Bb3">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
@@ -3801,7 +3801,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="80" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="95"/>
+                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -5163,7 +5163,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Tf-I7-BlT">
-                                <rect key="frame" x="353" y="64" width="149" height="17"/>
+                                <rect key="frame" x="353" y="44" width="149" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5172,7 +5172,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-3U-xyN">
-                                <rect key="frame" x="352" y="37" width="53" height="16"/>
+                                <rect key="frame" x="352" y="17" width="53" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Paused" id="UE7-F8-Nxu">
                                     <font key="font" metaFont="system"/>
@@ -5181,7 +5181,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjJ-hC-owe">
-                                <rect key="frame" x="452" y="37" width="60" height="16"/>
+                                <rect key="frame" x="452" y="17" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Running" id="eLZ-QT-H2b">
                                     <font key="font" metaFont="system"/>
@@ -5190,7 +5190,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="YBv-Rr-ica" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="503" y="65" width="16" height="16"/>
+                                <rect key="frame" x="503" y="45" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5203,7 +5203,7 @@ Lunar will continue to check in the background</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wv7-Y2-jNx" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="406" y="32" width="45" height="26"/>
+                                <rect key="frame" x="406" y="12" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5218,7 +5218,7 @@ Lunar will continue to check in the background</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
-                                <rect key="frame" x="94" y="64" width="117" height="17"/>
+                                <rect key="frame" x="94" y="44" width="117" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5227,7 +5227,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
-                                <rect key="frame" x="76" y="37" width="52" height="16"/>
+                                <rect key="frame" x="76" y="17" width="52" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Target" id="tHM-5a-Ojq">
                                     <font key="font" metaFont="system"/>
@@ -5236,7 +5236,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
-                                <rect key="frame" x="174" y="37" width="55" height="16"/>
+                                <rect key="frame" x="174" y="17" width="55" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Source" id="KKZ-a3-9z1">
                                     <font key="font" metaFont="system"/>
@@ -5245,7 +5245,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EFB-4R-z3b" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="213" y="65" width="16" height="16"/>
+                                <rect key="frame" x="213" y="45" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5258,7 +5258,7 @@ Lunar will continue to check in the background</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="129" y="32" width="45" height="26"/>
+                                <rect key="frame" x="129" y="12" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5273,7 +5273,7 @@ Lunar will continue to check in the background</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Q18-Wf-Dsy">
-                                <rect key="frame" x="330" y="90" width="196" height="5"/>
+                                <rect key="frame" x="330" y="70" width="196" height="5"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhq-Ab-KP4" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
@@ -5898,7 +5898,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="KnN-Jz-Pck">
-                                <rect key="frame" x="55" y="90" width="196" height="5"/>
+                                <rect key="frame" x="55" y="70" width="196" height="5"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CQH-qt-4Ge">
@@ -6039,17 +6039,6 @@ Lunar will continue to check in the background</string>
                                     <action selector="resetLimits:" target="21a-h6-6He" id="kMS-3R-ZTL"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ugr-z2-nyl" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="210" y="161" width="66" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tok-Cc-Ja4">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetColors:" target="21a-h6-6He" id="dqL-Pb-KoR"/>
-                                </connections>
-                            </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HSn-nF-nA6" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="498" y="517" width="66" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
@@ -6179,6 +6168,34 @@ Lunar will continue to check in the background</string>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ugr-z2-nyl" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="65" y="82" width="177" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <string key="toolTip">Try to fetch color gain values from the monitor using DDC.
+
+Caution! In rare cases it can cause a kernel panic and you might need to restart your device if it happens.</string>
+                                <buttonCell key="cell" type="inline" title="Read values from monitor" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="tok-Cc-Ja4">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="readColors:" target="21a-h6-6He" id="7s2-0O-fPT"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wtr-V8-utH" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="211" y="162" width="66" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <string key="toolTip">Send a RESET_COLOR command to the monitor using DDC.
+
+Caution! In rare cases it can cause a kernel panic and you might need to restart your device if it happens.</string>
+                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Igc-wI-hIH">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="resetColors:" target="21a-h6-6He" id="7WT-z6-D6d"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -6212,10 +6229,10 @@ Lunar will continue to check in the background</string>
                         <outlet property="minDDCContrastField" destination="cfR-jL-M0Y" id="5CS-cU-ohh"/>
                         <outlet property="minDDCVolumeField" destination="chb-ZQ-va4" id="YrR-Bf-K9c"/>
                         <outlet property="networkControlCheckbox" destination="Kap-E3-AbC" id="dmT-02-wDv"/>
+                        <outlet property="readColorsButton" destination="ugr-z2-nyl" id="gI1-5Z-c62"/>
                         <outlet property="redGainField" destination="ObD-fo-ny8" id="737-cE-fIB"/>
-                        <outlet property="resetColorsButton" destination="ugr-z2-nyl" id="pYY-yS-TI5"/>
+                        <outlet property="resetColorsButton" destination="wtr-V8-utH" id="5ly-n8-fY9"/>
                         <outlet property="resetGammaButton" destination="HSn-nF-nA6" id="cG3-AO-4TS"/>
-                        <outlet property="resetLimits" destination="Xwk-Qd-h2d" id="RSk-an-jem"/>
                         <outlet property="resetLimitsButton" destination="Xwk-Qd-h2d" id="RE6-ul-dDd"/>
                         <outlet property="syncModeRoleToggle" destination="VNJ-7E-pDo" id="cjW-cx-8Y7"/>
                     </connections>
