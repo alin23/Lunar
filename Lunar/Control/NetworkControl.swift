@@ -552,6 +552,10 @@ class NetworkControl: Control {
         get(.CONTRAST, max: true)
     }
 
+    func getMaxVolume() -> UInt8? {
+        get(.AUDIO_SPEAKER_VOLUME, max: true)
+    }
+
     func getVolume() -> UInt8? {
         get(.AUDIO_SPEAKER_VOLUME)
     }

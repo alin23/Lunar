@@ -445,9 +445,9 @@ struct Lunar: ParsableCommand {
                 for display in displays {
                     if let result = DDC.read(displayID: display.id, controlID: control) {
                         if displays.count == 1 {
-                            print(max ? result.currentValue : result.maxValue)
+                            print(max ? result.maxValue : result.currentValue)
                         } else {
-                            print("\(display.name)[\(display.serial)]: \(max ? result.currentValue : result.maxValue)")
+                            print("\(display.name)[\(display.serial)]: \(max ? result.maxValue : result.currentValue)")
                         }
                     } else {
                         if displays.count == 1 {
