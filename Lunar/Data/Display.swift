@@ -32,6 +32,7 @@ let DEFAULT_MIN_BRIGHTNESS: UInt8 = 0
 let DEFAULT_MAX_BRIGHTNESS: UInt8 = 100
 let DEFAULT_MIN_CONTRAST: UInt8 = 50
 let DEFAULT_MAX_CONTRAST: UInt8 = 75
+let DEFAULT_COLOR_GAIN: UInt8 = 90
 
 let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
 let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 0.5
@@ -254,9 +255,9 @@ enum ValueType {
         minDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
         minDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
 
-        redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? 90.ns
-        greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? 90.ns
-        blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? 90.ns
+        redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
+        greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
+        blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
 
         lockedBrightness = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightness)) ?? false
         lockedContrast = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrast)) ?? false
@@ -388,9 +389,9 @@ enum ValueType {
         minDDCBrightness: UInt8 = 0,
         minDDCContrast: UInt8 = 0,
         minDDCVolume: UInt8 = 0,
-        redGain: UInt8 = 90,
-        greenGain: UInt8 = 90,
-        blueGain: UInt8 = 90,
+        redGain: UInt8 = DEFAULT_COLOR_GAIN,
+        greenGain: UInt8 = DEFAULT_COLOR_GAIN,
+        blueGain: UInt8 = DEFAULT_COLOR_GAIN,
         lockedBrightness: Bool = false,
         lockedContrast: Bool = false,
         lockedBrightnessCurve: Bool = false,
@@ -1570,9 +1571,9 @@ enum ValueType {
             minDDCBrightness: (config["minDDCBrightness"] as? UInt8) ?? 0,
             minDDCContrast: (config["minDDCContrast"] as? UInt8) ?? 0,
             minDDCVolume: (config["minDDCVolume"] as? UInt8) ?? 0,
-            redGain: (config["redGain"] as? UInt8) ?? 90,
-            greenGain: (config["greenGain"] as? UInt8) ?? 90,
-            blueGain: (config["blueGain"] as? UInt8) ?? 90,
+            redGain: (config["redGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
+            greenGain: (config["greenGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
+            blueGain: (config["blueGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
             lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
             lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
             lockedBrightnessCurve: (config["lockedBrightnessCurve"] as? Bool) ?? false,
