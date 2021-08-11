@@ -1891,9 +1891,7 @@ enum ValueType {
 
         startI2CDetection()
         detectI2C()
-        if hasI2C {
-            refreshColors()
-        }
+        if hasI2C { refreshColors() }
 
         control = getBestControl()
     }
@@ -1982,6 +1980,7 @@ enum ValueType {
             self.detectI2C()
             if self.hasI2C {
                 cancelTask(taskKey)
+                self.refreshColors()
             }
         }
     }
@@ -2354,23 +2353,24 @@ enum ValueType {
     @discardableResult
     func refreshColors() -> Bool {
         guard !isTestID(id) else { return false }
-        guard let newRedGain = readRedGain(),
-              let newGreenGain = readGreenGain(),
-              let newBlueGain = readBlueGain()
-        else {
+        let newRedGain = readRedGain()
+        let newGreenGain = readGreenGain()
+        let newBlueGain = readBlueGain()
+
+        guard newRedGain != nil || newGreenGain != nil || newBlueGain != nil else {
             log.warning("Can't read color gain for \(description)")
             return false
         }
 
-        if newRedGain != redGain.uint8Value {
+        if let newRedGain = newRedGain, newRedGain != redGain.uint8Value {
             log.info("Refreshing red gain value: \(redGain.uint8Value) <> \(newRedGain)")
             withoutSmoothTransition { withoutDDC { redGain = newRedGain.ns } }
         }
-        if newGreenGain != greenGain.uint8Value {
+        if let newGreenGain = newGreenGain, newGreenGain != greenGain.uint8Value {
             log.info("Refreshing green gain value: \(greenGain.uint8Value) <> \(newGreenGain)")
             withoutSmoothTransition { withoutDDC { greenGain = newGreenGain.ns } }
         }
-        if newBlueGain != blueGain.uint8Value {
+        if let newBlueGain = newBlueGain, newBlueGain != blueGain.uint8Value {
             log.info("Refreshing blue gain value: \(blueGain.uint8Value) <> \(newBlueGain)")
             withoutSmoothTransition { withoutDDC { blueGain = newBlueGain.ns } }
         }

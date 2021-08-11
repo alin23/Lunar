@@ -276,7 +276,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.updater.automaticallyChecksForUpdates = change.newValue
         }.store(in: &observers)
         showVirtualDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList()
+            displayController.resetDisplayList(advancedSettings: true)
+        }.store(in: &observers)
+        showAirplayDisplaysPublisher.sink { _ in
+            displayController.resetDisplayList(advancedSettings: true)
         }.store(in: &observers)
         // NotificationCenter.default
         //     .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
@@ -554,10 +557,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [self] _ in
                 recreateWindow()
-
-                CachedDefaults[.advancedSettingsShown] = true
-                currentPage = Page.settings.rawValue
-                activateUIElement(.advancedSettingsButton, page: currentPage, highlight: false)
+                showAdvancedSettings(highlight: false)
             }.store(in: &observers)
     }
 
@@ -694,6 +694,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             controllerType: SettingsPopoverController.self,
             appearance: appDelegate.darkMode ? .vibrantDark : .vibrantLight
         )
+    }
+
+    func showAdvancedSettings(highlight: Bool = false) {
+        CachedDefaults[.advancedSettingsShown] = true
+        currentPage = Page.settings.rawValue
+        activateUIElement(.advancedSettingsButton, page: currentPage, highlight: highlight)
     }
 
     func recreateWindow() {
@@ -920,7 +926,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
         }
 
-        displayController.displays = displayController.getDisplaysLock.around { DisplayController.getDisplays() }
+        displayController.displays = displayController.getDisplaysLock.around {
+            DisplayController.getDisplays(
+                includeVirtual: CachedDefaults[.showVirtualDisplays],
+                includeAirplay: CachedDefaults[.showAirplayDisplays]
+            )
+        }
         displayController.addSentryData()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {
