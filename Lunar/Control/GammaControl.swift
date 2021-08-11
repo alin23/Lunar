@@ -182,6 +182,10 @@ class GammaControl: Control {
         MAX_CONTRAST
     }
 
+    func getMaxVolume() -> UInt8? {
+        nil
+    }
+
     func getVolume() -> UInt8? {
         nil
     }

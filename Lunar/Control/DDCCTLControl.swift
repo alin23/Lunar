@@ -165,6 +165,10 @@ struct DDCCTLControl: Control {
         nil
     }
 
+    func getMaxVolume() -> UInt8? {
+        nil
+    }
+
     func reset() -> Bool {
         ddcctlSet(.RESET_BRIGHTNESS_AND_CONTRAST, value: 1)
     }

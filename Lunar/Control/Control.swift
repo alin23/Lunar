@@ -108,6 +108,7 @@ protocol Control {
 
     func getMaxBrightness() -> Brightness?
     func getMaxContrast() -> Contrast?
+    func getMaxVolume() -> UInt8?
 
     func reset() -> Bool
     func resetState()
@@ -130,16 +131,24 @@ extension Control {
             return getBrightness()
         case .contrast:
             return getContrast()
-        case .maxBrightness:
+        case .maxBrightness, .maxDDCBrightness:
             return getMaxBrightness()
-        case .maxContrast:
+        case .maxContrast, .maxDDCContrast:
             return getMaxContrast()
+        case .maxDDCVolume:
+            return getMaxVolume()
         case .volume:
             return getVolume()
         case .input:
             return getInput()
         case .audioMuted:
             return getMute()
+        case .redGain:
+            return getRedGain()
+        case .greenGain:
+            return getGreenGain()
+        case .blueGain:
+            return getBlueGain()
         default:
             log.warning("\(key) is not readable")
             return nil
