@@ -233,7 +233,7 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            ensureAtLeastOneControlEnabled()
+            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -244,7 +244,7 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            ensureAtLeastOneControlEnabled()
+            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -255,7 +255,7 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            ensureAtLeastOneControlEnabled()
+            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -266,7 +266,7 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            ensureAtLeastOneControlEnabled()
+            // ensureAtLeastOneControlEnabled()
         }
     }
 
