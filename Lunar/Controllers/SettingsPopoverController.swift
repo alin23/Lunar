@@ -303,6 +303,7 @@ class SettingsPopoverController: NSViewController {
 
     @IBAction func readColors(_: Any) {
         guard let display = display, display.hasI2C, let control = display.control, !(control is GammaControl) else {
+            readColorsButton.attributedTitle = "DDC support needed".withAttribute(.textColor(readColorsButton.labelColor))
             return
         }
 
