@@ -481,7 +481,7 @@ class DisplayViewController: NSViewController {
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
 
-            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            let userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
@@ -495,7 +495,7 @@ class DisplayViewController: NSViewController {
             let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
             display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
 
-            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            let userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentContrast: contrast.u8, userContrast: userValues.dictionary)
         }
 
