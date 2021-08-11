@@ -224,6 +224,11 @@ class CoreDisplayControl: Control {
         return control.getMaxContrast()
     }
 
+    func getMaxVolume() -> UInt8? {
+        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        return control.getMaxVolume()
+    }
+
     func getVolume() -> UInt8? {
         guard let control = display.alternativeControlForCoreDisplay else { return nil }
         return control.getVolume()

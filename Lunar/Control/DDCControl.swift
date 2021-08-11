@@ -161,6 +161,10 @@ class DDCControl: Control {
         DDC.getMaxValue(for: display.id, controlID: .CONTRAST)
     }
 
+    func getMaxVolume() -> UInt8? {
+        DDC.getMaxValue(for: display.id, controlID: .AUDIO_SPEAKER_VOLUME)
+    }
+
     func getVolume() -> UInt8? {
         DDC.getAudioSpeakerVolume(for: display.id)
     }
