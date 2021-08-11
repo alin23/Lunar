@@ -58,7 +58,8 @@ enum InputSource: UInt8, CaseIterable {
     case displayPort2 = 16
     case hdmi1 = 17
     case hdmi2 = 18
-    case usbC = 27
+    case thunderbolt1 = 25
+    case thunderbolt2 = 27
     case unknown = 246
 
     // MARK: Lifecycle
@@ -97,9 +98,11 @@ enum InputSource: UInt8, CaseIterable {
         case "hdmi": self = .hdmi1
         case "hdmi1": self = .hdmi1
         case "hdmi2": self = .hdmi2
-        case "thunderbolt": self = .usbC
-        case "thunderbolt3": self = .usbC
-        case "usbc": self = .usbC
+        case "thunderbolt": self = .thunderbolt2
+        case "thunderbolt1": self = .thunderbolt1
+        case "thunderbolt2": self = .thunderbolt2
+        case "thunderbolt3": self = .thunderbolt2
+        case "usbc": self = .thunderbolt2
         case "unknown": self = .unknown
         default:
             return nil
@@ -109,7 +112,7 @@ enum InputSource: UInt8, CaseIterable {
     // MARK: Internal
 
     static var mostUsed: [InputSource] {
-        [.usbC, .displayPort1, .displayPort2, .hdmi1, .hdmi2]
+        [.thunderbolt1, .thunderbolt2, .displayPort1, .displayPort2, .hdmi1, .hdmi2]
     }
 
     static var leastUsed: [InputSource] {
@@ -155,7 +158,8 @@ enum InputSource: UInt8, CaseIterable {
         case .displayPort2: return "DisplayPort 2"
         case .hdmi1: return "HDMI 1"
         case .hdmi2: return "HDMI 2"
-        case .usbC: return "USB-C"
+        case .thunderbolt1: return "Thunderbolt (DDC 25)"
+        case .thunderbolt2: return "Thunderbolt (DDC 27)"
         case .unknown: return "Unknown"
         }
     }
