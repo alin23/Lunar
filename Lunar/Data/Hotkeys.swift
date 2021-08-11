@@ -302,11 +302,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     func unregister() {
         log.debug("Unregistered hotkey \(identifier)")
         HotKeyCenter.shared.unregisterHotKey(with: hotkey.identifier)
-//        hotkey.unregister()
     }
 
     func register() {
         log.debug("Registered hotkey \(identifier)")
+        #if DEBUG
+            mainAsyncAfter(ms: 10) { [weak self] in log.verbose("Registered hotkey \(self?.description ?? "")") }
+        #endif
         hotkey.register()
     }
 

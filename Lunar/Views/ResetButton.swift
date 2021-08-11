@@ -10,9 +10,13 @@ import Cocoa
 import Foundation
 
 class ResetButton: ToggleButton {
+    var resettingText = "Resetting"
+
     override func mouseDown(with event: NSEvent) {
         guard isEnabled else { return }
 
+        let text = attributedTitle.string
+        attributedTitle = resettingText.withAttribute(.textColor(labelColor))
         state = .off
         hoverState = .noHover
 
@@ -20,7 +24,9 @@ class ResetButton: ToggleButton {
 
         isEnabled = false
         fade()
-        mainAsyncAfter(ms: 3000) {
+        mainAsyncAfter(ms: 3000) { [weak self] in
+            guard let self = self else { return }
+            self.attributedTitle = text.withAttribute(.textColor(self.labelColor))
             self.state = .off
             self.hoverState = .noHover
             self.isEnabled = true
