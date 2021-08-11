@@ -306,7 +306,12 @@ class SettingsPopoverController: NSViewController {
             return
         }
 
-        display.refreshColors()
+        let success = display.refreshColors()
+        mainAsyncAfter(ms: 1000) { [weak self] in
+            guard let self = self else { return }
+            let text = success ? "Values refreshed successfully" : "Monitor not responding"
+            self.readColorsButton.attributedTitle = text.withAttribute(.textColor(self.readColorsButton.labelColor))
+        }
         setupDDCColorGain(display)
     }
 
@@ -551,9 +556,11 @@ class SettingsPopoverController: NSViewController {
         gammaHelpButton?.helpText = GAMMA_HELP_TEXT
 
         resetLimitsButton.page = .hotkeysReset
-        readColorsButton.page = .settingsReset
         resetColorsButton.page = .hotkeysReset
         resetGammaButton.page = .hotkeysReset
+
+        readColorsButton.page = .hotkeysReset
+        readColorsButton.resettingText = "Reading values..."
 
         gammaRedMin.decimalPoints = 2
         gammaRedMax.decimalPoints = 2

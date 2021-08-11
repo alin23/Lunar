@@ -876,9 +876,10 @@ class DisplayController {
         } else if lastModeWasAuto {
             CachedDefaults[.overrideAdaptiveMode] = false
             adaptiveMode = DisplayController.getAdaptiveMode()
-        } else if lastNonManualAdaptiveMode.available {
+        } else if lastNonManualAdaptiveMode.available, lastNonManualAdaptiveMode.key != .manual {
             adaptiveMode = lastNonManualAdaptiveMode
         } else {
+            CachedDefaults[.overrideAdaptiveMode] = false
             adaptiveMode = DisplayController.getAdaptiveMode()
         }
         CachedDefaults[.adaptiveBrightnessMode] = adaptiveMode.key

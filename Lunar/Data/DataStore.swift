@@ -399,7 +399,10 @@ enum CachedDefaults {
                         return value
                     }
 
-                    return key.suite[key]
+                    let value = key.suite[key]
+
+                    cache[key.name] = AnyCodable(value)
+                    return value
                 }
             }
         }
@@ -466,9 +469,6 @@ enum CachedDefaults {
     }
 
     static func reset(_ keys: [Defaults.AnyKey]) {
-        // semaphore.wait(for: nil, context: "Reset \(keys.map(\.name))")
-        // defer { semaphore.signal() }
-
         lock.around {
             Defaults.reset(keys)
             for key in keys {

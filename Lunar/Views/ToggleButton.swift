@@ -61,7 +61,7 @@ class ToggleButton: NSButton {
     var bgColor: NSColor {
         if !isEnabled {
             if highlighterTask != nil { stopHighlighting() }
-            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!).shadow(withLevel: 0.3)!
+            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!).highlight(withLevel: 0.3)!
         } else if state == .on {
             return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
         } else {
@@ -70,7 +70,10 @@ class ToggleButton: NSButton {
     }
 
     var labelColor: NSColor {
-        if state == .on {
+        if !isEnabled {
+            return (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
+                .highlight(withLevel: 0.3)!
+        } else if state == .on {
             return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
             return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!

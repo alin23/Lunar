@@ -57,8 +57,17 @@ class HotkeyViewController: NSViewController {
     var cachedFnState = Defaults[.fKeysAsFunctionKeys]
 
     @IBAction func resetHotkeys(_: Any) {
+        HotKeyCenter.shared.unregisterAll()
         CachedDefaults.reset(.hotkeys)
-        setHotkeys()
+
+        mainAsyncAfter(ms: 100) { [weak self] in
+            CachedDefaults[.hotkeys].forEach {
+                $0.unregister()
+                if $0.isEnabled { $0.register() }
+            }
+            self?.setHotkeys()
+            appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+        }
     }
 
     @IBAction func toggleFineAdjustments(_ sender: NSButton) {
