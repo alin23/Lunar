@@ -293,9 +293,9 @@ class SettingsPopoverController: NSViewController {
 
         _ = control.resetColors()
         if !display.refreshColors() {
-            display.redGain = 90
-            display.greenGain = 90
-            display.blueGain = 90
+            display.redGain = DEFAULT_COLOR_GAIN.ns
+            display.greenGain = DEFAULT_COLOR_GAIN.ns
+            display.blueGain = DEFAULT_COLOR_GAIN.ns
         }
 
         setupDDCColorGain(display)
