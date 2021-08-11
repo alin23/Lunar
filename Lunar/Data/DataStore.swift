@@ -18,6 +18,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .appExceptions,
     .muteVolumeZero,
     .showVirtualDisplays,
+    .showAirplayDisplays,
     .mediaKeysNotified,
     .brightnessKeysEnabled,
     .brightnessStep,
@@ -496,6 +497,7 @@ func initCache() {
     cacheKey(.mediaKeysNotified)
     cacheKey(.muteVolumeZero)
     cacheKey(.showVirtualDisplays)
+    cacheKey(.showAirplayDisplays)
     cacheKey(.advancedSettingsShown)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
@@ -556,7 +558,8 @@ extension Defaults.Keys {
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
-    static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: false)
+    static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
+    static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
@@ -676,3 +679,4 @@ let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volum
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).removeDuplicates().filter { $0.oldValue != $0.newValue }

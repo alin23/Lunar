@@ -442,9 +442,12 @@ enum DDC {
         }
     }
 
-    static func findExternalDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID] {
+    static func findExternalDisplays(includeVirtual: Bool = true, includeAirplay: Bool = false) -> [CGDirectDisplayID] {
         var displayIDs = NSScreen.onlineDisplayIDs.filter { id in
-            !isBuiltinDisplay(id) && (includeVirtual || !isVirtualDisplay(id, name: Display.printableName(id)))
+            let name = Display.printableName(id)
+            return !isBuiltinDisplay(id) &&
+                (includeVirtual || !isVirtualDisplay(id, name: name)) &&
+                (includeAirplay || !isAirplayDisplay(id, name: name))
         }
 
         #if DEBUG
@@ -472,7 +475,8 @@ enum DDC {
         }
 
         if checkName {
-            result = (name ?? Display.printableName(id)).lowercased().contains("airplay")
+            let realName = (name ?? Display.printableName(id)).lowercased()
+            result = realName.contains("virtual") || realName.contains("displaylink")
         }
 
         guard let infoDictionary = displayInfoDictionary(id) else {
@@ -481,9 +485,28 @@ enum DDC {
         }
 
         let isVirtualDevice = infoDictionary["kCGDisplayIsVirtualDevice"] as? Bool
-        let displayIsAirplay = infoDictionary["kCGDisplayIsAirPlay"] as? Bool
 
-        return isVirtualDevice ?? displayIsAirplay ?? result
+        return isVirtualDevice ?? result
+    }
+
+    static func isAirplayDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
+        var result = false
+        guard !isGeneric(id) else {
+            return result
+        }
+
+        if checkName {
+            let realName = (name ?? Display.printableName(id)).lowercased()
+            result = realName.contains("airplay") || realName.contains("sidecar") || realName.contains("ipad")
+        }
+
+        guard !result else { return result }
+        guard let infoDictionary = displayInfoDictionary(id) else {
+            log.debug("No info dict for id \(id)")
+            return result
+        }
+
+        return (infoDictionary["kCGDisplayIsAirPlay"] as? Bool) ?? false
     }
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {

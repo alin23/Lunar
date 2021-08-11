@@ -717,8 +717,11 @@ class DisplayController {
         return propScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
-    static func getDisplays(includeVirtual: Bool = false) -> [CGDirectDisplayID: Display] {
-        let ids = DDC.findExternalDisplays(includeVirtual: includeVirtual || TEST_MODE || CachedDefaults[.showVirtualDisplays])
+    static func getDisplays(includeVirtual: Bool = true, includeAirplay: Bool = false) -> [CGDirectDisplayID: Display] {
+        let ids = DDC.findExternalDisplays(
+            includeVirtual: includeVirtual || TEST_MODE,
+            includeAirplay: includeAirplay || TEST_MODE
+        )
         var serials = ids.map { Display.uuid(id: $0) }
 
         // Make sure serials are unique
@@ -882,11 +885,15 @@ class DisplayController {
         adaptBrightness(force: true)
     }
 
-    func resetDisplayList() {
+    func resetDisplayList(advancedSettings: Bool = false) {
         asyncNow {
             self.getDisplaysLock.around {
                 DDC.reset()
-                self.displays = DisplayController.getDisplays()
+                self.displays = DisplayController.getDisplays(
+                    includeVirtual: CachedDefaults[.showVirtualDisplays],
+                    includeAirplay: CachedDefaults[.showAirplayDisplays]
+                )
+
                 SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
                 SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
                 self.addSentryData()
@@ -894,6 +901,7 @@ class DisplayController {
 
             mainThread {
                 appDelegate.recreateWindow()
+                if advancedSettings { appDelegate.showAdvancedSettings() }
             }
         }
     }
