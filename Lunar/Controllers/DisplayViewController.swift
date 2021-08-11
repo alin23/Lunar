@@ -271,12 +271,14 @@ class DisplayViewController: NSViewController {
     @objc dynamic var lockedBrightnessCurve: Bool = false {
         didSet {
             display?.lockedBrightnessCurve = lockedBrightnessCurve
+            lockBrightnessCurveButton?.state = lockedBrightnessCurve.state
         }
     }
 
     @objc dynamic var lockedContrastCurve: Bool = false {
         didSet {
             display?.lockedContrastCurve = lockedContrastCurve
+            lockContrastCurveButton?.state = lockedContrastCurve.state
         }
     }
 
@@ -476,16 +478,11 @@ class DisplayViewController: NSViewController {
             }
             cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
 
-            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
-            Display.insertDataPoint(
-                values: &userValues,
-                featureValue: lastDataPoint,
-                targetValue: brightness,
-                logValue: false
-            )
-            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
+
+            var userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
             guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
@@ -495,16 +492,11 @@ class DisplayViewController: NSViewController {
                 return
             }
 
-            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
-            Display.insertDataPoint(
-                values: &userValues,
-                featureValue: lastDataPoint,
-                targetValue: contrast,
-                logValue: false
-            )
-            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues.dictionary)
             display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
+
+            var userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues.dictionary)
         }
 
         display.onControlChange = { [weak self] control in

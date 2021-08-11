@@ -70,6 +70,7 @@ class SettingsPopoverController: NSViewController {
 
     @IBOutlet var resetLimitsButton: ResetButton!
     @IBOutlet var resetColorsButton: ResetButton!
+    @IBOutlet var readColorsButton: ResetButton!
     @IBOutlet var resetGammaButton: ResetButton!
 
     @IBOutlet var brightnessCurveFactorField: ScrollableTextField!
@@ -297,6 +298,15 @@ class SettingsPopoverController: NSViewController {
             display.blueGain = 90
         }
 
+        setupDDCColorGain(display)
+    }
+
+    @IBAction func readColors(_: Any) {
+        guard let display = display, display.hasI2C, let control = display.control, !(control is GammaControl) else {
+            return
+        }
+
+        display.refreshColors()
         setupDDCColorGain(display)
     }
 
@@ -541,6 +551,7 @@ class SettingsPopoverController: NSViewController {
         gammaHelpButton?.helpText = GAMMA_HELP_TEXT
 
         resetLimitsButton.page = .hotkeysReset
+        readColorsButton.page = .settingsReset
         resetColorsButton.page = .hotkeysReset
         resetGammaButton.page = .hotkeysReset
 
