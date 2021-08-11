@@ -641,6 +641,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if CachedDefaults[.reapplyValuesAfterWake] {
                         asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                             displayController.adaptBrightness(force: true)
+                            for display in displayController.activeDisplays.values {
+                                if display.redGain != 90 { _ = display.control?.setRedGain(display.redGain.uint8Value) }
+                                if display.greenGain != 90 { _ = display.control?.setGreenGain(display.greenGain.uint8Value) }
+                                if display.blueGain != 90 { _ = display.control?.setBlueGain(display.blueGain.uint8Value) }
+                            }
                         }
                     }
 
@@ -743,12 +748,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.startValuesReaderThread()
             }
         }.store(in: &observers)
-
-        // hotkeysObserver = hotkeysObserver ?? hotkeysPublisher.sink { _ in
-        //     mainThread {
-        //         self.setKeyEquivalents(CachedDefaults[.hotkeys])
-        //     }
-        // }
 
         brightnessKeysEnabledPublisher.sink { change in
             self.startOrRestartMediaKeyTap(brightnessKeysEnabled: change.newValue)
@@ -980,6 +979,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if CachedDefaults[.reapplyValuesAfterWake] {
             asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
+                for display in displayController.activeDisplays.values {
+                    if display.redGain != 90 { _ = display.control?.setRedGain(display.redGain.uint8Value) }
+                    if display.greenGain != 90 { _ = display.control?.setGreenGain(display.greenGain.uint8Value) }
+                    if display.blueGain != 90 { _ = display.control?.setBlueGain(display.blueGain.uint8Value) }
+                }
             }
         }
 
