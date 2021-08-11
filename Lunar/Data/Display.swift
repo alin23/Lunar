@@ -1891,7 +1891,6 @@ enum ValueType {
 
         startI2CDetection()
         detectI2C()
-        if hasI2C { refreshColors() }
 
         control = getBestControl()
     }
@@ -1980,7 +1979,6 @@ enum ValueType {
             self.detectI2C()
             if self.hasI2C {
                 cancelTask(taskKey)
-                self.refreshColors()
             }
         }
     }
@@ -2790,7 +2788,7 @@ enum ValueType {
             fromHigh: maxBrightness.floatValue,
             toLow: MIN_BRIGHTNESS.f,
             toHigh: MAX_BRIGHTNESS.f
-        ).i
+        ).intround
 
         brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
             while let self = self, self.sendingBrightness {
@@ -2822,7 +2820,7 @@ enum ValueType {
             fromHigh: maxContrast.floatValue,
             toLow: MIN_CONTRAST.f,
             toHigh: MAX_CONTRAST.f
-        ).i
+        ).intround
 
         contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
             while let self = self, self.sendingContrast {
