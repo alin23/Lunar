@@ -242,9 +242,13 @@ class SplitViewController: NSSplitViewController {
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
+                goLeftNotice?.appearance = appDelegate.darkMode ? nil : NSAppearance(named: .darkAqua)
+                goLeftNotice?.compositingFilter = appDelegate.darkMode ? nil : CIFilter(name: "CISubtractBlendMode")
                 goLeftNotice?.stringValue = "Click to go to the\nConfiguration page"
             }
             if !rightHintsShown {
+                goRightNotice?.appearance = appDelegate.darkMode ? nil : NSAppearance(named: .darkAqua)
+                goRightNotice?.compositingFilter = appDelegate.darkMode ? nil : CIFilter(name: "CISubtractBlendMode")
                 goRightNotice?.stringValue = "Click to configure\nthe next monitor"
             }
         }
@@ -256,6 +260,7 @@ class SplitViewController: NSSplitViewController {
             POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantDark)
             view.bg = darkMauve
+
             goLeftButton?.compositingFilter = nil
             goRightButton?.compositingFilter = nil
         } else {
@@ -265,9 +270,11 @@ class SplitViewController: NSSplitViewController {
             POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantLight)
             view.bg = white
+
             goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
             goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         }
+
         goLeftButton?.enable()
         goRightButton?.enable()
     }
@@ -291,9 +298,13 @@ class SplitViewController: NSSplitViewController {
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
+                goLeftNotice?.appearance = NSAppearance(named: .aqua)
+                goLeftNotice?.compositingFilter = nil
                 goLeftNotice?.stringValue = "Click to go to the\nHotkeys page"
             }
             if !rightHintsShown {
+                goRightNotice?.appearance = NSAppearance(named: .aqua)
+                goRightNotice?.compositingFilter = nil
                 goRightNotice?.stringValue = "Click to go back to\nthe Display page"
                 goRightButton?.highlight()
             }
@@ -314,10 +325,14 @@ class SplitViewController: NSSplitViewController {
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
+                goLeftNotice?.appearance = NSAppearance(named: .darkAqua)
+                goLeftNotice?.compositingFilter = nil
                 goLeftNotice?.stringValue = ""
                 leftHintsShown = true
             }
             if !rightHintsShown {
+                goRightNotice?.appearance = NSAppearance(named: .darkAqua)
+                goRightNotice?.compositingFilter = nil
                 goRightNotice?.stringValue = "Click to go back to the\n Configuration page"
             }
         }
