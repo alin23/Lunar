@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 import SwiftyAttributes
 
@@ -15,17 +16,20 @@ import SwiftyAttributes
 class PopUpButtonCell: NSPopUpButtonCell {
     var textColor: NSColor?
     var dotColor: NSColor?
+    @IBInspectable var prefix: String = ""
 
     override func drawTitle(_ title: NSAttributedString, withFrame frame: NSRect, in controlView: NSView) -> NSRect {
-        if let color = textColor {
-            let title = title.withAttribute(.textColor(color))
-            if let dotColor = dotColor, let font = NSFont(name: "HiraKakuProN-W3", size: 11.0) {
-                title.addAttributes([.font(font), .textColor(dotColor)], range: 0 ..< 3)
-            }
-            return super.drawTitle(title, withFrame: frame, in: controlView)
-        } else {
+        guard let color = textColor else {
             return super.drawTitle(title, withFrame: frame, in: controlView)
         }
+
+        let titleString = "\(prefix)\(title.string)"
+        let title = titleString.withAttribute(.textColor(color))
+        if titleString.count > 5, let dotColor = dotColor, let font = NSFont(name: "HiraKakuProN-W3", size: 11.0) {
+            title.addAttributes([.font(font), .textColor(dotColor)], range: 0 ..< 3)
+            title.addAttributes([.font(.boldSystemFont(ofSize: NSFont.smallSystemFontSize)), .textColor(color)], range: 3 ..< title.length)
+        }
+        return super.drawTitle(title, withFrame: frame, in: controlView)
     }
 }
 
@@ -46,7 +50,14 @@ class PopUpButton: NSPopUpButton {
 
     // MARK: Internal
 
+    @IBInspectable var dotColor: NSColor? = nil
+
     var hoverState = HoverState.noHover
+
+    @IBInspectable var padding: CGFloat = 16
+    @IBInspectable var maxWidth: CGFloat = 0
+
+    var observers: Set<AnyCancellable> = []
 
     var page = Page.display {
         didSet {
@@ -70,7 +81,7 @@ class PopUpButton: NSPopUpButton {
         }
     }
 
-    func dotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
+    func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
         if overrideMode ?? CachedDefaults[.overrideAdaptiveMode] {
             return buttonDotColor[modeKey ?? displayController.adaptiveModeKey]!
         } else {
@@ -86,23 +97,26 @@ class PopUpButton: NSPopUpButton {
         defocus()
     }
 
-    func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil) {
+    func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
         if let cell = cell as? PopUpButtonCell {
             cell.textColor = labelColor
-            cell.dotColor = dotColor(modeKey: modeKey)
+            cell.dotColor = dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode)
         }
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         bg = bgColor
 
-        let title = attributedTitle.withAttribute(.textColor(labelColor))
-        title.addAttributes([.textColor(dotColor(modeKey: modeKey))], range: 0 ..< 2)
-        attributedTitle = title
-
-        attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
+        attributedTitle = attributedTitle.withAttribute(.textColor(labelColor))
+//        title.addAttributes([.textColor(dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode))], range: 0 ..< 2)
+//        attributedTitle = title
+//
+//        attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
     }
 
     func resizeToFitTitle() {
-        let width = sizeThatFits(attributedTitle.size()).width + 16
+        var width = sizeThatFits(attributedTitle.size()).width + padding
+        if maxWidth > 0 {
+            width = cap(width, minVal: 0, maxVal: maxWidth)
+        }
 
         let x: CGFloat
         if width > frame.width {
@@ -115,10 +129,13 @@ class PopUpButton: NSPopUpButton {
         setFrameSize(NSSize(width: width, height: frame.height))
     }
 
-    func fade(modeKey: AdaptiveModeKey? = nil) {
+    func fade(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
         mainThread {
-            setColors(modeKey: modeKey)
+            setColors(modeKey: modeKey, overrideMode: overrideMode)
             resizeToFitTitle()
+            trackingAreas.forEach { removeTrackingArea($0) }
+            let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+            addTrackingArea(area)
         }
     }
 
@@ -146,6 +163,11 @@ class PopUpButton: NSPopUpButton {
 
         let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
         addTrackingArea(area)
+
+        selectionPublisher
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.fade() }
+            .store(in: &observers)
     }
 
     override func draw(_ dirtyRect: NSRect) {

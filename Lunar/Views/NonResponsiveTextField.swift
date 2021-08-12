@@ -22,10 +22,10 @@ class NonResponsiveTextField: NSTextField {
     override var isHidden: Bool {
         didSet {
             mainThread {
-                if let adaptiveButton = superview?.subviews.first(
-                    where: { v in (v as? QuickAdaptiveButton) != nil }
-                ) as? QuickAdaptiveButton {
-                    adaptiveButton.isHidden = !self.isHidden
+                if let inputDropdown = superview?.subviews.first(
+                    where: { v in (v as? PopUpButton) != nil }
+                ) as? PopUpButton {
+                    inputDropdown.isHidden = !self.isHidden
                 }
             }
         }

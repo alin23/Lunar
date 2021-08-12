@@ -1862,7 +1862,7 @@ when dock and menubar icons are hidden</string>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bUO-Qi-56O">
                                 <rect key="frame" x="30" y="236" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="left" title="Hotkey step" id="ak3-la-rd5">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
@@ -1932,7 +1932,7 @@ when dock and menubar icons are hidden</string>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptg-bU-WRA">
                                 <rect key="frame" x="30" y="497" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Polling interval" id="2Zp-Qy-xtN">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
@@ -1985,7 +1985,7 @@ when dock and menubar icons are hidden</string>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="osm-bT-7sA">
                                 <rect key="frame" x="30" y="185" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Smooth transition" id="zxx-4L-t4t">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
@@ -2027,7 +2027,7 @@ when dock and menubar icons are hidden</string>
                             </customView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J3H-YT-CPY">
                                 <rect key="frame" x="30" y="297" width="99" height="32"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Location" id="VmO-qe-cP9">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
@@ -2309,7 +2309,7 @@ when dock and menubar icons are hidden</string>
                         <subviews>
                             <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="70" horizontalPageScroll="10" verticalLineScroll="70" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="uGn-PW-Pif">
                                 <rect key="frame" x="0.0" y="220" width="475" height="314"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="QLY-hc-WFL">
                                     <rect key="frame" x="0.0" y="0.0" width="475" height="314"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2538,7 +2538,7 @@ when dock and menubar icons are hidden</string>
                             </scrollView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Me3-zd-wSK">
                                 <rect key="frame" x="158" y="580" width="173" height="37"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="EXCEPTIONS" id="BNH-yp-CJC">
                                     <font key="font" size="26" name="Menlo-Bold"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -2547,7 +2547,7 @@ when dock and menubar icons are hidden</string>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YpS-Zm-PyQ">
                                 <rect key="frame" x="106" y="565" width="263" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Enhance visibility in the following apps" usesSingleLineMode="YES" id="J8r-d9-DNr">
                                     <font key="font" metaFont="systemMedium" size="14"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
@@ -2573,7 +2573,7 @@ when dock and menubar icons are hidden</string>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ENC-nL-gtE">
                                 <rect key="frame" x="265" y="540" width="83" height="15"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness" id="erG-by-oaF">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.24313725490196078" green="0.24313725490196078" blue="0.4392156862745098" alpha="0.49643004966887416" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2582,7 +2582,7 @@ when dock and menubar icons are hidden</string>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vTy-8C-HpY">
                                 <rect key="frame" x="378" y="540" width="67" height="15"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Contrast" id="2pR-8e-dSI">
                                     <font key="font" size="13" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.24313725490196078" green="0.24313725490196078" blue="0.4392156862745098" alpha="0.49643004966887416" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2619,11 +2619,11 @@ when dock and menubar icons are hidden</string>
                         <subviews>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-25" y="-10" width="1000" height="190"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="6nl-T1-C3E" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="125" y="31" width="73" height="8"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <ciFilter key="compositingFilter" name="CISubtractBlendMode">
                                             <configuration>
                                                 <null key="inputBackgroundImage"/>
@@ -2645,7 +2645,7 @@ when dock and menubar icons are hidden</string>
                                     </button>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="Z5X-YG-FjQ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="125" y="15" width="73" height="8"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <ciFilter key="compositingFilter" name="CISubtractBlendMode">
                                             <configuration>
                                                 <null key="inputBackgroundImage"/>
@@ -2669,11 +2669,11 @@ when dock and menubar icons are hidden</string>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="325" y="274" width="300" height="300"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <imageCell key="cell" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="390" y="216" width="170" height="18"/>
+                                <rect key="frame" x="388" y="216" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive" id="dgU-DI-4YJ">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -2698,7 +2698,7 @@ when dock and menubar icons are hidden</string>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="umA-QT-AAO">
                                         <rect key="frame" x="-1" y="304" width="250" height="27"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Scm-pa-EMP">
                                             <font key="font" size="14" name="Menlo-Bold"/>
                                             <color key="textColor" name="Gray"/>
@@ -2707,7 +2707,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sHO-oG-RCf" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="64" y="74" width="120" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="h6T-2W-xq9" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
@@ -2716,7 +2716,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="AFf-yC-bHu" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="55" width="250" height="17"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="yxN-eN-fTW">
                                             <font key="font" metaFont="smallSystemBold"/>
                                             <color key="textColor" name="Caption"/>
@@ -2725,7 +2725,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="98" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="bWj-lO-viB" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="231" width="250" height="17"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="kl2-hg-amy">
                                             <font key="font" metaFont="smallSystemBold"/>
                                             <color key="textColor" name="Caption"/>
@@ -2734,7 +2734,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OzI-5V-Ofu" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="65" y="252" width="120" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="GW0-Io-Qsz" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.95206473214285714" green="0.75076706127244597" blue="0.1428097098214286" alpha="1" colorSpace="calibratedRGB"/>
@@ -2743,7 +2743,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="53f-Gg-bId" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="83" y="15" width="83" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OEK-mm-GWN">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="systemBold" size="12"/>
@@ -2754,7 +2754,7 @@ when dock and menubar icons are hidden</string>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mts-p9-8Zt" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="65" y="149" width="120" height="54"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="74a-eH-SG4" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="44"/>
                                             <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
@@ -2763,7 +2763,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="who-Wm-5BR" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="59" y="20" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <shadow key="shadow" blurRadius="4">
                                             <size key="offset" width="0.0" height="4"/>
                                             <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
@@ -2797,11 +2797,11 @@ when dock and menubar icons are hidden</string>
                             </customView>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XVS-nO-2Mf" customClass="ScrollableContrast" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="655" y="237" width="250" height="337"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7BM-c4-qeq">
                                         <rect key="frame" x="1" y="304" width="250" height="27"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="fSu-Aa-UGk">
                                             <font key="font" size="14" name="Menlo-Bold"/>
                                             <color key="textColor" name="Gray"/>
@@ -2810,7 +2810,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EOc-dV-pve" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="66" y="74" width="120" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" usesSingleLineMode="YES" id="b0T-Nr-uCc" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -2819,7 +2819,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="hND-EE-xno" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="55" width="250" height="17"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="j1k-jz-zl9">
                                             <font key="font" metaFont="smallSystemBold"/>
                                             <color key="textColor" name="Caption"/>
@@ -2828,7 +2828,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="98" preferredMaxLayoutWidth="246" translatesAutoresizingMaskIntoConstraints="NO" id="1u6-gf-UFK" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="231" width="250" height="17"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="Dyb-7m-YDq">
                                             <font key="font" metaFont="smallSystemBold"/>
                                             <color key="textColor" name="Caption"/>
@@ -2837,7 +2837,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QAV-hB-Z6e" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="66" y="252" width="120" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="bOn-60-FuP" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="56"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888113839278" blue="0.14250000000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -2846,7 +2846,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ffG-pW-9dT" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="83" y="15" width="83" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="eST-GN-uHq">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="systemBold" size="12"/>
@@ -2857,7 +2857,7 @@ when dock and menubar icons are hidden</string>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0p3-Ip-HPc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="67" y="149" width="116" height="54"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="Hxe-Bv-eWX" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="44"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888110000004" blue="0.14249999999999999" alpha="1" colorSpace="calibratedRGB"/>
@@ -2866,7 +2866,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="09R-D2-mY8" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="59" y="20" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <shadow key="shadow" blurRadius="4">
                                             <size key="offset" width="0.0" height="4"/>
                                             <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
@@ -2900,7 +2900,7 @@ when dock and menubar icons are hidden</string>
                             </customView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="343" y="409" width="264" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" size="28" name="Menlo-Bold"/>
                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2914,11 +2914,11 @@ when dock and menubar icons are hidden</string>
                                     </binding>
                                 </connections>
                             </textField>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT">
-                                <rect key="frame" x="389" y="213" width="173" height="25"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Thunderbolt 3 (DDC 27)" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="387" y="213" width="173" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="mmT-ta-ING">
                                         <items>
@@ -2983,14 +2983,25 @@ when dock and menubar icons are hidden</string>
                                             <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="Ah9-ua-jqI">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Unknown" tag="246" hidden="YES" id="IdB-fg-Bb3">
+                                            <menuItem title="Input" tag="246" hidden="YES" id="IdB-fg-Bb3">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
                                     </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                    </userDefinedRuntimeAttributes>
                                 </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" name="Caption Secondary"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="setInput:" target="1Bn-Ca-ETm" id="CPa-dk-uc9"/>
+                                    <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="WjQ-Yx-YEJ"/>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" previousBinding="0Pp-lL-OYP" id="12M-mJ-DK9">
                                         <dictionary key="options">
@@ -3015,7 +3026,7 @@ when dock and menubar icons are hidden</string>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kAQ-3d-HnF" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="835" y="203" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
                                     <color key="color" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.50887313741721851" colorSpace="calibratedRGB"/>
@@ -3039,7 +3050,7 @@ when dock and menubar icons are hidden</string>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="446" y="623" width="53" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -3091,8 +3102,8 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="423" y="194" width="103" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <rect key="frame" x="421" y="194" width="103" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
                                     <color key="color" red="1" green="0.83529411764705885" blue="0.52549019607843139" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3139,11 +3150,11 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE">
-                                <rect key="frame" x="861" y="197" width="73" height="25"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="99" imageScaling="proportionallyDown" inset="2" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="861" y="197" width="73" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="99" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="zQp-JQ-yds">
                                         <items>
@@ -3187,10 +3198,21 @@ and contrast to their highest values</string>
                                             </menuItem>
                                         </items>
                                     </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼ "/>
+                                    </userDefinedRuntimeAttributes>
                                     <connections>
                                         <action selector="reset:" target="1Bn-Ca-ETm" id="TEo-OZ-X1P"/>
                                     </connections>
                                 </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" name="Caption Secondary"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
                                 </connections>
@@ -3213,6 +3235,7 @@ and contrast to their highest values</string>
                         <outlet property="lockBrightnessCurveButton" destination="Z5X-YG-FjQ" id="pOc-V1-hxI"/>
                         <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
                         <outlet property="nonResponsiveTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
+                        <outlet property="resetDropdown" destination="xhP-CD-ogE" id="4zg-Y7-6bF"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                     </connections>
@@ -3914,23 +3937,106 @@ and contrast to their highest values</string>
                                                             <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" id="AnX-xS-ue0"/>
                                                         </connections>
                                                     </textField>
-                                                    <button focusRingType="none" verticalHuggingPriority="750" id="XPe-bn-XeV" customClass="QuickAdaptiveButton" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="52" y="13" width="84" height="16"/>
+                                                    <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xe3-ix-Mkh" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="6" y="4" width="173" height="15"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="inline" title="Manual" alternateTitle="Adaptive" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="oZn-eu-t1B">
+                                                        <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="uVs-RS-bzO" id="F5y-NP-O9g" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="systemBold" size="12"/>
-                                                            <string key="keyEquivalent">a</string>
-                                                            <modifierMask key="keyEquivalentModifierMask" option="YES"/>
-                                                        </buttonCell>
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                            <menu key="menu" id="O3v-Zl-sI9">
+                                                                <items>
+                                                                    <menuItem title="Thunderbolt 3 (DDC 27)" state="on" tag="27" id="uVs-RS-bzO">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thunderbolt 3 (DDC 25)" tag="25" id="FzX-QI-e6C">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DisplayPort 1" tag="15" id="gIn-NF-jJ9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DisplayPort 2" tag="16" id="8xb-WW-QQO">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="HDMI 1" tag="17" id="i1N-tV-kqi">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="HDMI 2" tag="18" id="i3P-E5-jtu">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem isSeparatorItem="YES" id="N1M-up-Z9l"/>
+                                                                    <menuItem title="VGA 1" tag="1" id="w1a-zY-ixL">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="VGA 2" tag="2" id="IVY-dp-emX">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DVI 1" tag="3" id="jaw-KV-FG4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DVI 2" tag="4" id="eH1-H9-J4D">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Composite video 1" tag="5" id="Nal-2K-Slp">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Composite video 2" tag="6" id="z7A-z2-8qY">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="S-Video 1" tag="7" id="cwx-z7-1K9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="S-Video 2" tag="8" id="JrA-nE-E5i">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 1" tag="9" id="nex-WA-0a2">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 2" tag="10" id="XL7-69-htS">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 3" tag="11" id="TOw-5G-ZIc">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 1" tag="12" id="tnX-9v-aJb">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 2" tag="13" id="cxA-gq-xtb">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="BeW-EY-cF0">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Unknown" tag="246" hidden="YES" id="23r-bE-teV">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                </items>
+                                                            </menu>
+                                                            <userDefinedRuntimeAttributes>
+                                                                <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                                            </userDefinedRuntimeAttributes>
+                                                        </popUpButtonCell>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                                                <real key="value" value="34"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                                                <color key="value" name="Caption Secondary"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="maxWidth">
+                                                                <real key="value" value="160"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
                                                         <connections>
-                                                            <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" id="0RN-Pv-Y2t">
+                                                            <action selector="setInput:" target="1Bn-Ca-ETm" id="CfU-Yo-qSt"/>
+                                                            <binding destination="sUH-3g-BTj" name="enabled" keyPath="objectValue.active" id="CUN-ET-b4x"/>
+                                                            <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" previousBinding="CUN-ET-b4x" id="wcl-M0-8Ez">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
                                                             </binding>
+                                                            <binding destination="sUH-3g-BTj" name="selectedTag" keyPath="objectValue.input" id="IMa-iP-GGJ"/>
                                                         </connections>
-                                                    </button>
+                                                    </popUpButton>
                                                 </subviews>
                                                 <connections>
                                                     <outlet property="textField" destination="S3N-hZ-p5E" id="MnV-HX-yZW"/>
@@ -4199,11 +4305,11 @@ and contrast to their highest values</string>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB">
-                                <rect key="frame" x="139" y="505" width="160" height="25"/>
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="136" y="507" width="160" height="15"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="fWr-J1-2iU">
                                         <items>
@@ -4212,7 +4318,21 @@ and contrast to their highest values</string>
                                             </menuItem>
                                         </items>
                                     </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                    </userDefinedRuntimeAttributes>
                                 </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="maxWidth">
+                                        <real key="value" value="160"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="selectItem:" target="VkT-77-mId" id="p2H-73-sMs"/>
                                 </connections>
@@ -4305,11 +4425,11 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ygF-rE-Ln9">
-                                <rect key="frame" x="137" y="329" width="160" height="25"/>
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ygF-rE-Ln9" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="135" y="331" width="160" height="15"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="1Zo-rI-ste" id="IJw-8j-6p1">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="1Zo-rI-ste" id="IJw-8j-6p1" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="K8G-zX-yiU">
                                         <items>
@@ -4318,7 +4438,21 @@ and contrast to their highest values</string>
                                             </menuItem>
                                         </items>
                                     </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                    </userDefinedRuntimeAttributes>
                                 </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="maxWidth">
+                                        <real key="value" value="160"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="selectItem:" target="VkT-77-mId" id="kYc-QA-duL"/>
                                 </connections>
@@ -4445,11 +4579,11 @@ and contrast to their highest values</string>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p">
-                                <rect key="frame" x="136" y="153" width="160" height="25"/>
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="133" y="155" width="160" height="15"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="r6T-el-KBe" id="sg9-44-wbG">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="r6T-el-KBe" id="sg9-44-wbG" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="CrD-qm-seI">
                                         <items>
@@ -4458,7 +4592,21 @@ and contrast to their highest values</string>
                                             </menuItem>
                                         </items>
                                     </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                    </userDefinedRuntimeAttributes>
                                 </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="maxWidth">
+                                        <real key="value" value="160"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="selectItem:" target="VkT-77-mId" id="zxT-4d-Blh"/>
                                 </connections>
@@ -6877,6 +7025,9 @@ You can choose to send the diagnostics to the developer if you think this is not
         <image name="power" width="96" height="96"/>
         <namedColor name="Caption">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Caption Secondary">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.79995678567886352" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Gray">
             <color red="0.49399998784065247" green="0.46599999070167542" blue="0.49399998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
