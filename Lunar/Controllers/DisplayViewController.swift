@@ -552,11 +552,11 @@ class DisplayViewController: NSViewController {
                 button.attributedTitle = "Native Controls".withAttribute(.textColor(mauve))
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
             case is DDCControl:
-                button.bg = lunarYellow
+                button.bg = appDelegate.darkMode ? peach : lunarYellow
                 button.attributedTitle = "Hardware Controls".withAttribute(.textColor(darkMauve))
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
             case is GammaControl where display.enabledControls[.gamma] ?? false:
-                button.bg = appDelegate.darkMode ? red.highlight(withLevel: 0.3) : red.withAlphaComponent(0.9)
+                button.bg = appDelegate.darkMode ? peach.blended(withFraction: 0.5, of: red) : red.withAlphaComponent(0.9)
                 button.attributedTitle = "Software Controls".withAttribute(.textColor(.black))
                 button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
             case is NetworkControl:

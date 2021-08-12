@@ -14,6 +14,7 @@ let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.43921
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
 let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
 let orange = #colorLiteral(red: 0.9921568627, green: 0.6431372549, blue: 0.2274509804, alpha: 1)
+let peach = #colorLiteral(red: 0.9982646108, green: 0.7837697268, blue: 0.5843595266, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
