@@ -1623,15 +1623,15 @@ enum ValueType {
         #if DEBUG
             switch id {
             case TEST_DISPLAY_ID:
-                return "Test Display"
+                return "LG Ultra HD"
             case TEST_DISPLAY_PERSISTENT_ID:
-                return "Persistent"
+                return "DELL U3419W"
             case TEST_DISPLAY_PERSISTENT2_ID:
-                return "Persistent v2"
+                return "LG Ultrafine"
             case TEST_DISPLAY_PERSISTENT3_ID:
-                return "Persistent v3"
+                return "Pro Display XDR"
             case TEST_DISPLAY_PERSISTENT4_ID:
-                return "Persistent v4"
+                return "Thunderbolt"
             default:
                 break
             }

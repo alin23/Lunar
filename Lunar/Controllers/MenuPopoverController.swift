@@ -33,7 +33,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         listenForPopoverEvents()
-        listenForAdaptiveModeChange()
+//        listenForAdaptiveModeChange()
         listenForDisplaysChange()
         listenForResponsiveDDCChange()
     }
@@ -41,7 +41,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         listenForPopoverEvents()
-        listenForAdaptiveModeChange()
+//        listenForAdaptiveModeChange()
         listenForDisplaysChange()
         listenForResponsiveDDCChange()
     }
@@ -134,6 +134,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func popoverWillShow() {
+        tableView.resizeInputs()
         #if DEBUG
             log.verbose("Calling adaptViewSize()")
         #endif
@@ -241,36 +242,6 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 }
                 .store(in: &observers, for: display.serial)
         }
-    }
-
-    func listenForAdaptiveModeChange() {
-        adaptiveBrightnessModePublisher
-            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
-            .sink { [unowned self] change in
-                mainThread { [weak self] in
-                    guard let self = self, !self.pausedAdaptiveModeObserver, let tableView = self.tableView else {
-                        return
-                    }
-
-                    self.pausedAdaptiveModeObserver = true
-                    Defaults.withoutPropagation {
-                        let adaptiveMode = change.newValue
-
-                        switch adaptiveMode {
-                        case .sensor:
-                            tableView.setAdaptiveButtonHidden(false)
-                        case .sync:
-                            tableView.setAdaptiveButtonHidden(false)
-                        case .location:
-                            tableView.setAdaptiveButtonHidden(false)
-                        case .manual:
-                            tableView.setAdaptiveButtonHidden(true)
-                        }
-                    }
-                    self.pausedAdaptiveModeObserver = false
-                }
-            }
-            .store(in: &observers, for: "adaptive")
     }
 
     override func mouseEntered(with _: NSEvent) {
