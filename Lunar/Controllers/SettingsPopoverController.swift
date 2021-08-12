@@ -140,7 +140,7 @@ class SettingsPopoverController: NSViewController {
             .first(where: { checkbox in checkbox!.state == .on })
     }
 
-    weak var display: Display? {
+    @objc dynamic weak var display: Display? {
         didSet {
             guard let display = display else { return }
 

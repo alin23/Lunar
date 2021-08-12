@@ -294,13 +294,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return mode.available
     }
 
-    func showWindow(after ms: Int? = nil) {
+    func showWindow(after ms: Int? = nil, position: NSPoint? = nil) {
         guard let ms = ms else {
-            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
+            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse, position: position)
             return
         }
         mainAsyncAfter(ms: ms) { [self] in
-            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse)
+            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse, position: position)
         }
     }
 
@@ -562,6 +562,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForScreenConfigurationChanged() {
+        CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
+            if let display = displayController.activeDisplays[displayID] {
+                display.rotation = CGDisplayRotation(displayID).intround
+            }
+        }, nil)
+
         NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.activeSpaceDidChangeNotification, object: nil)
             .eraseToAnyPublisher().map { $0 as Any? }
@@ -715,12 +721,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func recreateWindow() {
         if windowController?.window != nil {
-            let shouldShow = windowController!.window!.isVisible
+            let window = windowController!.window!
+            let shouldShow = window.isVisible
+            let lastPosition = window.frame.origin
             windowController?.close()
             windowController?.window = nil
             windowController = nil
             if shouldShow {
-                showWindow()
+                showWindow(position: lastPosition)
             }
         }
     }

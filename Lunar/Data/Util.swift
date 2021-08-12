@@ -1784,3 +1784,76 @@ extension LineReader: Sequence {
         }
     }
 }
+
+func getModeDetails(_ mode: MPDisplayMode?, prefix: String = "\t") -> String {
+    guard let mode = mode else { return "nil" }
+    return """
+        \(prefix)refreshString: \(mode.refreshString ?? "Unknown")
+        \(prefix)resolutionString: \(mode.resolutionString ?? "Unknown")
+        \(prefix)isSafeMode: \(mode.isSafeMode)
+        \(prefix)tvModeEquiv: \(mode.tvModeEquiv)
+        \(prefix)tvMode: \(mode.tvMode)
+        \(prefix)isTVMode: \(mode.isTVMode)
+        \(prefix)isSimulscan: \(mode.isSimulscan)
+        \(prefix)isInterlaced: \(mode.isInterlaced)
+        \(prefix)isNativeMode: \(mode.isNativeMode)
+        \(prefix)isDefaultMode: \(mode.isDefaultMode)
+        \(prefix)isStretched: \(mode.isStretched)
+        \(prefix)isUserVisible: \(mode.isUserVisible)
+        \(prefix)isHiDPI: \(mode.isHiDPI)
+        \(prefix)isRetina: \(mode.isRetina)
+        \(prefix)scanRate: \(mode.scanRate ?? 0)
+        \(prefix)roundedScanRate: \(mode.roundedScanRate)
+        \(prefix)scale: \(mode.scale)
+        \(prefix)aspectRatio: \(mode.aspectRatio)
+        \(prefix)fixPtRefreshRate: \(mode.fixPtRefreshRate)
+        \(prefix)refreshRate: \(mode.refreshRate)
+        \(prefix)dotsPerInch: \(mode.dotsPerInch)
+        \(prefix)vertDPI: \(mode.vertDPI)
+        \(prefix)horizDPI: \(mode.horizDPI)
+        \(prefix)pixelsHigh: \(mode.pixelsHigh)
+        \(prefix)pixelsWide: \(mode.pixelsWide)
+        \(prefix)height: \(mode.height)
+        \(prefix)width: \(mode.width)
+        \(prefix)modeNumber: \(mode.modeNumber)
+    """
+}
+
+func getMonitorPanelData(_ display: MPDisplay) -> String {
+    """
+        ID: \(display.displayID)
+        Alias ID: \(display.aliasID)
+        canChangeOrientation: \(display.canChangeOrientation())
+        hasRotationSensor: \(display.hasRotationSensor)
+        hasZeroRate: \(display.hasZeroRate)
+        hasMultipleRates: \(display.hasMultipleRates)
+        isSidecarDisplay: \(display.isSidecarDisplay)
+        isAirPlayDisplay: \(display.isAirPlayDisplay)
+        isProjector: \(display.isProjector)
+        is4K: \(display.is4K)
+        isTV: \(display.isTV)
+        isMirrorMaster: \(display.isMirrorMaster)
+        isMirrored: \(display.isMirrored)
+        isBuiltIn: \(display.isBuiltIn)
+        isHiDPI: \(display.isHiDPI)
+        hasTVModes: \(display.hasTVModes)
+        hasSimulscan: \(display.hasSimulscan)
+        hasSafeMode: \(display.hasSafeMode)
+        isSmartDisplay: \(display.isSmartDisplay)
+        orientation: \(display.orientation)
+
+        Default mode:
+        \(getModeDetails(display.defaultMode, prefix: "\t"))
+
+        Native mode:
+        \(getModeDetails(display.nativeMode, prefix: "\t"))
+
+        Current mode:
+        \(getModeDetails(display.currentMode, prefix: "\t"))
+
+        All modes:
+        \((display.allModes() as? [MPDisplayMode])?
+        .map { "\t\($0.description.replacingOccurrences(of: "\n", with: ", ")):\n\(getModeDetails($0, prefix: "\t\t"))" }
+        .joined(separator: "\n\n") ?? "nil")
+    """
+}

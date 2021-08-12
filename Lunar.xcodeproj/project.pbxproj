@@ -122,6 +122,7 @@
 		C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */; };
 		C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = C7C43190269DD9AE00DCD0F5 /* install.sh */; };
 		C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C7C43191269DD9AE00DCD0F5 /* lunar.yaml */; };
+		C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */; };
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
@@ -314,6 +315,7 @@
 		C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALSInstallViewController.swift; sourceTree = "<group>"; };
 		C7C43190269DD9AE00DCD0F5 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		C7C43191269DD9AE00DCD0F5 /* lunar.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = lunar.yaml; sourceTree = "<group>"; };
+		C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MonitorPanel.framework; sourceTree = "<group>"; };
 		C7C68F08201B75C700F49A2B /* DeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteButton.swift; sourceTree = "<group>"; };
 		C7C68F0A201D356800F49A2B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C753799A26A5E6AD0017B784 /* Sparkle.framework in Frameworks */,
+				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
 				C7045DAF2440DBB0002289E5 /* Alamofire in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
@@ -677,6 +680,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
 				C753799826A5D8820017B784 /* Sparkle.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,

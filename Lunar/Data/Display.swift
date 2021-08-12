@@ -853,6 +853,17 @@ enum ValueType {
     var lastConnectionTime = Date()
     @Atomic var gammaChanged = false
 
+    let VALID_ROTATION_VALUES: Set<Int> = [0, 90, 180, 270]
+    @objc dynamic lazy var rotationTooltip: String? = canRotate ? nil : "This monitor doesn't support rotation"
+    @objc dynamic lazy var inputTooltip: String? = hasDDC ? nil :
+        "This monitor doesn't support input switching because DDC is not available"
+
+    lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
+        didSet {
+            canRotate = panel?.canChangeOrientation() ?? false
+        }
+    }
+
     override var description: String {
         "\(name)[\(serial): \(id)]"
     }
@@ -1299,6 +1310,31 @@ enum ValueType {
         }
     }
 
+    var canChangeOrientation: Bool {
+        #if DEBUG
+            if isForTesting { return true }
+        #endif
+
+        return panel?.canChangeOrientation() ?? false
+    }
+
+    @objc dynamic lazy var canRotate: Bool = canChangeOrientation {
+        didSet {
+            rotationTooltip = canRotate ? nil : "This monitor doesn't support rotation"
+        }
+    }
+
+    @objc dynamic lazy var rotation: Int = CGDisplayRotation(id).intround {
+        didSet {
+            guard let panel = panel, let mode = panel.currentMode,
+                  canRotate, VALID_ROTATION_VALUES.contains(rotation) else { return }
+            panel.orientation = rotation.i32
+            asyncAfter(ms: 1000) {
+                panel.setMode(mode)
+            }
+        }
+    }
+
     @Published @objc dynamic var input: NSNumber {
         didSet {
             save()
@@ -1411,7 +1447,9 @@ enum ValueType {
     }
 
     @Published @objc dynamic var hasDDC: Bool = false {
-        didSet {}
+        didSet {
+            inputTooltip = hasDDC ? nil : "This monitor doesn't support input switching because DDC is not available"
+        }
     }
 
     @Published @objc dynamic var alwaysUseNetworkControl: Bool = false {
@@ -2157,6 +2195,11 @@ enum ValueType {
     func addSentryData() {
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self, var dict = self.dictionary else { return }
+            if let panel = self.panel,
+               let compressed = getMonitorPanelData(panel).data(using: .utf8)?.gzip()?.base64EncodedString()
+            {
+                dict["panelData"] = compressed
+            }
             if let encoded = try? encoder.encode(ForgivingEncodable(self.infoDictionary)),
                let compressed = encoded.gzip()?.base64EncodedString()
             {
