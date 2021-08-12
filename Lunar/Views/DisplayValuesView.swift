@@ -133,7 +133,7 @@ class DisplayValuesView: NSTableView {
         notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
 
         inputDropdown.isHidden = !display.active
-        inputDropdown.isEnabled = display.active && displayController.adaptiveModeKey != .manual
+        inputDropdown.isEnabled = display.hasDDC
         inputDropdown.page = .hotkeys
         inputDropdown.tag = id.i
         inputDropdown.fade()
