@@ -961,3 +961,13 @@ extension AnyCancellable {
         }
     }
 }
+
+extension NSPopUpButton {
+    /// Publishes index of selected Item
+    var selectionPublisher: AnyPublisher<Int, Never> {
+        NotificationCenter.default
+            .publisher(for: NSMenu.didSendActionNotification, object: menu)
+            .map { _ in self.indexOfSelectedItem }
+            .eraseToAnyPublisher()
+    }
+}

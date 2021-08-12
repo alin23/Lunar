@@ -39,22 +39,6 @@ class DisplayValuesView: NSTableView {
         super.draw(dirtyRect)
     }
 
-    func setAdaptiveButtonHidden(_ hidden: Bool) {
-        enumerateAvailableRowViews { rowView, _ in
-            if let nameCell = rowView.view(atColumn: 1) as? NSTableCellView,
-               let display = nameCell.objectValue as? Display,
-               let adaptiveButton = nameCell.subviews.first(where: { v in (v as? QuickAdaptiveButton) != nil }) as? QuickAdaptiveButton,
-               display.active
-            {
-                mainThread {
-                    adaptiveButton.isEnabled = !hidden
-                    adaptiveButton.toolTip = hidden ? "Disabled in Manual Mode" : ""
-                    adaptiveButton.setColor()
-                }
-            }
-        }
-    }
-
     func resetDeleteButtons() {
         enumerateAvailableRowViews { rowView, row in
             guard let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
@@ -133,9 +117,9 @@ class DisplayValuesView: NSTableView {
     func addRow(_ rowView: NSTableRowView, forRow row: Int) {
         guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
               let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
-              let adaptiveButton = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                  where: { v in (v as? QuickAdaptiveButton) != nil }
-              ) as? QuickAdaptiveButton,
+              let inputDropdown = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                  where: { v in (v as? PopUpButton) != nil }
+              ) as? PopUpButton,
               let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
                   where: { v in (v as? NotConnectedTextField) != nil }
               ) as? NotConnectedTextField,
@@ -148,9 +132,11 @@ class DisplayValuesView: NSTableView {
 
         notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
 
-        adaptiveButton.isHidden = !display.active
-        adaptiveButton.isEnabled = display.active && displayController.adaptiveModeKey != .manual
-        adaptiveButton.setup(displayID: id)
+        inputDropdown.isHidden = !display.active
+        inputDropdown.isEnabled = display.active && displayController.adaptiveModeKey != .manual
+        inputDropdown.page = .hotkeys
+        inputDropdown.tag = id.i
+        inputDropdown.fade()
 
         scrollableBrightness.textFieldColor = textFieldColor
         scrollableBrightness.textFieldColorHover = textFieldColorHover
@@ -253,6 +239,26 @@ class DisplayValuesView: NSTableView {
                 scrollableContrast.upperLimit = newContrast.doubleValue
             }
         }.store(in: &observers)
+        display.$input.sink { [weak self] _ in
+            self?.enumerateAvailableRowViews { rowView, _ in
+                if let inputDropdown = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                    where: { v in (v as? PopUpButton) != nil }
+                ) as? PopUpButton, inputDropdown.tag == id {
+                    mainAsyncAfter(ms: 1000) { inputDropdown.fade() }
+                }
+            }
+
+        }.store(in: &observers)
+    }
+
+    func resizeInputs() {
+        enumerateAvailableRowViews { rowView, _ in
+            if let inputDropdown = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
+                where: { v in (v as? PopUpButton) != nil }
+            ) as? PopUpButton {
+                inputDropdown.fade()
+            }
+        }
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {

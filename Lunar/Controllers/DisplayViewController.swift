@@ -182,6 +182,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var gammaNotice: NSTextField!
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
+    @IBOutlet var resetDropdown: PopUpButton?
 
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
@@ -209,6 +210,8 @@ class DisplayViewController: NSViewController {
 
     @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
+    @IBOutlet var inputDropdown: PopUpButton?
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
@@ -219,14 +222,6 @@ class DisplayViewController: NSViewController {
 
     var inputDropdownHotkeyButton: HotkeyButton? {
         _inputDropdownHotkeyButton as? HotkeyButton
-    }
-
-    @IBOutlet var inputDropdown: PopUpButton? {
-        didSet {
-            if let display = display, let input = InputSource(rawValue: display.input.uint8Value) {
-                inputDropdown?.selectItem(withTag: input.rawValue.i)
-            }
-        }
     }
 
     var controlsButton: HelpButton? {
@@ -303,6 +298,7 @@ class DisplayViewController: NSViewController {
 
     func setButtonsHidden(_ hidden: Bool) {
         mainThread {
+            resetDropdown?.isHidden = hidden
             inputDropdown?.isHidden = hidden
             inputDropdownHotkeyButton?.isHidden = hidden
         }
@@ -526,13 +522,8 @@ class DisplayViewController: NSViewController {
             }
         }
 
-        if let input = InputSource(rawValue: display.input.uint8Value) {
-            inputDropdown?.selectItem(withTag: input.rawValue.i)
-        }
-        display.$input.sink { [weak self] displayInput in
-            if let dropdown = self?.inputDropdown, let input = InputSource(rawValue: displayInput.uint8Value) {
-                dropdown.selectItem(withTag: input.rawValue.i)
-            }
+        display.$input.sink { [weak self] _ in
+            mainAsyncAfter(ms: 1000) { self?.inputDropdown?.fade() }
         }.store(in: &displayObservers, for: "input")
 
         initHotkeys()
@@ -998,11 +989,6 @@ class DisplayViewController: NSViewController {
         _ = display?.control?.setPower(.off)
     }
 
-    @IBAction func setInput(_ sender: NSPopUpButton) {
-        guard let display = display, let input = InputSource(rawValue: sender.selectedTag().u8) else { return }
-        display.input = input.rawValue.ns
-    }
-
     func showGammaNotice() {
         let windowVisible = mainThread { view.window?.isVisible ?? false }
         guard gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), windowVisible
@@ -1110,19 +1096,9 @@ class DisplayViewController: NSViewController {
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
 
-            if let inputDropdown = inputDropdown {
-                // inputDropdown.appearance = NSAppearance(named: .vibrantLight)
-                let color = appDelegate.darkMode ? white.blended(withFraction: 0.1, of: darkMauve)! : darkMauve
-                    .blended(withFraction: 0.3, of: gray)!
-                for item in inputDropdown.itemArray {
-                    var title = item.attributedTitle?.string ?? item.title
-                    if title == "Unknown" {
-                        title = "Input"
-                    }
-                    item.attributedTitle = title
-                        .withAttribute(.textColor(color))
-                }
-            }
+            inputDropdown?.page = appDelegate.darkMode ? .hotkeys : .display
+            inputDropdown?.fade()
+            resetDropdown?.page = appDelegate.darkMode ? .hotkeysReset : .displayReset
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor

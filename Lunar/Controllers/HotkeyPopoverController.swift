@@ -29,7 +29,7 @@ class HotkeyPopoverController: NSViewController {
 
     @IBOutlet var hotkeyLabel1: NSBox!
     @IBOutlet var hotkeyView1: HotkeyView!
-    @IBOutlet var dropdown1: NSPopUpButton!
+    @IBOutlet var dropdown1: PopUpButton!
     @IBOutlet var scrollableBrightnessField1: ScrollableTextField!
     @IBOutlet var scrollableContrastField1: ScrollableTextField!
     @IBOutlet var scrollableBrightnessCaption1: ScrollableTextFieldCaption!
@@ -37,7 +37,7 @@ class HotkeyPopoverController: NSViewController {
 
     @IBOutlet var hotkeyLabel2: NSBox!
     @IBOutlet var hotkeyView2: HotkeyView!
-    @IBOutlet var dropdown2: NSPopUpButton!
+    @IBOutlet var dropdown2: PopUpButton!
     @IBOutlet var scrollableBrightnessField2: ScrollableTextField!
     @IBOutlet var scrollableContrastField2: ScrollableTextField!
     @IBOutlet var scrollableBrightnessCaption2: ScrollableTextFieldCaption!
@@ -45,7 +45,7 @@ class HotkeyPopoverController: NSViewController {
 
     @IBOutlet var hotkeyLabel3: NSBox!
     @IBOutlet var hotkeyView3: HotkeyView!
-    @IBOutlet var dropdown3: NSPopUpButton!
+    @IBOutlet var dropdown3: PopUpButton!
     @IBOutlet var scrollableBrightnessField3: ScrollableTextField!
     @IBOutlet var scrollableContrastField3: ScrollableTextField!
     @IBOutlet var scrollableBrightnessCaption3: ScrollableTextFieldCaption!
@@ -143,6 +143,14 @@ class HotkeyPopoverController: NSViewController {
         self.display = display
 
         mainThread {
+            dropdown1.page = .hotkeys
+            dropdown2.page = .hotkeys
+            dropdown3.page = .hotkeys
+
+            dropdown1.fade()
+            dropdown2.fade()
+            dropdown3.fade()
+
             scrollableBrightnessField1?.integerValue = display.brightnessOnInputChange1.intValue
             scrollableContrastField1?.integerValue = display.contrastOnInputChange1.intValue
             scrollableBrightnessField1?.onValueChanged = { [weak self] value in

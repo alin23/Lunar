@@ -106,11 +106,11 @@ let offStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
     .noHover: [
         .hotkeys: white,
         .settings: mauve.withAlphaComponent(0.7),
-        .display: mauve.withAlphaComponent(0.35),
+        .display: mauve.withAlphaComponent(0.55),
 
         .hotkeysReset: white.withAlphaComponent(0.8),
         .settingsReset: mauve.withAlphaComponent(0.7),
-        .displayReset: mauve.withAlphaComponent(0.35),
+        .displayReset: mauve.withAlphaComponent(0.55),
     ],
 ]
 let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
@@ -126,7 +126,7 @@ let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
     .noHover: [
         .hotkeys: white,
         .settings: white,
-        .display: mauve.withAlphaComponent(0.35),
+        .display: mauve.withAlphaComponent(0.55),
 
         .hotkeysReset: white,
         .settingsReset: white,
