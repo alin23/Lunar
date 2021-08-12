@@ -129,6 +129,17 @@ extension Bool {
     }
 }
 
+extension NSColor {
+    func with(hue: CGFloat? = nil, saturation: CGFloat? = nil, brightness: CGFloat? = nil, alpha: CGFloat? = nil) -> NSColor {
+        NSColor(
+            hue: cap(hueComponent + (hue ?? 0), minVal: 0, maxVal: 1),
+            saturation: cap(saturationComponent + (saturation ?? 0), minVal: 0, maxVal: 1),
+            brightness: cap(brightnessComponent + (brightness ?? 0), minVal: 0, maxVal: 1),
+            alpha: cap(alphaComponent + (alpha ?? 0), minVal: 0, maxVal: 1)
+        )
+    }
+}
+
 let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
 extension String {
     @inline(__always) var stripped: String {

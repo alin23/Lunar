@@ -66,7 +66,10 @@ class PopUpButton: NSPopUpButton {
     }
 
     var bgColor: NSColor {
-        if state == .off {
+        if !isEnabled {
+            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
+                .with(saturation: -0.2, brightness: -0.1)
+        } else if state == .off {
             return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
         } else {
             return offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!
@@ -74,7 +77,10 @@ class PopUpButton: NSPopUpButton {
     }
 
     var labelColor: NSColor {
-        if state == .off {
+        if !isEnabled {
+            return (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
+                .highlight(withLevel: 0.3)!
+        } else if state == .off {
             return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
             return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
@@ -133,9 +139,14 @@ class PopUpButton: NSPopUpButton {
         mainThread {
             setColors(modeKey: modeKey, overrideMode: overrideMode)
             resizeToFitTitle()
+
             trackingAreas.forEach { removeTrackingArea($0) }
-            let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-            addTrackingArea(area)
+            addTrackingArea(NSTrackingArea(
+                rect: visibleRect,
+                options: [.mouseEnteredAndExited, .activeInActiveApp],
+                owner: self,
+                userInfo: nil
+            ))
         }
     }
 
@@ -148,6 +159,7 @@ class PopUpButton: NSPopUpButton {
 
     func hover() {
         mainThread {
+            guard isEnabled, !isHidden else { return }
             hoverState = .hover
             setColors(fadeDuration: 0.1)
         }

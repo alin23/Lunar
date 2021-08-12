@@ -2915,7 +2915,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="387" y="213" width="173" height="15"/>
+                                <rect key="frame" x="387" y="213" width="173" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3001,13 +3001,13 @@ when dock and menubar icons are hidden</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="WjQ-Yx-YEJ"/>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" previousBinding="0Pp-lL-OYP" id="12M-mJ-DK9">
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="0Pp-lL-OYP" id="buI-ya-khP">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
+                                    <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="WjQ-Yx-YEJ"/>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
@@ -3122,12 +3122,12 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="Bbe-9O-i0M"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" previousBinding="Bbe-9O-i0M" id="hY5-di-52G">
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="Bbe-9O-i0M" id="HTE-nx-ndF">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="Bbe-9O-i0M"/>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="GJn-hd-DZ0">
@@ -3151,7 +3151,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="861" y="197" width="73" height="15"/>
+                                <rect key="frame" x="861" y="197" width="73" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="99" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3938,7 +3938,7 @@ and contrast to their highest values</string>
                                                         </connections>
                                                     </textField>
                                                     <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xe3-ix-Mkh" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="6" y="4" width="173" height="15"/>
+                                                        <rect key="frame" x="6" y="4" width="173" height="12"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="uVs-RS-bzO" id="F5y-NP-O9g" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4006,7 +4006,7 @@ and contrast to their highest values</string>
                                                                     <menuItem title="Component video (YPrPb/YCrCb) 3" tag="14" id="BeW-EY-cF0">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Unknown" tag="246" hidden="YES" id="23r-bE-teV">
+                                                                    <menuItem title="Input" tag="246" hidden="YES" id="23r-bE-teV">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                 </items>
@@ -4028,12 +4028,12 @@ and contrast to their highest values</string>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="setInput:" target="1Bn-Ca-ETm" id="CfU-Yo-qSt"/>
-                                                            <binding destination="sUH-3g-BTj" name="enabled" keyPath="objectValue.active" id="CUN-ET-b4x"/>
-                                                            <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" previousBinding="CUN-ET-b4x" id="wcl-M0-8Ez">
+                                                            <binding destination="sUH-3g-BTj" name="hidden" keyPath="objectValue.active" previousBinding="1yV-JE-lEz" id="yXr-cI-xmp">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
                                                             </binding>
+                                                            <binding destination="sUH-3g-BTj" name="enabled" keyPath="objectValue.hasDDC" id="1yV-JE-lEz"/>
                                                             <binding destination="sUH-3g-BTj" name="selectedTag" keyPath="objectValue.input" id="IMa-iP-GGJ"/>
                                                         </connections>
                                                     </popUpButton>
@@ -4306,7 +4306,7 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="136" y="507" width="160" height="15"/>
+                                <rect key="frame" x="136" y="507" width="160" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4426,7 +4426,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ygF-rE-Ln9" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="135" y="331" width="160" height="15"/>
+                                <rect key="frame" x="135" y="331" width="160" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="1Zo-rI-ste" id="IJw-8j-6p1" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4580,7 +4580,7 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="133" y="155" width="160" height="15"/>
+                                <rect key="frame" x="133" y="155" width="160" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="r6T-el-KBe" id="sg9-44-wbG" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
