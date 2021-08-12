@@ -56,6 +56,8 @@ class DisplayController {
 
     // MARK: Internal
 
+    static var panelManager: MPDisplayMgr? = MPDisplayMgr()
+
     let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = IsLidClosed()
     var clamshellMode: Bool = false
@@ -192,6 +194,12 @@ class DisplayController {
         }
     }
 
+    static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
+        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
+
+        return displays.first { $0.displayID == id }
+    }
+
     static func autoMode() -> AdaptiveMode {
         if let mode = SensorMode.shared.ifAvailable() {
             return mode
@@ -287,23 +295,6 @@ class DisplayController {
         }
 
         return matches
-    }
-
-    func autoAdaptMode() {
-        guard !CachedDefaults[.overrideAdaptiveMode] else {
-            if adaptiveMode.available {
-                adaptiveMode.watching = adaptiveMode.watch()
-            } else {
-                adaptiveMode.stopWatching()
-            }
-            return
-        }
-
-        let mode = DisplayController.autoMode()
-        if mode.key != adaptiveMode.key {
-            adaptiveMode = mode
-            CachedDefaults[.adaptiveBrightnessMode] = mode.key
-        }
     }
 
     func watchModeAvailability() {
@@ -785,6 +776,23 @@ class DisplayController {
         return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
     }
 
+    func autoAdaptMode() {
+        guard !CachedDefaults[.overrideAdaptiveMode] else {
+            if adaptiveMode.available {
+                adaptiveMode.watching = adaptiveMode.watch()
+            } else {
+                adaptiveMode.stopWatching()
+            }
+            return
+        }
+
+        let mode = DisplayController.autoMode()
+        if mode.key != adaptiveMode.key {
+            adaptiveMode = mode
+            CachedDefaults[.adaptiveBrightnessMode] = mode.key
+        }
+    }
+
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
         guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
 
@@ -889,6 +897,7 @@ class DisplayController {
     func resetDisplayList(advancedSettings: Bool = false) {
         asyncNow {
             self.getDisplaysLock.around {
+                Self.panelManager = MPDisplayMgr()
                 DDC.reset()
                 self.displays = DisplayController.getDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],

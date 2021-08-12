@@ -10,6 +10,9 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
 #import <OSD/OSDManager.h>
+#import <MonitorPanel/MPDisplay.h>
+#import <MonitorPanel/MPDisplayMgr.h>
+#import <MonitorPanel/MPDisplayMode.h>
 
 #include "libssh2.h"
 #include "libssh2_sftp.h"
