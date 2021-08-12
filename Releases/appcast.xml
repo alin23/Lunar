@@ -732,8 +732,8 @@
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
             <enclosure url="https://static.lunar.fyi/releases/Lunar-4.7.2.dmg" length="17186793" type="application/octet-stream" sparkle:edSignature="p1r0hE/BX94Vj/aIcRuXdoOOqPjH+DPLbRI34T7pnVZdh/GWscwTxJXYpZxJ4GZRJHvb/d3Ax/+Z0p/bi9/NDw=="/>
             <sparkle:deltas>
-                <enclosure url="https://lunar.fyi/delta/4.7.2/4.7.1" sparkle:deltaFrom="4.7.1" length="2041543" type="application/octet-stream" sparkle:edSignature="or3I5HEn/1hJX7vWCL4TwzUNpPo/iQ7FWxBG0czoIK6JgE9kjTPfKyHrzski086zWY7quN7uBlTvaw5P72dIAQ=="/>
                 <enclosure url="https://lunar.fyi/delta/4.7.2/4.7.0" sparkle:deltaFrom="4.7.0" length="2677389" type="application/octet-stream" sparkle:edSignature="fHZlpP26ED+tCS17HpVkgsEiDK12lYLTTS83ukP8PstqPHcPStcwQg8S1r2mUbLENKf9TJm7Qoy2b3KEEWuKBg=="/>
+                <enclosure url="https://lunar.fyi/delta/4.7.2/4.7.1" sparkle:deltaFrom="4.7.1" length="2041543" type="application/octet-stream" sparkle:edSignature="or3I5HEn/1hJX7vWCL4TwzUNpPo/iQ7FWxBG0czoIK6JgE9kjTPfKyHrzski086zWY7quN7uBlTvaw5P72dIAQ=="/>
                 <enclosure url="https://lunar.fyi/delta/4.7.2/4.6.5" sparkle:deltaFrom="4.6.5" length="2888362" type="application/octet-stream" sparkle:edSignature="RyZ9YsyEvX6x5xL9rjubqfY2EBOAbcwmD1VkJsaMrYqOZc0A+uQKhd5Th6zHK0H6Tz30SL6KaDLRZBilYUhgAw=="/>
                 <enclosure url="https://lunar.fyi/delta/4.7.2/4.6.3" sparkle:deltaFrom="4.6.3" length="3734774" type="application/octet-stream" sparkle:edSignature="AAPDA1Kfm9JKqDV1S6BFiy2hOu9+NpmjeMwWMo1qbzfjJNMS9fglcjbKC0leR9qLAHv6ODkIzypNYt16pPLRCQ=="/>
             </sparkle:deltas>
@@ -770,6 +770,8 @@
             <signature>0SwlZM.72ZP5snUgXxpmDzpfaEU=</signature>
             <signature>0SwlZM/72ZP5snUgXxpmDzpfaEU=</signature>
             <signature>pInchvlfAh0PrPecr82olyFlDGI=</signature>
+            <signature>qjQQxNae6KoTrDR2yaubl83rJJU=</signature>
+            <signature>pCuYDYRYS4W9U9TXMhm8H3cHFR0=</signature>
         </item>
     </channel>
 </rss>
