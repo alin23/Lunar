@@ -95,6 +95,7 @@ build-version:
 beta: SHELL=/usr/local/bin/fish
 beta: ENV=Release
 beta: DISABLE_PACKING=1
+beta: DISABLE_SENTRY=1
 beta: DSA=0
 beta: V=1
 beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$V
