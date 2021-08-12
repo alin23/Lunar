@@ -28,8 +28,8 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-        return id == GENERIC_DISPLAY_ID
-//        return TEST_IDS.contains(id)
+//        return id == GENERIC_DISPLAY_ID
+        return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
     #endif
@@ -385,7 +385,8 @@ func createAndShowWindow(
     controller: inout ModernWindowController?,
     show: Bool = true,
     focus: Bool = true,
-    screen: NSScreen? = nil
+    screen: NSScreen? = nil,
+    position: NSPoint? = nil
 ) {
     mainThread {
         guard let mainStoryboard = NSStoryboard.main else { return }
@@ -402,6 +403,8 @@ func createAndShowWindow(
             if let screen = screen, let w = wc.window, w.screen != screen {
                 let size = w.frame.size
                 w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - size.width / 2, y: screen.visibleFrame.midY - size.height / 2))
+            } else if let position = position, let w = wc.window {
+                w.setFrameOrigin(position)
             }
 
             wc.showWindow(nil)
@@ -1300,7 +1303,16 @@ final class UnfairLock {
     }
 
     private func lock() -> Bool {
-        guard let threadID = Thread.current.value(forKeyPath: "private.seqNum") as? Int32, lockedInThread != threadID else {
+        var id: Int32?
+        let exc = tryBlock {
+            id = Thread.current.value(forKeyPath: "private.seqNum") as? Int32
+        }
+        if exc != nil {
+            tryBlock {
+                id = Thread.current.value(forKeyPath: "seqNum") as? Int32
+            }
+        }
+        guard let threadID = id, lockedInThread != threadID else {
             return trylock()
         }
         os_unfair_lock_lock(unfairLock)
