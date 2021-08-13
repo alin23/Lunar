@@ -28,8 +28,8 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-//        return id == GENERIC_DISPLAY_ID
-        return TEST_IDS.contains(id)
+        return id == GENERIC_DISPLAY_ID
+    // return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
     #endif

@@ -112,10 +112,6 @@ class PopUpButton: NSPopUpButton {
         bg = bgColor
 
         attributedTitle = attributedTitle.withAttribute(.textColor(labelColor))
-//        title.addAttributes([.textColor(dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode))], range: 0 ..< 2)
-//        attributedTitle = title
-//
-//        attributedAlternateTitle = attributedAlternateTitle.string.withAttribute(.textColor(labelColor))
     }
 
     func resizeToFitTitle() {
@@ -137,6 +133,7 @@ class PopUpButton: NSPopUpButton {
 
     func fade(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
         mainThread {
+            guard !isHidden else { return }
             setColors(modeKey: modeKey, overrideMode: overrideMode)
             resizeToFitTitle()
 
@@ -152,6 +149,7 @@ class PopUpButton: NSPopUpButton {
 
     func defocus() {
         mainThread {
+            guard !isHidden else { return }
             hoverState = .noHover
             setColors()
         }

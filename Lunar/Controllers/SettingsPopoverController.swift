@@ -340,15 +340,15 @@ class SettingsPopoverController: NSViewController {
     func setupApplyGammaCheckbox() {
         mainAsyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
-            if self.display?.control is GammaControl {
-                self.applyGammaCheckbox.state = .on
-                self.applyGammaCheckbox.isEnabled = false
-                self.applyGammaCheckbox.toolTip = "Always enabled when Software Controls is used."
-            } else {
-                self.applyGammaCheckbox.state = self.applyGamma.state
-                self.applyGammaCheckbox.isEnabled = true
-                self.applyGammaCheckbox.toolTip = nil
-            }
+            // if self.display?.control is GammaControl {
+            //     self.applyGammaCheckbox.state = .on
+            //     self.applyGammaCheckbox.isEnabled = false
+            //     self.applyGammaCheckbox.toolTip = "Always enabled when Software Controls is used."
+            // } else {
+            self.applyGammaCheckbox.state = self.applyGamma.state
+            self.applyGammaCheckbox.isEnabled = true
+            self.applyGammaCheckbox.toolTip = nil
+            // }
         }
     }
 

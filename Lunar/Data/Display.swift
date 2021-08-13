@@ -49,6 +49,7 @@ let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
     let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
     let TEST_DISPLAY_PERSISTENT_ID: CGDirectDisplayID = UINT32_MAX / 3
     let TEST_DISPLAY_PERSISTENT2_ID: CGDirectDisplayID = UINT32_MAX / 4
+    // let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = 1
     let TEST_DISPLAY_PERSISTENT3_ID: CGDirectDisplayID = UINT32_MAX / 5
     let TEST_DISPLAY_PERSISTENT4_ID: CGDirectDisplayID = UINT32_MAX / 6
     let TEST_IDS = Set(
@@ -163,10 +164,6 @@ let CINEMA_HD_NAME = "Cinema HD"
 let COLOR_LCD_NAME = "Color LCD"
 let APPLE_DISPLAY_VENDOR_ID = 0x05AC
 
-var INITIAL_GAMMA_VALUES = [CGDirectDisplayID: Gamma]()
-var INITIAL_MAX_VALUES = [CGDirectDisplayID: Gamma]()
-var INITIAL_MIN_VALUES = [CGDirectDisplayID: Gamma]()
-
 // MARK: - Transport
 
 struct Transport: Equatable, CustomStringConvertible {
@@ -197,6 +194,106 @@ struct Gamma: Equatable {
             ramp(targetValue: gamma.contrast, lastTargetValue: &contrast, samples: samples, step: 0.01)
         )
         return zip4(ramps.0, ramps.1, ramps.2, ramps.3).map { Gamma(red: $0, green: $1, blue: $2, contrast: $3) }
+    }
+}
+
+let STEP_255: Float = 1.0 / 255.0
+
+// MARK: - GammaTable
+
+struct GammaTable: Equatable {
+    // MARK: Lifecycle
+
+    init(
+        redMin: CGGammaValue = 0,
+        redMax: CGGammaValue = 1,
+        redValue: CGGammaValue = 1,
+        greenMin: CGGammaValue = 0,
+        greenMax: CGGammaValue = 1,
+        greenValue: CGGammaValue = 1,
+        blueMin: CGGammaValue = 0,
+        blueMax: CGGammaValue = 1,
+        blueValue: CGGammaValue = 1
+    ) {
+        red = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+            redMin + ((redMax - redMin) * powf(index, redValue))
+        }
+        green = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+            greenMin + ((greenMax - greenMin) * powf(index, greenValue))
+        }
+        blue = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+            blueMin + ((blueMax - blueMin) * powf(index, blueValue))
+        }
+        samples = 255
+    }
+
+    init(red: [CGGammaValue], green: [CGGammaValue], blue: [CGGammaValue], samples: UInt32) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+        self.samples = samples
+    }
+
+    init(for id: CGDirectDisplayID) {
+        var redTable = [CGGammaValue](repeating: 0, count: 255)
+        var greenTable = [CGGammaValue](repeating: 0, count: 255)
+        var blueTable = [CGGammaValue](repeating: 0, count: 255)
+        var sampleCount: UInt32 = 0
+
+        CGGetDisplayTransferByTable(id, 255, &redTable, &greenTable, &blueTable, &sampleCount)
+
+        red = redTable
+        green = greenTable
+        blue = blueTable
+        samples = sampleCount
+    }
+
+    // MARK: Internal
+
+    static let original = GammaTable()
+
+    var red: [CGGammaValue]
+    var green: [CGGammaValue]
+    var blue: [CGGammaValue]
+    var samples: UInt32
+
+    var isZero: Bool {
+        samples == 0 || (
+            !red.contains(where: { $0 != 0 }) &&
+                !green.contains(where: { $0 != 0 }) &&
+                !blue.contains(where: { $0 != 0 })
+        )
+    }
+
+    @discardableResult
+    func apply(to id: CGDirectDisplayID) -> Bool {
+        log.debug("Applying gamma table to ID \(id)")
+        guard !isZero else {
+            log.debug("Zero gamma table: samples=\(samples)")
+            GammaTable.original.apply(to: id)
+            return false
+        }
+        CGSetDisplayTransferByTable(id, samples, red, green, blue)
+        return true
+    }
+
+    func adjust(brightness: UInt8, contrast _: UInt8? = nil) -> GammaTable {
+        let brightness: Float = powf(brightness.f / 100, 0.8)
+        return GammaTable(
+            red: red.map { $0 * brightness },
+            green: green.map { $0 * brightness },
+            blue: blue.map { $0 * brightness },
+            samples: samples
+        )
+    }
+
+    func stride(from brightness: Brightness, to newBrightness: Brightness, contrast _: Contrast? = nil) -> [GammaTable] {
+        guard brightness != newBrightness else { return [] }
+
+        return Swift.stride(from: brightness, through: newBrightness, by: newBrightness < brightness ? -1 : 1).compactMap { b in
+            let table = adjust(brightness: b)
+            return table.isZero ? nil : table
+        }
     }
 }
 
@@ -369,6 +466,7 @@ enum ValueType {
         }
 
         setupHotkeys()
+        refreshGamma()
     }
 
     init(
@@ -514,6 +612,7 @@ enum ValueType {
 
         startControls()
         setupHotkeys()
+        refreshGamma()
     }
 
     // MARK: Internal
@@ -699,6 +798,8 @@ enum ValueType {
         case gamma
     }
 
+    lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
+
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = {
         mainThread {
@@ -793,6 +894,7 @@ enum ValueType {
     var slowRead = false
     var slowWrite = false
     var macMiniHDMI = false
+    var isTV = false
 
     var onControlChange: ((Control) -> Void)? = nil
     @AtomicLock var context: [String: Any]? = nil
@@ -858,6 +960,19 @@ enum ValueType {
     @objc dynamic lazy var inputTooltip: String? = hasDDC ? nil :
         "This monitor doesn't support input switching because DDC is not available"
 
+    lazy var defaultGammaTable = GammaTable(for: id)
+    var lunarGammaTable: GammaTable? = nil
+    var lastGammaTable: GammaTable? = nil
+
+    // MARK: Gamma
+
+    let DEFAULT_GAMMA_PARAMETERS: (Float, Float, Float, Float, Float, Float, Float, Float, Float) = (0, 1, 1, 0, 1, 1, 0, 1, 1)
+
+    @Atomic var settingGamma: Bool = false
+
+    lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: name)
+    lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: name)
+
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
         didSet {
             canRotate = panel?.canChangeOrientation() ?? false
@@ -895,7 +1010,19 @@ enum ValueType {
     @Published @objc dynamic var applyGamma: Bool {
         didSet {
             save()
-            readapt(newValue: applyGamma, oldValue: oldValue)
+            if !applyGamma {
+                lunarGammaTable = nil
+                if defaultGammaTable.apply(to: id) {
+                    lastGammaTable = defaultGammaTable
+                }
+            } else {
+                reapplyGamma()
+            }
+            if control is GammaControl {
+                displayController.adaptBrightness(for: self, force: true)
+            } else {
+                readapt(newValue: applyGamma, oldValue: oldValue)
+            }
         }
     }
 
@@ -916,99 +1043,63 @@ enum ValueType {
     @Published @objc dynamic var defaultGammaRedMin: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaRedMax: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaRedValue: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaGreenMin: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaGreenMax: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaGreenValue: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaBlueMin: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaBlueMax: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
     @Published @objc dynamic var defaultGammaBlueValue: NSNumber {
         didSet {
             save()
-            if control is GammaControl {
-                setGamma()
-            } else if applyGamma || gammaChanged, !blackOutEnabled {
-                resetGamma()
-            }
+            reapplyGamma()
         }
     }
 
@@ -1326,12 +1417,22 @@ enum ValueType {
 
     @objc dynamic lazy var rotation: Int = CGDisplayRotation(id).intround {
         didSet {
-            guard let panel = panel, let mode = panel.currentMode,
-                  canRotate, VALID_ROTATION_VALUES.contains(rotation) else { return }
+            guard let panel = panel, let manager = DisplayController.panelManager,
+                  canRotate, VALID_ROTATION_VALUES.contains(rotation),
+                  manager.tryLockAccess()
+            else { return }
+
+            manager.notifyWillReconfigure()
             panel.orientation = rotation.i32
-            asyncAfter(ms: 1000) {
-                panel.setMode(mode)
-            }
+            manager.notifyReconfigure()
+            manager.unlockAccess()
+        }
+    }
+
+    @objc dynamic lazy var modeNumber: Int32 = panel?.currentMode.modeNumber ?? -1 {
+        didSet {
+            guard modeNumber != -1, let panel = panel else { return }
+            panel.setModeNumber(modeNumber)
         }
     }
 
@@ -1524,18 +1625,6 @@ enum ValueType {
         }
     }
 
-    var initialRedMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.red ?? 1.0 }
-    var initialRedMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.red ?? 1.0 }
-    var initialRedGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.red ?? 1.0 }
-
-    var initialGreenMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.green ?? 1.0 }
-    var initialGreenMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.green ?? 1.0 }
-    var initialGreenGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.green ?? 1.0 }
-
-    var initialBlueMin: CGGammaValue { INITIAL_MIN_VALUES[id]?.blue ?? 1.0 }
-    var initialBlueMax: CGGammaValue { INITIAL_MAX_VALUES[id]?.blue ?? 1.0 }
-    var initialBlueGamma: CGGammaValue { INITIAL_GAMMA_VALUES[id]?.blue ?? 1.0 }
-
     var readableID: String {
         if name.isEmpty || name == "Unknown" {
             return shortHash(string: serial)
@@ -1585,6 +1674,18 @@ enum ValueType {
                 onControlChange?(control)
             }
         }
+    }
+
+    var defaultGammaChanged: Bool {
+        defaultGammaRedMin.floatValue != 0 ||
+            defaultGammaRedMax.floatValue != 1 ||
+            defaultGammaRedValue.floatValue != 1 ||
+            defaultGammaGreenMin.floatValue != 0 ||
+            defaultGammaGreenMax.floatValue != 1 ||
+            defaultGammaGreenValue.floatValue != 1 ||
+            defaultGammaBlueMin.floatValue != 0 ||
+            defaultGammaBlueMax.floatValue != 1 ||
+            defaultGammaBlueValue.floatValue != 1
     }
 
     static func fromDictionary(_ config: [String: Any]) -> Display? {
@@ -1743,6 +1844,20 @@ enum ValueType {
             log.debug("Adding data point \(featureValue) => \(targetValue)")
         }
         values[featureValue] = targetValue
+    }
+
+    func reapplyGamma() {
+        if defaultGammaChanged, applyGamma {
+            refreshGamma()
+        } else {
+            lunarGammaTable = nil
+        }
+
+        if control is GammaControl {
+            setGamma()
+        } else if applyGamma, !blackOutEnabled {
+            resetGamma()
+        }
     }
 
     func thrice(_ action: @escaping ((Display) -> Void), onFinish: ((Display) -> Void)? = nil) {
@@ -2046,6 +2161,7 @@ enum ValueType {
         defaultGammaBlueMin = 0.0
         defaultGammaBlueMax = 1.0
         defaultGammaBlueValue = 1.0
+        lunarGammaTable = nil
     }
 
     func resetBrightnessCurveFactor(mode: AdaptiveModeKey? = nil) {
@@ -2515,34 +2631,32 @@ enum ValueType {
     func refreshGamma() {
         guard !isForTesting else { return }
 
-        CGGetDisplayTransferByFormula(2, &redMin, &redMax, &redGamma, &greenMin, &greenMax, &greenGamma, &blueMin, &blueMax, &blueGamma)
-        if INITIAL_MIN_VALUES[id] == nil {
-            INITIAL_MIN_VALUES[id] = Gamma(red: redMin, green: greenMin, blue: blueMin, contrast: minContrast.floatValue)
+        guard !defaultGammaChanged || !applyGamma else {
+            lunarGammaTable = GammaTable(
+                redMin: defaultGammaRedMin.floatValue,
+                redMax: defaultGammaRedMax.floatValue,
+                redValue: defaultGammaRedValue.floatValue,
+                greenMin: defaultGammaGreenMin.floatValue,
+                greenMax: defaultGammaGreenMax.floatValue,
+                greenValue: defaultGammaGreenValue.floatValue,
+                blueMin: defaultGammaBlueMin.floatValue,
+                blueMax: defaultGammaBlueMax.floatValue,
+                blueValue: defaultGammaBlueValue.floatValue
+            )
+            return
         }
-        if INITIAL_MAX_VALUES[id] == nil {
-            INITIAL_MAX_VALUES[id] = Gamma(red: redMax, green: greenMax, blue: blueMax, contrast: maxContrast.floatValue)
-        }
-        if INITIAL_GAMMA_VALUES[id] == nil {
-            INITIAL_GAMMA_VALUES[id] = Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: contrast.floatValue)
-        }
-    }
 
-    // MARK: Gamma
+        lunarGammaTable = nil
+        defaultGammaTable = GammaTable(for: id)
+    }
 
     func resetGamma() {
         guard !isForTesting else { return }
-        CGSetDisplayTransferByFormula(
-            id,
-            defaultGammaRedMin.floatValue,
-            defaultGammaRedMax.floatValue,
-            defaultGammaRedValue.floatValue,
-            defaultGammaGreenMin.floatValue,
-            defaultGammaGreenMax.floatValue,
-            defaultGammaGreenValue.floatValue,
-            defaultGammaBlueMin.floatValue,
-            defaultGammaBlueMax.floatValue,
-            defaultGammaBlueValue.floatValue
-        )
+
+        let gammaTable = (lunarGammaTable ?? defaultGammaTable)
+        if gammaTable.apply(to: id) {
+            lastGammaTable = gammaTable
+        }
         gammaChanged = true
     }
 
@@ -2586,25 +2700,25 @@ enum ValueType {
         return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: newContrast)
     }
 
-    func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast: UInt8? = nil) {
+    func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast _: UInt8? = nil) {
         #if DEBUG
             guard !isForTesting else { return }
         #endif
 
         guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) > 5 else { return }
         gammaLock()
+        settingGamma = true
+        defer { settingGamma = false }
 
-        let newGamma = computeGamma(brightness: brightness, contrast: contrast)
-        log.debug("gamma contrast: \(newGamma.contrast)")
-        log.debug("red: \(newGamma.red)")
-        log.debug("green: \(newGamma.green)")
-        log.debug("blue: \(newGamma.blue)")
+        let brightness = brightness ?? self.brightness.uint8Value
+        let gammaTable = lunarGammaTable ?? defaultGammaTable
+        let newGammaTable = gammaTable.adjust(brightness: brightness, contrast: contrast)
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
         let id = self.id
 
         showOperationInProgress(screen: screen)
 
-        if oldBrightness != nil || oldContrast != nil {
+        if let oldBrightness = oldBrightness {
             asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
                 guard let self = self else {
                     gammaSemaphore.signal()
@@ -2612,29 +2726,9 @@ enum ValueType {
                 }
                 Thread.sleep(forTimeInterval: 0.005)
 
-                let redGamma = self.defaultGammaRedValue.floatValue
-                let greenGamma = self.defaultGammaGreenValue.floatValue
-                let blueGamma = self.defaultGammaBlueValue.floatValue
-
-                let oldGamma = self.computeGamma(brightness: oldBrightness, contrast: oldContrast)
-                let maxDiff = max(
-                    abs(newGamma.red - oldGamma.red), abs(newGamma.green - oldGamma.green),
-                    abs(newGamma.blue - oldGamma.blue), abs(newGamma.contrast - oldGamma.contrast)
-                )
                 self.gammaChanged = true
-                for gamma in oldGamma.stride(to: newGamma, samples: (maxDiff * 100).intround) {
-                    CGSetDisplayTransferByFormula(
-                        id,
-                        self.defaultGammaRedMin.floatValue,
-                        gamma.red,
-                        redGamma + gamma.contrast,
-                        self.defaultGammaGreenMin.floatValue,
-                        gamma.green,
-                        greenGamma + gamma.contrast,
-                        self.defaultGammaBlueMin.floatValue,
-                        gamma.blue,
-                        blueGamma + gamma.contrast
-                    )
+                for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, contrast: contrast) {
+                    gammaTable.apply(to: id)
                     Thread.sleep(forTimeInterval: 0.01)
                 }
                 gammaSemaphore.signal()
@@ -2642,27 +2736,18 @@ enum ValueType {
         }
         asyncNow(runLoopQueue: lowprioQueue) { [weak self] in
             guard let self = self else { return }
-            if oldBrightness != nil || oldContrast != nil {
-                gammaSemaphore.wait(for: 1.8)
-            }
-
-            let redGamma = self.defaultGammaRedValue.floatValue
-            let greenGamma = self.defaultGammaGreenValue.floatValue
-            let blueGamma = self.defaultGammaBlueValue.floatValue
+            if oldBrightness != nil { gammaSemaphore.wait(for: 1.8) }
 
             self.gammaChanged = true
-            CGSetDisplayTransferByFormula(
-                id,
-                self.defaultGammaRedMin.floatValue,
-                newGamma.red,
-                redGamma + newGamma.contrast,
-                self.defaultGammaGreenMin.floatValue,
-                newGamma.green,
-                greenGamma + newGamma.contrast,
-                self.defaultGammaBlueMin.floatValue,
-                newGamma.blue,
-                blueGamma + newGamma.contrast
-            )
+
+            guard !newGammaTable.isZero else {
+                gammaSemaphore.signal()
+                return
+            }
+
+            if newGammaTable.apply(to: id) {
+                self.lastGammaTable = newGammaTable
+            }
             gammaSemaphore.signal()
         }
     }

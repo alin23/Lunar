@@ -267,9 +267,9 @@ class DataStore: NSObject {
 
     @discardableResult
     func storeDisplays(_ displays: [Display], now: Bool = false) -> [Display] {
-        let displays = displays.filter {
-            display in !DDC.isBuiltinDisplay(display.id)
-        }
+        // let displays = displays.filter {
+        //     display in !DDC.isBuiltinDisplay(display.id)
+        // }
 
         guard let storedDisplays = self.displays() else {
             CachedDefaults[.displays] = displays
@@ -287,9 +287,10 @@ class DataStore: NSObject {
             }
         }
 
-        let allDisplays = (inactiveDisplays + displays).filter {
-            display in !DDC.isBuiltinDisplay(display.id)
-        }
+        // let allDisplays = (inactiveDisplays + displays).filter {
+        //     display in !DDC.isBuiltinDisplay(display.id)
+        // }
+        let allDisplays = (inactiveDisplays + displays)
         CachedDefaults[.displays] = allDisplays
         if now { Defaults[.displays] = allDisplays }
 
