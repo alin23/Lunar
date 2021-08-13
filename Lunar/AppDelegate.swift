@@ -562,11 +562,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForScreenConfigurationChanged() {
+        asyncEvery(3.seconds, uniqueTaskKey: "zeroGammaChecker") { _ in
+            displayController.activeDisplays.values
+                .filter { d in
+                    !d.settingGamma && d.control is GammaControl && GammaTable(for: d.id).isZero
+                }
+                .forEach { d in
+                    log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")
+                    d.lastGammaTable?.apply(to: d.id)
+                }
+        }
+
         CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
             if let display = displayController.activeDisplays[displayID] {
                 display.rotation = CGDisplayRotation(displayID).intround
             }
         }, nil)
+
+        DistributedNotificationCenter
+            .default()
+            .publisher(
+                for: NSNotification.Name(rawValue: kColorSyncDisplayDeviceProfilesNotification.takeRetainedValue() as String),
+                object: nil
+            )
+            .sink { n in
+                guard let displayUUID = n.userInfo?["DeviceID"] as? String,
+                      let display = displayController.activeDisplays.values.first(where: { $0.serial == displayUUID }) else { return }
+                log.debug("ColorSync changed for \(display)")
+//                CGDisplayRestoreColorSyncSettings()
+                display.refreshGamma()
+                display.reapplyGamma()
+
+            }.store(in: &observers)
 
         NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.activeSpaceDidChangeNotification, object: nil)

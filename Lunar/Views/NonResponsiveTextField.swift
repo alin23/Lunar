@@ -25,7 +25,7 @@ class NonResponsiveTextField: NSTextField {
                 if let inputDropdown = superview?.subviews.first(
                     where: { v in (v as? PopUpButton) != nil }
                 ) as? PopUpButton {
-                    inputDropdown.isHidden = !self.isHidden
+                    inputDropdown.isHidden = !self.isHidden || displayController.activeDisplays.isEmpty
                 }
             }
         }

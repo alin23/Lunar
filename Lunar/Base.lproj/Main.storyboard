@@ -3001,6 +3001,14 @@ when dock and menubar icons are hidden</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="buI-ya-khP" id="QdZ-mq-Ih5">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="0Pp-lL-OYP" id="buI-ya-khP">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -3122,6 +3130,14 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="HTE-nx-ndF" id="3LJ-MI-tJD">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="Bbe-9O-i0M" id="HTE-nx-ndF">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -3824,7 +3840,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="100" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="95"/>
+                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -5769,7 +5785,7 @@ Lunar will continue to check in the background</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eDC-Mb-fDf">
-                                <rect key="frame" x="312" y="286" width="151" height="18"/>
+                                <rect key="frame" x="312" y="296" width="151" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Apply gamma values" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="RTo-Aw-rJh">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -5780,7 +5796,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bYX-UC-exN" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="451" y="179" width="116" height="41"/>
+                                <rect key="frame" x="451" y="209" width="116" height="41"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="2.0" usesSingleLineMode="YES" id="dkb-iT-CVj" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -5813,7 +5829,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oge-E8-xk7" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="478" y="163" width="61" height="20"/>
+                                <rect key="frame" x="478" y="193" width="61" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="vfx-jc-5Zg">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5825,7 +5841,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdr-hu-ZjR" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="330" y="179" width="116" height="41"/>
+                                <rect key="frame" x="330" y="209" width="116" height="41"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.51" usesSingleLineMode="YES" id="JcN-LR-JfD" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -5858,7 +5874,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7y7-qg-Ocq" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="163" width="75" height="20"/>
+                                <rect key="frame" x="350" y="193" width="75" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="Apc-ZL-xdF">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -5870,7 +5886,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jgH-le-AsL">
-                                <rect key="frame" x="309" y="226" width="129" height="21"/>
+                                <rect key="frame" x="309" y="256" width="129" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Curve Factors" id="rgm-lf-XOv">
                                     <font key="font" metaFont="systemHeavy" size="18"/>
@@ -6365,6 +6381,48 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 <rect key="frame" x="374" y="109" width="137" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Screen orientation" id="Yqe-40-eOy">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="476-c7-fYc" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="360" y="145" width="160" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="xha-Vd-D6D" id="Pme-Jb-I0l" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="t2M-V5-cWi">
+                                        <items>
+                                            <menuItem title="Item" state="on" tag="246" hidden="YES" enabled="NO" id="xha-Vd-D6D">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼  "/>
+                                    </userDefinedRuntimeAttributes>
+                                </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="maxWidth">
+                                        <real key="value" value="160"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="selectItem:" target="VkT-77-mId" id="X8R-2G-1dd"/>
+                                    <binding destination="21a-h6-6He" name="selectedTag" keyPath="self.display.modeNumber" id="tGw-PR-5pS"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
+                                <rect key="frame" x="398" y="170" width="89" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Resolutions" id="lZ7-CA-fcm">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

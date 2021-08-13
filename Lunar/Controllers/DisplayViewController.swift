@@ -523,7 +523,10 @@ class DisplayViewController: NSViewController {
         }
 
         display.$input.sink { [weak self] _ in
-            mainAsyncAfter(ms: 1000) { self?.inputDropdown?.fade() }
+            mainAsyncAfter(ms: 1000) {
+                guard let self = self else { return }
+                if !self.noDisplay { self.inputDropdown?.fade() }
+            }
         }.store(in: &displayObservers, for: "input")
 
         initHotkeys()
