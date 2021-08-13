@@ -86,7 +86,7 @@ class CoreDisplayControl: Control {
 
     func isAvailable() -> Bool {
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
-        return display.isAppleDisplay() || display.isForTesting
+        return display.isAppleDisplay() || display.isBuiltin || display.isForTesting
     }
 
     func isResponsive() -> Bool {
@@ -102,15 +102,18 @@ class CoreDisplayControl: Control {
     }
 
     func writeBrightness(_ brightness: Brightness) -> Bool {
+        let br = brightness.d / 100.0
+        var success = true
+
         switch method {
         case .coreDisplay:
-            let br = brightness.d / 100.0
             CoreDisplay_Display_SetUserBrightness(display.id, br)
-            DisplayServicesBrightnessChanged(display.id, br)
         case .displayServices:
-            return DisplayServicesSetBrightness(display.id, brightness.f / 100.0) == KERN_SUCCESS
+            success = DisplayServicesSetBrightness(display.id, br.f) == KERN_SUCCESS
         }
-        return true
+
+        DisplayServicesBrightnessChanged(display.id, br)
+        return success
     }
 
     func setPower(_ power: PowerState) -> Bool {

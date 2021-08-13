@@ -598,6 +598,19 @@ class DisplayController {
                 return nil
             }
 
+            if let panel = display.panel {
+                log.info("TV Ignore: Panel is TV=\(panel.isTV)")
+                log.info("TV Ignore: Panel has TV modes=\(panel.hasTVModes)")
+                if let mode = panel.currentMode {
+                    log.info("TV Ignore: Current mode is TV mode=\(mode.isTVMode)")
+                    if panel.isTV || (panel.hasTVModes && mode.isTVMode) {
+                        log.warning("TVs don't support DDC, ignoring for display \(display)")
+                        display.isTV = true
+                        return nil
+                    }
+                }
+            }
+
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
             guard let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
                   let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
@@ -709,10 +722,13 @@ class DisplayController {
     }
 
     static func getDisplays(includeVirtual: Bool = true, includeAirplay: Bool = false) -> [CGDirectDisplayID: Display] {
-        let ids = DDC.findExternalDisplays(
+        var ids = DDC.findExternalDisplays(
             includeVirtual: includeVirtual || TEST_MODE,
             includeAirplay: includeAirplay || TEST_MODE
         )
+        if let builtinDisplayID = SyncMode.builtinDisplay {
+            ids.append(builtinDisplayID)
+        }
         var serials = ids.map { Display.uuid(id: $0) }
 
         // Make sure serials are unique
@@ -723,6 +739,7 @@ class DisplayController {
         let idForSerial = Dictionary(zip(serials, ids), uniquingKeysWith: first(this:other:))
         let serialForID = Dictionary(zip(ids, serials), uniquingKeysWith: first(this:other:))
 
+        CGDisplayRestoreColorSyncSettings()
         guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
             let displays = ids.map { Display(id: $0, active: true) }
 

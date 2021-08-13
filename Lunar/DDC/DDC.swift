@@ -447,7 +447,7 @@ enum DDC {
             let name = Display.printableName(id)
             return !isBuiltinDisplay(id) &&
                 (includeVirtual || !isVirtualDisplay(id, name: name)) &&
-                (includeAirplay || !isAirplayDisplay(id, name: name))
+                (includeAirplay || !(isSidecarDisplay(id, name: name) || isAirplayDisplay(id, name: name)))
         }
 
         #if DEBUG
@@ -495,9 +495,13 @@ enum DDC {
             return result
         }
 
+        if let panel = DisplayController.panel(with: id), panel.isAirPlayDisplay {
+            return true
+        }
+
         if checkName {
             let realName = (name ?? Display.printableName(id)).lowercased()
-            result = realName.contains("airplay") || realName.contains("sidecar") || realName.contains("ipad")
+            result = realName.contains("airplay")
         }
 
         guard !result else { return result }
@@ -509,12 +513,33 @@ enum DDC {
         return (infoDictionary["kCGDisplayIsAirPlay"] as? Bool) ?? false
     }
 
+    static func isSidecarDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
+        guard !isGeneric(id) else {
+            return false
+        }
+
+        if let panel = DisplayController.panel(with: id), panel.isSidecarDisplay {
+            return true
+        }
+
+        guard checkName else { return false }
+        let realName = (name ?? Display.printableName(id)).lowercased()
+        return realName.contains("sidecar") || realName.contains("ipad")
+    }
+
     static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
-        !isGeneric(id) &&
-            (
-                CGDisplayIsBuiltin(id) == 1 || id == lastKnownBuiltinDisplayID || Display.printableName(id)
-                    .stripped == "Built-in Retina Display"
-            )
+        guard !isGeneric(id) else { return false }
+        if let panel = DisplayController.panel(with: id) {
+            return panel.isBuiltIn || panel.isBuiltInRetina
+        }
+        return (
+            CGDisplayIsBuiltin(id) == 1 ||
+                id == lastKnownBuiltinDisplayID ||
+                Display
+                .printableName(id).stripped
+                .lowercased().replacingOccurrences(of: "-", with: "")
+                .contains("builtin")
+        )
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {

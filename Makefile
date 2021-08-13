@@ -102,6 +102,6 @@ beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -w
 beta: build-version appcast
 	test (defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion) = $(VERSION)
 	xcnotary notarize -d alin.p32@gmail.com -k altool /tmp/Lunar/Lunar.app
-	spctl -vvv --assess /tmp/Lunar/Lunar.app | grep Notarized
+	spctl -vvv --assess /tmp/Lunar/Lunar.app 2>&1 | grep Notarized
 	upload -d lunar -n Lunar-(defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion).zip /tmp/Lunar/Lunar.zip
 	upload -d lunar Releases/appcast.xml

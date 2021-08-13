@@ -883,6 +883,19 @@ struct Lunar: ParsableCommand {
                 globalExit(0)
             }
 
+            guard redMin != 0 || redMax != 1 || red != 1 ||
+                greenMin != 0 || greenMax != 1 || green != 1 ||
+                blueMin != 0 || blueMax != 1 || blue != 1
+            else {
+                print("""
+                    Gamma table for \(display):
+                        Red: \(display.defaultGammaTable.red)
+                        Green: \(display.defaultGammaTable.green)
+                        Blue: \(display.defaultGammaTable.blue)
+                """)
+                return
+            }
+
             print(
                 "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
             )
