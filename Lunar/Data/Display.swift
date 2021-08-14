@@ -1016,7 +1016,11 @@ enum ValueType {
 
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
         didSet {
-            canRotate = panel?.canChangeOrientation() ?? false
+            #if DEBUG
+                canRotate = isForTesting || panel?.canChangeOrientation() ?? false
+            #else
+                canRotate = panel?.canChangeOrientation() ?? false
+            #endif
         }
     }
 
@@ -2124,6 +2128,13 @@ enum ValueType {
 
             self.refreshBrightness()
         }
+        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true) { [weak self] _ in
+            guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
+                return
+            }
+
+            self.refreshContrast()
+        }
     }
 
     func matchesEDIDUUID(_ edidUUID: String) -> Bool {
@@ -2594,7 +2605,13 @@ enum ValueType {
     }
 
     func readContrast() -> UInt8? {
-        control?.getContrast()
+        guard !isBuiltin else {
+            guard let (_, contrast) = SyncMode.getBuiltinDisplayBrightnessContrast() else {
+                return nil
+            }
+            return contrast.u8
+        }
+        return control?.getContrast()
     }
 
     func readInput() -> UInt8? {

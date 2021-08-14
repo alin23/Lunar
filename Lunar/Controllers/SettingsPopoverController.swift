@@ -164,12 +164,12 @@ class SettingsPopoverController: NSViewController {
 
                 applyGamma = display.applyGamma
                 setupApplyGammaCheckbox()
+                resolutionsDropdown.fade()
             }
             setupDDCLimits(display)
             setupDDCColorGain(display)
             setupCurveFactors(display)
             setupGamma(display)
-            resolutionsDropdown.fade()
         }
     }
 

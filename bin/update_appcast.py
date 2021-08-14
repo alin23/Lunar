@@ -26,7 +26,31 @@ H = ElementMaker()
 CHANGELOG_STYLE = H.style(
     """
     * {
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 1rem;
+    }
+
+    img {
+        width: 80%;
+        margin: 1rem auto;
+        object-fit: cover;
+    }
+
+    code, pre {
         font-family: Menlo, monospace;
+        color: #fda43a;
+    }
+
+    strong {
+        color: #fda43a;
+    }
+
+    em {
+        color: #FBAB7E;
+    }
+
+    code {
+        font-weight: bold;
     }
 
     a {
@@ -37,20 +61,35 @@ CHANGELOG_STYLE = H.style(
         color: #0077b5;
     }
 
-    h2#features {
+    h1, h2 {
+        font-weight: 800;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    h3 {
+        font-size: 1.25rem;
+    }
+    h4 {
+        font-size: 1.125rem;
+    }
+    h5 {
+        font-size: 1.1rem;
+    }
+
+    h1#features, h2#features {
         color: #EDB44B;
     }
 
-    h2#improvements {
+    h1#improvements, h2#improvements {
         color: #515193;
     }
 
-    h2#fixes {
+    h1#fixes, h2#fixes {
         color: #E14283;
-    }
-
-    li {
-        font-size: 13px;
     }
 """
 )
