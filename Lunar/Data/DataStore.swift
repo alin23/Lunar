@@ -17,6 +17,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .advancedSettingsShown,
     .appExceptions,
     .muteVolumeZero,
+    .hotkeysAffectBuiltin,
     .showVirtualDisplays,
     .showAirplayDisplays,
     .mediaKeysNotified,
@@ -497,6 +498,7 @@ func initCache() {
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.muteVolumeZero)
+    cacheKey(.hotkeysAffectBuiltin)
     cacheKey(.showVirtualDisplays)
     cacheKey(.showAirplayDisplays)
     cacheKey(.advancedSettingsShown)
@@ -559,6 +561,7 @@ extension Defaults.Keys {
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
+    static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)

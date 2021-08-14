@@ -211,6 +211,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         currentPage += (number - 1)
                     }
 
+                    if firstPath == "builtin" || firstPath == "internal" || firstPath == "built-in" {
+                        if let w = windowController?.window, let view = w.contentView, !view.subviews.isEmpty,
+                           !view.subviews[0].subviews.isEmpty,
+                           let pageController = view.subviews[0].subviews[0].nextResponder as? PageController
+                        {
+                            currentPage = pageController.arrangedObjects.firstIndex {
+                                ($0 as? Display)?.isBuiltin ?? false
+                            } ?? currentPage
+                        }
+                    }
                     if firstPath == "settings" || firstPath == "gear" || lastPath == "settings" || lastPath == "gear" {
                         uiElement = .gear
                     }
@@ -589,7 +599,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 guard let displayUUID = n.userInfo?["DeviceID"] as? String,
                       let display = displayController.activeDisplays.values.first(where: { $0.serial == displayUUID }) else { return }
                 log.debug("ColorSync changed for \(display)")
-//                CGDisplayRestoreColorSyncSettings()
                 display.refreshGamma()
                 display.reapplyGamma()
 
