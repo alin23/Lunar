@@ -717,6 +717,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func adjust(_ mediaKey: MediaKey, by value: Int? = nil, currentDisplay: Bool = false, contrast: Bool = false) {
+        let affectBuiltin = CachedDefaults[.hotkeysAffectBuiltin]
+
         switch mediaKey {
         case .brightnessUp where contrast:
             increaseContrast(by: value, currentDisplay: currentDisplay)
@@ -731,6 +733,8 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         let showOSD = { (display: Display) in
+            if contrast, display.isBuiltin { return }
+
             if contrast {
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
             } else {
@@ -739,10 +743,12 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         if currentDisplay {
-            guard let display = displayController.currentDisplay else { return }
+            guard let display = displayController.currentDisplay, affectBuiltin || !display.isBuiltin else { return }
             showOSD(display)
         } else {
-            displayController.activeDisplays.values.forEach(showOSD)
+            displayController.activeDisplays.values
+                .filter { affectBuiltin || !$0.isBuiltin }
+                .forEach(showOSD)
         }
     }
 
@@ -985,6 +991,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         increaseBrightness(by: offset)
 
         for (_, display) in displayController.activeDisplays {
+            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -996,6 +1003,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         decreaseBrightness(by: offset)
 
         for (_, display) in displayController.activeDisplays {
+            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1007,6 +1015,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         increaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {
+            guard !display.isBuiltin else { continue }
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 
@@ -1018,6 +1027,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         decreaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {
+            guard !display.isBuiltin else { continue }
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 

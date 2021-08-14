@@ -30,51 +30,6 @@ class DisplayViewController: NSViewController {
 
     // MARK: Internal
 
-//     func demo() {
-//         guard let solar = LocationMode.specific.geolocation?.solar,
-//               let sunrise = LocationMode.specific.moment?.sunrise,
-//               let sunset = LocationMode.specific.moment?.sunset,
-    // //              let sunrisePosition = solar.sunrisePosition,
-    // //              let sunsetPosition = solar.sunsetPosition,
-    // //              let solarNoonPosition = solar.solarNoonPosition,
-//               let display = display, let brightnessContrastChart = brightnessContrastChart
-//         else {
-//             return
-//         }
-//         scrollableBrightness?.onCurrentValueChanged = nil
-//         scrollableContrast?.onCurrentValueChanged = nil
-//         for hour in sunrise.hour ... sunset.hour {
-//             for minute in stride(from: 0, to: 60, by: 5) {
-//                 log.info("Setting time to \(hour):\(minute)")
-//                 let (brightness, contrast) = LocationMode.specific.getBrightnessContrast(
-//                     display: display, hour: hour, minute: minute
-//                 )
-//                 mainThread {
-//                     log.info("Brightness: \(brightness)    Contrast: \(contrast)")
-//                     scrollableBrightness!.currentValue.stringValue = brightness.intround.s
-//                     scrollableContrast!.currentValue.stringValue = contrast.intround.s
-//                     scrollableBrightness!.setNeedsDisplay(scrollableBrightness!.visibleRect)
-//                     scrollableContrast!.setNeedsDisplay(scrollableContrast!.visibleRect)
-
-//                     var now = DateInRegion().convertTo(region: Region.local)
-//                     now = now.dateBySet(hour: hour, min: minute, secs: 0)!
-
-//                     brightnessContrastChart.highlightCurrentValues(
-//                         adaptiveMode: displayController.adaptiveMode, for: display,
-//                         now: now.date
-//                     )
-//                     brightnessContrastChart.notifyDataSetChanged()
-//                     brightnessContrastChart.setNeedsDisplay(brightnessContrastChart.visibleRect)
-//                     view.setNeedsDisplay(view.visibleRect)
-//                 }
-    // //            let sleepTime = pow(0.01, 1 - (elevation / solarNoonPosition.elevation))
-    // //            log.info("Sleeping for \(sleepTime)")
-    // //            Thread.sleep(forTimeInterval: sleepTime)
-//                 Thread.sleep(forTimeInterval: 0.01)
-//             }
-//         }
-//     }
-
     enum ResetAction: Int {
         case algorithmCurve = 0
         case networkControl
@@ -184,6 +139,8 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var resetDropdown: PopUpButton?
 
+    @IBOutlet var builtinBrightnessField: ScrollableTextField?
+    @IBOutlet var builtinBrightnessCaption: ScrollableTextFieldCaption?
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
     @IBOutlet var _controlsButton: NSButton!
@@ -195,6 +152,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
     @objc dynamic var noDisplay: Bool = false
+    @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
 
     var adaptiveModeObserver: Cancellable?
     var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
@@ -236,7 +194,7 @@ class DisplayViewController: NSViewController {
         didSet {
             if let d = display {
                 mainThread {
-                    nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID
+                    nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID || d.isBuiltin
                 }
             }
         }
@@ -312,7 +270,7 @@ class DisplayViewController: NSViewController {
 
     @discardableResult
     func initHotkeys() -> Bool {
-        guard let button = inputDropdownHotkeyButton, let display = display, display.hotkeyPopoverController != nil
+        guard let button = inputDropdownHotkeyButton, let display = display, !display.isBuiltin, display.hotkeyPopoverController != nil
         else {
             if let button = inputDropdownHotkeyButton {
                 button.onClick = { [weak self] in
@@ -430,6 +388,7 @@ class DisplayViewController: NSViewController {
         guard let button = proButton else { return }
 
         mainThread {
+            let width = button.frame.width
             if lunarProActive {
                 button.bg = red
                 button.attributedTitle = "Pro".withAttribute(.textColor(white))
@@ -443,7 +402,9 @@ class DisplayViewController: NSViewController {
                 button.attributedTitle = "Get Pro".withAttribute(.textColor(white))
                 button.setFrameSize(NSSize(width: 70, height: button.frame.height))
             }
-            button.center(within: view, vertically: false)
+            if button.frame.width != width {
+                button.center(within: view, vertically: false)
+            }
         }
     }
 
@@ -453,6 +414,8 @@ class DisplayViewController: NSViewController {
 
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
+
+        inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
 
         settingsButton?.display = display
         settingsButton?.displayViewController = self
@@ -464,6 +427,12 @@ class DisplayViewController: NSViewController {
 
         lockedBrightnessCurve = display.lockedBrightnessCurve
         lockedContrastCurve = display.lockedContrastCurve
+
+        if display.isBuiltin {
+            builtinBrightnessField?.onValueChanged = { value in
+                display.withSmoothTransition { display.brightness = value.ns }
+            }
+        }
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
             guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
@@ -516,7 +485,7 @@ class DisplayViewController: NSViewController {
                 mainThread { [weak self] in
                     guard let self = self, let display = self.display else { return }
                     display.control?.resetState()
-                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
                     self.refreshView()
                 }
             }
@@ -525,12 +494,12 @@ class DisplayViewController: NSViewController {
         display.$input.sink { [weak self] _ in
             mainAsyncAfter(ms: 1000) {
                 guard let self = self else { return }
-                if !self.noDisplay { self.inputDropdown?.fade() }
+                if !self.inputHidden { self.inputDropdown?.fade() }
             }
         }.store(in: &displayObservers, for: "input")
 
         initHotkeys()
-        setButtonsHidden(display.id == GENERIC_DISPLAY_ID)
+        setButtonsHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
         refreshView()
 
         listenForSendingBrightnessContrast()
@@ -859,17 +828,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func setIsHidden(_ value: Bool) {
-        mainThread {
-            setButtonsHidden(value)
-
-            nonResponsiveTextField?.isHidden = value
-            scrollableBrightness?.isHidden = value
-            scrollableContrast?.isHidden = value
-            brightnessContrastChart?.isHidden = value
-        }
-    }
-
     func listenForSendingBrightnessContrast() {
         display?.$sendingBrightness.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
@@ -903,12 +861,47 @@ class DisplayViewController: NSViewController {
     func listenForBrightnessContrastChange() {
         display?.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread { self.scrollableBrightness?.maxValue.integerValue = value.intValue }
+            mainThread {
+                self.scrollableBrightness?.maxValue.integerValue = value.intValue
+                self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
+            }
         }.store(in: &displayObservers, for: "maxBrightness")
         display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread { self.scrollableContrast?.maxValue.integerValue = value.intValue }
+            mainThread {
+                self.scrollableContrast?.maxValue.integerValue = value.intValue
+                self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
+            }
         }.store(in: &displayObservers, for: "maxContrast")
+
+        display?.$minBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
+            guard let self = self else { return }
+            mainThread {
+                self.scrollableBrightness?.minValue.integerValue = value.intValue
+                self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
+            }
+        }.store(in: &displayObservers, for: "minBrightness")
+        display?.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
+            guard let self = self else { return }
+            mainThread {
+                self.scrollableContrast?.minValue.integerValue = value.intValue
+                self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
+            }
+        }.store(in: &displayObservers, for: "minContrast")
+
+        display?.$brightness.receive(on: dataPublisherQueue).sink { [weak self] value in
+            guard let self = self else { return }
+            mainThread {
+                self.scrollableBrightness?.currentValue.integerValue = value.intValue
+                self.builtinBrightnessField?.integerValue = value.intValue
+            }
+        }.store(in: &displayObservers, for: "brightness")
+        display?.$contrast.receive(on: dataPublisherQueue).sink { [weak self] value in
+            guard let self = self else { return }
+            mainThread {
+                self.scrollableContrast?.currentValue.integerValue = value.intValue
+            }
+        }.store(in: &displayObservers, for: "contrast")
     }
 
     func listenForDisplayBoolChange() {
@@ -1105,6 +1098,7 @@ class DisplayViewController: NSViewController {
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor
+            builtinBrightnessField?.caption = builtinBrightnessCaption
 
             scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u8) }
             scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u8) }
@@ -1113,7 +1107,14 @@ class DisplayViewController: NSViewController {
 
             initGraph()
         } else {
-            setIsHidden(true)
+            mainThread {
+                setButtonsHidden(true)
+
+                nonResponsiveTextField?.isHidden = true
+                scrollableBrightness?.isHidden = true
+                scrollableContrast?.isHidden = true
+                brightnessContrastChart?.isHidden = true
+            }
         }
     }
 }

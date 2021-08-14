@@ -86,7 +86,7 @@ class CoreDisplayControl: Control {
 
     func isAvailable() -> Bool {
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
-        return display.isAppleDisplay() || display.isBuiltin || display.isForTesting
+        return display.isAppleDisplay() || (display.isBuiltin && (display.panel?.isSmartDisplay ?? false)) || display.isForTesting
     }
 
     func isResponsive() -> Bool {
@@ -161,7 +161,7 @@ class CoreDisplayControl: Control {
 
         if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
             var faults = 0
-            display.smoothTransition(from: oldValue, to: brightness) { [weak self] brightness in
+            display.smoothTransition(from: oldValue, to: brightness, delay: 0.01) { [weak self] brightness in
                 guard let self = self else { return }
                 if faults > 5 {
                     return

@@ -59,6 +59,8 @@ class SettingsPopoverController: NSViewController {
     let GAMMA_HELP_TEXT = """
     ## Description
 
+    These values will override any custom color profile until the app is quit or until `Apply gamma values` is unchecked.
+
     How these gamma values are applied depends on how the monitor can be controlled:
     - `Software Controls`: the values will be used in computing the gamma table for approximating brightness/contrast changes
     - `Hardware/Native/Network Controls`: the values will be set exactly as they are when `Apply gamma values` is checked
@@ -68,6 +70,7 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var ddcControlCheckbox: NSButton!
     @IBOutlet var gammaControlCheckbox: NSButton!
 
+    @IBOutlet var resolutionsDropdown: PopUpButton!
     @IBOutlet var resetLimitsButton: ResetButton!
     @IBOutlet var resetColorsButton: ResetButton!
     @IBOutlet var readColorsButton: ResetButton!
@@ -166,6 +169,7 @@ class SettingsPopoverController: NSViewController {
             setupDDCColorGain(display)
             setupCurveFactors(display)
             setupGamma(display)
+            resolutionsDropdown.fade()
         }
     }
 
@@ -599,6 +603,9 @@ class SettingsPopoverController: NSViewController {
         setupDDCColorGain()
         setupCurveFactors()
         setupGamma()
+
+        resolutionsDropdown.page = .hotkeysReset
+        resolutionsDropdown.fade()
 
         adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
             guard let self = self, let display = self.display else { return }

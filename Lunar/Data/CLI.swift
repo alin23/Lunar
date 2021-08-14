@@ -131,6 +131,8 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
     case "best-guess":
         guard let currentDisplayId = displayController.currentDisplay?.id else { return nil }
         return displays.first(where: { $0.id == currentDisplayId })
+    case "builtin":
+        return displayController.activeDisplays.values.first(where: { $0.isBuiltin })
     default:
         if let id = filter.u32 {
             return displays.first(where: { $0.id == id })
