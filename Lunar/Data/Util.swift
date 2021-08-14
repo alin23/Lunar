@@ -1136,6 +1136,35 @@ func dialog(
 func ask(
     message: String,
     info: String,
+    window: NSWindow,
+    okButton: String = "OK",
+    cancelButton: String = "Cancel",
+    timeout: DateComponents = 5.seconds,
+    onCompletion: @escaping (Bool) -> Void
+) {
+    let alert = dialog(
+        message: message,
+        info: info,
+        okButton: okButton,
+        cancelButton: cancelButton,
+        window: window
+    )
+
+    alert.beginSheetModal(for: window, completionHandler: { resp in
+        onCompletion(resp == .alertFirstButtonReturn)
+    })
+
+    mainAsyncAfter(ms: (timeout.timeInterval * 1000).intround) {
+        if alert.window.isVisible {
+            alert.window.close()
+            onCompletion(false)
+        }
+    }
+}
+
+func ask(
+    message: String,
+    info: String,
     okButton: String = "OK",
     cancelButton: String = "Cancel",
     thirdButton: String? = nil,

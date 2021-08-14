@@ -52,14 +52,21 @@ class PageController: NSPageController {
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
         let activeDisplays = displayController.activeDisplays
         if !activeDisplays.isEmpty {
-            let displays: [Any] = activeDisplays.values.sorted(by: { d1, d2 -> Bool in
-                d1.serial < d2.serial
-            })
-            arrangedObjects.append(contentsOf: displays)
+            let builtinDisplays: [Any] = activeDisplays.values
+                .filter(\.isBuiltin)
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let externalDisplays: [Any] = activeDisplays.values
+                .filter { !$0.isBuiltin }
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            arrangedObjects.append(contentsOf: externalDisplays + builtinDisplays)
         } else if TEST_MODE {
-            let displays: [Any] = displayController.displays.values.sorted(by: { d1, d2 -> Bool in
-                d1.serial < d2.serial
-            })
+            let builtinDisplays: [Any] = displayController.displays.values
+                .filter(\.isBuiltin)
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let externalDisplays: [Any] = displayController.displays.values
+                .filter { !$0.isBuiltin }
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let displays = externalDisplays + builtinDisplays
             arrangedObjects.append(contentsOf: displays.isEmpty ? [GENERIC_DISPLAY] : displays.map { $0 })
         } else {
             arrangedObjects.append(GENERIC_DISPLAY)

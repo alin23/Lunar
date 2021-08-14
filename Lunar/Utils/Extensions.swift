@@ -620,6 +620,36 @@ extension ArraySlice {
     }
 }
 
+extension MPDisplayMode {
+    enum Tag: String {
+        case retina
+        case hidpi
+        case native
+        case defaultMode = "default"
+        case tv
+        case unsafe
+        case simulscan
+        case interlaced
+    }
+
+    override open var description: String {
+        let res = "\(pixelsWide)x\(pixelsHigh)"
+        let refresh = "\(refreshRate)Hz"
+        let tags: [String] = [
+            isNativeMode ? Tag.native : nil,
+            isDefaultMode ? Tag.defaultMode : nil,
+            isRetina ? Tag.retina : nil,
+            isHiDPI ? Tag.hidpi : nil,
+            isTVMode ? Tag.tv : nil,
+            isSafeMode ? nil : Tag.unsafe,
+            isSimulscan ? Tag.simulscan : nil,
+            isInterlaced ? Tag.interlaced : nil,
+        ].compactMap { $0?.rawValue }
+        let tagsString = tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+        return "\(res)@\(refresh)\(tagsString)"
+    }
+}
+
 extension NSScreen {
     override open var description: String {
         "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"

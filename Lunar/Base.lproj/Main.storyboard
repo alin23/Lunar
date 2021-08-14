@@ -2681,6 +2681,14 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.isBuiltin" previousBinding="RNK-1I-mNb" id="Vt0-sn-7O8">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="yMj-md-h9o"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="yMj-md-h9o" id="RNK-1I-mNb">
                                         <dictionary key="options">
@@ -2785,6 +2793,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                 </subviews>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" id="iLv-d1-gQR"/>
                                     <outlet property="currentValue" destination="Mts-p9-8Zt" id="0as-8d-tlT"/>
                                     <outlet property="currentValueCaption" destination="Zt1-xU-YsD" id="dMb-SV-c4p"/>
                                     <outlet property="label" destination="umA-QT-AAO" id="h1E-9Y-e3c"/>
@@ -2888,6 +2897,7 @@ when dock and menubar icons are hidden</string>
                                     </textField>
                                 </subviews>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" id="SiT-g9-Fv5"/>
                                     <outlet property="currentValue" destination="0p3-Ip-HPc" id="OHP-0a-u4q"/>
                                     <outlet property="currentValueCaption" destination="VM8-Rs-rmy" id="e3O-37-zxw"/>
                                     <outlet property="label" destination="7BM-c4-qeq" id="sel-wj-PFB"/>
@@ -3001,19 +3011,7 @@ when dock and menubar icons are hidden</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="buI-ya-khP" id="QdZ-mq-Ih5">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="0Pp-lL-OYP" id="buI-ya-khP">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.inputHidden" previousBinding="0Pp-lL-OYP" id="YQ2-ZJ-B87"/>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
                                     <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="WjQ-Yx-YEJ"/>
                                 </connections>
@@ -3102,6 +3100,14 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="powerOff:" target="1Bn-Ca-ETm" id="uwQ-Z4-n0a"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="ccV-9Q-Z6t" id="fqf-Sp-p9s">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="ccV-9Q-Z6t">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -3130,20 +3136,8 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="HTE-nx-ndF" id="3LJ-MI-tJD">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" previousBinding="Bbe-9O-i0M" id="HTE-nx-ndF">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="Bbe-9O-i0M"/>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="VOK-X2-wpd"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.inputHidden" previousBinding="VOK-X2-wpd" id="SqX-99-pja"/>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="GJn-hd-DZ0">
@@ -3167,7 +3161,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="861" y="201" width="73" height="12"/>
+                                <rect key="frame" x="861" y="199" width="73" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="99" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3233,6 +3227,49 @@ and contrast to their highest values</string>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
                                 </connections>
                             </popUpButton>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="neU-41-LZY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="415" y="206" width="120" height="54"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="Scs-uo-xcg" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="44"/>
+                                    <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.040743998339999997" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
+                                        <real key="value" value="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
+                                        <real key="value" value="100"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="step">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" id="vC7-N5-4VP">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="uan-gt-LLv" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="350" y="184" width="250" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="bVK-oc-lud">
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" id="fd3-hA-DAB">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -3244,6 +3281,8 @@ and contrast to their highest values</string>
                         <outlet property="_settingsButton" destination="kAQ-3d-HnF" id="pDI-vl-ZYf"/>
                         <outlet property="adaptiveNotice" destination="ZlW-Lv-Oa8" id="e5o-8i-RIo"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
+                        <outlet property="builtinBrightnessCaption" destination="uan-gt-LLv" id="hhC-Zo-IGi"/>
+                        <outlet property="builtinBrightnessField" destination="neU-41-LZY" id="8P7-ZZ-hP0"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
                         <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
@@ -3629,7 +3668,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhI-ji-g4G">
-                                <rect key="frame" x="37" y="366" width="258" height="40"/>
+                                <rect key="frame" x="37" y="366" width="247" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Use Brightness keys with Lunar (no Touchbar sliders though)" id="gJE-aA-LcL">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3659,7 +3698,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ts4-UD-dRd">
-                                <rect key="frame" x="37" y="306" width="239" height="40"/>
+                                <rect key="frame" x="37" y="306" width="247" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Control monitor audio output using volume keys" id="4qO-ts-X7U">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3668,7 +3707,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
-                                <rect key="frame" x="37" y="9" width="258" height="126"/>
+                                <rect key="frame" x="37" y="-16" width="258" height="126"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" selectable="YES" title="Function keys notice" id="aWn-9O-e5g">
                                     <font key="font" usesAppearanceFont="YES"/>
@@ -3698,7 +3737,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0P4-lz-uH4">
-                                <rect key="frame" x="37" y="235" width="239" height="51"/>
+                                <rect key="frame" x="37" y="235" width="247" height="51"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="If unchecked, Brightness keys will only control the monitor where the cursor is placed" id="oBZ-yU-Ykc">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3770,7 +3809,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
-                                <rect key="frame" x="37" y="164" width="239" height="51"/>
+                                <rect key="frame" x="37" y="164" width="247" height="51"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Frees up F14/F15 keys but might not work on all keyboards" id="kPG-QJ-rNC">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -3794,6 +3833,36 @@ and contrast to their highest values</string>
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uof-9j-l0d">
+                                <rect key="frame" x="37" y="147" width="266" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Include built-in display" id="t5s-by-eTt">
+                                    <font key="font" size="15" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="0.89771316229999998" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="rfi-dA-feR">
+                                <rect key="frame" x="303" y="158" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="845-NO-K16">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <binding destination="upY-F0-APc" name="value" keyPath="values.hotkeysAffectBuiltin" id="P0X-AH-8dl"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Ki-QK-JJe">
+                                <rect key="frame" x="37" y="105" width="247" height="51"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Allow hotkeys to also change the brightness of the built-in display" id="NhR-ru-CPS">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
                         </subviews>
@@ -3840,7 +3909,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="100" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
+                                <rect key="frame" x="25" y="10" width="430" height="95"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -6416,7 +6485,9 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="selectItem:" target="VkT-77-mId" id="X8R-2G-1dd"/>
-                                    <binding destination="21a-h6-6He" name="selectedTag" keyPath="self.display.modeNumber" id="tGw-PR-5pS"/>
+                                    <binding destination="Hw6-bB-9z0" name="content" keyPath="arrangedObjects" id="jO2-98-ogd"/>
+                                    <binding destination="Hw6-bB-9z0" name="contentObjects" keyPath="selection" previousBinding="jO2-98-ogd" id="cA7-n9-aEV"/>
+                                    <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.panelMode" previousBinding="cA7-n9-aEV" id="892-eQ-Hot"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
@@ -6466,10 +6537,16 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                         <outlet property="resetColorsButton" destination="wtr-V8-utH" id="5ly-n8-fY9"/>
                         <outlet property="resetGammaButton" destination="HSn-nF-nA6" id="cG3-AO-4TS"/>
                         <outlet property="resetLimitsButton" destination="Xwk-Qd-h2d" id="RE6-ul-dDd"/>
+                        <outlet property="resolutionsDropdown" destination="476-c7-fYc" id="3fT-R4-HAp"/>
                         <outlet property="syncModeRoleToggle" destination="VNJ-7E-pDo" id="cjW-cx-8Y7"/>
                     </connections>
                 </viewController>
                 <customObject id="gdS-SJ-DKe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <arrayController id="Hw6-bB-9z0">
+                    <connections>
+                        <binding destination="21a-h6-6He" name="contentArray" keyPath="self.display.panelModes" id="968-aS-2Jv"/>
+                    </connections>
+                </arrayController>
                 <userDefaultsController id="acV-IR-6EQ"/>
                 <userDefaultsController id="hT5-7y-BjN"/>
                 <userDefaultsController id="MYZ-fE-EBq"/>

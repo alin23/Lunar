@@ -598,19 +598,6 @@ class DisplayController {
                 return nil
             }
 
-            if let panel = display.panel {
-                log.info("TV Ignore: Panel is TV=\(panel.isTV)")
-                log.info("TV Ignore: Panel has TV modes=\(panel.hasTVModes)")
-                if let mode = panel.currentMode {
-                    log.info("TV Ignore: Current mode is TV mode=\(mode.isTVMode)")
-                    if panel.isTV || (panel.hasTVModes && mode.isTVMode) {
-                        log.warning("TVs don't support DDC, ignoring for display \(display)")
-                        display.isTV = true
-                        return nil
-                    }
-                }
-            }
-
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
             guard let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
                   let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
@@ -1151,6 +1138,7 @@ class DisplayController {
             display.refreshContrast()
             display.refreshVolume()
             display.refreshInput()
+            display.refreshColors()
         }
     }
 
@@ -1174,6 +1162,7 @@ class DisplayController {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         if let displays = displays {
             displays.forEach { display in
+                guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
                 if !display.lockedBrightness {
                     display.brightness = manualMode.compute(
                         percent: value,
@@ -1185,6 +1174,7 @@ class DisplayController {
         } else {
             activeDisplays.values
                 .forEach { display in
+                    guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
                     if !display.lockedBrightness {
                         display.brightness = manualMode.compute(
                             percent: value,
@@ -1201,6 +1191,7 @@ class DisplayController {
         if let displays = displays {
             displays
                 .forEach { display in
+                    guard !display.isBuiltin else { return }
                     if !display.lockedContrast {
                         display.contrast = manualMode.compute(
                             percent: value,
@@ -1212,6 +1203,7 @@ class DisplayController {
         } else {
             activeDisplays.values
                 .forEach { display in
+                    guard !display.isBuiltin else { return }
                     if !display.lockedContrast {
                         display.contrast = manualMode.compute(
                             percent: value,
@@ -1257,6 +1249,8 @@ class DisplayController {
         guard checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
+
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
 
             value = cap(
@@ -1280,6 +1274,8 @@ class DisplayController {
         guard checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+            guard !display.isBuiltin else { return }
+
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)
 
             value = cap(

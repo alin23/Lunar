@@ -22,10 +22,17 @@ class NonResponsiveTextField: NSTextField {
     override var isHidden: Bool {
         didSet {
             mainThread {
-                if let inputDropdown = superview?.subviews.first(
-                    where: { v in (v as? PopUpButton) != nil }
-                ) as? PopUpButton {
-                    inputDropdown.isHidden = !self.isHidden || displayController.activeDisplays.isEmpty
+                if let dvc = superview?.nextResponder as? DisplayViewController,
+                   let inputDropdown = superview?.subviews.first(
+                       where: { v in (v as? PopUpButton) != nil }
+                   ) as? PopUpButton,
+                   let inputDropdownHotkeyButton = superview?.subviews.first(
+                       where: { v in (v as? HotkeyButton) != nil }
+                   ) as? HotkeyButton
+                {
+                    log.debug("Non-responsive text hidden: \(isHidden)")
+                    inputDropdown.isHidden = !self.isHidden || displayController.activeDisplays.isEmpty || dvc.inputHidden
+                    inputDropdownHotkeyButton.isHidden = !self.isHidden || displayController.activeDisplays.isEmpty || dvc.inputHidden
                 }
             }
         }

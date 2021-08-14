@@ -690,6 +690,7 @@ enum ValueType {
         case contrastOnInputChange1
         case contrastOnInputChange2
         case contrastOnInputChange3
+        case rotation
 
         // MARK: Internal
 
@@ -777,6 +778,7 @@ enum ValueType {
             .contrastOnInputChange1,
             .contrastOnInputChange2,
             .contrastOnInputChange3,
+            .rotation,
         ]
 
         var isHidden: Bool {
@@ -798,7 +800,7 @@ enum ValueType {
         case gamma
     }
 
-    lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
+    @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
 
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = {
@@ -973,6 +975,10 @@ enum ValueType {
     lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: name)
     lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: name)
 
+    @objc dynamic lazy var panelModes: [MPDisplayMode] = (panel?.allModes() as? [MPDisplayMode]) ?? []
+
+    var modeChangeAsk = true
+
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
         didSet {
             canRotate = panel?.canChangeOrientation() ?? false
@@ -1032,7 +1038,7 @@ enum ValueType {
         }
     }
 
-    var shouldAdapt: Bool { adaptive && !adaptivePaused }
+    var shouldAdapt: Bool { adaptive && !adaptivePaused && !isBuiltin }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()
@@ -1429,6 +1435,29 @@ enum ValueType {
         }
     }
 
+    @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
+        didSet {
+            guard modeChangeAsk, let window = appDelegate.windowController?.window else { return }
+            modeNumber = panelMode?.modeNumber ?? -1
+            if modeNumber != -1 {
+                ask(
+                    message: "Resolution Change",
+                    info: "Do you want to keep this resolution?\n\nLunar will revert to the last resolution if no option is selected in 5 seconds.",
+                    window: window,
+                    okButton: "Keep", cancelButton: "Revert",
+                    onCompletion: { [weak self] keep in
+                        if !keep, let self = self {
+                            self.modeChangeAsk = false
+                            self.panelMode = oldValue
+                            self.modeNumber = oldValue?.modeNumber ?? -1
+                            self.modeChangeAsk = true
+                        }
+                    }
+                )
+            }
+        }
+    }
+
     @objc dynamic lazy var modeNumber: Int32 = panel?.currentMode.modeNumber ?? -1 {
         didSet {
             guard modeNumber != -1, let panel = panel else { return }
@@ -1776,6 +1805,10 @@ enum ValueType {
             }
         #endif
 
+        if DDC.isBuiltinDisplay(id) {
+            return "Built-in"
+        }
+
         if let screen = NSScreen.forDisplayID(id) {
             return screen.localizedName
         }
@@ -2029,24 +2062,33 @@ enum ValueType {
     }
 
     func startControls() {
-        if !isGeneric(id) {
-            if CachedDefaults[.refreshValues] {
-                serialQueue.async { [weak self] in
-                    guard let self = self else { return }
-                    self.refreshBrightness()
-                    self.refreshContrast()
-                    self.refreshVolume()
-                    self.refreshInput()
-                    self.refreshColors()
-                }
+        guard !isGeneric(id) else { return }
+
+        if CachedDefaults[.refreshValues] {
+            serialQueue.async { [weak self] in
+                guard let self = self else { return }
+                self.refreshBrightness()
+                self.refreshContrast()
+                self.refreshVolume()
+                self.refreshInput()
+                self.refreshColors()
             }
-            refreshGamma()
         }
+        refreshGamma()
 
         startI2CDetection()
         detectI2C()
 
         control = getBestControl()
+
+        guard isBuiltin else { return }
+        asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] _ in
+            guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
+                return
+            }
+
+            self.refreshBrightness()
+        }
     }
 
     func matchesEDIDUUID(_ edidUUID: String) -> Bool {
@@ -2096,7 +2138,20 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled else { return }
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isTV else { return }
+
+        if let panel = panel {
+            log.info("TV Ignore: Panel is TV=\(panel.isTV)")
+            log.info("TV Ignore: Panel has TV modes=\(panel.hasTVModes)")
+            if let mode = panel.currentMode {
+                log.info("TV Ignore: Current mode is TV mode=\(mode.isTVMode)")
+                if panel.isTV || (panel.hasTVModes && mode.isTVMode) {
+                    log.warning("TVs don't support DDC, ignoring for display \(description)")
+                    isTV = true
+                    return
+                }
+            }
+        }
 
         #if DEBUG
             #if arch(arm64)
@@ -2270,6 +2325,7 @@ enum ValueType {
             try container.encode(contrastOnInputChange1.uint8Value, forKey: .contrastOnInputChange1)
             try container.encode(contrastOnInputChange2.uint8Value, forKey: .contrastOnInputChange2)
             try container.encode(contrastOnInputChange3.uint8Value, forKey: .contrastOnInputChange3)
+            try container.encode(rotation, forKey: .rotation)
 
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sync]?.dictionary, forKey: .sync)
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor]?.dictionary, forKey: .sensor)
@@ -2402,7 +2458,7 @@ enum ValueType {
         }
     }
 
-    func smoothTransition(from currentValue: UInt8, to value: UInt8, adjust: @escaping ((UInt8) -> Void)) {
+    func smoothTransition(from currentValue: UInt8, to value: UInt8, delay: TimeInterval? = nil, adjust: @escaping ((UInt8) -> Void)) {
         inSmoothTransition = true
 
         var steps = abs(value.distance(to: currentValue))
@@ -2451,6 +2507,9 @@ enum ValueType {
 
             for newValue in stride(from: currentValue.i, through: value.i, by: step) {
                 adjust(cap(newValue.u8, minVal: minVal, maxVal: maxVal))
+                if let delay = delay {
+                    Thread.sleep(forTimeInterval: delay)
+                }
             }
             adjust(value)
 
@@ -2547,7 +2606,7 @@ enum ValueType {
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
-            guard displayController.adaptiveModeKey == .manual else {
+            guard displayController.adaptiveModeKey == .manual || isBuiltin else {
                 readapt(newValue: newBrightness, oldValue: brightness.uint8Value)
                 return
             }
@@ -2571,7 +2630,7 @@ enum ValueType {
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
-            guard displayController.adaptiveModeKey == .manual else {
+            guard displayController.adaptiveModeKey == .manual || isBuiltin else {
                 readapt(newValue: newContrast, oldValue: contrast.uint8Value)
                 return
             }
