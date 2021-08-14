@@ -66,6 +66,10 @@ extension BinaryInteger {
         Double(self)
     }
 
+    @inline(__always) var cg: CGGammaValue {
+        CGGammaValue(self)
+    }
+
     @inline(__always) var f: Float {
         Float(self)
     }
@@ -289,6 +293,10 @@ extension Double {
 
     @inline(__always) var ns: NSNumber {
         NSNumber(value: self)
+    }
+
+    @inline(__always) var cg: CGGammaValue {
+        CGGammaValue(self)
     }
 
     @inline(__always) var f: Float {

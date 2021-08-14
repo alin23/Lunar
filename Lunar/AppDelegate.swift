@@ -575,7 +575,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         asyncEvery(3.seconds, uniqueTaskKey: "zeroGammaChecker") { _ in
             displayController.activeDisplays.values
                 .filter { d in
-                    !d.settingGamma && d.control is GammaControl && GammaTable(for: d.id).isZero
+                    !d.isForTesting && !d.settingGamma && d.control is GammaControl && !d.isInMirrorSet && GammaTable(for: d.id).isZero
                 }
                 .forEach { d in
                     log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")

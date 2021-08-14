@@ -19,6 +19,12 @@
 //
 import Foundation
 
+let NATIVE_EXECUTION = Int32(0)
+let EMULATED_EXECUTION = Int32(1)
+let UNKONWN_EXECUTION = -Int32(1)
+
+// MARK: - Sysctl
+
 /// A "static"-only namespace around a series of functions that operate on buffers returned from the `Darwin.sysctl` function
 public enum Sysctl {
     /// Possible errors.
@@ -28,6 +34,19 @@ public enum Sysctl {
         case invalidSize
         case posixError(POSIXErrorCode)
     }
+
+    public static var processIsTranslated: Int32 = {
+        var ret = Int32(0)
+        var size = ret.bitWidth
+        let result = sysctlbyname("sysctl.proc_translated", &ret, &size, nil, 0)
+        if result == -1 {
+            if errno == ENOENT {
+                return 0
+            }
+            return -1
+        }
+        return ret
+    }()
 
     /// e.g. "MacPro4,1" or "iPhone8,1"
     /// NOTE: this is *corrected* on iOS devices to fetch hw.machine
@@ -204,4 +223,16 @@ public enum Sysctl {
         /// e.g. 25769803776 (not available on iOS)
         public static var memSize: UInt64 { try! Sysctl.value(ofType: UInt64.self, forKeys: [CTL_HW, HW_MEMSIZE]) }
     #endif
+
+    public static var rosetta: Bool = processIsTranslated == EMULATED_EXECUTION
+    public static var processIsTranslatedStr: String = {
+        switch processIsTranslated {
+        case NATIVE_EXECUTION:
+            return "native"
+        case EMULATED_EXECUTION:
+            return "rosetta"
+        default:
+            return "unkown"
+        }
+    }()
 }

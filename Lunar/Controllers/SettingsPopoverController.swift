@@ -160,7 +160,7 @@ class SettingsPopoverController: NSViewController {
 
                 adaptAutoToggle.isOn = display.adaptive
                 syncModeRoleToggle.isOn = display.isSource
-                syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(display.id) || TEST_MODE
+                syncModeRoleToggle.isEnabled = display.isSmartDisplay || TEST_MODE
 
                 applyGamma = display.applyGamma
                 setupApplyGammaCheckbox()
@@ -594,8 +594,8 @@ class SettingsPopoverController: NSViewController {
             }
             SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
         }
-        if let id = display?.id {
-            syncModeRoleToggle.isEnabled = DisplayServicesIsSmartDisplay(id) || TEST_MODE
+        if let d = display {
+            syncModeRoleToggle.isEnabled = d.isSmartDisplay || TEST_MODE
         } else {
             syncModeRoleToggle.isEnabled = false
         }
