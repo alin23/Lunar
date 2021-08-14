@@ -482,8 +482,10 @@ enum CachedDefaults {
 
 let displayEncodingLock = NSRecursiveLock()
 
-func cacheKey<Value>(_ key: Defaults.Key<Value>) {
-    CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
+func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
+    if load {
+        CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
+    }
     CachedDefaults.locks[key.name] = NSRecursiveLock()
     Defaults.publisher(key).sink { change in
         log.debug("Caching \(key.name) = \(change.newValue)")
@@ -547,7 +549,7 @@ func initCache() {
 
     cacheKey(.location)
     cacheKey(.secure)
-    cacheKey(.wttr)
+    // cacheKey(.wttr)
     cacheKey(.hotkeys)
     cacheKey(.displays)
     cacheKey(.appExceptions)

@@ -2673,7 +2673,7 @@ when dock and menubar icons are hidden</string>
                                 <imageCell key="cell" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="388" y="216" width="170" height="18"/>
+                                <rect key="frame" x="388" y="541" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive" id="dgU-DI-4YJ">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -2681,6 +2681,7 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="yMj-md-h9o"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.isBuiltin" previousBinding="RNK-1I-mNb" id="Vt0-sn-7O8">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2689,7 +2690,6 @@ when dock and menubar icons are hidden</string>
                                             <integer key="NSNullPlaceholder" value="-1"/>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="yMj-md-h9o"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="yMj-md-h9o" id="RNK-1I-mNb">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -3011,9 +3011,9 @@ when dock and menubar icons are hidden</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.inputHidden" previousBinding="0Pp-lL-OYP" id="YQ2-ZJ-B87"/>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
                                     <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="WjQ-Yx-YEJ"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.inputHidden" previousBinding="0Pp-lL-OYP" id="YQ2-ZJ-B87"/>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
@@ -3077,9 +3077,6 @@ when dock and menubar icons are hidden</string>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="591" y="495" width="26" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <string key="toolTip">Power off the monitor. Works only if the monitor can be controlled through DDC.
-
-Can't power on the monitor. When a monitor is turned off or in standby, it does not accept commands from a connected device</string>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
                                     <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
@@ -3100,19 +3097,13 @@ Can't power on the monitor. When a monitor is turned off or in standby, it does 
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="powerOff:" target="1Bn-Ca-ETm" id="uwQ-Z4-n0a"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="ccV-9Q-Z6t" id="fqf-Sp-p9s">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="ccV-9Q-Z6t">
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.powerOffEnabled" id="7VF-Dj-kVR"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.powerOffEnabled" previousBinding="7VF-Dj-kVR" id="RfT-5b-jsS">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="toolTip" keyPath="self.powerOffTooltip" id="AHg-xe-L4Y"/>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
@@ -6486,8 +6477,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 <connections>
                                     <action selector="selectItem:" target="VkT-77-mId" id="X8R-2G-1dd"/>
                                     <binding destination="Hw6-bB-9z0" name="content" keyPath="arrangedObjects" id="jO2-98-ogd"/>
-                                    <binding destination="Hw6-bB-9z0" name="contentObjects" keyPath="selection" previousBinding="jO2-98-ogd" id="cA7-n9-aEV"/>
-                                    <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.panelMode" previousBinding="cA7-n9-aEV" id="892-eQ-Hot"/>
+                                    <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.panelMode" previousBinding="jO2-98-ogd" id="wU0-q3-UR7"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
