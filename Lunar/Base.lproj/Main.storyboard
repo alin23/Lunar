@@ -332,73 +332,117 @@
                                                 <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="em1-5W-zou"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Advanced" id="faP-Rt-ei5">
+                                        <menuItem title="Percentage Hotkeys" id="gUE-F7-aFP">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Advanced" id="Uct-W7-6le">
+                                            <menu key="submenu" title="Percentage Hotkeys" id="Qy6-y7-1cK">
                                                 <items>
-                                                    <menuItem title="Moved to Configuration Page -&gt; Advanced (the button under the window title)" enabled="NO" indentationLevel="1" id="36q-pn-c3B">
-                                                        <attributedString key="attributedTitle">
-                                                            <fragment content="Moved to Configuration Page -&gt; Advanced ">
-                                                                <attributes>
-                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <font key="NSFont" metaFont="systemSemibold" size="13"/>
-                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                                </attributes>
-                                                            </fragment>
-                                                            <fragment content="(the button under the window title)">
-                                                                <attributes>
-                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <font key="NSFont" metaFont="system"/>
-                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                                </attributes>
-                                                            </fragment>
-                                                        </attributedString>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    <menuItem title="0%" keyEquivalent="0" id="vbd-AN-CIC">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="setLight0PercentWithSender:" target="Voe-Tx-rLC" id="p8q-FH-5TO"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="yWx-pa-g8E"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="25%" keyEquivalent="1" id="Cey-Fd-ldS">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="setLight25PercentWithSender:" target="Voe-Tx-rLC" id="i6w-g1-cLO"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="i40-o9-oai"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="50%" keyEquivalent="2" id="D33-Eu-UFI">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="setLight50PercentWithSender:" target="Voe-Tx-rLC" id="K6y-9T-ZPa"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="aW6-Oo-3N4"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="75%" keyEquivalent="3" id="zDv-Iq-Rje">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="setLight75PercentWithSender:" target="Voe-Tx-rLC" id="Zis-jN-WCz"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="45F-6l-KCo"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="100%" keyEquivalent="4" id="nE1-DF-cX8">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="setLight100PercentWithSender:" target="Voe-Tx-rLC" id="Y6y-GS-9XB"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="YQx-AO-KNx"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Monitor Controls" id="7EM-iP-2gd">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Monitor Controls" id="B5p-IQ-4Vu">
+                                                <items>
+                                                    <menuItem title="Brightness Up" keyEquivalent="" id="901-kH-Bky">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                                        <connections>
+                                                            <action selector="brightnessUp:" target="Voe-Tx-rLC" id="lX5-cs-RdM"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="5th-G2-yzc"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Brightness Down" keyEquivalent="" id="7w6-Ut-dgH">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                                        <connections>
+                                                            <action selector="brightnessDown:" target="Voe-Tx-rLC" id="Rcq-je-x5J"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="pfB-1Q-olR"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Contrast Up" keyEquivalent="" id="Y1b-7P-hbu">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES"/>
+                                                        <connections>
+                                                            <action selector="contrastUp:" target="Voe-Tx-rLC" id="etV-sA-mLw"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="HpU-HK-YlW"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Contrast Down" keyEquivalent="" id="FDC-pE-gF0">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES"/>
+                                                        <connections>
+                                                            <action selector="contrastDown:" target="Voe-Tx-rLC" id="DuZ-fF-aoF"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="qya-fy-dbz"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Volume Up" keyEquivalent="" id="Omt-Sm-w0d">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                                        <connections>
+                                                            <action selector="volumeUp:" target="Voe-Tx-rLC" id="6Zv-cy-mx1"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="8Rl-iX-B86"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Volume Down" keyEquivalent="" id="8zH-Ds-rhs">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                                        <connections>
+                                                            <action selector="volumeDown:" target="Voe-Tx-rLC" id="Ufn-57-Qg4"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="H5J-n6-RrM"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Mute Audio" keyEquivalent="" id="EHx-xw-fQb">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                                                        <connections>
+                                                            <action selector="muteAudio:" target="Voe-Tx-rLC" id="WyO-2C-hFd"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="bPs-FO-m5E"/>
+                                                        </connections>
                                                     </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
-                                        <menuItem title="0%" keyEquivalent="0" id="9Jm-7d-C6T">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="setLight0PercentWithSender:" target="Voe-Tx-rLC" id="R2f-pe-MUE"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="1Iq-vb-Tqx"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="25%" keyEquivalent="1" id="ZLP-Iz-rrn">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="setLight25PercentWithSender:" target="Voe-Tx-rLC" id="SRI-4A-2Go"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="2Ab-D8-Kg2"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="50%" keyEquivalent="2" id="O0t-Fi-WJU">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="setLight50PercentWithSender:" target="Voe-Tx-rLC" id="8rU-pN-HX3"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="Zlj-cg-vvk"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="75%" keyEquivalent="3" id="rXC-7i-Z75">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="setLight75PercentWithSender:" target="Voe-Tx-rLC" id="MsR-LL-H2p"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="PlC-ef-7SG"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="100%" keyEquivalent="4" id="UL7-qh-pTF">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="setLight100PercentWithSender:" target="Voe-Tx-rLC" id="bm5-Fr-7Kb"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="7pq-Di-nZM"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="FaceLight" keyEquivalent="5" id="yNB-Oq-RZH">
                                             <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
@@ -432,63 +476,6 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hCM-7b-68r"/>
-                                        <menuItem title="Brightness Up" keyEquivalent="" id="jpb-NA-VFf">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
-                                            <connections>
-                                                <action selector="brightnessUp:" target="Voe-Tx-rLC" id="mjb-GK-fA5"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="AA4-Jb-PcQ"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Brightness Down" keyEquivalent="" id="edD-OP-hud">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
-                                            <connections>
-                                                <action selector="brightnessDown:" target="Voe-Tx-rLC" id="WYu-wY-rJB"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="OsI-X1-lEj"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Contrast Up" keyEquivalent="" id="VlH-nA-RFU">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES"/>
-                                            <connections>
-                                                <action selector="contrastUp:" target="Voe-Tx-rLC" id="Mmp-21-Rz9"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="k7O-Rb-4xh"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Contrast Down" keyEquivalent="" id="0mO-FB-Bx4">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES"/>
-                                            <connections>
-                                                <action selector="contrastDown:" target="Voe-Tx-rLC" id="eBo-pF-oGJ"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="Fev-3m-FsH"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Volume Up" keyEquivalent="" id="91P-qR-leE">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
-                                            <connections>
-                                                <action selector="volumeUp:" target="Voe-Tx-rLC" id="i4D-bF-0qb"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="arw-dc-ISz"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Volume Down" keyEquivalent="" id="ORj-JY-7d6">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
-                                            <connections>
-                                                <action selector="volumeDown:" target="Voe-Tx-rLC" id="cDb-jp-cJb"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="S2g-Xn-F8n"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Mute Audio" keyEquivalent="" id="g92-oe-Taz">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask" control="YES"/>
-                                            <connections>
-                                                <action selector="muteAudio:" target="Voe-Tx-rLC" id="fuQ-17-0R5"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="xoT-Yn-wFv"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="7x9-QU-LR6"/>
                                         <menuItem title="Open Lunar Diagnostics" id="KjM-rl-EtZ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -613,26 +600,14 @@
                     <connections>
                         <outlet property="activateLicenseMenuItem" destination="f5h-jV-U1l" id="wMY-Ct-tBG"/>
                         <outlet property="blackOutMenuItem" destination="yNB-Oq-RZ1" id="wQD-dU-hX3"/>
-                        <outlet property="brightnessDownMenuItem" destination="edD-OP-hud" id="z8P-cM-XfU"/>
-                        <outlet property="brightnessUpMenuItem" destination="jpb-NA-VFf" id="vA0-By-Vrr"/>
-                        <outlet property="contrastDownMenuItem" destination="0mO-FB-Bx4" id="xyG-dc-x6a"/>
-                        <outlet property="contrastUpMenuItem" destination="VlH-nA-RFU" id="PmV-aD-CdY"/>
                         <outlet property="expireTrialMenuItem" destination="gYw-dd-G40" id="UxE-tk-Cun"/>
                         <outlet property="faceLightMenuItem" destination="yNB-Oq-RZH" id="j5n-Xh-f3A"/>
                         <outlet property="infoMenuItem" destination="B7F-Wk-7dh" id="Ygz-Xr-3e0"/>
                         <outlet property="lunarProMenuItem" destination="fev-Gj-SRD" id="itY-CS-AJi"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
-                        <outlet property="muteAudioMenuItem" destination="g92-oe-Taz" id="kE3-mC-M4Q"/>
-                        <outlet property="percent0MenuItem" destination="9Jm-7d-C6T" id="f9t-jn-RIA"/>
-                        <outlet property="percent100MenuItem" destination="UL7-qh-pTF" id="9lg-G5-OdX"/>
-                        <outlet property="percent25MenuItem" destination="ZLP-Iz-rrn" id="KiH-Cm-5Wq"/>
-                        <outlet property="percent50MenuItem" destination="O0t-Fi-WJU" id="NIq-hG-J6p"/>
-                        <outlet property="percent75MenuItem" destination="rXC-7i-Z75" id="rln-kM-6lF"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="resetTrialMenuItem" destination="v9d-uL-JbA" id="9bY-DS-tBe"/>
                         <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
-                        <outlet property="volumeDownMenuItem" destination="ORj-JY-7d6" id="bIx-iF-AnX"/>
-                        <outlet property="volumeUpMenuItem" destination="91P-qR-leE" id="UjC-Dk-2b5"/>
                     </connections>
                 </customObject>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -4181,6 +4156,15 @@ and contrast to their highest values</string>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
+                                                            <binding destination="hLc-sr-Ed2" name="enabled2" keyPath="objectValue.isBuiltin" previousBinding="kKe-hK-FY4" id="xn6-kD-qzp">
+                                                                <dictionary key="options">
+                                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                                    <integer key="NSNullPlaceholder" value="-1"/>
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
                                                             <binding destination="hLc-sr-Ed2" name="enabled" keyPath="objectValue.activeAndResponsive" id="kKe-hK-FY4"/>
                                                             <binding destination="hLc-sr-Ed2" name="value" keyPath="objectValue.contrast" id="fwg-2l-Fbd">
                                                                 <dictionary key="options">

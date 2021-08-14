@@ -28,8 +28,8 @@ import UserNotifications
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-        return id == GENERIC_DISPLAY_ID
-    // return TEST_IDS.contains(id)
+//        return id == GENERIC_DISPLAY_ID
+        return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
     #endif
@@ -1333,14 +1333,27 @@ final class UnfairLock {
 
     private func lock() -> Bool {
         var id: Int32?
-        let exc = tryBlock {
-            id = Thread.current.value(forKeyPath: "private.seqNum") as? Int32
-        }
-        if exc != nil {
-            tryBlock {
+
+        if #available(macOS 12, *) {
+            let exc = tryBlock {
                 id = Thread.current.value(forKeyPath: "seqNum") as? Int32
             }
+            if exc != nil {
+                tryBlock {
+                    id = Thread.current.value(forKeyPath: "private.seqNum") as? Int32
+                }
+            }
+        } else {
+            let exc = tryBlock {
+                id = Thread.current.value(forKeyPath: "private.seqNum") as? Int32
+            }
+            if exc != nil {
+                tryBlock {
+                    id = Thread.current.value(forKeyPath: "seqNum") as? Int32
+                }
+            }
         }
+
         guard let threadID = id, lockedInThread != threadID else {
             return trylock()
         }
