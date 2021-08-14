@@ -240,6 +240,27 @@ struct GammaTable: Equatable {
         var blueTable = [CGGammaValue](repeating: 0, count: 255)
         var sampleCount: UInt32 = 0
 
+        guard !Sysctl.rosetta else {
+            var r = 0.cg, g = 0.cg, b = 0.cg, rm = 0.cg, gm = 0.cg, bm = 0.cg, rM = 0.cg, gM = 0.cg, bM = 0.cg
+            CGGetDisplayTransferByFormula(id, &rm, &rM, &r, &gm, &gM, &g, &bm, &bM, &b)
+            let table = GammaTable(
+                redMin: rm,
+                redMax: rM,
+                redValue: r,
+                greenMin: gm,
+                greenMax: gM,
+                greenValue: g,
+                blueMin: bm,
+                blueMax: bM,
+                blueValue: b
+            )
+            red = table.red
+            green = table.green
+            blue = table.blue
+            samples = table.samples
+            return
+        }
+
         CGGetDisplayTransferByTable(id, 255, &redTable, &greenTable, &blueTable, &sampleCount)
 
         red = redTable
@@ -251,6 +272,12 @@ struct GammaTable: Equatable {
     // MARK: Internal
 
     static let original = GammaTable()
+    static let zero = GammaTable(
+        red: [CGGammaValue](repeating: 0, count: 255),
+        green: [CGGammaValue](repeating: 0, count: 255),
+        blue: [CGGammaValue](repeating: 0, count: 255),
+        samples: 255
+    )
 
     var red: [CGGammaValue]
     var green: [CGGammaValue]
@@ -266,9 +293,9 @@ struct GammaTable: Equatable {
     }
 
     @discardableResult
-    func apply(to id: CGDirectDisplayID) -> Bool {
+    func apply(to id: CGDirectDisplayID, force: Bool = false) -> Bool {
         log.debug("Applying gamma table to ID \(id)")
-        guard !isZero else {
+        guard force || !isZero else {
             log.debug("Zero gamma table: samples=\(samples)")
             GammaTable.original.apply(to: id)
             return false
@@ -936,15 +963,6 @@ enum ValueType {
 
     @Atomic var inSmoothTransition = false
 
-//    deinit {
-//        #if DEBUG
-//            log.verbose("START DEINIT: \(description)")
-//            log.verbose("popover: \(_hotkeyPopover)")
-//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
-//            do { log.verbose("END DEINIT: \(description)") }
-//        #endif
-//    }
-
     lazy var hotkeyIdentifiers = [
         "toggle-last-input-\(serial)",
         "toggle-last-input2-\(serial)",
@@ -978,6 +996,23 @@ enum ValueType {
     @objc dynamic lazy var panelModes: [MPDisplayMode] = (panel?.allModes() as? [MPDisplayMode]) ?? []
 
     var modeChangeAsk = true
+
+    lazy var isOnline = NSScreen.isOnline(id)
+
+    lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
+
+//    deinit {
+//        #if DEBUG
+//            log.verbose("START DEINIT: \(description)")
+//            log.verbose("popover: \(_hotkeyPopover)")
+//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
+//            do { log.verbose("END DEINIT: \(description)") }
+//        #endif
+//    }
+
+    var isInMirrorSet: Bool {
+        CGDisplayIsInMirrorSet(id) != 0
+    }
 
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
         didSet {
@@ -2138,7 +2173,10 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isTV else { return }
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isTV, !(isBuiltin && isSmartDisplay) else {
+            hasI2C = false
+            return
+        }
 
         if let panel = panel {
             log.info("TV Ignore: Panel is TV=\(panel.isTV)")
@@ -2688,7 +2726,7 @@ enum ValueType {
     }
 
     func refreshGamma() {
-        guard !isForTesting else { return }
+        guard !isForTesting, isOnline else { return }
 
         guard !defaultGammaChanged || !applyGamma else {
             lunarGammaTable = GammaTable(

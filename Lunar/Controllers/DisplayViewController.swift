@@ -170,6 +170,9 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var inputDropdown: PopUpButton?
 
+    @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
+    @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
@@ -415,6 +418,8 @@ class DisplayViewController: NSViewController {
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
 
+        powerOffEnabled = getPowerOffEnabled()
+        powerOffTooltip = getPowerOffTooltip()
         inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
 
         settingsButton?.display = display
@@ -905,35 +910,33 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForDisplayBoolChange() {
-        display?.$activeAndResponsive.receive(on: dataPublisherQueue).sink { [weak self] newActiveAndResponsive in
+        guard let display = display else { return }
+        display.$hasDDC.receive(on: dataPublisherQueue).sink { [weak self] hasDDC in
+            guard let self = self else { return }
+            self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
+            self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
+        }.store(in: &displayObservers, for: "hasDDC")
+        display.$activeAndResponsive.receive(on: dataPublisherQueue).sink { [weak self] newActiveAndResponsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
                 self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
 
                 mainThread { textField.isHidden = newActiveAndResponsive }
             }
         }.store(in: &displayObservers, for: "activeAndResponsive")
-
-        if let display = display {
-            if !display.adaptive {
-                showAdaptiveNotice()
-            }
-            display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
-                if let self = self {
-                    mainThread {
-                        if !newAdaptive {
-                            self.showAdaptiveNotice()
-                        } else {
-                            self.hideAdaptiveNotice()
-                        }
+        if !display.adaptive {
+            showAdaptiveNotice()
+        }
+        display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
+            if let self = self {
+                mainThread {
+                    if !newAdaptive {
+                        self.showAdaptiveNotice()
+                    } else {
+                        self.hideAdaptiveNotice()
                     }
                 }
-            }.store(in: &displayObservers, for: "adaptive")
-//            display.setObserver(
-//                prop: .adaptive,
-//                key: "displayViewController-\(viewID ?? "")",
-//                action: adaptiveObserver!
-//            )
-        }
+            }
+        }.store(in: &displayObservers, for: "adaptive")
     }
 
     func listenForAdaptiveModeChange() {
@@ -981,8 +984,48 @@ class DisplayViewController: NSViewController {
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
+    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
+        guard let display = display else { return false }
+        guard !display.isInMirrorSet else { return true }
+
+        return (displayController.activeDisplays.count > 1 || (hasDDC ?? display.hasDDC)) && !display.isSidecar && !display.isAirplay
+    }
+
+    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String? {
+        guard let display = display else { return nil }
+        guard !(hasDDC ?? display.hasDDC) else {
+            return "Power off the monitor. Works only if the monitor can be controlled through DDC.\n\nCan't power on the monitor. When a monitor is turned off or in standby, it does not accept commands from a connected device"
+        }
+        guard displayController.activeDisplays.count > 1 else {
+            return "At least 2 screens need to be visible for this to work."
+        }
+
+        return "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.\n\nCan be toggled with the keyboard as well using Ctrl-Cmd-6."
+    }
+
     @IBAction func powerOff(_: Any) {
-        _ = display?.control?.setPower(.off)
+        guard let display = display, displayController.activeDisplays.count > 1 else { return }
+
+        guard display.hasDDC else {
+            guard lunarProOnTrial || lunarProActive else {
+                if let url = URL(string: "https://lunar.fyi/#blackout") {
+                    NSWorkspace.shared.open(url)
+                }
+                return
+            }
+
+            if !display.isInMirrorSet {
+                displayController.blackOut(display: display.id, state: .on)
+            } else {
+                let mirrored = CGDisplayMirrorsDisplay(display.id)
+                displayController.blackOut(
+                    display: (mirrored != kCGNullDirectDisplay) ? mirrored : display.id,
+                    state: .off
+                )
+            }
+            return
+        }
+        _ = display.control?.setPower(.off)
     }
 
     func showGammaNotice() {
@@ -1116,5 +1159,8 @@ class DisplayViewController: NSViewController {
                 brightnessContrastChart?.isHidden = true
             }
         }
+
+        powerOffEnabled = getPowerOffEnabled()
+        powerOffTooltip = getPowerOffTooltip()
     }
 }
