@@ -3049,7 +3049,7 @@ enum ValueType {
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve, !adaptivePaused else { return }
+        guard !lockedBrightnessCurve, !adaptivePaused, !isBuiltin else { return }
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
@@ -3081,7 +3081,7 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve, !adaptivePaused else { return }
+        guard !lockedContrastCurve, !adaptivePaused, !isBuiltin else { return }
 
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {
