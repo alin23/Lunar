@@ -527,7 +527,7 @@ enum DDC {
         return realName.contains("sidecar") || realName.contains("ipad")
     }
 
-    static func isBuiltinDisplay(_ id: CGDirectDisplayID) -> Bool {
+    static func isBuiltinDisplay(_ id: CGDirectDisplayID, checkName: Bool = true) -> Bool {
         guard !isGeneric(id) else { return false }
         if let panel = DisplayController.panel(with: id) {
             return panel.isBuiltIn || panel.isBuiltInRetina
@@ -535,10 +535,12 @@ enum DDC {
         return (
             CGDisplayIsBuiltin(id) == 1 ||
                 id == lastKnownBuiltinDisplayID ||
-                Display
-                .printableName(id).stripped
-                .lowercased().replacingOccurrences(of: "-", with: "")
-                .contains("builtin")
+                (
+                    checkName && Display
+                        .printableName(id).stripped
+                        .lowercased().replacingOccurrences(of: "-", with: "")
+                        .contains("builtin")
+                )
         )
     }
 

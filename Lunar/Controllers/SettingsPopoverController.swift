@@ -146,6 +146,7 @@ class SettingsPopoverController: NSViewController {
     @objc dynamic weak var display: Display? {
         didSet {
             guard let display = display else { return }
+            display.refreshPanel()
 
             applySettings = false
             defer {

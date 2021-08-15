@@ -173,6 +173,8 @@ class DisplayViewController: NSViewController {
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
 
+    @Atomic var optionKeyPressed = false
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
@@ -994,19 +996,38 @@ class DisplayViewController: NSViewController {
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String? {
         guard let display = display else { return nil }
         guard !(hasDDC ?? display.hasDDC) else {
-            return "Power off the monitor. Works only if the monitor can be controlled through DDC.\n\nCan't power on the monitor. When a monitor is turned off or in standby, it does not accept commands from a connected device"
+            return """
+            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+            Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+            Hold the Option key while clicking the button if you want to power off the monitor completely using DDC.
+            Caveats:
+              • works only if the monitor can be controlled through DDC
+              • can't be used to power on the monitor
+              • when a monitor is turned off or in standby, it does not accept commands from a connected device
+              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
+            """
         }
         guard displayController.activeDisplays.count > 1 else {
             return "At least 2 screens need to be visible for this to work."
         }
 
-        return "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.\n\nCan be toggled with the keyboard as well using Ctrl-Cmd-6."
+        return """
+        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+        Can also be toggled with the keyboard using Ctrl-Cmd-6.
+        """
+    }
+
+    override func flagsChanged(with event: NSEvent) {
+        optionKeyPressed = event.modifierFlags.contains(.option)
     }
 
     @IBAction func powerOff(_: Any) {
         guard let display = display, displayController.activeDisplays.count > 1 else { return }
 
-        guard display.hasDDC else {
+        guard display.hasDDC, optionKeyPressed else {
             guard lunarProOnTrial || lunarProActive else {
                 if let url = URL(string: "https://lunar.fyi/#blackout") {
                     NSWorkspace.shared.open(url)

@@ -640,21 +640,28 @@ extension MPDisplayMode {
         case interlaced
     }
 
+    var depth: Int32 {
+        var description = _CGSDisplayModeDescription()
+        getDescription(&description)
+        return description.depth
+    }
+
     override open var description: String {
         let res = "\(pixelsWide)x\(pixelsHigh)"
-        let refresh = "\(refreshRate)Hz"
+        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
+        let dpi = "\(dotsPerInch)DPI"
         let tags: [String] = [
             isNativeMode ? Tag.native : nil,
             isDefaultMode ? Tag.defaultMode : nil,
             isRetina ? Tag.retina : nil,
             isHiDPI ? Tag.hidpi : nil,
-            isTVMode ? Tag.tv : nil,
+            (isTVMode && tvMode != 0) ? Tag.tv : nil,
             isSafeMode ? nil : Tag.unsafe,
             isSimulscan ? Tag.simulscan : nil,
             isInterlaced ? Tag.interlaced : nil,
         ].compactMap { $0?.rawValue }
         let tagsString = tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
-        return "\(res)@\(refresh)\(tagsString)"
+        return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
     }
 }
 
