@@ -235,25 +235,32 @@ struct GammaTable: Equatable {
     }
 
     init(for id: CGDirectDisplayID) {
-        guard NSScreen.isOnline(id), !Sysctl.rosetta else {
+        #if arch(arm64)
+            guard NSScreen.isOnline(id), !Sysctl.rosetta else {
+                red = GammaTable.original.red
+                green = GammaTable.original.green
+                blue = GammaTable.original.blue
+                samples = GammaTable.original.samples
+                return
+            }
+
+            var redTable = [CGGammaValue](repeating: 0, count: 255)
+            var greenTable = [CGGammaValue](repeating: 0, count: 255)
+            var blueTable = [CGGammaValue](repeating: 0, count: 255)
+            var sampleCount: UInt32 = 0
+
+            CGGetDisplayTransferByTable(id, 255, &redTable, &greenTable, &blueTable, &sampleCount)
+
+            red = redTable
+            green = greenTable
+            blue = blueTable
+            samples = sampleCount
+        #else
             red = GammaTable.original.red
             green = GammaTable.original.green
             blue = GammaTable.original.blue
             samples = GammaTable.original.samples
-            return
-        }
-
-        var redTable = [CGGammaValue](repeating: 0, count: 255)
-        var greenTable = [CGGammaValue](repeating: 0, count: 255)
-        var blueTable = [CGGammaValue](repeating: 0, count: 255)
-        var sampleCount: UInt32 = 0
-
-        CGGetDisplayTransferByTable(id, 255, &redTable, &greenTable, &blueTable, &sampleCount)
-
-        red = redTable
-        green = greenTable
-        blue = blueTable
-        samples = sampleCount
+        #endif
     }
 
     // MARK: Internal
