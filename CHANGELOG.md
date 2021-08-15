@@ -1,3 +1,9 @@
+# 4.8.1
+## Fixes
+
+* Fix stack overflow crash in detecting if a display is built-in
+* Check for display ID to be online before reading Gamma
+
 # 4.8.0
 ## Features
 
