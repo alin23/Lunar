@@ -612,7 +612,7 @@ extension Defaults.Keys {
     static let disableControllerVideo = Key<Bool>("disableControllerVideo", default: true)
     static let neverAskAboutFlux = Key<Bool>("neverAskAboutFlux", default: false)
     static let hasActiveDisplays = Key<Bool>("hasActiveDisplays", default: true)
-    static let toolTipDelay = Key<Int>("NSInitialToolTipDelay", default: 1)
+    static let toolTipDelay = Key<Int>("NSInitialToolTipDelay", default: 3)
     static let wttr = Key<Wttr?>("wttr")
     static let ignoredVolumes = Key<Set<String>>("ignoredVolumes", default: [])
     static let secure = Key<SecureSettings>("secure", default: SecureSettings())

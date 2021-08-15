@@ -29,7 +29,7 @@
         }
       },
       {
-        "package": "BlueECC",
+        "package": "CryptorECC",
         "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
         "state": {
           "branch": null,
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "BlueSocket",
+        "package": "Socket",
         "repositoryURL": "https://github.com/Kitura/BlueSocket",
         "state": {
           "branch": null,
@@ -83,7 +83,7 @@
         }
       },
       {
-        "package": "FSEvents",
+        "package": "EonilFSEvents",
         "repositoryURL": "https://github.com/eonil/FSEvents",
         "state": {
           "branch": null,
@@ -155,7 +155,7 @@
         }
       },
       {
-        "package": "sentry-cocoa",
+        "package": "Sentry",
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
@@ -218,7 +218,7 @@
         }
       },
       {
-        "package": "swift-eventsource",
+        "package": "LDSwiftEventSource",
         "repositoryURL": "https://github.com/launchdarkly/swift-eventsource",
         "state": {
           "branch": "master",

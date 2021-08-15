@@ -57,7 +57,7 @@ function make-installer -a ext
 
     cp "$APP_TMP_INSTALLER" "$APP_INSTALLER" || exit 1
 
-    if not set -q DISABLE_NOTARIZATION
+    if test "$DISABLE_NOTARIZATION" != 1
         xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_INSTALLER" || exit 1
     end
 
