@@ -83,7 +83,7 @@ signatures:
 setversion: OLD_VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')
 setversion:
 ifneq (, $(VERSION))
-	rg -l 'VERSION = "?$(OLD_VERSION)"?' && sed -i .bkp 's/VERSION = "?$(OLD_VERSION)"?/VERSION = $(VERSION)/g' $$(rg -l 'VERSION = "?$(OLD_VERSION)"?')
+	rg -l 'VERSION = "?$(OLD_VERSION)"?' && sed -E -i .bkp 's/VERSION = "?$(OLD_VERSION)"?/VERSION = $(VERSION)/g' $$(rg -l 'VERSION = "?$(OLD_VERSION)"?')
 endif
 
 clean:
