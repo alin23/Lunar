@@ -228,12 +228,33 @@
 			<key>orderHint</key>
 			<integer>224</integer>
 		</dict>
+		<key>AnyCodable (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>240</integer>
+		</dict>
 		<key>AnyCodable (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>29</integer>
+		</dict>
+		<key>AnyCodable (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>241</integer>
+		</dict>
+		<key>AnyCodable (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>242</integer>
 		</dict>
 		<key>AnyCodable (Playground) 5.xcscheme</key>
 		<dict>
@@ -529,12 +550,33 @@
 			<key>orderHint</key>
 			<integer>236</integer>
 		</dict>
+		<key>Playground (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>252</integer>
+		</dict>
 		<key>Playground (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>37</integer>
+		</dict>
+		<key>Playground (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>253</integer>
+		</dict>
+		<key>Playground (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>254</integer>
 		</dict>
 		<key>Playground (Playground) 5.xcscheme</key>
 		<dict>
@@ -802,12 +844,33 @@
 			<key>orderHint</key>
 			<integer>230</integer>
 		</dict>
+		<key>PlaygroundChart (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>249</integer>
+		</dict>
 		<key>PlaygroundChart (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>40</integer>
+		</dict>
+		<key>PlaygroundChart (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>250</integer>
+		</dict>
+		<key>PlaygroundChart (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>251</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 5.xcscheme</key>
 		<dict>
@@ -1075,12 +1138,33 @@
 			<key>orderHint</key>
 			<integer>227</integer>
 		</dict>
+		<key>Surge (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>243</integer>
+		</dict>
 		<key>Surge (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>26</integer>
+		</dict>
+		<key>Surge (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>244</integer>
+		</dict>
+		<key>Surge (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>245</integer>
 		</dict>
 		<key>Surge (Playground) 5.xcscheme</key>
 		<dict>
@@ -1348,12 +1432,33 @@
 			<key>orderHint</key>
 			<integer>239</integer>
 		</dict>
+		<key>SwiftDate (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>255</integer>
+		</dict>
 		<key>SwiftDate (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>31</integer>
+		</dict>
+		<key>SwiftDate (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>256</integer>
+		</dict>
+		<key>SwiftDate (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>257</integer>
 		</dict>
 		<key>SwiftDate (Playground) 5.xcscheme</key>
 		<dict>
@@ -1621,12 +1726,33 @@
 			<key>orderHint</key>
 			<integer>233</integer>
 		</dict>
+		<key>SwiftyMarkdown (Playground) 39.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>246</integer>
+		</dict>
 		<key>SwiftyMarkdown (Playground) 4.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
 			<integer>34</integer>
+		</dict>
+		<key>SwiftyMarkdown (Playground) 40.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>247</integer>
+		</dict>
+		<key>SwiftyMarkdown (Playground) 41.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>248</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 5.xcscheme</key>
 		<dict>
