@@ -2736,7 +2736,7 @@ when dock and menubar icons are hidden</string>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mts-p9-8Zt" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="65" y="149" width="120" height="54"/>
+                                        <rect key="frame" x="65" y="159" width="120" height="54"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="74a-eH-SG4" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="44"/>
@@ -2758,11 +2758,11 @@ when dock and menubar icons are hidden</string>
                                         <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zt1-xU-YsD" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="130" width="250" height="17"/>
+                                        <rect key="frame" x="0.0" y="137" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="gb7-Ko-73d">
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="gb7-Ko-73d">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333330000006" green="0.01" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2840,7 +2840,7 @@ when dock and menubar icons are hidden</string>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0p3-Ip-HPc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="67" y="149" width="116" height="54"/>
+                                        <rect key="frame" x="67" y="159" width="116" height="54"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="Hxe-Bv-eWX" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                             <font key="font" metaFont="systemHeavy" size="44"/>
@@ -2862,11 +2862,11 @@ when dock and menubar icons are hidden</string>
                                         <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VM8-Rs-rmy" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="130" width="250" height="17"/>
+                                        <rect key="frame" x="0.0" y="137" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="jPr-Bs-JhR">
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="jPr-Bs-JhR">
                                             <font key="font" metaFont="smallSystemBold"/>
-                                            <color key="textColor" red="0.063833333330000006" green="0.01" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="textColor" name="Caption"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -2900,7 +2900,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="387" y="213" width="173" height="12"/>
+                                <rect key="frame" x="387" y="216" width="173" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3060,7 +3060,7 @@ when dock and menubar icons are hidden</string>
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
-                                <color key="contentTintColor" red="0.94901960780000005" green="0.20000000000000001" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="contentTintColor" name="Power"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="YES"/>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
@@ -7169,6 +7169,9 @@ You can choose to send the diagnostics to the developer if you think this is not
         </namedColor>
         <namedColor name="Inverted">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Power">
+            <color red="0.94901960784313721" green="0.20000000000000001" blue="0.2627450980392157" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
