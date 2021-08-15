@@ -43,7 +43,7 @@ dev: install-deps install-hooks codegen
 
 .PHONY: release upload build sentry-release pkg dmg pack appcast
 upload:
-	rsync -avzP Releases/*.delta noiseblend:/static/Lunar/deltas/
+	rsync -avzP Releases/*.delta noiseblend:/static/Lunar/deltas/ || exit 0
 	rsync -avzP Releases/*.dmg noiseblend:/static/Lunar/releases/
 	fish -c 'upload -d Lunar Releases/appcast.xml'
 	cfcli -d lunar.fyi purge
@@ -83,8 +83,11 @@ signatures:
 setversion: OLD_VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')
 setversion:
 ifneq (, $(VERSION))
-	sed -i .bkp 's/VERSION = "$(OLD_VERSION)"/VERSION = "$(VERSION)"/g' $$(rg -l 'VERSION = "$(OLD_VERSION)"')
+	rg -l 'VERSION = "?$(OLD_VERSION)"?' && sed -i .bkp 's/VERSION = "?$(OLD_VERSION)"?/VERSION = $(VERSION)/g' $$(rg -l 'VERSION = "?$(OLD_VERSION)"?')
 endif
+
+clean:
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
 
 build: setversion
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify

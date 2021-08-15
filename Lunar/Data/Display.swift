@@ -923,7 +923,6 @@ enum ValueType {
     var slowRead = false
     var slowWrite = false
     var macMiniHDMI = false
-    var isTV = false
 
     var onControlChange: ((Control) -> Void)? = nil
     @AtomicLock var context: [String: Any]? = nil
@@ -993,7 +992,15 @@ enum ValueType {
     lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: name)
     lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: name)
 
-    @objc dynamic lazy var panelModes: [MPDisplayMode] = (panel?.allModes() as? [MPDisplayMode]) ?? []
+    @objc dynamic lazy var panelModes: [MPDisplayMode] = {
+        let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
+            (panel?.isTV ?? false) || !($0.isTVMode && $0.tvMode != 0)
+        }
+        guard !modes.isEmpty else { return modes }
+
+        let grouped = Dictionary(grouping: modes, by: \.depth)
+        return Array(grouped.values.map { $0.sorted(by: { $0.dotsPerInch <= $1.dotsPerInch }).reversed() }.joined())
+    }()
 
     var modeChangeAsk = true
 
@@ -1470,7 +1477,7 @@ enum ValueType {
                       let window = appDelegate.windowController?.window else { return }
                 ask(
                     message: "Orientation Change",
-                    info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 5 seconds.",
+                    info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 15 seconds.",
                     window: window,
                     okButton: "Keep", cancelButton: "Revert",
                     onCompletion: { [weak self] keep in
@@ -1496,7 +1503,7 @@ enum ValueType {
             if modeNumber != -1 {
                 ask(
                     message: "Resolution Change",
-                    info: "Do you want to keep this resolution?\n\nLunar will revert to the last resolution if no option is selected in 5 seconds.",
+                    info: "Do you want to keep this resolution?\n\nLunar will revert to the last resolution if no option is selected in 15 seconds.",
                     window: window,
                     okButton: "Keep", cancelButton: "Revert",
                     onCompletion: { [weak self] keep in
@@ -1863,7 +1870,7 @@ enum ValueType {
             }
         #endif
 
-        if DDC.isBuiltinDisplay(id) {
+        if DDC.isBuiltinDisplay(id, checkName: false) {
             return "Built-in"
         }
 
@@ -1935,6 +1942,14 @@ enum ValueType {
             log.debug("Adding data point \(featureValue) => \(targetValue)")
         }
         values[featureValue] = targetValue
+    }
+
+    func refreshPanel() {
+        withoutDDC {
+            rotation = CGDisplayRotation(id).intround
+            panelMode = panel?.currentMode
+            modeNumber = panel?.currentMode.modeNumber ?? -1
+        }
     }
 
     func reconfigure(_ action: (MPDisplay) -> Void) {
@@ -2214,27 +2229,19 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isTV, !(isBuiltin && isSmartDisplay) else {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !(panel?.isTV ?? false), !(isBuiltin && isSmartDisplay) else {
+            if panel?.isTV ?? false {
+                log.warning("TVs don't support DDC, ignoring for display \(description)")
+            }
+            if isBuiltin, isSmartDisplay {
+                log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
+            }
             hasI2C = false
             return
         }
 
-        if let panel = panel {
-            log.info("TV Ignore: Panel is TV=\(panel.isTV)")
-            log.info("TV Ignore: Panel has TV modes=\(panel.hasTVModes)")
-            if let mode = panel.currentMode {
-                log.info("TV Ignore: Current mode is TV mode=\(mode.isTVMode)")
-                if panel.isTV || (panel.hasTVModes && mode.isTVMode) {
-                    log.warning("TVs don't support DDC, ignoring for display \(description)")
-                    isTV = true
-                    return
-                }
-            }
-        }
-
         #if DEBUG
             #if arch(arm64)
-                // avService = (id == TEST_DISPLAY_ID) ? (1 as IOAVService) : DDC.AVService(displayID: id, display: self)
                 hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
                     .hasAVService(
                         displayID: id,
@@ -2242,7 +2249,6 @@ enum ValueType {
                         ignoreCache: true
                     )
             #else
-                // i2cController = (id == TEST_DISPLAY_ID) ? 1 : DDC.I2CController(displayID: id)
                 hasI2C = (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
                     .hasI2CController(
                         displayID: id,
@@ -2251,10 +2257,8 @@ enum ValueType {
             #endif
         #else
             #if arch(arm64)
-                // avService = DDC.AVService(displayID: id, display: self)
                 hasI2C = DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
             #else
-                // i2cController = DDC.I2CController(displayID: id)
                 hasI2C = DDC.hasI2CController(displayID: id, ignoreCache: true)
             #endif
         #endif

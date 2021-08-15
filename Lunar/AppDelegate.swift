@@ -585,7 +585,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
             if let display = displayController.activeDisplays[displayID] {
-                display.rotation = CGDisplayRotation(displayID).intround
+                display.refreshPanel()
             }
         }, nil)
 

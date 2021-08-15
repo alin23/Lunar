@@ -1139,7 +1139,7 @@ func ask(
     window: NSWindow,
     okButton: String = "OK",
     cancelButton: String = "Cancel",
-    timeout: DateComponents = 5.seconds,
+    timeout: DateComponents = 15.seconds,
     onCompletion: @escaping (Bool) -> Void
 ) {
     let alert = dialog(

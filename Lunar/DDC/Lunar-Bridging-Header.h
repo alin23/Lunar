@@ -13,6 +13,7 @@
 #import <MonitorPanel/MPDisplay.h>
 #import <MonitorPanel/MPDisplayMgr.h>
 #import <MonitorPanel/MPDisplayMode.h>
+#import <MonitorPanel/CDStructures.h>
 
 #include "libssh2.h"
 #include "libssh2_sftp.h"
