@@ -1462,21 +1462,36 @@ enum ValueType {
 
     @objc dynamic lazy var rotation: Int = CGDisplayRotation(id).intround {
         didSet {
-            guard let panel = panel, let manager = DisplayController.panelManager,
-                  canRotate, VALID_ROTATION_VALUES.contains(rotation),
-                  manager.tryLockAccess()
-            else { return }
+            guard DDC.apply, canRotate, VALID_ROTATION_VALUES.contains(rotation) else { return }
 
-            manager.notifyWillReconfigure()
-            panel.orientation = rotation.i32
-            manager.notifyReconfigure()
-            manager.unlockAccess()
+            reconfigure { panel in
+                panel.orientation = rotation.i32
+                guard modeChangeAsk, rotation != oldValue,
+                      let window = appDelegate.windowController?.window else { return }
+                ask(
+                    message: "Orientation Change",
+                    info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 5 seconds.",
+                    window: window,
+                    okButton: "Keep", cancelButton: "Revert",
+                    onCompletion: { [weak self] keep in
+                        if !keep, let self = self {
+                            self.modeChangeAsk = false
+                            mainThread { self.rotation = oldValue }
+                            self.modeChangeAsk = true
+                        }
+                    }
+                )
+            }
+            withoutDDC {
+                panelMode = panel?.currentMode
+                modeNumber = panelMode?.modeNumber ?? -1
+            }
         }
     }
 
     @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
         didSet {
-            guard modeChangeAsk, let window = appDelegate.windowController?.window else { return }
+            guard DDC.apply, modeChangeAsk, let window = appDelegate.windowController?.window else { return }
             modeNumber = panelMode?.modeNumber ?? -1
             if modeNumber != -1 {
                 ask(
@@ -1487,8 +1502,10 @@ enum ValueType {
                     onCompletion: { [weak self] keep in
                         if !keep, let self = self {
                             self.modeChangeAsk = false
-                            self.panelMode = oldValue
-                            self.modeNumber = oldValue?.modeNumber ?? -1
+                            mainThread {
+                                self.panelMode = oldValue
+                                self.modeNumber = oldValue?.modeNumber ?? -1
+                            }
                             self.modeChangeAsk = true
                         }
                     }
@@ -1499,8 +1516,10 @@ enum ValueType {
 
     @objc dynamic lazy var modeNumber: Int32 = panel?.currentMode.modeNumber ?? -1 {
         didSet {
-            guard modeNumber != -1, let panel = panel else { return }
-            panel.setModeNumber(modeNumber)
+            guard modeNumber != -1, DDC.apply else { return }
+            reconfigure { panel in
+                panel.setModeNumber(modeNumber)
+            }
         }
     }
 
@@ -1916,6 +1935,17 @@ enum ValueType {
             log.debug("Adding data point \(featureValue) => \(targetValue)")
         }
         values[featureValue] = targetValue
+    }
+
+    func reconfigure(_ action: (MPDisplay) -> Void) {
+        guard let panel = panel, let manager = DisplayController.panelManager,
+              manager.tryLockAccess()
+        else { return }
+
+        manager.notifyWillReconfigure()
+        action(panel)
+        manager.notifyReconfigure()
+        manager.unlockAccess()
     }
 
     func reapplyGamma() {
