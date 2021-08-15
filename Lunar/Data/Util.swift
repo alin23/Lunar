@@ -1150,15 +1150,25 @@ func ask(
         window: window
     )
 
+    let semaphore = DispatchSemaphore(value: 0, name: "Panel alert dismissed")
     alert.beginSheetModal(for: window, completionHandler: { resp in
         onCompletion(resp == .alertFirstButtonReturn)
+        semaphore.signal()
     })
 
-    mainAsyncAfter(ms: (timeout.timeInterval * 1000).intround) {
-        if alert.window.isVisible {
-            alert.window.close()
+    asyncNow {
+        if semaphore.wait(for: timeout) == .timedOut {
+            mainThread {
+                if alert.window.isVisible {
+                    alert.window.close()
+                }
+            }
             onCompletion(false)
         }
+//        if alert.window.isVisible {
+//            alert.window.close()
+//            onCompletion(false)
+//        }
     }
 }
 
