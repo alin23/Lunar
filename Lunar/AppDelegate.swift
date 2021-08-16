@@ -235,6 +235,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func initHotkeys() {
         guard !CachedDefaults[.hotkeys].isEmpty else {
             CachedDefaults[.hotkeys] = Hotkey.defaults
+            Hotkey.toggleOrientationHotkeys()
             return
         }
         MediaKeyTap.useAlternateBrightnessKeys = CachedDefaults[.useAlternateBrightnessKeys]
@@ -256,6 +257,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             hotkey.handleRegistration(persist: false)
         }
         CachedDefaults[.hotkeys] = hotkeys
+        Hotkey.toggleOrientationHotkeys()
+        enableOrientationHotkeysPublisher.sink { change in
+            Hotkey.toggleOrientationHotkeys(enabled: change.newValue)
+        }.store(in: &observers)
+
         setKeyEquivalents(hotkeys)
         startOrRestartMediaKeyTap(checkPermissions: true)
     }
