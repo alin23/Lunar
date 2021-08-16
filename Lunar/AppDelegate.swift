@@ -590,12 +590,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
-            if let display = displayController.activeDisplays[displayID] {
-                display.refreshPanel()
-                mainAsyncAfter(ms: 2000) {
-                    if let display = displayController.activeDisplays[displayID] {
-                        display.refreshPanel()
-                    }
+            debounce(ms: 2000, uniqueTaskKey: "panel-refresh-\(displayID)", mainThread: true, value: displayID) { id in
+                DisplayController.panelManager = MPDisplayMgr()
+                if let display = displayController.activeDisplays[id] {
+                    display.refreshPanel()
                 }
             }
         }, nil)
@@ -1178,8 +1176,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
-    func toggleAudioMuted() {
-        displayController.toggleAudioMuted()
+    func toggleAudioMuted(for displays: [Display]? = nil, currentDisplay: Bool = false, currentAudioDisplay: Bool = true) {
+        displayController.toggleAudioMuted(for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentAudioDisplay)
     }
 
     func increaseVolume(
