@@ -197,7 +197,7 @@ struct Gamma: Equatable {
     }
 }
 
-let STEP_255: Float = 1.0 / 255.0
+let STEP_256: Float = 1.0 / 256.0
 
 // MARK: - GammaTable
 
@@ -215,16 +215,16 @@ struct GammaTable: Equatable {
         blueMax: CGGammaValue = 1,
         blueValue: CGGammaValue = 1
     ) {
-        red = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+        red = Swift.stride(from: 0.00, through: 1.00, by: STEP_256).map { index in
             redMin + ((redMax - redMin) * powf(index, redValue))
         }
-        green = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+        green = Swift.stride(from: 0.00, through: 1.00, by: STEP_256).map { index in
             greenMin + ((greenMax - greenMin) * powf(index, greenValue))
         }
-        blue = Swift.stride(from: 0.00, through: 1.00, by: STEP_255).map { index in
+        blue = Swift.stride(from: 0.00, through: 1.00, by: STEP_256).map { index in
             blueMin + ((blueMax - blueMin) * powf(index, blueValue))
         }
-        samples = 255
+        samples = 256
     }
 
     init(red: [CGGammaValue], green: [CGGammaValue], blue: [CGGammaValue], samples: UInt32) {
@@ -235,42 +235,27 @@ struct GammaTable: Equatable {
     }
 
     init(for id: CGDirectDisplayID) {
-        #if arch(arm64)
-            guard NSScreen.isOnline(id), !Sysctl.rosetta else {
-                red = GammaTable.original.red
-                green = GammaTable.original.green
-                blue = GammaTable.original.blue
-                samples = GammaTable.original.samples
-                return
-            }
+        var redTable = [CGGammaValue](repeating: 0, count: 256)
+        var greenTable = [CGGammaValue](repeating: 0, count: 256)
+        var blueTable = [CGGammaValue](repeating: 0, count: 256)
+        var sampleCount: UInt32 = 0
 
-            var redTable = [CGGammaValue](repeating: 0, count: 255)
-            var greenTable = [CGGammaValue](repeating: 0, count: 255)
-            var blueTable = [CGGammaValue](repeating: 0, count: 255)
-            var sampleCount: UInt32 = 0
+        CGGetDisplayTransferByTable(id, 256, &redTable, &greenTable, &blueTable, &sampleCount)
 
-            CGGetDisplayTransferByTable(id, 255, &redTable, &greenTable, &blueTable, &sampleCount)
-
-            red = redTable
-            green = greenTable
-            blue = blueTable
-            samples = sampleCount
-        #else
-            red = GammaTable.original.red
-            green = GammaTable.original.green
-            blue = GammaTable.original.blue
-            samples = GammaTable.original.samples
-        #endif
+        red = redTable
+        green = greenTable
+        blue = blueTable
+        samples = sampleCount
     }
 
     // MARK: Internal
 
     static let original = GammaTable()
     static let zero = GammaTable(
-        red: [CGGammaValue](repeating: 0, count: 255),
-        green: [CGGammaValue](repeating: 0, count: 255),
-        blue: [CGGammaValue](repeating: 0, count: 255),
-        samples: 255
+        red: [CGGammaValue](repeating: 0, count: 256),
+        green: [CGGammaValue](repeating: 0, count: 256),
+        blue: [CGGammaValue](repeating: 0, count: 256),
+        samples: 256
     )
 
     var red: [CGGammaValue]

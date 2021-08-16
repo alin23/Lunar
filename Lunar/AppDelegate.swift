@@ -586,6 +586,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
             if let display = displayController.activeDisplays[displayID] {
                 display.refreshPanel()
+                mainAsyncAfter(ms: 2000) {
+                    if let display = displayController.activeDisplays[displayID] {
+                        display.refreshPanel()
+                    }
+                }
             }
         }, nil)
 

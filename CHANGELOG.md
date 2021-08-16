@@ -3,7 +3,8 @@
 
 * Fix stack overflow crash in detecting if a display is built-in
 * Check for display ID to be online before reading Gamma
-
+* Make ColorSync profile matching in Software Control mode M1 only
+    * This is because Apple's `CGGetDisplayTransferByTable` is buggy on Intel and crashes the app on some systems
 # 4.8.0
 ## Features
 
