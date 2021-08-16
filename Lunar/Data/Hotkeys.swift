@@ -844,14 +844,14 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
         case []:
             guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No main display, ignoring media key event")
+                log.info("No cursor display or the display is builtin, ignoring media key event")
                 return event
             }
             log.info("No modifiers and lid open, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
         case [.option, .shift]:
             guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No main display, ignoring media key event")
+                log.info("No cursor display or the display is builtin, ignoring media key event")
                 return event
             }
             log.info("Option+Shift modifiers and lid open, adjusting current display")
@@ -923,6 +923,8 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .volumeUp:
+            let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+
             guard let display = displayController.currentAudioDisplay else {
                 return event
             }
@@ -1106,12 +1108,18 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func volumeUpAction(offset: Int? = nil) {
-        increaseVolume(by: offset)
-        if let display = displayController.currentDisplay, display.audioMuted {
+        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+
+        increaseVolume(by: offset, currentAudioDisplay: !allMonitors)
+        if let display = displayController.currentDisplay, display.audioMuted, !CachedDefaults[.muteVolumeZero] {
             toggleAudioMuted()
         }
 
-        if let display = displayController.currentAudioDisplay {
+        if allMonitors {
+            displayController.externalActiveDisplays.forEach { d in
+                Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
+            }
+        } else if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -1119,12 +1127,18 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func volumeDownAction(offset: Int? = nil) {
-        decreaseVolume(by: offset)
-        if let display = displayController.currentDisplay, display.audioMuted {
+        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+
+        decreaseVolume(by: offset, currentAudioDisplay: !allMonitors)
+        if let display = displayController.currentDisplay, display.audioMuted, !CachedDefaults[.muteVolumeZero] {
             toggleAudioMuted()
         }
 
-        if let display = displayController.currentAudioDisplay {
+        if allMonitors {
+            displayController.externalActiveDisplays.forEach { d in
+                Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
+            }
+        } else if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -1132,9 +1146,15 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func muteAudioHotkeyHandler() {
-        toggleAudioMuted()
+        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
 
-        if let display = displayController.currentAudioDisplay {
+        toggleAudioMuted(currentAudioDisplay: !allMonitors)
+
+        if allMonitors {
+            displayController.externalActiveDisplays.forEach { d in
+                Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
+            }
+        } else if let display = displayController.currentAudioDisplay {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 

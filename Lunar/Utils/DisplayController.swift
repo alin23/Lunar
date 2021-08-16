@@ -69,7 +69,6 @@ class DisplayController {
     var _activeDisplaysLock = NSRecursiveLock()
     var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplaysByReadableID: [String: Display] = [:]
-
     var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
@@ -87,6 +86,22 @@ class DisplayController {
     var pausedOverrideAdaptiveModeObserver: Bool = false
 
     var observers: Set<AnyCancellable> = []
+
+    var externalActiveDisplays: [Display] {
+        activeDisplays.values.filter { !$0.isBuiltin }
+    }
+
+    var builtinActiveDisplays: [Display] {
+        activeDisplays.values.filter(\.isBuiltin)
+    }
+
+    var externalDisplays: [Display] {
+        displays.values.filter { !$0.isBuiltin }
+    }
+
+    var builtinDisplays: [Display] {
+        displays.values.filter(\.isBuiltin)
+    }
 
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
