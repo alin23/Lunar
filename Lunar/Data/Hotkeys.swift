@@ -752,69 +752,14 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func handleSingleDisplay(
+    func handleBrightnessKeys(
         withLidClosed lidClosed: Bool,
         mediaKey: MediaKey,
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
         let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
-
-        switch flags {
-        case [] where lidClosed:
-            log.info("No modifiers and lid closed, adjusting current display")
-            adjust(mediaKey, currentDisplay: true)
-        case [.option, .shift] where lidClosed:
-            log.info("Option+Shift modifiers and lid closed, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true)
-        case [] where allMonitors, [.option, .shift] where allMonitors:
-            log.info("All Monitors enabled, ignoring media key event")
-            return event
-
-        case []:
-            guard displayController.cursorDisplay != nil else {
-                log.info("No main display, ignoring media key event")
-                return event
-            }
-            log.info("No modifiers and lid open, adjusting current display")
-            adjust(mediaKey, currentDisplay: true)
-        case [.option, .shift]:
-            guard displayController.cursorDisplay != nil else {
-                log.info("No main display, ignoring media key event")
-                return event
-            }
-            log.info("Option+Shift modifiers and lid open, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true)
-
-        case [.control]:
-            log.info("Control modifier, adjusting current display")
-            adjust(mediaKey, currentDisplay: true)
-        case [.control, .option]:
-            log.info("Control+Options modifiers, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true)
-
-        case [.control, .shift]:
-            log.info("Control+Shift modifiers, adjusting current display")
-            adjust(mediaKey, currentDisplay: true, contrast: true)
-        case [.control, .shift, .option]:
-            log.info("Control+Shift+Option modifiers, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true, contrast: true)
-
-        default:
-            log.info("Ignoring media key event")
-            return event
-        }
-
-        return nil
-    }
-
-    func handleMultipleDisplays(
-        withLidClosed lidClosed: Bool,
-        mediaKey: MediaKey,
-        modifiers flags: NSEvent.ModifierFlags,
-        event: CGEvent
-    ) -> CGEvent? {
-        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+        let affectBuiltin = CachedDefaults[.hotkeysAffectBuiltin]
 
         switch flags {
         case [] where lidClosed:
@@ -829,6 +774,33 @@ extension AppDelegate: MediaKeyTapDelegate {
             log.info("Sync Mode active, ignoring media key event")
             return event
 
+        case [] where allMonitors:
+            log.info("No modifiers and all monitors, adjusting all monitors")
+            adjust(mediaKey, currentDisplay: false)
+            if !affectBuiltin {
+                return event
+            }
+        case [.option, .shift] where allMonitors:
+            log.info("Option+Shift and all monitors, adjusting all monitors")
+            adjust(mediaKey, by: 1, currentDisplay: false)
+            if !affectBuiltin {
+                return event
+            }
+        case []:
+            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
+                log.info("No main display, ignoring media key event")
+                return event
+            }
+            log.info("No modifiers and lid open, adjusting current display")
+            adjust(mediaKey, currentDisplay: true)
+        case [.option, .shift]:
+            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
+                log.info("No main display, ignoring media key event")
+                return event
+            }
+            log.info("Option+Shift modifiers and lid open, adjusting current display")
+            adjust(mediaKey, by: 1, currentDisplay: true)
+
         case [.control] where lidClosed:
             log.info("Control modifier and lid closed, adjusting current display")
             adjust(mediaKey, currentDisplay: true)
@@ -837,12 +809,23 @@ extension AppDelegate: MediaKeyTapDelegate {
             adjust(mediaKey, by: 1, currentDisplay: true)
 
         case [.control]:
+            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
+                log.info("No main display, adjusting all external monitors")
+                adjust(mediaKey, currentDisplay: false)
+                return nil
+            }
+
             log.info("Control modifier and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, currentDisplay: !allMonitors)
         case [.control, .option]:
+            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
+                log.info("No main display, adjusting all external monitors")
+                adjust(mediaKey, currentDisplay: false)
+                return nil
+            }
+
             log.info("Control+Option modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, by: 1, currentDisplay: !allMonitors)
-
         case [.control, .shift]:
             log.info("Control+Shift modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
             adjust(mediaKey, currentDisplay: !allMonitors, contrast: true)
@@ -879,11 +862,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         guard isVolumeKey(mediaKey) else {
             let lidClosed = displayController.lidClosed || SyncMode.builtinDisplay == nil
-            if displayController.activeDisplays.count == 1 {
-                return handleSingleDisplay(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
-            } else {
-                return handleMultipleDisplays(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
-            }
+            return handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
         }
 
         switch mediaKey {
