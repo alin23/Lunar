@@ -2212,15 +2212,15 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !(panel?.isTV ?? false), !(isBuiltin && isSmartDisplay) else {
-            if panel?.isTV ?? false {
-                log.warning("TVs don't support DDC, ignoring for display \(description)")
-            }
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !(isBuiltin && isSmartDisplay) else {
             if isBuiltin, isSmartDisplay {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
             hasI2C = false
             return
+        }
+        if panel?.isTV ?? false {
+            log.warning("This could be a TV, and TVs don't support DDC: \(description)")
         }
 
         #if DEBUG
