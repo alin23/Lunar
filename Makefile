@@ -95,6 +95,14 @@ build: setversion
 build-version:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO MARKETING_VERSION=$(VERSION) CURRENT_PROJECT_VERSION=$(VERSION) | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
 
+beta-upload: SHELL=/usr/local/bin/fish
+beta-upload: ENV=Release
+beta-upload: V=1
+beta-upload: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$V
+beta-upload:
+	upload -d lunar -n Lunar-(defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion).zip /tmp/Lunar/Lunar.zip
+	upload -d lunar Releases/appcast.xml
+
 beta: SHELL=/usr/local/bin/fish
 beta: ENV=Release
 beta: DISABLE_PACKING=1

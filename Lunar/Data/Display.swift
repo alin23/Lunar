@@ -1926,6 +1926,10 @@ enum ValueType {
     func refreshPanel() {
         withoutDDC {
             rotation = CGDisplayRotation(id).intround
+
+            guard let mgr = DisplayController.panelManager else { return }
+            panel = mgr.display(withID: id.i32) as? MPDisplay
+
             panelMode = panel?.currentMode
             modeNumber = panel?.currentMode.modeNumber ?? -1
         }
