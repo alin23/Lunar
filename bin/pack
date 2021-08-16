@@ -68,13 +68,12 @@ if test "$DISABLE_NOTARIZATION" != 1
 
         if test "$DISABLE_PACKING" == 1
             xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP"
-            test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
-            ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
         end
     end
-else if test "$DISABLE_PACKING" == 1
-    ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 end
+
+test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
+ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 
 if test "$DISABLE_PACKING" != 1
     set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
