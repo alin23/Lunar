@@ -15,6 +15,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .enableOrientationHotkeys,
     .appExceptions,
     .muteVolumeZero,
     .hotkeysAffectBuiltin,
@@ -504,6 +505,7 @@ func initCache() {
     cacheKey(.showVirtualDisplays)
     cacheKey(.showAirplayDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.enableOrientationHotkeys)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
     cacheKey(.useAlternateBrightnessKeys)
@@ -567,6 +569,7 @@ extension Defaults.Keys {
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
     static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: false)
@@ -658,6 +661,8 @@ let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode
 let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHotkeys).removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
 // let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }

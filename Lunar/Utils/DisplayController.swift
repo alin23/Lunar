@@ -148,7 +148,7 @@ class DisplayController {
     }
 
     var cursorDisplay: Display? {
-        guard let screen = NSScreen.externalWithMouse,
+        guard let screen = NSScreen.withMouse,
               let id = screen.displayID
         else { return nil }
 

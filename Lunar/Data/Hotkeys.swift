@@ -47,7 +47,11 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          contrastDown,
          muteAudio,
          volumeUp,
-         volumeDown
+         volumeDown,
+         orientation0,
+         orientation90,
+         orientation180,
+         orientation270
 }
 
 let preciseHotkeys: Set<String> = [
@@ -375,6 +379,13 @@ enum Hotkey {
         kVK_F20: String(Unicode.Scalar(NSF20FunctionKey)!),
     ]
 
+    static let orientationIdentifiers: Set<String> = [
+        HotkeyIdentifier.orientation0.rawValue,
+        HotkeyIdentifier.orientation90.rawValue,
+        HotkeyIdentifier.orientation180.rawValue,
+        HotkeyIdentifier.orientation270.rawValue,
+    ]
+
     static let defaults: Set<PersistentHotkey> = [
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.toggle.rawValue,
@@ -396,6 +407,34 @@ enum Hotkey {
             action: handler(identifier: .lunar),
             actionQueue: .main
         )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.orientation0.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
+            target: appDelegate,
+            action: handler(identifier: .orientation0),
+            actionQueue: .main
+        ), isEnabled: false, register: false),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.orientation90.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_9, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
+            target: appDelegate,
+            action: handler(identifier: .orientation90),
+            actionQueue: .main
+        ), isEnabled: false, register: false),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.orientation180.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_8, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
+            target: appDelegate,
+            action: handler(identifier: .orientation180),
+            actionQueue: .main
+        ), isEnabled: false, register: false),
+        PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.orientation270.rawValue,
+            keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_7, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
+            target: appDelegate,
+            action: handler(identifier: .orientation270),
+            actionQueue: .main
+        ), isEnabled: false, register: false),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent0.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
@@ -538,6 +577,15 @@ enum Hotkey {
         )),
     ]
 
+    static func toggleOrientationHotkeys(enabled: Bool? = nil) {
+        CachedDefaults[.hotkeys] = Set(CachedDefaults[.hotkeys].map { hotkey in
+            if Hotkey.orientationIdentifiers.contains(hotkey.identifier) {
+                hotkey.isEnabled = enabled ?? CachedDefaults[.enableOrientationHotkeys]
+            }
+            return hotkey
+        })
+    }
+
     static func toDictionary(_ hotkeys: [String: Any]) -> [HotkeyIdentifier: [HotkeyPart: Int]] {
         var hotkeySettings: [HotkeyIdentifier: [HotkeyPart: Int]] = [:]
         for (k, v) in hotkeys {
@@ -604,6 +652,14 @@ enum Hotkey {
             return #selector(AppDelegate.volumeUpHotkeyHandler)
         case .volumeDown:
             return #selector(AppDelegate.volumeDownHotkeyHandler)
+        case .orientation0:
+            return #selector(AppDelegate.orientation0Handler)
+        case .orientation90:
+            return #selector(AppDelegate.orientation90Handler)
+        case .orientation180:
+            return #selector(AppDelegate.orientation180Handler)
+        case .orientation270:
+            return #selector(AppDelegate.orientation270Handler)
         }
     }
 
@@ -963,6 +1019,42 @@ extension AppDelegate: MediaKeyTapDelegate {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         blackOut(self)
         log.debug("BlackOut Hotkey pressed")
+    }
+
+    @objc func orientation0Handler() {
+        guard let display = displayController.cursorDisplay else {
+            log.warning("Orientation 0 Hotkey pressed but no display with cursor found")
+            return
+        }
+        display.rotation = 0
+        log.debug("Orientation 0 Hotkey pressed")
+    }
+
+    @objc func orientation90Handler() {
+        guard let display = displayController.cursorDisplay else {
+            log.warning("Orientation 90 Hotkey pressed but no display with cursor found")
+            return
+        }
+        display.rotation = 90
+        log.debug("Orientation 90 Hotkey pressed")
+    }
+
+    @objc func orientation180Handler() {
+        guard let display = displayController.cursorDisplay else {
+            log.warning("Orientation 180 Hotkey pressed but no display with cursor found")
+            return
+        }
+        display.rotation = 180
+        log.debug("Orientation 180 Hotkey pressed")
+    }
+
+    @objc func orientation270Handler() {
+        guard let display = displayController.cursorDisplay else {
+            log.warning("Orientation 270 Hotkey pressed but no display with cursor found")
+            return
+        }
+        display.rotation = 270
+        log.debug("Orientation 270 Hotkey pressed")
     }
 
     func brightnessUpAction(offset: Int? = nil) {
