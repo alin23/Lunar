@@ -646,10 +646,7 @@ extension MPDisplayMode {
         return description.depth
     }
 
-    override open var description: String {
-        let res = "\(pixelsWide)x\(pixelsHigh)"
-        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
-        let dpi = "\(dotsPerInch)DPI"
+    var tagsString: String {
         let tags: [String] = [
             isNativeMode ? Tag.native : nil,
             isDefaultMode ? Tag.defaultMode : nil,
@@ -660,15 +657,22 @@ extension MPDisplayMode {
             isSimulscan ? Tag.simulscan : nil,
             isInterlaced ? Tag.interlaced : nil,
         ].compactMap { $0?.rawValue }
-        let tagsString = tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+        return tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+    }
+
+    override open var description: String {
+        let res = "\(pixelsWide)x\(pixelsHigh)"
+        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
+        let dpi = "\(dotsPerInch)DPI"
+
         return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
     }
 }
 
 extension NSScreen {
-    override open var description: String {
-        "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"
-    }
+    // override open var description: String {
+    //     "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"
+    // }
 
     static func isOnline(_ id: CGDirectDisplayID) -> Bool {
         onlineDisplayIDs.contains(id)
