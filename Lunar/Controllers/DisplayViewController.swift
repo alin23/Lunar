@@ -100,7 +100,6 @@ class DisplayViewController: NSViewController {
     ### Disadvantages
     * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
     * No support for changing volume or input
-    * No smooth transitions
     * Low brightness values can wash out colors
     * Quitting Lunar resets the brightness to default
     * Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
