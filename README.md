@@ -48,31 +48,31 @@ It works well along Night Shift and True Tone (and f.lux if Gamma/Software contr
 
 ## Display Page ##
 
-![Display page](https://static.lunar.fyi/img/display-page/display-page.png)
+![Display page](https://static.lunar.fyi/img/display-page/1920_display-page.png)
 
 ### Display Settings ###
 
-![Display settings](https://static.lunar.fyi/img/display-settings/display-settings.png)
+![Display settings](https://static.lunar.fyi/img/display-settings/1920_display-settings.png)
 
 ### Built-in Display Page ###
 
-![Built-in display page](https://static.lunar.fyi/img/builtin-page/builtin-page.png)
+![Built-in display page](https://static.lunar.fyi/img/builtin-page/1920_builtin-page.png)
 
 ### Display Input Hotkeys ###
 
-![Display input hotkeys](https://static.lunar.fyi/img/input-hotkeys/input-hotkeys.png)
+![Display input hotkeys](https://static.lunar.fyi/img/input-hotkeys/1920_input-hotkeys.png)
 
 ## Configuration Page ##
 
-![Configuration page](https://static.lunar.fyi/img/configuration-page/configuration-page.png)
+![Configuration page](https://static.lunar.fyi/img/configuration-page/1920_configuration-page.png)
 
 ### Advanced Settings ###
 
-![Advanced Settings](https://static.lunar.fyi/img/advanced-settings/advanced-settings.png)
+![Advanced Settings](https://static.lunar.fyi/img/advanced-settings/1920_advanced-settings.png)
 
 ## Hotkeys Page ##
 
-![Hotkeys page](https://static.lunar.fyi/img/hotkeys-page/hotkeys-page.png)
+![Hotkeys page](https://static.lunar.fyi/img/hotkeys-page/1920_hotkeys-page.png)
 
 
 ## Tested and known to work with the following types of connections ##
