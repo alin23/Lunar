@@ -572,7 +572,7 @@ extension Defaults.Keys {
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
-    static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: false)
+    static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
     static let didSwipeToHotkeys = Key<Bool>("didSwipeToHotkeys", default: false)
     static let didSwipeLeft = Key<Bool>("didSwipeLeft", default: false)

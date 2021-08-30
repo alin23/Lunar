@@ -516,10 +516,18 @@
                                                 <action selector="badDDC:" target="Voe-Tx-rLC" id="UEt-gD-qO1"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="How do hotkeys work?" id="RxR-cq-qd2">
+                                        <menuItem title="Brightness/Volume keys not working?" id="XQp-Gz-KFr">
+                                            <attributedString key="attributedTitle">
+                                                <fragment content="Brightness/Volume keys not working?">
+                                                    <attributes>
+                                                        <font key="NSFont" metaFont="systemSemibold" size="14"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="howDoHotkeysWork:" target="Voe-Tx-rLC" id="dgR-kM-dTo"/>
+                                                <action selector="badKeys:" target="Voe-Tx-rLC" id="UEt-gD-qO2"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Contact the developer" id="6xm-yP-myu">
@@ -3782,7 +3790,7 @@ and contrast to their highest values</string>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3d3-dA-7PX">
                                 <rect key="frame" x="37" y="206" width="266" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Use alternate brightness keys" id="Fxa-wd-qGG">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="F14/F15 as brightness keys" id="Fxa-wd-qGG">
                                     <font key="font" size="15" name="Menlo-Bold"/>
                                     <color key="textColor" red="1" green="1" blue="1" alpha="0.89771316229999998" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -3798,16 +3806,13 @@ and contrast to their highest values</string>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
                                     <binding destination="upY-F0-APc" name="value" keyPath="values.useAlternateBrightnessKeys" id="ytN-fK-nUe">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
                                     </binding>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
                                 <rect key="frame" x="37" y="164" width="247" height="51"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Frees up F14/F15 keys but might not work on all keyboards" id="kPG-QJ-rNC">
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable to free up F14/F15 keys. Might not work on all keyboards" id="kPG-QJ-rNC">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
