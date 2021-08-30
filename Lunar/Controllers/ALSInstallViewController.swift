@@ -180,9 +180,9 @@ class ALSInstallViewController: NSViewController {
                 installButton.bgColor = red
                 progressBar?.stopAnimation(nil)
                 operationDescription = DARK_MD
-                    .attributedString(from: "Please contact the developer about this.\n[Contact Page](\(CONTACT_URL.absoluteString))")
+                    .attributedString(from: "Please contact the developer about this.\n[Contact Page](\(contactURL().absoluteString))")
             }
-            onClick = { NSWorkspace.shared.open(CONTACT_URL) }
+            onClick = { NSWorkspace.shared.open(contactURL()) }
             return
         }
 
