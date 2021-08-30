@@ -1,3 +1,13 @@
+# 4.8.3
+## Fixes
+
+* Fix DDC for monitors that act as TVs when in fact they aren't
+
+## Improvements
+
+* Add contact form on lunar.fyi
+* Allow fully offline installations
+
 # 4.8.2
 # Hotfix Release
 
