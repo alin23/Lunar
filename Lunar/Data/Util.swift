@@ -1909,3 +1909,25 @@ func getMonitorPanelData(_ display: MPDisplay) -> String {
         .joined(separator: "\n\n") ?? "nil")
     """
 }
+
+func contactURL() -> URL {
+    guard var urlBuilder = URLComponents(url: CONTACT_URL, resolvingAgainstBaseURL: false) else {
+        return CONTACT_URL
+    }
+    let serialhash = getSerialNumberHash()
+    urlBuilder.queryItems = [URLQueryItem(name: "userid", value: serialhash)]
+
+    if let licenseCode = lunarProProduct?.licenseCode {
+        urlBuilder.queryItems?.append(URLQueryItem(name: "code", value: licenseCode))
+    }
+
+    if let email = lunarProProduct?.activationEmail {
+        urlBuilder.queryItems?.append(URLQueryItem(name: "email", value: email))
+    }
+
+    guard let url = try? urlBuilder.asURL() else {
+        return CONTACT_URL
+    }
+
+    return url
+}

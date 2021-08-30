@@ -30,7 +30,7 @@ let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
 var screensSleeping = ManagedAtomic<Bool>(false)
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
-let CONTACT_URL = try! "https://alinpanaitiu.com/contact/".asURL()
+let CONTACT_URL = try! "https://lunar.fyi/contact".asURL()
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -1301,7 +1301,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func leaveFeedback(_: Any) {
-        NSWorkspace.shared.open(CONTACT_URL)
+        NSWorkspace.shared.open(contactURL())
     }
 
     @IBAction func faq(_: Any) {
@@ -1312,6 +1312,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func badDDC(_: Any) {
         if let url = URL(string: "https://lunar.fyi/faq#bad-ddc") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @IBAction func badKeys(_: Any) {
+        if let url = URL(string: "https://lunar.fyi/faq#media-keys-not-working") {
             NSWorkspace.shared.open(url)
         }
     }
