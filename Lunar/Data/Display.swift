@@ -2152,7 +2152,7 @@ enum ValueType {
 
         control = getBestControl()
 
-        guard isBuiltin else { return }
+        guard isBuiltin, isSmartDisplay else { return }
         asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] _ in
             guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
                 return
@@ -2672,7 +2672,8 @@ enum ValueType {
     }
 
     func refreshBrightness() {
-        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
+        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness,
+              !SyncMode.possibleClamshellModeSoon else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return

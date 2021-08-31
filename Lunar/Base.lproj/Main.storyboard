@@ -826,54 +826,6 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTp-EE-gEX" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="20" y="42" width="38" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
-                                <contentFilters>
-                                    <ciFilter name="CIColorInvert">
-                                        <configuration>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="arrow.left.circle.fill" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="4Bd-TL-5QE">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system" size="38"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="goLeft:" target="cu7-9X-1cE" id="G0T-l9-3xh"/>
-                                </connections>
-                            </button>
-                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DOd-ks-yiz" customClass="PageButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="882" y="41" width="38" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
-                                <contentFilters>
-                                    <ciFilter name="CIColorInvert">
-                                        <configuration>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="arrow.right.circle.fill" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="z5e-EA-nMd">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system" size="38"/>
-                                    <connections>
-                                        <action selector="goRight:" target="cu7-9X-1cE" id="ack-5y-UBj"/>
-                                    </connections>
-                                </buttonCell>
-                            </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="7bV-H8-X8t" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="770" y="655" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
@@ -1039,54 +991,6 @@
                                     </menu>
                                 </popUpButtonCell>
                             </popUpButton>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="HbV-JR-nUQ">
-                                <rect key="frame" x="65" y="45" width="132" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
-                                <contentFilters>
-                                    <ciFilter name="CIColorInvert">
-                                        <configuration>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="4MO-wt-onU">
-                                    <font key="font" metaFont="systemMedium" size="13"/>
-                                    <string key="title">Click to go to the
-Configuration page</string>
-                                    <color key="textColor" name="Inverted"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="hKB-Ol-MnX">
-                                <rect key="frame" x="723" y="45" width="151" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
-                                <contentFilters>
-                                    <ciFilter name="CIColorInvert">
-                                        <configuration>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="wp3-of-A9S">
-                                    <font key="font" metaFont="systemMedium" size="13"/>
-                                    <string key="title">Click to go back to the
-Configuration page</string>
-                                    <color key="textColor" name="Inverted"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="94s-ei-4SF">
                                 <rect key="frame" x="417" y="643" width="116" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1127,10 +1031,6 @@ Configuration page</string>
                         <outlet property="activeModeButton" destination="xGE-aF-MVx" id="qKC-k3-Y0n"/>
                         <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
-                        <outlet property="goLeftButton" destination="dTp-EE-gEX" id="m8J-bM-DFy"/>
-                        <outlet property="goLeftNotice" destination="HbV-JR-nUQ" id="tVx-ID-CaM"/>
-                        <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
-                        <outlet property="goRightNotice" destination="hKB-Ol-MnX" id="ejk-lb-7Dn"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
                         <outlet property="pageControl" destination="YBA-Wk-tfq" id="ano-Vn-Ld4"/>
                     </connections>
@@ -7231,8 +7131,6 @@ You can choose to send the diagnostics to the developer if you think this is not
         <image name="NSAdvanced" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>
-        <image name="arrow.left.circle.fill" width="48" height="48"/>
-        <image name="arrow.right.circle.fill" width="48" height="48"/>
         <image name="power" width="96" height="96"/>
         <namedColor name="Caption">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -7242,9 +7140,6 @@ You can choose to send the diagnostics to the developer if you think this is not
         </namedColor>
         <namedColor name="Gray">
             <color red="0.49399998784065247" green="0.46599999070167542" blue="0.49399998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="Inverted">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Power">
             <color red="0.94900000095367432" green="0.20000000298023224" blue="0.2630000114440918" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

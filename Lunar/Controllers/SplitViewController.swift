@@ -164,10 +164,6 @@ class SplitViewController: NSSplitViewController {
 
     @IBOutlet var activeModeButton: AdaptiveModeButton!
     @IBOutlet var _activeHelpButton: NSButton!
-    @IBOutlet var goLeftButton: PageButton?
-    @IBOutlet var goRightButton: PageButton?
-    @IBOutlet var goLeftNotice: NSTextField?
-    @IBOutlet var goRightNotice: NSTextField?
     @IBOutlet var pageControl: NSSegmentedControl!
 
     var onLeftButtonPress: (() -> Void)?
@@ -210,14 +206,6 @@ class SplitViewController: NSSplitViewController {
 
     var activeHelpButton: HelpButton? {
         _activeHelpButton as? HelpButton
-    }
-
-    @IBAction func goRight(_: Any) {
-        onRightButtonPress?()
-    }
-
-    @IBAction func goLeft(_: Any) {
-        onLeftButtonPress?()
     }
 
     func listenForAdaptiveModeChange() {
@@ -278,12 +266,6 @@ class SplitViewController: NSSplitViewController {
     func lastPage() {
         setPage(pageController?.selectedIndex)
         whiteBackground()
-
-        goLeftButton?.enable()
-        goRightButton?.disable()
-        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
-            rightHintsShown = true
-        }
     }
 
     func whiteBackground() {
@@ -295,19 +277,6 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "LUNAR"
         }
 
-        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
-            if !leftHintsShown {
-                goLeftNotice?.appearance = appDelegate.darkMode ? nil : NSAppearance(named: .darkAqua)
-                goLeftNotice?.compositingFilter = appDelegate.darkMode ? nil : CIFilter(name: "CISubtractBlendMode")
-                goLeftNotice?.stringValue = "Click to go to the\nConfiguration page"
-            }
-            if !rightHintsShown {
-                goRightNotice?.appearance = appDelegate.darkMode ? nil : NSAppearance(named: .darkAqua)
-                goRightNotice?.compositingFilter = appDelegate.darkMode ? nil : CIFilter(name: "CISubtractBlendMode")
-                goRightNotice?.stringValue = "Click to configure\nthe next monitor"
-            }
-        }
-
         if appDelegate.darkMode {
             activeModeButton?.page = .hotkeys
             activeModeButton?.fade()
@@ -315,9 +284,6 @@ class SplitViewController: NSSplitViewController {
             POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantDark)
             view.bg = darkMauve
-
-            goLeftButton?.compositingFilter = nil
-            goRightButton?.compositingFilter = nil
 
             pageControl?.appearance = NSAppearance(named: .darkAqua)
         } else {
@@ -328,14 +294,8 @@ class SplitViewController: NSSplitViewController {
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantLight)
             view.bg = white
 
-            goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
-            goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
-
             pageControl?.appearance = NSAppearance(named: .aqua)
         }
-
-        goLeftButton?.enable()
-        goRightButton?.enable()
     }
 
     func yellowBackground() {
@@ -350,26 +310,7 @@ class SplitViewController: NSSplitViewController {
         activeModeButton?.fade()
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
-
-        goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
-        goLeftButton?.enable()
-        goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
-        goRightButton?.enable()
         pageControl?.appearance = NSAppearance(named: .aqua)
-
-        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
-            if !leftHintsShown {
-                goLeftNotice?.appearance = NSAppearance(named: .aqua)
-                goLeftNotice?.compositingFilter = nil
-                goLeftNotice?.stringValue = "Click to go to the\nHotkeys page"
-            }
-            if !rightHintsShown {
-                goRightNotice?.appearance = NSAppearance(named: .aqua)
-                goRightNotice?.compositingFilter = nil
-                goRightNotice?.stringValue = "Click to go back to\nthe Display page"
-                goRightButton?.highlight()
-            }
-        }
     }
 
     func mauveBackground() {
@@ -384,58 +325,13 @@ class SplitViewController: NSSplitViewController {
         activeModeButton?.fade()
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
-
-        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
-            if !leftHintsShown {
-                goLeftNotice?.appearance = NSAppearance(named: .darkAqua)
-                goLeftNotice?.compositingFilter = nil
-                goLeftNotice?.stringValue = ""
-                leftHintsShown = true
-            }
-            if !rightHintsShown {
-                goRightNotice?.appearance = NSAppearance(named: .darkAqua)
-                goRightNotice?.compositingFilter = nil
-                goRightNotice?.stringValue = "Click to go back to the\n Configuration page"
-            }
-        }
-
-        goLeftButton?.disable()
-        goRightButton?.compositingFilter = nil
-        goRightButton?.enable()
         pageControl?.appearance = NSAppearance(named: .darkAqua)
-    }
-
-    override func viewDidAppear() {
-        if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
-            showNavigationHints()
-        }
-    }
-
-    override func viewDidDisappear() {
-        hideNavigationHints()
-    }
-
-    func showNavigationHints() {
-        if !leftHintsShown {
-            goLeftButton?.highlight()
-        }
-        if !rightHintsShown {
-            goRightButton?.highlight()
-        }
-    }
-
-    func hideNavigationHints() {
-        goLeftButton?.stopHighlighting()
-        goRightButton?.stopHighlighting()
     }
 
     override func viewDidLoad() {
         view.wantsLayer = true
         view.radius = 12.0.ns
         view.bg = white
-
-        goLeftButton?.notice = goLeftNotice
-        goRightButton?.notice = goRightNotice
 
         whiteBackground()
         updateHelpButton()
