@@ -923,8 +923,6 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .volumeUp:
-            let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
-
             guard let display = displayController.currentAudioDisplay else {
                 return event
             }
