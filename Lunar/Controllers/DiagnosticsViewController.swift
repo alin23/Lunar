@@ -50,6 +50,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     @Atomic var keyPressed: UInt16 = 0
 
     let continueTestCondition = NSCondition()
+    @Atomic var waiting = false
     let markdown: SwiftyMarkdown = {
         let md = getMD()
 
@@ -62,17 +63,17 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         return md
     }()
 
+    let SENT_TITLE = "Sent!"
+    let SEND_DIAGNOSTICS_TITLE = "Send Diagnostics"
+
     @objc dynamic var sent = false {
         didSet {
             mainThread {
+                self.waiting = false
                 if sent {
-                    sendButton.isEnabled = false
-                    sendButton.bg = blue
-                    sendButton.attributedTitle = "Sent!".withAttribute(.textColor(white))
+                    setSendButtonEnabled(text: SENT_TITLE, color: blue)
                 } else {
-                    setSendButtonEnabled()
-                    sendButton.bg = green
-                    sendButton.attributedTitle = "Send Diagnostics".withAttribute(.textColor(white))
+                    setSendButtonEnabled(text: SEND_DIAGNOSTICS_TITLE, color: green)
                 }
             }
         }
@@ -90,12 +91,23 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         }
     }
 
-    func setSendButtonEnabled() {
-        sendButton.isEnabled = !sent && !(name?.isEmpty ?? true) && !(email?.isEmpty ?? true) && stopped
-        if sendButton.isEnabled {
-            sendButton.toolTip = nil
-        } else {
-            sendButton.toolTip = "Make sure the diagnostics process has finished."
+    func setSendButtonEnabled(text: String? = nil, color: NSColor? = nil, textColor: NSColor? = nil) {
+        mainThread {
+            sendButton.isEnabled = waiting || (!sent && !(name?.isEmpty ?? true) && !(email?.isEmpty ?? true) && stopped)
+
+            if sendButton.isEnabled {
+                sendButton.toolTip = nil
+            } else if text != SENT_TITLE {
+                sendButton.toolTip = "Make sure the diagnostics process has finished."
+            }
+
+            if let text = text {
+                sendButton.attributedTitle = text.withAttribute(.textColor(textColor ?? white))
+            }
+
+            if let color = color {
+                sendButton.bg = color
+            }
         }
     }
 
@@ -123,7 +135,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             self.render("""
             *Note: Don't copy/paste this output in an email as that is not enough.*
             *Clicking the `Send Diagnostics` button will send more useful technical data.*
-            *If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by pressing the necessary keys when prompted.*
+            *If you want to aid the developer in debugging your problem, make sure to complete the full diagnostics by clicking the necessary buttons when prompted.*
             """)
 
             for (i, display) in displayController.activeDisplays.values.enumerated() {
@@ -186,16 +198,16 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 	* _This monitor \(network == nil ?
                     "can't be controlled through the network" : "supports DDC through a network controller")_
                 * DDC Status: `\(display.responsiveDDC ? "responsive" : "unresponsive")`
-                * Apple vendored: `\(appleDisplay ? "YES" : "NO")`
+                * Apple vendored: `\((appleDisplay || display.isSmartDisplay) ? "YES" : "NO")`
                 	* **DisplayServicesCanChangeBrightness: \(DisplayServicesCanChangeBrightness(display.id))**
                 	* **DisplayServicesHasAmbientLightCompensation: \(DisplayServicesHasAmbientLightCompensation(display.id))**
                 	* **DisplayServicesIsSmartDisplay: \(DisplayServicesIsSmartDisplay(display.id))**
                 	* **DisplayServicesGetBrightness: \(DisplayServicesGetBrightness(display.id, &br) == KERN_SUCCESS ? br
                     .str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
                 	* **DisplayServicesGetLinearBrightness: \(DisplayServicesGetLinearBrightness(display.id, &br) == KERN_SUCCESS ? br
-                    .str(decimals: 2) : "\(br.str(decimals: 2)) [error]"))**
+                    .str(decimals: 2) : "\(br.str(decimals: 2)) [error]")**
                 	* _\(
-                	    appleDisplay
+                	    (appleDisplay || display.isSmartDisplay)
                 	        ?
                 	        (
                 	            coreDisplay ?
@@ -224,6 +236,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 let tryBrightness = { (control: Control) in
                     guard !self.stopped else { return }
 
+                    self.waiting = true
                     self.continueTestCondition.wait()
                     guard !self.stopped else { return }
 
@@ -237,9 +250,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             "#### Testing \(control.str):\(control is DDCCTLControl ? "  [https://github.com/kfix/ddcctl](https://github.com/kfix/ddcctl)" : "")"
                         )
 
+                    let brightnessBeforeTest = display.brightness.uint8Value
                     switch control {
                     case is CoreDisplayControl:
-                        self.render("##### Reading brightness...")
+                        self.render("\n##### Reading brightness...")
                         Thread.sleep(forTimeInterval: 0.5)
 
                         if let br = control.getBrightness() {
@@ -262,8 +276,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             """
                         )
                         self.renderSeparated(
-                            "_Press the `Enter` key to test reading._\n_Press `any other key` to `skip reading test` and continue diagnostics..._"
+                            "Click the `Test Read` button below to test reading.\n_Press `any other key` to `skip reading test` and continue diagnostics..._"
                         )
+                        self.waiting = true
+                        self.setSendButtonEnabled(text: "Test Read", color: lunarYellow, textColor: darkMauve)
                         self.continueTestCondition.wait()
 
                         if self.keyPressed == kVK_Return {
@@ -341,8 +357,13 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
-                    let tries = [try1, try2, try3, try4]
-                    self.render("\n`\(tries.trueCount)` out of `4` tries seemed to reach the monitor")
+                    self.render("\n* _Setting brightness back to `\(brightnessBeforeTest)`_")
+                    let try5 = control.setBrightness(brightnessBeforeTest, oldValue: nil)
+                    Thread.sleep(forTimeInterval: 0.5)
+                    guard !self.stopped else { return }
+
+                    let tries = [try1, try2, try3, try4, try5]
+                    self.render("\n`\(tries.trueCount)` out of `\(tries.count)` tries seemed to reach the monitor")
 
                     Thread.sleep(forTimeInterval: 1.5)
                     guard !self.stopped else { return }
@@ -481,8 +502,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 break
                             }
                             self.renderSeparated(
-                                "_Press any key to continue diagnostics..._"
+                                "Click the `Continue` button below to continue diagnostics..."
                             )
+                            self.waiting = true
+                            self.setSendButtonEnabled(text: "Continue", color: lunarYellow, textColor: darkMauve)
                         }
                     )
                 }
@@ -507,8 +530,11 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         display.readapt(newValue: false, oldValue: true)
                     }
                     self.renderSeparated(
-                        "_Press any key to start tests for this display..._"
+                        "Click the `Start Testing` button below to start tests for this display..."
                     )
+                    self.waiting = true
+                    self.setSendButtonEnabled(text: "Start Testing", color: lunarYellow, textColor: darkMauve)
+
                     if ddcAvailable {
                         tryBrightness(ddcControl)
                         setPercent(60)
@@ -535,13 +561,15 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     self.renderSeparated("**This display doesn't support hardware controls.**")
                 }
 
-                if SyncMode.specific.available {
+                if SyncMode.specific.available, !display.isBuiltin {
                     self.renderSeparated("### Sync Mode")
                     self.render("Do you want to test Sync Mode?")
 
                     self.renderSeparated(
-                        "_Press the `Enter` key to test Sync Mode._\n_Press `any other key` to `skip the Sync Mode test` and continue diagnostics..._"
+                        "Click the `Test Sync Mode` button to test Sync Mode.\n_Press `any other key` to `skip the Sync Mode test` and continue diagnostics..._"
                     )
+                    self.waiting = true
+                    self.setSendButtonEnabled(text: "Test Sync Mode", color: lunarYellow, textColor: darkMauve)
                     self.continueTestCondition.wait()
                     guard !self.stopped else { return }
 
@@ -552,8 +580,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         **Lunar will launch System Preferences for Displays now**
                         **Please disable `\"Automatically adjust brightness\"` until this test is done**
 
-                        Press any key to continue diagnostics _after disabling the setting_...
+                        Click the `Continue` button below to continue diagnostics _after disabling the setting_...
                         """)
+                        self.waiting = true
+                        self.setSendButtonEnabled(text: "Continue", color: lunarYellow, textColor: darkMauve)
                         Thread.sleep(forTimeInterval: 1)
                         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
                         self.continueTestCondition.wait()
@@ -677,13 +707,15 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 self.stopDiagnostics(self)
                 self.textView.isSelectable = true
                 self.textView.isEditable = true
-                self.setSendButtonEnabled()
+                self.waiting = false
+                self.setSendButtonEnabled(text: self.SEND_DIAGNOSTICS_TITLE, color: green)
             }
         }
     }
 
     override func keyDown(with event: NSEvent) {
         keyPressed = event.keyCode
+        waiting = false
         continueTestCondition.signal()
         if stopped {
             super.keyDown(with: event)
@@ -691,6 +723,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
     }
 
     @IBAction func restartDiagnostics(_: Any) {
+        waiting = false
         continueTestCondition.broadcast()
         stopped = false
         sent = false
@@ -713,10 +746,18 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
             stopButton.attributedTitle = "Restart".withAttribute(.textColor(white))
             stopButton.action = #selector(restartDiagnostics(_:))
         }
+        waiting = false
         continueTestCondition.broadcast()
     }
 
     @IBAction func sendDiagnostics(_: Any) {
+        guard sendButton.attributedTitle.string == SEND_DIAGNOSTICS_TITLE else {
+            keyPressed = kVK_Return.u16
+            waiting = false
+            continueTestCondition.signal()
+            return
+        }
+
         mainThread {
             sendButton.refusesFirstResponder = false
             view.window?.makeFirstResponder(sendButton)
@@ -753,6 +794,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
         outputScrollView.appearance = NSAppearance(named: .vibrantLight)
         outputScrollView.radius = 14.0.ns
         outputScrollView.onKeyDown = { [weak self] _ in
+            self?.waiting = false
             self?.continueTestCondition.signal()
         }
 

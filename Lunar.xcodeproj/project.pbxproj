@@ -33,6 +33,9 @@
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
+		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
+		C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */; };
+		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; };
 		C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -236,6 +239,9 @@
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
+		C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrightnessSystemClient.h; sourceTree = "<group>"; };
+		C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAdaptationClient.h; sourceTree = "<group>"; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
@@ -740,6 +746,9 @@
 		C7E896D72652C0F60079A328 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */,
+				C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */,
+				C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */,
 				C7E896D82652C0F60079A328 /* CBBlueLightClient.h */,
 				C7E896D92652C0F60079A328 /* ExceptionCatcher.h */,
 				C7DED367267A0639002E0188 /* LaunchAtLoginController.h */,
@@ -765,6 +774,9 @@
 			files = (
 				C7E80E3B2637060F004718A4 /* shim.h in Headers */,
 				C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */,
+				C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */,
+				C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */,
+				C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */,
 				C7E80E362637060F004718A4 /* libssh2_sftp.h in Headers */,
 				C7E80E372637060F004718A4 /* libssh2.h in Headers */,
 				C7E80E382637060F004718A4 /* libssh2_publickey.h in Headers */,
