@@ -1003,7 +1003,7 @@
                                     <binding destination="cu7-9X-1cE" name="value" keyPath="self.version" id="3Wt-ej-pJv"/>
                                 </connections>
                             </textField>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="YBA-Wk-tfq">
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="YBA-Wk-tfq" customClass="PageNavigationControl" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="335" y="54" width="280" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <shadow key="shadow" blurRadius="3">

@@ -142,7 +142,7 @@ class PageButton: NSButton {
         if !isEnabled { return }
 
         transition(0.1)
-        alphaValue = 0.8
+        alphaValue = visibleAlpha
         shadow = buttonShadow
 
         onMouseEnter?()
