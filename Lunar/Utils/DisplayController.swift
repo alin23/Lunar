@@ -742,6 +742,7 @@ class DisplayController {
         let serialForID = Dictionary(zip(ids, serials), uniquingKeysWith: first(this:other:))
 
         CGDisplayRestoreColorSyncSettings()
+        DisplayController.panelManager = MPDisplayMgr()
         guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
             let displays = ids.map { Display(id: $0, active: true) }
 
@@ -936,9 +937,10 @@ class DisplayController {
     }
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
-        guard !display.neverFallbackControl else { return false }
+        guard !display.neverFallbackControl, display.enabledControls[.gamma] ?? false else { return false }
 
-        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty,
+        if !SyncMode.possibleClamshellModeSoon, !screensSleeping.load(ordering: .relaxed),
+           let screen = display.screen, !screen.visibleFrame.isEmpty,
            !(display.control?.isResponsive() ?? true)
         {
             if let promptTime = fallbackPromptTime[display.id] {
