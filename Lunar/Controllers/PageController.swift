@@ -28,15 +28,15 @@ class PageController: NSPageController {
 
     // MARK: Internal
 
-    var pageControl: PageControl!
-
-    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("hotkey")
-    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("settings")
+    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("Hotkeys")
+    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("Configuration")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
     override var arrangedObjects: [Any] {
         didSet {
-            pageControl?.numberOfPages = arrangedObjects.count
+            if let splitViewController = parent as? SplitViewController {
+                splitViewController.pageController = self
+            }
         }
     }
 
@@ -67,20 +67,19 @@ class PageController: NSPageController {
             arrangedObjects.append(GENERIC_DISPLAY)
         }
 
-        setupPageControl(size: arrangedObjects.count)
+        selectedIndex = Page.display.rawValue
         if let splitViewController = parent as? SplitViewController {
+            splitViewController.pageController = self
             splitViewController.onLeftButtonPress = { [weak self] in
                 self?.navigateBack(nil)
             }
             splitViewController.onRightButtonPress = { [weak self] in
                 self?.navigateForward(nil)
             }
-            if pageControl.numberOfPages == 3 {
+            if arrangedObjects.count == 3 {
                 splitViewController.lastPage()
             }
         }
-
-        selectedIndex = Page.display.rawValue
 
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
@@ -89,27 +88,6 @@ class PageController: NSPageController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-    }
-
-    // MARK: Private
-
-    private func setupPageControl(size: Int) {
-        let width: CGFloat = 300
-        let x: CGFloat = (view.frame.width - width) / 2
-
-        let frame = NSRect(x: x, y: 20, width: width, height: 20)
-        pageControl = PageControl(
-            frame: frame,
-            numberOfPages: size,
-            hidesForSinglePage: true,
-            tintColor: pageIndicatorTintColor,
-            currentTintColor: currentPageIndicatorTintColor
-        )
-        if !view.subviews.contains(pageControl) {
-            view.addSubview(pageControl)
-        }
-
-        pageControl.setNeedsDisplay(pageControl.frame)
     }
 }
 
@@ -132,7 +110,6 @@ extension PageController: NSPageControllerDelegate {
         guard let c = c as? PageController else { return }
 
         guard let splitViewController = c.parent as? SplitViewController else {
-            c.pageControl?.currentPage = c.selectedIndex
             return
         }
 
@@ -149,13 +126,11 @@ extension PageController: NSPageControllerDelegate {
                 advancedSettingsHintShown = true
                 settingsPageController.advancedSettingsButton.highlight()
             }
-        case c.pageControl.numberOfPages - 1:
+        case arrangedObjects.count - 1:
             splitViewController.lastPage()
         default:
             splitViewController.whiteBackground()
         }
-
-        c.pageControl?.currentPage = c.selectedIndex
     }
 
     func pageController(_: NSPageController, identifierFor object: Any) -> NSPageController.ObjectIdentifier {

@@ -145,6 +145,19 @@ class SplitViewController: NSSplitViewController {
     var adaptiveModeObserver: Cancellable?
     var defaultAutoModeTitle: NSAttributedString?
 
+    @objc dynamic var pages: [NSTabViewItem] = {
+        let hotkeysTab = NSTabViewItem(identifier: "Hotkeys")
+        let configurationTab = NSTabViewItem(identifier: "Configuration")
+        let builtinTab = NSTabViewItem(identifier: "Built-in")
+
+        hotkeysTab.label = "Hotkeys"
+        configurationTab.label = "Configuration"
+        builtinTab.label = "Built-in"
+
+        return [hotkeysTab, configurationTab, builtinTab]
+    }()
+
+    @Atomic var applyPage = true
     @IBOutlet var logo: NSTextField?
 
     @IBOutlet var containerView: NSView?
@@ -155,12 +168,45 @@ class SplitViewController: NSSplitViewController {
     @IBOutlet var goRightButton: PageButton?
     @IBOutlet var goLeftNotice: NSTextField?
     @IBOutlet var goRightNotice: NSTextField?
+    @IBOutlet var pageControl: NSSegmentedControl!
 
     var onLeftButtonPress: (() -> Void)?
     var onRightButtonPress: (() -> Void)?
 
     var overrideAdaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver: Bool = false
+
+    @objc dynamic var page: Int = 2 {
+        didSet {
+            guard applyPage else { return }
+            appDelegate.currentPage = page
+            appDelegate.goToPage(ignoreUIElement: true)
+        }
+    }
+
+    weak var pageController: PageController? {
+        didSet {
+            guard let pageController = pageController else { return }
+            pages = pageController.arrangedObjects.compactMap { obj in
+                switch obj {
+                case let page as NSPageController.ObjectIdentifier:
+                    let tab = NSTabViewItem(identifier: page.stripped)
+                    tab.label = page.stripped
+                    return tab
+                case let display as Display:
+                    let tab = NSTabViewItem(identifier: display.serial)
+                    tab.label = display.name.stripped
+                    return tab
+                default:
+                    return nil
+                }
+            }
+            page = pageController.selectedIndex
+
+            pageControl.sizeToFit()
+            pageControl.center(within: view.visibleRect, vertically: false)
+        }
+    }
 
     var activeHelpButton: HelpButton? {
         _activeHelpButton as? HelpButton
@@ -222,7 +268,15 @@ class SplitViewController: NSSplitViewController {
         view.layer?.backgroundColor == white.cgColor
     }
 
+    func setPage(_ pageNumber: Int?) {
+        guard let pageNumber = pageNumber else { return }
+        applyPage = false
+        page = pageNumber
+        applyPage = true
+    }
+
     func lastPage() {
+        setPage(pageController?.selectedIndex)
         whiteBackground()
 
         goLeftButton?.enable()
@@ -233,6 +287,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func whiteBackground() {
+        setPage(pageController?.selectedIndex)
         view.transition(0.2)
         if let logo = logo {
             logo.transition(0.2)
@@ -263,6 +318,8 @@ class SplitViewController: NSSplitViewController {
 
             goLeftButton?.compositingFilter = nil
             goRightButton?.compositingFilter = nil
+
+            pageControl?.appearance = NSAppearance(named: .darkAqua)
         } else {
             activeModeButton?.page = .display
             activeModeButton?.fade()
@@ -273,6 +330,8 @@ class SplitViewController: NSSplitViewController {
 
             goLeftButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
             goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
+
+            pageControl?.appearance = NSAppearance(named: .aqua)
         }
 
         goLeftButton?.enable()
@@ -280,6 +339,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func yellowBackground() {
+        setPage(pageController?.selectedIndex)
         if let logo = logo {
             logo.transition(0.2)
             logo.textColor = bgColor
@@ -295,6 +355,7 @@ class SplitViewController: NSSplitViewController {
         goLeftButton?.enable()
         goRightButton?.compositingFilter = CIFilter(name: "CISubtractBlendMode")
         goRightButton?.enable()
+        pageControl?.appearance = NSAppearance(named: .aqua)
 
         if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade {
             if !leftHintsShown {
@@ -312,6 +373,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func mauveBackground() {
+        setPage(pageController?.selectedIndex)
         if let logo = logo {
             logo.transition(0.2)
             logo.textColor = logoColor
@@ -340,6 +402,7 @@ class SplitViewController: NSSplitViewController {
         goLeftButton?.disable()
         goRightButton?.compositingFilter = nil
         goRightButton?.enable()
+        pageControl?.appearance = NSAppearance(named: .darkAqua)
     }
 
     override func viewDidAppear() {
