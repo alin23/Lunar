@@ -152,6 +152,7 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic var noDisplay: Bool = false
     @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
+    @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin
 
     var adaptiveModeObserver: Cancellable?
     var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
@@ -422,6 +423,7 @@ class DisplayViewController: NSViewController {
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
         inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
+        chartHidden = noDisplay || display.isBuiltin
 
         settingsButton?.display = display
         settingsButton?.displayViewController = self
@@ -963,6 +965,7 @@ class DisplayViewController: NSViewController {
     }
 
     func initGraph(mode: AdaptiveMode? = nil) {
+        guard !chartHidden else { return }
         brightnessContrastChart?.initGraph(
             display: display,
             brightnessColor: brightnessGraphColor,
@@ -975,6 +978,7 @@ class DisplayViewController: NSViewController {
     }
 
     func zeroGraph() {
+        guard !chartHidden else { return }
         brightnessContrastChart?.initGraph(
             display: nil,
             brightnessColor: brightnessGraphColor,

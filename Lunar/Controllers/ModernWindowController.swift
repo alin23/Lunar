@@ -26,7 +26,7 @@ extension AppDelegate: NSWindowDelegate {
         log.debug("Got window while closing: \(window.title)")
         guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
-              let settingsPageController = pageController.viewControllers["settings"] as? SettingsPageController,
+              let settingsPageController = pageController.viewControllers["Configuration"] as? SettingsPageController,
               let settingsViewController = settingsPageController.view.subviews[1].subviews[0].nextResponder as? SettingsViewController,
               let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
               let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
@@ -55,7 +55,6 @@ extension AppDelegate: NSWindowDelegate {
             log.verbose("Removing subviews for \(key) controller")
             controller.view.subviews.removeAll()
         }
-        pageController.pageControl = nil
         pageController.viewControllers.removeAll()
         pageController.view.subviews.removeAll()
 

@@ -1099,6 +1099,27 @@ Configuration page</string>
                                     <binding destination="cu7-9X-1cE" name="value" keyPath="self.version" id="3Wt-ej-pJv"/>
                                 </connections>
                             </textField>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="YBA-Wk-tfq">
+                                <rect key="frame" x="335" y="54" width="280" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <shadow key="shadow" blurRadius="3">
+                                    <size key="offset" width="0.0" height="2"/>
+                                    <color key="color" red="0.19154800035540731" green="0.15628272776877544" blue="0.27301232993197277" alpha="0.69575227649006621" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GAw-88-Ynr">
+                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <segments>
+                                        <segment label="Hotkeys" toolTip="Wait a very short amount of time between DDC requests. Best setting if the monitor doesn't flicker by using it." selected="YES"/>
+                                        <segment label="Configuration" toolTip="Wait a moderate amount of time between DDC requests. This might make Smooth Transition janky." tag="1"/>
+                                        <segment label="LG Ultra HD" toolTip="Wait a longer amount of time between DDC requests. This might cause increased latency."/>
+                                        <segment label="Built-in"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <binding destination="cu7-9X-1cE" name="selectedIndex" keyPath="self.page" previousBinding="7jE-uO-cya" id="iQr-i1-qLF"/>
+                                    <binding destination="cu7-9X-1cE" name="content" keyPath="self.pages" id="7jE-uO-cya"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                     </view>
                     <connections>
@@ -1111,9 +1132,11 @@ Configuration page</string>
                         <outlet property="goRightButton" destination="DOd-ks-yiz" id="dSC-Fg-ulX"/>
                         <outlet property="goRightNotice" destination="hKB-Ol-MnX" id="ejk-lb-7Dn"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
+                        <outlet property="pageControl" destination="YBA-Wk-tfq" id="ano-Vn-Ld4"/>
                     </connections>
                 </viewController>
                 <customObject id="MYP-ov-2Hn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="vbX-Ne-dGf"/>
             </objects>
             <point key="canvasLocation" x="96" y="1227"/>
         </scene>
@@ -2649,6 +2672,14 @@ when dock and menubar icons are hidden</string>
                                         </buttonCell>
                                         <connections>
                                             <action selector="lockCurve:" target="1Bn-Ca-ETm" id="kxd-gi-Fbv"/>
+                                            <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.chartHidden" previousBinding="e5b-ch-dPT" id="OvN-HS-8r9">
+                                                <dictionary key="options">
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
+                                                </dictionary>
+                                            </binding>
                                             <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="e5b-ch-dPT">
                                                 <dictionary key="options">
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -2671,6 +2702,14 @@ when dock and menubar icons are hidden</string>
                                         </buttonCell>
                                         <connections>
                                             <action selector="lockCurve:" target="1Bn-Ca-ETm" id="b0O-bF-Oye"/>
+                                            <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.chartHidden" previousBinding="Gol-fQ-E4K" id="Oc8-WB-s1m">
+                                                <dictionary key="options">
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
+                                                </dictionary>
+                                            </binding>
                                             <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="Gol-fQ-E4K">
                                                 <dictionary key="options">
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -2679,6 +2718,9 @@ when dock and menubar icons are hidden</string>
                                         </connections>
                                     </button>
                                 </subviews>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.chartHidden" id="acp-KF-bgr"/>
+                                </connections>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="325" y="274" width="300" height="300"/>
@@ -3710,7 +3752,7 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
                                 <rect key="frame" x="37" y="-16" width="258" height="126"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" selectable="YES" title="Function keys notice" id="aWn-9O-e5g">
