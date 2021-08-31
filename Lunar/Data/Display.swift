@@ -437,6 +437,8 @@ enum ValueType {
         }
         if let gammaControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .gamma) {
             enabledControls[.gamma] = gammaControlEnabled
+        } else {
+            enabledControls[.gamma] = !DDC.isBuiltinDisplay(_id)
         }
 
         if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
@@ -594,6 +596,8 @@ enum ValueType {
 
         if let enabledControls = enabledControls {
             self.enabledControls = enabledControls
+        } else {
+            self.enabledControls[.gamma] = !DDC.isBuiltinDisplay(_id)
         }
         if let userBrightness = userBrightness {
             self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
@@ -1806,7 +1810,7 @@ enum ValueType {
                 .network: true,
                 .coreDisplay: true,
                 .ddc: true,
-                .gamma: true,
+                .gamma: !DDC.isBuiltinDisplay(id),
             ],
             brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
                 100,
@@ -2905,7 +2909,7 @@ enum ValueType {
             .network: true,
             .coreDisplay: true,
             .ddc: true,
-            .gamma: true,
+            .gamma: !DDC.isBuiltinDisplay(id),
         ]
         brightnessCurveFactors = [
             .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,

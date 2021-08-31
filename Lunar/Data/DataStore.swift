@@ -36,6 +36,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .firstRunAfterLunar4Upgrade,
     .firstRunAfterM1DDCUpgrade,
     .firstRunAfterDefaults5Upgrade,
+    .firstRunAfterBuiltinUpgrade,
     .fKeysAsFunctionKeys,
     .hasActiveDisplays,
     .hideMenuBarIcon,
@@ -106,6 +107,12 @@ class DataStore: NSObject {
             Defaults[.firstRunAfterLunar4Upgrade] = true
             Defaults[.firstRunAfterM1DDCUpgrade] = true
             Defaults[.firstRunAfterDefaults5Upgrade] = true
+            Defaults[.firstRunAfterBuiltinUpgrade] = true
+        }
+
+        if Defaults[.firstRunAfterBuiltinUpgrade] == nil {
+            DataStore.firstRunAfterBuiltinUpgrade()
+            Defaults[.firstRunAfterBuiltinUpgrade] = true
         }
 
         if Defaults[.firstRunAfterLunar4Upgrade] == nil {
@@ -164,6 +171,17 @@ class DataStore: NSObject {
 
         CachedDefaults[.displays] = displays
         if now { Defaults[.displays] = displays }
+    }
+
+    static func firstRunAfterBuiltinUpgrade() {
+        thisIsFirstRunAfterBuiltinUpgrade = true
+        guard let displays = CachedDefaults[.displays] else { return }
+        for display in displays {
+            if display.isBuiltin, display.isSmartDisplay {
+                display.enabledControls[.gamma] = false
+                display.save()
+            }
+        }
     }
 
     static func firstRunAfterLunar4Upgrade() {
@@ -561,6 +579,7 @@ extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
+    static let firstRunAfterBuiltinUpgrade = Key<Bool?>("firstRunAfterBuiltinUpgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)

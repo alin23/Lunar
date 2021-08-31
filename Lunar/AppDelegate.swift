@@ -56,15 +56,6 @@ let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar
 let TEST_MODE = AppSettings.testMode
 let LOG_URL = fm.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
     .appendingPathComponent("swiftybeaver.log", isDirectory: false)
-let TRANSFER_URL = "https://transfer.sh"
-let LOG_UPLOAD_URL = "https://log.lunar.fyi/upload"
-let ANALYTICS_URL = "https://log.lunar.fyi/analytics"
-let DEBUG_DATA_HEADERS: HTTPHeaders = [
-    "Content-type": "application/octet-stream",
-    "Max-Downloads": "50",
-    "Max-Days": "5",
-]
-let LOG_ENCODING_THRESHOLD: UInt64 = 100_000_000 // 100MB
 
 var activeDisplay: Display?
 
@@ -72,6 +63,7 @@ var thisIsFirstRun = false
 var thisIsFirstRunAfterLunar4Upgrade = false
 var thisIsFirstRunAfterDefaults5Upgrade = false
 var thisIsFirstRunAfterM1DDCUpgrade = false
+var thisIsFirstRunAfterBuiltinUpgrade = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
