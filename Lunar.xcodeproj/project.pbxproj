@@ -46,6 +46,7 @@
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
+		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
@@ -246,6 +247,7 @@
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
 		C740A1F3262490E1004BC1C7 /* CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLI.swift; sourceTree = "<group>"; };
+		C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNavigationControl.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginServiceKit.swift; sourceTree = "<group>"; };
 		C74F8DBE25EB94660077DF27 /* DisplayServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DisplayServices.framework; path = ../../../../../System/Library/PrivateFrameworks/DisplayServices.framework; sourceTree = "<group>"; };
@@ -562,6 +564,7 @@
 				C7DD62282612331700B07B31 /* PaddedTextField.swift */,
 				C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */,
 				C76B775C26445C9B007CAAC5 /* MacToggle.swift */,
+				C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1108,6 +1111,7 @@
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
 				C7E80E292637060F004718A4 /* ReadWrite.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
+				C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */,
 				C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
