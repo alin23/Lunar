@@ -160,7 +160,7 @@ class BrightnessContrastChartView: LineChartView {
         } else if let display = display {
             switch adaptiveMode {
             case let mode as SensorMode:
-                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 1.0)
+                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 30.0)
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
@@ -170,7 +170,7 @@ class BrightnessContrastChartView: LineChartView {
                 }
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, values
+                        xs, values.striding(by: 30)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
@@ -180,7 +180,7 @@ class BrightnessContrastChartView: LineChartView {
                 }
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, values
+                        xs, values.striding(by: 30)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as LocationMode:
@@ -188,21 +188,21 @@ class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 let points = mode.getBrightnessContrastBatch(display: display)
 
-                let xs = stride(from: 0.0, to: (points.brightness.count - 1).d, by: 1.0)
+                let xs = stride(from: 0.0, to: (points.brightness.count - 1).d, by: 3.0)
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, points.brightness
+                        xs, points.brightness.striding(by: 3)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, points.contrast
+                        xs, points.contrast.striding(by: 3)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 mode.maxChartDataPoints = points.brightness.count
                 setupLimitLines(mode, display: display, chartEntry: points)
             case let mode as SyncMode:
-                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 1.0)
+                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 3.0)
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
@@ -212,7 +212,7 @@ class BrightnessContrastChartView: LineChartView {
                 }
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, values
+                        xs, values.striding(by: 3)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
@@ -222,7 +222,7 @@ class BrightnessContrastChartView: LineChartView {
                 }
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, values
+                        xs, values.striding(by: 3)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as ManualMode:
@@ -263,26 +263,35 @@ class BrightnessContrastChartView: LineChartView {
         }
 
         brightnessGraph.colors = [NSColor.clear]
-        brightnessGraph.fillColor = brightnessColor
-        brightnessGraph.drawCirclesEnabled = false
+        brightnessGraph.fillColor = appDelegate.darkMode ? white.withAlphaComponent(0.5) : brightnessColor
+        brightnessGraph.cubicIntensity = 0.1
+        brightnessGraph.circleColors = appDelegate.darkMode ? [white] : [darkMauve.withAlphaComponent(0.6)]
+        brightnessGraph.circleHoleColor = appDelegate.darkMode ? lunarYellow : white
+        brightnessGraph.circleRadius = 4.0
+        brightnessGraph.circleHoleRadius = appDelegate.darkMode ? 2.5 : 1.5
+        brightnessGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData]
         brightnessGraph.drawFilledEnabled = true
         brightnessGraph.drawValuesEnabled = false
         brightnessGraph.highlightColor = brightnessColor.withAlphaComponent(0.3)
         brightnessGraph.highlightLineWidth = 2
         brightnessGraph.highlightLineDashPhase = 3
         brightnessGraph.highlightLineDashLengths = [10, 6]
-        brightnessGraph.mode = .linear
+        brightnessGraph.mode = .cubicBezier
 
         contrastGraph.colors = [NSColor.clear]
         contrastGraph.fillColor = contrastColor
-        contrastGraph.drawCirclesEnabled = false
+        contrastGraph.cubicIntensity = 0.1
+        contrastGraph.circleColors = [lunarYellow.withAlphaComponent(0.9)]
+        contrastGraph.circleRadius = 4.0
+        contrastGraph.circleHoleRadius = 1.5
+        contrastGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData]
         contrastGraph.drawFilledEnabled = true
         contrastGraph.drawValuesEnabled = false
         contrastGraph.highlightColor = contrastColor.withAlphaComponent(0.9)
         contrastGraph.highlightLineWidth = 2
         contrastGraph.highlightLineDashPhase = 10
         contrastGraph.highlightLineDashLengths = [10, 6]
-        contrastGraph.mode = .linear
+        contrastGraph.mode = .cubicBezier
 
         if CachedDefaults[.moreGraphData] {
             xAxis.labelTextColor = labelColor
