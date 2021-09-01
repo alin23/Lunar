@@ -589,10 +589,10 @@ class DisplayViewController: NSViewController {
                 contrastChartEntry.count
             )
             let xs = stride(from: 0, to: maxValues, by: 1)
-            for (x, y) in zip(xs, points.brightness) {
+            for (x, y) in zip(xs, points.brightness.striding(by: 3)) {
                 brightnessChartEntry[x].y = y
             }
-            for (x, y) in zip(xs, points.contrast) {
+            for (x, y) in zip(xs, points.contrast.striding(by: 3)) {
                 contrastChartEntry[x].y = y
             }
         case let mode as SyncMode:
@@ -608,7 +608,7 @@ class DisplayViewController: NSViewController {
                     factor: brightnessFactor,
                     userValues: userBrightness
                 )
-                for (x, b) in zip(xs, values) {
+                for (x, b) in zip(xs, values.striding(by: 3)) {
                     brightnessChartEntry[x].y = b
                 }
             }
@@ -621,7 +621,7 @@ class DisplayViewController: NSViewController {
                     factor: contrastFactor,
                     userValues: userContrast
                 )
-                for (x, b) in zip(xs, values) {
+                for (x, b) in zip(xs, values.striding(by: 3)) {
                     contrastChartEntry[x].y = b
                 }
             }
@@ -638,7 +638,7 @@ class DisplayViewController: NSViewController {
                     factor: brightnessFactor,
                     userValues: userBrightness
                 )
-                for (x, b) in zip(xs, values) {
+                for (x, b) in zip(xs, values.striding(by: 30)) {
                     brightnessChartEntry[x].y = b
                 }
             }
@@ -651,7 +651,7 @@ class DisplayViewController: NSViewController {
                     factor: contrastFactor,
                     userValues: userContrast
                 )
-                for (x, b) in zip(xs, values) {
+                for (x, b) in zip(xs, values.striding(by: 30)) {
                     contrastChartEntry[x].y = b
                 }
             }

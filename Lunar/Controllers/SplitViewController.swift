@@ -285,7 +285,7 @@ class SplitViewController: NSSplitViewController {
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantDark)
             view.bg = darkMauve
 
-            pageControl?.appearance = NSAppearance(named: .darkAqua)
+            pageControl?.appearance = NSAppearance(named: .vibrantDark)
         } else {
             activeModeButton?.page = .display
             activeModeButton?.fade()
