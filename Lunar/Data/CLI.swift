@@ -11,6 +11,7 @@ import ArgumentParser
 import Cocoa
 import Dispatch
 import Foundation
+import FuzzyFind
 import Regex
 import SwiftyJSON
 
@@ -136,9 +137,13 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
     default:
         if let id = filter.u32 {
             return displays.first(where: { $0.id == id })
+        } else if let display = displays.first(where: { $0.serial == filter }) {
+            return display
         } else {
-            return displays.first(where: { $0.serial == filter }) ?? displays
-                .min { $0.name.levenshtein(filter) < $1.name.levenshtein(filter) }
+            let alignments = fuzzyFind(queries: [filter], inputs: displays.map(\.name))
+            guard let name = alignments.first?.result.asString else { return nil }
+
+            return displays.first(where: { $0.name == name })
         }
     }
 }

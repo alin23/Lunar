@@ -92,6 +92,15 @@
         }
       },
       {
+        "package": "FuzzyFind",
+        "repositoryURL": "https://github.com/truizlop/FuzzyFind.git",
+        "state": {
+          "branch": "main",
+          "revision": "6070503243bf2e9cbe55332516fad01d5edf7534",
+          "version": null
+        }
+      },
+      {
         "package": "Glob",
         "repositoryURL": "https://github.com/Bouke/Glob",
         "state": {

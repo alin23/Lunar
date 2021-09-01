@@ -515,12 +515,14 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 let ddcControl = DDCControl(display: display)
 
                 #if arch(arm64)
-                    let ddcAvailable = ddcControl.isAvailable() || DDC.hasAVService(displayID: display.id, ignoreCache: true)
+                    let ddcAvailable = !display
+                        .isSmartBuiltin && (ddcControl.isAvailable() || DDC.hasAVService(displayID: display.id, ignoreCache: true))
                 #else
-                    let ddcAvailable = ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id, ignoreCache: true)
+                    let ddcAvailable = !display
+                        .isSmartBuiltin && (ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id, ignoreCache: true))
                 #endif
-                let coreDisplayAvailable = coreDisplayControl.isAvailable() || display.isAppleDisplay()
-                let networkAvailable = networkControl.isAvailable()
+                let coreDisplayAvailable = coreDisplayControl.isAvailable() || display.isAppleDisplay() || display.isSmartBuiltin
+                let networkAvailable = !display.isSmartBuiltin && networkControl.isAvailable()
                 let shouldStartTests = ddcAvailable || coreDisplayAvailable || networkAvailable
 
                 if shouldStartTests {

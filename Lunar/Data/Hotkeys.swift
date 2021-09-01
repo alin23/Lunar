@@ -725,6 +725,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil, checkPermissions: Bool = false) {
+        displayController.currentAudioDisplay = displayController.getCurrentAudioDisplay()
+
         if checkPermissions {
             acquirePrivileges()
         } else if let enabled = brightnessKeysEnabled, enabled {
