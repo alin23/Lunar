@@ -47,6 +47,7 @@
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
+		C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */ = {isa = PBXBuildFile; productRef = C748210326DFA44400556EA8 /* FuzzyFind */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
@@ -397,6 +398,7 @@
 				C7BADA0A26386E940058974C /* ZIPFoundation in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
 				C78BD047259B30CA00FC823F /* EonilFSEvents in Frameworks */,
+				C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
 				C7FE72572391B3BC00EBA6DA /* CryptorECC in Frameworks */,
@@ -838,6 +840,7 @@
 				C77AB65B269A032E0046BA78 /* Magnet */,
 				C7C43188269CBB1B00DCD0F5 /* LDSwiftEventSourceStatic */,
 				C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */,
+				C748210326DFA44400556EA8 /* FuzzyFind */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -904,6 +907,7 @@
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
 				C7C43187269CBB1B00DCD0F5 /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 				C7CA0D4A26C1144B00E12CE5 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
+				C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1754,6 +1758,14 @@
 				minimumVersion = 0.4.1;
 			};
 		};
+		C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/truizlop/FuzzyFind.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		C75BFE942695FAE9005EADCA /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimonFairbairn/SwiftyMarkdown";
@@ -1954,6 +1966,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
+		};
+		C748210326DFA44400556EA8 /* FuzzyFind */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */;
+			productName = FuzzyFind;
 		};
 		C75BFE952695FAE9005EADCA /* SwiftyMarkdown */ = {
 			isa = XCSwiftPackageProductDependency;

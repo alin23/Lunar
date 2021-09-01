@@ -1929,7 +1929,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bif-J2-zQD">
-                                <rect key="frame" x="323" y="437" width="52" height="16"/>
+                                <rect key="frame" x="342" y="437" width="52" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Off" id="rnQ-BR-CdR">
                                     <font key="font" metaFont="system"/>
@@ -1938,7 +1938,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vm8-ej-UNg">
-                                <rect key="frame" x="422" y="437" width="55" height="16"/>
+                                <rect key="frame" x="441" y="437" width="55" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="On" id="SXN-o3-o1q">
                                     <font key="font" metaFont="system"/>
@@ -1947,7 +1947,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YJh-qf-Vrr" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="377" y="432" width="45" height="26"/>
+                                <rect key="frame" x="396" y="432" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
