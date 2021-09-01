@@ -1106,7 +1106,7 @@
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PKh-fF-D5v">
                                 <rect key="frame" x="43" y="400" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Use CoreDisplay when possible" id="vhs-Fm-qk5">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show more graph data" id="vhs-Fm-qk5">
                                     <font key="font" size="15" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -1121,13 +1121,13 @@
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.useCoreDisplay" id="dgP-1D-39e"/>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.moreGraphData" id="mdh-ZT-sUe"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="64a-QL-7wH">
                                 <rect key="frame" x="43" y="382" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Try using native APIs for controlling Apple displays" id="3mV-KD-y63">
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Renders values and data lines on the bottom graph" id="3mV-KD-y63">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" red="0.28788789335664333" green="0.28788789335664333" blue="0.28788789335664333" alpha="0.7913212159863946" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -1797,7 +1797,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bUO-Qi-56O">
-                                <rect key="frame" x="30" y="236" width="300" height="30"/>
+                                <rect key="frame" x="30" y="476" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="left" title="Hotkey step" id="ak3-la-rd5">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1806,7 +1806,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3lx-5a-yKj" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="243" width="106" height="40"/>
+                                <rect key="frame" x="366" y="483" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="iVM-BZ-Psk" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -1832,7 +1832,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f7A-iG-9Ye" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="389" y="226" width="61" height="20"/>
+                                <rect key="frame" x="389" y="466" width="61" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="alH-YI-1PH">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1841,7 +1841,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TI6-iY-nn0" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="504" width="106" height="40"/>
+                                <rect key="frame" x="350" y="374" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="fm3-Yw-dde" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -1867,7 +1867,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptg-bU-WRA">
-                                <rect key="frame" x="30" y="497" width="300" height="30"/>
+                                <rect key="frame" x="30" y="367" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Polling interval" id="2Zp-Qy-xtN">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1876,7 +1876,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uAE-HJ-vLk" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="376" y="488" width="55" height="20"/>
+                                <rect key="frame" x="376" y="358" width="55" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="SECONDS" id="6wl-ua-zr3">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1885,7 +1885,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T9n-Uo-gx1" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="504" width="106" height="40"/>
+                                <rect key="frame" x="350" y="374" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="uxW-V8-xzW" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -1911,7 +1911,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oe4-fW-vjY" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="376" y="488" width="55" height="20"/>
+                                <rect key="frame" x="376" y="358" width="55" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="SECONDS" id="Vus-Zj-wXx">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1920,7 +1920,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="osm-bT-7sA">
-                                <rect key="frame" x="30" y="185" width="300" height="30"/>
+                                <rect key="frame" x="30" y="425" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Smooth transition" id="zxx-4L-t4t">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1929,7 +1929,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bif-J2-zQD">
-                                <rect key="frame" x="323" y="197" width="52" height="16"/>
+                                <rect key="frame" x="323" y="437" width="52" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Off" id="rnQ-BR-CdR">
                                     <font key="font" metaFont="system"/>
@@ -1938,7 +1938,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vm8-ej-UNg">
-                                <rect key="frame" x="422" y="197" width="55" height="16"/>
+                                <rect key="frame" x="422" y="437" width="55" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="On" id="SXN-o3-o1q">
                                     <font key="font" metaFont="system"/>
@@ -1947,7 +1947,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YJh-qf-Vrr" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="377" y="192" width="45" height="26"/>
+                                <rect key="frame" x="377" y="432" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -1962,7 +1962,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J3H-YT-CPY">
-                                <rect key="frame" x="30" y="297" width="99" height="32"/>
+                                <rect key="frame" x="30" y="367" width="99" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Location" id="VmO-qe-cP9">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1971,7 +1971,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ddp-9H-WcU" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="369" y="283" width="68" height="20"/>
+                                <rect key="frame" x="369" y="353" width="68" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="LONGITUDE" id="T9r-by-Kew">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -1980,7 +1980,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GIC-bS-xkl" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="219" y="302" width="116" height="34"/>
+                                <rect key="frame" x="219" y="372" width="116" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" alignment="center" title="0.00" drawsBackground="YES" usesSingleLineMode="YES" id="DEi-Zg-5Lt" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="29"/>
@@ -2006,7 +2006,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cnu-VZ-hsX" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="247" y="283" width="61" height="20"/>
+                                <rect key="frame" x="247" y="353" width="61" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="LATITUDE" id="2pH-Nn-K4a">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -2015,7 +2015,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xDb-6C-QXm" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="345" y="302" width="116" height="34"/>
+                                <rect key="frame" x="345" y="372" width="116" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" alignment="center" title="0.00" drawsBackground="YES" usesSingleLineMode="YES" id="9pl-KO-CQr" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="29"/>
@@ -2041,7 +2041,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MWb-7g-4Mv" customClass="TextButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="132" y="306" width="50" height="14"/>
+                                <rect key="frame" x="132" y="376" width="50" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="bevel" title="RESET" bezelStyle="rounded" alignment="center" scrollable="YES" lineBreakMode="clipping" imageScaling="proportionallyDown" inset="2" id="8iI-6y-koY">
                                     <behavior key="behavior" lightByContents="YES"/>
@@ -2052,7 +2052,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="h3b-zL-1U3" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="509" width="16" height="16"/>
+                                <rect key="frame" x="7" y="379" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2065,7 +2065,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="3mT-HK-iGJ" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="443" width="16" height="16"/>
+                                <rect key="frame" x="7" y="378" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2091,7 +2091,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="aSp-kK-Lh9" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="310" width="16" height="16"/>
+                                <rect key="frame" x="7" y="380" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2104,7 +2104,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="mGr-rx-1N2" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="197" width="16" height="16"/>
+                                <rect key="frame" x="7" y="437" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2117,7 +2117,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fCl-dS-CXv" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="275" y="243" width="106" height="40"/>
+                                <rect key="frame" x="275" y="483" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="cES-lL-RA0" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -2143,7 +2143,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="flo-Nr-g61" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="291" y="226" width="75" height="20"/>
+                                <rect key="frame" x="291" y="466" width="75" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="6Cp-c9-oaG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -2152,7 +2152,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Ttq-LW-8du" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="248" width="16" height="16"/>
+                                <rect key="frame" x="7" y="488" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2165,7 +2165,7 @@ when dock and menubar icons are hidden</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcL-nB-ff6" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="184" y="243" width="106" height="40"/>
+                                <rect key="frame" x="184" y="483" width="106" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="100" usesSingleLineMode="YES" id="CDG-Ok-ECd" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="35"/>
@@ -2191,7 +2191,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TaK-4f-5Y3" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="213" y="226" width="48" height="20"/>
+                                <rect key="frame" x="213" y="466" width="48" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VOLUME" id="tXp-WY-TaJ">
                                     <font key="font" size="11" name="Menlo-Bold"/>

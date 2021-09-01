@@ -2514,7 +2514,7 @@ enum ValueType {
     }
 
     func isAppleDisplay() -> Bool {
-        CachedDefaults[.useCoreDisplay] && (isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID())
+        isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID()
     }
 
     func isAppleVendorID() -> Bool {

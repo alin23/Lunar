@@ -69,6 +69,11 @@ class BrightnessContrastChartView: LineChartView {
         mainThread {
             guard let data = data, data.dataSetCount >= 2 else { return }
 
+            guard CachedDefaults[.moreGraphData] else {
+                highlightValues(nil)
+                return
+            }
+
             switch adaptiveMode {
             case let mode as SensorMode:
                 let lux = mode.lastAmbientLight.rounded()
@@ -279,9 +284,15 @@ class BrightnessContrastChartView: LineChartView {
         contrastGraph.highlightLineDashLengths = [10, 6]
         contrastGraph.mode = .cubicBezier
 
-        xAxis.labelTextColor = labelColor
-        leftAxis.labelTextColor = labelColor
-        rightAxis.labelTextColor = labelColor
+        if CachedDefaults[.moreGraphData] {
+            xAxis.labelTextColor = labelColor
+            leftAxis.labelTextColor = labelColor
+            rightAxis.labelTextColor = labelColor
+        } else {
+            xAxis.labelTextColor = .clear
+            leftAxis.labelTextColor = .clear
+            rightAxis.labelTextColor = .clear
+        }
 
         setupLegend()
 
@@ -385,9 +396,9 @@ class BrightnessContrastChartView: LineChartView {
 
         rightAxis.axisMaximum = 100
         rightAxis.axisMinimum = 0
-        rightAxis.drawGridLinesEnabled = true
+        rightAxis.drawGridLinesEnabled = CachedDefaults[.moreGraphData]
         rightAxis.drawAxisLineEnabled = false
-        rightAxis.drawLabelsEnabled = true
+        rightAxis.drawLabelsEnabled = CachedDefaults[.moreGraphData]
         rightAxis.labelFont = NSFont.systemFont(ofSize: 12, weight: .bold)
         rightAxis.labelPosition = .insideChart
         rightAxis.xOffset = 22.0
@@ -395,12 +406,12 @@ class BrightnessContrastChartView: LineChartView {
         rightAxis.drawZeroLineEnabled = false
         rightAxis.drawBottomYLabelEntryEnabled = false
 
-        xAxis.drawGridLinesEnabled = true
+        xAxis.drawGridLinesEnabled = CachedDefaults[.moreGraphData]
         xAxis.labelFont = NSFont.systemFont(ofSize: 12, weight: .bold)
         xAxis.labelPosition = .bottomInside
         xAxis.drawAxisLineEnabled = false
         xAxis.gridColor = white.withAlphaComponent(0.3)
-        xAxis.drawLabelsEnabled = true
+        xAxis.drawLabelsEnabled = CachedDefaults[.moreGraphData]
 
         switch mode ?? displayController.adaptiveModeKey {
         case .location:
@@ -416,7 +427,8 @@ class BrightnessContrastChartView: LineChartView {
 
         chartDescription = Description()
         chartDescription.font = NSFont.systemFont(ofSize: 11.0, weight: .semibold)
-        chartDescription.textColor = (red.blended(withFraction: 0.5, of: lunarYellow) ?? red).withAlphaComponent(0.9)
+        chartDescription.textColor = CachedDefaults[.moreGraphData] ? (red.blended(withFraction: 0.5, of: lunarYellow) ?? red)
+            .withAlphaComponent(0.9) : .clear
         chartDescription.position = CGPoint(x: 920, y: 130)
 
         switch mode ?? displayController.adaptiveModeKey {
