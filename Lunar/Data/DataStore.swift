@@ -15,6 +15,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .moreGraphData,
     .enableOrientationHotkeys,
     .appExceptions,
     .muteVolumeZero,
@@ -57,7 +58,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .sunrise,
     .sunset,
     .syncPollingSeconds,
-    .useCoreDisplay,
     .volumeKeysEnabled,
     .volumeStep,
     .reapplyValuesAfterWake,
@@ -523,6 +523,7 @@ func initCache() {
     cacheKey(.showVirtualDisplays)
     cacheKey(.showAirplayDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.moreGraphData)
     cacheKey(.enableOrientationHotkeys)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
@@ -533,7 +534,6 @@ func initCache() {
     cacheKey(.didSwipeRight)
     cacheKey(.smoothTransition)
     cacheKey(.refreshValues)
-    cacheKey(.useCoreDisplay)
     cacheKey(.debug)
     cacheKey(.showQuickActions)
     cacheKey(.manualLocation)
@@ -588,6 +588,7 @@ extension Defaults.Keys {
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let moreGraphData = Key<Bool>("moreGraphData", default: false)
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
@@ -598,7 +599,6 @@ extension Defaults.Keys {
     static let didSwipeRight = Key<Bool>("didSwipeRight", default: false)
     static let smoothTransition = Key<Bool>("smoothTransition", default: false)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
-    static let useCoreDisplay = Key<Bool>("useCoreDisplay", default: true)
     static let debug = Key<Bool>("debug", default: false)
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
     static let manualLocation = Key<Bool>("manualLocation", default: false)
@@ -680,6 +680,7 @@ let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode
 let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let moreGraphDataPublisher = Defaults.publisher(.moreGraphData).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHotkeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }

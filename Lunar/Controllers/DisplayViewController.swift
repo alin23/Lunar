@@ -154,6 +154,7 @@ class DisplayViewController: NSViewController {
     @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin
 
+    var graphObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
     var sendingBrightnessObserver: ((Bool, Bool) -> Void)?
     var sendingContrastObserver: ((Bool, Bool) -> Void)?
@@ -298,7 +299,8 @@ class DisplayViewController: NSViewController {
     }
 
     @objc func highlightChartValue(notification _: Notification) {
-        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID else { return }
+        guard CachedDefaults[.moreGraphData], let display = display, let brightnessContrastChart = brightnessContrastChart,
+              display.id != GENERIC_DISPLAY_ID else { return }
         brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
     }
 
@@ -511,6 +513,7 @@ class DisplayViewController: NSViewController {
         refreshView()
 
         listenForSendingBrightnessContrast()
+        listenForGraphDataChange()
         listenForAdaptiveModeChange()
         listenForDisplayBoolChange()
         listenForBrightnessContrastChange()
@@ -942,6 +945,16 @@ class DisplayViewController: NSViewController {
         }.store(in: &displayObservers, for: "adaptive")
     }
 
+    func listenForGraphDataChange() {
+        graphObserver = moreGraphDataPublisher.sink { [weak self] change in
+            log.debug("More graph data: \(change.newValue)")
+            guard let self = self else { return }
+            mainAsyncAfter(ms: 1000) {
+                self.initGraph()
+            }
+        }
+    }
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             guard let self = self, !self.pausedAdaptiveModeObserver else {
@@ -955,7 +968,7 @@ class DisplayViewController: NSViewController {
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
                 mainThread {
-                    if let chart = self.brightnessContrastChart, !chart.visibleRect.isEmpty {
+                    if let chart = self.brightnessContrastChart {
                         self.initGraph(mode: adaptiveMode.mode)
                     }
                 }
