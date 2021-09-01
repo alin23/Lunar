@@ -527,6 +527,10 @@ enum DDC {
         return realName.contains("sidecar") || realName.contains("ipad")
     }
 
+    static func isSmartBuiltinDisplay(_ id: CGDirectDisplayID, checkName: Bool = true) -> Bool {
+        isBuiltinDisplay(id, checkName: checkName) && DisplayServicesIsSmartDisplay(id)
+    }
+
     static func isBuiltinDisplay(_ id: CGDirectDisplayID, checkName: Bool = true) -> Bool {
         guard !isGeneric(id) else { return false }
         if let panel = DisplayController.panel(with: id) {
