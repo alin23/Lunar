@@ -13,6 +13,7 @@ import Combine
 import CoreLocation
 import Defaults
 import Foundation
+import FuzzyFind
 import Sentry
 import Solar
 import Surge
@@ -86,6 +87,8 @@ class DisplayController {
     var pausedOverrideAdaptiveModeObserver: Bool = false
 
     var observers: Set<AnyCancellable> = []
+
+    lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay()
 
     var externalActiveDisplays: [Display] {
         activeDisplays.values.filter { !$0.isBuiltin }
@@ -168,15 +171,6 @@ class DisplayController {
         else { return nil }
 
         return activeDisplays[id]
-    }
-
-    var currentAudioDisplay: Display? {
-        guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) else {
-            return nil
-        }
-        return activeDisplays.values.map { $0 }.sorted(by: { d1, d2 in
-            d1.name.levenshtein(audioDevice.name) < d2.name.levenshtein(audioDevice.name)
-        }).first ?? currentDisplay
     }
 
     var currentDisplay: Display? {
@@ -794,6 +788,16 @@ class DisplayController {
         #endif
 
         return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
+    }
+
+    func getCurrentAudioDisplay() -> Display? {
+        guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) else {
+            return nil
+        }
+        let alignments = fuzzyFind(queries: [audioDevice.name], inputs: activeDisplays.values.map(\.name))
+        guard let name = alignments.first?.result.asString else { return currentDisplay }
+
+        return activeDisplays.values.first(where: { $0.name == name }) ?? currentDisplay
     }
 
     func autoAdaptMode() {
