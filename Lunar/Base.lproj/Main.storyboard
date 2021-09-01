@@ -1013,9 +1013,9 @@
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="GAw-88-Ynr">
                                     <font key="font" metaFont="systemSemibold" size="11"/>
                                     <segments>
-                                        <segment label="Hotkeys" toolTip="Wait a very short amount of time between DDC requests. Best setting if the monitor doesn't flicker by using it." selected="YES"/>
-                                        <segment label="Configuration" toolTip="Wait a moderate amount of time between DDC requests. This might make Smooth Transition janky." tag="1"/>
-                                        <segment label="LG Ultra HD" toolTip="Wait a longer amount of time between DDC requests. This might cause increased latency."/>
+                                        <segment label="Hotkeys" selected="YES"/>
+                                        <segment label="Configuration" tag="1"/>
+                                        <segment label="LG Ultra HD"/>
                                         <segment label="Built-in"/>
                                     </segments>
                                 </segmentedCell>
