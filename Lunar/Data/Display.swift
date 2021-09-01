@@ -325,7 +325,8 @@ enum ValueType {
         let brightnessCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
         let contrastCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
 
-        _id = try container.decode(CGDirectDisplayID.self, forKey: .id)
+        let id = try container.decode(CGDirectDisplayID.self, forKey: .id)
+        _id = id
         serial = try container.decode(String.self, forKey: .serial)
 
         adaptive = try container.decode(Bool.self, forKey: .adaptive)
@@ -375,7 +376,7 @@ enum ValueType {
 
         volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
-        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
+        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
 
@@ -438,7 +439,7 @@ enum ValueType {
         if let gammaControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .gamma) {
             enabledControls[.gamma] = gammaControlEnabled
         } else {
-            enabledControls[.gamma] = !DDC.isBuiltinDisplay(_id)
+            enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
         }
 
         if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
@@ -530,7 +531,7 @@ enum ValueType {
         defaultGammaBlueMin: Float = 0.0,
         defaultGammaBlueMax: Float = 1.0,
         defaultGammaBlueValue: Float = 1.0,
-        isSource: Bool = false,
+        isSource: Bool? = nil,
         applyGamma: Bool = false
     ) {
         _id = id
@@ -538,7 +539,7 @@ enum ValueType {
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
 
-        self.isSource = isSource
+        self.isSource = isSource ?? DDC.isSmartBuiltinDisplay(id)
         self.applyGamma = applyGamma
 
         self.defaultGammaRedMin = defaultGammaRedMin.ns
@@ -597,7 +598,7 @@ enum ValueType {
         if let enabledControls = enabledControls {
             self.enabledControls = enabledControls
         } else {
-            self.enabledControls[.gamma] = !DDC.isBuiltinDisplay(_id)
+            self.enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
         }
         if let userBrightness = userBrightness {
             self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
@@ -811,6 +812,7 @@ enum ValueType {
     }
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
+    lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
 
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = {
@@ -1810,7 +1812,7 @@ enum ValueType {
                 .network: true,
                 .coreDisplay: true,
                 .ddc: true,
-                .gamma: !DDC.isBuiltinDisplay(id),
+                .gamma: !DDC.isSmartBuiltinDisplay(id),
             ],
             brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
                 100,
@@ -1828,7 +1830,7 @@ enum ValueType {
             defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
             defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
             defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
-            isSource: (config["isSource"] as? Bool) ?? false,
+            isSource: (config["isSource"] as? Bool) ?? DDC.isSmartBuiltinDisplay(id),
             applyGamma: (config["applyGamma"] as? Bool) ?? false
         )
     }
@@ -2152,7 +2154,7 @@ enum ValueType {
 
         control = getBestControl()
 
-        guard isBuiltin, isSmartDisplay else { return }
+        guard isSmartBuiltin else { return }
         asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] _ in
             guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
                 return
@@ -2216,8 +2218,8 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !(isBuiltin && isSmartDisplay) else {
-            if isBuiltin, isSmartDisplay {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin else {
+            if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
             hasI2C = false
@@ -2910,7 +2912,7 @@ enum ValueType {
             .network: true,
             .coreDisplay: true,
             .ddc: true,
-            .gamma: !DDC.isBuiltinDisplay(id),
+            .gamma: !DDC.isSmartBuiltinDisplay(id),
         ]
         brightnessCurveFactors = [
             .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
