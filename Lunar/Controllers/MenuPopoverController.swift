@@ -134,6 +134,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func popoverWillShow() {
+        menuPopoverCloser.cancel()
         tableView.resizeInputs()
         #if DEBUG
             log.verbose("Calling adaptViewSize()")
@@ -142,10 +143,13 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func popoverDidShow() {
+        menuPopoverCloser.cancel()
         mainThread {
             if let area = trackingArea {
+                log.verbose("Remove tracking area for QuickActions")
                 view.removeTrackingArea(area)
             }
+            log.verbose("Add tracking area for QuickActions")
             trackingArea = NSTrackingArea(
                 rect: view.visibleRect,
                 options: [.mouseEnteredAndExited, .activeAlways],
@@ -158,6 +162,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     func popoverDidClose() {
         mainThread {
+            log.verbose("Remove tracking area for QuickActions")
             if let area = trackingArea {
                 view.removeTrackingArea(area)
             }
@@ -245,14 +250,12 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     override func mouseEntered(with _: NSEvent) {
-        log.verbose("Mouse entered menu popover")
+        log.verbose("Mouse entered QuickActions")
         menuPopoverCloser.cancel()
     }
 
     override func mouseExited(with _: NSEvent) {
-        log.verbose("Mouse exited menu popover")
-        mainAsyncAfter(ms: 1500) {
-            POPOVERS["menu"]!!.close()
-        }
+        log.verbose("Mouse exited QuickActions")
+        closeMenuPopover(after: 1500)
     }
 }
