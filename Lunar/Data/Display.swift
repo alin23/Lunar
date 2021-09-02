@@ -2440,7 +2440,8 @@ enum ValueType {
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self, var dict = self.dictionary else { return }
             if let panel = self.panel,
-               let compressed = getMonitorPanelData(panel).data(using: .utf8)?.gzip()?.base64EncodedString()
+               let encoded = try? encoder.encode(ForgivingEncodable(getMonitorPanelDataJSON(panel))),
+               let compressed = encoded.gzip()?.base64EncodedString()
             {
                 dict["panelData"] = compressed
             }
