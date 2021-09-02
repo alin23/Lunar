@@ -89,11 +89,21 @@ endif
 clean:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
 
+build: BEAUTIFY=1
 build: setversion
+ifneq ($(BEAUTIFY),0)
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+else
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log
+endif
 
+build-version: BEAUTIFY=1
 build-version:
+ifneq ($(BEAUTIFY),0)
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO MARKETING_VERSION=$(VERSION) CURRENT_PROJECT_VERSION=$(VERSION) | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+else
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO MARKETING_VERSION=$(VERSION) CURRENT_PROJECT_VERSION=$(VERSION) | tee /tmp/lunar-$(ENV)-build.log
+endif
 
 beta-upload: SHELL=/usr/local/bin/fish
 beta-upload: ENV=Release
