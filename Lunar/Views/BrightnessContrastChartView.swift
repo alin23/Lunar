@@ -164,7 +164,7 @@ class BrightnessContrastChartView: LineChartView {
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
-                var values = mode.interpolateSIMD(.brightness(0), display: display)
+                var values = mode.interpolateSIMD(.brightness(0), display: display, factor: display.brightnessCurveFactors[mode.key])
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
@@ -174,7 +174,7 @@ class BrightnessContrastChartView: LineChartView {
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
-                values = mode.interpolateSIMD(.contrast(0), display: display)
+                values = mode.interpolateSIMD(.contrast(0), display: display, factor: display.contrastCurveFactors[mode.key])
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
@@ -186,43 +186,47 @@ class BrightnessContrastChartView: LineChartView {
             case let mode as LocationMode:
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
-                let points = mode.getBrightnessContrastBatch(display: display)
+                let points = mode.getBrightnessContrastBatch(
+                    display: display,
+                    brightnessFactor: display.brightnessCurveFactors[mode.key],
+                    contrastFactor: display.contrastCurveFactors[mode.key]
+                )
 
-                let xs = stride(from: 0.0, to: (points.brightness.count - 1).d, by: 3.0)
+                let xs = stride(from: 0.0, to: (points.brightness.count - 1).d, by: 9.0)
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, points.brightness.striding(by: 3)
+                        xs, points.brightness.striding(by: 9)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, points.contrast.striding(by: 3)
+                        xs, points.contrast.striding(by: 9)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 mode.maxChartDataPoints = points.brightness.count
                 setupLimitLines(mode, display: display, chartEntry: points)
             case let mode as SyncMode:
-                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 3.0)
+                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 6.0)
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
-                var values = mode.interpolateSIMD(.brightness(0), display: display)
+                var values = mode.interpolateSIMD(.brightness(0), display: display, factor: display.brightnessCurveFactors[mode.key])
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, values.striding(by: 3)
+                        xs, values.striding(by: 6)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
-                values = mode.interpolateSIMD(.contrast(0), display: display)
+                values = mode.interpolateSIMD(.contrast(0), display: display, factor: display.contrastCurveFactors[mode.key])
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, values.striding(by: 3)
+                        xs, values.striding(by: 6)
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as ManualMode:
@@ -264,12 +268,12 @@ class BrightnessContrastChartView: LineChartView {
 
         brightnessGraph.colors = [NSColor.clear]
         brightnessGraph.fillColor = appDelegate.darkMode ? white.withAlphaComponent(0.5) : brightnessColor
-        brightnessGraph.cubicIntensity = 0.1
+        brightnessGraph.cubicIntensity = 0.15
         brightnessGraph.circleColors = appDelegate.darkMode ? [white] : [darkMauve.withAlphaComponent(0.6)]
         brightnessGraph.circleHoleColor = appDelegate.darkMode ? lunarYellow : white
         brightnessGraph.circleRadius = 4.0
         brightnessGraph.circleHoleRadius = appDelegate.darkMode ? 2.5 : 1.5
-        brightnessGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData]
+        brightnessGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData] && adaptiveMode.key != .manual
         brightnessGraph.drawFilledEnabled = true
         brightnessGraph.drawValuesEnabled = false
         brightnessGraph.highlightColor = brightnessColor.withAlphaComponent(0.3)
@@ -280,11 +284,11 @@ class BrightnessContrastChartView: LineChartView {
 
         contrastGraph.colors = [NSColor.clear]
         contrastGraph.fillColor = contrastColor
-        contrastGraph.cubicIntensity = 0.1
+        contrastGraph.cubicIntensity = 0.15
         contrastGraph.circleColors = [lunarYellow.withAlphaComponent(0.9)]
         contrastGraph.circleRadius = 4.0
         contrastGraph.circleHoleRadius = 1.5
-        contrastGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData]
+        contrastGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData] && adaptiveMode.key != .manual
         contrastGraph.drawFilledEnabled = true
         contrastGraph.drawValuesEnabled = false
         contrastGraph.highlightColor = contrastColor.withAlphaComponent(0.9)
