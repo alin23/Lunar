@@ -26,6 +26,7 @@ var menuPopoverCloser = DispatchWorkItem(name: "menuPopoverCloser") {
 }
 
 func closeMenuPopover(after ms: Int) {
+    log.debug("Closing QuickActions in \(ms)ms")
     menuPopoverCloser.cancel()
     menuPopoverCloser = DispatchWorkItem(name: "menuPopoverCloser") {
         POPOVERS["menu"]!!.close()
