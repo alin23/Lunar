@@ -95,8 +95,8 @@ class BrightnessContrastChartView: LineChartView {
                 }
             case is SyncMode:
                 highlightValues([
-                    Highlight(x: SyncMode.lastBuiltinBrightness.rounded(), dataSetIndex: 0, stackIndex: 0),
-                    Highlight(x: SyncMode.lastBuiltinContrast.rounded(), dataSetIndex: 1, stackIndex: 1),
+                    Highlight(x: SyncMode.lastSourceBrightness.rounded(), dataSetIndex: 0, stackIndex: 0),
+                    Highlight(x: SyncMode.lastSourceContrast.rounded(), dataSetIndex: 1, stackIndex: 1),
                 ])
             case let mode as LocationMode:
                 guard let moment = mode.moment,

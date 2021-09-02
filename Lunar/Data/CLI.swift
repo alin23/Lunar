@@ -559,7 +559,7 @@ struct Lunar: ParsableCommand {
                 globalExit(0)
             }
 
-            guard let (brightness, contrast) = SyncMode.getBuiltinDisplayBrightnessContrast() else {
+            guard let (brightness, contrast) = SyncMode.getSourceBrightnessContrast() else {
                 throw CommandError.displayNotFound("builtin")
             }
             switch property {

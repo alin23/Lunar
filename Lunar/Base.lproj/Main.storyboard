@@ -2557,7 +2557,7 @@ when dock and menubar icons are hidden</string>
                                 <rect key="frame" x="-25" y="-10" width="1000" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
-                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="6nl-T1-C3E" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                    <button toolTip="Stops the auto-learning algorithm from recomputing the contrast curve when changing the contrast of this monitor manually." focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="6nl-T1-C3E" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="125" y="31" width="73" height="8"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <ciFilter key="compositingFilter" name="CISubtractBlendMode">
@@ -2587,7 +2587,7 @@ when dock and menubar icons are hidden</string>
                                             </binding>
                                         </connections>
                                     </button>
-                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="Z5X-YG-FjQ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                    <button toolTip="Stops the auto-learning algorithm from recomputing the brightness curve when changing the brightness of this monitor manually." focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="Z5X-YG-FjQ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="125" y="15" width="73" height="8"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <ciFilter key="compositingFilter" name="CISubtractBlendMode">

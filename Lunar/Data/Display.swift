@@ -2629,7 +2629,7 @@ enum ValueType {
 
     func readContrast() -> UInt8? {
         guard !isBuiltin else {
-            guard let (_, contrast) = SyncMode.getBuiltinDisplayBrightnessContrast() else {
+            guard let (_, contrast) = SyncMode.getSourceBrightnessContrast() else {
                 return nil
             }
             return contrast.u8

@@ -1035,7 +1035,7 @@ class DisplayController {
                 armProps.removeValue(forKey: "ColorElements")
 
                 var computedProps = [String: String]()
-                if let (b, c) = SyncMode.readBuiltinDisplayBrightnessContrast() {
+                if let (b, c) = SyncMode.readBrightnessContrast() {
                     computedProps["Brightness"] = b.str(decimals: 4)
                     computedProps["Contrast"] = c.str(decimals: 4)
                 }
@@ -1055,7 +1055,7 @@ class DisplayController {
                     scope.setExtra(value: compressed, key: "armBuiltinProps")
                 }
             } else {
-                scope.setExtra(value: SyncMode.readBuiltinDisplayBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
+                scope.setExtra(value: SyncMode.readBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
             }
             scope.setExtra(value: self?.lidClosed ?? IsLidClosed(), key: "lidClosed")
 
