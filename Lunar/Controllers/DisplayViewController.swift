@@ -968,7 +968,7 @@ class DisplayViewController: NSViewController {
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
                 mainThread {
-                    if let chart = self.brightnessContrastChart {
+                    if self.brightnessContrastChart != nil {
                         self.initGraph(mode: adaptiveMode.mode)
                     }
                 }
