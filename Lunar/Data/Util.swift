@@ -1871,6 +1871,86 @@ func getModeDetails(_ mode: MPDisplayMode?, prefix: String = "\t") -> String {
     """
 }
 
+import AnyCodable
+
+func getModeDetailsJSON(_ mode: MPDisplayMode?) -> [String: Any]? {
+    guard let mode = mode else { return nil }
+    return [
+        "refreshString": mode.refreshString ?? "Unknown",
+        "resolutionString": mode.resolutionString ?? "Unknown",
+        "isSafeMode": mode.isSafeMode,
+        "tvModeEquiv": mode.tvModeEquiv,
+        "tvMode": mode.tvMode,
+        "isTVMode": mode.isTVMode,
+        "isSimulscan": mode.isSimulscan,
+        "isInterlaced": mode.isInterlaced,
+        "isNativeMode": mode.isNativeMode,
+        "isDefaultMode": mode.isDefaultMode,
+        "isStretched": mode.isStretched,
+        "isUserVisible": mode.isUserVisible,
+        "isHiDPI": mode.isHiDPI,
+        "isRetina": mode.isRetina,
+        "scanRate": mode.scanRate ?? 0,
+        "roundedScanRate": mode.roundedScanRate,
+        "scale": mode.scale,
+        "aspectRatio": mode.aspectRatio,
+        "fixPtRefreshRate": mode.fixPtRefreshRate,
+        "refreshRate": mode.refreshRate,
+        "dotsPerInch": mode.dotsPerInch,
+        "vertDPI": mode.vertDPI,
+        "horizDPI": mode.horizDPI,
+        "pixelsHigh": mode.pixelsHigh,
+        "pixelsWide": mode.pixelsWide,
+        "height": mode.height,
+        "width": mode.width,
+        "modeNumber": mode.modeNumber,
+    ]
+}
+
+func getMonitorPanelDataJSON(_ display: MPDisplay) -> [String: Any] {
+    [
+        "id": display.displayID,
+        "aliasID": display.aliasID,
+        "canChangeOrientation": display.canChangeOrientation(),
+        "hasRotationSensor": display.hasRotationSensor,
+        "hasZeroRate": display.hasZeroRate,
+        "hasMultipleRates": display.hasMultipleRates,
+        "isSidecarDisplay": display.isSidecarDisplay,
+        "isAirPlayDisplay": display.isAirPlayDisplay,
+        "isProjector": display.isProjector,
+        "is4K": display.is4K,
+        "isTV": display.isTV,
+        "isMirrorMaster": display.isMirrorMaster,
+        "isMirrored": display.isMirrored,
+        "isBuiltIn": display.isBuiltIn,
+        "isHiDPI": display.isHiDPI,
+        "hasTVModes": display.hasTVModes,
+        "hasSimulscan": display.hasSimulscan,
+        "hasSafeMode": display.hasSafeMode,
+        "isSmartDisplay": display.isSmartDisplay,
+        "isAppleProDisplay": display.isAppleProDisplay,
+        "uuid": display.uuid?.uuidString as Any,
+        "isForcedToMirror": display.isForcedToMirror,
+        "hasMenuBar": display.hasMenuBar,
+        "isBuiltInRetina": display.isBuiltInRetina,
+        "titleName": display.titleName as Any,
+        "name": display.displayName as Any,
+        "orientation": display.orientation,
+        "modes": [String: Any](
+            ((display.allModes() as? [MPDisplayMode]) ?? [])
+                .compactMap { mode in
+                    guard let modeJSON = getModeDetailsJSON(mode) else { return nil }
+                    return (mode.description.replacingOccurrences(of: "\n", with: ", "), modeJSON)
+                } + [
+                    ("default", getModeDetailsJSON(display.defaultMode) as Any),
+                    ("native", getModeDetailsJSON(display.nativeMode) as Any),
+                    ("current", getModeDetailsJSON(display.currentMode) as Any),
+                ],
+            uniquingKeysWith: first(this:other:)
+        ),
+    ]
+}
+
 func getMonitorPanelData(_ display: MPDisplay) -> String {
     """
         ID: \(display.displayID)
