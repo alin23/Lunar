@@ -1,3 +1,20 @@
+# 4.8.4
+## Features
+
+* Add navigation bar and remove left/right arrow buttons
+* Simplify and smoothen brightness graph
+    * More complex data can be shown by enabling **Show more graph data** in [Advanced settings](lunar://advanced)
+
+## Fixes
+
+* Fix internal display being dimmed accidentally after the lid was opened
+* Fix QuickActions popover closing accidentally right after opening
+
+## Improvements
+
+* Add **Continue** button for diagnostics instead of relying on pressing keyboard keys
+* Improve Native Controls detection for the built-in display when closing/opening the lid
+
 # 4.8.3
 ## Fixes
 

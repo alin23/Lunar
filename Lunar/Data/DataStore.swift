@@ -176,11 +176,10 @@ class DataStore: NSObject {
     static func firstRunAfterBuiltinUpgrade() {
         thisIsFirstRunAfterBuiltinUpgrade = true
         guard let displays = CachedDefaults[.displays] else { return }
-        for display in displays {
-            if display.isBuiltin, display.isSmartDisplay {
-                display.enabledControls[.gamma] = false
-                display.save()
-            }
+
+        displays.filter { $0.isSmartBuiltin }.forEach { display in
+            display.enabledControls[.gamma] = false
+            display.save()
         }
     }
 
