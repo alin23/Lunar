@@ -626,19 +626,19 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             CachedDefaults[.smoothTransition] = false
                         }
 
-                        let builtinBrightness = SyncMode.getBuiltinDisplayBrightnessContrast()?.0
-                        var iokitBrightness = SyncMode.readBuiltinDisplayBrightnessIOKit()
-                        var armBrightness = SyncMode.readBuiltinDisplayBrightnessARM()
-                        var coreDisplayBrightness = SyncMode.readBuiltinDisplayBrightnessCoreDisplay()
-                        var displayServicesBrightness = SyncMode.readBuiltinDisplayBrightnessDisplayServices()
+                        let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0
+                        var iokitBrightness = SyncMode.readBrightnessIOKit()
+                        var armBrightness = SyncMode.readBrightnessARM()
+                        var coreDisplayBrightness = SyncMode.readBrightnessCoreDisplay()
+                        var displayServicesBrightness = SyncMode.readBrightnessDisplayServices()
 
                         let printBrightness = {
                             guard !self.stopped else { return }
-                            iokitBrightness = SyncMode.readBuiltinDisplayBrightnessIOKit()
-                            armBrightness = SyncMode.readBuiltinDisplayBrightnessARM()
-                            coreDisplayBrightness = SyncMode.readBuiltinDisplayBrightnessCoreDisplay()
-                            displayServicesBrightness = SyncMode.readBuiltinDisplayBrightnessDisplayServices()
-                            let builtinBrightness = SyncMode.getBuiltinDisplayBrightnessContrast()?.0.str(decimals: 2) ?? "nil"
+                            iokitBrightness = SyncMode.readBrightnessIOKit()
+                            armBrightness = SyncMode.readBrightnessARM()
+                            coreDisplayBrightness = SyncMode.readBrightnessCoreDisplay()
+                            displayServicesBrightness = SyncMode.readBrightnessDisplayServices()
+                            let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0.str(decimals: 2) ?? "nil"
 
                             self.renderSeparated("""
                             **Built-in brightness (as reported by):**
