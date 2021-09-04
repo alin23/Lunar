@@ -689,6 +689,7 @@ enum Hotkey {
         case .contrast:
             controlID = .CONTRAST
         case .volume:
+            guard display.showVolumeOSD else { return }
             controlID = .AUDIO_SPEAKER_VOLUME
         default:
             break

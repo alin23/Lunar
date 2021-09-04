@@ -177,7 +177,7 @@ class DataStore: NSObject {
         thisIsFirstRunAfterBuiltinUpgrade = true
         guard let displays = CachedDefaults[.displays] else { return }
 
-        displays.filter { $0.isSmartBuiltin }.forEach { display in
+        displays.filter(\.isSmartBuiltin).forEach { display in
             display.enabledControls[.gamma] = false
             display.save()
         }
