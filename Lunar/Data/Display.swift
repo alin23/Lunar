@@ -377,6 +377,7 @@ enum ValueType {
         volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
+        showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
 
@@ -532,6 +533,7 @@ enum ValueType {
         defaultGammaBlueMax: Float = 1.0,
         defaultGammaBlueValue: Float = 1.0,
         isSource: Bool? = nil,
+        showVolumeOSD: Bool = true,
         applyGamma: Bool = false
     ) {
         _id = id
@@ -540,6 +542,7 @@ enum ValueType {
         self.adaptive = adaptive
 
         self.isSource = isSource ?? DDC.isSmartBuiltinDisplay(id)
+        self.showVolumeOSD = showVolumeOSD
         self.applyGamma = applyGamma
 
         self.defaultGammaRedMin = defaultGammaRedMin.ns
@@ -692,6 +695,7 @@ enum ValueType {
         case sendingInput
         case sendingVolume
         case isSource
+        case showVolumeOSD
         case applyGamma
         case brightnessOnInputChange
         case brightnessOnInputChange1
@@ -718,6 +722,7 @@ enum ValueType {
             .alwaysFallbackControl,
             .neverFallbackControl,
             .isSource,
+            .showVolumeOSD,
             .applyGamma,
         ]
 
@@ -782,6 +787,7 @@ enum ValueType {
             .alwaysFallbackControl,
             .neverFallbackControl,
             .isSource,
+            .showVolumeOSD,
             .applyGamma,
             .brightnessOnInputChange1,
             .brightnessOnInputChange2,
@@ -1656,6 +1662,12 @@ enum ValueType {
         }
     }
 
+    @Published @objc dynamic var showVolumeOSD: Bool {
+        didSet {
+            context = getContext()
+        }
+    }
+
     @Published @objc dynamic var isSource: Bool {
         didSet {
             context = getContext()
@@ -1831,6 +1843,7 @@ enum ValueType {
             defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
             defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
             isSource: (config["isSource"] as? Bool) ?? DDC.isSmartBuiltinDisplay(id),
+            showVolumeOSD: (config["showVolumeOSD"] as? Bool) ?? true,
             applyGamma: (config["applyGamma"] as? Bool) ?? false
         )
     }
@@ -2045,6 +2058,7 @@ enum ValueType {
             "neverUseNetworkControl": neverUseNetworkControl,
             "isAppleDisplay": isAppleDisplay(),
             "isSource": isSource,
+            "showVolumeOSD": showVolumeOSD,
             "applyGamma": applyGamma,
         ]
     }
@@ -2430,6 +2444,7 @@ enum ValueType {
             try container.encode(neverFallbackControl, forKey: .neverFallbackControl)
             try container.encode(power, forKey: .power)
             try container.encode(isSource, forKey: .isSource)
+            try container.encode(showVolumeOSD, forKey: .showVolumeOSD)
             try container.encode(applyGamma, forKey: .applyGamma)
         }
     }

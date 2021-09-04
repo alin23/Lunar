@@ -3851,7 +3851,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="100" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="95"/>
+                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -5327,7 +5327,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Tf-I7-BlT">
-                                <rect key="frame" x="367" y="44" width="149" height="17"/>
+                                <rect key="frame" x="411" y="44" width="149" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Adapt automatically" id="hJG-IB-EKJ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -5336,7 +5336,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-3U-xyN">
-                                <rect key="frame" x="366" y="17" width="53" height="16"/>
+                                <rect key="frame" x="410" y="17" width="53" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Paused" id="UE7-F8-Nxu">
                                     <font key="font" metaFont="system"/>
@@ -5345,7 +5345,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjJ-hC-owe">
-                                <rect key="frame" x="466" y="17" width="60" height="16"/>
+                                <rect key="frame" x="510" y="17" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Running" id="eLZ-QT-H2b">
                                     <font key="font" metaFont="system"/>
@@ -5354,7 +5354,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="YBv-Rr-ica" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="517" y="45" width="16" height="16"/>
+                                <rect key="frame" x="561" y="45" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -5367,7 +5367,7 @@ Lunar will continue to check in the background</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wv7-Y2-jNx" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="420" y="12" width="45" height="26"/>
+                                <rect key="frame" x="464" y="12" width="45" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
@@ -5378,61 +5378,6 @@ Lunar will continue to check in the background</string>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
                                         <color key="value" red="0.50528805272108845" green="0.27399530750607737" blue="0.15303031545079038" alpha="0.15089507450331127" colorSpace="calibratedRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
-                                <rect key="frame" x="94" y="44" width="117" height="17"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
-                                    <font key="font" metaFont="systemHeavy" size="14"/>
-                                    <color key="textColor" name="Caption"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
-                                <rect key="frame" x="76" y="17" width="52" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Target" id="tHM-5a-Ojq">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
-                                <rect key="frame" x="174" y="17" width="55" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Source" id="KKZ-a3-9z1">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EFB-4R-z3b" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="213" y="45" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="zkO-Zh-13L">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="129" y="12" width="45" height="26"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
-                                        <color key="value" red="1" green="0.71891602710000002" blue="0.19021045919999999" alpha="1" colorSpace="calibratedRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
-                                        <integer key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
-                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
@@ -6449,6 +6394,116 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uix-d0-xYO">
+                                <rect key="frame" x="224" y="44" width="144" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="macOS volume OSD" id="3vG-9b-dUP">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GIq-89-gi4">
+                                <rect key="frame" x="219" y="17" width="53" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Hide" id="BRQ-0w-0qO">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IdV-wj-QZf">
+                                <rect key="frame" x="319" y="17" width="60" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Show" id="1Du-lK-7xD">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="0yl-Pj-Vbv" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="370" y="45" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="kul-0l-LeR">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l3U-xg-bo5" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="273" y="12" width="45" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                                        <color key="value" red="1" green="0.71891602710000002" blue="0.19021045919999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
+                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vOG-6s-UNr">
+                                <rect key="frame" x="46" y="44" width="117" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Sync Mode Role" id="zmV-Ih-qae">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TBy-E1-A2p">
+                                <rect key="frame" x="28" y="17" width="52" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Target" id="tHM-5a-Ojq">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGX-CT-byd">
+                                <rect key="frame" x="126" y="17" width="55" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Source" id="KKZ-a3-9z1">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="EFB-4R-z3b" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="165" y="45" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="zkO-Zh-13L">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNJ-7E-pDo" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="81" y="12" width="45" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                                        <color key="value" red="1" green="0.71891602710000002" blue="0.19021045919999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
+                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                         </subviews>
                     </view>
                     <connections>
@@ -6457,6 +6512,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                         <outlet property="_ddcLimitsHelpButton" destination="bx7-wa-OKf" id="S4R-hv-RlL"/>
                         <outlet property="_gammaHelpButton" destination="pjH-P3-asT" id="CNa-Lh-Uat"/>
                         <outlet property="_syncModeRoleHelpButton" destination="EFB-4R-z3b" id="0qj-Ba-X0T"/>
+                        <outlet property="_volumeOSDHelpButton" destination="0yl-Pj-Vbv" id="KlA-tb-fZT"/>
                         <outlet property="adaptAutoToggle" destination="wv7-Y2-jNx" id="lB7-pP-gR0"/>
                         <outlet property="applyGammaCheckbox" destination="eDC-Mb-fDf" id="3C4-v7-ArZ"/>
                         <outlet property="blueGainField" destination="JOG-sg-W6N" id="54H-Xq-w4D"/>
@@ -6489,6 +6545,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                         <outlet property="resetLimitsButton" destination="Xwk-Qd-h2d" id="RE6-ul-dDd"/>
                         <outlet property="resolutionsDropdown" destination="476-c7-fYc" id="3fT-R4-HAp"/>
                         <outlet property="syncModeRoleToggle" destination="VNJ-7E-pDo" id="cjW-cx-8Y7"/>
+                        <outlet property="volumeOSDToggle" destination="l3U-xg-bo5" id="G4k-4h-SCF"/>
                     </connections>
                 </viewController>
                 <customObject id="gdS-SJ-DKe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

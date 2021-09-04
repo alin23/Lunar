@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "d9b37a6664cf2467efda861e1383ec806a221b18",
-          "version": "7.1.4"
+          "revision": "eb09cfa3ebcb96ca4a7f8f8de6c5d7aff4c48c0e",
+          "version": "7.2.7"
         }
       },
       {
@@ -177,7 +177,7 @@
         "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "ba8b651a18a0ad5d10ccc00171bf554fc7c6ae2e",
+          "revision": "75970285e2470f12a569cdff68ef5a75498a4646",
           "version": null
         }
       },
@@ -213,8 +213,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "83b23d940471b313427da226196661856f6ba3e0",
-          "version": "0.4.4"
+          "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
+          "version": "0.5.0"
         }
       },
       {

@@ -12,6 +12,17 @@ import Combine
 import Defaults
 
 class SettingsPopoverController: NSViewController {
+    let VOLUME_OSD_HELP_TEXT = """
+    ## Description
+
+    `Available only for external monitors`
+
+    Some monitors show their own **On-Screen Display (OSD)** when changing the volume.
+
+    That OSD can't be disabled and it usually appears over the macOS OSD.
+
+    This setting allows the user hide the macOS OSD so that at least there's a single volume indicator appearing when changing volume.
+    """
     let SYNC_MODE_ROLE_HELP_TEXT = """
     ## Description
 
@@ -102,11 +113,13 @@ class SettingsPopoverController: NSViewController {
 
     @IBOutlet var adaptAutoToggle: MacToggle!
     @IBOutlet var syncModeRoleToggle: MacToggle!
+    @IBOutlet var volumeOSDToggle: MacToggle!
 
     @IBOutlet var _ddcLimitsHelpButton: NSButton!
     @IBOutlet var _gammaHelpButton: NSButton!
     @IBOutlet var _adaptAutomaticallyHelpButton: NSButton?
     @IBOutlet var _syncModeRoleHelpButton: NSButton?
+    @IBOutlet var _volumeOSDHelpButton: NSButton?
     var onClick: (() -> Void)?
     weak var displayViewController: DisplayViewController?
     @Atomic var applySettings = true
@@ -138,6 +151,10 @@ class SettingsPopoverController: NSViewController {
         _syncModeRoleHelpButton as? HelpButton
     }
 
+    var volumeOSDHelpButton: HelpButton? {
+        _volumeOSDHelpButton as? HelpButton
+    }
+
     var lastEnabledCheckbox: NSButton? {
         [networkControlCheckbox, coreDisplayControlCheckbox, ddcControlCheckbox, gammaControlCheckbox]
             .first(where: { checkbox in checkbox!.state == .on })
@@ -162,6 +179,9 @@ class SettingsPopoverController: NSViewController {
                 adaptAutoToggle.isOn = display.adaptive
                 syncModeRoleToggle.isOn = display.isSource
                 syncModeRoleToggle.isEnabled = display.isSmartDisplay || TEST_MODE
+
+                volumeOSDToggle.isOn = display.showVolumeOSD
+                volumeOSDToggle.isEnabled = !display.isSmartBuiltin
 
                 applyGamma = display.applyGamma
                 setupApplyGammaCheckbox()
@@ -227,6 +247,14 @@ class SettingsPopoverController: NSViewController {
         didSet {
             guard applySettings, let display = display else { return }
             display.isSource = isSource
+            display.save()
+        }
+    }
+
+    @objc dynamic var showVolumeOSD = true {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.showVolumeOSD = showVolumeOSD
             display.save()
         }
     }
@@ -556,6 +584,7 @@ class SettingsPopoverController: NSViewController {
         super.viewDidLoad()
 
         syncModeRoleHelpButton?.helpText = SYNC_MODE_ROLE_HELP_TEXT
+        volumeOSDHelpButton?.helpText = VOLUME_OSD_HELP_TEXT
         adaptAutomaticallyHelpButton?.helpText = ADAPTIVE_HELP_TEXT
         ddcLimitsHelpButton?.helpText = DDC_LIMITS_HELP_TEXT
         ddcColorGainHelpButton?.helpText = DDC_COLOR_GAIN_HELP_TEXT
@@ -595,10 +624,16 @@ class SettingsPopoverController: NSViewController {
             }
             SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
         }
+        volumeOSDToggle.callback = { [weak self] isOn in
+            guard let self = self, let display = self.display else { return }
+            self.showVolumeOSD = isOn
+        }
         if let d = display {
             syncModeRoleToggle.isEnabled = d.isSmartDisplay || TEST_MODE
+            volumeOSDToggle.isEnabled = !d.isSmartBuiltin
         } else {
             syncModeRoleToggle.isEnabled = false
+            volumeOSDToggle.isEnabled = false
         }
         setupDDCLimits()
         setupDDCColorGain()
@@ -634,6 +669,7 @@ class SettingsPopoverController: NSViewController {
             mainThread {
                 self.toggleWithoutCallback(self.adaptAutoToggle, value: display.adaptive)
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
+                self.toggleWithoutCallback(self.volumeOSDToggle, value: display.showVolumeOSD)
             }
             self.applyGamma = display.applyGamma
             self.setupApplyGammaCheckbox()
