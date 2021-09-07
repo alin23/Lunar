@@ -1,3 +1,14 @@
+# 4.8.5
+## Fixes
+
+* Fix BlackOut hotkey not reflecting in the menu bar item
+* Fix Check for Updates not working on some occasions
+
+## Features
+
+* Add a way to hide the macOS volume OSD for monitors that have their own volume indicator
+    * ![screenshot showing Lunar's setting for hiding the macOS Volume OSD](https://lunar.fyi/static/img/volume-osd/volume-osd.png)
+
 # 4.8.4
 ## Features
 
