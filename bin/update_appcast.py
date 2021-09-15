@@ -36,6 +36,13 @@ CHANGELOG_STYLE = H.style(
         object-fit: cover;
     }
 
+    video {
+        width: 80%;
+        margin: 1rem auto;
+        border-radius: 12px;
+        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);
+    }
+
     code, pre {
         font-family: Menlo, monospace;
         color: #fda43a;
