@@ -33,6 +33,14 @@ class PopUpButtonCell: NSPopUpButtonCell {
     }
 }
 
+// MARK: - Origin
+
+enum Origin {
+    case left
+    case center
+    case right
+}
+
 // MARK: - PopUpButton
 
 class PopUpButton: NSPopUpButton {
@@ -58,6 +66,8 @@ class PopUpButton: NSPopUpButton {
     @IBInspectable var maxWidth: CGFloat = 0
 
     var observers: Set<AnyCancellable> = []
+
+    var origin = Origin.center
 
     var page = Page.display {
         didSet {
@@ -121,11 +131,23 @@ class PopUpButton: NSPopUpButton {
         }
 
         let x: CGFloat
-        if width > frame.width {
-            x = frame.minX - (width - frame.width) / 2
-        } else {
-            x = frame.minX + (frame.width - width) / 2
+        switch origin {
+        case .left:
+            x = frame.minX
+        case .center:
+            if width > frame.width {
+                x = frame.minX - (width - frame.width) / 2
+            } else {
+                x = frame.minX + (frame.width - width) / 2
+            }
+        case .right:
+            if width > frame.width {
+                x = frame.minX - (width - frame.width)
+            } else {
+                x = frame.minX + (frame.width - width)
+            }
         }
+
         setFrameOrigin(NSPoint(x: x, y: frame.minY))
 
         setFrameSize(NSSize(width: width, height: frame.height))

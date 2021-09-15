@@ -111,4 +111,8 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             }
         }
     }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
+    }
 }

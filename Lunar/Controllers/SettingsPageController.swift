@@ -39,9 +39,13 @@ class SettingsPageController: NSViewController {
             }
         }
 
-        advancedSettingsButton.page = .settings
-        advancedSettingsButton.isHidden = false
-        advancedSettingsButton.state = advancedSettingsShown ? .on : .off
-        advancedSettingsButton.notice = advancedSettingsNotice
+        advancedSettingsButton?.page = .settings
+        advancedSettingsButton?.isHidden = false
+        advancedSettingsButton?.state = advancedSettingsShown ? .on : .off
+        advancedSettingsButton?.notice = advancedSettingsNotice
+    }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
     }
 }

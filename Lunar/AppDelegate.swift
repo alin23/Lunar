@@ -64,6 +64,7 @@ var thisIsFirstRunAfterLunar4Upgrade = false
 var thisIsFirstRunAfterDefaults5Upgrade = false
 var thisIsFirstRunAfterM1DDCUpgrade = false
 var thisIsFirstRunAfterBuiltinUpgrade = false
+var thisIsFirstRunAfterHotkeysUpgrade = false
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -101,7 +102,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
-    @IBOutlet var debugMenuItem: NSMenuItem!
     @IBOutlet var infoMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
@@ -436,7 +436,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         else { return }
 
         if pageController.selectedIndex != currentPage {
-            pageController.animator().selectedIndex = currentPage
+            // pageController.animator().selectedIndex = currentPage
+            pageController.select(index: currentPage)
             switch currentPage {
             case 0:
                 splitViewController.mauveBackground()
@@ -684,7 +685,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if CachedDefaults[.reapplyValuesAfterWake] {
                         asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                             displayController.adaptBrightness(force: true)
-                            for display in displayController.activeDisplays.values {
+
+                            for display in displayController.activeDisplays.values.filter(\.blackOutEnabled) {
+                                showOperationInProgress(screen: display.screen)
+                                GammaTable.zero.apply(to: display.id, force: true)
+                                hideOperationInProgress()
+
+                                if display.isSmartBuiltin, display.readBrightness() != 0 {
+                                    display.withoutSmoothTransition {
+                                        display.withForce {
+                                            display.brightness = 0
+                                        }
+                                    }
+                                }
+                            }
+
+                            for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled }) {
                                 if display.redGain.uint8Value != DEFAULT_COLOR_GAIN {
                                     _ = display.control?.setRedGain(display.redGain.uint8Value)
                                 }
@@ -805,9 +821,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
         volumeKeysEnabledPublisher.sink { change in
             self.startOrRestartMediaKeyTap(volumeKeysEnabled: change.newValue)
-        }.store(in: &observers)
-        mediaKeysControlAllMonitorsPublisher.sink { _ in
-            self.startOrRestartMediaKeyTap()
         }.store(in: &observers)
         useAlternateBrightnessKeysPublisher.sink { change in
             MediaKeyTap.useAlternateBrightnessKeys = change.newValue
@@ -931,7 +944,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
-        ValueTransformer.setValueTransformer(DisplayTransformer(), forName: .displayTransformerName)
         ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
         ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
         ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
@@ -1210,9 +1222,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
     }
 
-    func increaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func increaseBrightness(
+        by amount: Int? = nil,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        builtinDisplay: Bool = false
+    ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
     }
 
     func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
@@ -1220,9 +1237,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
     }
 
-    func decreaseBrightness(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func decreaseBrightness(
+        by amount: Int? = nil,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        builtinDisplay: Bool = false
+    ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
     }
 
     func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {

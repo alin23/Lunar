@@ -50,11 +50,11 @@ class GammaViewController: NSViewController {
 
                 mainThread {
                     if dot.alphaValue == 0.0 {
-                        dot.transition(0.25)
-                        dot.alphaValue = 0.8
+                        dot.transition(0.2)
+                        dot.alphaValue = 0.1
                         dot.needsDisplay = true
                     } else {
-                        dot.transition(0.35)
+                        dot.transition(0.2)
                         dot.alphaValue = 0.0
                         dot.needsDisplay = true
                     }

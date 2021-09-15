@@ -593,7 +593,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                         let lastMode = displayController.adaptiveMode
                         let lastPollingInterval = SyncMode.pollingSeconds
-                        let smoothTransitionActive = CachedDefaults[.smoothTransition]
+                        let brightnessTransition = CachedDefaults[.brightnessTransition]
                         defer {
                             if lastMode.key != .sync {
                                 self.render("\nGoing back from Sync to \(lastMode.str) Mode")
@@ -603,9 +603,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 self.render("\nSetting polling interval back to \(lastPollingInterval) seconds")
                                 SyncMode.pollingSeconds = lastPollingInterval
                             }
-                            if smoothTransitionActive {
+                            if brightnessTransition != .instant {
                                 self.render("\nRe-enabling smooth transition")
-                                CachedDefaults[.smoothTransition] = true
+                                CachedDefaults[.brightnessTransition] = brightnessTransition
                             }
                         }
                         if lastMode.key != .sync {
@@ -621,9 +621,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 SyncMode.specific.watching = SyncMode.specific.watch()
                             }
                         }
-                        if smoothTransitionActive {
+                        if brightnessTransition != .instant {
                             self.render("\nDisabling smooth transition")
-                            CachedDefaults[.smoothTransition] = false
+                            CachedDefaults[.brightnessTransition] = .instant
                         }
 
                         let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0

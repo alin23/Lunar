@@ -87,9 +87,6 @@ class ConfigurationViewController: NSViewController {
     **Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
     """
 
-    @IBOutlet var smoothTransitionLabel: NSTextField!
-    @IBOutlet var smoothTransitionToggle: MacToggle!
-
     @IBOutlet var _helpButton1: NSButton?
     @IBOutlet var _helpButton2: NSButton?
     @IBOutlet var _helpButton3: NSButton?
@@ -477,10 +474,6 @@ class ConfigurationViewController: NSViewController {
         setupVolumeStep()
         setupLocation()
 
-        smoothTransitionToggle.isOn = CachedDefaults[.smoothTransition]
-        smoothTransitionToggle.callback = { isOn in
-            CachedDefaults[.smoothTransition] = isOn
-        }
         showRelevantSettings(CachedDefaults[.adaptiveBrightnessMode])
 
         listenForLocationChange()
@@ -496,5 +489,9 @@ class ConfigurationViewController: NSViewController {
         super.viewDidLoad()
         settingsController = parent?.parent as? SettingsPageController
         setup()
+    }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
     }
 }

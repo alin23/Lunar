@@ -32,9 +32,9 @@ let settingsDividerColor = white.withAlphaComponent(0.3)
 
 var scrollableTextFieldCaptionColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.7) }
 
-let scrollableTextFieldColor = lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow
-let scrollableTextFieldColorHover = lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow
-let scrollableTextFieldColorLight = lunarYellow.highlight(withLevel: 0.3) ?? lunarYellow
+var scrollableTextFieldColor: NSColor { appDelegate.darkMode ? lunarYellow : lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow }
+var scrollableTextFieldColorHover: NSColor { appDelegate.darkMode ? orange : lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow }
+var scrollableTextFieldColorLight: NSColor { appDelegate.darkMode ? white : lunarYellow.highlight(withLevel: 0.3) ?? lunarYellow }
 
 let scrollableTextFieldColorWhite = white
 let scrollableTextFieldColorHoverWhite = mauve.withAlphaComponent(0.7)

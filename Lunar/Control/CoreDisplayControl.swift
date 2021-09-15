@@ -161,9 +161,15 @@ class CoreDisplayControl: Control {
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         guard !display.isForTesting else { return false }
 
-        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
+        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+           oldValue != brightness
+        {
             var faults = 0
-            display.smoothTransition(from: oldValue, to: brightness, delay: 0.01) { [weak self] brightness in
+            display.smoothTransition(
+                from: oldValue,
+                to: brightness,
+                delay: CachedDefaults[.brightnessTransition] == .smooth ? 0.01 : 0.0025
+            ) { [weak self] brightness in
                 guard let self = self else { return }
                 if faults > 5 {
                     return

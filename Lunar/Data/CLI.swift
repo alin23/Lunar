@@ -127,10 +127,10 @@ private func getDisplay(displays: [Display], filter: String) -> Display? {
     case "first":
         return displays.first
     case "main":
-        guard let mainDisplayId = displayController.mainDisplay?.id else { return nil }
+        guard let mainDisplayId = displayController.mainExternalDisplay?.id else { return nil }
         return displays.first(where: { $0.id == mainDisplayId })
     case "best-guess":
-        guard let currentDisplayId = displayController.currentDisplay?.id else { return nil }
+        guard let currentDisplayId = displayController.mainExternalOrCGMainDisplay?.id else { return nil }
         return displays.first(where: { $0.id == currentDisplayId })
     case "builtin":
         return displayController.activeDisplays.values.first(where: { $0.isBuiltin })

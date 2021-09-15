@@ -1813,7 +1813,9 @@ class LineReader {
         var line: UnsafeMutablePointer<CChar>?
         var linecap = 0
         defer {
-            free(line)
+            if let line = line {
+                free(line)
+            }
         }
         let status = getline(&line, &linecap, file)
         guard status > 0, let unwrappedLine = line else {

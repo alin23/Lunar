@@ -60,6 +60,43 @@ class ModernWindow: WAYWindow {
         case kVK_Escape.u16:
             undoManager?.undo()
             endEditing(for: nil)
+        case kVK_ANSI_H.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = 0
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_C.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = 1
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_B.u16 where navigationHotkeysEnabled && title == "Settings",
+             kVK_ANSI_0.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = (pageController?.arrangedObjects.count ?? 3) - 1
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_1.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = 2
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_2.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(3, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_3.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(4, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_4.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(5, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_5.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(6, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_6.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(7, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_7.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(8, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_8.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(9, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
+        case kVK_ANSI_9.u16 where navigationHotkeysEnabled && title == "Settings":
+            appDelegate.currentPage = min(10, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate.goToPage(ignoreUIElement: true)
         case kVK_LeftArrow.u16 where navigationHotkeysEnabled && title == "Settings":
             pageController?.navigateBack(nil)
         case kVK_RightArrow.u16 where navigationHotkeysEnabled && title == "Settings":
