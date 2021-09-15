@@ -294,6 +294,10 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         lhs.identifier == rhs.identifier
     }
 
+    func disabled() -> PersistentHotkey {
+        PersistentHotkey(hotkey: hotkey, isEnabled: false)
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
     }
@@ -351,6 +355,15 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         try container.encode(modifiers, forKey: .modifiers)
         try container.encode(isEnabled, forKey: .enabled)
     }
+}
+
+// MARK: - BrightnessKeyAction
+
+enum BrightnessKeyAction: Int, CaseIterable, Defaults.Serializable {
+    case all
+    case external
+    case cursor
+    case builtin
 }
 
 // MARK: - Hotkey
@@ -714,7 +727,7 @@ enum Hotkey {
 
 extension AppDelegate: MediaKeyTapDelegate {
     func volumeOsdImage(display: Display? = nil) -> OSDImage {
-        guard let display = (display ?? displayController.currentDisplay) else {
+        guard let display = (display ?? displayController.mainExternalOrCGMainDisplay) else {
             return .volume
         }
 
@@ -775,39 +788,75 @@ extension AppDelegate: MediaKeyTapDelegate {
         return nil
     }
 
-    func adjust(_ mediaKey: MediaKey, by value: Int? = nil, currentDisplay: Bool = false, contrast: Bool = false) {
-        let affectBuiltin = CachedDefaults[.hotkeysAffectBuiltin]
+    func adjust(
+        _ mediaKey: MediaKey,
+        by value: Int? = nil,
+        currentDisplay: Bool = false,
+        contrast: Bool = false,
+        builtinDisplay: Bool = false,
+        allDisplays: Bool = false
+    ) {
+        guard !(contrast && builtinDisplay) else { return }
 
         switch mediaKey {
         case .brightnessUp where contrast:
             increaseContrast(by: value, currentDisplay: currentDisplay)
+        case .brightnessUp where allDisplays:
+            increaseBrightness(by: value, builtinDisplay: true)
+            increaseBrightness(by: value)
         case .brightnessUp:
-            increaseBrightness(by: value, currentDisplay: currentDisplay)
+            increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
         case .brightnessDown where contrast:
             decreaseContrast(by: value, currentDisplay: currentDisplay)
+        case .brightnessDown where allDisplays:
+            decreaseBrightness(by: value, builtinDisplay: true)
+            decreaseBrightness(by: value)
         case .brightnessDown:
-            decreaseBrightness(by: value, currentDisplay: currentDisplay)
+            decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
         default:
             break
         }
 
         let showOSD = { (display: Display) in
-            if contrast, display.isBuiltin { return }
-
             if contrast {
+                guard !display.isBuiltin else { return }
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
             } else {
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
         }
 
-        if currentDisplay {
-            guard let display = displayController.currentDisplay, affectBuiltin || !display.isBuiltin else { return }
+        if builtinDisplay {
+            guard let display = displayController.builtinDisplay else { return }
             showOSD(display)
+        } else if currentDisplay {
+            guard let display = displayController.cursorDisplay else { return }
+            showOSD(display)
+        } else if allDisplays {
+            displayController.activeDisplays.values.forEach(showOSD)
         } else {
             displayController.activeDisplays.values
-                .filter { affectBuiltin || !$0.isBuiltin }
+                .filter { !$0.isBuiltin }
                 .forEach(showOSD)
+        }
+    }
+
+    func handleBrightnessKeyAction(
+        _ action: BrightnessKeyAction,
+        mediaKey: MediaKey,
+        by offset: Int? = nil,
+        contrast: Bool = false,
+        lidClosed: Bool
+    ) {
+        switch action {
+        case .all:
+            adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
+        case .external:
+            adjust(mediaKey, by: offset, contrast: contrast)
+        case .cursor:
+            adjust(mediaKey, by: offset, currentDisplay: true, contrast: contrast)
+        case .builtin:
+            adjust(mediaKey, by: offset, currentDisplay: lidClosed, contrast: contrast, builtinDisplay: !lidClosed)
         }
     }
 
@@ -817,80 +866,42 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
-        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
-        let affectBuiltin = CachedDefaults[.hotkeysAffectBuiltin]
-
         switch flags {
-        case [] where lidClosed:
-            log.info("No modifiers and lid closed, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, currentDisplay: !allMonitors)
-        case [.option, .shift] where lidClosed:
-            log.info("Option+Shift modifiers and lid closed, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, by: 1, currentDisplay: !allMonitors)
+        case [] where displayController.adaptiveModeKey == .sync:
+            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
+        case [.option, .shift] where displayController.adaptiveModeKey == .sync:
+            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysSyncControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
 
-        case [] where displayController.adaptiveModeKey == .sync,
-             [.option, .shift] where displayController.adaptiveModeKey == .sync:
-            log.info("Sync Mode active, ignoring media key event")
-            return event
-
-        case [] where allMonitors:
-            log.info("No modifiers and all monitors, adjusting all monitors")
-            adjust(mediaKey, currentDisplay: false)
-            if !affectBuiltin {
-                return event
-            }
-        case [.option, .shift] where allMonitors:
-            log.info("Option+Shift and all monitors, adjusting all monitors")
-            adjust(mediaKey, by: 1, currentDisplay: false)
-            if !affectBuiltin {
-                return event
-            }
         case []:
-            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No cursor display or the display is builtin, ignoring media key event")
-                return event
-            }
-            log.info("No modifiers and lid open, adjusting current display")
-            adjust(mediaKey, currentDisplay: true)
+            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
         case [.option, .shift]:
-            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No cursor display or the display is builtin, ignoring media key event")
-                return event
-            }
-            log.info("Option+Shift modifiers and lid open, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true)
+            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
 
-        case [.control] where lidClosed:
-            log.info("Control modifier and lid closed, adjusting current display")
-            adjust(mediaKey, currentDisplay: true)
-        case [.control, .option] where lidClosed:
-            log.info("Control+Option modifiers and lid closed, adjusting current display")
-            adjust(mediaKey, by: 1, currentDisplay: true)
+        case [.shift] where displayController.adaptiveModeKey == .sync:
+            handleBrightnessKeyAction(CachedDefaults[.shiftBrightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
+        case [.shift]:
+            handleBrightnessKeyAction(CachedDefaults[.shiftBrightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
 
+        case [.control] where displayController.adaptiveModeKey == .sync:
+            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
         case [.control]:
-            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No main display, adjusting all external monitors")
-                adjust(mediaKey, currentDisplay: false)
-                return nil
-            }
+            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
 
-            log.info("Control modifier and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, currentDisplay: !allMonitors)
+        case [.control, .option] where displayController.adaptiveModeKey == .sync:
+            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysSyncControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
         case [.control, .option]:
-            guard let cursorDisplay = displayController.cursorDisplay, affectBuiltin || !cursorDisplay.isBuiltin else {
-                log.info("No main display, adjusting all external monitors")
-                adjust(mediaKey, currentDisplay: false)
-                return nil
-            }
+            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
 
-            log.info("Control+Option modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, by: 1, currentDisplay: !allMonitors)
         case [.control, .shift]:
-            log.info("Control+Shift modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, currentDisplay: !allMonitors, contrast: true)
+            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, contrast: true, lidClosed: lidClosed)
         case [.control, .shift, .option]:
-            log.info("Control+Shift+Option modifiers and lid opened, adjusting \(allMonitors ? "all monitors" : "current display")")
-            adjust(mediaKey, by: 1, currentDisplay: !allMonitors, contrast: true)
+            handleBrightnessKeyAction(
+                CachedDefaults[.brightnessKeysControl],
+                mediaKey: mediaKey,
+                by: 1,
+                contrast: true,
+                lidClosed: lidClosed
+            )
 
         default:
             log.info("Ignoring media key event")
@@ -1063,6 +1074,9 @@ extension AppDelegate: MediaKeyTapDelegate {
     func brightnessUpAction(offset: Int? = nil) {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         increaseBrightness(by: offset)
+        if CachedDefaults[.hotkeysAffectBuiltin] {
+            increaseBrightness(by: offset, builtinDisplay: true)
+        }
 
         for (_, display) in displayController.activeDisplays {
             guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
@@ -1075,6 +1089,9 @@ extension AppDelegate: MediaKeyTapDelegate {
     func brightnessDownAction(offset: Int? = nil) {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         decreaseBrightness(by: offset)
+        if CachedDefaults[.hotkeysAffectBuiltin] {
+            decreaseBrightness(by: offset, builtinDisplay: true)
+        }
 
         for (_, display) in displayController.activeDisplays {
             guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
@@ -1112,15 +1129,14 @@ extension AppDelegate: MediaKeyTapDelegate {
         let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
 
         increaseVolume(by: offset, currentAudioDisplay: !allMonitors)
-        if let display = displayController.currentDisplay, display.audioMuted, !CachedDefaults[.muteVolumeZero] {
-            toggleAudioMuted()
-        }
 
         if allMonitors {
+            toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = displayController.currentAudioDisplay {
+            if display.audioMuted { toggleAudioMuted(for: [display]) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -1131,15 +1147,14 @@ extension AppDelegate: MediaKeyTapDelegate {
         let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
 
         decreaseVolume(by: offset, currentAudioDisplay: !allMonitors)
-        if let display = displayController.currentDisplay, display.audioMuted, !CachedDefaults[.muteVolumeZero] {
-            toggleAudioMuted()
-        }
 
         if allMonitors {
+            toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = displayController.currentAudioDisplay {
+            if display.audioMuted { toggleAudioMuted(for: [display]) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 

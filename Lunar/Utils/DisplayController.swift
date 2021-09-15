@@ -35,9 +35,6 @@ class DisplayController {
     init() {
         watchControlAvailability()
         watchModeAvailability()
-        concurrentQueue.async {
-            log.info("Sensor initial serial port: \(SensorMode.validSensorSerialPort?.path ?? "none")")
-        }
         initObservers()
     }
 
@@ -106,6 +103,10 @@ class DisplayController {
         displays.values.filter(\.isBuiltin)
     }
 
+    var builtinDisplay: Display? {
+        builtinActiveDisplays.first
+    }
+
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
@@ -157,7 +158,7 @@ class DisplayController {
         }
     }
 
-    var mainDisplay: Display? {
+    var mainExternalDisplay: Display? {
         guard let screen = NSScreen.externalWithMouse ?? NSScreen.onlyExternalScreen,
               let id = screen.displayID
         else { return nil }
@@ -173,8 +174,8 @@ class DisplayController {
         return activeDisplays[id]
     }
 
-    var currentDisplay: Display? {
-        if let display = mainDisplay {
+    var mainExternalOrCGMainDisplay: Display? {
+        if let display = mainExternalDisplay {
             return display
         }
 
@@ -795,9 +796,9 @@ class DisplayController {
             return nil
         }
         let alignments = fuzzyFind(queries: [audioDevice.name], inputs: activeDisplays.values.map(\.name))
-        guard let name = alignments.first?.result.asString else { return currentDisplay }
+        guard let name = alignments.first?.result.asString else { return mainExternalOrCGMainDisplay }
 
-        return activeDisplays.values.first(where: { $0.name == name }) ?? currentDisplay
+        return activeDisplays.values.first(where: { $0.name == name }) ?? mainExternalOrCGMainDisplay
     }
 
     func autoAdaptMode() {
@@ -1172,7 +1173,7 @@ class DisplayController {
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
         guard adaptiveMode.available else { return }
-        for display in displays ?? Array(activeDisplays.values) {
+        for display in (displays ?? externalActiveDisplays).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
             }
@@ -1266,11 +1267,13 @@ class DisplayController {
         }
     }
 
-    func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false, builtinDisplay: Bool = false) {
         guard checkRemainingAdjustments() else { return }
 
-        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
-            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
+        adjustValue(for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay) { (display: Display) in
+            if display.isBuiltin {
+                guard builtinDisplay || currentDisplay else { return }
+            }
 
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
 
@@ -1320,6 +1323,7 @@ class DisplayController {
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
         currentAudioDisplay: Bool = false,
+        builtinDisplay: Bool = false,
         _ setValue: (Display) -> Void
     ) {
         if currentAudioDisplay {
@@ -1327,7 +1331,11 @@ class DisplayController {
                 setValue(display)
             }
         } else if currentDisplay {
-            if let display = self.currentDisplay {
+            if let display = cursorDisplay {
+                setValue(display)
+            }
+        } else if builtinDisplay {
+            if let display = self.builtinDisplay {
                 setValue(display)
             }
         } else if let displays = displays {

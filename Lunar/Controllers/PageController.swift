@@ -46,6 +46,12 @@ class PageController: NSPageController {
         }
     }
 
+    func select(index: Int) {
+        NSAnimationContext.runAnimationGroup({ _ in animator().selectedIndex = index }) { [weak self] in
+            self?.completeTransition()
+        }
+    }
+
     func setup() {
         delegate = self
 
@@ -96,7 +102,7 @@ class PageController: NSPageController {
 extension PageController: NSPageControllerDelegate {
     func pageControllerWillStartLiveTransition(_: NSPageController) {
         #if DEBUG
-            log.verbose("Will start live transition")
+//            log.verbose("Will start live transition")
         #endif
         for popover in POPOVERS.values {
             popover?.close()
@@ -108,6 +114,8 @@ extension PageController: NSPageControllerDelegate {
             log.verbose("Did end live transition")
         #endif
         guard let c = c as? PageController else { return }
+
+        c.completeTransition()
 
         guard let splitViewController = c.parent as? SplitViewController else {
             return

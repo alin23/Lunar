@@ -121,6 +121,16 @@ def get_eddsa_signature(file):
     )
     return EDDSA_SIGNER_PATTERN.match(output).groups()
 
+def get_item_for_version(app_version, appcast):
+    for item in appcast.iter("item"):
+        enclosure = item.find("enclosure")
+        version = (
+            enclosure.attrib.get(sparkle("version"))
+            or item.find(sparkle("version")).text
+        )
+        if app_version == version or re.sub(r"-beta\d+", "", app_version) == version:
+            return item
+    return item
 
 # pylint: disable=too-many-locals,too-many-branches
 def main(
@@ -143,10 +153,19 @@ def main(
 
     appcast = etree.parse(str(appcast_path), parser=PARSER)
 
+    if app_signatures and app_version:
+        item = get_item_for_version(app_version, appcast)
+        signatures = item.findall("signature")
+        existing_signatures = {s.text for s in signatures}
+        for signature in set(app_signatures) - existing_signatures:
+            if "/" in signature:
+                item.append(E.signature(signature.replace("/", ".")))
+            item.append(E.signature(signature))
+
+
     for item in appcast.iter("item"):
         enclosure = item.find("enclosure")
         description = item.find("description")
-        signatures = item.findall("signature")
 
         dsaSig = enclosure.attrib.get(sparkle("dsaSignature"))
         sig = enclosure.attrib.get(sparkle("edSignature"))
@@ -163,18 +182,6 @@ def main(
             )
             el.text = "4.0.0"
             item.append(el)
-
-        if (
-            app_signatures
-            and app_version
-            and app_version == version
-            or re.sub(r"-beta\d+", "", app_version) == version
-        ):
-            existing_signatures = {s.text for s in signatures}
-            for signature in set(app_signatures) - existing_signatures:
-                if "/" in signature:
-                    item.append(E.signature(signature.replace("/", ".")))
-                item.append(E.signature(signature))
 
         dmg = appcast_path.with_name(f"Lunar-{version}.dmg")
         pkgzip = appcast_path.with_name(f"Lunar-{version}.zip")

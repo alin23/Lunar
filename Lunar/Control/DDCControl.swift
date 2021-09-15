@@ -91,21 +91,28 @@ class DDCControl: Control {
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue, oldValue != brightness {
+        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+           oldValue != brightness
+        {
             var faults = 0
-            display.smoothTransition(from: oldValue, to: brightness) { brightness in
-                if faults > 5 {
-                    return
-                }
+            display
+                .smoothTransition(
+                    from: oldValue,
+                    to: brightness,
+                    delay: CachedDefaults[.brightnessTransition] == .smooth ? nil : 0.01
+                ) { brightness in
+                    if faults > 5 {
+                        return
+                    }
 
-                log.debug(
-                    "Writing brightness using \(self)",
-                    context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
-                )
-                if !DDC.setBrightness(for: self.display.id, brightness: brightness) {
-                    faults += 1
+                    log.debug(
+                        "Writing brightness using \(self)",
+                        context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
+                    )
+                    if !DDC.setBrightness(for: self.display.id, brightness: brightness) {
+                        faults += 1
+                    }
                 }
-            }
             return faults <= 5
         }
 
@@ -113,21 +120,28 @@ class DDCControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue, oldValue != contrast {
+        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
+           oldValue != contrast
+        {
             var faults = 0
-            display.smoothTransition(from: oldValue, to: contrast) { contrast in
-                if faults > 5 {
-                    return
-                }
+            display
+                .smoothTransition(
+                    from: oldValue,
+                    to: contrast,
+                    delay: CachedDefaults[.brightnessTransition] == .smooth ? nil : 0.01
+                ) { contrast in
+                    if faults > 5 {
+                        return
+                    }
 
-                log.debug(
-                    "Writing contrast using \(self)",
-                    context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
-                )
-                if !DDC.setContrast(for: self.display.id, contrast: contrast) {
-                    faults += 1
+                    log.debug(
+                        "Writing contrast using \(self)",
+                        context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
+                    )
+                    if !DDC.setContrast(for: self.display.id, contrast: contrast) {
+                        faults += 1
+                    }
                 }
-            }
             return faults <= 5
         }
         return DDC.setContrast(for: display.id, contrast: contrast)

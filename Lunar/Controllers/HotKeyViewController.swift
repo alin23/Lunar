@@ -43,22 +43,34 @@ class HotkeyViewController: NSViewController {
     @IBOutlet var faceLightHotkeyView: HotkeyView!
     @IBOutlet var blackOutHotkeyView: HotkeyView!
 
-    @IBOutlet var preciseBrightnessUpCheckbox: NSButton!
-    @IBOutlet var preciseBrightnessDownCheckbox: NSButton!
-    @IBOutlet var preciseContrastUpCheckbox: NSButton!
-    @IBOutlet var preciseContrastDownCheckbox: NSButton!
-    @IBOutlet var preciseVolumeUpCheckbox: NSButton!
-    @IBOutlet var preciseVolumeDownCheckbox: NSButton!
-
-    @IBOutlet var hotkeysInfoButton: ResetButton!
     @IBOutlet var resetButton: ResetButton!
+    @IBOutlet var disableButton: ResetButton!
     @IBOutlet var fnKeysNotice: NSTextField!
+
+    @IBOutlet var brightnessKeysControlButton: PopUpButton!
+    @IBOutlet var brightnessKeysSyncControlButton: PopUpButton!
+    @IBOutlet var ctrlBrightnessKeysControlButton: PopUpButton!
+    @IBOutlet var ctrlBrightnessKeysSyncControlButton: PopUpButton!
+    @IBOutlet var shiftBrightnessKeysControlButton: PopUpButton!
+    @IBOutlet var shiftBrightnessKeysSyncControlButton: PopUpButton!
 
     var cachedFnState = Defaults[.fKeysAsFunctionKeys]
 
     @IBAction func resetHotkeys(_: Any) {
         HotKeyCenter.shared.unregisterAll()
         CachedDefaults.reset(.hotkeys)
+        CachedDefaults.reset(.hotkeysAffectBuiltin)
+        CachedDefaults.reset(.brightnessKeysEnabled)
+        CachedDefaults.reset(.volumeKeysEnabled)
+        CachedDefaults.reset(.useAlternateBrightnessKeys)
+        CachedDefaults.reset(.mediaKeysControlAllMonitors)
+
+        CachedDefaults.reset(.brightnessKeysSyncControl)
+        CachedDefaults.reset(.brightnessKeysControl)
+        CachedDefaults.reset(.ctrlBrightnessKeysSyncControl)
+        CachedDefaults.reset(.ctrlBrightnessKeysControl)
+        CachedDefaults.reset(.shiftBrightnessKeysSyncControl)
+        CachedDefaults.reset(.shiftBrightnessKeysControl)
 
         mainAsyncAfter(ms: 100) { [weak self] in
             CachedDefaults[.hotkeys].forEach {
@@ -70,37 +82,37 @@ class HotkeyViewController: NSViewController {
         }
     }
 
-    @IBAction func toggleFineAdjustments(_ sender: NSButton) {
-        var hotkey: PersistentHotkey?
-
-        switch sender.tag {
-        case 1:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessDown.rawValue }
-        case 2:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessUp.rawValue }
-        case 3:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastDown.rawValue }
-        case 4:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastUp.rawValue }
-        case 5:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeDown.rawValue }
-        case 6:
-            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeUp.rawValue }
-        default:
-            log.warning("Unknown tag: \(sender.tag)")
-        }
-
-        guard let hk = hotkey else { return }
-
-        if sender.state == .on {
-            hk.register()
-        } else {
-            hk.unregister()
-        }
-
-        hk.isEnabled = sender.state == .on
-        hk.save()
-    }
+//    @IBAction func toggleFineAdjustments(_ sender: NSButton) {
+//        var hotkey: PersistentHotkey?
+//
+//        switch sender.tag {
+//        case 1:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessDown.rawValue }
+//        case 2:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessUp.rawValue }
+//        case 3:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastDown.rawValue }
+//        case 4:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastUp.rawValue }
+//        case 5:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeDown.rawValue }
+//        case 6:
+//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeUp.rawValue }
+//        default:
+//            log.warning("Unknown tag: \(sender.tag)")
+//        }
+//
+//        guard let hk = hotkey else { return }
+//
+//        if sender.state == .on {
+//            hk.register()
+//        } else {
+//            hk.unregister()
+//        }
+//
+//        hk.isEnabled = sender.state == .on
+//        hk.save()
+//    }
 
     func setHotkeys() {
         let hotkeys = CachedDefaults[.hotkeys]
@@ -122,12 +134,12 @@ class HotkeyViewController: NSViewController {
         volumeUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }
         volumeDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }
 
-        brightnessUpHotkeyView.preciseHotkeyCheckbox = preciseBrightnessUpCheckbox
-        brightnessDownHotkeyView.preciseHotkeyCheckbox = preciseBrightnessDownCheckbox
-        contrastUpHotkeyView.preciseHotkeyCheckbox = preciseContrastUpCheckbox
-        contrastDownHotkeyView.preciseHotkeyCheckbox = preciseContrastDownCheckbox
-        volumeUpHotkeyView.preciseHotkeyCheckbox = preciseVolumeUpCheckbox
-        volumeDownHotkeyView.preciseHotkeyCheckbox = preciseVolumeDownCheckbox
+//        brightnessUpHotkeyView.preciseHotkeyCheckbox = preciseBrightnessUpCheckbox
+//        brightnessDownHotkeyView.preciseHotkeyCheckbox = preciseBrightnessDownCheckbox
+//        contrastUpHotkeyView.preciseHotkeyCheckbox = preciseContrastUpCheckbox
+//        contrastDownHotkeyView.preciseHotkeyCheckbox = preciseContrastDownCheckbox
+//        volumeUpHotkeyView.preciseHotkeyCheckbox = preciseVolumeUpCheckbox
+//        volumeDownHotkeyView.preciseHotkeyCheckbox = preciseVolumeDownCheckbox
 
         muteAudioHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }
     }
@@ -156,6 +168,25 @@ class HotkeyViewController: NSViewController {
         }
     }
 
+    @IBAction func disableAll(_ sender: Any) {
+        CachedDefaults[.hotkeys] = Set(CachedDefaults[.hotkeys].map { hotkey in
+            guard HotkeyIdentifier(rawValue: hotkey.identifier) != nil else {
+                return hotkey
+            }
+
+            return hotkey.disabled()
+        })
+
+        mainAsyncAfter(ms: 100) { [weak self] in
+            CachedDefaults[.hotkeys].forEach {
+                $0.unregister()
+                if $0.isEnabled { $0.register() }
+            }
+            self?.setHotkeys()
+            appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+        }
+    }
+
     @IBAction func howDoHotkeysWork(_: Any) {
         NSWorkspace.shared.open(try! "https://lunar.fyi/faq#hotkeys".asURL())
     }
@@ -166,10 +197,35 @@ class HotkeyViewController: NSViewController {
         view.bg = hotkeysBgColor
 
         resetButton.page = .hotkeysReset
-        hotkeysInfoButton.page = .hotkeys
+        disableButton.page = .hotkeysReset
+        disableButton.resettingText = "Disabling"
 
         setHotkeys()
         setupFKeysNotice()
+
+        brightnessKeysControlButton?.page = .hotkeys
+        brightnessKeysControlButton?.origin = .left
+        brightnessKeysControlButton?.fade()
+
+        ctrlBrightnessKeysControlButton?.page = .hotkeys
+        ctrlBrightnessKeysControlButton?.origin = .left
+        ctrlBrightnessKeysControlButton?.fade()
+
+        shiftBrightnessKeysControlButton?.page = .hotkeys
+        shiftBrightnessKeysControlButton?.origin = .left
+        shiftBrightnessKeysControlButton?.fade()
+
+        brightnessKeysSyncControlButton?.page = .hotkeys
+        brightnessKeysSyncControlButton?.origin = .left
+        brightnessKeysSyncControlButton?.fade()
+
+        ctrlBrightnessKeysSyncControlButton?.page = .hotkeys
+        ctrlBrightnessKeysSyncControlButton?.origin = .left
+        ctrlBrightnessKeysSyncControlButton?.fade()
+
+        shiftBrightnessKeysSyncControlButton?.page = .hotkeys
+        shiftBrightnessKeysSyncControlButton?.origin = .left
+        shiftBrightnessKeysSyncControlButton?.fade()
     }
 
     override func viewDidAppear() {
