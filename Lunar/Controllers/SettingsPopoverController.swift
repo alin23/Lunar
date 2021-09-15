@@ -90,6 +90,9 @@ class SettingsPopoverController: NSViewController {
     @IBOutlet var brightnessCurveFactorField: ScrollableTextField!
     @IBOutlet var contrastCurveFactorField: ScrollableTextField!
 
+    @IBOutlet var faceLightBrightnessField: ScrollableTextField!
+    @IBOutlet var faceLightContrastField: ScrollableTextField!
+
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
@@ -191,6 +194,7 @@ class SettingsPopoverController: NSViewController {
             setupDDCColorGain(display)
             setupCurveFactors(display)
             setupGamma(display)
+            setupFaceLight(display)
         }
     }
 
@@ -426,50 +430,75 @@ class SettingsPopoverController: NSViewController {
         toggle.callback = callback
     }
 
+    func setupFaceLight(_: Display? = nil) {
+        guard let display = display ?? self.display else { return }
+        mainThread {
+            faceLightBrightnessField.intValue = display.faceLightBrightness.int32Value
+            faceLightContrastField.intValue = display.faceLightContrast.int32Value
+
+            faceLightBrightnessField.lowerLimit = display.minDDCBrightness.intValue.d
+            faceLightContrastField.lowerLimit = display.minDDCContrast.intValue.d
+
+            faceLightBrightnessField.upperLimit = display.maxDDCBrightness.intValue.d
+            faceLightContrastField.upperLimit = display.maxDDCContrast.intValue.d
+        }
+
+        faceLightBrightnessField.onValueChanged = { [weak self] value in
+            self?.display?.faceLightBrightness = value.ns
+        }
+        faceLightContrastField.onValueChanged = { [weak self] value in
+            self?.display?.faceLightContrast = value.ns
+        }
+    }
+
     func setupDDCLimits(_ display: Display? = nil) {
-        if let display = display ?? self.display {
-            mainThread {
-                minDDCBrightnessField.intValue = display.minDDCBrightness.int32Value
-                minDDCContrastField.intValue = display.minDDCContrast.int32Value
-                minDDCVolumeField.intValue = display.minDDCVolume.int32Value
+        guard let display = display ?? self.display else { return }
 
-                maxDDCBrightnessField.intValue = display.maxDDCBrightness.int32Value
-                maxDDCContrastField.intValue = display.maxDDCContrast.int32Value
-                maxDDCVolumeField.intValue = display.maxDDCVolume.int32Value
+        mainThread {
+            minDDCBrightnessField.intValue = display.minDDCBrightness.int32Value
+            minDDCContrastField.intValue = display.minDDCContrast.int32Value
+            minDDCVolumeField.intValue = display.minDDCVolume.int32Value
 
-                minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d - 1
-                maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d + 1
-                minDDCContrastField.upperLimit = maxDDCContrastField.intValue.d - 1
-                maxDDCContrastField.lowerLimit = minDDCContrastField.intValue.d + 1
-                minDDCVolumeField.upperLimit = maxDDCVolumeField.intValue.d - 1
-                maxDDCVolumeField.lowerLimit = minDDCVolumeField.intValue.d + 1
-            }
+            maxDDCBrightnessField.intValue = display.maxDDCBrightness.int32Value
+            maxDDCContrastField.intValue = display.maxDDCContrast.int32Value
+            maxDDCVolumeField.intValue = display.maxDDCVolume.int32Value
 
-            minDDCBrightnessField.onValueChanged = { [weak self] value in
-                self?.display?.minDDCBrightness = value.ns
-                self?.maxDDCBrightnessField.lowerLimit = value.d
-            }
-            minDDCContrastField.onValueChanged = { [weak self] value in
-                self?.display?.minDDCContrast = value.ns
-                self?.maxDDCContrastField.lowerLimit = value.d
-            }
-            minDDCVolumeField.onValueChanged = { [weak self] value in
-                self?.display?.minDDCVolume = value.ns
-                self?.maxDDCVolumeField.lowerLimit = value.d
-            }
+            minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d
+            maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d
+            minDDCContrastField.upperLimit = maxDDCContrastField.intValue.d
+            maxDDCContrastField.lowerLimit = minDDCContrastField.intValue.d
+            minDDCVolumeField.upperLimit = maxDDCVolumeField.intValue.d
+            maxDDCVolumeField.lowerLimit = minDDCVolumeField.intValue.d
+        }
 
-            maxDDCBrightnessField.onValueChanged = { [weak self] value in
-                self?.display?.maxDDCBrightness = value.ns
-                self?.minDDCBrightnessField.upperLimit = value.d
-            }
-            maxDDCContrastField.onValueChanged = { [weak self] value in
-                self?.display?.maxDDCContrast = value.ns
-                self?.minDDCContrastField.upperLimit = value.d
-            }
-            maxDDCVolumeField.onValueChanged = { [weak self] value in
-                self?.display?.maxDDCVolume = value.ns
-                self?.minDDCVolumeField.upperLimit = value.d
-            }
+        minDDCBrightnessField.onValueChanged = { [weak self] value in
+            self?.display?.minDDCBrightness = value.ns
+            self?.maxDDCBrightnessField.lowerLimit = value.d
+            self?.faceLightBrightnessField.lowerLimit = value.d
+        }
+        minDDCContrastField.onValueChanged = { [weak self] value in
+            self?.display?.minDDCContrast = value.ns
+            self?.maxDDCContrastField.lowerLimit = value.d
+            self?.faceLightContrastField.lowerLimit = value.d
+        }
+        minDDCVolumeField.onValueChanged = { [weak self] value in
+            self?.display?.minDDCVolume = value.ns
+            self?.maxDDCVolumeField.lowerLimit = value.d
+        }
+
+        maxDDCBrightnessField.onValueChanged = { [weak self] value in
+            self?.display?.maxDDCBrightness = value.ns
+            self?.minDDCBrightnessField.upperLimit = value.d
+            self?.faceLightBrightnessField.upperLimit = value.d
+        }
+        maxDDCContrastField.onValueChanged = { [weak self] value in
+            self?.display?.maxDDCContrast = value.ns
+            self?.minDDCContrastField.upperLimit = value.d
+            self?.faceLightContrastField.upperLimit = value.d
+        }
+        maxDDCVolumeField.onValueChanged = { [weak self] value in
+            self?.display?.maxDDCVolume = value.ns
+            self?.minDDCVolumeField.upperLimit = value.d
         }
     }
 
@@ -625,7 +654,7 @@ class SettingsPopoverController: NSViewController {
             SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
         }
         volumeOSDToggle.callback = { [weak self] isOn in
-            guard let self = self, let display = self.display else { return }
+            guard let self = self, self.display != nil else { return }
             self.showVolumeOSD = isOn
         }
         if let d = display {
@@ -639,6 +668,7 @@ class SettingsPopoverController: NSViewController {
         setupDDCColorGain()
         setupCurveFactors()
         setupGamma()
+        setupFaceLight()
 
         resolutionsDropdown.page = .hotkeysReset
         resolutionsDropdown.fade()

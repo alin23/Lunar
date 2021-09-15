@@ -440,7 +440,7 @@ class DisplayViewController: NSViewController {
 
         if display.isBuiltin {
             builtinBrightnessField?.onValueChanged = { value in
-                display.withSmoothTransition { display.brightness = value.ns }
+                display.withBrightnessTransition { display.brightness = value.ns }
             }
         }
 

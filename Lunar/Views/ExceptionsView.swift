@@ -50,4 +50,8 @@ class ExceptionsView: NSTableView {
             displayController.adaptBrightness(force: true)
         }
     }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
+    }
 }

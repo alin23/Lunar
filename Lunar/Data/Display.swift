@@ -82,8 +82,7 @@ let GENERIC_DISPLAY = Display(
             maxBrightness: 60,
             minContrast: 50,
             maxContrast: 75,
-            adaptive: true,
-            userBrightness: [.sync: [71: 55]]
+            adaptive: true
         )
         d.hasI2C = true
         return d
@@ -351,13 +350,19 @@ enum ValueType {
         defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
         defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
 
-        maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
-        maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
+        let _maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
+        let _maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
         maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+        maxDDCBrightness = _maxDDCBrightness
+        maxDDCContrast = _maxDDCContrast
 
         minDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
         minDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
         minDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
+
+        faceLightBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
+        faceLightContrast = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightContrast)?.ns) ??
+            (_maxDDCContrast.doubleValue * 0.9).intround.ns
 
         redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
         greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
@@ -471,6 +476,21 @@ enum ValueType {
 
         super.init()
 
+        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) &&
+            (CGDisplayIsInMirrorSet(id) != 0)
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
+            brightnessBeforeBlackout = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .contrastBeforeBlackout)?.ns) {
+            contrastBeforeBlackout = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minBrightnessBeforeBlackout)?.ns) {
+            minBrightnessBeforeBlackout = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minContrastBeforeBlackout)?.ns) {
+            minContrastBeforeBlackout = value
+        }
+
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
@@ -481,8 +501,6 @@ enum ValueType {
 
     init(
         id: CGDirectDisplayID,
-        brightness: UInt8 = 50,
-        contrast: UInt8 = 50,
         serial: String? = nil,
         name: String? = nil,
         active: Bool = false,
@@ -490,125 +508,21 @@ enum ValueType {
         maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS,
         minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
         maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
-        adaptive: Bool = true,
-        maxDDCBrightness: UInt8 = 100,
-        maxDDCContrast: UInt8 = 100,
-        maxDDCVolume: UInt8 = 100,
-        minDDCBrightness: UInt8 = 0,
-        minDDCContrast: UInt8 = 0,
-        minDDCVolume: UInt8 = 0,
-        redGain: UInt8 = DEFAULT_COLOR_GAIN,
-        greenGain: UInt8 = DEFAULT_COLOR_GAIN,
-        blueGain: UInt8 = DEFAULT_COLOR_GAIN,
-        lockedBrightness: Bool = false,
-        lockedContrast: Bool = false,
-        lockedBrightnessCurve: Bool = false,
-        lockedContrastCurve: Bool = false,
-        volume: UInt8 = 10,
-        audioMuted: Bool = false,
-        input: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput1: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput2: UInt8 = InputSource.unknown.rawValue,
-        hotkeyInput3: UInt8 = InputSource.unknown.rawValue,
-        userBrightness: [AdaptiveModeKey: [Int: Int]]? = nil,
-        userContrast: [AdaptiveModeKey: [Int: Int]]? = nil,
-        alwaysUseNetworkControl: Bool = false,
-        neverUseNetworkControl: Bool = false,
-        alwaysFallbackControl: Bool = false,
-        neverFallbackControl: Bool = false,
-        enabledControls: [DisplayControl: Bool]? = nil,
-        brightnessOnInputChange1: UInt8 = 100,
-        brightnessOnInputChange2: UInt8 = 100,
-        brightnessOnInputChange3: UInt8 = 100,
-        contrastOnInputChange1: UInt8 = 75,
-        contrastOnInputChange2: UInt8 = 75,
-        contrastOnInputChange3: UInt8 = 75,
-        defaultGammaRedMin: Float = 0.0,
-        defaultGammaRedMax: Float = 1.0,
-        defaultGammaRedValue: Float = 1.0,
-        defaultGammaGreenMin: Float = 0.0,
-        defaultGammaGreenMax: Float = 1.0,
-        defaultGammaGreenValue: Float = 1.0,
-        defaultGammaBlueMin: Float = 0.0,
-        defaultGammaBlueMax: Float = 1.0,
-        defaultGammaBlueValue: Float = 1.0,
-        isSource: Bool? = nil,
-        showVolumeOSD: Bool = true,
-        applyGamma: Bool = false
+        adaptive: Bool = true
     ) {
         _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
 
-        self.isSource = isSource ?? DDC.isSmartBuiltinDisplay(id)
-        self.showVolumeOSD = showVolumeOSD
-        self.applyGamma = applyGamma
+        isSource = DDC.isSmartBuiltinDisplay(id)
 
-        self.defaultGammaRedMin = defaultGammaRedMin.ns
-        self.defaultGammaRedMax = defaultGammaRedMax.ns
-        self.defaultGammaRedValue = defaultGammaRedValue.ns
-        self.defaultGammaGreenMin = defaultGammaGreenMin.ns
-        self.defaultGammaGreenMax = defaultGammaGreenMax.ns
-        self.defaultGammaGreenValue = defaultGammaGreenValue.ns
-        self.defaultGammaBlueMin = defaultGammaBlueMin.ns
-        self.defaultGammaBlueMax = defaultGammaBlueMax.ns
-        self.defaultGammaBlueValue = defaultGammaBlueValue.ns
-
-        self.maxDDCBrightness = maxDDCBrightness.ns
-        self.maxDDCContrast = maxDDCContrast.ns
-        self.maxDDCVolume = maxDDCVolume.ns
-
-        self.minDDCBrightness = minDDCBrightness.ns
-        self.minDDCContrast = minDDCContrast.ns
-        self.minDDCVolume = minDDCVolume.ns
-
-        self.redGain = redGain.ns
-        self.greenGain = greenGain.ns
-        self.blueGain = blueGain.ns
-
-        self.lockedBrightness = lockedBrightness
-        self.lockedContrast = lockedContrast
-        self.lockedBrightnessCurve = lockedBrightnessCurve
-        self.lockedContrastCurve = lockedContrastCurve
-        self.audioMuted = audioMuted
-
-        self.brightness = brightness.ns
-        self.contrast = contrast.ns
-        self.volume = volume.ns
         self.minBrightness = minBrightness.ns
         self.maxBrightness = maxBrightness.ns
         self.minContrast = minContrast.ns
         self.maxContrast = maxContrast.ns
-        self.input = input.ns
 
-        self.hotkeyInput1 = hotkeyInput1.ns
-        self.hotkeyInput2 = hotkeyInput2.ns
-        self.hotkeyInput3 = hotkeyInput3.ns
-
-        self.alwaysUseNetworkControl = alwaysUseNetworkControl
-        self.neverUseNetworkControl = neverUseNetworkControl
-        self.alwaysFallbackControl = alwaysFallbackControl
-        self.neverFallbackControl = neverFallbackControl
-
-        self.brightnessOnInputChange1 = brightnessOnInputChange1.ns
-        self.brightnessOnInputChange2 = brightnessOnInputChange2.ns
-        self.brightnessOnInputChange3 = brightnessOnInputChange3.ns
-        self.contrastOnInputChange1 = contrastOnInputChange1.ns
-        self.contrastOnInputChange2 = contrastOnInputChange2.ns
-        self.contrastOnInputChange3 = contrastOnInputChange3.ns
-
-        if let enabledControls = enabledControls {
-            self.enabledControls = enabledControls
-        } else {
-            self.enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
-        }
-        if let userBrightness = userBrightness {
-            self.userBrightness = userBrightness.mapValues { $0.threadSafe }.threadSafe
-        }
-        if let userContrast = userContrast {
-            self.userContrast = userContrast.mapValues { $0.threadSafe }.threadSafe
-        }
+        enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
 
         edidName = Self.printableName(id)
         if let n = name, !n.isEmpty {
@@ -654,6 +568,13 @@ enum ValueType {
         case minDDCBrightness
         case minDDCContrast
         case minDDCVolume
+        case faceLightBrightness
+        case faceLightContrast
+        case blackOutEnabled
+        case brightnessBeforeBlackout
+        case contrastBeforeBlackout
+        case minBrightnessBeforeBlackout
+        case minContrastBeforeBlackout
         case redGain
         case greenGain
         case blueGain
@@ -762,6 +683,8 @@ enum ValueType {
             .minDDCBrightness,
             .minDDCContrast,
             .minDDCVolume,
+            .faceLightBrightness,
+            .faceLightContrast,
             .redGain,
             .greenGain,
             .blueGain,
@@ -939,13 +862,14 @@ enum ValueType {
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
 
     @Atomic var force = false
+
     @Atomic var faceLightEnabled = false
-    @Atomic var blackOutEnabled = false
     lazy var brightnessBeforeFacelight = brightness
     lazy var contrastBeforeFacelight = contrast
     lazy var maxBrightnessBeforeFacelight = maxBrightness
     lazy var maxContrastBeforeFacelight = maxContrast
 
+    @Atomic var blackOutEnabled = false
     lazy var brightnessBeforeBlackout = brightness
     lazy var contrastBeforeBlackout = contrast
     lazy var minBrightnessBeforeBlackout = minBrightness
@@ -1050,7 +974,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var applyGamma: Bool {
+    @Published @objc dynamic var applyGamma: Bool = false {
         didSet {
             save()
             if !applyGamma {
@@ -1083,70 +1007,70 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var defaultGammaRedMin: NSNumber {
+    @Published @objc dynamic var defaultGammaRedMin: NSNumber = 0.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaRedMax: NSNumber {
+    @Published @objc dynamic var defaultGammaRedMax: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaRedValue: NSNumber {
+    @Published @objc dynamic var defaultGammaRedValue: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaGreenMin: NSNumber {
+    @Published @objc dynamic var defaultGammaGreenMin: NSNumber = 0.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaGreenMax: NSNumber {
+    @Published @objc dynamic var defaultGammaGreenMax: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaGreenValue: NSNumber {
+    @Published @objc dynamic var defaultGammaGreenValue: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaBlueMin: NSNumber {
+    @Published @objc dynamic var defaultGammaBlueMin: NSNumber = 0.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaBlueMax: NSNumber {
+    @Published @objc dynamic var defaultGammaBlueMax: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var defaultGammaBlueValue: NSNumber {
+    @Published @objc dynamic var defaultGammaBlueValue: NSNumber = 1.0 {
         didSet {
             save()
             reapplyGamma()
         }
     }
 
-    @Published @objc dynamic var redGain: NSNumber {
+    @Published @objc dynamic var redGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
             if let control = control, !control.setRedGain(redGain.uint8Value) {
@@ -1158,7 +1082,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var greenGain: NSNumber {
+    @Published @objc dynamic var greenGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
             if let control = control, !control.setGreenGain(greenGain.uint8Value) {
@@ -1170,7 +1094,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var blueGain: NSNumber {
+    @Published @objc dynamic var blueGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
             if let control = control, !control.setBlueGain(blueGain.uint8Value) {
@@ -1182,94 +1106,108 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var maxDDCBrightness: NSNumber {
+    @Published @objc dynamic var maxDDCBrightness: NSNumber = 100 {
         didSet {
             save()
             readapt(newValue: maxDDCBrightness, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var maxDDCContrast: NSNumber {
+    @Published @objc dynamic var maxDDCContrast: NSNumber = 100 {
         didSet {
             save()
             readapt(newValue: maxDDCContrast, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var maxDDCVolume: NSNumber {
+    @Published @objc dynamic var maxDDCVolume: NSNumber = 100 {
         didSet {
             save()
             readapt(newValue: maxDDCVolume, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var minDDCBrightness: NSNumber {
+    @Published @objc dynamic var minDDCBrightness: NSNumber = 0 {
         didSet {
             save()
             readapt(newValue: minDDCBrightness, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var minDDCContrast: NSNumber {
+    @Published @objc dynamic var minDDCContrast: NSNumber = 0 {
         didSet {
             save()
             readapt(newValue: minDDCContrast, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var minDDCVolume: NSNumber {
+    @Published @objc dynamic var minDDCVolume: NSNumber = 0 {
         didSet {
             save()
             readapt(newValue: minDDCVolume, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var lockedBrightness: Bool {
+    @objc dynamic var faceLightBrightness: NSNumber = 100 {
+        didSet {
+            save()
+            readapt(newValue: faceLightBrightness, oldValue: oldValue)
+        }
+    }
+
+    @objc dynamic var faceLightContrast: NSNumber = 90 {
+        didSet {
+            save()
+            readapt(newValue: faceLightContrast, oldValue: oldValue)
+        }
+    }
+
+    @Published @objc dynamic var lockedBrightness: Bool = false {
         didSet {
             save()
         }
     }
 
-    @Published @objc dynamic var lockedContrast: Bool {
+    @Published @objc dynamic var lockedContrast: Bool = false {
         didSet {
             save()
         }
     }
 
-    @Published @objc dynamic var lockedBrightnessCurve: Bool {
+    @Published @objc dynamic var lockedBrightnessCurve: Bool = false {
         didSet {
             save()
         }
     }
 
-    @Published @objc dynamic var lockedContrastCurve: Bool {
+    @Published @objc dynamic var lockedContrastCurve: Bool = false {
         didSet {
             save()
         }
     }
 
-    @Published @objc dynamic var minBrightness: NSNumber {
+    @Published @objc dynamic var minBrightness: NSNumber = DEFAULT_MIN_BRIGHTNESS.ns {
         didSet {
             save()
             readapt(newValue: minBrightness, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var maxBrightness: NSNumber {
+    @Published @objc dynamic var maxBrightness: NSNumber = DEFAULT_MAX_BRIGHTNESS.ns {
         didSet {
             save()
             readapt(newValue: maxBrightness, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var minContrast: NSNumber {
+    @Published @objc dynamic var minContrast: NSNumber = DEFAULT_MIN_CONTRAST.ns {
         didSet {
             save()
             readapt(newValue: minContrast, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var maxContrast: NSNumber {
+    @Published @objc dynamic var maxContrast: NSNumber = DEFAULT_MAX_CONTRAST.ns {
         didSet {
             save()
             readapt(newValue: maxContrast, oldValue: oldValue)
@@ -1315,7 +1253,7 @@ enum ValueType {
         ).rounded().u8
     }
 
-    @Published @objc dynamic var brightness: NSNumber {
+    @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()
 
@@ -1367,7 +1305,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var contrast: NSNumber {
+    @Published @objc dynamic var contrast: NSNumber = 50 {
         didSet {
             save()
 
@@ -1419,7 +1357,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var volume: NSNumber {
+    @Published @objc dynamic var volume: NSNumber = 10 {
         didSet {
             if oldValue.uint8Value > 0 {
                 lastVolume = oldValue
@@ -1521,7 +1459,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var input: NSNumber {
+    @Published @objc dynamic var input: NSNumber = InputSource.unknown.rawValue.ns {
         didSet {
             save()
 
@@ -1538,17 +1476,17 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var hotkeyInput1: NSNumber { didSet { save() } }
-    @Published @objc dynamic var hotkeyInput2: NSNumber { didSet { save() } }
-    @Published @objc dynamic var hotkeyInput3: NSNumber { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput1: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput2: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput3: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
 
-    @Published @objc dynamic var brightnessOnInputChange1: NSNumber { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange1: NSNumber { didSet { save() } }
-    @Published @objc dynamic var brightnessOnInputChange2: NSNumber { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange2: NSNumber { didSet { save() } }
-    @Published @objc dynamic var brightnessOnInputChange3: NSNumber { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange3: NSNumber { didSet { save() } }
-    @Published @objc dynamic var audioMuted: Bool {
+    @Published @objc dynamic var brightnessOnInputChange1: NSNumber = 100 { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange2: NSNumber = 100 { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange3: NSNumber = 100 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange1: NSNumber = 75 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange2: NSNumber = 75 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange3: NSNumber = 75 { didSet { save() } }
+    @Published @objc dynamic var audioMuted: Bool = false {
         didSet {
             save()
 
@@ -1662,7 +1600,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var showVolumeOSD: Bool {
+    @Published @objc dynamic var showVolumeOSD: Bool = true {
         didSet {
             context = getContext()
         }
@@ -1777,75 +1715,6 @@ enum ValueType {
             defaultGammaBlueMin.floatValue != 0 ||
             defaultGammaBlueMax.floatValue != 1 ||
             defaultGammaBlueValue.floatValue != 1
-    }
-
-    static func fromDictionary(_ config: [String: Any]) -> Display? {
-        guard let id = config["id"] as? CGDirectDisplayID,
-              let serial = config["serial"] as? String else { return nil }
-
-        return Display(
-            id: id,
-            brightness: (config["brightness"] as? UInt8) ?? 50,
-            contrast: (config["contrast"] as? UInt8) ?? 50,
-            serial: serial,
-            name: config["name"] as? String,
-            active: (config["active"] as? Bool) ?? false,
-            minBrightness: (config["minBrightness"] as? UInt8) ?? DEFAULT_MIN_BRIGHTNESS,
-            maxBrightness: (config["maxBrightness"] as? UInt8) ?? DEFAULT_MAX_BRIGHTNESS,
-            minContrast: (config["minContrast"] as? UInt8) ?? DEFAULT_MIN_CONTRAST,
-            maxContrast: (config["maxContrast"] as? UInt8) ?? DEFAULT_MAX_CONTRAST,
-            adaptive: (config["adaptive"] as? Bool) ?? true,
-            maxDDCBrightness: (config["maxDDCBrightness"] as? UInt8) ?? 100,
-            maxDDCContrast: (config["maxDDCContrast"] as? UInt8) ?? 100,
-            maxDDCVolume: (config["maxDDCVolume"] as? UInt8) ?? 100,
-            minDDCBrightness: (config["minDDCBrightness"] as? UInt8) ?? 0,
-            minDDCContrast: (config["minDDCContrast"] as? UInt8) ?? 0,
-            minDDCVolume: (config["minDDCVolume"] as? UInt8) ?? 0,
-            redGain: (config["redGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
-            greenGain: (config["greenGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
-            blueGain: (config["blueGain"] as? UInt8) ?? DEFAULT_COLOR_GAIN,
-            lockedBrightness: (config["lockedBrightness"] as? Bool) ?? false,
-            lockedContrast: (config["lockedContrast"] as? Bool) ?? false,
-            lockedBrightnessCurve: (config["lockedBrightnessCurve"] as? Bool) ?? false,
-            lockedContrastCurve: (config["lockedContrastCurve"] as? Bool) ?? false,
-            volume: (config["volume"] as? UInt8) ?? 10,
-            audioMuted: (config["audioMuted"] as? Bool) ?? false,
-            input: (config["input"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput1: (config["hotkeyInput1"] as? UInt8) ?? (config["hotkeyInput"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput2: (config["hotkeyInput2"] as? UInt8) ?? InputSource.unknown.rawValue,
-            hotkeyInput3: (config["hotkeyInput3"] as? UInt8) ?? InputSource.unknown.rawValue,
-            userBrightness: (config["userBrightness"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
-            userContrast: (config["userContrast"] as? [AdaptiveModeKey: [Int: Int]]) ?? [:],
-            alwaysUseNetworkControl: (config["alwaysUseNetworkControl"] as? Bool) ?? false,
-            neverUseNetworkControl: (config["neverUseNetworkControl"] as? Bool) ?? false,
-            alwaysFallbackControl: (config["alwaysFallbackControl"] as? Bool) ?? false,
-            neverFallbackControl: (config["neverFallbackControl"] as? Bool) ?? false,
-            enabledControls: (config["enabledControls"] as? [DisplayControl: Bool]) ?? [
-                .network: true,
-                .coreDisplay: true,
-                .ddc: true,
-                .gamma: !DDC.isSmartBuiltinDisplay(id),
-            ],
-            brightnessOnInputChange1: (config["brightnessOnInputChange1"] as? UInt8) ?? (config["brightnessOnInputChange"] as? UInt8) ??
-                100,
-            brightnessOnInputChange2: (config["brightnessOnInputChange2"] as? UInt8) ?? 100,
-            brightnessOnInputChange3: (config["brightnessOnInputChange3"] as? UInt8) ?? 100,
-            contrastOnInputChange1: (config["contrastOnInputChange1"] as? UInt8) ?? (config["contrastOnInputChange"] as? UInt8) ?? 75,
-            contrastOnInputChange2: (config["contrastOnInputChange2"] as? UInt8) ?? 75,
-            contrastOnInputChange3: (config["contrastOnInputChange3"] as? UInt8) ?? 75,
-            defaultGammaRedMin: (config["defaultGammaRedMin"] as? Float) ?? 0.0,
-            defaultGammaRedMax: (config["defaultGammaRedMax"] as? Float) ?? 1.0,
-            defaultGammaRedValue: (config["defaultGammaRedValue"] as? Float) ?? 1.0,
-            defaultGammaGreenMin: (config["defaultGammaGreenMin"] as? Float) ?? 0.0,
-            defaultGammaGreenMax: (config["defaultGammaGreenMax"] as? Float) ?? 1.0,
-            defaultGammaGreenValue: (config["defaultGammaGreenValue"] as? Float) ?? 1.0,
-            defaultGammaBlueMin: (config["defaultGammaBlueMin"] as? Float) ?? 0.0,
-            defaultGammaBlueMax: (config["defaultGammaBlueMax"] as? Float) ?? 1.0,
-            defaultGammaBlueValue: (config["defaultGammaBlueValue"] as? Float) ?? 1.0,
-            isSource: (config["isSource"] as? Bool) ?? DDC.isSmartBuiltinDisplay(id),
-            showVolumeOSD: (config["showVolumeOSD"] as? Bool) ?? true,
-            applyGamma: (config["applyGamma"] as? Bool) ?? false
-        )
     }
 
     // MARK: EDID
@@ -1981,7 +1850,7 @@ enum ValueType {
 
     func thrice(_ action: @escaping ((Display) -> Void), onFinish: ((Display) -> Void)? = nil) {
         asyncNow { [weak self] in
-            self?.withSmoothTransition(false) {
+            self?.withoutSmoothTransition {
                 self?.withForce {
                     for _ in 1 ... 3 { if let self = self { action(self) } }
                     if let self = self {
@@ -2380,6 +2249,15 @@ enum ValueType {
             try container.encode(minDDCBrightness.uint8Value, forKey: .minDDCBrightness)
             try container.encode(minDDCContrast.uint8Value, forKey: .minDDCContrast)
             try container.encode(minDDCVolume.uint8Value, forKey: .minDDCVolume)
+
+            try container.encode(faceLightBrightness.uint8Value, forKey: .faceLightBrightness)
+            try container.encode(faceLightContrast.uint8Value, forKey: .faceLightContrast)
+
+            try container.encode(blackOutEnabled, forKey: .blackOutEnabled)
+            try container.encode(brightnessBeforeBlackout.uint8Value, forKey: .brightnessBeforeBlackout)
+            try container.encode(contrastBeforeBlackout.uint8Value, forKey: .contrastBeforeBlackout)
+            try container.encode(minBrightnessBeforeBlackout.uint8Value, forKey: .minBrightnessBeforeBlackout)
+            try container.encode(minContrastBeforeBlackout.uint8Value, forKey: .minContrastBeforeBlackout)
 
             try container.encode(redGain.uint8Value, forKey: .redGain)
             try container.encode(greenGain.uint8Value, forKey: .greenGain)
@@ -2883,7 +2761,7 @@ enum ValueType {
                 self.gammaChanged = true
                 for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, contrast: contrast) {
                     gammaTable.apply(to: id)
-                    Thread.sleep(forTimeInterval: 0.01)
+                    Thread.sleep(forTimeInterval: CachedDefaults[.brightnessTransition] == .slow ? 0.025 : 0.005)
                 }
                 gammaSemaphore.signal()
             }
@@ -2914,6 +2792,9 @@ enum ValueType {
         minDDCBrightness = 0.ns
         minDDCContrast = 0.ns
         minDDCVolume = 0.ns
+
+        faceLightBrightness = 100.ns
+        faceLightContrast = 90.ns
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()
         userBrightness[displayController.adaptiveModeKey]?.removeAll()
@@ -2977,18 +2858,19 @@ enum ValueType {
     }
 
     @inline(__always) func withoutSmoothTransition(_ block: () -> Void) {
-        withSmoothTransition(false, block)
+        withBrightnessTransition(.instant, block)
     }
 
-    @inline(__always) func withSmoothTransition(_ active: Bool = true, _ block: () -> Void) {
-        if CachedDefaults[.smoothTransition] == active {
+    @inline(__always) func withBrightnessTransition(_ transition: BrightnessTransition = .smooth, _ block: () -> Void) {
+        if CachedDefaults[.brightnessTransition] == transition {
             block()
             return
         }
 
-        CachedDefaults[.smoothTransition] = active
+        let oldTransition = CachedDefaults[.brightnessTransition]
+        CachedDefaults[.brightnessTransition] = transition
         block()
-        CachedDefaults[.smoothTransition] = !active
+        CachedDefaults[.brightnessTransition] = oldTransition
     }
 
     // MARK: Computing Values

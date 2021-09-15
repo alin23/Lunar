@@ -655,7 +655,7 @@ enum DDC {
             DDC.skipWritingPropertyById[displayID] = Set([controlID])
         }
         if controlID == ControlID.BRIGHTNESS {
-            mainThread {
+            mainAsyncAfter(ms: 100) {
                 #if DEBUG
                     displayController.displays[displayID]?.responsiveDDC = TEST_IDS.contains(displayID)
                 #else

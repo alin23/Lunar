@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
           "branch": null,
-          "revision": "69261f239f0fffaf51495dadc4f8483fbfe97025",
-          "version": "0.6.1"
+          "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
+          "version": "0.6.2"
         }
       },
       {
@@ -114,7 +114,7 @@
         "repositoryURL": "https://github.com/alin23/KeyHolder",
         "state": {
           "branch": "master",
-          "revision": "212dad3e6def0ee25e0700c03680d9ba8c31486b",
+          "revision": "657e6c54ff670c91a27ccea8e73893c5b9664c18",
           "version": null
         }
       },
@@ -123,7 +123,7 @@
         "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
           "branch": "dev",
-          "revision": "cb7e78c2b515fb190e217e712dfe427386eb8fdb",
+          "revision": "63d8c759f2f6e2d7ca3f7e768b4ae6bc1198bfc2",
           "version": null
         }
       },
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "eb09cfa3ebcb96ca4a7f8f8de6c5d7aff4c48c0e",
-          "version": "7.2.7"
+          "revision": "9583543c763bc36c2f7928d1dbde26e9a8c52c4e",
+          "version": "7.2.10"
         }
       },
       {
@@ -251,15 +251,6 @@
           "branch": null,
           "revision": "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
           "version": "6.3.1"
-        }
-      },
-      {
-        "package": "SwiftSerial",
-        "repositoryURL": "https://github.com/alin23/SwiftSerial",
-        "state": {
-          "branch": "master",
-          "revision": "06a57193a96af68e58d94ac53fe000b0fecafb5a",
-          "version": null
         }
       },
       {

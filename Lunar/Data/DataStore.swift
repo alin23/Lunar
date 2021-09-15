@@ -11,6 +11,14 @@ import Cocoa
 import Combine
 import Defaults
 
+// MARK: - BrightnessTransition
+
+enum BrightnessTransition: Int, CaseIterable, Defaults.Serializable {
+    case instant
+    case smooth
+    case slow
+}
+
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
@@ -38,6 +46,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .firstRunAfterM1DDCUpgrade,
     .firstRunAfterDefaults5Upgrade,
     .firstRunAfterBuiltinUpgrade,
+    .firstRunAfterHotkeysUpgrade,
     .fKeysAsFunctionKeys,
     .hasActiveDisplays,
     .hideMenuBarIcon,
@@ -53,6 +62,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .sensorPollingSeconds,
     .showQuickActions,
     .smoothTransition,
+    .brightnessTransition,
     .solarNoon,
     .startAtLogin,
     .sunrise,
@@ -62,6 +72,13 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeStep,
     .reapplyValuesAfterWake,
     .ddcSleepFactor,
+
+    .brightnessKeysSyncControl,
+    .brightnessKeysControl,
+    .ctrlBrightnessKeysSyncControl,
+    .ctrlBrightnessKeysControl,
+    .shiftBrightnessKeysSyncControl,
+    .shiftBrightnessKeysControl,
 ]
 
 // MARK: - DDCSleepFactor
@@ -108,6 +125,12 @@ class DataStore: NSObject {
             Defaults[.firstRunAfterM1DDCUpgrade] = true
             Defaults[.firstRunAfterDefaults5Upgrade] = true
             Defaults[.firstRunAfterBuiltinUpgrade] = true
+            Defaults[.firstRunAfterHotkeysUpgrade] = true
+        }
+
+        if Defaults[.firstRunAfterHotkeysUpgrade] == nil {
+            DataStore.firstRunAfterHotkeysUpgrade()
+            Defaults[.firstRunAfterHotkeysUpgrade] = true
         }
 
         if Defaults[.firstRunAfterBuiltinUpgrade] == nil {
@@ -171,6 +194,15 @@ class DataStore: NSObject {
 
         CachedDefaults[.displays] = displays
         if now { Defaults[.displays] = displays }
+    }
+
+    static func firstRunAfterHotkeysUpgrade() {
+        thisIsFirstRunAfterHotkeysUpgrade = true
+        CachedDefaults[.brightnessKeysControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .all : .cursor
+        CachedDefaults[.ctrlBrightnessKeysSyncControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .external : .cursor
+        CachedDefaults[.ctrlBrightnessKeysControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .external : .cursor
+        CachedDefaults[.brightnessTransition] = CachedDefaults[.smoothTransition] ? .smooth : .instant
+        CachedDefaults.reset(.mediaKeysControlAllMonitors)
     }
 
     static func firstRunAfterBuiltinUpgrade() {
@@ -519,6 +551,14 @@ func initCache() {
     cacheKey(.mediaKeysNotified)
     cacheKey(.muteVolumeZero)
     cacheKey(.hotkeysAffectBuiltin)
+
+    cacheKey(.brightnessKeysSyncControl)
+    cacheKey(.brightnessKeysControl)
+    cacheKey(.ctrlBrightnessKeysSyncControl)
+    cacheKey(.ctrlBrightnessKeysControl)
+    cacheKey(.shiftBrightnessKeysSyncControl)
+    cacheKey(.shiftBrightnessKeysControl)
+
     cacheKey(.showVirtualDisplays)
     cacheKey(.showAirplayDisplays)
     cacheKey(.advancedSettingsShown)
@@ -532,6 +572,7 @@ func initCache() {
     cacheKey(.didSwipeLeft)
     cacheKey(.didSwipeRight)
     cacheKey(.smoothTransition)
+    cacheKey(.brightnessTransition)
     cacheKey(.refreshValues)
     cacheKey(.debug)
     cacheKey(.showQuickActions)
@@ -579,24 +620,34 @@ extension Defaults.Keys {
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterBuiltinUpgrade = Key<Bool?>("firstRunAfterBuiltinUpgrade", default: nil)
+    static let firstRunAfterHotkeysUpgrade = Key<Bool?>("firstRunAfterHotkeysUpgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
     static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
+
+    static let brightnessKeysSyncControl = Key<BrightnessKeyAction>("brightnessKeysSyncControl", default: .builtin)
+    static let brightnessKeysControl = Key<BrightnessKeyAction>("brightnessKeysControl", default: .all)
+    static let ctrlBrightnessKeysSyncControl = Key<BrightnessKeyAction>("ctrlBrightnessKeysSyncControl", default: .external)
+    static let ctrlBrightnessKeysControl = Key<BrightnessKeyAction>("ctrlBrightnessKeysControl", default: .external)
+    static let shiftBrightnessKeysSyncControl = Key<BrightnessKeyAction>("shiftBrightnessKeysSyncControl", default: .cursor)
+    static let shiftBrightnessKeysControl = Key<BrightnessKeyAction>("shiftBrightnessKeysControl", default: .builtin)
+
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
-    static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: true)
+    static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: false)
     static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
     static let didSwipeToHotkeys = Key<Bool>("didSwipeToHotkeys", default: false)
     static let didSwipeLeft = Key<Bool>("didSwipeLeft", default: false)
     static let didSwipeRight = Key<Bool>("didSwipeRight", default: false)
     static let smoothTransition = Key<Bool>("smoothTransition", default: false)
+    static let brightnessTransition = Key<BrightnessTransition>("brightnessTransition", default: .instant)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
     static let debug = Key<Bool>("debug", default: false)
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
@@ -701,8 +752,6 @@ let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).re
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let mediaKeysControlAllMonitorsPublisher = Defaults.publisher(.mediaKeysControlAllMonitors).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
 let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
