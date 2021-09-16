@@ -123,7 +123,7 @@
         "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
           "branch": "dev",
-          "revision": "63d8c759f2f6e2d7ca3f7e768b4ae6bc1198bfc2",
+          "revision": "716ba54839bd08766358984e8a556035d99fde49",
           "version": null
         }
       },
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "9583543c763bc36c2f7928d1dbde26e9a8c52c4e",
-          "version": "7.2.10"
+          "revision": "4abaa663a7916902ae9196a8bf3c4c047caacc17",
+          "version": "7.3.0"
         }
       },
       {

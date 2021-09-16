@@ -25,6 +25,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .advancedSettingsShown,
     .moreGraphData,
     .enableOrientationHotkeys,
+    .detectKeyHold,
     .appExceptions,
     .muteVolumeZero,
     .hotkeysAffectBuiltin,
@@ -564,6 +565,7 @@ func initCache() {
     cacheKey(.advancedSettingsShown)
     cacheKey(.moreGraphData)
     cacheKey(.enableOrientationHotkeys)
+    cacheKey(.detectKeyHold)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
     cacheKey(.useAlternateBrightnessKeys)
@@ -639,6 +641,7 @@ extension Defaults.Keys {
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
+    static let detectKeyHold = Key<Bool>("detectKeyHold", default: true)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: false)
     static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: true)
@@ -733,6 +736,7 @@ let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).
 let moreGraphDataPublisher = Defaults.publisher(.moreGraphData).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHotkeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
+let detectKeyHoldPublisher = Defaults.publisher(.detectKeyHold).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
 // let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }

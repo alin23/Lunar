@@ -332,11 +332,14 @@ enum DDC {
     }
 
     static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
+        guard !Thread.isMainThread else {
+            return action()
+        }
+
         if let q = DispatchQueue.current, q == queue {
             return action()
-        } else {
-            return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
         }
+        return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
     }
 
     #if arch(arm64)
@@ -457,11 +460,11 @@ enum DDC {
                 return displayIDs
             }
             return [
-                TEST_DISPLAY_ID,
+                // TEST_DISPLAY_ID,
                 TEST_DISPLAY_PERSISTENT_ID,
-                TEST_DISPLAY_PERSISTENT2_ID,
-                TEST_DISPLAY_PERSISTENT3_ID,
-                TEST_DISPLAY_PERSISTENT4_ID,
+                // TEST_DISPLAY_PERSISTENT2_ID,
+                // TEST_DISPLAY_PERSISTENT3_ID,
+                // TEST_DISPLAY_PERSISTENT4_ID,
             ]
         #else
             return displayIDs
