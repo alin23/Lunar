@@ -283,7 +283,7 @@ struct GammaTable: Equatable {
     }
 
     func adjust(brightness: UInt8, contrast _: UInt8? = nil) -> GammaTable {
-        let brightness: Float = powf(brightness.f / 100, 0.8)
+        let brightness: Float = mapNumber(powf(brightness.f / 100, 0.8), fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00)
         return GammaTable(
             red: red.map { $0 * brightness },
             green: green.map { $0 * brightness },
@@ -2586,7 +2586,7 @@ enum ValueType {
 
             withoutSmoothTransition {
                 withoutDDC {
-                    brightness = newBrightness.ns
+                    mainThread { brightness = newBrightness.ns }
                 }
             }
         }
@@ -2610,7 +2610,7 @@ enum ValueType {
 
             withoutSmoothTransition {
                 withoutDDC {
-                    contrast = newContrast.ns
+                    mainThread { contrast = newContrast.ns }
                 }
             }
         }
@@ -2632,7 +2632,7 @@ enum ValueType {
 
             withoutSmoothTransition {
                 withoutDDC {
-                    input = newInput.ns
+                    mainThread { input = newInput.ns }
                 }
             }
         }
@@ -2647,14 +2647,14 @@ enum ValueType {
 
         if newAudioMuted != audioMuted {
             log.info("Refreshing mute value: \(audioMuted) <> \(newAudioMuted)")
-            audioMuted = newAudioMuted
+            mainThread { audioMuted = newAudioMuted }
         }
         if newVolume != volume.uint8Value {
             log.info("Refreshing volume: \(volume.uint8Value) <> \(newVolume)")
 
             withoutSmoothTransition {
                 withoutDDC {
-                    volume = newVolume.ns
+                    mainThread { volume = newVolume.ns }
                 }
             }
         }
@@ -2700,36 +2700,6 @@ enum ValueType {
     func gammaUnlock() {
         log.verbose("Unlocking gamma", context: context)
         gammaDistributedLock?.unlock()
-    }
-
-    func computeGamma(brightness: UInt8? = nil, contrast: UInt8? = nil) -> Gamma {
-        let rawBrightness = Float(brightness ?? self.brightness.uint8Value) / 100.0
-        let redGamma = CGGammaValue(mapNumber(
-            rawBrightness,
-            fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: defaultGammaRedValue.floatValue
-        ))
-        let greenGamma = CGGammaValue(mapNumber(
-            rawBrightness,
-            fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: defaultGammaGreenValue.floatValue
-        ))
-        let blueGamma = CGGammaValue(mapNumber(
-            rawBrightness,
-            fromLow: 0.0, fromHigh: 1.0,
-            toLow: 0.3, toHigh: defaultGammaBlueValue.floatValue
-        ))
-
-        var newContrast = CGGammaValue(0)
-        if contrast ?? self.contrast.uint8Value != 75 {
-            newContrast = CGGammaValue(mapNumber(
-                powf(Float(contrast ?? self.contrast.uint8Value) / 100.0, 2.4),
-                fromLow: 0, fromHigh: 1.0,
-                toLow: 0.2, toHigh: -0.2
-            ))
-        }
-
-        return Gamma(red: redGamma, green: greenGamma, blue: blueGamma, contrast: newContrast)
     }
 
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast _: UInt8? = nil) {

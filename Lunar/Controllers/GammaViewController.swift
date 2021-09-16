@@ -19,48 +19,34 @@ class GammaViewController: NSViewController {
         dot.alphaValue > 0
     }
 
+    var visible: Bool {
+        mainThread { view.window?.isVisible ?? false }
+    }
+
     func highlight() {
-        // return
-        let windowVisible = mainThread { view.window?.isVisible ?? false }
-        guard highlighterTask == nil, dot != nil, windowVisible
-        else {
-            return
-        }
+        guard dot != nil, visible else { return }
 
-        highlighterTask = operationHighlightQueue.async(every: 200.milliseconds) { [weak self] (_: CFRunLoopTimer?) in
-            self?.highlighterLock.around {
-                guard let s = self else {
-                    if let timer = self?.highlighterTask {
-                        operationHighlightQueue.cancel(timer: timer)
-                        self?.highlighterTask = nil
+        highlighterTask = operationHighlightQueue
+            .async(every: 200.milliseconds, existingTimer: highlighterTask) { [weak self] (timer: CFRunLoopTimer?) in
+                self?.highlighterLock.around {
+                    guard let s = self, s.visible, let dot = s.dot else {
+                        if let timer = timer { operationHighlightQueue.cancel(timer: timer) }
+                        return
                     }
-                    return
-                }
 
-                let windowVisible: Bool = mainThread {
-                    s.view.window?.isVisible ?? false
-                }
-                guard windowVisible, let dot = s.dot
-                else {
-                    if let timer = self?.highlighterTask {
-                        operationHighlightQueue.cancel(timer: timer)
-                    }
-                    return
-                }
-
-                mainThread {
-                    if dot.alphaValue == 0.0 {
-                        dot.transition(0.2)
-                        dot.alphaValue = 0.1
-                        dot.needsDisplay = true
-                    } else {
-                        dot.transition(0.2)
-                        dot.alphaValue = 0.0
-                        dot.needsDisplay = true
+                    mainThread {
+                        if dot.alphaValue == 0.0 {
+                            dot.transition(0.2)
+                            dot.alphaValue = 0.1
+                            dot.needsDisplay = true
+                        } else {
+                            dot.transition(0.2)
+                            dot.alphaValue = 0.0
+                            dot.needsDisplay = true
+                        }
                     }
                 }
             }
-        }
 
         let key = "stopHighlighting"
         let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
@@ -74,13 +60,11 @@ class GammaViewController: NSViewController {
     }
 
     func stopHighlighting() {
-        // return
         if let timer = highlighterTask {
             operationHighlightQueue.cancel(timer: timer)
         }
-        highlighterTask = nil
 
-        mainThread { [weak self] in
+        mainAsyncAfter(ms: 10) { [weak self] in
             guard let dot = self?.dot else { return }
             dot.transition(0.2)
             dot.alphaValue = 0.0
