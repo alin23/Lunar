@@ -8,6 +8,8 @@
 ## Improvements
 
 * Make sure Gamma never goes below `0.08` on brightness 0 to retain visibility
+* Allow **press-and-hold** detection to be disabled for users that encounter problems with it
+* Remove unused serial-port and volume-based sensor options
 
 # 4.9.0
 ## Features
