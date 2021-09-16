@@ -109,8 +109,6 @@
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
 		C7BAD9C3263869920058974C /* Pro Meteor.png in Resources */ = {isa = PBXBuildFile; fileRef = C7BAD9BC263869920058974C /* Pro Meteor.png */; };
-		C7BAD9EC26386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 in Resources */ = {isa = PBXBuildFile; fileRef = C7BAD9D126386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 */; };
-		C7BADA0426386BE40058974C /* als.zip in Resources */ = {isa = PBXBuildFile; fileRef = C7BADA0326386BE40058974C /* als.zip */; };
 		C7BADA0A26386E940058974C /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = C7BADA0926386E940058974C /* ZIPFoundation */; };
 		C7BADA12263889CD0058974C /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BADA11263889CD0058974C /* ProgressViewController.swift */; };
 		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
@@ -307,10 +305,6 @@
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
 		C7BAD9BC263869920058974C /* Pro Meteor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Pro Meteor.png"; sourceTree = "<group>"; };
-		C7BAD9CF26386ABC0058974C /* boot.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = boot.py; sourceTree = "<group>"; };
-		C7BAD9D126386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2"; sourceTree = "<group>"; };
-		C7BAD9D226386ABC0058974C /* code.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = code.py; sourceTree = "<group>"; };
-		C7BADA0326386BE40058974C /* als.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = als.zip; sourceTree = "<group>"; };
 		C7BADA11263889CD0058974C /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
 		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveModeButton.swift; sourceTree = "<group>"; };
@@ -670,20 +664,8 @@
 				C780CF96269F2370007FFB58 /* tsl2591.h */,
 				C7C43190269DD9AE00DCD0F5 /* install.sh */,
 				C7C43191269DD9AE00DCD0F5 /* lunar.yaml */,
-				C7BADA0326386BE40058974C /* als.zip */,
-				C7BAD9CF26386ABC0058974C /* boot.py */,
-				C7BAD9D026386ABC0058974C /* bootloader */,
-				C7BAD9D226386ABC0058974C /* code.py */,
 			);
 			path = ALS;
-			sourceTree = "<group>";
-		};
-		C7BAD9D026386ABC0058974C /* bootloader */ = {
-			isa = PBXGroup;
-			children = (
-				C7BAD9D126386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 */,
-			);
-			path = bootloader;
 			sourceTree = "<group>";
 		};
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
@@ -953,9 +935,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7BAD9EC26386ABC0058974C /* adafruit-circuitpython-raspberry_pi_pico-en_US-6.2.0.uf2 in Resources */,
 				C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */,
-				C7BADA0426386BE40058974C /* als.zip in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
 				C780CF98269F241A007FFB58 /* tsl2591.h in Resources */,

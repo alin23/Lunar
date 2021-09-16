@@ -249,6 +249,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             hotkey.handleRegistration(persist: false)
         }
         CachedDefaults[.hotkeys] = hotkeys
+
+        HotKeyCenter.shared.detectKeyHold = CachedDefaults[.detectKeyHold]
+        detectKeyHoldPublisher.sink { change in
+            HotKeyCenter.shared.detectKeyHold = change.newValue
+        }.store(in: &observers)
+
         Hotkey.toggleOrientationHotkeys()
         enableOrientationHotkeysPublisher.sink { change in
             Hotkey.toggleOrientationHotkeys(enabled: change.newValue)
@@ -428,7 +434,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func goToPage(ignoreUIElement: Bool = false) {
+    func goToPage(ignoreUIElement: Bool = false, highlight: Bool = false) {
         guard let view = windowController?.window?.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let splitViewController = pageController.parent as? SplitViewController,
@@ -452,7 +458,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if !ignoreUIElement, let uiElement = uiElement {
             mainAsyncAfter(ms: 500) { [self] in
-                activateUIElement(uiElement, page: currentPage)
+                activateUIElement(uiElement, page: currentPage, highlight: highlight)
                 self.uiElement = nil
             }
         }
@@ -769,7 +775,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func showAdvancedSettings(highlight: Bool = false) {
         CachedDefaults[.advancedSettingsShown] = true
         currentPage = Page.settings.rawValue
-        activateUIElement(.advancedSettingsButton, page: currentPage, highlight: highlight)
+        uiElement = .advancedSettingsButton
+        appDelegate.goToPage(highlight: highlight)
+    }
+
+    func hideAdvancedSettings() {
+        CachedDefaults[.advancedSettingsShown] = false
+        uiElement = nil
     }
 
     func recreateWindow() {

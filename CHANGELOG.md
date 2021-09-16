@@ -1,3 +1,14 @@
+# 4.9.1
+## Fixes
+
+* Fix crash because of gamma smooth transition logic
+* Fix crash when Sensor Mode would update brightness on a non-main thread
+* Avoid app entering a not responding state when in Location mode and waking the screen
+
+## Improvements
+
+* Make sure Gamma never goes below `0.08` on brightness 0 to retain visibility
+
 # 4.9.0
 ## Features
 
@@ -5,7 +16,7 @@
 * Hotkeys now support press and hold for repeating actions
 * Add configurable FaceLight brightness/contrast settings inside the [Lunar Display settings](lunar://display/settings)
 * Add **Disable all hotkeys** button on the Hotkey page
-    * [disable all hotkeys button](https://lunar.fyi/static/img/disable-all-hotkeys-button/disable-all-hotkeys-button.png)
+    * ![disable all hotkeys button](https://lunar.fyi/static/img/disable-all-hotkeys-button/disable-all-hotkeys-button.png)
 * Add **Slow** brightness transition option
 * Change Lunar window pages using keys:
     * Press **H** for the *Hotkeys* page
@@ -13,7 +24,7 @@
     * Press **B** for the *Built-in display* page
     * Press **1..9** for switching to the *Display* page with that number
 
-<video src="https://static.lunar.fyi/page-key-demo.mp4" autobuffer autoloop loop controls></video>
+<video src="https://static.lunar.fyi/page-key-demo.mp4" autobuffer autoloop loop muted autoplay></video>
 
 ## Improvements
 
@@ -66,8 +77,6 @@
 * Allow fully offline installations
 
 # 4.8.2
-# Hotfix Release
-
 ## Fixes
 
 * Make Gamma ColorSync profile matching work on Intel as well
@@ -76,127 +85,13 @@
 * Add missing hotkeys for changing screen orientation in [Advanced settings](lunar://advanced)
 * Fix `recursive locking` crash because of using `NSScreen` inside `MPDisplay`
 
-----
-
-# Release Notes from 4.8.0
-
-## Features
-
-* **Dark Mode UI**
-    * ![dark mode UI](https://static.lunar.fyi/dark-mode.png)
-* Add **[Built-in Display page](lunar://display/builtin)**
-    * ![built-in display page](https://static.lunar.fyi/builtin.png)
-* **[BlackOut](https://lunar.fyi/#blackout)**: a feature that lets you selectively turn off displays by:
-    * Mirroring the main display contents
-    * Setting their brightness and contrast to 0
-    * **How to use:**
-        * Press `Ctrl+Cmd+6` to activate it and turn off the display where the cursor is
-        * You can also activate it by *clicking the power button* on the display page for the following cases:
-            * Built-in display
-            * External monitors that don't support DDC
-    * ![blackout power off button](https://static.lunar.fyi/blackout-button.png)
-* Add *"Use Alternate Brightness Keys"* checkbox on the [Hotkeys page](lunar://hotkeys)
-    * Useful if you have a keyboard that has `F14`/`F15` keys and the Brightness keys can send special key codes
-* Add *"Include Built-in Display"* checkbox on the [Hotkeys page](lunar://hotkeys)
-    * Useful if you use a Hackintosh with an external monitor set as a built-in display
-* Add **Lock Curve** button for disabling the auto-learning curve algorithm when needed
-* Add **Reset** buttons in the [gear icon menu](lunar://display/settings)
-* Allow setting **minimum** values for **DDC Limits**
-* Add more useful controls in the [gear icon menu](lunar://display/settings)
-    * **DDC Color Gain**
-    * **Resolutions** (including hidden resolutions)
-    * **Screen orientation**
-    * ![gear icon menu new controls](https://static.lunar.fyi/gear-menu-resolution-rotation.png)
-    * ![resolutions dropdown](https://static.lunar.fyi/resolutions.png)
-* Replace the Adaptive button with a more useful **input switch dropdown** in the QuickActions menu
-    * ![quick actions menu with input and screen orientation](https://static.lunar.fyi/quick-input-rotation.png)
-
-## Improvements
-
-* **Respect custom color profiles when adjusting brightness using Gamma**
-* Handle non-english locales in text fields
-* Show error when CLI can't be installed and show a possible fix using chown and chmod
-* Allow fuzzy display name matching in CLI
-    * Things like this should work now:
-        * Switch input to HDMI for LG UltraFine: `lunar displays ultrafine input hdmi`
-        * Read contrast of Dell U3419W: `lunar displays dell34 contrast`
-* Switch to rounding the curve value in the auto-learning algorithm for more precise mappings
-* Make transitions smoother on Apple displays
-
-## Fixes
-
-* Fix crash on Monterey beta 5 because of `Thread.private` not existing anymore
-* Handle cases where app exceptions can't be added because their bundle doesn't contain `CFBundleName`
-* Pin `TSL2591` library to a known working version
-* Fix DDC limits not being applied correctly in Manual Mode
-* Fix data race crash when iterating some dictionaries
-* Allow brightness 0 in Sync Mode on iMacs 
-
 # 4.8.1
-# Hotfix Release
-
 ## Fixes
 
 * Fix stack overflow crash in detecting if a display is built-in
 * Check for display ID to be online before reading Gamma
 * Make ColorSync profile matching in Software Control mode M1 only
     * This is because Apple's `CGGetDisplayTransferByTable` is buggy on Intel and crashes the app on some systems
-
-----
-
-# Release Notes from 4.8.0
-
-## Features
-
-* **Dark Mode UI**
-    * ![dark mode UI](https://static.lunar.fyi/dark-mode.png)
-* Add **[Built-in Display page](lunar://display/builtin)**
-    * ![built-in display page](https://static.lunar.fyi/builtin.png)
-* **[BlackOut](https://lunar.fyi/#blackout)**: a feature that lets you selectively turn off displays by:
-    * Mirroring the main display contents
-    * Setting their brightness and contrast to 0
-    * **How to use:**
-        * Press `Ctrl+Cmd+6` to activate it and turn off the display where the cursor is
-        * You can also activate it by *clicking the power button* on the display page for the following cases:
-            * Built-in display
-            * External monitors that don't support DDC
-    * ![blackout power off button](https://static.lunar.fyi/blackout-button.png)
-* Add *"Use Alternate Brightness Keys"* checkbox on the [Hotkeys page](lunar://hotkeys)
-    * Useful if you have a keyboard that has `F14`/`F15` keys and the Brightness keys can send special key codes
-* Add *"Include Built-in Display"* checkbox on the [Hotkeys page](lunar://hotkeys)
-    * Useful if you use a Hackintosh with an external monitor set as a built-in display
-* Add **Lock Curve** button for disabling the auto-learning curve algorithm when needed
-* Add **Reset** buttons in the [gear icon menu](lunar://display/settings)
-* Allow setting **minimum** values for **DDC Limits**
-* Add more useful controls in the [gear icon menu](lunar://display/settings)
-    * **DDC Color Gain**
-    * **Resolutions** (including hidden resolutions)
-    * **Screen orientation**
-    * ![gear icon menu new controls](https://static.lunar.fyi/gear-menu-resolution-rotation.png)
-    * ![resolutions dropdown](https://static.lunar.fyi/resolutions.png)
-* Replace the Adaptive button with a more useful **input switch dropdown** in the QuickActions menu
-    * ![quick actions menu with input and screen orientation](https://static.lunar.fyi/quick-input-rotation.png)
-
-## Improvements
-
-* **Respect custom color profiles when adjusting brightness using Gamma**
-* Handle non-english locales in text fields
-* Show error when CLI can't be installed and show a possible fix using chown and chmod
-* Allow fuzzy display name matching in CLI
-    * Things like this should work now:
-        * Switch input to HDMI for LG UltraFine: `lunar displays ultrafine input hdmi`
-        * Read contrast of Dell U3419W: `lunar displays dell34 contrast`
-* Switch to rounding the curve value in the auto-learning algorithm for more precise mappings
-* Make transitions smoother on Apple displays
-
-## Fixes
-
-* Fix crash on Monterey beta 5 because of `Thread.private` not existing anymore
-* Handle cases where app exceptions can't be added because their bundle doesn't contain `CFBundleName`
-* Pin `TSL2591` library to a known working version
-* Fix DDC limits not being applied correctly in Manual Mode
-* Fix data race crash when iterating some dictionaries
-* Allow brightness 0 in Sync Mode on iMacs 
 
 # 4.8.0
 ## Features
@@ -415,26 +310,6 @@
     * Wake from standby
     * Display connection/reconnection
 
-# Changes from 4.3.0
-
-## Features
-* Allow negative offsets for app exceptions
-* Add separate curve factors for brightness and contrast
-
-## Improvements
-
-* Add a way to change the automatic check for updates interval in Advanced settings
-* Isolate reset actions into a dropdown
-* App exceptions logic rewrite
-    * Now the offsets are only applied if the app has any visible window on an external monitor (in the past the offsets were applied on app launch/quit)
-    * The offsets are also only applied to the monitor where the app is visible
-
-## Fixes
-
-* Always reset adjustment limit within 24 hours
-* Fix diagnostics message saying the monitor supports DDC when in fact it didn't support it
-
-
 # 4.3.0
 ## Features
 * Allow negative offsets for app exceptions
@@ -549,7 +424,7 @@
 # 4.0.4
 ## Fixes
 
-* I'm really sorry if you have been seing the **Your period of free updates has expired** screen. This should be fixed now in 4.0.4 and the next update shouldn't show that screen anymore
+* Stop showing **Your period of free updates has expired** when the period of updates is still valid
 
 # 4.0.3
 ## Fixes
@@ -591,11 +466,6 @@
 **Lunar 4 is released!**
 
 Head over to [the official website](https://lunar.fyi) for more details.
-# 4.0.0-alpha.1
-## Features
-
-- Lunar Pro
-
 # 3.2.3
 ## Improvements
 

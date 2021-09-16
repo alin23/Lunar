@@ -55,14 +55,29 @@ public class RunloopQueue: NSObject {
     /// Execute a block of code in an asynchronous manner periodically. Will return immediately.
     ///
     /// - Parameter block: The block of code to execute.
-    @objc public func async(every interval: DateComponents, _ block: @escaping ((CFRunLoopTimer?) -> Void)) -> CFRunLoopTimer? {
-        let timer = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), interval.timeInterval, 0, 0, block)
-        CFRunLoopAddTimer(runloop, timer, CFRunLoopMode.defaultMode)
+    @objc public func async(
+        every interval: DateComponents,
+        existingTimer: CFRunLoopTimer? = nil,
+        _ block: @escaping ((CFRunLoopTimer?) -> Void)
+    ) -> CFRunLoopTimer? {
+        guard let timer = existingTimer ?? CFRunLoopTimerCreateWithHandler(
+            kCFAllocatorDefault,
+            CFAbsoluteTimeGetCurrent(),
+            interval.timeInterval,
+            0,
+            0,
+            block
+        )
+        else { return nil }
+        if !isValid(timer: timer) {
+            CFRunLoopAddTimer(runloop, timer, CFRunLoopMode.defaultMode)
+        }
         thread.awake()
         return timer
     }
 
     @objc public func cancel(timer: CFRunLoopTimer) {
+        guard isValid(timer: timer) else { return }
         CFRunLoopRemoveTimer(runloop, timer, CFRunLoopMode.defaultMode)
     }
 

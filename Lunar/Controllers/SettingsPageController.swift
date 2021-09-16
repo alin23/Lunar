@@ -36,6 +36,7 @@ class SettingsPageController: NSViewController {
             mainThread {
                 self.advancedSettingsShown = shown.newValue
                 self.advancedSettingsButton?.state = shown.newValue ? .on : .off
+                self.advancedSettingsButton?.fade()
             }
         }
 
