@@ -121,7 +121,7 @@ extension PageController: NSPageControllerDelegate {
             return
         }
 
-        appDelegate.currentPage = c.selectedIndex
+        appDelegate!.currentPage = c.selectedIndex
 
         switch c.selectedIndex {
         case 0:

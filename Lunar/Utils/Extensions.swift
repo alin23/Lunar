@@ -135,11 +135,12 @@ extension Bool {
 
 extension NSColor {
     func with(hue: CGFloat? = nil, saturation: CGFloat? = nil, brightness: CGFloat? = nil, alpha: CGFloat? = nil) -> NSColor {
-        NSColor(
-            hue: cap(hueComponent + (hue ?? 0), minVal: 0, maxVal: 1),
-            saturation: cap(saturationComponent + (saturation ?? 0), minVal: 0, maxVal: 1),
-            brightness: cap(brightnessComponent + (brightness ?? 0), minVal: 0, maxVal: 1),
-            alpha: cap(alphaComponent + (alpha ?? 0), minVal: 0, maxVal: 1)
+        let c = usingColorSpace(.extendedSRGB) ?? self
+        return NSColor(
+            hue: cap(c.hueComponent + (hue ?? 0), minVal: 0, maxVal: 1),
+            saturation: cap(c.saturationComponent + (saturation ?? 0), minVal: 0, maxVal: 1),
+            brightness: cap(c.brightnessComponent + (brightness ?? 0), minVal: 0, maxVal: 1),
+            alpha: cap(c.alphaComponent + (alpha ?? 0), minVal: c.alphaComponent > 0 ? 0.1 : 0, maxVal: 1)
         )
     }
 }
@@ -323,11 +324,8 @@ extension Double {
         rounded().i
     }
 
-    func str(decimals: UInt8, localized: Bool = false) -> String {
-        guard decimals > 0 else { return "\(intround)" }
-        guard localized else { return String(format: "%.\(decimals)f", self) }
-
-        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, padding: UInt8 = 0) -> String {
+        NumberFormatter.shared(decimals: decimals.i, padding: padding.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
@@ -335,32 +333,42 @@ extension Double {
     }
 }
 
+// MARK: - Formatting
+
+struct Formatting: Hashable {
+    let decimals: Int
+    let padding: Int
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(padding)
+        hasher.combine(decimals)
+    }
+}
+
 extension NumberFormatter {
     static let shared = NumberFormatter()
-    static let oneDecimalPoint = formatter(with: 1)
-    static let twoDecimalPoints = formatter(with: 2)
-    static let threeDecimalPoints = formatter(with: 3)
+    static var formatters: [Formatting: NumberFormatter] = [:]
 
-    static func formatter(with _: Int) -> NumberFormatter {
+    static func formatter(decimals: Int = 0, padding: Int = 0) -> NumberFormatter {
         let f = NumberFormatter()
-        f.alwaysShowsDecimalSeparator = true
-        f.maximumFractionDigits = 2
-        f.minimumFractionDigits = 2
-
+        if decimals > 0 {
+            f.alwaysShowsDecimalSeparator = true
+            f.maximumFractionDigits = decimals
+            f.minimumFractionDigits = decimals
+        }
+        if padding > 0 {
+            f.minimumIntegerDigits = padding
+        }
         return f
     }
 
-    static func shared(decimals: Int) -> NumberFormatter {
-        switch decimals {
-        case 1:
-            return NumberFormatter.oneDecimalPoint
-        case 2:
-            return NumberFormatter.twoDecimalPoints
-        case 3:
-            return NumberFormatter.threeDecimalPoints
-        default:
-            return NumberFormatter.formatter(with: decimals)
+    static func shared(decimals: Int = 0, padding: Int = 0) -> NumberFormatter {
+        guard let f = formatters[Formatting(decimals: decimals, padding: padding)] else {
+            let newF = formatter(decimals: decimals, padding: padding)
+            formatters[Formatting(decimals: decimals, padding: padding)] = newF
+            return newF
         }
+        return f
     }
 }
 
@@ -422,11 +430,8 @@ extension Float {
         rounded().i
     }
 
-    func str(decimals: UInt8, localized: Bool = false) -> String {
-        guard decimals > 0 else { return "\(intround)" }
-        guard localized else { return String(format: "%.\(decimals)f", self) }
-
-        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, padding: UInt8 = 0) -> String {
+        NumberFormatter.shared(decimals: decimals.i, padding: padding.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
@@ -463,11 +468,8 @@ extension CGFloat {
         rounded().i
     }
 
-    func str(decimals: UInt8, localized: Bool = false) -> String {
-        guard decimals > 0 else { return "\(intround)" }
-        guard localized else { return String(format: "%.\(decimals)f", self) }
-
-        return NumberFormatter.shared(decimals: decimals.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
+    func str(decimals: UInt8, padding: UInt8 = 0) -> String {
+        NumberFormatter.shared(decimals: decimals.i, padding: padding.i).string(from: ns) ?? String(format: "%.\(decimals)f", self)
     }
 
     func asPercentage(of value: Self, decimals: UInt8 = 2) -> String {
@@ -817,6 +819,14 @@ extension NSWindow {
 }
 
 extension NSView {
+    @objc func trackHover() {
+        for area in trackingAreas {
+            removeTrackingArea(area)
+        }
+        let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        addTrackingArea(area)
+    }
+
     @inline(__always) func transition(_ duration: TimeInterval = 0.2) {
         layer?.add(fadeTransition(duration: duration), forKey: "transition")
     }

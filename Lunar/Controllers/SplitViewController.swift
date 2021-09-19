@@ -122,6 +122,41 @@ This mode is the last resort for people that:
 
 \(NOTE_TEXT)
 """
+let CLOCK_HELP_TEXT = """
+# Clock Mode
+
+The adaptive algorithm is disabled in `Manual` mode, but Lunar provides useful hotkeys to control all the monitors' brightness and contrast from your keyboard.
+
+This mode is the last resort for people that:
+
+1. Don't have a built-in display (*Mac Mini*)
+1. Don't use the built-in display (*Macbook with lid closed*)
+1. Work in an environment without much natural light (*where Location mode is useless*)
+1. Don't have an Ambient Light Sensor (*Hackintosh*)
+1. Don't trust machines to do their work
+
+## Algorithm
+
+1. Percentage Hotkeys: `0%`, `25%`, `50%`, `75%`, `100%`
+    - When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
+1. Brightness/Contrast Up/Down Hotkeys
+    - When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
+
+##### Percentage Hotkeys Example:
+- `MIN` Brightness = 15
+- `MAX` Brightness = 100
+- `MIN` Contrast = 40
+- `MAX` Contrast = 75
+- `25%` hotkey is pressed
+- **The monitor will get**:
+    - `brightness = 25% * (100 - 15) + 15 =` **36**
+    - `contrast = 25% * (75 - 40) + 40 =` **49**
+
+## Settings
+- `Brightness/Contrast Step` adjusts how much to increase or decrease the values when using the up/down hotkeys
+
+\(NOTE_TEXT)
+"""
 
 let AUTO_MODE_TAG = 99
 var leftHintsShown = false
@@ -175,8 +210,8 @@ class SplitViewController: NSSplitViewController {
     @objc dynamic var page: Int = 2 {
         didSet {
             guard applyPage else { return }
-            appDelegate.currentPage = page
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = page
+            appDelegate!.goToPage(ignoreUIElement: true)
         }
     }
 
@@ -277,7 +312,7 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "LUNAR"
         }
 
-        if appDelegate.darkMode {
+        if darkMode {
             activeModeButton?.page = .hotkeys
             activeModeButton?.fade()
 

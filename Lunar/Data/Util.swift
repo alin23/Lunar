@@ -360,8 +360,8 @@ let publicKey =
     -----END PUBLIC KEY-----
     """
 
-var appDelegate: AppDelegate =
-    NSApplication.shared.delegate as! AppDelegate
+var appDelegate: AppDelegate? =
+    NSApplication.shared.delegate as? AppDelegate
 
 func refreshScreen(refocus: Bool = true) {
     mainThread {
@@ -370,7 +370,7 @@ func refreshScreen(refocus: Bool = true) {
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
         }
 
-        if let w = appDelegate.windowController?.window?.contentViewController?.view {
+        if let w = appDelegate!.windowController?.window?.contentViewController?.view {
             w.setNeedsDisplay(w.frame)
         }
 
@@ -392,7 +392,7 @@ func createAndShowWindow(
         guard let mainStoryboard = NSStoryboard.main else { return }
 
         if identifier == "windowController" {
-            appDelegate.initPopovers()
+            appDelegate!.initPopovers()
         }
         if controller == nil {
             controller = mainStoryboard
@@ -1005,9 +1005,6 @@ func zip4<S1: Sequence, S2: Sequence, S3: Sequence, S4: Sequence>(
     Zip4Sequence(s1, s2, s3, s4)
 }
 
-var gammaWindowController: NSWindowController?
-var faceLightWindowController: NSWindowController?
-
 func createWindow(
     _ identifier: String,
     controller: inout NSWindowController?,
@@ -1015,7 +1012,8 @@ func createWindow(
     show: Bool = true,
     backgroundColor: NSColor? = .clear,
     level: NSWindow.Level = .normal,
-    fillScreen: Bool = false
+    fillScreen: Bool = false,
+    stationary: Bool = false
 ) {
     mainThread {
         guard let mainStoryboard = NSStoryboard.main else { return }
@@ -1037,6 +1035,10 @@ func createWindow(
                 window.level = level
                 window.isOpaque = false
                 window.backgroundColor = backgroundColor
+                if stationary {
+                    window.collectionBehavior = [.stationary, .canJoinAllSpaces]
+                    window.ignoresMouseEvents = true
+                }
                 if show {
                     log.debug("Showing window '\(window.title)'")
                     wc.showWindow(nil)
@@ -1045,26 +1047,6 @@ func createWindow(
             }
         }
     }
-}
-
-// MARK: - OperationHighlightData
-
-struct OperationHighlightData: Equatable {
-    let shouldHighlight: Bool
-    let screen: NSScreen?
-}
-
-let operationHighlightPublisher = PassthroughSubject<OperationHighlightData, Never>()
-
-func showOperationInProgress(screen: NSScreen? = nil) {
-    operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: true, screen: screen))
-    debounce(ms: 3000, uniqueTaskKey: "operationHighlightHandler") {
-        operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
-    }
-}
-
-func hideOperationInProgress() {
-    operationHighlightPublisher.send(OperationHighlightData(shouldHighlight: false, screen: nil))
 }
 
 // MARK: Dialogs
@@ -2012,4 +1994,17 @@ func contactURL() -> URL {
     }
 
     return url
+}
+
+extension NSView {
+    class func loadFromNib<T>(withName nibName: String, for owner: Any) -> T? {
+        var nibObjects: NSArray?
+        let bundle = Bundle(identifier: "fyi.lunar.Lunar")
+        guard let nib = NSNib(nibNamed: nibName, bundle: bundle),
+              nib.instantiate(withOwner: owner, topLevelObjects: &nibObjects),
+              let view = nibObjects?.compactMap({ $0 as? T }).first
+        else { return nil }
+
+        return view
+    }
 }

@@ -85,6 +85,7 @@ enum HotkeyPart: String, CaseIterable, Defaults.Serializable {
     case modifiers
     case keyCode
     case enabled
+    case allowsHold
 }
 
 // MARK: - OSDImage
@@ -98,6 +99,12 @@ enum OSDImage: Int64 {
 
 var HOTKEY_HANDLERS = [String: (HotKey) -> Void](minimumCapacity: 10)
 
+extension String {
+    var hk: HotkeyIdentifier? {
+        HotkeyIdentifier(rawValue: self)
+    }
+}
+
 // MARK: - PersistentHotkey
 
 class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
@@ -107,6 +114,12 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         let keyCode = hk[.keyCode]!
         let enabled = hk[.enabled]!
         let modifiers = hk[.modifiers]!
+        var allowsHold = false
+        if let hold = hk[.allowsHold] {
+            allowsHold = hold == 1
+        } else {
+            allowsHold = Hotkey.allowHold(for: identifier.hk)
+        }
         let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers)!
 
         if let handler = handler {
@@ -120,6 +133,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             if isEnabled {
                 register()
             }
+            hotkey.detectKeyHold = allowsHold
             log.debug("Created hotkey with handler \(identifier)")
             return
         }
@@ -128,7 +142,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             hotkey = Magnet.HotKey(
                 identifier: identifier,
                 keyCombo: keyCombo,
-                target: appDelegate,
+                target: appDelegate!,
                 action: Hotkey.handler(identifier: hkIdentifier),
                 actionQueue: .main
             )
@@ -136,6 +150,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             if isEnabled {
                 register()
             }
+            hotkey.detectKeyHold = allowsHold
             log.debug("Created hotkey with action/target \(identifier)")
             return
         }
@@ -160,6 +175,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             }
         )
         isEnabled = enabled == 1
+        hotkey.detectKeyHold = allowsHold
     }
 
     deinit {
@@ -167,7 +183,6 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             log.verbose("START DEINIT: \(identifier)")
             do { log.verbose("END DEINIT: \(identifier)") }
         #endif
-//        hotkey.unregister()
     }
 
     init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
@@ -188,11 +203,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         log.debug("Enabled: \(enabled)")
         let modifiers = try container.decode(Int.self, forKey: .modifiers)
         let keyCode = try container.decode(Int.self, forKey: .keyCode)
+        let allowsHold = (try? container.decodeIfPresent(Bool.self, forKey: .allowsHold)) ?? Hotkey.allowHold(for: identifier.hk)
 
         self.init(identifier, dict: [
             .enabled: enabled ? 1 : 0,
             .keyCode: keyCode,
             .modifiers: modifiers,
+            .allowsHold: allowsHold ? 1 : 0,
         ])
     }
 
@@ -203,9 +220,15 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         case keyCode
         case enabled
         case modifiers
+        case allowsHold
     }
 
     @Atomic static var isRecording = false
+
+    var allowsHold: Bool {
+        get { hotkey.detectKeyHold }
+        set { hotkey.detectKeyHold = newValue }
+    }
 
     var description: String {
         "<PersistentHotkey \(identifier)[\(hotkeyString)]>"
@@ -231,7 +254,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
             handleRegistration(persist: true)
             if HotkeyIdentifier(rawValue: identifier) != nil {
-                appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+                appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
             }
         }
     }
@@ -344,6 +367,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             .enabled: isEnabled ? 1 : 0,
             .keyCode: hotkey.keyCombo.QWERTYKeyCode,
             .modifiers: hotkey.keyCombo.modifiers,
+            .allowsHold: allowsHold ? 1 : 0,
         ]
     }
 
@@ -354,6 +378,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         try container.encode(keyCode, forKey: .keyCode)
         try container.encode(modifiers, forKey: .modifiers)
         try container.encode(isEnabled, forKey: .enabled)
+        try container.encode(allowsHold, forKey: .allowsHold)
     }
 }
 
@@ -406,9 +431,10 @@ enum Hotkey {
                 QWERTYKeyCode: kVK_ANSI_L,
                 cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option])
             )!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .toggle),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.lunar.rawValue,
@@ -416,179 +442,212 @@ enum Hotkey {
                 QWERTYKeyCode: kVK_ANSI_L,
                 cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option, .shift])
             )!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .lunar),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.orientation0.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .orientation0),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         ), isEnabled: false, register: false),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.orientation90.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_9, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .orientation90),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         ), isEnabled: false, register: false),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.orientation180.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_8, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .orientation180),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         ), isEnabled: false, register: false),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.orientation270.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_7, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .orientation270),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         ), isEnabled: false, register: false),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent0.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .percent0),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent25.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .percent25),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent50.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .percent50),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent75.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_3, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .percent75),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.percent100.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_4, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .percent100),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.faceLight.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_5, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .faceLight),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.blackOut.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_6, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .blackOut),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseBrightnessUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseBrightnessDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseContrastUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseContrastUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseContrastDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseContrastDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseVolumeUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseVolumeUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseVolumeDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .preciseVolumeDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.brightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .brightnessUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.brightnessDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .brightnessDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.contrastUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .contrastUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.contrastDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F1, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .shift]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .contrastDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.muteAudio.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F10, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .muteAudio),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.volumeUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F12, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .volumeUp),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.volumeDown.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F11, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command]))!,
-            target: appDelegate,
+            target: appDelegate!,
             action: handler(identifier: .volumeDown),
-            actionQueue: .main
+            actionQueue: .main,
+            detectKeyHold: true
         )),
     ]
+
+    static func allowHold(for identifier: HotkeyIdentifier?) -> Bool {
+        guard let identifier = identifier else {
+            return false
+        }
+
+        return defaults.first(where: { $0.identifier == identifier.rawValue })?.allowsHold ?? false
+    }
 
     static func toggleOrientationHotkeys(enabled: Bool? = nil) {
         CachedDefaults[.hotkeys] = Set(CachedDefaults[.hotkeys].map { hotkey in

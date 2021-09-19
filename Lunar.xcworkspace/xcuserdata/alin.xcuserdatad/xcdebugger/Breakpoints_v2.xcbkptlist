@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1C40DFE7-A756-4B7F-B279-2E85F4782569"
+            uuid = "3AB28544-6F8D-476D-B5B0-F8C3FF525373"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Lunar/Views/ModernWindow.swift"
+            filePath = "Lunar/Views/Schedule.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
-            landmarkName = "keyDown(with:)"
+            startingLineNumber = "293"
+            endingLineNumber = "293"
+            landmarkName = "setup()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

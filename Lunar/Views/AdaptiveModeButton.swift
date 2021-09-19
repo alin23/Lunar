@@ -123,6 +123,8 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
                 } else {
                     menuItem.toolTip = "Disabled because Lunar Pro is not activated."
                 }
+            case .clock:
+                menuItem.toolTip = "Disabled because Lunar Pro is not activated."
             default:
                 break
             }

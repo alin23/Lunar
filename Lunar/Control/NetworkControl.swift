@@ -209,7 +209,7 @@ class NetworkControl: Control {
             return
         }
 
-        let window = mainThread { appDelegate.sshWindowController?.window ?? appDelegate.windowController?.window }
+        let window = mainThread { appDelegate!.sshWindowController?.window ?? appDelegate!.windowController?.window }
         let resp = ask(
             message: "Lunar Network Controller",
             info: """

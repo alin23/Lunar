@@ -35,34 +35,21 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     // MARK: Internal
 
-    @IBInspectable var lowerLimit: Double = 0.0
-    @IBInspectable var upperLimit: Double = 100.0
-    @IBInspectable var step: Double = 1.0
+    @IBInspectable dynamic var lowerLimit: Double = 0.0
+    @IBInspectable dynamic var upperLimit: Double = 100.0
+    @IBInspectable dynamic var step: Double = 1.0
+    @IBInspectable dynamic var leftPadding: UInt8 = 0
+    @IBInspectable dynamic var showPlusSign = false
+    @IBInspectable dynamic var decimalPoints: UInt8 = 0
 
     var editingTextFieldColorChanged = false
-    @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
-//        get {
-//            _stringValue
-//        }
-//        set {
-//            let number = newValue.d ?? doubleValue
-//            if decimalPoints > 0 {
-//                _stringValue = String(format: "\(showPlusSign && number > 0 ? "+" : "")%.\(decimalPoints)f", number)
-//            } else {
-//                _stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
-//            }
-//        }
-//    }
-
-    var decimalPoints: UInt8 = 0
     var _floatValue: Float = 0
     var _doubleValue: Double = 0
     var _integerValue: Int = 0
     let growPointSize: CGFloat = 2
     var hover: Bool = false
     var scrolling: Bool = false
-    var showPlusSign = false
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
     var onValueChangedDouble: ((Double) -> Void)?
@@ -85,6 +72,8 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     lazy var lastValidValue: Double = doubleValue
 
     @AtomicLock var highlighterTask: CFRunLoopTimer?
+
+    @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
     @IBInspectable var bgColor: NSColor = .clear {
         didSet {
@@ -138,11 +127,9 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             _integerValue = newValue.i
             let number = newValue
             if number <= 0.0001, number >= -0.0001 {
-                stringValue = 0.str(decimals: decimalPoints, localized: true)
-            } else if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, localized: true))"
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
             } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
             }
         }
     }
@@ -155,11 +142,9 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             _integerValue = newValue.i
             let number = newValue
             if number <= 0.0001, number >= -0.0001 {
-                stringValue = 0.str(decimals: decimalPoints, localized: true)
-            } else if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, localized: true))"
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
             } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.intround)"
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
             }
         }
     }
@@ -172,11 +157,9 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             _doubleValue = newValue.d
             let number = newValue
             if number == 0 {
-                stringValue = 0.str(decimals: decimalPoints, localized: true)
-            } else if decimalPoints > 0 {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints, localized: true))"
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
             } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number)"
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints, padding: leftPadding))"
             }
         }
     }
@@ -203,6 +186,22 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             )
             addTrackingArea(captionTrackingArea!)
         }
+    }
+
+    override func viewDidMoveToWindow() {
+        trackHover()
+    }
+
+    override func viewDidMoveToSuperview() {
+        trackHover()
+    }
+
+    override func trackHover() {
+        if let trackingArea = trackingArea {
+            removeTrackingArea(trackingArea)
+        }
+        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        addTrackingArea(trackingArea!)
     }
 
     override func becomeFirstResponder() -> Bool {
@@ -236,8 +235,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
-        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(trackingArea!)
+        trackHover()
         needsDisplay = true
         // toolTip = """
         // Scroll to change, click to edit.

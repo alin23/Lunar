@@ -22,6 +22,7 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
     case sync = -1
     case manual = 0
     case sensor = 2
+    case clock = 3
 
     // MARK: Lifecycle
 
@@ -48,6 +49,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return "Location"
         case .sync:
             return "Sync"
+        case .clock:
+            return "Clock"
         }
     }
 
@@ -61,6 +64,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return LocationMode.shared.available
         case .sync:
             return SyncMode.shared.available
+        case .clock:
+            return ClockMode.shared.available
         }
     }
 
@@ -74,6 +79,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return LocationMode.shared
         case .sync:
             return SyncMode.shared
+        case .clock:
+            return ClockMode.shared
         }
     }
 
@@ -87,6 +94,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return LOCATION_HELP_TEXT
         case .sync:
             return SYNC_HELP_TEXT
+        case .clock:
+            return CLOCK_HELP_TEXT
         }
     }
 
@@ -99,6 +108,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
         case .location:
             return "https://ipstack.com"
         case .sync:
+            return nil
+        case .clock:
             return nil
         }
     }
@@ -113,6 +124,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
             return .location
         case "sync", AdaptiveModeKey.sync.rawValue.s:
             return .sync
+        case "clock", AdaptiveModeKey.clock.rawValue.s:
+            return .clock
         default:
             return .manual
         }
@@ -147,7 +160,7 @@ protocol AdaptiveMode: AnyObject {
     var str: String { get }
 
     func stopWatching()
-    func watch() -> Bool
+    func watch()
     func adapt(_ display: Display)
 }
 

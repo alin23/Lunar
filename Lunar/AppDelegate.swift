@@ -40,7 +40,7 @@ let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .util
 let mediaKeyStarterQueue = RunloopQueue(named: "fyi.lunar.mediaKeyStarter.queue")
 let debounceQueue = RunloopQueue(named: "fyi.lunar.debounce.queue")
 let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
-let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
+// let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
@@ -273,6 +273,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             CachedDefaults[.nonManualMode] = change.newValue != .manual
+            CachedDefaults[.clockMode] = change.newValue == .clock
             displayController.adaptiveMode = change.newValue.mode
 
             mainThread {
@@ -495,7 +496,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 //                log.warning("BUILTIN BRIGHTNESS GOT NOTIFICATION: \(builtinBrightness.str(decimals: 2)) \(builtinBrightness.rounded(.toNearestOrAwayFromZero))")
                 self.infoMenuItem?.title = "Built-in display brightness: \(builtinBrightness.rounded(.toNearestOrAwayFromZero))%"
             }
-        case .manual:
+        case .manual, .clock:
             guard let info = notification.userInfo as? [String: Double] else { return }
             mainThread {
                 if let brightness = info["manualBrightness"] {
@@ -530,7 +531,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
         if displayController.adaptiveMode.available {
-            displayController.adaptiveMode.watching = displayController.adaptiveMode.watch()
+            displayController.adaptiveMode.watch()
         }
     }
 
@@ -584,7 +585,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
                 .forEach { d in
                     log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")
-                    d.lastGammaTable?.apply(to: d.id)
+                    if let table = d.lastGammaTable {
+                        d.apply(gamma: table)
+                    }
                 }
         }
 
@@ -679,7 +682,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         self.startValuesReaderThread()
                     }
                     if displayController.adaptiveMode.available {
-                        displayController.adaptiveMode.watching = displayController.adaptiveMode.watch()
+                        displayController.adaptiveMode.watch()
                     }
 
                     debounce(ms: 3000, uniqueTaskKey: "resetStates") {
@@ -693,9 +696,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             displayController.adaptBrightness(force: true)
 
                             for display in displayController.activeDisplays.values.filter(\.blackOutEnabled) {
-                                showOperationInProgress(screen: display.screen)
-                                GammaTable.zero.apply(to: display.id, force: true)
-                                hideOperationInProgress()
+                                display.apply(gamma: GammaTable.zero, force: true)
 
                                 if display.isSmartBuiltin, display.readBrightness() != 0 {
                                     display.withoutSmoothTransition {
@@ -762,13 +763,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             "help",
             identifier: "HelpPopoverController",
             controllerType: HelpPopoverController.self,
-            appearance: appDelegate.darkMode ? .vibrantDark : .vibrantLight
+            appearance: darkMode ? .vibrantDark : .vibrantLight
         )
         initPopover(
             "settings",
             identifier: "SettingsPopoverController",
             controllerType: SettingsPopoverController.self,
-            appearance: appDelegate.darkMode ? .vibrantDark : .vibrantLight
+            appearance: darkMode ? .vibrantDark : .vibrantLight
         )
     }
 
@@ -776,7 +777,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         CachedDefaults[.advancedSettingsShown] = true
         currentPage = Page.settings.rawValue
         uiElement = .advancedSettingsButton
-        appDelegate.goToPage(highlight: highlight)
+        appDelegate!.goToPage(highlight: highlight)
     }
 
     func hideAdvancedSettings() {
@@ -858,7 +859,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     .publisher(for: .defaultSystemOutputDeviceChanged, object: nil)
             )
             .receive(on: RunLoop.main)
-            .sink { _ in appDelegate.startOrRestartMediaKeyTap() }
+            .sink { _ in appDelegate!.startOrRestartMediaKeyTap() }
             .store(in: &observers)
     }
 
@@ -890,45 +891,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         PFMoveToApplicationsFolderIfNecessary()
     }
 
-    func stopHighlighting() {
-        guard let c = gammaWindowController?.window?.contentViewController as? GammaViewController else { return }
-        while c.highlighting {
-            c.stopHighlighting()
-        }
-    }
-
     func applicationDidFinishLaunching(_: Notification) {
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }
 
         initCache()
-
-        operationHighlightPublisher
-            .receive(on: RunLoop.main)
-            .removeDuplicates()
-            .sink { data in
-                if data.shouldHighlight {
-                    createWindow(
-                        "gammaWindowController",
-                        controller: &gammaWindowController,
-                        screen: data.screen,
-                        show: true,
-                        backgroundColor: .clear,
-                        level: .popUpMenu
-                    )
-
-                    guard let w = gammaWindowController?.window,
-                          let c = w.contentViewController as? GammaViewController else { return }
-                    w.setFrameOrigin(NSPoint(x: 0, y: 0))
-                    w.ignoresMouseEvents = true
-                    c.highlight()
-                } else {
-                    debounce(ms: 30, uniqueTaskKey: "stopHighlighting", mainThread: true) {
-                        self.stopHighlighting()
-                    }
-                }
-            }.store(in: &observers)
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
