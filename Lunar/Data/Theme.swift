@@ -13,7 +13,7 @@ let darkMauve = #colorLiteral(red: 0.1529411765, green: 0.1411764706, blue: 0.19
 let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
 let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
-let orange = #colorLiteral(red: 0.9921568627, green: 0.6431372549, blue: 0.2274509804, alpha: 1)
+let orange = #colorLiteral(red: 1, green: 0.6532859206, blue: 0.4175746441, alpha: 1)
 let peach = #colorLiteral(red: 0.9982646108, green: 0.7837697268, blue: 0.5843595266, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha: 1)
@@ -30,11 +30,15 @@ let settingsBgColor = lunarYellow
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
-var scrollableTextFieldCaptionColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.7) }
+var darkMode: Bool {
+    appDelegate?.darkMode ?? false
+}
 
-var scrollableTextFieldColor: NSColor { appDelegate.darkMode ? lunarYellow : lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow }
-var scrollableTextFieldColorHover: NSColor { appDelegate.darkMode ? orange : lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow }
-var scrollableTextFieldColorLight: NSColor { appDelegate.darkMode ? white : lunarYellow.highlight(withLevel: 0.3) ?? lunarYellow }
+var scrollableTextFieldCaptionColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.7) }
+
+var scrollableTextFieldColor: NSColor { darkMode ? lunarYellow : lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow }
+var scrollableTextFieldColorHover: NSColor { darkMode ? orange : lunarYellow.highlight(withLevel: 0.1) ?? lunarYellow }
+var scrollableTextFieldColorLight: NSColor { darkMode ? white : lunarYellow.highlight(withLevel: 0.3) ?? lunarYellow }
 
 let scrollableTextFieldColorWhite = white
 let scrollableTextFieldColorHoverWhite = mauve.withAlphaComponent(0.7)
@@ -47,7 +51,7 @@ let scrollableTextFieldColorHoverOnBlack = lunarYellow
 let scrollableTextFieldColorLightOnBlack = white
 let scrollableCaptionColorOnBlack = white
 
-var scrollableViewLabelColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.9) : mauve.withAlphaComponent(0.35) }
+var scrollableViewLabelColor: NSColor { darkMode ? white.withAlphaComponent(0.9) : mauve.withAlphaComponent(0.35) }
 
 // MARK: - ButtonColor
 
@@ -62,20 +66,20 @@ enum ButtonColor: Int {
     case labelOffHover
 }
 
-var lockButtonBgOn: NSColor { appDelegate.darkMode ? red.withAlphaComponent(0.8) : red.withAlphaComponent(0.8) }
+var lockButtonBgOn: NSColor { darkMode ? red.withAlphaComponent(0.8) : red.withAlphaComponent(0.8) }
 var lockButtonBgOnHover: NSColor {
-    appDelegate.darkMode ? lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn : lockButtonBgOn
+    darkMode ? lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn : lockButtonBgOn
         .highlight(withLevel: 0.2) ?? lockButtonBgOn
 }
 
-var lockButtonLabelOn: NSColor { appDelegate.darkMode ? white : white }
-var lockButtonBgOff: NSColor { appDelegate.darkMode ? lunarYellow.withAlphaComponent(0.4) : gray.withAlphaComponent(0.8) }
+var lockButtonLabelOn: NSColor { darkMode ? white : white }
+var lockButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray.withAlphaComponent(0.8) }
 var lockButtonBgOffHover: NSColor {
-    appDelegate.darkMode ? lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn : lockButtonBgOn
+    darkMode ? lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn : lockButtonBgOn
         .highlight(withLevel: 0.4) ?? lockButtonBgOn
 }
 
-var lockButtonLabelOff: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
+var lockButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
 
 let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
 let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
@@ -197,6 +201,7 @@ let buttonDotColor: [AdaptiveModeKey: NSColor] = [
     .location: lunarYellow,
     .manual: red,
     .sensor: blue,
+    .clock: orange,
 ]
 
 let xColor = red
@@ -204,7 +209,7 @@ let removeButtonColor = red.highlight(withLevel: 0.3) ?? red
 
 let contrastGraphColor = lunarYellow
 let brightnessGraphColor = violet
-var xAxisLabelColor: NSColor { appDelegate.darkMode ? white.withAlphaComponent(0.6) : mauve.withAlphaComponent(0.5) }
+var xAxisLabelColor: NSColor { darkMode ? white.withAlphaComponent(0.6) : mauve.withAlphaComponent(0.5) }
 
 let contrastGraphColorYellow = white
 let brightnessGraphColorYellow = lunarYellow.shadow(withLevel: 0.3) ?? lunarYellow

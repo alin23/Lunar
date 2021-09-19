@@ -78,7 +78,7 @@ class HotkeyViewController: NSViewController {
                 if $0.isEnabled { $0.register() }
             }
             self?.setHotkeys()
-            appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+            appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
         }
     }
 
@@ -183,7 +183,7 @@ class HotkeyViewController: NSViewController {
                 if $0.isEnabled { $0.register() }
             }
             self?.setHotkeys()
-            appDelegate.setKeyEquivalents(CachedDefaults[.hotkeys])
+            appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
         }
     }
 

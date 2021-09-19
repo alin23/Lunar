@@ -217,7 +217,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
                     if !sameDisplayCount {
                         if newDisplays.count == 1, currentDisplayCount > 1 {
-                            appDelegate.initMenuPopover()
+                            appDelegate!.initMenuPopover()
                         }
                         self.adaptViewSize()
                     }

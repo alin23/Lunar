@@ -907,11 +907,23 @@ struct Lunar: ParsableCommand {
                 "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
             )
 
-            showOperationInProgress(screen: display.screen)
             var stepsDone = 0
             _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
                 display.gammaLock()
-                CGSetDisplayTransferByFormula(display.id, redMin, red, redMax, greenMin, green, greenMax, blueMin, blue, blueMax)
+
+                let table = GammaTable(
+                    redMin: redMin,
+                    redMax: redMax,
+                    redValue: red,
+                    greenMin: greenMin,
+                    greenMax: greenMax,
+                    greenValue: green,
+                    blueMin: blueMin,
+                    blueMax: blueMax,
+                    blueValue: blue
+                )
+                display.apply(gamma: table, force: true)
+
                 stepsDone += 1
                 if stepsDone == wait {
                     display.gammaUnlock()
@@ -1220,6 +1232,20 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
         return (InputSource(rawValue: value as! UInt8) ?? .unknown).str
     case .power:
         return (value as! Bool) ? "on" : "off"
+    case .schedules:
+        return "\n\t" + (value as! [[String: Any]]).map { scheduleDict in
+            let schedule = BrightnessSchedule.from(dict: scheduleDict)
+            switch schedule.type {
+            case .time:
+                return "\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
+            case .sunrise:
+                return "Sunrise \(schedule.hour > 0 ? "+" : "")\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
+            case .sunset:
+                return "Sunset \(schedule.hour > 0 ? "+" : "")\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
+            case .noon:
+                return "Noon \(schedule.hour > 0 ? "+" : "")\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
+            }
+        }.joined(separator: "\n\t")
     default:
         if let v = value as? Bool, Display.CodingKeys.bool.contains(key) {
             return "\(v)"

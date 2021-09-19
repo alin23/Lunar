@@ -69,45 +69,45 @@ class ModernWindow: WAYWindow {
 
         switch event.keyCode {
         case kVK_ANSI_A.u16:
-            appDelegate.showAdvancedSettings()
+            appDelegate!.showAdvancedSettings()
         case kVK_ANSI_H.u16:
-            appDelegate.currentPage = 0
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = 0
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_C.u16:
-            appDelegate.hideAdvancedSettings()
-            appDelegate.currentPage = 1
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.hideAdvancedSettings()
+            appDelegate!.currentPage = 1
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_B.u16,
              kVK_ANSI_0.u16:
-            appDelegate.currentPage = (pageController?.arrangedObjects.count ?? 3) - 1
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = (pageController?.arrangedObjects.count ?? 3) - 1
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_1.u16:
-            appDelegate.currentPage = 2
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = 2
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_2.u16:
-            appDelegate.currentPage = min(3, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(3, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_3.u16:
-            appDelegate.currentPage = min(4, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(4, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_4.u16:
-            appDelegate.currentPage = min(5, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(5, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_5.u16:
-            appDelegate.currentPage = min(6, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(6, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_6.u16:
-            appDelegate.currentPage = min(7, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(7, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_7.u16:
-            appDelegate.currentPage = min(8, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(8, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_8.u16:
-            appDelegate.currentPage = min(9, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(9, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_9.u16:
-            appDelegate.currentPage = min(10, (pageController?.arrangedObjects.count ?? 3) - 1)
-            appDelegate.goToPage(ignoreUIElement: true)
+            appDelegate!.currentPage = min(10, (pageController?.arrangedObjects.count ?? 3) - 1)
+            appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_LeftArrow.u16:
             pageController?.navigateBack(nil)
         case kVK_RightArrow.u16:

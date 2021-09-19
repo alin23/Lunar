@@ -152,7 +152,8 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic var noDisplay: Bool = false
     @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
-    @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin
+    @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin || displayController
+        .adaptiveModeKey == .clock
 
     var graphObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
@@ -175,6 +176,11 @@ class DisplayViewController: NSViewController {
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
 
     @Atomic var optionKeyPressed = false
+
+    @IBOutlet var schedule1: Schedule!
+    @IBOutlet var schedule2: Schedule!
+    @IBOutlet var schedule3: Schedule!
+    @IBOutlet var schedule4: Schedule!
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -305,7 +311,7 @@ class DisplayViewController: NSViewController {
     }
 
     @objc func adaptToUserDataPoint(notification: Notification) {
-        guard displayController.adaptiveModeKey != .manual,
+        guard displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
               let values = notification.userInfo?["values"] as? [Int: Int]
         else { return }
 
@@ -425,7 +431,7 @@ class DisplayViewController: NSViewController {
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
         inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
-        chartHidden = noDisplay || display.isBuiltin
+        chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
 
         settingsButton?.display = display
         settingsButton?.displayViewController = self
@@ -438,6 +444,11 @@ class DisplayViewController: NSViewController {
         lockedBrightnessCurve = display.lockedBrightnessCurve
         lockedContrastCurve = display.lockedContrastCurve
 
+        schedule1?.display = display
+        schedule2?.display = display
+        schedule3?.display = display
+        schedule4?.display = display
+
         if display.isBuiltin {
             builtinBrightnessField?.onValueChanged = { value in
                 display.withBrightnessTransition { display.brightness = value.ns }
@@ -445,7 +456,8 @@ class DisplayViewController: NSViewController {
         }
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
-            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
+            guard let self = self, let display = self.display,
+                  displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedBrightnessCurve
             else {
                 self?.updateDataset(currentBrightness: brightness.u8)
@@ -460,7 +472,8 @@ class DisplayViewController: NSViewController {
             self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
-            guard let self = self, let display = self.display, displayController.adaptiveModeKey != .manual,
+            guard let self = self, let display = self.display,
+                  displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedContrastCurve
             else {
                 self?.updateDataset(currentContrast: contrast.u8)
@@ -535,19 +548,19 @@ class DisplayViewController: NSViewController {
                 button.attributedTitle = "Native Controls".withAttribute(.textColor(mauve))
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
             case is DDCControl:
-                button.bg = appDelegate.darkMode ? peach : lunarYellow
+                button.bg = darkMode ? peach : lunarYellow
                 button.attributedTitle = "Hardware Controls".withAttribute(.textColor(darkMauve))
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
             case is GammaControl where display.enabledControls[.gamma] ?? false:
-                button.bg = appDelegate.darkMode ? peach.blended(withFraction: 0.5, of: red) : red.withAlphaComponent(0.9)
+                button.bg = darkMode ? peach.blended(withFraction: 0.5, of: red) : red.withAlphaComponent(0.9)
                 button.attributedTitle = "Software Controls".withAttribute(.textColor(.black))
                 button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
             case is NetworkControl:
-                button.bg = appDelegate.darkMode ? blue.highlight(withLevel: 0.2) : blue.withAlphaComponent(0.9)
+                button.bg = darkMode ? blue.highlight(withLevel: 0.2) : blue.withAlphaComponent(0.9)
                 button.attributedTitle = "Network Controls".withAttribute(.textColor(.black))
                 button.helpText = NETWORK_CONTROLS_HELP_TEXT
             default:
-                button.bg = appDelegate.darkMode ? gray.withAlphaComponent(0.6) : gray.withAlphaComponent(0.9)
+                button.bg = darkMode ? gray.withAlphaComponent(0.6) : gray.withAlphaComponent(0.9)
                 button.attributedTitle = "No Controls".withAttribute(.textColor(.darkGray))
                 button.helpText = NO_CONTROLS_HELP_TEXT
             }
@@ -826,19 +839,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func initToggleButton(_ button: NSButton?, helpButton: NSButton?) {
-        guard let button = button else { return }
-        if displayController
-            .adaptiveModeKey == .manual || (display != nil && !display!.activeAndResponsive || display!.id == GENERIC_DISPLAY_ID)
-        {
-            button.isHidden = true
-            helpButton?.isHidden = true
-        } else {
-            button.isHidden = false
-            helpButton?.isHidden = false
-        }
-    }
-
     func listenForSendingBrightnessContrast() {
         display?.$sendingBrightness.receive(on: dataPublisherQueue).sink { [weak self] newValue in
             guard newValue else {
@@ -875,6 +875,11 @@ class DisplayViewController: NSViewController {
             mainThread {
                 self.scrollableBrightness?.maxValue.integerValue = value.intValue
                 self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
+
+                self.schedule1?.brightness.upperLimit = value.doubleValue
+                self.schedule2?.brightness.upperLimit = value.doubleValue
+                self.schedule3?.brightness.upperLimit = value.doubleValue
+                self.schedule4?.brightness.upperLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "maxBrightness")
         display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
@@ -882,6 +887,11 @@ class DisplayViewController: NSViewController {
             mainThread {
                 self.scrollableContrast?.maxValue.integerValue = value.intValue
                 self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
+
+                self.schedule1?.contrast.upperLimit = value.doubleValue
+                self.schedule2?.contrast.upperLimit = value.doubleValue
+                self.schedule3?.contrast.upperLimit = value.doubleValue
+                self.schedule4?.contrast.upperLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "maxContrast")
 
@@ -890,6 +900,11 @@ class DisplayViewController: NSViewController {
             mainThread {
                 self.scrollableBrightness?.minValue.integerValue = value.intValue
                 self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
+
+                self.schedule1?.brightness.lowerLimit = value.doubleValue
+                self.schedule2?.brightness.lowerLimit = value.doubleValue
+                self.schedule3?.brightness.lowerLimit = value.doubleValue
+                self.schedule4?.brightness.lowerLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "minBrightness")
         display?.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
@@ -897,6 +912,11 @@ class DisplayViewController: NSViewController {
             mainThread {
                 self.scrollableContrast?.minValue.integerValue = value.intValue
                 self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
+
+                self.schedule1?.contrast.lowerLimit = value.doubleValue
+                self.schedule2?.contrast.lowerLimit = value.doubleValue
+                self.schedule3?.contrast.lowerLimit = value.doubleValue
+                self.schedule4?.contrast.lowerLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "minContrast")
 
@@ -960,10 +980,15 @@ class DisplayViewController: NSViewController {
             guard let self = self, !self.pausedAdaptiveModeObserver else {
                 return
             }
+            self.chartHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue == .clock
             self.pausedAdaptiveModeObserver = true
             mainThread {
-                self.lockBrightnessCurveButton.isHidden = change.newValue == .manual
-                self.lockContrastCurveButton.isHidden = change.newValue == .manual
+                self.lockBrightnessCurveButton.isHidden = self.chartHidden
+                self.lockContrastCurveButton.isHidden = self.chartHidden
+                self.schedule1?.isHidden = change.newValue != .clock
+                self.schedule2?.isHidden = change.newValue != .clock
+                self.schedule3?.isHidden = change.newValue != .clock
+                self.schedule4?.isHidden = change.newValue != .clock
             }
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
@@ -1172,9 +1197,9 @@ class DisplayViewController: NSViewController {
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
 
-            inputDropdown?.page = appDelegate.darkMode ? .hotkeys : .display
+            inputDropdown?.page = darkMode ? .hotkeys : .display
             inputDropdown?.fade()
-            resetDropdown?.page = appDelegate.darkMode ? .hotkeysReset : .displayReset
+            resetDropdown?.page = darkMode ? .hotkeysReset : .displayReset
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor

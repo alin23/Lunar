@@ -292,16 +292,18 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 }
 
 func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
-    #if arch(arm64)
-        DDC.avServiceCache.removeAll(keepingCapacity: true)
-        displayController.clcd2Mapping.removeAll(keepingCapacity: true)
-    #else
-        DDC.i2cControllerCache.removeAll(keepingCapacity: true)
-    #endif
+    DDC.sync(barrier: true) {
+        #if arch(arm64)
+            DDC.avServiceCache.removeAll(keepingCapacity: true)
+            displayController.clcd2Mapping.removeAll(keepingCapacity: true)
+        #else
+            DDC.i2cControllerCache.removeAll(keepingCapacity: true)
+        #endif
 
-    displayController.activeDisplays.values.forEach { display in
-        display.detectI2C()
-        display.startI2CDetection()
+        displayController.activeDisplays.values.forEach { display in
+            display.detectI2C()
+            display.startI2CDetection()
+        }
     }
 }
 
@@ -317,8 +319,8 @@ enum DDC {
     static var displayUUIDByEDID = [Data: CFUUID]()
     static var skipReadingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
     static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
-    static var readFaults = [CGDirectDisplayID: [ControlID: Int]]()
-    static var writeFaults = [CGDirectDisplayID: [ControlID: Int]]()
+    static var readFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
+    static var writeFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
     static let lock = NSRecursiveLock()
 
     static var notifyPort: IONotificationPortRef?
@@ -609,7 +611,7 @@ enum DDC {
 
     static func readFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
         guard let propertyFaults = DDC.readFaults[displayID] else {
-            DDC.readFaults[displayID] = [controlID: severity]
+            DDC.readFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
             return
         }
         guard var faults = propertyFaults[controlID] else {
@@ -626,7 +628,7 @@ enum DDC {
 
     static func writeFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
         guard let propertyFaults = DDC.writeFaults[displayID] else {
-            DDC.writeFaults[displayID] = [controlID: severity]
+            DDC.writeFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
             return
         }
         guard var faults = propertyFaults[controlID] else {

@@ -419,6 +419,9 @@ enum ValueType {
         if let manualUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
             userBrightness[.manual] = manualUserBrightness.threadSafe
         }
+        if let clockUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .clock) {
+            userBrightness[.clock] = clockUserBrightness.threadSafe
+        }
 
         if let syncUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
             userContrast[.sync] = syncUserContrast.threadSafe
@@ -431,6 +434,9 @@ enum ValueType {
         }
         if let manualUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
             userContrast[.manual] = manualUserContrast.threadSafe
+        }
+        if let clockUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .clock) {
+            userContrast[.clock] = clockUserContrast.threadSafe
         }
 
         if let networkControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .network) {
@@ -460,6 +466,9 @@ enum ValueType {
         if let manualFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
             brightnessCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
         }
+        if let clockFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .clock) {
+            brightnessCurveFactors[.clock] = clockFactor > 0 ? clockFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
+        }
 
         if let sensorFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
             contrastCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
@@ -472,6 +481,9 @@ enum ValueType {
         }
         if let manualFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
             contrastCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
+        }
+        if let clockFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .clock) {
+            contrastCurveFactors[.clock] = clockFactor > 0 ? clockFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
         }
 
         super.init()
@@ -489,6 +501,11 @@ enum ValueType {
         }
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minContrastBeforeBlackout)?.ns) {
             minContrastBeforeBlackout = value
+        }
+        if let value = (try container.decodeIfPresent([BrightnessSchedule].self, forKey: .schedules)),
+           value.count == Display.DEFAULT_SCHEDULES.count
+        {
+            schedules = value
         }
 
         if let dict = displayInfoDictionary(id) {
@@ -541,6 +558,11 @@ enum ValueType {
         startControls()
         setupHotkeys()
         refreshGamma()
+    }
+
+    deinit {
+        gammaWindowController?.close()
+        gammaWindowController = nil
     }
 
     // MARK: Internal
@@ -605,6 +627,7 @@ enum ValueType {
         case alwaysFallbackControl
         case neverFallbackControl
         case enabledControls
+        case schedules
         case brightnessCurveFactors
         case contrastCurveFactors
         case activeAndResponsive
@@ -731,6 +754,7 @@ enum ValueType {
         case sync
         case location
         case manual
+        case clock
     }
 
     enum DisplayControlKeys: String, CodingKey {
@@ -739,6 +763,13 @@ enum ValueType {
         case ddc
         case gamma
     }
+
+    static let DEFAULT_SCHEDULES = [
+        BrightnessSchedule(type: .sunrise, hour: 0, minute: 30, brightness: 70, contrast: 65, negative: true, enabled: false),
+        BrightnessSchedule(type: .time, hour: 12, minute: 0, brightness: 100, contrast: 75, negative: false, enabled: false),
+        BrightnessSchedule(type: .sunset, hour: 1, minute: 30, brightness: 60, contrast: 60, negative: false, enabled: false),
+        BrightnessSchedule(type: .time, hour: 7, minute: 30, brightness: 20, contrast: 45, negative: false, enabled: false),
+    ]
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
@@ -782,6 +813,8 @@ enum ValueType {
 
     @Published @objc dynamic var activeAndResponsive: Bool = false
 
+    var schedules: [BrightnessSchedule] = Display.DEFAULT_SCHEDULES
+
     var enabledControls: [DisplayControl: Bool] = [
         .network: true,
         .coreDisplay: true,
@@ -794,6 +827,7 @@ enum ValueType {
         .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
         .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
         .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
+        .clock: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
     ]
 
     var contrastCurveFactors: [AdaptiveModeKey: Double] = [
@@ -801,6 +835,7 @@ enum ValueType {
         .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
         .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
         .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
+        .clock: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
     ]
 
     @objc dynamic var sentBrightnessCondition = NSCondition()
@@ -923,6 +958,10 @@ enum ValueType {
 
     lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
 
+    var gammaWindowController: NSWindowController?
+    var shadeWindowController: NSWindowController?
+    var faceLightWindowController: NSWindowController?
+
 //    deinit {
 //        #if DEBUG
 //            log.verbose("START DEINIT: \(description)")
@@ -979,7 +1018,7 @@ enum ValueType {
             save()
             if !applyGamma {
                 lunarGammaTable = nil
-                if defaultGammaTable.apply(to: id) {
+                if apply(gamma: defaultGammaTable) {
                     lastGammaTable = defaultGammaTable
                 }
             } else {
@@ -1403,7 +1442,7 @@ enum ValueType {
             reconfigure { panel in
                 panel.orientation = rotation.i32
                 guard modeChangeAsk, rotation != oldValue,
-                      let window = appDelegate.windowController?.window else { return }
+                      let window = appDelegate!.windowController?.window else { return }
                 ask(
                     message: "Orientation Change",
                     info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 15 seconds.",
@@ -1427,7 +1466,7 @@ enum ValueType {
 
     @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
         didSet {
-            guard DDC.apply, modeChangeAsk, let window = appDelegate.windowController?.window else { return }
+            guard DDC.apply, modeChangeAsk, let window = appDelegate!.windowController?.window else { return }
             modeNumber = panelMode?.modeNumber ?? -1
             if modeNumber != -1 {
                 ask(
@@ -1882,13 +1921,7 @@ enum ValueType {
 
         if !value {
             condition.broadcast()
-            hideOperationInProgress()
         } else {
-            if let app = NSWorkspace.shared.frontmostApplication,
-               !displayController.runningAppExceptions.contains(where: { appexc in appexc.identifier == app.bundleIdentifier })
-            {
-                showOperationInProgress(screen: screen)
-            }
             let subscriberKey = "\(name)-\(serial)"
             debounce(ms: 5000, uniqueTaskKey: name, subscriberKey: subscriberKey) { [weak self] in
                 guard let self = self else {
@@ -1905,7 +1938,6 @@ enum ValueType {
                     return
                 }
                 condition.broadcast()
-                hideOperationInProgress()
             }
         }
     }
@@ -2161,6 +2193,32 @@ enum ValueType {
         }
     }
 
+    func redraw() {
+        mainThread {
+            createWindow(
+                "gammaWindowController",
+                controller: &gammaWindowController,
+                screen: screen,
+                show: true,
+                backgroundColor: .clear,
+                level: .screenSaver,
+                stationary: true
+            )
+
+            guard let w = gammaWindowController?.window,
+                  let c = w.contentViewController as? GammaViewController else { return }
+            c.change()
+        }
+    }
+
+    func hideGammaDot() {
+        mainThread {
+            guard let w = gammaWindowController?.window,
+                  let c = w.contentViewController as? GammaViewController else { return }
+            c.hide()
+        }
+    }
+
     func resetDefaultGamma() {
         defaultGammaRedMin = 0.0
         defaultGammaRedMax = 1.0
@@ -2183,7 +2241,7 @@ enum ValueType {
             brightnessCurveFactors[mode] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
         case .location:
             brightnessCurveFactors[mode] = DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
-        case .manual:
+        case .manual, .clock:
             brightnessCurveFactors[mode] = DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
         }
     }
@@ -2197,7 +2255,7 @@ enum ValueType {
             contrastCurveFactors[mode] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
         case .location:
             contrastCurveFactors[mode] = DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
-        case .manual:
+        case .manual, .clock:
             contrastCurveFactors[mode] = DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
         }
     }
@@ -2295,11 +2353,13 @@ enum ValueType {
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor]?.dictionary, forKey: .sensor)
             try userBrightnessContainer.encodeIfPresent(userBrightness[.location]?.dictionary, forKey: .location)
             try userBrightnessContainer.encodeIfPresent(userBrightness[.manual]?.dictionary, forKey: .manual)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.clock]?.dictionary, forKey: .clock)
 
             try userContrastContainer.encodeIfPresent(userContrast[.sync]?.dictionary, forKey: .sync)
             try userContrastContainer.encodeIfPresent(userContrast[.sensor]?.dictionary, forKey: .sensor)
             try userContrastContainer.encodeIfPresent(userContrast[.location]?.dictionary, forKey: .location)
             try userContrastContainer.encodeIfPresent(userContrast[.manual]?.dictionary, forKey: .manual)
+            try userContrastContainer.encodeIfPresent(userContrast[.clock]?.dictionary, forKey: .clock)
 
             try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.coreDisplay], forKey: .coreDisplay)
@@ -2310,11 +2370,13 @@ enum ValueType {
             try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.sensor], forKey: .sensor)
             try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.location], forKey: .location)
             try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.manual], forKey: .manual)
+            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.clock], forKey: .clock)
 
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sync], forKey: .sync)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sensor], forKey: .sensor)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.location], forKey: .location)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.manual], forKey: .manual)
+            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.clock], forKey: .clock)
 
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
             try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
@@ -2324,6 +2386,7 @@ enum ValueType {
             try container.encode(isSource, forKey: .isSource)
             try container.encode(showVolumeOSD, forKey: .showVolumeOSD)
             try container.encode(applyGamma, forKey: .applyGamma)
+            try container.encode(schedules, forKey: .schedules)
         }
     }
 
@@ -2569,7 +2632,7 @@ enum ValueType {
 
     func refreshBrightness() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness,
-              !SyncMode.possibleClamshellModeSoon else { return }
+              !SyncMode.possibleClamshellModeSoon, !(control is GammaControl) else { return }
         guard let newBrightness = readBrightness() else {
             log.warning("Can't read brightness for \(name)")
             return
@@ -2686,7 +2749,7 @@ enum ValueType {
         guard !isForTesting else { return }
 
         let gammaTable = (lunarGammaTable ?? defaultGammaTable)
-        if gammaTable.apply(to: id) {
+        if apply(gamma: gammaTable) {
             lastGammaTable = gammaTable
         }
         gammaChanged = true
@@ -2700,6 +2763,14 @@ enum ValueType {
     func gammaUnlock() {
         log.verbose("Unlocking gamma", context: context)
         gammaDistributedLock?.unlock()
+    }
+
+    @discardableResult
+    func apply(gamma: GammaTable, force: Bool = false) -> Bool {
+        let result = gamma.apply(to: id, force: force)
+        redraw()
+
+        return result
     }
 
     func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast _: UInt8? = nil) {
@@ -2718,8 +2789,6 @@ enum ValueType {
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
         let id = self.id
 
-        showOperationInProgress(screen: screen)
-
         if let oldBrightness = oldBrightness {
             asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
                 guard let self = self else {
@@ -2730,7 +2799,7 @@ enum ValueType {
 
                 self.gammaChanged = true
                 for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, contrast: contrast) {
-                    gammaTable.apply(to: id)
+                    self.apply(gamma: gammaTable)
                     Thread.sleep(forTimeInterval: CachedDefaults[.brightnessTransition] == .slow ? 0.025 : 0.005)
                 }
                 gammaSemaphore.signal()
@@ -2747,7 +2816,7 @@ enum ValueType {
                 return
             }
 
-            if newGammaTable.apply(to: id) {
+            if self.apply(gamma: newGammaTable) {
                 self.lastGammaTable = newGammaTable
             }
             gammaSemaphore.signal()
@@ -2786,6 +2855,7 @@ enum ValueType {
             .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
             .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
             .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
+            .clock: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
         ]
 
         contrastCurveFactors = [
@@ -2793,6 +2863,7 @@ enum ValueType {
             .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
             .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
             .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
+            .clock: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
         ]
 
         save()
