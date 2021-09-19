@@ -52,16 +52,47 @@ class ToggleButton: NSButton {
 
     @AtomicLock var highlighterTask: CFRunLoopTimer?
 
+    lazy var initialHeight = frame.height
+
+    @IBInspectable dynamic var verticalPadding: CGFloat = 10 {
+        didSet {
+            setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
+            radius = circle ? (frame.height / 2).ns : roundedness.ns
+            trackHover()
+        }
+    }
+
+    @IBInspectable dynamic var circle: Bool = true {
+        didSet {
+            setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
+            radius = circle ? (frame.height / 2).ns : roundedness.ns
+            trackHover()
+        }
+    }
+
+    @IBInspectable dynamic var roundedness: CGFloat = 4 {
+        didSet {
+            setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
+            radius = circle ? (frame.height / 2).ns : roundedness.ns
+            trackHover()
+        }
+    }
+
     var page = Page.display {
         didSet {
             setColors()
         }
     }
 
+    override var isEnabled: Bool {
+        didSet { fade() }
+    }
+
     var bgColor: NSColor {
         if !isEnabled {
             if highlighterTask != nil { stopHighlighting() }
-            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!).highlight(withLevel: 0.3)!
+            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
+                .with(saturation: -0.2, brightness: -0.1)
         } else if state == .on {
             return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
         } else {
@@ -72,7 +103,7 @@ class ToggleButton: NSButton {
     var labelColor: NSColor {
         if !isEnabled {
             return (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
-                .highlight(withLevel: 0.3)!
+                .highlight(withLevel: 0.3)!.with(alpha: -0.4)
         } else if state == .on {
             return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
@@ -176,16 +207,22 @@ class ToggleButton: NSButton {
     func setup() {
         wantsLayer = true
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
-        radius = (frame.height / 2).ns
+        setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
+        radius = circle ? (frame.height / 2).ns : roundedness.ns
         allowsMixedState = false
         setColors()
 
-        let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(area)
+        trackHover()
     }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+    }
+
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        if isEnabled {
+            addCursorRect(bounds, cursor: .pointingHand)
+        }
     }
 }

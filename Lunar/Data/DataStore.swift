@@ -58,6 +58,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .useAlternateBrightnessKeys,
     .neverAskAboutFlux,
     .nonManualMode,
+    .clockMode,
     .overrideAdaptiveMode,
     .refreshValues,
     .sensorPollingSeconds,
@@ -219,7 +220,7 @@ class DataStore: NSObject {
     static func firstRunAfterLunar4Upgrade() {
         thisIsFirstRunAfterLunar4Upgrade = true
         DataStore.reset()
-        mainThread { appDelegate.onboard() }
+        mainThread { appDelegate!.onboard() }
     }
 
     static func firstRunAfterDefaults5Upgrade() {
@@ -255,7 +256,7 @@ class DataStore: NSObject {
                 storeAppException(app: AppException(identifier: id, name: name))
             }
         }
-        mainThread { appDelegate.onboard() }
+        mainThread { appDelegate!.onboard() }
     }
 
     func displays(serials: [String]? = nil) -> [Display]? {
@@ -590,6 +591,7 @@ func initCache() {
     cacheKey(.adaptiveBrightnessMode)
     cacheKey(.colorScheme)
     cacheKey(.nonManualMode)
+    cacheKey(.clockMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
     cacheKey(.sunrise)
@@ -666,6 +668,7 @@ extension Defaults.Keys {
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
     static let colorScheme = Key<ColorScheme>("colorScheme", default: .system)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
+    static let clockMode = Key<Bool>("clockMode", default: false)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
     static let hotkeys = Key<Set<PersistentHotkey>>("hotkeys", default: Hotkey.defaults)

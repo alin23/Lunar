@@ -206,7 +206,7 @@ class ConfigurationViewController: NSViewController {
             helpButton1?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
         case .sensor:
             helpButton1?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
-        case .manual:
+        case .manual, .clock:
             break
         }
 
@@ -463,7 +463,7 @@ class ConfigurationViewController: NSViewController {
 
     @IBAction func resetLocation(_: Any?) {
         CachedDefaults[.manualLocation] = false
-        mainThread { appDelegate.startReceivingSignificantLocationChanges() }
+        mainThread { appDelegate!.startReceivingSignificantLocationChanges() }
     }
 
     func setup() {

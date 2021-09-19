@@ -934,6 +934,31 @@
                                                 </attributedString>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+                                            <menuItem title="⚫︎  Clock Mode" tag="3" id="4gE-Pl-sMD">
+                                                <attributedString key="attributedTitle">
+                                                    <fragment content="⚫︎">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.99215686274509807" green="0.58431372549019611" blue="0.34509803921568627" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="smallSystem"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="  ">
+                                                        <attributes>
+                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                    <fragment content="Clock Mode">
+                                                        <attributes>
+                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
                                             <menuItem title="⚫︎  Manual Mode" id="rh0-mE-71Z">
                                                 <attributedString key="attributedTitle">
                                                     <fragment content="⚫︎">
@@ -1016,7 +1041,7 @@
                                 </connections>
                             </textField>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="YBA-Wk-tfq" customClass="PageNavigationControl" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="335" y="54" width="280" height="24"/>
+                                <rect key="frame" x="335" y="19" width="280" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <shadow key="shadow" blurRadius="3">
                                     <size key="offset" width="0.0" height="2"/>
@@ -1263,7 +1288,7 @@
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zXD-tN-N7i" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="442" y="19" width="66" height="14"/>
+                                <rect key="frame" x="442" y="54" width="66" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Y1g-If-niE">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2223,7 +2248,6 @@ when dock and menubar icons are hidden</string>
                         <outlet property="pollingIntervalLabel" destination="ptg-bU-WRA" id="fUW-7h-nmJ"/>
                         <outlet property="sensorPollingIntervalCaption" destination="oe4-fW-vjY" id="yKQ-m1-net"/>
                         <outlet property="sensorPollingIntervalField" destination="T9n-Uo-gx1" id="tfp-Di-Omp"/>
-                        <outlet property="smoothTransitionLabel" destination="osm-bT-7sA" id="OU8-18-fgX"/>
                         <outlet property="syncPollingIntervalCaption" destination="uAE-HJ-vLk" id="FDe-as-tMB"/>
                         <outlet property="syncPollingIntervalField" destination="TI6-iY-nn0" id="5rX-3X-ca7"/>
                         <outlet property="volumeStepCaption" destination="TaK-4f-5Y3" id="nv1-L7-jMW"/>
@@ -3202,7 +3226,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="uan-gt-LLv" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="184" width="250" height="17"/>
+                                <rect key="frame" x="350" y="186" width="250" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="bVK-oc-lud">
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -3217,6 +3241,40 @@ and contrast to their highest values</string>
                                     </binding>
                                 </connections>
                             </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Gg-t4-OFT" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="40" y="43" width="180" height="146"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </customView>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8rB-Ds-3J9" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="270" y="43" width="180" height="146"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 2"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JFo-6Q-ajI" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="500" y="43" width="180" height="146"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 3"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4le-Xe-OqI" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="730" y="43" width="180" height="146"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 4"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                         </subviews>
                     </view>
                     <connections>
@@ -3238,6 +3296,10 @@ and contrast to their highest values</string>
                         <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
                         <outlet property="nonResponsiveTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
                         <outlet property="resetDropdown" destination="xhP-CD-ogE" id="4zg-Y7-6bF"/>
+                        <outlet property="schedule1" destination="8Gg-t4-OFT" id="UT0-vV-4ZY"/>
+                        <outlet property="schedule2" destination="8rB-Ds-3J9" id="DGU-6X-J2W"/>
+                        <outlet property="schedule3" destination="JFo-6Q-ajI" id="Bg8-ea-r6p"/>
+                        <outlet property="schedule4" destination="4le-Xe-OqI" id="k04-5R-vbo"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                     </connections>
@@ -3649,7 +3711,7 @@ and contrast to their highest values</string>
                                 </view>
                             </box>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LsA-6Y-wu2" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="442" y="19" width="66" height="14"/>
+                                <rect key="frame" x="442" y="54" width="66" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="xya-5q-Etj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4590,19 +4652,19 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box fixedFrame="YES" title="Input Hotkey 1" translatesAutoresizingMaskIntoConstraints="NO" id="TtZ-WU-d64">
-                                <rect key="frame" x="12" y="473" width="409" height="148"/>
+                                <rect key="frame" x="10" y="473" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="87T-n8-qsS">
-                                    <rect key="frame" x="3" y="3" width="403" height="124"/>
+                                    <rect key="frame" x="3" y="3" width="404" height="124"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <box fixedFrame="YES" title="Input Hotkey 2" translatesAutoresizingMaskIntoConstraints="NO" id="AUg-hB-5hT">
-                                <rect key="frame" x="12" y="297" width="409" height="148"/>
+                                <rect key="frame" x="10" y="297" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Oqw-0y-d8X">
-                                    <rect key="frame" x="3" y="3" width="403" height="124"/>
+                                    <rect key="frame" x="3" y="3" width="404" height="124"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
@@ -4640,7 +4702,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </popUpButton>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dgm-ya-85K" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="105" y="559" width="220" height="34"/>
+                                <rect key="frame" x="103" y="559" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4760,7 +4822,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </popUpButton>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YjI-T5-inx" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="104" y="383" width="220" height="34"/>
+                                <rect key="frame" x="103" y="383" width="220" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4873,16 +4935,16 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Input Hotkey 3" translatesAutoresizingMaskIntoConstraints="NO" id="p6a-2M-XBu">
-                                <rect key="frame" x="11" y="121" width="409" height="148"/>
+                                <rect key="frame" x="9" y="121" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="UeR-8a-f3r">
-                                    <rect key="frame" x="3" y="3" width="403" height="124"/>
+                                    <rect key="frame" x="3" y="3" width="404" height="124"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="132" y="155" width="160" height="12"/>
+                                <rect key="frame" x="131" y="155" width="160" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="r6T-el-KBe" id="sg9-44-wbG" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -6678,7 +6740,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IdV-wj-QZf">
-                                <rect key="frame" x="318" y="17" width="60" height="16"/>
+                                <rect key="frame" x="316" y="17" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Show" id="1Du-lK-7xD">
                                     <font key="font" metaFont="system"/>
@@ -6800,7 +6862,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="476-c7-fYc" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="71" y="82" width="160" height="12"/>
+                                <rect key="frame" x="70" y="82" width="160" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingMiddle" state="on" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="xha-Vd-D6D" id="Pme-Jb-I0l" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -6834,7 +6896,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
-                                <rect key="frame" x="109" y="109" width="89" height="17"/>
+                                <rect key="frame" x="107" y="109" width="89" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Resolutions" id="lZ7-CA-fcm">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
@@ -7533,7 +7595,7 @@ You can choose to send the diagnostics to the developer if you think this is not
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Caption Secondary">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999999999999996" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

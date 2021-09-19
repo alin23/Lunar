@@ -136,7 +136,7 @@ class DisplayController {
             }
             oldValue.stopWatching()
             if adaptiveMode.available {
-                adaptiveMode.watching = adaptiveMode.watch()
+                adaptiveMode.watch()
             }
         }
     }
@@ -804,7 +804,7 @@ class DisplayController {
     func autoAdaptMode() {
         guard !CachedDefaults[.overrideAdaptiveMode] else {
             if adaptiveMode.available {
-                adaptiveMode.watching = adaptiveMode.watch()
+                adaptiveMode.watch()
             } else {
                 adaptiveMode.stopWatching()
             }
@@ -935,8 +935,8 @@ class DisplayController {
             }
 
             mainThread {
-                appDelegate.recreateWindow()
-                if advancedSettings { appDelegate.showAdvancedSettings() }
+                appDelegate!.recreateWindow()
+                if advancedSettings { appDelegate!.showAdvancedSettings() }
             }
         }
     }
@@ -989,7 +989,7 @@ class DisplayController {
                         return
                     }
 
-                    let window = mainThread { appDelegate.windowController?.window }
+                    let window = mainThread { appDelegate!.windowController?.window }
 
                     let resp = ask(
                         message: "Non-responsive display \"\(display.name)\"",

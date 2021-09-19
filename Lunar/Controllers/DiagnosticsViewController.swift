@@ -618,7 +618,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             SyncMode.specific.stopWatching()
                             Thread.sleep(forTimeInterval: 1)
                             if SyncMode.specific.available {
-                                SyncMode.specific.watching = SyncMode.specific.watch()
+                                SyncMode.specific.watch()
                             }
                         }
                         if brightnessTransition != .instant {

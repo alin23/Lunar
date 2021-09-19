@@ -65,7 +65,7 @@ class GammaControl: Control {
             }
         }
 
-        let window = mainThread { appDelegate.windowController?.window }
+        let window = mainThread { appDelegate!.windowController?.window }
 
         let resp = ask(
             message: "F.lux app is conflicting with Lunar",

@@ -62,17 +62,34 @@ class PopUpButton: NSPopUpButton {
 
     var hoverState = HoverState.noHover
 
-    @IBInspectable var padding: CGFloat = 16
-    @IBInspectable var maxWidth: CGFloat = 0
-
     var observers: Set<AnyCancellable> = []
 
     var origin = Origin.center
+
+    @IBInspectable var padding: CGFloat = 16 {
+        didSet { resizeToFitTitle() }
+    }
+
+    @IBInspectable var verticalPadding: CGFloat = 10 {
+        didSet {
+            setFrameSize(NSSize(width: frame.width, height: frame.height + verticalPadding))
+            radius = (frame.height / 2).ns
+            trackHover()
+        }
+    }
+
+    @IBInspectable var maxWidth: CGFloat = 0 {
+        didSet { resizeToFitTitle() }
+    }
 
     var page = Page.display {
         didSet {
             setColors()
         }
+    }
+
+    override var isEnabled: Bool {
+        didSet { fade() }
     }
 
     var bgColor: NSColor {
@@ -89,7 +106,7 @@ class PopUpButton: NSPopUpButton {
     var labelColor: NSColor {
         if !isEnabled {
             return (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
-                .highlight(withLevel: 0.3)!
+                .highlight(withLevel: 0.3)!.with(alpha: -0.4)
         } else if state == .off {
             return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
@@ -116,7 +133,7 @@ class PopUpButton: NSPopUpButton {
     func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
         if let cell = cell as? PopUpButtonCell {
             cell.textColor = labelColor
-            cell.dotColor = dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode)
+            cell.dotColor = (dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode)).with(alpha: isEnabled ? 0 : -0.4)
         }
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         bg = bgColor
@@ -151,6 +168,7 @@ class PopUpButton: NSPopUpButton {
         setFrameOrigin(NSPoint(x: x, y: frame.minY))
 
         setFrameSize(NSSize(width: width, height: frame.height))
+        trackHover()
     }
 
     func fade(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
@@ -158,14 +176,7 @@ class PopUpButton: NSPopUpButton {
             guard !isHidden else { return }
             setColors(modeKey: modeKey, overrideMode: overrideMode)
             resizeToFitTitle()
-
-            trackingAreas.forEach { removeTrackingArea($0) }
-            addTrackingArea(NSTrackingArea(
-                rect: visibleRect,
-                options: [.mouseEnteredAndExited, .activeInActiveApp],
-                owner: self,
-                userInfo: nil
-            ))
+            trackHover()
         }
     }
 
@@ -188,13 +199,11 @@ class PopUpButton: NSPopUpButton {
     func setup() {
         wantsLayer = true
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + 10))
+        setFrameSize(NSSize(width: frame.width, height: frame.height + verticalPadding))
         radius = (frame.height / 2).ns
         allowsMixedState = false
         setColors()
-
-        let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(area)
+        trackHover()
 
         selectionPublisher
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)

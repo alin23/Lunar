@@ -104,6 +104,9 @@
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
 		C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */; };
 		C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7AEC7FE1FD0B4350039B562 /* Main.storyboard */; };
+		C7AF321926F5EEDE00AC14AF /* ClockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AF321426F5EEDE00AC14AF /* ClockMode.swift */; };
+		C7AF321B26F62D3B00AC14AF /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AF321A26F62D3B00AC14AF /* Schedule.swift */; };
+		C7AF321D26F62F5C00AC14AF /* Schedule.xib in Resources */ = {isa = PBXBuildFile; fileRef = C7AF321C26F62F5C00AC14AF /* Schedule.xib */; };
 		C7B5E8592548B3F900530B47 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = C7B5E8582548B3F900530B47 /* Defaults */; };
 		C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = C7B5E85C2548B5AC00530B47 /* AnyCodable */; };
 		C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6EA0F201B41C10090EE0E /* Theme.swift */; };
@@ -132,7 +135,6 @@
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
-		C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D6C720254ADAEB007E91B6 /* PageButton.swift */; };
 		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622026120B7600B07B31 /* RaspberryPageController.swift */; };
 		C7DD62292612331700B07B31 /* PaddedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD62282612331700B07B31 /* PaddedTextField.swift */; };
@@ -302,6 +304,9 @@
 		C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7AEC7FF1FD0B4350039B562 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7AEC8011FD0B4350039B562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7AF321426F5EEDE00AC14AF /* ClockMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClockMode.swift; sourceTree = "<group>"; };
+		C7AF321A26F62D3B00AC14AF /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
+		C7AF321C26F62F5C00AC14AF /* Schedule.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Schedule.xib; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
 		C7BAD9BC263869920058974C /* Pro Meteor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Pro Meteor.png"; sourceTree = "<group>"; };
@@ -325,7 +330,6 @@
 		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
-		C7D6C720254ADAEB007E91B6 /* PageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageButton.swift; sourceTree = "<group>"; };
 		C7DD622026120B7600B07B31 /* RaspberryPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaspberryPageController.swift; sourceTree = "<group>"; };
 		C7DD62282612331700B07B31 /* PaddedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedTextField.swift; sourceTree = "<group>"; };
 		C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHConnectionViewController.swift; sourceTree = "<group>"; };
@@ -549,7 +553,6 @@
 				C7C68F0C201D3D9800F49A2B /* SettingsView.swift */,
 				C728D7EC2296D81B003CAD65 /* TextButton.swift */,
 				C794E1631FEE84DF00549462 /* ToggleButton.swift */,
-				C7D6C720254ADAEB007E91B6 /* PageButton.swift */,
 				C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */,
 				C7A7C2492593B5EA00745637 /* HotkeyButton.swift */,
 				C7A517A02593C11C00F6CC83 /* PopoverButon.swift */,
@@ -559,6 +562,7 @@
 				C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */,
 				C76B775C26445C9B007CAAC5 /* MacToggle.swift */,
 				C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */,
+				C7AF321A26F62D3B00AC14AF /* Schedule.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -566,6 +570,7 @@
 		C78BD03D259B2FA300FC823F /* Modes */ = {
 			isa = PBXGroup;
 			children = (
+				C7AF321426F5EEDE00AC14AF /* ClockMode.swift */,
 				C78BD043259B2FB100FC823F /* SensorMode.swift */,
 				C78BD054259B6BAD00FC823F /* SyncMode.swift */,
 				C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */,
@@ -636,6 +641,7 @@
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
+				C7AF321C26F62F5C00AC14AF /* Schedule.xib */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
 				C79975D025DEEDB100C797FF /* Control */,
 				C76545241FD8A10200DBACE9 /* Controllers */,
@@ -939,6 +945,7 @@
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
 				C780CF98269F241A007FFB58 /* tsl2591.h in Resources */,
+				C7AF321D26F62F5C00AC14AF /* Schedule.xib in Resources */,
 				C73B41F6263E1301006F6783 /* ddcctl in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
 				C7BAD9C3263869920058974C /* Pro Meteor.png in Resources */,
@@ -1008,7 +1015,6 @@
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
 				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
-				C7D6C721254ADAEB007E91B6 /* PageButton.swift in Sources */,
 				C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
@@ -1092,9 +1098,11 @@
 				C7E80E292637060F004718A4 /* ReadWrite.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
 				C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */,
+				C7AF321926F5EEDE00AC14AF /* ClockMode.swift in Sources */,
 				C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
+				C7AF321B26F62D3B00AC14AF /* Schedule.swift in Sources */,
 				BF_746411459837 /* Secrets.generated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

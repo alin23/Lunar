@@ -53,7 +53,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         if !(CachedDefaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
             let app = AppException(identifier: id, name: name)
             DataStore.storeAppException(app: app)
-            appDelegate.acquirePrivileges(
+            appDelegate!.acquirePrivileges(
                 notificationTitle: "Lunar can now watch for app exceptions",
                 notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
             )

@@ -267,12 +267,12 @@ class BrightnessContrastChartView: LineChartView {
         }
 
         brightnessGraph.colors = [NSColor.clear]
-        brightnessGraph.fillColor = appDelegate.darkMode ? white.withAlphaComponent(0.5) : brightnessColor
+        brightnessGraph.fillColor = darkMode ? white.withAlphaComponent(0.5) : brightnessColor
         brightnessGraph.cubicIntensity = 0.15
-        brightnessGraph.circleColors = appDelegate.darkMode ? [white] : [darkMauve.withAlphaComponent(0.6)]
-        brightnessGraph.circleHoleColor = appDelegate.darkMode ? lunarYellow : white
+        brightnessGraph.circleColors = darkMode ? [white] : [darkMauve.withAlphaComponent(0.6)]
+        brightnessGraph.circleHoleColor = darkMode ? lunarYellow : white
         brightnessGraph.circleRadius = 4.0
-        brightnessGraph.circleHoleRadius = appDelegate.darkMode ? 2.5 : 1.5
+        brightnessGraph.circleHoleRadius = darkMode ? 2.5 : 1.5
         brightnessGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData] && adaptiveMode.key != .manual
         brightnessGraph.drawFilledEnabled = true
         brightnessGraph.drawValuesEnabled = false
@@ -451,7 +451,7 @@ class BrightnessContrastChartView: LineChartView {
             chartDescription.text = ""
         case .sensor:
             chartDescription.text = ""
-        case .manual:
+        case .manual, .clock:
             chartDescription.text = ""
         }
 

@@ -16,7 +16,7 @@ extension AppDelegate: NSWindowDelegate {
         log.info("Window closing")
 
         if let window = n.object as? ModernWindow, window.title == "Ambient Light Sensor" {
-            appDelegate.alsWindowController = nil
+            appDelegate!.alsWindowController = nil
             return
         }
 
@@ -36,7 +36,7 @@ extension AppDelegate: NSWindowDelegate {
             return
         }
 
-        appDelegate.currentPage = Page.display.rawValue
+        appDelegate!.currentPage = Page.display.rawValue
         if settingsPageController.advancedSettingsShown {
             CachedDefaults[.advancedSettingsShown] = false
         }
@@ -89,10 +89,10 @@ class ModernWindowController: NSWindowController {
         mainThread {
             if let w = window as? ModernWindow {
                 if w.title == "Settings" || w.title == "Ambient Light Sensor" {
-                    w.delegate = appDelegate
+                    w.delegate = appDelegate!
                 }
                 if w.title == "Settings" {
-                    w.appearance = appDelegate.darkMode ? NSAppearance(named: .darkAqua) : NSAppearance(named: .aqua)
+                    w.appearance = darkMode ? NSAppearance(named: .darkAqua) : NSAppearance(named: .aqua)
                 }
                 w.setup()
             } else {

@@ -39,13 +39,11 @@ class ManualMode: AdaptiveMode {
         watching = false
     }
 
-    @discardableResult
-    func watch() -> Bool {
-        guard !watching else { return false }
+    func watch() {
+        guard !watching else { return }
         log.verbose("Start watching \(str)")
 
         watching = true
-        return true
     }
 
     func adapt(_ display: Display) {
@@ -55,6 +53,10 @@ class ManualMode: AdaptiveMode {
                 log.debug("Setting brightness to \(display.brightness) for \(display)")
             #endif
             display.brightness = display.brightness.uint8Value.ns
+
+            #if DEBUG
+                log.debug("Setting contrast to \(display.contrast) for \(display)")
+            #endif
             display.contrast = display.contrast.uint8Value.ns
         }
         // }

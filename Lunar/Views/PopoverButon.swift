@@ -46,7 +46,7 @@ class PopoverButton<T: NSViewController>: Button {
 
     var popoverController: T? {
         if !POPOVERS.keys.contains(popoverKey) || POPOVERS[popoverKey]! == nil {
-            appDelegate.initPopovers()
+            appDelegate!.initPopovers()
         }
         guard let popover = POPOVERS[popoverKey]! else { return nil }
         return popover.contentViewController as? T
@@ -54,7 +54,7 @@ class PopoverButton<T: NSViewController>: Button {
 
     override func mouseDown(with event: NSEvent) {
         if !POPOVERS.keys.contains(popoverKey) || POPOVERS[popoverKey]! == nil {
-            appDelegate.initPopovers()
+            appDelegate!.initPopovers()
         }
         guard let popover = POPOVERS[popoverKey]!, isEnabled else { return }
         handlePopoverClick(popover, with: event)
