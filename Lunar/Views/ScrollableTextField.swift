@@ -35,8 +35,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     // MARK: Internal
 
-    @IBInspectable dynamic var lowerLimit: Double = 0.0
-    @IBInspectable dynamic var upperLimit: Double = 100.0
     @IBInspectable dynamic var step: Double = 1.0
     @IBInspectable dynamic var leftPadding: UInt8 = 0
     @IBInspectable dynamic var showPlusSign = false
@@ -74,6 +72,14 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
+
+    @IBInspectable dynamic var lowerLimit: Double = 0.0 {
+        didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
+    }
+
+    @IBInspectable dynamic var upperLimit: Double = 100.0 {
+        didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
+    }
 
     @IBInspectable var bgColor: NSColor = .clear {
         didSet {
@@ -190,10 +196,12 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     override func viewDidMoveToWindow() {
         trackHover()
+        setBgAlpha()
     }
 
     override func viewDidMoveToSuperview() {
         trackHover()
+        setBgAlpha()
     }
 
     override func trackHover() {
@@ -236,6 +244,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         normalSize = frame.size
         activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
         trackHover()
+        setBgAlpha()
         needsDisplay = true
         // toolTip = """
         // Scroll to change, click to edit.

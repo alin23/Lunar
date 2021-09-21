@@ -593,7 +593,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                         let lastMode = displayController.adaptiveMode
                         let lastPollingInterval = SyncMode.pollingSeconds
-                        let brightnessTransition = CachedDefaults[.brightnessTransition]
+                        let oldBrightnessTransition = CachedDefaults[.brightnessTransition]
                         defer {
                             if lastMode.key != .sync {
                                 self.render("\nGoing back from Sync to \(lastMode.str) Mode")
@@ -603,9 +603,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 self.render("\nSetting polling interval back to \(lastPollingInterval) seconds")
                                 SyncMode.pollingSeconds = lastPollingInterval
                             }
-                            if brightnessTransition != .instant {
+                            if oldBrightnessTransition != .instant {
                                 self.render("\nRe-enabling smooth transition")
-                                CachedDefaults[.brightnessTransition] = brightnessTransition
+                                brightnessTransition = oldBrightnessTransition
                             }
                         }
                         if lastMode.key != .sync {
@@ -623,7 +623,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         }
                         if brightnessTransition != .instant {
                             self.render("\nDisabling smooth transition")
-                            CachedDefaults[.brightnessTransition] = .instant
+                            brightnessTransition = .instant
                         }
 
                         let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0

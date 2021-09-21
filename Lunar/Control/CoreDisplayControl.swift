@@ -103,8 +103,8 @@ class CoreDisplayControl: Control {
         responsive = testReadAndWrite(method: .displayServices) || testReadAndWrite(method: .coreDisplay)
     }
 
-    func writeBrightness(_ brightness: Brightness) -> Bool {
-        let br = brightness.d / 100.0
+    func writeBrightness(_ brightness: Brightness, preciseBrightness: PreciseBrightness? = nil) -> Bool {
+        let br = preciseBrightness ?? (brightness.d / 100.0)
         var success = true
 
         switch method {
@@ -161,28 +161,31 @@ class CoreDisplayControl: Control {
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
         guard !display.isForTesting else { return false }
 
-        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
            oldValue != brightness
         {
+            display.inSmoothTransition = true
             var faults = 0
-            display.smoothTransition(
-                from: oldValue,
-                to: brightness,
-                delay: CachedDefaults[.brightnessTransition] == .smooth ? 0.01 : 0.0025
-            ) { [weak self] brightness in
-                guard let self = self else { return }
-                if faults > 5 {
+            let step = brightness > oldValue ? 0.002 : -0.002
+            let prevBrightness = oldValue.d / 100.0
+            let nextBrightness = brightness.d / 100.0
+            let interval = (brightnessTransition == .smooth ? 0.01 : 0.05)
+
+            asyncNow(barrier: true) { [weak self] in
+                guard let self = self, let display = self.display, faults <= 5 else {
                     return
                 }
 
-                log.debug(
-                    "Writing brightness using \(self)",
-                    context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
-                )
-                if !self.writeBrightness(brightness) {
-                    faults += 1
+                for brightness in stride(from: prevBrightness, through: nextBrightness, by: step) {
+                    log.debug("Writing brightness using \(self) to \(display)")
+                    if !self.writeBrightness(0, preciseBrightness: brightness) {
+                        faults += 1
+                    }
+                    Thread.sleep(forTimeInterval: interval)
                 }
+                display.inSmoothTransition = false
             }
+
             return faults > 5
         }
 

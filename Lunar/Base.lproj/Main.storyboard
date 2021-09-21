@@ -1834,7 +1834,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bUO-Qi-56O">
-                                <rect key="frame" x="30" y="476" width="300" height="30"/>
+                                <rect key="frame" x="30" y="476" width="135" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="left" title="Hotkey step" id="ak3-la-rd5">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1904,7 +1904,7 @@ when dock and menubar icons are hidden</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptg-bU-WRA">
-                                <rect key="frame" x="30" y="366" width="300" height="30"/>
+                                <rect key="frame" x="30" y="366" width="195" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Polling interval" id="2Zp-Qy-xtN">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -1957,7 +1957,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="osm-bT-7sA">
-                                <rect key="frame" x="30" y="422" width="300" height="30"/>
+                                <rect key="frame" x="30" y="422" width="265" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Brightness transition" id="zxx-4L-t4t">
                                     <font key="font" size="19" name="Menlo-Bold"/>
@@ -2055,32 +2055,6 @@ when dock and menubar icons are hidden</string>
                                     <action selector="resetLocation:" target="8dO-ff-2g9" id="M5j-84-zy1"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="h3b-zL-1U3" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="378" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309859156" green="0.28658670774647887" blue="0.886168573943662" alpha="0.55144146126760563" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h9o-wr-i7V">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="3mT-HK-iGJ" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="377" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Niy-1J-QA6">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="MiW-AX-iOY" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="7" y="376" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
@@ -2089,19 +2063,6 @@ when dock and menubar icons are hidden</string>
                                     <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
                                 </shadow>
                                 <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="c4r-te-ssb">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="aSp-kK-Lh9" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="379" width="16" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="RDO-l8-5lx">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -2213,27 +2174,41 @@ when dock and menubar icons are hidden</string>
                                         <segment label="Smooth" toolTip="Apply brightness changes smoothly as fast as possible" tag="1"/>
                                         <segment label="Slow" toolTip="Apply brightness changes smoothly in a slower manner" tag="2"/>
                                     </segments>
-                                    <connections>
-                                        <binding destination="g98-4g-z0d" name="selectedTag" keyPath="values.brightnessTransition" id="IAD-bt-DvM"/>
-                                    </connections>
                                 </segmentedCell>
                                 <connections>
-                                    <binding destination="2iU-q0-Za5" name="selectedIndex" keyPath="values.colorScheme" id="ETV-nS-SSb">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">ColorSchemeTransformer</string>
-                                        </dictionary>
-                                    </binding>
+                                    <binding destination="hWD-oU-Uq8" name="selectedIndex" keyPath="values.brightnessTransition" id="K9w-fq-o5A"/>
+                                </connections>
+                            </segmentedControl>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Obq-aN-oRI">
+                                <rect key="frame" x="30" y="368" width="265" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Schedule transition" id="ba9-Mg-74n">
+                                    <font key="font" size="19" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2t-GT-thi">
+                                <rect key="frame" x="296" y="375" width="173" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="cev-oE-Zup">
+                                    <font key="font" size="12" name="Menlo-Bold"/>
+                                    <segments>
+                                        <segment label="None" toolTip="Apply brightness and contrast on schedule without any transition"/>
+                                        <segment label="30 minutes" toolTip="Start transitioning to the schedule brightness and contrast 30 minutes before the schedule time" selected="YES" tag="1"/>
+                                        <segment label="Full" toolTip="Transition brightness and contrast slowly from previous schedule until the next schedule" tag="2"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <binding destination="MT2-ZO-keE" name="selectedIndex" keyPath="values.scheduleTransition" id="I4M-TQ-3sV"/>
                                 </connections>
                             </segmentedControl>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="_helpButton1" destination="h3b-zL-1U3" id="Y3T-m7-L5c"/>
-                        <outlet property="_helpButton2" destination="3mT-HK-iGJ" id="Hba-JY-bLx"/>
+                        <outlet property="_helpButton1" destination="Ttq-LW-8du" id="6hQ-18-Oco"/>
+                        <outlet property="_helpButton2" destination="mGr-rx-1N2" id="Wpi-lp-7wS"/>
                         <outlet property="_helpButton3" destination="MiW-AX-iOY" id="B6a-4J-4qc"/>
-                        <outlet property="_helpButton4" destination="aSp-kK-Lh9" id="xLg-PE-ebT"/>
-                        <outlet property="_helpButtonBottom" destination="mGr-rx-1N2" id="TZg-Ke-zia"/>
-                        <outlet property="_helpButtonStep" destination="Ttq-LW-8du" id="Nga-CD-AgV"/>
                         <outlet property="brightnessStepCaption" destination="flo-Nr-g61" id="uuw-QZ-P71"/>
                         <outlet property="brightnessStepField" destination="fCl-dS-CXv" id="0xf-ZI-EfT"/>
                         <outlet property="contrastStepCaption" destination="f7A-iG-9Ye" id="reS-aB-2Lj"/>
@@ -2246,6 +2221,8 @@ when dock and menubar icons are hidden</string>
                         <outlet property="locationLonField" destination="xDb-6C-QXm" id="GU2-XD-DK2"/>
                         <outlet property="locationReset" destination="MWb-7g-4Mv" id="Nih-P5-8VD"/>
                         <outlet property="pollingIntervalLabel" destination="ptg-bU-WRA" id="fUW-7h-nmJ"/>
+                        <outlet property="scheduleTransitionLabel" destination="Obq-aN-oRI" id="6bH-AN-ZPU"/>
+                        <outlet property="scheduleTransitionSelector" destination="B2t-GT-thi" id="OCQ-rn-VMA"/>
                         <outlet property="sensorPollingIntervalCaption" destination="oe4-fW-vjY" id="yKQ-m1-net"/>
                         <outlet property="sensorPollingIntervalField" destination="T9n-Uo-gx1" id="tfp-Di-Omp"/>
                         <outlet property="syncPollingIntervalCaption" destination="uAE-HJ-vLk" id="FDe-as-tMB"/>
@@ -2257,6 +2234,7 @@ when dock and menubar icons are hidden</string>
                 <customObject id="89H-EB-DsY" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="hWD-oU-Uq8"/>
                 <userDefaultsController id="g98-4g-z0d"/>
+                <userDefaultsController id="MT2-ZO-keE"/>
             </objects>
             <point key="canvasLocation" x="-1138.5" y="3817"/>
         </scene>
@@ -2648,12 +2626,12 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </customView>
                             <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="325" y="274" width="300" height="300"/>
+                                <rect key="frame" x="325" y="284" width="300" height="300"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <imageCell key="cell" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
                             </imageView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="388" y="541" width="170" height="18"/>
+                                <rect key="frame" x="388" y="551" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Non-responsive" id="dgU-DI-4YJ">
                                     <font key="font" size="13" name="Menlo-Bold"/>
@@ -2681,7 +2659,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ASQ-wq-GuY" customClass="ScrollableBrightness" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="45" y="237" width="250" height="337"/>
+                                <rect key="frame" x="45" y="247" width="250" height="337"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="umA-QT-AAO">
@@ -2785,7 +2763,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </customView>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XVS-nO-2Mf" customClass="ScrollableContrast" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="655" y="237" width="250" height="337"/>
+                                <rect key="frame" x="655" y="247" width="250" height="337"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7BM-c4-qeq">
@@ -2889,7 +2867,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </customView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="343" y="409" width="264" height="45"/>
+                                <rect key="frame" x="343" y="419" width="264" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" size="28" name="Menlo-Bold"/>
@@ -2905,7 +2883,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="386" y="216" width="173" height="12"/>
+                                <rect key="frame" x="386" y="231" width="173" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Thunderbolt 3 (DDC 27)" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="27" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="Ap5-ua-jqI" id="tqJ-YD-mMA" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2986,9 +2964,7 @@ when dock and menubar icons are hidden</string>
                                     <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                         <real key="value" value="34"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                        <color key="value" name="Caption Secondary"/>
-                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dotColorSecondary" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="0Pp-lL-OYP"/>
@@ -2997,7 +2973,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="410" y="390" width="130" height="18"/>
+                                <rect key="frame" x="410" y="400" width="130" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="inline" title="Hardware Control" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ie5-OW-ycd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3011,7 +2987,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kAQ-3d-HnF" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="835" y="203" width="16" height="16"/>
+                                <rect key="frame" x="835" y="218" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -3055,7 +3031,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Wp-4p-KkP" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="591" y="495" width="26" height="26"/>
+                                <rect key="frame" x="591" y="505" width="26" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -3087,7 +3063,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="421" y="194" width="103" height="22"/>
+                                <rect key="frame" x="421" y="209" width="103" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -3112,7 +3088,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="GJn-hd-DZ0">
-                                <rect key="frame" x="323" y="336" width="304" height="49"/>
+                                <rect key="frame" x="323" y="346" width="304" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="buh-dr-GoZ">
                                     <font key="font" metaFont="systemMedium" size="11"/>
@@ -3123,7 +3099,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="ZlW-Lv-Oa8">
-                                <rect key="frame" x="779" y="173" width="122" height="21"/>
+                                <rect key="frame" x="779" y="188" width="122" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Adaptive disabled" id="taZ-lk-cLI">
                                     <font key="font" metaFont="systemSemibold" size="11"/>
@@ -3132,7 +3108,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="861" y="199" width="73" height="12"/>
+                                <rect key="frame" x="861" y="214" width="73" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="99" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3187,19 +3163,17 @@ and contrast to their highest values</string>
                                     </connections>
                                 </popUpButtonCell>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                        <color key="value" name="Caption Secondary"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                         <real key="value" value="34"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dotColorSecondary" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
                                 </connections>
                             </popUpButton>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="neU-41-LZY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="415" y="206" width="120" height="54"/>
+                                <rect key="frame" x="415" y="221" width="120" height="54"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="Scs-uo-xcg" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="44"/>
@@ -3226,7 +3200,7 @@ and contrast to their highest values</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="uan-gt-LLv" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="350" y="186" width="250" height="17"/>
+                                <rect key="frame" x="350" y="201" width="250" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="bVK-oc-lud">
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -3241,40 +3215,74 @@ and contrast to their highest values</string>
                                     </binding>
                                 </connections>
                             </textField>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Gg-t4-OFT" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="40" y="43" width="180" height="146"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            </customView>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8rB-Ds-3J9" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="270" y="43" width="180" height="146"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 2"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
-                                        <integer key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JFo-6Q-ajI" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="500" y="43" width="180" height="146"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 3"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
-                                        <integer key="value" value="3"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4le-Xe-OqI" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="730" y="43" width="180" height="146"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 4"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="number">
-                                        <integer key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
+                            <box fixedFrame="YES" title="Schedule" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcs-8U-Dl2">
+                                <rect key="frame" x="22" y="46" width="906" height="157"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" id="H08-7g-sez">
+                                    <rect key="frame" x="3" y="3" width="900" height="151"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c7W-w3-0q6" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="720" y="2" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 5"/>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                                    <integer key="value" value="5"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WET-aM-MU7" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="360" y="2" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 3"/>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                                    <integer key="value" value="3"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gkp-TR-IaX" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="540" y="2" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 4"/>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                                    <integer key="value" value="4"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qx8-vD-Roe" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="180" y="2" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 2"/>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                                    <integer key="value" value="2"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6NV-4N-tbR" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="2" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 1"/>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="number">
+                                                    <integer key="value" value="1"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                    </subviews>
+                                </view>
+                                <font key="titleFont" size="14" name="Menlo-Bold"/>
+                                <connections>
+                                    <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.clockMode" id="iUl-BJ-u8m">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </box>
                         </subviews>
                     </view>
                     <connections>
@@ -3296,10 +3304,12 @@ and contrast to their highest values</string>
                         <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
                         <outlet property="nonResponsiveTextField" destination="mes-5X-Dx6" id="HfA-e2-9sB"/>
                         <outlet property="resetDropdown" destination="xhP-CD-ogE" id="4zg-Y7-6bF"/>
-                        <outlet property="schedule1" destination="8Gg-t4-OFT" id="UT0-vV-4ZY"/>
-                        <outlet property="schedule2" destination="8rB-Ds-3J9" id="DGU-6X-J2W"/>
-                        <outlet property="schedule3" destination="JFo-6Q-ajI" id="Bg8-ea-r6p"/>
-                        <outlet property="schedule4" destination="4le-Xe-OqI" id="k04-5R-vbo"/>
+                        <outlet property="schedule1" destination="6NV-4N-tbR" id="Sd6-GT-XsB"/>
+                        <outlet property="schedule2" destination="Qx8-vD-Roe" id="KdS-IP-3Qy"/>
+                        <outlet property="schedule3" destination="WET-aM-MU7" id="kfP-Fy-QFj"/>
+                        <outlet property="schedule4" destination="gkp-TR-IaX" id="zEg-EK-ImZ"/>
+                        <outlet property="schedule5" destination="c7W-w3-0q6" id="AN1-FW-bbo"/>
+                        <outlet property="scheduleBox" destination="mcs-8U-Dl2" id="Xhi-p7-Bsk"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
                     </connections>
@@ -3390,7 +3400,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>
@@ -3449,7 +3459,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>
@@ -3497,7 +3507,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>
@@ -3556,7 +3566,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>
@@ -3604,7 +3614,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>
@@ -3663,7 +3673,7 @@ and contrast to their highest values</string>
                                             </popUpButtonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
-                                                    <color key="value" name="Caption Secondary"/>
+                                                    <color key="value" red="0.16159625515578441" green="0.13462888410572563" blue="0.17708333333333334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="padding">
                                                     <real key="value" value="34"/>

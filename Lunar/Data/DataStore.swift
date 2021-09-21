@@ -65,6 +65,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showQuickActions,
     .smoothTransition,
     .brightnessTransition,
+    .scheduleTransition,
     .solarNoon,
     .startAtLogin,
     .sunrise,
@@ -576,6 +577,7 @@ func initCache() {
     cacheKey(.didSwipeRight)
     cacheKey(.smoothTransition)
     cacheKey(.brightnessTransition)
+    cacheKey(.scheduleTransition)
     cacheKey(.refreshValues)
     cacheKey(.debug)
     cacheKey(.showQuickActions)
@@ -653,6 +655,7 @@ extension Defaults.Keys {
     static let didSwipeRight = Key<Bool>("didSwipeRight", default: false)
     static let smoothTransition = Key<Bool>("smoothTransition", default: false)
     static let brightnessTransition = Key<BrightnessTransition>("brightnessTransition", default: .instant)
+    static let scheduleTransition = Key<ScheduleTransition>("scheduleTransition", default: .minutes30)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
     static let debug = Key<Bool>("debug", default: false)
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
@@ -758,6 +761,7 @@ let debugPublisher = Defaults.publisher(.debug).removeDuplicates().filter { $0.o
 let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let brightnessTransitionPublisher = Defaults.publisher(.brightnessTransition).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
