@@ -502,6 +502,21 @@ enum ValueType {
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minContrastBeforeBlackout)?.ns) {
             minContrastBeforeBlackout = value
         }
+
+        faceLightEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .faceLightEnabled)) ?? false)
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeFacelight)?.ns) {
+            brightnessBeforeFacelight = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .contrastBeforeFacelight)?.ns) {
+            contrastBeforeFacelight = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .maxBrightnessBeforeFacelight)?.ns) {
+            maxBrightnessBeforeFacelight = value
+        }
+        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .maxContrastBeforeFacelight)?.ns) {
+            maxContrastBeforeFacelight = value
+        }
+
         if let value = (try container.decodeIfPresent([BrightnessSchedule].self, forKey: .schedules)),
            value.count == Display.DEFAULT_SCHEDULES.count
         {
@@ -590,13 +605,22 @@ enum ValueType {
         case minDDCBrightness
         case minDDCContrast
         case minDDCVolume
+
         case faceLightBrightness
         case faceLightContrast
+
         case blackOutEnabled
         case brightnessBeforeBlackout
         case contrastBeforeBlackout
         case minBrightnessBeforeBlackout
         case minContrastBeforeBlackout
+
+        case faceLightEnabled
+        case brightnessBeforeFacelight
+        case contrastBeforeFacelight
+        case maxBrightnessBeforeFacelight
+        case maxContrastBeforeFacelight
+
         case redGain
         case greenGain
         case blueGain
@@ -766,7 +790,8 @@ enum ValueType {
 
     static let DEFAULT_SCHEDULES = [
         BrightnessSchedule(type: .sunrise, hour: 0, minute: 30, brightness: 70, contrast: 65, negative: true, enabled: false),
-        BrightnessSchedule(type: .time, hour: 12, minute: 0, brightness: 100, contrast: 75, negative: false, enabled: false),
+        BrightnessSchedule(type: .time, hour: 10, minute: 20, brightness: 80, contrast: 70, negative: false, enabled: false),
+        BrightnessSchedule(type: .noon, hour: 0, minute: 0, brightness: 100, contrast: 75, negative: false, enabled: false),
         BrightnessSchedule(type: .sunset, hour: 1, minute: 30, brightness: 60, contrast: 60, negative: false, enabled: false),
         BrightnessSchedule(type: .time, hour: 7, minute: 30, brightness: 20, contrast: 45, negative: false, enabled: false),
     ]
@@ -800,11 +825,6 @@ enum ValueType {
 
     var _idLock = NSRecursiveLock()
     var _id: CGDirectDisplayID
-    // @AtomicLock @objc dynamic var id: CGDirectDisplayID {
-    //     didSet {
-    //         save()
-    //     }
-    // }
 
     var transport: Transport? = nil
 
@@ -814,7 +834,6 @@ enum ValueType {
     @Published @objc dynamic var activeAndResponsive: Bool = false
 
     var schedules: [BrightnessSchedule] = Display.DEFAULT_SCHEDULES
-
     var enabledControls: [DisplayControl: Bool] = [
         .network: true,
         .coreDisplay: true,
@@ -961,6 +980,30 @@ enum ValueType {
     var gammaWindowController: NSWindowController?
     var shadeWindowController: NSWindowController?
     var faceLightWindowController: NSWindowController?
+
+    var prevSchedule: BrightnessSchedule? {
+        let now = DateInRegion().convertTo(region: Region.local)
+        return schedules.filter(\.enabled).sorted().reversed().first { sch in
+            guard let date = sch.dateInRegion else { return false }
+            return date <= now
+        }
+    }
+
+    var currentSchedule: BrightnessSchedule? {
+        let now = DateInRegion().convertTo(region: Region.local)
+        return schedules.filter(\.enabled).sorted().first { sch in
+            guard let (hour, minute) = sch.getHourMinute() else { return false }
+            return hour == now.hour && minute == now.minute
+        }
+    }
+
+    var nextSchedule: BrightnessSchedule? {
+        let now = DateInRegion().convertTo(region: Region.local)
+        return schedules.filter(\.enabled).sorted().first { sch in
+            guard let date = sch.dateInRegion else { return false }
+            return date >= now
+        }
+    }
 
 //    deinit {
 //        #if DEBUG
@@ -2317,6 +2360,12 @@ enum ValueType {
             try container.encode(minBrightnessBeforeBlackout.uint8Value, forKey: .minBrightnessBeforeBlackout)
             try container.encode(minContrastBeforeBlackout.uint8Value, forKey: .minContrastBeforeBlackout)
 
+            try container.encode(faceLightEnabled, forKey: .faceLightEnabled)
+            try container.encode(brightnessBeforeFacelight.uint8Value, forKey: .brightnessBeforeFacelight)
+            try container.encode(contrastBeforeFacelight.uint8Value, forKey: .contrastBeforeFacelight)
+            try container.encode(maxBrightnessBeforeFacelight.uint8Value, forKey: .maxBrightnessBeforeFacelight)
+            try container.encode(maxContrastBeforeFacelight.uint8Value, forKey: .maxContrastBeforeFacelight)
+
             try container.encode(redGain.uint8Value, forKey: .redGain)
             try container.encode(greenGain.uint8Value, forKey: .greenGain)
             try container.encode(blueGain.uint8Value, forKey: .blueGain)
@@ -2800,7 +2849,7 @@ enum ValueType {
                 self.gammaChanged = true
                 for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, contrast: contrast) {
                     self.apply(gamma: gammaTable)
-                    Thread.sleep(forTimeInterval: CachedDefaults[.brightnessTransition] == .slow ? 0.025 : 0.005)
+                    Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.005)
                 }
                 gammaSemaphore.signal()
             }
@@ -2903,15 +2952,15 @@ enum ValueType {
     }
 
     @inline(__always) func withBrightnessTransition(_ transition: BrightnessTransition = .smooth, _ block: () -> Void) {
-        if CachedDefaults[.brightnessTransition] == transition {
+        if brightnessTransition == transition {
             block()
             return
         }
 
-        let oldTransition = CachedDefaults[.brightnessTransition]
-        CachedDefaults[.brightnessTransition] = transition
+        let oldTransition = brightnessTransition
+        brightnessTransition = transition
         block()
-        CachedDefaults[.brightnessTransition] = oldTransition
+        brightnessTransition = oldTransition
     }
 
     // MARK: Computing Values

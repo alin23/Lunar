@@ -91,7 +91,7 @@ class DDCControl: Control {
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
            oldValue != brightness
         {
             var faults = 0
@@ -99,7 +99,7 @@ class DDCControl: Control {
                 .smoothTransition(
                     from: oldValue,
                     to: brightness,
-                    delay: CachedDefaults[.brightnessTransition] == .smooth ? nil : 0.01
+                    delay: brightnessTransition == .smooth ? nil : 0.01
                 ) { brightness in
                     if faults > 5 {
                         return
@@ -120,7 +120,7 @@ class DDCControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
            oldValue != contrast
         {
             var faults = 0
@@ -128,7 +128,7 @@ class DDCControl: Control {
                 .smoothTransition(
                     from: oldValue,
                     to: contrast,
-                    delay: CachedDefaults[.brightnessTransition] == .smooth ? nil : 0.01
+                    delay: brightnessTransition == .smooth ? nil : 0.01
                 ) { contrast in
                     if faults > 5 {
                         return

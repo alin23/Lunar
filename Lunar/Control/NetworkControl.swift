@@ -511,7 +511,7 @@ class NetworkControl: Control {
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
            oldValue != brightness
         {
             return set(brightness, for: .BRIGHTNESS, smooth: true, oldValue: oldValue)
@@ -520,7 +520,7 @@ class NetworkControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if CachedDefaults[.brightnessTransition] != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
            oldValue != contrast
         {
             return set(contrast, for: .CONTRAST, smooth: true, oldValue: oldValue)

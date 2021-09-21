@@ -97,6 +97,19 @@ class Moment: NSObject {
 
     // MARK: Internal
 
+    enum CodingKeys: String, CodingKey {
+        case sunrise
+        case sunset
+        case solarNoon
+        case dayLength
+        case civilSunrise
+        case civilSunset
+        case nauticalSunrise
+        case nauticalSunset
+        case astronomicalSunrise
+        case astronomicalSunset
+    }
+
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first
     static let ArchiveURL = DocumentsDirectory?.appendingPathComponent("moments")
 
@@ -174,6 +187,29 @@ class Moment: NSObject {
             noon.date,
             sevenPM.date
         )
+    }
+
+    func offset(_ key: ScheduleType, with schedule: BrightnessSchedule) -> DateInRegion {
+        var momentWithOffset: DateInRegion
+
+        switch key {
+        case .sunrise:
+            momentWithOffset = sunrise
+        case .sunset:
+            momentWithOffset = sunset
+        case .noon:
+            momentWithOffset = solarNoon
+        default:
+            momentWithOffset = sunrise
+        }
+
+        if schedule.negative {
+            momentWithOffset = momentWithOffset - [.hour: schedule.hour.i, .minute: schedule.minute.i]
+        } else {
+            momentWithOffset = momentWithOffset + [.hour: schedule.hour.i, .minute: schedule.minute.i]
+        }
+
+        return momentWithOffset
     }
 
     func store() {

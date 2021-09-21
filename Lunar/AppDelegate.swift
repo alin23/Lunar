@@ -29,6 +29,7 @@ import WAYWindow
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
 var screensSleeping = ManagedAtomic<Bool>(false)
+var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = try! "https://lunar.fyi/contact".asURL()
 
@@ -272,11 +273,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
 
-            CachedDefaults[.nonManualMode] = change.newValue != .manual
-            CachedDefaults[.clockMode] = change.newValue == .clock
             displayController.adaptiveMode = change.newValue.mode
 
             mainThread {
+                CachedDefaults[.nonManualMode] = change.newValue != .manual
+                CachedDefaults[.clockMode] = change.newValue == .clock
                 self.resetElements()
             }
             self.manageDisplayControllerActivity(mode: change.newValue)
@@ -897,6 +898,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         initCache()
+        brightnessTransition = CachedDefaults[.brightnessTransition]
+        brightnessTransitionPublisher.sink { change in
+            brightnessTransition = change.newValue
+        }.store(in: &observers)
 
         signal(SIGINT) { _ in
             for display in displayController.displays.values {
@@ -1038,7 +1043,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
 
-        log.debug("App finished launching")
+        NotificationCenter.default.post(name: displayListChanged, object: nil)
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
+        log.info("App finished launching v\(version)")
     }
 
     @IBAction func forceUpdateDisplayList(_: Any) {
@@ -1056,6 +1063,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if let task = valuesReaderThread {
             lowprioQueue.cancel(timer: task)
+        }
+        displayController.activeDisplays.values.filter(\.faceLightEnabled).forEach { display in
+            display.disableFaceLight(smooth: false)
+            display.save(now: true)
+        }
+        displayController.activeDisplays.values.filter(\.blackOutEnabled).forEach { display in
+            display.disableBlackOut()
+            display.save(now: true)
         }
     }
 

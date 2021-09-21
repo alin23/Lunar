@@ -58,7 +58,8 @@ class PopUpButton: NSPopUpButton {
 
     // MARK: Internal
 
-    @IBInspectable var dotColor: NSColor? = nil
+    @IBInspectable dynamic var dotColorSecondary: Bool = false
+    @IBInspectable dynamic var dotColor: NSColor? = nil
 
     var hoverState = HoverState.noHover
 
@@ -115,11 +116,7 @@ class PopUpButton: NSPopUpButton {
     }
 
     func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
-        if overrideMode ?? CachedDefaults[.overrideAdaptiveMode] {
-            return buttonDotColor[modeKey ?? displayController.adaptiveModeKey]!
-        } else {
-            return darkMauve
-        }
+        dotColor ?? (dotColorSecondary ? dropdownArrowSecondaryColor : dropdownArrowColor)
     }
 
     override func mouseEntered(with _: NSEvent) {
@@ -133,7 +130,7 @@ class PopUpButton: NSPopUpButton {
     func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
         if let cell = cell as? PopUpButtonCell {
             cell.textColor = labelColor
-            cell.dotColor = (dotColor ?? getDotColor(modeKey: modeKey, overrideMode: overrideMode)).with(alpha: isEnabled ? 0 : -0.4)
+            cell.dotColor = getDotColor().with(alpha: isEnabled ? 0 : -0.4)
         }
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         bg = bgColor

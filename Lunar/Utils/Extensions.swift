@@ -134,6 +134,15 @@ extension Bool {
 }
 
 extension NSColor {
+    var hsb: (Int, Int, Int) {
+        let c = usingColorSpace(.extendedSRGB) ?? self
+        return (
+            (c.hueComponent * 360).intround,
+            (c.saturationComponent * 100).intround,
+            (c.brightnessComponent * 100).intround
+        )
+    }
+
     func with(hue: CGFloat? = nil, saturation: CGFloat? = nil, brightness: CGFloat? = nil, alpha: CGFloat? = nil) -> NSColor {
         let c = usingColorSpace(.extendedSRGB) ?? self
         return NSColor(
@@ -957,6 +966,7 @@ let contrastDataPointInserted = NSNotification.Name("contrastDataPointInserted")
 let currentDataPointChanged = NSNotification.Name("currentDataPointChanged")
 let dataPointBoundsChanged = NSNotification.Name("dataPointBoundsChanged")
 let lunarProStateChanged = NSNotification.Name("lunarProStateChanged")
+let displayListChanged = NSNotification.Name("displayListChanged")
 
 func first<T>(this: T, other _: T) -> T {
     this

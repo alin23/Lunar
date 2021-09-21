@@ -23,7 +23,7 @@ class LockButton: NSButton {
 
     // MARK: Internal
 
-    var lockButtonTrackingArea: NSTrackingArea!
+    @IBInspectable dynamic var verticalPadding: CGFloat = 0.7
 
     override var state: NSControl.StateValue {
         didSet {
@@ -50,7 +50,7 @@ class LockButton: NSButton {
         attributedTitle = inactiveTitle
         attributedAlternateTitle = activeTitle
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * 0.7)))
+        setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * verticalPadding)))
         radius = (frame.height / 2).ns
         if locked {
             state = .on
@@ -59,13 +59,7 @@ class LockButton: NSButton {
             state = .off
             bg = lockButtonBgOff
         }
-        lockButtonTrackingArea = NSTrackingArea(
-            rect: visibleRect,
-            options: [.mouseEnteredAndExited, .activeInActiveApp],
-            owner: self,
-            userInfo: nil
-        )
-        addTrackingArea(lockButtonTrackingArea)
+        trackHover()
     }
 
     override func mouseEntered(with _: NSEvent) {

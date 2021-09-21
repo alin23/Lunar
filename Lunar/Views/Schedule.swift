@@ -8,6 +8,15 @@
 
 import Cocoa
 import Defaults
+import SwiftDate
+
+// MARK: - ScheduleTransition
+
+enum ScheduleTransition: Int, CaseIterable, Defaults.Serializable {
+    case none
+    case minutes30
+    case full
+}
 
 // MARK: - ScheduleType
 
@@ -20,7 +29,7 @@ enum ScheduleType: Int, CaseIterable, Codable, Defaults.Serializable {
 
 // MARK: - BrightnessSchedule
 
-struct BrightnessSchedule: Codable, Defaults.Serializable {
+struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
     let type: ScheduleType
     let hour: UInt8
     let minute: UInt8
@@ -28,6 +37,18 @@ struct BrightnessSchedule: Codable, Defaults.Serializable {
     let contrast: Contrast
     let negative: Bool
     let enabled: Bool
+
+    var dateInRegion: DateInRegion? {
+        guard let (hour, minute) = getHourMinute() else { return nil }
+        return DateInRegion().convertTo(region: Region.local).dateBySet(hour: hour.i, min: minute.i, secs: 0)
+    }
+
+    static func < (lhs: BrightnessSchedule, rhs: BrightnessSchedule) -> Bool {
+        guard let date1 = lhs.dateInRegion, let date2 = rhs.dateInRegion else {
+            return lhs.dateInRegion == nil
+        }
+        return date1 < date2
+    }
 
     static func from(dict: [String: Any]) -> Self {
         BrightnessSchedule(
@@ -39,6 +60,26 @@ struct BrightnessSchedule: Codable, Defaults.Serializable {
             negative: dict["negative"] as! Bool,
             enabled: dict["enabled"] as! Bool
         )
+    }
+
+    func getHourMinute() -> (UInt8, UInt8)? {
+        var hour: UInt8
+        var minute: UInt8
+
+        switch type {
+        case .time:
+            hour = self.hour
+            minute = self.minute
+        case .sunrise, .sunset, .noon:
+            guard let moment = LocationMode.specific.moment else {
+                log.debug("Day moments aren't fetched yet")
+                return nil
+            }
+            let momentWithOffset = moment.offset(type, with: self)
+            hour = momentWithOffset.hour.u8
+            minute = momentWithOffset.minute.u8
+        }
+        return (hour, minute)
     }
 
     func with(
@@ -96,6 +137,7 @@ class Schedule: NSView {
     @IBOutlet var contrast: ScrollableTextField!
     @IBOutlet var signButton: ToggleButton!
     @IBOutlet var box: NSBox!
+    @IBOutlet var enableButton: LockButton!
 
     @IBOutlet var dropdown: PopUpButton!
     @IBInspectable dynamic var title = "Schedule 1"
@@ -111,6 +153,7 @@ class Schedule: NSView {
 
             let newSchedule = schedule.with(enabled: enabled)
             display.schedules[number - 1] = newSchedule
+            display.save()
             box?.alphaValue = enabled ? 1.0 : 0.5
         }
     }
@@ -124,6 +167,7 @@ class Schedule: NSView {
 
             let newSchedule = schedule.with(negative: negativeState == .on)
             display.schedules[number - 1] = newSchedule
+            display.save()
         }
     }
 
@@ -157,6 +201,7 @@ class Schedule: NSView {
 
             let newSchedule = schedule.with(type: scheduleType, hour: hour, minute: minute)
             display.schedules[number - 1] = newSchedule
+            display.save()
             setTimeValues(from: newSchedule)
         }
     }
@@ -273,8 +318,6 @@ class Schedule: NSView {
         signButton?.page = darkMode ? .hotkeys : .display
         dropdown?.page = darkMode ? .hotkeys : .display
         dropdown?.resizeToFitTitle()
-        box?.wantsLayer = true
-        box?.alphaValue = 1.0
     }
 
     override func draw(_ dirtyRect: NSRect) {
