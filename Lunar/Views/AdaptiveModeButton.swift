@@ -134,6 +134,14 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         return true
     }
 
+    override func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
+        if overrideMode ?? CachedDefaults[.overrideAdaptiveMode] {
+            return buttonDotColor[modeKey ?? displayController.adaptiveModeKey]!
+        } else {
+            return darkMauve
+        }
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }

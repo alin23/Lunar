@@ -75,7 +75,7 @@ class ConfigurationViewController: NSViewController {
     - Click to edit then press enter to set custom values.
     - Press reset to use the last location stored by the system.
     """
-    let SMOOTH_TRANSITION_TOOLTIP = """
+    let BRIGHTNESS_TRANSITION_TOOLTIP = """
     ## Description
     Allows brightness/contrast to change smoothly from a value to another.
 
@@ -86,13 +86,13 @@ class ConfigurationViewController: NSViewController {
 
     **Note:** This can make the system lag in transitions if the monitor has a *very* slow response time
     """
+    let SCHEDULE_TRANSITION_TOOLTIP = """
+    ## Description
+    """
 
     @IBOutlet var _helpButton1: NSButton?
     @IBOutlet var _helpButton2: NSButton?
     @IBOutlet var _helpButton3: NSButton?
-    @IBOutlet var _helpButton4: NSButton?
-    @IBOutlet var _helpButtonStep: NSButton?
-    @IBOutlet var _helpButtonBottom: NSButton?
     @IBOutlet var brightnessStepField: ScrollableTextField!
     @IBOutlet var brightnessStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var contrastStepField: ScrollableTextField!
@@ -111,6 +111,8 @@ class ConfigurationViewController: NSViewController {
     @IBOutlet var locationLonCaption: ScrollableTextFieldCaption!
     @IBOutlet var locationLabel: NSTextField!
     @IBOutlet var locationReset: TextButton!
+    @IBOutlet var scheduleTransitionLabel: NSTextField!
+    @IBOutlet var scheduleTransitionSelector: NSSegmentedControl!
     weak var settingsController: SettingsPageController?
 
     var dayMomentsObserver: Cancellable?
@@ -132,18 +134,6 @@ class ConfigurationViewController: NSViewController {
 
     var helpButton3: HelpButton? {
         _helpButton3 as? HelpButton
-    }
-
-    var helpButton4: HelpButton? {
-        _helpButton4 as? HelpButton
-    }
-
-    var helpButtonStep: HelpButton? {
-        _helpButtonStep as? HelpButton
-    }
-
-    var helpButtonBottom: HelpButton? {
-        _helpButtonBottom as? HelpButton
     }
 
     var hotkeyStepVisible: Bool = false {
@@ -174,6 +164,13 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
+    var scheduleTransitionVisible: Bool = false {
+        didSet {
+            scheduleTransitionLabel?.isHidden = !scheduleTransitionVisible
+            scheduleTransitionSelector?.isHidden = !scheduleTransitionVisible
+        }
+    }
+
     var locationVisible: Bool = false {
         didSet {
             locationLatField?.isHidden = !locationVisible
@@ -189,31 +186,32 @@ class ConfigurationViewController: NSViewController {
         let locationMode = adaptiveMode == .location
         let syncMode = adaptiveMode == .sync
         let sensorMode = adaptiveMode == .sensor
+        let clockMode = adaptiveMode == .clock
         // let manualMode = adaptiveMode == .manual
 
         locationVisible = locationMode
         syncPollingIntervalVisible = syncMode
         sensorPollingIntervalVisible = sensorMode
+        scheduleTransitionVisible = clockMode
         hotkeyStepVisible = true
 
-        helpButtonStep?.helpText = HOTKEY_STEP_TOOLTIP
-        helpButtonBottom?.helpText = SMOOTH_TRANSITION_TOOLTIP
+        helpButton1?.helpText = HOTKEY_STEP_TOOLTIP
+        helpButton2?.helpText = BRIGHTNESS_TRANSITION_TOOLTIP
 
         switch adaptiveMode {
         case .location:
-            helpButton4?.helpText = LOCATION_TOOLTIP
+            helpButton3?.helpText = LOCATION_TOOLTIP
         case .sync:
-            helpButton1?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
+            helpButton3?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
         case .sensor:
-            helpButton1?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
-        case .manual, .clock:
+            helpButton3?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
+        case .clock:
+            helpButton3?.helpText = SCHEDULE_TRANSITION_TOOLTIP
+        case .manual:
             break
         }
 
-        helpButton1?.isHidden = !syncPollingIntervalVisible && !sensorPollingIntervalVisible
-        helpButton2?.isHidden = true
-        helpButton3?.isHidden = true
-        helpButton4?.isHidden = !locationVisible
+        helpButton3?.isHidden = adaptiveMode == .manual
     }
 
     func listenForLocationChange() {

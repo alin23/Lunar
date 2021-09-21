@@ -611,6 +611,8 @@ func asyncEvery(
     runs: Int? = nil,
     skipIfExists: Bool = false,
     eager: Bool = false,
+    onSuccess: (() -> Void)? = nil,
+    onCancelled: (() -> Void)? = nil,
     _ action: @escaping (Timer) -> Void
 ) {
     timerQueue.async {
@@ -630,6 +632,7 @@ func asyncEvery(
             if runs >= maxRuns || isCancelled(key) {
                 timer.invalidate()
                 Thread.current.threadDictionary[key] = nil
+                if runs >= maxRuns { onSuccess?() } else { onCancelled?() }
             } else {
                 Thread.current.threadDictionary["\(key)-runs"] = runs + 1
             }

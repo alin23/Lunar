@@ -177,10 +177,12 @@ class DisplayViewController: NSViewController {
 
     @Atomic var optionKeyPressed = false
 
+    @IBOutlet var scheduleBox: NSBox!
     @IBOutlet var schedule1: Schedule!
     @IBOutlet var schedule2: Schedule!
     @IBOutlet var schedule3: Schedule!
     @IBOutlet var schedule4: Schedule!
+    @IBOutlet var schedule5: Schedule!
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -448,10 +450,15 @@ class DisplayViewController: NSViewController {
         schedule2?.display = display
         schedule3?.display = display
         schedule4?.display = display
+        schedule5?.display = display
+        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
 
         if display.isBuiltin {
             builtinBrightnessField?.onValueChanged = { value in
-                display.withBrightnessTransition { display.brightness = value.ns }
+                display
+                    .withBrightnessTransition(brightnessTransition == .instant ? .smooth : brightnessTransition) {
+                        display.brightness = value.ns
+                    }
             }
         }
 
@@ -880,6 +887,7 @@ class DisplayViewController: NSViewController {
                 self.schedule2?.brightness.upperLimit = value.doubleValue
                 self.schedule3?.brightness.upperLimit = value.doubleValue
                 self.schedule4?.brightness.upperLimit = value.doubleValue
+                self.schedule5?.brightness.upperLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "maxBrightness")
         display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
@@ -892,6 +900,7 @@ class DisplayViewController: NSViewController {
                 self.schedule2?.contrast.upperLimit = value.doubleValue
                 self.schedule3?.contrast.upperLimit = value.doubleValue
                 self.schedule4?.contrast.upperLimit = value.doubleValue
+                self.schedule5?.contrast.upperLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "maxContrast")
 
@@ -905,6 +914,7 @@ class DisplayViewController: NSViewController {
                 self.schedule2?.brightness.lowerLimit = value.doubleValue
                 self.schedule3?.brightness.lowerLimit = value.doubleValue
                 self.schedule4?.brightness.lowerLimit = value.doubleValue
+                self.schedule5?.brightness.lowerLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "minBrightness")
         display?.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
@@ -917,6 +927,7 @@ class DisplayViewController: NSViewController {
                 self.schedule2?.contrast.lowerLimit = value.doubleValue
                 self.schedule3?.contrast.lowerLimit = value.doubleValue
                 self.schedule4?.contrast.lowerLimit = value.doubleValue
+                self.schedule5?.contrast.lowerLimit = value.doubleValue
             }
         }.store(in: &displayObservers, for: "minContrast")
 
@@ -980,15 +991,11 @@ class DisplayViewController: NSViewController {
             guard let self = self, !self.pausedAdaptiveModeObserver else {
                 return
             }
-            self.chartHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue == .clock
+
             self.pausedAdaptiveModeObserver = true
             mainThread {
-                self.lockBrightnessCurveButton.isHidden = self.chartHidden
-                self.lockContrastCurveButton.isHidden = self.chartHidden
-                self.schedule1?.isHidden = change.newValue != .clock
-                self.schedule2?.isHidden = change.newValue != .clock
-                self.schedule3?.isHidden = change.newValue != .clock
-                self.schedule4?.isHidden = change.newValue != .clock
+                self.chartHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue == .clock
+                self.scheduleBox?.isHidden = change.newValue != .clock
             }
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
@@ -1003,7 +1010,10 @@ class DisplayViewController: NSViewController {
     }
 
     func initGraph(mode: AdaptiveMode? = nil) {
-        guard !chartHidden else { return }
+        guard !chartHidden else {
+            zeroGraph()
+            return
+        }
         brightnessContrastChart?.initGraph(
             display: display,
             brightnessColor: brightnessGraphColor,
@@ -1016,7 +1026,6 @@ class DisplayViewController: NSViewController {
     }
 
     func zeroGraph() {
-        guard !chartHidden else { return }
         brightnessContrastChart?.initGraph(
             display: nil,
             brightnessColor: brightnessGraphColor,
@@ -1224,5 +1233,7 @@ class DisplayViewController: NSViewController {
 
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
+        scheduleBox?.bg = .black.withAlphaComponent(0.03)
+        scheduleBox?.radius = 10
     }
 }

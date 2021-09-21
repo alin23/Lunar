@@ -757,7 +757,7 @@ class DisplayController {
 
         // Update IDs after reconnection
         for display in displayList {
-            defer { display.active = true }
+            defer { mainThread { display.active = true } }
             guard let newID = idForSerial[display.serial] else {
                 continue
             }
@@ -938,6 +938,7 @@ class DisplayController {
                 appDelegate!.recreateWindow()
                 if advancedSettings { appDelegate!.showAdvancedSettings() }
             }
+            NotificationCenter.default.post(name: displayListChanged, object: nil)
         }
     }
 

@@ -34,6 +34,9 @@ var darkMode: Bool {
     appDelegate?.darkMode ?? false
 }
 
+var dropdownArrowColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : orange.withAlphaComponent(0.7) }
+var dropdownArrowSecondaryColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.5) }
+
 var scrollableTextFieldCaptionColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.7) }
 
 var scrollableTextFieldColor: NSColor { darkMode ? lunarYellow : lunarYellow.shadow(withLevel: 0.05) ?? lunarYellow }
