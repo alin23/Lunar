@@ -77,8 +77,17 @@ class ModernWindow: WAYWindow {
             appDelegate!.hideAdvancedSettings()
             appDelegate!.currentPage = 1
             appDelegate!.goToPage(ignoreUIElement: true)
-        case kVK_ANSI_B.u16,
-             kVK_ANSI_0.u16:
+        case kVK_ANSI_B.u16:
+            if let index = pageController?.arrangedObjects.firstIndex(where: { obj in
+                guard let d = obj as? Display else {
+                    return false
+                }
+                return d.isBuiltin && d.active
+            }) {
+                appDelegate!.currentPage = index
+                appDelegate!.goToPage(ignoreUIElement: true)
+            }
+        case kVK_ANSI_0.u16:
             appDelegate!.currentPage = (pageController?.arrangedObjects.count ?? 3) - 1
             appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_1.u16:

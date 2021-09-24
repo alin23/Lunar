@@ -17,7 +17,6 @@ import Defaults
 import LetsMove
 import Magnet
 import MediaKeyTap
-import Path
 import Sauce
 import Sentry
 import SimplyCoreAudio
@@ -25,6 +24,8 @@ import Sparkle
 import SwiftDate
 import UserNotifications
 import WAYWindow
+
+import Path
 
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
@@ -143,6 +144,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
     var currentPage: Int = 2
+
+    var brightnessIcon = "brightness"
+
+    var sliderPercentage: Float = 40 {
+        didSet {
+            mainThread { infoMenuItem.view?.needsDisplay = true }
+        }
+    }
+
+    var sliderWidth: Float = 200 {
+        didSet {
+            mainThread { infoMenuItem.view?.needsDisplay = true }
+        }
+    }
+
+    var sliderHeight: Float = 22 {
+        didSet {
+            mainThread { infoMenuItem.view?.needsDisplay = true }
+        }
+    }
 
     var windowController: ModernWindowController? {
         get { _windowControllerLock.around { _windowController } }
@@ -292,10 +313,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             self.updater.automaticallyChecksForUpdates = change.newValue
         }.store(in: &observers)
         showVirtualDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(advancedSettings: true)
+            displayController.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showAirplayDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(advancedSettings: true)
+            displayController.resetDisplayList(configurationPage: true)
+        }.store(in: &observers)
+        showProjectorDisplaysPublisher.sink { _ in
+            displayController.resetDisplayList(configurationPage: true)
+        }.store(in: &observers)
+        showDisconnectedDisplaysPublisher.sink { _ in
+            displayController.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         // NotificationCenter.default
         //     .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
@@ -359,8 +386,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
-            guard let appPath = Path(Bundle.main.bundlePath),
-                  appPath.parent == Path("/Applications")
+            guard let appPath = p(Bundle.main.bundlePath),
+                  appPath.parent == p("/Applications")
             else { return }
             LaunchAtLoginController().setLaunchAtLogin(shouldStartAtLogin, for: appPath.url)
         }
@@ -663,6 +690,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     self.disableFaceLight(smooth: false)
                     NetworkControl.resetState()
                     DDCControl.resetState()
+                    appDelegate!.startOrRestartMediaKeyTap()
                 }
             }.store(in: &observers)
 
@@ -690,6 +718,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         self.disableFaceLight(smooth: false)
                         NetworkControl.resetState()
                         DDCControl.resetState()
+                        appDelegate!.startOrRestartMediaKeyTap()
                     }
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
@@ -779,6 +808,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentPage = Page.settings.rawValue
         uiElement = .advancedSettingsButton
         appDelegate!.goToPage(highlight: highlight)
+    }
+
+    func showConfigurationPage() {
+        CachedDefaults[.advancedSettingsShown] = false
+        currentPage = Page.settings.rawValue
+        uiElement = nil
+        appDelegate!.goToPage()
     }
 
     func hideAdvancedSettings() {
@@ -977,7 +1013,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         displayController.displays = displayController.getDisplaysLock.around {
             DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
-                includeAirplay: CachedDefaults[.showAirplayDisplays]
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays]
             )
         }
         displayController.addSentryData()
@@ -1050,6 +1087,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func forceUpdateDisplayList(_: Any) {
         displayController.resetDisplayList()
+        appDelegate!.startOrRestartMediaKeyTap()
     }
 
     @IBAction func openLunarDiagnostics(_: Any) {

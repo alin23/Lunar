@@ -311,7 +311,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="Built-in brightness" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="B7F-Wk-7dh">
+                                        <menuItem title="Displays" allowsKeyEquivalentWhenHidden="YES" id="B7F-Wk-7dh">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="INI-Sl-rYJ"/>
@@ -1553,36 +1553,6 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cAf-Xp-7jE">
-                                <rect key="frame" x="510" y="250" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show virtual displays" id="ENH-dw-pDI">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Ch3-iB-ATV">
-                                <rect key="frame" x="874" y="261" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="r7k-gY-UJl">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.showVirtualDisplays" id="867-kb-nb0"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YTv-22-zky">
-                                <rect key="frame" x="510" y="232" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Enables DisplayLink displays to appear in Lunar" id="BMv-Sc-gaI">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-c9-2b2">
                                 <rect key="frame" x="510" y="458" width="177" height="24"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -1611,38 +1581,8 @@ when dock and menubar icons are hidden</string>
                                     </binding>
                                 </connections>
                             </segmentedControl>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GqJ-q8-EG7">
-                                <rect key="frame" x="510" y="205" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show Airplay displays" id="bLT-rA-Tbf">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="rYH-1R-QWq">
-                                <rect key="frame" x="874" y="216" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="o2x-2h-Yoq">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.showAirplayDisplays" id="xgi-hR-Ztw"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fjD-Xb-cAs">
-                                <rect key="frame" x="510" y="187" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Enables iPad Sidecar and other Airplay displays to appear in Lunar" id="sVe-mL-MZN">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oc-JS-1wg">
-                                <rect key="frame" x="510" y="147" width="312" height="30"/>
+                                <rect key="frame" x="510" y="248" width="312" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable screen orientation hotkeys" id="6qV-NU-vWc">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1651,7 +1591,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="thT-2h-5yD">
-                                <rect key="frame" x="874" y="160" width="20" height="20"/>
+                                <rect key="frame" x="874" y="261" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="NDa-Xw-2p4">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1663,7 +1603,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lQU-Ve-CjX">
-                                <rect key="frame" x="510" y="129" width="360" height="26"/>
+                                <rect key="frame" x="510" y="230" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Press Ctrl+0/9/8/7 for setting 0°/90°/180°/270° for the display with the cursor on it" id="1KQ-hF-FAx">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -2056,7 +1996,7 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="MiW-AX-iOY" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="376" width="16" height="16"/>
+                                <rect key="frame" x="7" y="380" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -2189,7 +2129,7 @@ when dock and menubar icons are hidden</string>
                                 </textFieldCell>
                             </textField>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2t-GT-thi">
-                                <rect key="frame" x="296" y="375" width="173" height="24"/>
+                                <rect key="frame" x="292" y="375" width="173" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="cev-oE-Zup">
                                     <font key="font" size="12" name="Menlo-Bold"/>
@@ -2203,6 +2143,81 @@ when dock and menubar icons are hidden</string>
                                     <binding destination="MT2-ZO-keE" name="selectedIndex" keyPath="values.scheduleTransition" id="I4M-TQ-3sV"/>
                                 </connections>
                             </segmentedControl>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l9m-G3-nsl">
+                                <rect key="frame" x="30" y="314" width="265" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Shown displays" id="70f-i0-sYR">
+                                    <font key="font" size="19" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="kD3-4R-20L" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="7" y="326" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="1ej-4b-atI">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zK2-UT-kkE">
+                                <rect key="frame" x="30" y="295" width="360" height="26"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Which kind of displays to show in Preferences" id="Ks8-hg-KDN">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="yU2-HB-aGN">
+                                <rect key="frame" x="42" y="270" width="152" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Virtual (DisplayLink)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oLC-C0-Ocf">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showVirtualDisplays" id="Dfn-df-q2f"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="W8w-Y5-cle">
+                                <rect key="frame" x="42" y="248" width="161" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="AirPlay (Sidecar, TVs)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fES-jk-PZE">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showAirplayDisplays" id="GXd-us-coq"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="bBn-fY-Gma">
+                                <rect key="frame" x="42" y="226" width="90" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Projectors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="X0i-hF-WSy">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showProjectorDisplays" id="UtQ-TY-5tp"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="R0g-6e-j2A">
+                                <rect key="frame" x="42" y="204" width="170" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Disconnected monitors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AWI-5a-gca">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showDisconnectedDisplays" id="GYv-BC-u8k"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -2235,6 +2250,7 @@ when dock and menubar icons are hidden</string>
                 <userDefaultsController id="hWD-oU-Uq8"/>
                 <userDefaultsController id="g98-4g-z0d"/>
                 <userDefaultsController id="MT2-ZO-keE"/>
+                <userDefaultsController id="PK4-lO-oV8"/>
             </objects>
             <point key="canvasLocation" x="-1138.5" y="3817"/>
         </scene>
@@ -2639,23 +2655,7 @@ when dock and menubar icons are hidden</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.activeAndResponsive" id="yMj-md-h9o"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.isBuiltin" previousBinding="RNK-1I-mNb" id="Vt0-sn-7O8">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.noDisplay" previousBinding="yMj-md-h9o" id="RNK-1I-mNb">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.nonResponsiveTextFieldHidden" id="H0w-oE-eGB"/>
                                 </connections>
                             </textField>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ASQ-wq-GuY" customClass="ScrollableBrightness" customModule="Lunar" customModuleProvider="target">
@@ -2981,6 +2981,9 @@ when dock and menubar icons are hidden</string>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.5"/>
+                                    </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="eik-cf-0eC"/>
@@ -3223,7 +3226,7 @@ and contrast to their highest values</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c7W-w3-0q6" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="720" y="2" width="180" height="146"/>
+                                            <rect key="frame" x="720" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 5"/>
@@ -3233,7 +3236,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WET-aM-MU7" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="360" y="2" width="180" height="146"/>
+                                            <rect key="frame" x="360" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 3"/>
@@ -3243,7 +3246,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gkp-TR-IaX" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="540" y="2" width="180" height="146"/>
+                                            <rect key="frame" x="540" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 4"/>
@@ -3253,7 +3256,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qx8-vD-Roe" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="180" y="2" width="180" height="146"/>
+                                            <rect key="frame" x="180" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 2"/>
@@ -3263,7 +3266,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6NV-4N-tbR" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="2" width="180" height="146"/>
+                                            <rect key="frame" x="0.0" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="string" keyPath="title" value="Schedule 1"/>
@@ -7039,7 +7042,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                         <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
                         <rect key="contentRect" x="0.0" y="0.0" width="100" height="100"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
                         <value key="maxSize" type="size" width="950" height="700"/>
                         <view key="contentView" id="i5I-4E-D2Q">
                             <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
@@ -7049,7 +7052,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                 </windowController>
                 <customObject id="Thh-y2-zZd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-5217" y="2007"/>
+            <point key="canvasLocation" x="-5213" y="1980"/>
         </scene>
         <!--Gamma View Controller-->
         <scene sceneID="P7v-Pf-7le">
@@ -7592,6 +7595,26 @@ You can choose to send the diagnostics to the developer if you think this is not
             </objects>
             <point key="canvasLocation" x="-817" y="716"/>
         </scene>
+        <!--Window Controller-->
+        <scene sceneID="dIC-8d-yov">
+            <objects>
+                <windowController storyboardIdentifier="shadeWindowController" id="03W-XR-4dx" sceneMemberID="viewController">
+                    <window key="window" title="Shade" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" deferred="NO" hasShadow="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" titleVisibility="hidden" id="UdE-06-ACb" userLabel="Diagnostics">
+                        <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
+                        <rect key="contentRect" x="0.0" y="0.0" width="100" height="100"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+                        <value key="maxSize" type="size" width="950" height="700"/>
+                        <view key="contentView" id="xHi-Yu-XeD">
+                            <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                    </window>
+                </windowController>
+                <customObject id="A4E-8h-Bqj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-5247" y="2186"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Display" width="250" height="211"/>
@@ -7605,7 +7628,7 @@ You can choose to send the diagnostics to the developer if you think this is not
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Caption Secondary">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999999999999996" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

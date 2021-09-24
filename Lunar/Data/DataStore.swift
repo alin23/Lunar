@@ -31,6 +31,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .hotkeysAffectBuiltin,
     .showVirtualDisplays,
     .showAirplayDisplays,
+    .showProjectorDisplays,
+    .showDisconnectedDisplays,
     .mediaKeysNotified,
     .brightnessKeysEnabled,
     .brightnessStep,
@@ -564,6 +566,8 @@ func initCache() {
 
     cacheKey(.showVirtualDisplays)
     cacheKey(.showAirplayDisplays)
+    cacheKey(.showProjectorDisplays)
+    cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
     cacheKey(.moreGraphData)
     cacheKey(.enableOrientationHotkeys)
@@ -642,6 +646,8 @@ extension Defaults.Keys {
 
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
+    static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: false)
+    static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
@@ -768,5 +774,11 @@ let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBright
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let showProjectorDisplaysPublisher = Defaults.publisher(.showProjectorDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let showDisconnectedDisplaysPublisher = Defaults.publisher(.showDisconnectedDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }

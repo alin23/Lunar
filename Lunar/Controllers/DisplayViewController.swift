@@ -103,6 +103,9 @@ class DisplayViewController: NSViewController {
     * Low brightness values can wash out colors
     * Quitting Lunar resets the brightness to default
     * Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
+    * **Airplay**, **iPad Sidecar** and **DisplayLink** monitors don't support Gamma so we have to use an overlay which looks even worse
+        - An overlay is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar
+        - The overlay is not used on non-Airplay/Virtual monitors because Gamma is a better choice for accurate color rendering
     """
     let NO_CONTROLS_HELP_TEXT = """
     ## No controls available
@@ -184,6 +187,8 @@ class DisplayViewController: NSViewController {
     @IBOutlet var schedule4: Schedule!
     @IBOutlet var schedule5: Schedule!
 
+    @objc dynamic var nonResponsiveTextFieldHidden: Bool = true
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainThread {
@@ -206,10 +211,8 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
         didSet {
-            if let d = display {
-                mainThread {
-                    nonResponsiveTextField?.isHidden = d.id == GENERIC_DISPLAY_ID || d.isBuiltin
-                }
+            mainThread {
+                nonResponsiveTextField?.isHidden = getNonResponsiveTextFieldHidden()
             }
         }
     }
@@ -247,6 +250,11 @@ class DisplayViewController: NSViewController {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state
         }
+    }
+
+    func getNonResponsiveTextFieldHidden() -> Bool {
+        guard let display = display, display.active else { return true }
+        return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || display.activeAndResponsive
     }
 
     @IBAction func lockCurve(_ sender: LockButton) {
@@ -541,8 +549,26 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
+    func setDisconnected() {
+        guard let button = controlsButton else { return }
+        button.bg = darkMode ? gray.withAlphaComponent(0.6) : gray.withAlphaComponent(0.9)
+        button.attributedTitle = "Disconnected".withAttribute(.textColor(.darkGray))
+        button.helpText = "This display is not connected to your Mac."
+    }
+
     func updateControlsButton(control: Control? = nil) {
-        guard let button = controlsButton, let display = display, let control = control ?? display.control else { return }
+        guard let button = controlsButton, let display = display else {
+            return
+        }
+
+        guard display.active else {
+            setDisconnected()
+            return
+        }
+
+        guard let control = control ?? display.control else {
+            return
+        }
 
         mainThread {
             button.alpha = 1.0
@@ -718,8 +744,10 @@ class DisplayViewController: NSViewController {
         display.control = control
         display.onControlChange?(control)
 
-        if !(display.enabledControls[.gamma] ?? false), display.applyGamma || display.gammaChanged {
-            display.resetGamma()
+        if !(display.enabledControls[.gamma] ?? false),
+           display.applyGamma || display.gammaChanged || display.isVirtual || display.isAirPlay
+        {
+            display.resetSoftwareControl()
         }
     }
 
@@ -1037,7 +1065,7 @@ class DisplayViewController: NSViewController {
     }
 
     func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
-        guard let display = display else { return false }
+        guard let display = display, display.active else { return false }
         guard !display.isInMirrorSet else { return true }
 
         return (displayController.activeDisplays.count > 1 || (hasDDC ?? display.hasDDC)) && !display.isSidecar && !display.isAirplay
@@ -1100,6 +1128,7 @@ class DisplayViewController: NSViewController {
     }
 
     func showGammaNotice() {
+        guard display?.active ?? false else { return }
         let windowVisible = mainThread { view.window?.isVisible ?? false }
         guard gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), windowVisible
         else {

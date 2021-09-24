@@ -85,6 +85,7 @@ class CoreDisplayControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
         return display
             .isAppleDisplay() || (display.isBuiltin && (DisplayController.panel(with: display.id)?.isSmartDisplay ?? false)) || display

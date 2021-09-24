@@ -100,6 +100,7 @@ class GammaControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return display.enabledControls.values.allSatisfy { enabled in !enabled }
         }
@@ -121,8 +122,15 @@ class GammaControl: Control {
     func resetColors() -> Bool { true }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
+        guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return false
+        }
+
+        let brightness = cap(brightness, minVal: 0, maxVal: 100)
+
+        guard !display.isVirtual, !display.isAirPlay else {
+            display.shade(amount: 1.0 - (brightness.d / 100.0))
+            return true
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
@@ -136,8 +144,14 @@ class GammaControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
+        guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return false
+        }
+
+        let contrast = cap(contrast, minVal: 0, maxVal: 100)
+
+        guard !display.isVirtual, !display.isAirPlay else {
+            return true
         }
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
@@ -199,7 +213,7 @@ class GammaControl: Control {
     }
 
     func reset() -> Bool {
-        display.resetGamma()
+        display.resetSoftwareControl()
         return true
     }
 
