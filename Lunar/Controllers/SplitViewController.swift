@@ -125,37 +125,35 @@ This mode is the last resort for people that:
 let CLOCK_HELP_TEXT = """
 # Clock Mode
 
-The adaptive algorithm is disabled in `Manual` mode, but Lunar provides useful hotkeys to control all the monitors' brightness and contrast from your keyboard.
+This mode allows you to apply brightness and contrast values based on a custom schedule.
 
-This mode is the last resort for people that:
+Each schedule can be of the following types:
+1. `Time`: apply values at a specific time of day
+1. `Sunrise`: apply values when the sun starts to rise above the horizon
+1. `Noon`: apply values when the sun is at its highest point in the sky
+1. `Sunset`: apply values when the sun starts to fall below the horizon
 
-1. Don't have a built-in display (*Mac Mini*)
-1. Don't use the built-in display (*Macbook with lid closed*)
-1. Work in an environment without much natural light (*where Location mode is useless*)
-1. Don't have an Ambient Light Sensor (*Hackintosh*)
-1. Don't trust machines to do their work
+### Sunrise, sunset and noon
+- The time for these types is computed daily
+- The time can be offset using the hour/minute and sign values
+- If the sign is `+` the values will be applied *after* the sunset time
+- If the sign is `-` the values will be applied *before* the sunset time
 
-## Algorithm
+## Schedule Transitions
+1. `None`: the brightness and contrast are applied at the exact time of the schedule
+1. `30 minutes`: the brightness and contrast start transitioning 30 minutes before the schedule time, from your current brightness to the schedule brightness
+    - *When the transition starts, the algorithm applies the computed values every 30 seconds so it doesn't allow for manual adjustments in the 30 minutes before the schedule*
+1. `Full`: the brightness and contrast transition from schedule to schedule
+    - *This transition applies the computed values every 30 seconds so it doesn't allow for manual adjustments*
 
-1. Percentage Hotkeys: `0%`, `25%`, `50%`, `75%`, `100%`
-    - When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
-1. Brightness/Contrast Up/Down Hotkeys
-    - When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
+## Events
 
-##### Percentage Hotkeys Example:
-- `MIN` Brightness = 15
-- `MAX` Brightness = 100
-- `MIN` Contrast = 40
-- `MAX` Contrast = 75
-- `25%` hotkey is pressed
-- **The monitor will get**:
-    - `brightness = 25% * (100 - 15) + 15 =` **36**
-    - `contrast = 25% * (75 - 40) + 40 =` **49**
+The previous schedule values are re-applied when following events happen:
+- Wake from sleep
+- Display list changes (display connected/disconnected or enters standby)
+- App is launched
 
-## Settings
-- `Brightness/Contrast Step` adjusts how much to increase or decrease the values when using the up/down hotkeys
-
-\(NOTE_TEXT)
+**To disable this event behaviour, uncheck `Re-apply brightness on screen wake` in [Advanced settings](lunar://advanced)**
 """
 
 let AUTO_MODE_TAG = 99

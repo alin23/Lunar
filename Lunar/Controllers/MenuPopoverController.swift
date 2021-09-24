@@ -54,7 +54,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var brightnessColumn: NSTableColumn!
     @IBOutlet var contrastColumn: NSTableColumn!
-    @IBInspectable dynamic lazy var displays: [Display] = displayController.displays.values.map { $0 }
+    @IBInspectable dynamic lazy var displays: [Display] = displayController.activeDisplays.values.map { $0 }
         .sorted(by: { d1, d2 in d1.active && !d2.active })
 
     var viewHeight: CGFloat?
@@ -205,7 +205,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
                 if !sameDisplays {
                     self.setValue(
-                        displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
+                        displayController.activeDisplays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
                         forKey: "displays"
                     )
                     self.tableView.reloadData()
@@ -238,7 +238,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                     mainAsyncAfter(ms: 1000) { [weak self] in
                         guard let self = self else { return }
                         self.setValue(
-                            displayController.displays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
+                            displayController.activeDisplays.values.map { $0 }.sorted(by: { d1, d2 in d1.active && !d2.active }),
                             forKey: "displays"
                         )
                         self.tableView.reloadData()

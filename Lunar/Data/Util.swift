@@ -6,9 +6,15 @@ import Cocoa
 import Combine
 import CryptorECC
 import Foundation
+import Path
 import Surge
 import SwiftDate
 import UserNotifications
+
+typealias FilePath = Path
+func p(_ string: String) -> FilePath? {
+    FilePath(string)
+}
 
 @inline(__always) func isGeneric(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG

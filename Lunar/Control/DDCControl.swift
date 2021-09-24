@@ -46,6 +46,7 @@ class DDCControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
         return display.hasI2C || display.isForTesting
     }

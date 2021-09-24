@@ -718,10 +718,15 @@ class DisplayController {
         return propScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
-    static func getDisplays(includeVirtual: Bool = true, includeAirplay: Bool = false) -> [CGDirectDisplayID: Display] {
+    static func getDisplays(
+        includeVirtual: Bool = true,
+        includeAirplay: Bool = false,
+        includeProjector: Bool = false
+    ) -> [CGDirectDisplayID: Display] {
         var ids = DDC.findExternalDisplays(
             includeVirtual: includeVirtual || TEST_MODE,
-            includeAirplay: includeAirplay || TEST_MODE
+            includeAirplay: includeAirplay || TEST_MODE,
+            includeProjector: includeProjector || TEST_MODE
         )
         if let builtinDisplayID = SyncMode.builtinDisplay {
             ids.append(builtinDisplayID)
@@ -919,14 +924,15 @@ class DisplayController {
         adaptBrightness(force: true)
     }
 
-    func resetDisplayList(advancedSettings: Bool = false) {
+    func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false) {
         asyncNow {
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
                 DDC.reset()
                 self.displays = DisplayController.getDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
-                    includeAirplay: CachedDefaults[.showAirplayDisplays]
+                    includeAirplay: CachedDefaults[.showAirplayDisplays],
+                    includeProjector: CachedDefaults[.showProjectorDisplays]
                 )
 
                 SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
@@ -936,7 +942,11 @@ class DisplayController {
 
             mainThread {
                 appDelegate!.recreateWindow()
-                if advancedSettings { appDelegate!.showAdvancedSettings() }
+                if advancedSettings {
+                    appDelegate!.showAdvancedSettings()
+                } else if configurationPage {
+                    appDelegate!.showConfigurationPage()
+                }
             }
             NotificationCenter.default.post(name: displayListChanged, object: nil)
         }

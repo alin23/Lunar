@@ -269,7 +269,11 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(includeVirtual: false, includeAirplay: false)
+            displayController.displays = DisplayController.getDisplays(
+                includeVirtual: false,
+                includeAirplay: false,
+                includeProjector: false
+            )
             let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
 
@@ -351,7 +355,11 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(includeVirtual: false, includeAirplay: false)
+            displayController.displays = DisplayController.getDisplays(
+                includeVirtual: false,
+                includeAirplay: false,
+                includeProjector: false
+            )
             let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
 
@@ -439,7 +447,11 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(includeVirtual: false, includeAirplay: false)
+            displayController.displays = DisplayController.getDisplays(
+                includeVirtual: false,
+                includeAirplay: false,
+                includeProjector: false
+            )
             var displays = displayController.activeDisplays.values.map { $0 }
             if display != "all" {
                 guard let display = getDisplay(displays: displays, filter: display) else {
@@ -640,6 +652,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "If Airplay displays (e.g. iPad Sidecar, AirPlay) should be included.")
         var airplay = false
 
+        @Flag(help: "If projectors should be included.")
+        var projector = false
+
         @Flag(name: .shortAndLong, help: "Include EDID in the output.")
         var edid = false
 
@@ -669,7 +684,11 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(includeVirtual: virtual || all, includeAirplay: airplay || all)
+            displayController.displays = DisplayController.getDisplays(
+                includeVirtual: virtual || all,
+                includeAirplay: airplay || all,
+                includeProjector: projector || all
+            )
 
             let displays = (all ? displayController.displays : displayController.activeDisplays).sorted(by: { d1, d2 in
                 d1.key <= d2.key
@@ -685,7 +704,9 @@ struct Lunar: ParsableCommand {
                         value: value,
                         json: json,
                         controls: controls,
-                        read: read
+                        read: read,
+                        systemInfo: systemInfo,
+                        edid: edid
                     )
                 }
                 globalExit(0)
@@ -707,7 +728,7 @@ struct Lunar: ParsableCommand {
                     )
                 } else {
                     print("\(i): \(display.name)")
-                    try printDisplay(display, prefix: "\t", systemInfo: systemInfo, edid: edid)
+                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, edid: edid)
                     print("")
                 }
             }
@@ -745,7 +766,8 @@ struct Lunar: ParsableCommand {
 
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
-                includeAirplay: CachedDefaults[.showAirplayDisplays]
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -796,7 +818,8 @@ struct Lunar: ParsableCommand {
 
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
-                includeAirplay: CachedDefaults[.showAirplayDisplays]
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -861,7 +884,8 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
-                includeAirplay: CachedDefaults[.showAirplayDisplays]
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -1080,7 +1104,9 @@ private func handleDisplay(
     value: String? = nil,
     json: Bool = false,
     controls: [DisplayControl] = [.coreDisplay, .ddc, .network, .gamma],
-    read: Bool = false
+    read: Bool = false,
+    systemInfo: Bool = false,
+    edid: Bool = false
 ) throws {
     // MARK: - Apply display filter to get single display
 
@@ -1089,7 +1115,7 @@ private func handleDisplay(
     }
 
     guard let property = property else {
-        try printDisplay(display, json: json)
+        try printDisplay(display, json: json, systemInfo: systemInfo, edid: edid)
         return
     }
 

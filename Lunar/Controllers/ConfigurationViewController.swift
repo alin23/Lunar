@@ -88,6 +88,13 @@ class ConfigurationViewController: NSViewController {
     """
     let SCHEDULE_TRANSITION_TOOLTIP = """
     ## Description
+
+    1. `None`: the brightness and contrast are applied at the exact time of the schedule
+    1. `30 minutes`: the brightness and contrast start transitioning 30 minutes before the schedule time, from your current brightness to the schedule brightness
+        - *When the transition starts, the algorithm applies the computed values every 30 seconds so it doesn't allow for manual adjustments in the 30 minutes before the schedule*
+    1. `Full`: the brightness and contrast transition from schedule to schedule
+        - *This transition applies the computed values every 30 seconds so it doesn't allow for manual adjustments*
+
     """
 
     @IBOutlet var _helpButton1: NSButton?
