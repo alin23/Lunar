@@ -745,7 +745,7 @@ class DisplayViewController: NSViewController {
         display.onControlChange?(control)
 
         if !(display.enabledControls[.gamma] ?? false),
-           display.applyGamma || display.gammaChanged || display.isVirtual || display.isAirPlay
+           display.applyGamma || display.gammaChanged || !display.supportsGamma
         {
             display.resetSoftwareControl()
         }

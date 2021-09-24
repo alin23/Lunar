@@ -210,7 +210,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 currentPage = Page.settings.rawValue
                 uiElement = .advancedSettingsButton
                 showWindow(after: windowController == nil ? 2000 : nil)
-            case "settings":
+            case "settings", "configuration":
                 currentPage = Page.settings.rawValue
                 showWindow(after: windowController == nil ? 2000 : nil)
             case "hotkeys":

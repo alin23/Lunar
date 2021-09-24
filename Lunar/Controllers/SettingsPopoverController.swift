@@ -361,7 +361,7 @@ class SettingsPopoverController: NSViewController {
         display.control = control
         display.onControlChange?(control)
 
-        if !gammaEnabled, display.applyGamma || display.gammaChanged || display.isVirtual || display.isAirPlay {
+        if !gammaEnabled, display.applyGamma || display.gammaChanged || !display.supportsGamma {
             display.resetSoftwareControl()
         }
         setupApplyGammaCheckbox()
@@ -382,7 +382,7 @@ class SettingsPopoverController: NSViewController {
     func setupApplyGammaCheckbox() {
         mainAsyncAfter(ms: 10) { [weak self] in
             guard let self = self, let display = self.display else { return }
-            if display.isVirtual || display.isAirPlay {
+            if !display.supportsGamma {
                 self.applyGammaCheckbox.state = .off
                 self.applyGammaCheckbox.isEnabled = false
                 self.applyGammaCheckbox.toolTip = "Gamma can't be adjusted on virtual, Sidecar or AirPlay displays"

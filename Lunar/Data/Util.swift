@@ -16,6 +16,10 @@ func p(_ string: String) -> FilePath? {
     FilePath(string)
 }
 
+func displayIsInMirrorSet(_ id: CGDirectDisplayID) -> Bool {
+    CGDisplayIsInMirrorSet(id) != 0
+}
+
 @inline(__always) func isGeneric(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
         return id == GENERIC_DISPLAY_ID || id == TEST_DISPLAY_ID
@@ -581,19 +585,21 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 
     let task: DispatchWorkItem
     if let key = uniqueTaskKey {
-        taskQueueLock.around { taskQueue[key] = mainThread ? mainQueue : timerQueue }
+        let queue = mainThread ? mainQueue : timerQueue
+        taskQueueLock.around { taskQueue[key] = queue }
         task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
             guard !isCancelled(key) else {
-                timerQueue.async { Thread.current.threadDictionary[key] = nil }
+                queue.async { Thread.current.threadDictionary[key] = nil }
                 return
             }
             action()
 
-            timerQueue.async { Thread.current.threadDictionary[key] = nil }
+            queue.async { Thread.current.threadDictionary[key] = nil }
         }
 
-        timerQueue.async {
+        sync(queue: queue) {
             (Thread.current.threadDictionary[key] as? DispatchWorkItem)?.cancel()
+            Thread.current.threadDictionary["\(key)-cancelled"] = false
             Thread.current.threadDictionary[key] = task
         }
     } else {
@@ -776,8 +782,19 @@ var globalObservers: [String: AnyCancellable] = Dictionary(minimumCapacity: 100)
 var taskQueue: [String: RunloopQueue] = Dictionary(minimumCapacity: 100)
 let taskQueueLock = NSRecursiveLock()
 
+func sync<T>(queue: RunloopQueue, _ action: @escaping () -> T) -> T {
+    if let q = DispatchQueue.current, queue == q {
+        return action()
+    } else {
+        return queue.sync { action() }
+    }
+}
+
 func isCancelled(_ key: String) -> Bool {
-    Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
+    guard let queue = taskQueueLock.around({ taskQueue[key] }) else { return false }
+    return sync(queue: queue) {
+        Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
+    }
 }
 
 func debounce(
@@ -810,7 +827,8 @@ func debounce<T: Equatable>(
     subscriberKey: String? = nil,
     _ action: @escaping (T) -> Void
 ) {
-    taskQueueLock.around { taskQueue[uniqueTaskKey] = mainThread ? mainQueue : queue }
+    let queue = mainThread ? mainQueue : queue
+    taskQueueLock.around { taskQueue[uniqueTaskKey] = queue }
     queue.async {
         Thread.current.threadDictionary["\(uniqueTaskKey)-cancelled"] = false
         if Thread.current.threadDictionary[uniqueTaskKey] == nil || replace {

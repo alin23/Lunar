@@ -83,7 +83,7 @@ class GammaControl: Control {
             """,
             okButton: "Yes",
             cancelButton: "No",
-            screen: display.screen,
+            screen: display.screen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",
             onSuppression: { shouldStopAsking in
@@ -128,7 +128,7 @@ class GammaControl: Control {
 
         let brightness = cap(brightness, minVal: 0, maxVal: 100)
 
-        guard !display.isVirtual, !display.isAirPlay else {
+        guard display.supportsGamma else {
             display.shade(amount: 1.0 - (brightness.d / 100.0))
             return true
         }
@@ -150,7 +150,7 @@ class GammaControl: Control {
 
         let contrast = cap(contrast, minVal: 0, maxVal: 100)
 
-        guard !display.isVirtual, !display.isAirPlay else {
+        guard display.supportsGamma else {
             return true
         }
 
