@@ -579,6 +579,7 @@ class NetworkControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard display.active else { return false }
         if display.isForTesting, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay {
             return true
         }

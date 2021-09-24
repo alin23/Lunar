@@ -115,17 +115,17 @@ class DisplayValuesView: NSTableView {
     }
 
     func addRow(_ rowView: NSTableRowView, forRow row: Int) {
-        guard let scrollableBrightness = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-              let display = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? Display,
-              let inputDropdown = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                  where: { v in (v as? PopUpButton) != nil }
-              ) as? PopUpButton,
-              let notConnectedTextField = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                  where: { v in (v as? NotConnectedTextField) != nil }
-              ) as? NotConnectedTextField,
-              let scrollableContrast = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
+        guard let col1 = rowView.view(atColumn: 0) as? NSTableCellView,
+              let col2 = rowView.view(atColumn: 1) as? NSTableCellView,
+              let col3 = rowView.view(atColumn: 2) as? NSTableCellView,
+              let scrollableBrightness = col1.subviews[0] as? ScrollableTextField,
+              let display = col2.objectValue as? Display,
+              let inputDropdown = col2.subviews.first(where: { v in (v as? PopUpButton) != nil }) as? PopUpButton,
+              let notConnectedTextField = col2.subviews
+              .first(where: { v in (v as? NotConnectedTextField) != nil }) as? NotConnectedTextField,
+              let scrollableContrast = col3.subviews[0] as? ScrollableTextField,
               let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
-              let scrollableContrastCaption = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption
+              let scrollableContrastCaption = col3.subviews[1] as? ScrollableTextFieldCaption
         else { return }
 
         let id = display.id

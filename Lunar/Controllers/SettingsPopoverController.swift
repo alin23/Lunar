@@ -227,7 +227,7 @@ class SettingsPopoverController: NSViewController {
             guard applySettings, let display = display else { return }
             display.applyGamma = applyGamma
             if !(display.control is GammaControl), display.applyGamma || display.gammaChanged {
-                display.resetGamma()
+                display.resetSoftwareControl()
             }
             if !display.applyGamma {
                 display.gammaChanged = false
@@ -239,9 +239,6 @@ class SettingsPopoverController: NSViewController {
     @objc dynamic var adaptive = true {
         didSet {
             guard applySettings, let display = display else { return }
-//            if adaptive {
-//                display.adaptivePaused = false
-//            }
             display.adaptive = adaptive
             display.save()
         }
@@ -270,7 +267,6 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -281,7 +277,6 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -292,7 +287,6 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -303,7 +297,6 @@ class SettingsPopoverController: NSViewController {
             display.save()
 
             resetControl()
-            // ensureAtLeastOneControlEnabled()
         }
     }
 
@@ -368,57 +361,35 @@ class SettingsPopoverController: NSViewController {
         display.control = control
         display.onControlChange?(control)
 
-        if !gammaEnabled, display.applyGamma || display.gammaChanged {
-            display.resetGamma()
+        if !gammaEnabled, display.applyGamma || display.gammaChanged || display.isVirtual || display.isAirPlay {
+            display.resetSoftwareControl()
         }
         setupApplyGammaCheckbox()
+
+        display.withForce {
+            #if DEBUG
+                log.debug("Setting brightness to \(display.brightness) for \(display)")
+            #endif
+            display.brightness = display.brightness.uint8Value.ns
+
+            #if DEBUG
+                log.debug("Setting contrast to \(display.contrast) for \(display)")
+            #endif
+            display.contrast = display.contrast.uint8Value.ns
+        }
     }
 
     func setupApplyGammaCheckbox() {
         mainAsyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
-            // if self.display?.control is GammaControl {
-            //     self.applyGammaCheckbox.state = .on
-            //     self.applyGammaCheckbox.isEnabled = false
-            //     self.applyGammaCheckbox.toolTip = "Always enabled when Software Controls is used."
-            // } else {
-            self.applyGammaCheckbox.state = self.applyGamma.state
-            self.applyGammaCheckbox.isEnabled = true
-            self.applyGammaCheckbox.toolTip = nil
-            // }
-        }
-    }
-
-    func ensureAtLeastOneControlEnabled() {
-        guard let display = display else { return }
-        if display.enabledControls.values.filter({ enabled in enabled }).count <= 1 {
-            if let checkbox = lastEnabledCheckbox {
-                mainThread {
-                    checkbox.isEnabled = false
-                    checkbox.needsDisplay = true
-                }
+            guard let self = self, let display = self.display else { return }
+            if display.isVirtual || display.isAirPlay {
+                self.applyGammaCheckbox.state = .off
+                self.applyGammaCheckbox.isEnabled = false
+                self.applyGammaCheckbox.toolTip = "Gamma can't be adjusted on virtual, Sidecar or AirPlay displays"
             } else {
-                applySettings = false
-                gammaEnabled = true
-                display.enabledControls[.gamma] = gammaEnabled
-                applySettings = true
-
-                mainThread {
-                    gammaControlCheckbox.isEnabled = false
-                    gammaControlCheckbox.needsDisplay = true
-                }
-            }
-        } else {
-            mainThread {
-                networkControlCheckbox.isEnabled = true
-                coreDisplayControlCheckbox.isEnabled = true
-                ddcControlCheckbox.isEnabled = true
-                gammaControlCheckbox.isEnabled = true
-
-                networkControlCheckbox.needsDisplay = true
-                coreDisplayControlCheckbox.needsDisplay = true
-                ddcControlCheckbox.needsDisplay = true
-                gammaControlCheckbox.needsDisplay = true
+                self.applyGammaCheckbox.state = self.applyGamma.state
+                self.applyGammaCheckbox.isEnabled = true
+                self.applyGammaCheckbox.toolTip = nil
             }
         }
     }

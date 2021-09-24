@@ -56,7 +56,23 @@ class PageController: NSPageController {
         delegate = self
 
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
-        if !displayController.activeDisplays.isEmpty {
+        if CachedDefaults[.showDisconnectedDisplays], !displayController.displays.isEmpty {
+            let builtinActiveDisplays: [Any] = displayController.builtinActiveDisplays
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let externalActiveDisplays: [Any] = displayController.externalActiveDisplays
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let builtinDisconnectedDisplays: [Any] = displayController.builtinDisplays
+                .filter { !$0.active }
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            let externalDisconnectedDisplays: [Any] = displayController.externalDisplays
+                .filter { !$0.active }
+                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            arrangedObjects
+                .append(
+                    contentsOf: externalActiveDisplays + builtinActiveDisplays + externalDisconnectedDisplays +
+                        builtinDisconnectedDisplays
+                )
+        } else if !displayController.activeDisplays.isEmpty {
             let builtinDisplays: [Any] = displayController.builtinActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
             let externalDisplays: [Any] = displayController.externalActiveDisplays

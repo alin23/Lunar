@@ -311,7 +311,7 @@ enum ValueType {
 
 // MARK: - Display
 
-@objc class Display: NSObject, Codable, Defaults.Serializable {
+@objc class Display: NSObject, Codable, Defaults.Serializable, ObservableObject {
     // MARK: Lifecycle
 
     // MARK: Initializers
@@ -980,6 +980,10 @@ enum ValueType {
     var gammaWindowController: NSWindowController?
     var shadeWindowController: NSWindowController?
     var faceLightWindowController: NSWindowController?
+
+    var isVirtual: Bool { DDC.isVirtualDisplay(id, name: edidName) }
+    var isAirPlay: Bool { DDC.isAirplayDisplay(id, name: edidName) }
+    var isProjector: Bool { DDC.isProjectorDisplay(id, name: edidName) }
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
@@ -1905,6 +1909,43 @@ enum ValueType {
         }
     }
 
+    func shade(amount: Double) {
+        mainThread {
+            if shadeWindowController?.window == nil {
+                createWindow(
+                    "shadeWindowController",
+                    controller: &shadeWindowController,
+                    screen: screen,
+                    show: true,
+                    backgroundColor: .clear,
+                    level: .screenSaver,
+                    fillScreen: true,
+                    stationary: true
+                )
+
+                if let w = shadeWindowController?.window {
+                    w.ignoresMouseEvents = true
+                    w.contentView?.wantsLayer = true
+
+                    w.contentView?.alphaValue = 0.0
+                    w.contentView?.bg = NSColor.black
+                    w.contentView?.setNeedsDisplay(w.frame)
+                }
+            }
+            guard let w = shadeWindowController?.window else { return }
+
+            w.contentView?.transition(brightnessTransition == .slow ? 2.0 : 0.6)
+            w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 0.98)
+        }
+    }
+
+    func resetSoftwareControl() {
+        guard active else { return }
+        resetGamma()
+        shadeWindowController?.close()
+        shadeWindowController = nil
+    }
+
     func reconfigure(_ action: (MPDisplay) -> Void) {
         guard let panel = panel, let manager = DisplayController.panelManager,
               manager.tryLockAccess()
@@ -1926,7 +1967,7 @@ enum ValueType {
         if control is GammaControl {
             setGamma()
         } else if applyGamma, !blackOutEnabled {
-            resetGamma()
+            resetSoftwareControl()
         }
     }
 
@@ -1989,6 +2030,7 @@ enum ValueType {
 
     func getContext() -> [String: Any] {
         [
+            "connected": active,
             "name": name,
             "id": id,
             "serial": serial,
@@ -2015,21 +2057,21 @@ enum ValueType {
 
         if coreDisplayControl.isAvailable() {
             if applyGamma || gammaChanged {
-                if !blackOutEnabled { resetGamma() }
+                if !blackOutEnabled { resetSoftwareControl() }
                 coreDisplayControl.reapply()
             }
             return coreDisplayControl
         }
         if ddcControl.isAvailable() {
             if applyGamma || gammaChanged {
-                if !blackOutEnabled { resetGamma() }
+                if !blackOutEnabled { resetSoftwareControl() }
                 ddcControl.reapply()
             }
             return ddcControl
         }
         if networkControl.isAvailable() {
             if applyGamma || gammaChanged {
-                if !blackOutEnabled { resetGamma() }
+                if !blackOutEnabled { resetSoftwareControl() }
                 networkControl.reapply()
             }
             return networkControl
@@ -2180,7 +2222,7 @@ enum ValueType {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
-            hasI2C = false
+            mainThread { hasI2C = false }
             return
         }
         if panel?.isTV ?? false {
@@ -2836,7 +2878,6 @@ enum ValueType {
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, contrast: contrast)
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
-        let id = self.id
 
         if let oldBrightness = oldBrightness {
             asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
