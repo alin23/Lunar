@@ -174,7 +174,9 @@ class NetworkControl: Control {
     static func shouldPromptForNetworkControl(_ display: Display) -> Bool {
         guard !display.neverUseNetworkControl else { return false }
 
-        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen, !screen.visibleFrame.isEmpty {
+        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen ?? display.primaryMirrorScreen,
+           !screen.visibleFrame.isEmpty
+        {
             return true
         }
 

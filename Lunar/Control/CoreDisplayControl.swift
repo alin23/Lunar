@@ -166,28 +166,26 @@ class CoreDisplayControl: Control {
            oldValue != brightness
         {
             display.inSmoothTransition = true
-            var faults = 0
             let step = brightness > oldValue ? 0.002 : -0.002
             let prevBrightness = oldValue.d / 100.0
             let nextBrightness = brightness.d / 100.0
-            let interval = (brightnessTransition == .smooth ? 0.01 : 0.05)
+            let interval = (brightnessTransition == .smooth ? 0.004 : 0.025)
 
             asyncNow(barrier: true) { [weak self] in
-                guard let self = self, let display = self.display, faults <= 5 else {
+                guard let self = self, let display = self.display else {
                     return
                 }
+                display.inSmoothTransition = true
 
                 for brightness in stride(from: prevBrightness, through: nextBrightness, by: step) {
                     log.debug("Writing brightness using \(self) to \(display)")
-                    if !self.writeBrightness(0, preciseBrightness: brightness) {
-                        faults += 1
-                    }
+                    _ = self.writeBrightness(0, preciseBrightness: brightness)
                     Thread.sleep(forTimeInterval: interval)
                 }
                 display.inSmoothTransition = false
             }
 
-            return faults > 5
+            return true
         }
 
         return writeBrightness(brightness)

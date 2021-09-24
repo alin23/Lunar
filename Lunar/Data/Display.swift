@@ -488,8 +488,7 @@ enum ValueType {
 
         super.init()
 
-        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) &&
-            (CGDisplayIsInMirrorSet(id) != 0)
+        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && displayIsInMirrorSet(id)
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
             brightnessBeforeBlackout = value
         }
@@ -899,18 +898,54 @@ enum ValueType {
 
     var observers: Set<AnyCancellable> = []
 
+    lazy var primaryMirrorScreen: NSScreen? = {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self, !self.isForTesting, self.isInMirrorSet,
+                      let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(self.id) == $0 })
+                else { return }
+                self.primaryMirrorScreen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+            }
+            .store(in: &observers)
+
+        guard !isForTesting, self.isInMirrorSet,
+              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+    }()
+
+    lazy var secondaryMirrorScreen: NSScreen? = {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self, !self.isForTesting, self.isInMirrorSet,
+                      let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == self.id })
+                else { return }
+                self.secondaryMirrorScreen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+            }
+            .store(in: &observers)
+
+        guard !isForTesting, self.isInMirrorSet,
+              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+    }()
+
     lazy var screen: NSScreen? = {
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) }) ?? NSScreen.onlyExternalScreen
+                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) })
             }
             .store(in: &observers)
 
         guard !isForTesting else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) }) ?? NSScreen.onlyExternalScreen
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
     }()
 
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
@@ -958,8 +993,12 @@ enum ValueType {
 
     @Atomic var settingGamma: Bool = false
 
-    lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: name)
-    lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: name)
+    lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: edidName)
+    lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: edidName)
+    lazy var isVirtual: Bool = DDC.isVirtualDisplay(id, name: edidName)
+    lazy var isProjector: Bool = DDC.isProjectorDisplay(id, name: edidName)
+
+    lazy var supportsGamma: Bool = !isSidecar && !isAirplay && !isVirtual
 
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
         let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
@@ -980,10 +1019,6 @@ enum ValueType {
     var gammaWindowController: NSWindowController?
     var shadeWindowController: NSWindowController?
     var faceLightWindowController: NSWindowController?
-
-    var isVirtual: Bool { DDC.isVirtualDisplay(id, name: edidName) }
-    var isAirPlay: Bool { DDC.isAirplayDisplay(id, name: edidName) }
-    var isProjector: Bool { DDC.isProjectorDisplay(id, name: edidName) }
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
@@ -1910,6 +1945,12 @@ enum ValueType {
     }
 
     func shade(amount: Double) {
+        guard !isInMirrorSet, let screen = screen else {
+            shadeWindowController?.close()
+            shadeWindowController = nil
+            return
+        }
+
         mainThread {
             if shadeWindowController?.window == nil {
                 createWindow(
@@ -1933,7 +1974,8 @@ enum ValueType {
                 }
             }
             guard let w = shadeWindowController?.window else { return }
-
+            w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
+            w.setFrame(screen.frame, display: false)
             w.contentView?.transition(brightnessTransition == .slow ? 2.0 : 0.6)
             w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 0.98)
         }
@@ -2279,6 +2321,7 @@ enum ValueType {
     }
 
     func redraw() {
+        guard let screen = screen ?? primaryMirrorScreen else { return }
         mainThread {
             createWindow(
                 "gammaWindowController",

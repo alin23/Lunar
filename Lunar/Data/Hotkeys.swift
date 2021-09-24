@@ -750,7 +750,7 @@ enum Hotkey {
     }
 
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display, locked: Bool = false) {
-        guard let manager = OSDManager.sharedManager() as? OSDManager else {
+        guard !display.blackOutEnabled, let manager = OSDManager.sharedManager() as? OSDManager else {
             log.warning("No OSDManager available")
             return
         }
