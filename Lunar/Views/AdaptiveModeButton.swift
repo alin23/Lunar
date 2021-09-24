@@ -119,7 +119,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
                 }
             case .sync:
                 if lunarProActive {
-                    menuItem.toolTip = "Disabled because no display with a built-in light sensor was found"
+                    menuItem.toolTip = "Disabled because no source display was found"
                 } else {
                     menuItem.toolTip = "Disabled because Lunar Pro is not activated."
                 }

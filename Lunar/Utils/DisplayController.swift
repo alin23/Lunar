@@ -211,9 +211,11 @@ class DisplayController {
     }
 
     static func autoMode() -> AdaptiveMode {
-        if let mode = SensorMode.shared.ifAvailable() {
+        if let mode = SensorMode.specific.ifExternalSensorAvailable() {
             return mode
         } else if let mode = SyncMode.shared.ifAvailable() {
+            return mode
+        } else if let mode = SensorMode.specific.ifInternalSensorAvailable() {
             return mode
         } else if let mode = LocationMode.shared.ifAvailable() {
             return mode
@@ -1016,7 +1018,7 @@ class DisplayController {
                         okButton: "Yes",
                         cancelButton: "Not now",
                         thirdButton: "No, never ask again",
-                        screen: display.screen,
+                        screen: display.screen ?? display.primaryMirrorScreen,
                         window: window,
                         suppressionText: "Always fallback to software controls for this display when needed",
                         onSuppression: { fallback in

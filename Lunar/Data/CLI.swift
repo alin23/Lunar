@@ -211,7 +211,7 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            print(SyncMode.getLux() ?? -1)
+            print(SensorMode.getLux() ?? -1)
             globalExit(0)
         }
     }
