@@ -486,6 +486,13 @@ enum DDC {
         if let panel = DisplayController.panel(with: id), panel.isProjector {
             return true
         }
+
+        if checkName {
+            let realName = (name ?? Display.printableName(id)).lowercased()
+            return realName.contains("crestron") || realName.contains("optoma") || realName.contains("epson") || realName
+                .contains("projector")
+        }
+
         return false
     }
 

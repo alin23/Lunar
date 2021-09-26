@@ -266,7 +266,8 @@ class SettingsPopoverController: NSViewController {
             display.enabledControls[.network] = networkEnabled
             display.save()
 
-            resetControl()
+            display.resetNetworkController()
+            // resetControl()
         }
     }
 
@@ -286,7 +287,8 @@ class SettingsPopoverController: NSViewController {
             display.enabledControls[.ddc] = ddcEnabled
             display.save()
 
-            resetControl()
+            display.resetDDC()
+            // resetControl()
         }
     }
 
