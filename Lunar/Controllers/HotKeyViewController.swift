@@ -188,7 +188,7 @@ class HotkeyViewController: NSViewController {
     }
 
     @IBAction func howDoHotkeysWork(_: Any) {
-        NSWorkspace.shared.open(try! "https://lunar.fyi/faq#hotkeys".asURL())
+        NSWorkspace.shared.open("https://lunar.fyi/faq#hotkeys".asURL()!)
     }
 
     override func viewDidLoad() {

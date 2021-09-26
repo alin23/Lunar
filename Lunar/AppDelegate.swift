@@ -6,7 +6,6 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
-import Alamofire
 import Atomics
 import Carbon.HIToolbox
 import Cocoa
@@ -32,7 +31,7 @@ let simplyCA = SimplyCoreAudio()
 var screensSleeping = ManagedAtomic<Bool>(false)
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
-let CONTACT_URL = try! "https://lunar.fyi/contact".asURL()
+let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -99,7 +98,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
-    var alamoFireManager = buildAlamofireSession(requestTimeout: 24.hours, resourceTimeout: 7.days)
 
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
@@ -143,9 +141,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var didBecomeActiveAtLeastOnce = false
     var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
-    var currentPage: Int = 2
-
     var brightnessIcon = "brightness"
+
+    var currentPage: Int = Page.display.rawValue {
+        didSet {
+            log.verbose("Current Page: \(currentPage)")
+        }
+    }
 
     var sliderPercentage: Float = 40 {
         didSet {
@@ -600,8 +602,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         colorSchemePublisher
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [self] _ in
-                recreateWindow()
-                showAdvancedSettings(highlight: false)
+                CachedDefaults[.advancedSettingsShown] = true
+                recreateWindow(page: Page.settings.rawValue, advancedSettings: true)
             }.store(in: &observers)
     }
 
@@ -822,7 +824,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         uiElement = nil
     }
 
-    func recreateWindow() {
+    func recreateWindow(page: Int? = nil, advancedSettings: Bool? = nil) {
         if windowController?.window != nil {
             let window = windowController!.window!
             let shouldShow = window.isVisible
@@ -830,6 +832,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             windowController?.close()
             windowController?.window = nil
             windowController = nil
+            if let page = page {
+                currentPage = page
+            }
+            if let advancedSettings = advancedSettings {
+                CachedDefaults[.advancedSettingsShown] = advancedSettings
+            }
             if shouldShow {
                 showWindow(position: lastPosition)
             }

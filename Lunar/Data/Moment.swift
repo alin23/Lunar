@@ -189,19 +189,21 @@ class Moment: NSObject {
         )
     }
 
-    func offset(_ key: ScheduleType, with schedule: BrightnessSchedule) -> DateInRegion {
-        var momentWithOffset: DateInRegion
-
+    func moment(_ key: ScheduleType) -> DateInRegion {
         switch key {
         case .sunrise:
-            momentWithOffset = sunrise
+            return sunrise
         case .sunset:
-            momentWithOffset = sunset
+            return sunset
         case .noon:
-            momentWithOffset = solarNoon
+            return solarNoon
         default:
-            momentWithOffset = sunrise
+            return sunrise
         }
+    }
+
+    func offset(_ key: ScheduleType, with schedule: BrightnessSchedule) -> DateInRegion {
+        var momentWithOffset: DateInRegion = moment(key)
 
         if schedule.negative {
             momentWithOffset = momentWithOffset - [.hour: schedule.hour.i, .minute: schedule.minute.i]
