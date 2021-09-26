@@ -2297,7 +2297,7 @@ enum ValueType {
 
     func startI2CDetection() {
         let taskKey = "i2c-detector-\(serial)"
-        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15) { [weak self] _ in
+        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15, eager: true) { [weak self] _ in
             guard let self = self else { return }
             self.detectI2C()
             if self.hasI2C {
@@ -2344,6 +2344,64 @@ enum ValueType {
             guard let w = gammaWindowController?.window,
                   let c = w.contentViewController as? GammaViewController else { return }
             c.hide()
+        }
+    }
+
+    func resetControl() {
+        control = getBestControl()
+        if let control = control, let onControlChange = onControlChange {
+            onControlChange(control)
+        }
+
+        if !(enabledControls[.gamma] ?? false),
+           applyGamma || gammaChanged || !supportsGamma
+        {
+            resetSoftwareControl()
+        }
+    }
+
+    func resetDDC() {
+        detectI2C()
+        let key = "resetDDCTask"
+        let subscriberKey = "\(key)-\(serial)"
+        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
+            guard let self = self else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
+            if self.control is DDCControl {
+                self.control?.resetState()
+            } else {
+                DDCControl(display: self).resetState()
+            }
+
+            self.resetControl()
+
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 3, skipIfExists: true) { _ in
+                displayController.adaptBrightness(force: true)
+            }
+        }
+    }
+
+    func resetNetworkController() {
+        let key = "resetNetworkControlTask"
+        let subscriberKey = "\(key)-\(serial)"
+        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
+            guard let self = self else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
+            if self.control is NetworkControl {
+                self.control?.resetState()
+            } else {
+                NetworkControl.resetState(serial: self.serial)
+            }
+
+            self.resetControl()
+
+            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
+                displayController.adaptBrightness(force: true)
+            }
         }
     }
 
