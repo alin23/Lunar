@@ -738,61 +738,14 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func resetControl() {
-        guard let display = display else { return }
-        let control = display.getBestControl()
-        display.control = control
-        display.onControlChange?(control)
-
-        if !(display.enabledControls[.gamma] ?? false),
-           display.applyGamma || display.gammaChanged || !display.supportsGamma
-        {
-            display.resetSoftwareControl()
-        }
-    }
-
     func resetDDC() {
-        let key = "resetDDCTask"
-        let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
-        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
-            guard let self = self, let display = self.display else {
-                cancelTask(key, subscriberKey: subscriberKey)
-                return
-            }
-            if display.control is DDCControl {
-                display.control?.resetState()
-            } else {
-                DDCControl(display: display).resetState()
-            }
-
-            self.resetControl()
-
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
-                displayController.adaptBrightness(force: true)
-            }
-        }
+        guard let display = display else { return }
+        display.resetDDC()
     }
 
     func resetNetworkController() {
-        let key = "resetNetworkControlTask"
-        let subscriberKey = "\(key)-\(view.accessibilityIdentifier())"
-        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
-            guard let self = self, let display = self.display else {
-                cancelTask(key, subscriberKey: subscriberKey)
-                return
-            }
-            if display.control is NetworkControl {
-                display.control?.resetState()
-            } else {
-                NetworkControl.resetState(serial: display.serial)
-            }
-
-            self.resetControl()
-
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
-                displayController.adaptBrightness(force: true)
-            }
-        }
+        guard let display = display else { return }
+        display.resetNetworkController()
     }
 
     @IBAction func reset(_ sender: NSPopUpButton) {
