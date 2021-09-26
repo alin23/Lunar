@@ -25,7 +25,10 @@ public:
         uint16_t ch1 = full >> 16;
         float lux = tsl.calculateLux(ch0, ch1);
 
-        if (lux > 30000) {
+        if (lux == -1) {
+            tsl.setGain(TSL2591_GAIN_LOW);
+            tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);
+        } else if (lux > 30000) {
             tsl.setGain(TSL2591_GAIN_LOW);
             tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);
         } else if (lux > 500) {
