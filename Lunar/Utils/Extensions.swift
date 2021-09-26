@@ -11,6 +11,12 @@ import Combine
 import Foundation
 import Surge
 
+public extension String {
+    func asURL() -> URL? {
+        URL(string: self)
+    }
+}
+
 // MARK: private functionality
 
 extension DispatchQueue {

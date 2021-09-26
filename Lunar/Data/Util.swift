@@ -1,10 +1,8 @@
 import Accelerate
-import Alamofire
 import Atomics
 import AXSwift
 import Cocoa
 import Combine
-import CryptorECC
 import Foundation
 import Path
 import Surge
@@ -203,7 +201,7 @@ class DispatchWorkItem {
 
 // MARK: - DispatchSemaphore
 
-class DispatchSemaphore {
+class DispatchSemaphore: CustomStringConvertible {
     // MARK: Lifecycle
 
     init(value: Int, name: String) {
@@ -215,6 +213,10 @@ class DispatchSemaphore {
 
     var name: String = ""
     var sem: Foundation.DispatchSemaphore
+
+    var description: String {
+        "<DispatchSemaphore: \(name)>"
+    }
 
     @discardableResult
     @inline(__always) func wait(for timeout: DateComponents?, context: Any? = nil) -> DispatchTimeoutResult {
@@ -248,39 +250,53 @@ class DispatchSemaphore {
     }
 }
 
-func query(url: URL, timeout: TimeInterval = 0.seconds.timeInterval, wait: Bool = true) throws -> String {
-    let semaphore = DispatchSemaphore(value: 0, name: "query \(url.absoluteString)")
+import SwiftyJSON
 
-    var result: String = ""
-    var responseError: Error?
+func queryJSON(url: URL, timeout: TimeInterval = 0, _ action: @escaping (JSON) -> Void) -> AnyCancellable {
+    query(url: url, timeout: timeout)
+        .map(\.data)
+        .catch { error -> Just<Data> in
+            log.error("Error requesting \(url.host ?? ""): \(error)")
+            return Just(Data())
+        }
+        .sink { data in
+            guard !data.isEmpty else { return }
+            let json = JSON(data)
+            guard json != JSON.null else { return }
+            action(json)
+        }
+}
 
-    let task = URLSession.shared.dataTask(with: url) { data, resp, error in
-        guard let data = data else {
-            responseError = error
-            semaphore.signal()
-            return
-        }
-        guard let response = resp as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
-            responseError = ResponseError(statusCode: (resp as? HTTPURLResponse)?.statusCode ?? 400)
-            semaphore.signal()
-            return
-        }
-        result = String(data: data, encoding: String.Encoding.utf8)!
-        semaphore.signal()
+func session(timeout: TimeInterval = 0) -> URLSession {
+    if timeout == 0 {
+        return URLSession.shared
     }
 
-    task.resume()
-    guard wait else { return "" }
+    let key = "URLSession: timeout=\(timeout)"
+    guard let session = Thread.current.threadDictionary[key] as? URLSession else {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForResource = timeout
+        let session = URLSession(configuration: config)
 
-    switch semaphore.wait(for: timeout) {
-    case .timedOut:
-        throw RequestTimeoutError()
-    case .success:
-        if let error = responseError {
-            throw error
-        }
-        return result
+        Thread.current.threadDictionary[key] = session
+        return session
     }
+    return session
+}
+
+typealias DataTaskOutput = URLSession.DataTaskPublisher.Output
+typealias DataTaskResult = Result<DataTaskOutput, Error>
+
+func query(url: URL, timeout: TimeInterval = 0) -> Publishers.TryMap<URLSession.DataTaskPublisher, DataTaskOutput> {
+    let session = session(timeout: timeout)
+
+    return session.dataTaskPublisher(for: url)
+        .tryMap { (dataTaskOutput: DataTaskOutput) -> DataTaskOutput in
+            guard let response = dataTaskOutput.response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
+                throw ResponseError(statusCode: (dataTaskOutput.response as? HTTPURLResponse)?.statusCode ?? 400)
+            }
+            return dataTaskOutput
+        }
 }
 
 func waitForResponse(
@@ -292,27 +308,42 @@ func waitForResponse(
     maxSleepBetweenTries: TimeInterval = 300
 ) -> String? {
     var sleepBetweenTries = sleepBetweenTries
-    for tryNum in 0 ... retries {
-        do {
-            let resp = try query(url: url, timeout: timeoutPerTry.timeInterval)
-            return resp
-        } catch {
-            log.debug("Could not reach URL '\(url)': \(error)", context: ["try": tryNum])
-        }
-        if sleepBetweenTries > 0 {
-            Thread.sleep(forTimeInterval: sleepBetweenTries)
-            sleepBetweenTries = min(sleepBetweenTries * backoff, maxSleepBetweenTries)
-        }
-    }
+    let semaphore = DispatchSemaphore(value: 0, name: "waitForResponse \(url.absoluteString)")
 
-    return nil
-}
+    let session = session(timeout: timeoutPerTry.timeInterval)
+    var responseString: String?
 
-func buildAlamofireSession(requestTimeout: DateComponents = 30.seconds, resourceTimeout: DateComponents = 60.seconds) -> Alamofire.Session {
-    let configuration = URLSessionConfiguration.default
-    configuration.timeoutIntervalForRequest = requestTimeout.timeInterval
-    configuration.timeoutIntervalForResource = resourceTimeout.timeInterval
-    return Alamofire.Session(configuration: configuration)
+    let request = session.dataTaskPublisher(for: url)
+        .tryMap { (dataTaskOutput: DataTaskOutput) -> DataTaskResult in
+            guard let response = dataTaskOutput.response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
+                throw ResponseError(statusCode: (dataTaskOutput.response as? HTTPURLResponse)?.statusCode ?? 400)
+            }
+            return .success(dataTaskOutput)
+        }
+        .catch { (error: Error) -> AnyPublisher<DataTaskResult, Error> in
+            defer {
+                if sleepBetweenTries > 0 {
+                    sleepBetweenTries = min(sleepBetweenTries * backoff, maxSleepBetweenTries)
+                }
+            }
+            return Fail(error: error)
+                .delay(for: RunLoop.SchedulerTimeType.Stride(sleepBetweenTries), scheduler: RunLoop.current)
+                .eraseToAnyPublisher()
+        }
+        .retry(retries.i)
+        .map { (result: DataTaskResult) -> String? in
+            guard let data = (try? result.get())?.data else { return nil }
+            return String(data: data, encoding: .utf8)
+        }
+        .replaceError(with: nil)
+        .sink { resp in
+            responseString = resp
+            semaphore.signal()
+        }
+
+    log.debug("Waiting for request on \(url.absoluteString)")
+    semaphore.wait(for: timeoutPerTry.timeInterval * retries.d)
+    return responseString
 }
 
 extension String {
@@ -427,18 +458,6 @@ func createAndShowWindow(
                 NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
             }
         }
-    }
-}
-
-func encrypt(message: Data, key: String? = nil) -> Data? {
-    do {
-        let eccPublicKey = try ECPublicKey(key: key ?? publicKey)
-        let encrypted = try message.encrypt(with: eccPublicKey)
-
-        return encrypted
-    } catch {
-        log.error("Error when encrypting message: \(error)")
-        return nil
     }
 }
 
@@ -2016,11 +2035,7 @@ func contactURL() -> URL {
         urlBuilder.queryItems?.append(URLQueryItem(name: "email", value: email))
     }
 
-    guard let url = try? urlBuilder.asURL() else {
-        return CONTACT_URL
-    }
-
-    return url
+    return urlBuilder.url ?? CONTACT_URL
 }
 
 extension NSView {

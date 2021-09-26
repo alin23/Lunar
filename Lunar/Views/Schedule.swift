@@ -62,7 +62,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
         )
     }
 
-    func getHourMinute() -> (UInt8, UInt8)? {
+    func getHourMinute(withOffset: Bool = true) -> (UInt8, UInt8)? {
         var hour: UInt8
         var minute: UInt8
 
@@ -75,9 +75,15 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
                 log.debug("Day moments aren't fetched yet")
                 return nil
             }
-            let momentWithOffset = moment.offset(type, with: self)
-            hour = momentWithOffset.hour.u8
-            minute = momentWithOffset.minute.u8
+            if withOffset {
+                let momentWithOffset = moment.offset(type, with: self)
+                hour = momentWithOffset.hour.u8
+                minute = momentWithOffset.minute.u8
+            } else {
+                let momentWithoutOffset = moment.moment(type)
+                hour = momentWithoutOffset.hour.u8
+                minute = momentWithoutOffset.minute.u8
+            }
         }
         return (hour, minute)
     }
@@ -317,6 +323,22 @@ class Schedule: NSView {
         addSubview(view)
         signButton?.page = darkMode ? .hotkeys : .display
         dropdown?.page = darkMode ? .hotkeys : .display
+        for item in dropdown.itemArray {
+            guard let type = ScheduleType(rawValue: item.tag) else { continue }
+            switch type {
+            case .noon:
+                guard let moment = LocationMode.specific.moment?.solarNoon else { continue }
+                item.title = "Noon (\(moment.toString(.time(.short))))"
+            case .sunrise:
+                guard let moment = LocationMode.specific.moment?.sunrise else { continue }
+                item.title = "Sunrise (\(moment.toString(.time(.short))))"
+            case .sunset:
+                guard let moment = LocationMode.specific.moment?.sunset else { continue }
+                item.title = "Sunset (\(moment.toString(.time(.short))))"
+            default:
+                break
+            }
+        }
         dropdown?.resizeToFitTitle()
     }
 

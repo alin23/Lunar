@@ -84,9 +84,6 @@ var lockButtonBgOffHover: NSColor {
 
 var lockButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
 
-let currentPageIndicatorTintColor = lunarYellow.withAlphaComponent(0.35)
-let pageIndicatorTintColor = mauve.withAlphaComponent(0.15)
-
 let hotkeyColor: [HoverState: [String: NSColor]] = [
     .hover: [
         "background": white.withAlphaComponent(0.4),

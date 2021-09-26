@@ -393,9 +393,9 @@ class DisplayViewController: NSViewController {
 
     @IBAction func proButtonClick(_: Any) {
         if lunarProActive, !lunarProOnTrial {
-            NSWorkspace.shared.open(try! "https://lunar.fyi/#pro".asURL())
+            NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
         } else if lunarProBadSignature {
-            NSWorkspace.shared.open(try! "https://lunar.fyi/download/latest".asURL())
+            NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
         } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
             if lunarProProduct.licenseCode != nil {
                 deactivateLicense {
