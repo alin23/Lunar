@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "Alamofire",
-        "repositoryURL": "https://github.com/Alamofire/Alamofire",
-        "state": {
-          "branch": null,
-          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
-          "version": "5.4.3"
-        }
-      },
-      {
         "package": "AnyCodable",
         "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
@@ -30,11 +21,11 @@
       },
       {
         "package": "CryptorECC",
-        "repositoryURL": "https://github.com/IBM-Swift/BlueECC.git",
+        "repositoryURL": "https://github.com/Kitura/BlueECC.git",
         "state": {
-          "branch": null,
+          "branch": "master",
           "revision": "baf6ed3fc1a622675f0041b4aff7c02dd1a93818",
-          "version": "1.2.200"
+          "version": null
         }
       },
       {
@@ -80,15 +71,6 @@
           "branch": null,
           "revision": "63d93f97ad545c8bceb125a8a36175ea705f7cf5",
           "version": "5.0.0"
-        }
-      },
-      {
-        "package": "EonilFSEvents",
-        "repositoryURL": "https://github.com/eonil/FSEvents",
-        "state": {
-          "branch": null,
-          "revision": "e6b7cdfa2754454e194a45ee6c2004d0f630fe88",
-          "version": "0.1.7"
         }
       },
       {
@@ -231,7 +213,7 @@
         "repositoryURL": "https://github.com/launchdarkly/swift-eventsource",
         "state": {
           "branch": "master",
-          "revision": "b0e979dc578e620bf9fd568e8e31985da9f34d35",
+          "revision": "cbe5b4d2f86f37aa80036cf25fc4f16ed2b05b8a",
           "version": null
         }
       },
@@ -287,15 +269,6 @@
           "branch": null,
           "revision": "5b0a1e76332a633726f9f9a00b4bbd840166bccf",
           "version": "1.2.3"
-        }
-      },
-      {
-        "package": "ZIPFoundation",
-        "repositoryURL": "https://github.com/weichsel/ZIPFoundation",
-        "state": {
-          "branch": null,
-          "revision": "cf10bbff6ac3b873e97b36b9784c79866a051a8e",
-          "version": "0.9.12"
         }
       }
     ]

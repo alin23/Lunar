@@ -12,7 +12,7 @@ import Defaults
 import Sentry
 import SwiftyMarkdown
 
-let FAQ_URL = try! "https://lunar.fyi/faq".asURL()
+let FAQ_URL = "https://lunar.fyi/faq".asURL()!
 
 // MARK: - DiagnosticsViewController
 

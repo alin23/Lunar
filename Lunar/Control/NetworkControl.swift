@@ -134,13 +134,12 @@ class NetworkControl: Control {
     struct Request: Equatable {
         var url: URL
         var controlID: ControlID
-        var timeout: TimeInterval
+        var timeout: DateComponents
         var value: UInt8
     }
 
     static var browser = CiaoBrowser()
     static var controllersForDisplay: [String: Service] = [:]
-    static let alamoFireManager = buildAlamofireSession()
     static var controllerVideoObserver: Cancellable?
     static let browserSemaphore = DispatchSemaphore(value: 1, name: "browserSemaphore")
 
@@ -327,7 +326,7 @@ class NetworkControl: Control {
     static func setDisplayPower(_ power: Bool) {
         guard !screensSleeping.load(ordering: .relaxed) else { return }
         sendToAllControllers { url in
-            _ = try? query(url: url / "display-power" / power.i, wait: false)
+            _ = waitForResponse(from: url / "display-power" / power.i)
         }
     }
 
@@ -385,17 +384,15 @@ class NetworkControl: Control {
                         self.manageSendingState(for: request.controlID, sending: false)
                     }
 
-                    do {
-                        let resp = try query(url: request.url, timeout: request.timeout)
-                        guard let display = self.display else { return }
-                        log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)`", context: display.context)
-                    } catch {
+                    guard let resp = waitForResponse(from: request.url, timeoutPerTry: request.timeout) else {
                         guard let display = self.display else { return }
                         log.error(
-                            "Error sending \(request.controlID)=\(request.value): \(error)",
-                            context: display.context?.with(["url": request.url])
+                            "Error sending \(request.controlID)=\(request.value) to \(request.url) for display \(display)"
                         )
+                        return
                     }
+                    guard let display = self.display else { return }
+                    log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)` for display \(display)")
                 }.store(in: &self.observers)
 
             self.responsiveCheckPublisher
@@ -451,7 +448,7 @@ class NetworkControl: Control {
             fullUrl = url / controlID / value
         }
 
-        requestsPublisher.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60 : 15, value: value))
+        requestsPublisher.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60.seconds : 15.seconds, value: value))
 
         return true
     }
@@ -469,13 +466,16 @@ class NetworkControl: Control {
         }
 
         var value: UInt8?
-        do {
-            let resp = try query(url: url / controlID, timeout: 1.5)
-            log.debug("Read \(controlID), received response `\(resp)`", context: ["name": display.name, "id": display.id])
-            value = UInt8(resp)
-        } catch {
-            log.error("Error reading \(controlID): \(error)", context: ["name": display.name, "id": display.id])
+        guard let resp = waitForResponse(from: url / controlID, timeoutPerTry: 1500.milliseconds) else {
+            if let display = display {
+                log.error("Error reading \(controlID) for \(display)")
+            }
+            return nil
         }
+        if let display = display {
+            log.debug("Read \(controlID), received response `\(resp)` for \(display)")
+        }
+        value = UInt8(resp)
 
         return value
     }

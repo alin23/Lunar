@@ -32,14 +32,6 @@ class PageController: NSPageController {
     let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("Configuration")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
-    override var arrangedObjects: [Any] {
-        didSet {
-            if let splitViewController = parent as? SplitViewController {
-                splitViewController.pageController = self
-            }
-        }
-    }
-
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
@@ -89,17 +81,27 @@ class PageController: NSPageController {
             arrangedObjects.append(GENERIC_DISPLAY)
         }
 
-        selectedIndex = Page.display.rawValue
+        selectedIndex = appDelegate!.currentPage
+
         if let splitViewController = parent as? SplitViewController {
             splitViewController.pageController = self
+
+            switch selectedIndex {
+            case 0:
+                splitViewController.mauveBackground()
+            case 1:
+                splitViewController.yellowBackground()
+            case arrangedObjects.count - 1:
+                splitViewController.lastPage()
+            default:
+                splitViewController.whiteBackground()
+            }
+
             splitViewController.onLeftButtonPress = { [weak self] in
                 self?.navigateBack(nil)
             }
             splitViewController.onRightButtonPress = { [weak self] in
                 self?.navigateForward(nil)
-            }
-            if arrangedObjects.count == 3 {
-                splitViewController.lastPage()
             }
         }
 

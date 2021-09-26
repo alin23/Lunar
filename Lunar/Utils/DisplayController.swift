@@ -6,7 +6,6 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
-import Alamofire
 import AXSwift
 import Cocoa
 import Combine
@@ -943,12 +942,10 @@ class DisplayController {
             }
 
             mainThread {
-                appDelegate!.recreateWindow()
-                if advancedSettings {
-                    appDelegate!.showAdvancedSettings()
-                } else if configurationPage {
-                    appDelegate!.showConfigurationPage()
-                }
+                appDelegate!.recreateWindow(
+                    page: (advancedSettings || configurationPage) ? Page.settings.rawValue : nil,
+                    advancedSettings: advancedSettings
+                )
             }
             NotificationCenter.default.post(name: displayListChanged, object: nil)
         }
