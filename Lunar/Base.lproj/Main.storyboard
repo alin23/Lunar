@@ -311,27 +311,13 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="Displays" allowsKeyEquivalentWhenHidden="YES" id="B7F-Wk-7dh">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="INI-Sl-rYJ"/>
-                                        <menuItem title="Version" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="chG-l1-mZY">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" title="Intensity" id="kCx-OE-vgT"/>
                                         <menuItem title="Preferences…" keyEquivalent="L" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showPreferencesWindowWithSender:" target="Voe-Tx-rLC" id="qbP-Ur-gqG"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Start at Login" state="on" id="HeU-1X-veM">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="em1-5W-zou"/>
-                                            </connections>
-                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" title="Intensity" id="bAa-ht-jc6"/>
                                         <menuItem title="Percentage Hotkeys" id="gUE-F7-aFP">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Percentage Hotkeys" id="Qy6-y7-1cK">
@@ -399,6 +385,7 @@
                                                             <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="pfB-1Q-olR"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem isSeparatorItem="YES" title="Intensity" id="HK6-Dd-Ltz"/>
                                                     <menuItem title="Contrast Up" keyEquivalent="" id="Y1b-7P-hbu">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES"/>
@@ -415,6 +402,7 @@
                                                             <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="qya-fy-dbz"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem isSeparatorItem="YES" title="Intensity" id="gE9-5m-kbJ"/>
                                                     <menuItem title="Volume Up" keyEquivalent="" id="Omt-Sm-w0d">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask" control="YES"/>
@@ -442,6 +430,116 @@
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Common Issues" id="c1b-5M-jrl">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Common Issues" id="IpY-qi-SzD">
+                                                <items>
+                                                    <menuItem title="Brightness/Volume/Contrast does not change?" id="qYd-Y9-8JR">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="brightnessNotChanging:" target="Voe-Tx-rLC" id="W3o-H5-ATa"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Monitor turns off or loses signal?" id="TdR-h1-C6a">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="badDDC:" target="Voe-Tx-rLC" id="3aQ-O9-CLc"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Brightness/Volume keys not working?" id="s1n-Iq-FPv">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="badKeys:" target="Voe-Tx-rLC" id="xSU-lC-Xqf"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" title="Intensity" id="tbD-HD-5Xq"/>
+                                                    <menuItem title="Contact the developer" id="PvK-rz-N7V">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="leaveFeedback:" target="Voe-Tx-rLC" id="5Bk-aL-QR2"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Join the community" id="c7m-nS-hS2">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="joinCommunity:" target="Voe-Tx-rLC" id="uRm-DS-tQZ"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Frequently Asked Questions (FAQ)" id="Zyr-2d-Kj3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="faq:" target="Voe-Tx-rLC" id="gRa-eh-2fV"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Advanced Features" id="pdj-2w-366">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Advanced Features" id="U0y-gg-pVR">
+                                                <items>
+                                                    <menuItem title="Open Lunar Diagnostics" id="rl2-Eu-7ne">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="openLunarDiagnostics:" target="Voe-Tx-rLC" id="Nfe-kN-5L9"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="JiI-T5-Pkg"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Install DDC Server on Raspberry Pi" id="BQC-o6-sh9">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="startDDCServerInstall:" target="Voe-Tx-rLC" id="dIR-X6-G3t"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Install firmware on Ambient Light Sensor" id="LJ1-YV-FIb">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="startALSFirmwareInstall:" target="Voe-Tx-rLC" id="Faw-Ml-MMt"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Install CLI integration" id="9pb-nb-BWJ">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="installCLI:" target="Voe-Tx-rLC" id="KRr-Ng-kxw"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Lunar Pro" id="aHz-QH-JWU">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Lunar Pro" id="BQW-zI-vBS">
+                                                <items>
+                                                    <menuItem title="Get Lunar Pro" id="Pzs-I0-BZq">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="getLunarPro:" target="Voe-Tx-rLC" id="R0T-n2-ofi"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Recover license" id="TWD-DH-JV7">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="recoverLicense:" target="Voe-Tx-rLC" id="Cw3-aJ-UcK"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Activate existing license" id="xUM-y5-dTw">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="activateLicense:" target="Voe-Tx-rLC" id="pYj-lg-BTf"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset trial" id="q2e-UA-fI7">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem title="Expire trial" id="ifT-LC-6Dy">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hyT-YG-TrU"/>
                                         <menuItem title="FaceLight" keyEquivalent="5" id="yNB-Oq-RZH">
                                             <attributedString key="attributedTitle"/>
@@ -451,12 +549,20 @@
                                                 <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="IDl-sw-lX8"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Turns the active monitor into a light panel" enabled="NO" indentationLevel="1" id="D0F-3o-byd">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="for video calls in dark environments" enabled="NO" indentationLevel="1" id="CTB-Nb-WGZ">
-                                            <attributedString key="attributedTitle"/>
+                                        <menuItem enabled="NO" id="D0F-3o-byd">
+                                            <string key="title">Turns the active monitor into a light panel 
+for video calls in dark environments</string>
+                                            <attributedString key="attributedTitle">
+                                                <fragment>
+                                                    <string key="content">Turns the active monitor into a light panel 
+for video calls in dark environments</string>
+                                                    <attributes>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77416183774834435" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" metaFont="systemMedium" size="10"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem title="BlackOut" keyEquivalent="6" id="yNB-Oq-RZ1">
@@ -467,120 +573,55 @@
                                                 <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="IDl-sw-lX1"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Turns off the active monitor by mirroring it" enabled="NO" indentationLevel="1" id="ER6-p6-U36">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="and setting its brightness/contrast to 0" enabled="NO" indentationLevel="1" id="eAl-H3-Qg3">
-                                            <attributedString key="attributedTitle"/>
+                                        <menuItem enabled="NO" id="eAl-H3-Qg3">
+                                            <string key="title">Turns off the active monitor by mirroring it
+and setting its brightness/contrast to 0</string>
+                                            <attributedString key="attributedTitle">
+                                                <fragment>
+                                                    <string key="content">Turns off the active monitor by mirroring it
+and setting its brightness/contrast to 0</string>
+                                                    <attributes>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77415999999999996" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" metaFont="system" size="10"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="hCM-7b-68r"/>
-                                        <menuItem title="Open Lunar Diagnostics" id="KjM-rl-EtZ">
+                                        <menuItem title="About" id="lJh-is-tIJ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="About" id="I4p-FF-kPT">
+                                                <items>
+                                                    <menuItem title="Version" enabled="NO" id="Z7J-9D-kCB">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" title="Intensity" id="UO1-f2-C9g"/>
+                                                    <menuItem title="Changelog" id="JKn-mi-rgi">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="changelog:" target="Voe-Tx-rLC" id="eWn-zl-tHP"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Other versions" id="HyR-ej-Fcq">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="releases:" target="Voe-Tx-rLC" id="Ewv-3U-4AI"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Start at Login" state="on" id="HeU-1X-veM">
+                                            <attributedString key="attributedTitle"/>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="openLunarDiagnostics:" target="Voe-Tx-rLC" id="KPi-jy-oKX"/>
-                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="NIQ-hl-nhW"/>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="em1-5W-zou"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Install DDC Server on Raspberry Pi" id="pkK-gf-P1b">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="startDDCServerInstall:" target="Voe-Tx-rLC" id="4OC-db-oJJ"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Install firmware on Ambient Light Sensor" id="Sf0-qu-Q6J">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="startALSFirmwareInstall:" target="Voe-Tx-rLC" id="Wvl-bv-Qvu"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Install CLI integration" id="UWD-Sg-HSt">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="installCLI:" target="Voe-Tx-rLC" id="OOG-az-kPf"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="DeQ-n5-ddV"/>
-                                        <menuItem title="Monitor turns off or loses signal?" id="XQp-Gz-GFr">
-                                            <attributedString key="attributedTitle">
-                                                <fragment content="Monitor turns off or loses signal?">
-                                                    <attributes>
-                                                        <font key="NSFont" metaFont="systemSemibold" size="14"/>
-                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                    </attributes>
-                                                </fragment>
-                                            </attributedString>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="badDDC:" target="Voe-Tx-rLC" id="UEt-gD-qO1"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Brightness/Volume keys not working?" id="XQp-Gz-KFr">
-                                            <attributedString key="attributedTitle">
-                                                <fragment content="Brightness/Volume keys not working?">
-                                                    <attributes>
-                                                        <font key="NSFont" metaFont="systemSemibold" size="14"/>
-                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                    </attributes>
-                                                </fragment>
-                                            </attributedString>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="badKeys:" target="Voe-Tx-rLC" id="UEt-gD-qO2"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Contact the developer" id="6xm-yP-myu">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="leaveFeedback:" target="Voe-Tx-rLC" id="CJp-p3-GzZ"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Join the community" id="Imr-CD-aeg">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="joinCommunity:" target="Voe-Tx-rLC" id="MWp-Kq-aZ0"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Frequently Asked Questions (FAQ)" id="Som-uG-Ufi">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="faq:" target="Voe-Tx-rLC" id="Uen-4g-U5h"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="GNT-HB-tbd"/>
-                                        <menuItem title="Get Lunar Pro" id="fev-Gj-SRD">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="getLunarPro:" target="Voe-Tx-rLC" id="6Ym-YK-13x"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Recover license" id="0os-cd-DNe">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="recoverLicense:" target="Voe-Tx-rLC" id="JK7-Dr-jyv"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Activate existing license" id="f5h-jV-U1l">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="activateLicense:" target="Voe-Tx-rLC" id="zD0-p5-a7Y"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Reset trial" id="v9d-uL-JbA">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="Expire trial" id="gYw-dd-G40">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="JfK-0c-iRE"/>
-                                        <menuItem title="Force update display list" id="YHO-fH-eQk">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="forceUpdateDisplayList:" target="Voe-Tx-rLC" id="fPU-mc-8El"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="Xzc-1A-RF2"/>
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -606,16 +647,15 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Lunar" customModuleProvider="target">
                     <connections>
-                        <outlet property="activateLicenseMenuItem" destination="f5h-jV-U1l" id="wMY-Ct-tBG"/>
+                        <outlet property="activateLicenseMenuItem" destination="xUM-y5-dTw" id="jhW-HM-fs1"/>
                         <outlet property="blackOutMenuItem" destination="yNB-Oq-RZ1" id="wQD-dU-hX3"/>
                         <outlet property="brightnessDownMenuItem" destination="7w6-Ut-dgH" id="57z-2k-Qyb"/>
                         <outlet property="brightnessUpMenuItem" destination="901-kH-Bky" id="Dia-9T-gdF"/>
                         <outlet property="contrastDownMenuItem" destination="FDC-pE-gF0" id="hxa-UG-1ry"/>
                         <outlet property="contrastUpMenuItem" destination="Y1b-7P-hbu" id="A9L-UN-9uN"/>
-                        <outlet property="expireTrialMenuItem" destination="gYw-dd-G40" id="UxE-tk-Cun"/>
+                        <outlet property="expireTrialMenuItem" destination="ifT-LC-6Dy" id="5TS-Uo-ksB"/>
                         <outlet property="faceLightMenuItem" destination="yNB-Oq-RZH" id="j5n-Xh-f3A"/>
-                        <outlet property="infoMenuItem" destination="B7F-Wk-7dh" id="Ygz-Xr-3e0"/>
-                        <outlet property="lunarProMenuItem" destination="fev-Gj-SRD" id="itY-CS-AJi"/>
+                        <outlet property="lunarProMenuItem" destination="Pzs-I0-BZq" id="5Mm-UT-LAB"/>
                         <outlet property="menu" destination="uQy-DD-JDr" id="Vtf-ap-8J3"/>
                         <outlet property="muteAudioMenuItem" destination="EHx-xw-fQb" id="XYl-1u-tBg"/>
                         <outlet property="percent0MenuItem" destination="vbd-AN-CIC" id="09h-Ro-4qJ"/>
@@ -624,8 +664,8 @@
                         <outlet property="percent50MenuItem" destination="D33-Eu-UFI" id="GKc-q4-JHq"/>
                         <outlet property="percent75MenuItem" destination="zDv-Iq-Rje" id="dSQ-lb-a2v"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
-                        <outlet property="resetTrialMenuItem" destination="v9d-uL-JbA" id="9bY-DS-tBe"/>
-                        <outlet property="versionMenuItem" destination="chG-l1-mZY" id="JSo-ci-RwC"/>
+                        <outlet property="resetTrialMenuItem" destination="q2e-UA-fI7" id="AGz-dj-nt7"/>
+                        <outlet property="versionMenuItem" destination="Z7J-9D-kCB" id="nVs-Yw-zGg"/>
                         <outlet property="volumeDownMenuItem" destination="8zH-Ds-rhs" id="86Z-ha-Ydz"/>
                         <outlet property="volumeUpMenuItem" destination="Omt-Sm-w0d" id="XgG-im-1c1"/>
                     </connections>
@@ -1456,7 +1496,7 @@ when dock and menubar icons are hidden</string>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7M-AW-ZKZ">
                                 <rect key="frame" x="510" y="400" width="431" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Log path: ~/Library/Caches/Lunar/swiftybeaver.log" id="Wmi-hJ-bx4">
+                                <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Log path: ~/Library/Caches/Lunar/swiftybeaver.log" id="Wmi-hJ-bx4">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -1607,6 +1647,38 @@ when dock and menubar icons are hidden</string>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Press Ctrl+0/9/8/7 for setting 0°/90°/180°/270° for the display with the cursor on it" id="1KQ-hF-FAx">
                                     <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PP2-os-CeM">
+                                <rect key="frame" x="510" y="188" width="312" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Detect DDC responsiveness" id="HAb-yw-64g">
+                                    <font key="font" size="15" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="5oJ-Sm-zPr">
+                                <rect key="frame" x="874" y="201" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="v0a-jy-aqp">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.detectResponsiveness" id="ehQ-s4-YaQ"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmS-xQ-0ER">
+                                <rect key="frame" x="510" y="170" width="360" height="26"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="Iir-6q-N4Y">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <string key="title">Shows when DDC becomes unresponsive and presents
+the choice to switch to software controls</string>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
@@ -2990,23 +3062,19 @@ when dock and menubar icons are hidden</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kAQ-3d-HnF" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="835" y="218" width="16" height="16"/>
+                                <rect key="frame" x="741" y="214" width="115" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="4">
-                                    <size key="offset" width="0.0" height="4"/>
-                                    <color key="color" red="0.19215686274509802" green="0.16470588235294117" blue="0.29803921568627451" alpha="0.50887313741721851" colorSpace="calibratedRGB"/>
-                                </shadow>
-                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAdvanced" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gND-G2-IfY">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                <buttonCell key="cell" type="inline" title="Display Settings" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gND-G2-IfY">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
-                                <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="contentTintColor" name="Caption Tertiary"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="0.40000000000000002"/>
+                                        <real key="value" value="0.80000000000000004"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="0.90000000000000002"/>
+                                        <integer key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -3065,6 +3133,40 @@ when dock and menubar icons are hidden</string>
                                     <binding destination="1Bn-Ca-ETm" name="toolTip" keyPath="self.powerOffTooltip" id="AHg-xe-L4Y"/>
                                 </connections>
                             </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MRF-Be-NAq" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="591" y="505" width="26" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <string key="toolTip">Remove this display from Lunar's settings storage.
+
+The display will reappear with default settings on reconnection.</string>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="Trash" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="HXG-bS-767">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="Power"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="0.90000000000000002"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="delete:" target="1Bn-Ca-ETm" id="Jwj-2b-Jch"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.deleteEnabled" previousBinding="mYj-l1-9ib" id="LuU-QE-u9n">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.deleteEnabled" id="mYj-l1-9ib"/>
+                                </connections>
+                            </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="421" y="209" width="103" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3102,15 +3204,18 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="ZlW-Lv-Oa8">
-                                <rect key="frame" x="779" y="188" width="122" height="21"/>
+                                <rect key="frame" x="738" y="194" width="122" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Adaptive disabled" id="taZ-lk-cLI">
                                     <font key="font" metaFont="systemSemibold" size="11"/>
                                     <color key="textColor" red="0.94884672619047616" green="0.72978899948076581" blue="0.3464379787908467" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="oHc-hs-F6O"/>
+                                </connections>
                             </textField>
-                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                            <popUpButton fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="xhP-CD-ogE" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="861" y="214" width="73" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" tag="99" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="RBL-6F-ZwG" id="9JP-sY-sMd" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
@@ -3170,6 +3275,9 @@ and contrast to their highest values</string>
                                         <real key="value" value="34"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="dotColorSecondary" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="0.0"/>
+                                    </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
@@ -4665,7 +4773,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box fixedFrame="YES" title="Input Hotkey 1" translatesAutoresizingMaskIntoConstraints="NO" id="TtZ-WU-d64">
-                                <rect key="frame" x="10" y="473" width="410" height="148"/>
+                                <rect key="frame" x="8" y="473" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="87T-n8-qsS">
                                     <rect key="frame" x="3" y="3" width="404" height="124"/>
@@ -4674,7 +4782,7 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <box fixedFrame="YES" title="Input Hotkey 2" translatesAutoresizingMaskIntoConstraints="NO" id="AUg-hB-5hT">
-                                <rect key="frame" x="10" y="297" width="410" height="148"/>
+                                <rect key="frame" x="8" y="297" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Oqw-0y-d8X">
                                     <rect key="frame" x="3" y="3" width="404" height="124"/>
@@ -4948,7 +5056,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Input Hotkey 3" translatesAutoresizingMaskIntoConstraints="NO" id="p6a-2M-XBu">
-                                <rect key="frame" x="9" y="121" width="410" height="148"/>
+                                <rect key="frame" x="7" y="121" width="410" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="UeR-8a-f3r">
                                     <rect key="frame" x="3" y="3" width="404" height="124"/>
@@ -5638,9 +5746,9 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Tt-VZ-2bh">
-                                <rect key="frame" x="27" y="496" width="140" height="18"/>
+                                <rect key="frame" x="27" y="496" width="192" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Software (Gamma)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
+                                <buttonCell key="cell" type="check" title="Software (Gamma/Shade)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -6753,7 +6861,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IdV-wj-QZf">
-                                <rect key="frame" x="316" y="17" width="60" height="16"/>
+                                <rect key="frame" x="314" y="17" width="60" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Show" id="1Du-lK-7xD">
                                     <font key="font" metaFont="system"/>
@@ -7620,7 +7728,6 @@ You can choose to send the diagnostics to the developer if you think this is not
         <image name="Display" width="250" height="211"/>
         <image name="Moon" width="780" height="780"/>
         <image name="NSAddTemplate" width="14" height="13"/>
-        <image name="NSAdvanced" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>
         <image name="power" width="96" height="96"/>
@@ -7629,6 +7736,9 @@ You can choose to send the diagnostics to the developer if you think this is not
         </namedColor>
         <namedColor name="Caption Secondary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Caption Tertiary">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

@@ -70,19 +70,14 @@ enum ButtonColor: Int {
 }
 
 var lockButtonBgOn: NSColor { darkMode ? red.withAlphaComponent(0.8) : red.withAlphaComponent(0.8) }
-var lockButtonBgOnHover: NSColor {
-    darkMode ? lockButtonBgOn.highlight(withLevel: 0.2) ?? lockButtonBgOn : lockButtonBgOn
-        .highlight(withLevel: 0.2) ?? lockButtonBgOn
-}
-
 var lockButtonLabelOn: NSColor { darkMode ? white : white }
 var lockButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray.withAlphaComponent(0.8) }
-var lockButtonBgOffHover: NSColor {
-    darkMode ? lockButtonBgOn.highlight(withLevel: 0.4) ?? lockButtonBgOn : lockButtonBgOn
-        .highlight(withLevel: 0.4) ?? lockButtonBgOn
-}
-
 var lockButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
+
+var enableButtonBgOn: NSColor { darkMode ? sunYellow.withAlphaComponent(0.8) : lunarYellow }
+var enableButtonLabelOn: NSColor { darkMode ? darkMauve : darkMauve.withAlphaComponent(0.8) }
+var enableButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray }
+var enableButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.5) : mauve.withAlphaComponent(0.45) }
 
 let hotkeyColor: [HoverState: [String: NSColor]] = [
     .hover: [

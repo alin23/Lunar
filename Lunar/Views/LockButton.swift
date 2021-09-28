@@ -8,6 +8,8 @@
 
 import Cocoa
 
+// MARK: - LockButton
+
 class LockButton: NSButton {
     // MARK: Lifecycle
 
@@ -25,9 +27,26 @@ class LockButton: NSButton {
 
     @IBInspectable dynamic var verticalPadding: CGFloat = 0.7
 
+    var bgOn: NSColor { lockButtonBgOn }
+    var bgOff: NSColor { lockButtonBgOff }
+    var bgOnHover: NSColor {
+        darkMode ?
+            bgOn.highlight(withLevel: 0.2) ?? bgOn :
+            bgOn.highlight(withLevel: 0.2) ?? bgOn
+    }
+
+    var bgOffHover: NSColor {
+        darkMode ?
+            bgOn.highlight(withLevel: 0.4) ?? bgOn :
+            bgOn.highlight(withLevel: 0.4) ?? bgOn
+    }
+
+    var labelOn: NSColor { lockButtonLabelOn }
+    var labelOff: NSColor { lockButtonLabelOff }
+
     override var state: NSControl.StateValue {
         didSet {
-            bg = state == .on ? lockButtonBgOn : lockButtonBgOff
+            bg = state == .on ? bgOn : bgOff
         }
     }
 
@@ -37,13 +56,13 @@ class LockButton: NSButton {
         let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
         activeTitle.addAttribute(
             NSAttributedString.Key.foregroundColor,
-            value: lockButtonLabelOn,
+            value: labelOn,
             range: NSMakeRange(0, activeTitle.length)
         )
         let inactiveTitle = NSMutableAttributedString(attributedString: attributedTitle)
         inactiveTitle.addAttribute(
             NSAttributedString.Key.foregroundColor,
-            value: lockButtonLabelOff,
+            value: labelOff,
             range: NSMakeRange(0, inactiveTitle.length)
         )
 
@@ -54,10 +73,10 @@ class LockButton: NSButton {
         radius = (frame.height / 2).ns
         if locked {
             state = .on
-            bg = lockButtonBgOn
+            bg = bgOn
         } else {
             state = .off
-            bg = lockButtonBgOff
+            bg = bgOff
         }
         trackHover()
     }
@@ -66,9 +85,9 @@ class LockButton: NSButton {
         transition(0.1)
 
         if state == .on {
-            bg = lockButtonBgOnHover
+            bg = bgOnHover
         } else {
-            bg = lockButtonBgOffHover
+            bg = bgOffHover
         }
     }
 
@@ -76,13 +95,22 @@ class LockButton: NSButton {
         transition(0.2)
 
         if state == .on {
-            bg = lockButtonBgOn
+            bg = bgOn
         } else {
-            bg = lockButtonBgOff
+            bg = bgOff
         }
     }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
+}
+
+// MARK: - EnableButton
+
+class EnableButton: LockButton {
+    override var bgOn: NSColor { enableButtonBgOn }
+    override var bgOff: NSColor { enableButtonBgOff }
+    override var labelOn: NSColor { enableButtonLabelOn }
+    override var labelOff: NSColor { enableButtonLabelOff }
 }

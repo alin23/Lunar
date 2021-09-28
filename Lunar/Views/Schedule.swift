@@ -160,7 +160,8 @@ class Schedule: NSView {
             let newSchedule = schedule.with(enabled: enabled)
             display.schedules[number - 1] = newSchedule
             display.save()
-            box?.alphaValue = enabled ? 1.0 : 0.5
+            box?.alphaValue = enabled ? 1.0 : 0.2
+            enableButton.layer?.shadowOpacity = enabled ? 0.7 : 0
         }
     }
 
