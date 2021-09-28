@@ -137,10 +137,12 @@ class BrightnessContrastChartView: LineChartView {
     }
 
     func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
-        if display == nil || display?.id == GENERIC_DISPLAY_ID {
-            isHidden = true
-        } else {
-            isHidden = false
+        mainThread {
+            if display == nil || display?.id == GENERIC_DISPLAY_ID {
+                isHidden = true
+            } else {
+                isHidden = false
+            }
         }
 
         var brightnessChartEntry = brightnessGraph.entries
@@ -307,7 +309,7 @@ class BrightnessContrastChartView: LineChartView {
             rightAxis.labelTextColor = .clear
         }
 
-        setupLegend()
+        mainThread { setupLegend() }
 
         data = graphData
 

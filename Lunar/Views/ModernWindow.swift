@@ -90,7 +90,7 @@ class ModernWindow: WAYWindow {
         case kVK_ANSI_0.u16:
             appDelegate!.currentPage = (pageController?.arrangedObjects.count ?? 3) - 1
             appDelegate!.goToPage(ignoreUIElement: true)
-        case kVK_ANSI_1.u16:
+        case kVK_ANSI_1.u16, kVK_ANSI_D.u16:
             appDelegate!.currentPage = 2
             appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_2.u16:

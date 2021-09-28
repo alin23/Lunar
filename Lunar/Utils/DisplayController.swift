@@ -450,7 +450,7 @@ class DisplayController {
                 transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
             }
 
-            let activeDisplays = (displays ?? displayController.activeDisplays.values.map { $0 })
+            let activeDisplays = (displays ?? activeDisplays.values.map { $0 })
             guard let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) else {
                 log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
                 return nil
@@ -478,7 +478,7 @@ class DisplayController {
                 return nil
             }
 
-            var allActiveDisplays = Set(displayController.activeDisplays.values.map { $0 })
+            var allActiveDisplays = Set(activeDisplays.values.map { $0 })
             if let displays = displays {
                 allActiveDisplays.formUnion(displays)
             }
@@ -1192,58 +1192,29 @@ class DisplayController {
 
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
-        if let displays = displays {
-            displays.forEach { display in
-                guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
-                if !display.lockedBrightness {
-                    display.brightness = manualMode.compute(
-                        percent: value,
-                        minVal: display.minBrightness.intValue,
-                        maxVal: display.maxBrightness.intValue
-                    )
-                }
-            }
-        } else {
-            activeDisplays.values
-                .forEach { display in
-                    guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { return }
-                    if !display.lockedBrightness {
-                        display.brightness = manualMode.compute(
-                            percent: value,
-                            minVal: display.minBrightness.intValue,
-                            maxVal: display.maxBrightness.intValue
-                        )
-                    }
-                }
+        let displays = displays ?? activeDisplays.values.map { $0 }
+        displays.forEach { display in
+            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin,
+                  !display.lockedBrightness
+            else { return }
+            display.brightness = manualMode.compute(
+                percent: value,
+                minVal: display.minBrightness.intValue,
+                maxVal: display.maxBrightness.intValue
+            )
         }
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
-        if let displays = displays {
-            displays
-                .forEach { display in
-                    guard !display.isBuiltin else { return }
-                    if !display.lockedContrast {
-                        display.contrast = manualMode.compute(
-                            percent: value,
-                            minVal: display.minContrast.intValue,
-                            maxVal: display.maxContrast.intValue
-                        )
-                    }
-                }
-        } else {
-            activeDisplays.values
-                .forEach { display in
-                    guard !display.isBuiltin else { return }
-                    if !display.lockedContrast {
-                        display.contrast = manualMode.compute(
-                            percent: value,
-                            minVal: display.minContrast.intValue,
-                            maxVal: display.maxContrast.intValue
-                        )
-                    }
-                }
+        let displays = displays ?? activeDisplays.values.map { $0 }
+        displays.forEach { display in
+            guard !display.isBuiltin, !display.lockedContrast else { return }
+            display.contrast = manualMode.compute(
+                percent: value,
+                minVal: display.minContrast.intValue,
+                maxVal: display.maxContrast.intValue
+            )
         }
     }
 
@@ -1294,9 +1265,9 @@ class DisplayController {
             )
             display.brightness = value.ns
 
-            if displayController.adaptiveModeKey != .manual {
+            if adaptiveModeKey != .manual {
                 display.insertBrightnessUserDataPoint(
-                    displayController.adaptiveModeKey.mode.brightnessDataPoint.last,
+                    adaptiveMode.brightnessDataPoint.last,
                     value,
                     modeKey: adaptiveModeKey
                 )
@@ -1319,9 +1290,9 @@ class DisplayController {
             )
             display.contrast = value.ns
 
-            if displayController.adaptiveModeKey != .manual {
+            if adaptiveModeKey != .manual {
                 display.insertContrastUserDataPoint(
-                    displayController.adaptiveModeKey.mode.contrastDataPoint.last,
+                    adaptiveMode.contrastDataPoint.last,
                     value,
                     modeKey: adaptiveModeKey
                 )

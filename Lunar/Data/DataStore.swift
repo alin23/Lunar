@@ -34,6 +34,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showProjectorDisplays,
     .showDisconnectedDisplays,
     .mediaKeysNotified,
+    .detectResponsiveness,
     .brightnessKeysEnabled,
     .brightnessStep,
     .clamshellModeDetection,
@@ -554,6 +555,7 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
 func initCache() {
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
+    cacheKey(.detectResponsiveness)
     cacheKey(.muteVolumeZero)
     cacheKey(.hotkeysAffectBuiltin)
 
@@ -634,6 +636,7 @@ extension Defaults.Keys {
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
+    static let detectResponsiveness = Key<Bool>("detectResponsiveness", default: true)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
     static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
 
@@ -645,8 +648,8 @@ extension Defaults.Keys {
     static let shiftBrightnessKeysControl = Key<BrightnessKeyAction>("shiftBrightnessKeysControl", default: .builtin)
 
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
-    static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: false)
-    static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: false)
+    static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: true)
+    static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
@@ -781,4 +784,6 @@ let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).drop
 let showProjectorDisplaysPublisher = Defaults.publisher(.showProjectorDisplays).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let showDisconnectedDisplaysPublisher = Defaults.publisher(.showDisconnectedDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let detectResponsivenessPublisher = Defaults.publisher(.detectResponsiveness).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }

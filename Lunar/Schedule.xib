@@ -42,7 +42,7 @@
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" name="Caption Secondary"/>
+                                        <color key="value" name="Caption Tertiary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
@@ -77,7 +77,7 @@
                                 </textFieldCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" name="Caption Secondary"/>
+                                        <color key="value" name="Caption Tertiary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
                                         <color key="value" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
@@ -268,8 +268,8 @@
                         <binding destination="-2" name="title" keyPath="self.title" id="XLc-eZ-oDB"/>
                     </connections>
                 </box>
-                <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="I1D-Qq-7ue" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                    <rect key="frame" x="61" y="123" width="59" height="13"/>
+                <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="I1D-Qq-7ue" customClass="EnableButton" customModule="Lunar" customModuleProvider="target">
+                    <rect key="frame" x="58" y="123" width="65" height="13"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <shadow key="shadow" blurRadius="3">
                         <size key="offset" width="0.0" height="2"/>
@@ -283,7 +283,7 @@
                     </ciFilter>
                     <buttonCell key="cell" type="inline" title="Disabled" alternateTitle="Enabled" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="3mh-QJ-U4d">
                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="systemBold" size="10"/>
+                        <font key="font" metaFont="systemHeavy" size="11"/>
                     </buttonCell>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
