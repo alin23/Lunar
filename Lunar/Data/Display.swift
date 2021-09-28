@@ -1977,7 +1977,13 @@ enum ValueType {
             w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
             w.setFrame(screen.frame, display: false)
             w.contentView?.transition(brightnessTransition == .slow ? 2.0 : 0.6)
-            w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 0.98)
+            w.contentView?.alphaValue = mapNumber(
+                cap(amount, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: 0.0,
+                toHigh: 0.9
+            )
         }
     }
 
@@ -2260,9 +2266,12 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin else {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGamma else {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
+            }
+            if !supportsGamma {
+                log.debug("Virtual/Airplay displays don't support DDC, ignoring for display \(description)")
             }
             mainThread { hasI2C = false }
             return
@@ -2834,9 +2843,11 @@ enum ValueType {
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
-            guard displayController.adaptiveModeKey == .manual || isBuiltin else {
-                readapt(newValue: newBrightness, oldValue: brightness.uint8Value)
-                return
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin {
+                insertBrightnessUserDataPoint(
+                    displayController.adaptiveMode.brightnessDataPoint.last,
+                    newBrightness.i, modeKey: displayController.adaptiveModeKey
+                )
             }
 
             withoutSmoothTransition {
@@ -2858,9 +2869,11 @@ enum ValueType {
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
-            guard displayController.adaptiveModeKey == .manual || isBuiltin else {
-                readapt(newValue: newContrast, oldValue: contrast.uint8Value)
-                return
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin {
+                insertContrastUserDataPoint(
+                    displayController.adaptiveMode.contrastDataPoint.last,
+                    newContrast.i, modeKey: displayController.adaptiveModeKey
+                )
             }
 
             withoutSmoothTransition {

@@ -175,6 +175,7 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var inputDropdown: PopUpButton?
 
+    @objc dynamic lazy var deleteEnabled = getDeleteEnabled()
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
 
@@ -276,9 +277,8 @@ class DisplayViewController: NSViewController {
         super.mouseDown(with: ev)
     }
 
-    func setButtonsHidden(_ hidden: Bool) {
+    func setInputHidden(_ hidden: Bool) {
         mainThread {
-            resetDropdown?.isHidden = hidden
             inputDropdown?.isHidden = hidden
             inputDropdownHotkeyButton?.isHidden = hidden
         }
@@ -438,13 +438,18 @@ class DisplayViewController: NSViewController {
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
 
+        deleteEnabled = getDeleteEnabled()
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
         inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
         chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
 
-        settingsButton?.display = display
-        settingsButton?.displayViewController = self
+        if let button = settingsButton {
+            button.display = display
+            button.displayViewController = self
+            button.bg = lockButtonBgOff
+        }
+
         scrollableBrightness?.display = display
         scrollableContrast?.display = display
 
@@ -523,7 +528,7 @@ class DisplayViewController: NSViewController {
                 mainThread { [weak self] in
                     guard let self = self, let display = self.display else { return }
                     display.control?.resetState()
-                    self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
+                    self.setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
                     self.refreshView()
                 }
             }
@@ -537,7 +542,7 @@ class DisplayViewController: NSViewController {
         }.store(in: &displayObservers, for: "input")
 
         initHotkeys()
-        setButtonsHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
+        setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
         refreshView()
 
         listenForSendingBrightnessContrast()
@@ -936,7 +941,7 @@ class DisplayViewController: NSViewController {
         }.store(in: &displayObservers, for: "hasDDC")
         display.$activeAndResponsive.receive(on: dataPublisherQueue).sink { [weak self] newActiveAndResponsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
-                self.setButtonsHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive)
+                self.setInputHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || display.isBuiltin)
 
                 mainThread { textField.isHidden = newActiveAndResponsive }
             }
@@ -1017,6 +1022,13 @@ class DisplayViewController: NSViewController {
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
+    func getDeleteEnabled() -> Bool {
+        guard let display = display else {
+            return false
+        }
+        return display.id != GENERIC_DISPLAY_ID && !display.active
+    }
+
     func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
         guard let display = display, display.active else { return false }
         guard !display.isInMirrorSet else { return true }
@@ -1053,6 +1065,12 @@ class DisplayViewController: NSViewController {
 
     override func flagsChanged(with event: NSEvent) {
         optionKeyPressed = event.modifierFlags.contains(.option)
+    }
+
+    @IBAction func delete(_: Any) {
+        guard let serial = display?.serial else { return }
+        CachedDefaults[.displays] = CachedDefaults[.displays]?.filter { $0.serial != serial }
+        displayController.resetDisplayList()
     }
 
     @IBAction func powerOff(_: Any) {
@@ -1172,7 +1190,7 @@ class DisplayViewController: NSViewController {
 
         mainThread { [weak self] in
             guard let adaptiveNotice = self?.adaptiveNotice else { return }
-            adaptiveNotice.transition(0.3)
+            adaptiveNotice.transition(0.5)
             adaptiveNotice.alphaValue = 0.0
             adaptiveNotice.needsDisplay = true
         }
@@ -1204,7 +1222,10 @@ class DisplayViewController: NSViewController {
             initGraph()
         } else {
             mainThread {
-                setButtonsHidden(true)
+                setInputHidden(true)
+
+                settingsButton?.isHidden = true
+                resetDropdown?.isHidden = true
 
                 nonResponsiveTextField?.isHidden = true
                 scrollableBrightness?.isHidden = true
@@ -1213,9 +1234,10 @@ class DisplayViewController: NSViewController {
             }
         }
 
+        deleteEnabled = getDeleteEnabled()
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
-        scheduleBox?.bg = .black.withAlphaComponent(0.03)
-        scheduleBox?.radius = 10
+//        scheduleBox?.bg = .black.withAlphaComponent(0.03)
+//        scheduleBox?.radius = 10
     }
 }

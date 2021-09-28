@@ -102,7 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
-    @IBOutlet var infoMenuItem: NSMenuItem!
+//    @IBOutlet var infoMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -146,24 +146,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
-        }
-    }
-
-    var sliderPercentage: Float = 40 {
-        didSet {
-            mainThread { infoMenuItem.view?.needsDisplay = true }
-        }
-    }
-
-    var sliderWidth: Float = 200 {
-        didSet {
-            mainThread { infoMenuItem.view?.needsDisplay = true }
-        }
-    }
-
-    var sliderHeight: Float = 22 {
-        didSet {
-            mainThread { infoMenuItem.view?.needsDisplay = true }
         }
     }
 
@@ -325,6 +307,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
         showDisconnectedDisplaysPublisher.sink { _ in
             displayController.resetDisplayList(configurationPage: true)
+        }.store(in: &observers)
+        detectResponsivenessPublisher.sink { change in
+            let shouldDetect = change.newValue
+            if !shouldDetect {
+                displayController.activeDisplays.values.forEach { $0.responsiveDDC = true }
+            }
         }.store(in: &observers)
         // NotificationCenter.default
         //     .publisher(for: UserDefaults.didChangeNotification, object: UserDefaults.standard)
@@ -508,35 +496,35 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         didBecomeActiveAtLeastOnce = true
     }
 
-    @objc func updateInfoMenuItem(notification: Notification) {
-        switch displayController.adaptiveModeKey {
-        case .sensor:
-            guard let info = notification.userInfo as? [String: Double], let ambientLight = info["ambientLight"] else { return }
-            mainThread {
-                self.infoMenuItem?.title = "Ambient light: \(String(format: "%.2f", ambientLight)) lux"
-            }
-        case .location:
-            guard let info = notification.userInfo as? [String: Double], let elevation = info["sunElevation"] else { return }
-            mainThread {
-                self.infoMenuItem?.title = "Sun elevation: \(String(format: "%.2f", elevation))°"
-            }
-        case .sync:
-            guard let info = notification.userInfo as? [String: Double], let builtinBrightness = info["brightness"] else { return }
-            mainThread {
-//                log.warning("BUILTIN BRIGHTNESS GOT NOTIFICATION: \(builtinBrightness.str(decimals: 2)) \(builtinBrightness.rounded(.toNearestOrAwayFromZero))")
-                self.infoMenuItem?.title = "Built-in display brightness: \(builtinBrightness.rounded(.toNearestOrAwayFromZero))%"
-            }
-        case .manual, .clock:
-            guard let info = notification.userInfo as? [String: Double] else { return }
-            mainThread {
-                if let brightness = info["manualBrightness"] {
-                    self.infoMenuItem?.title = "Last set brightness: \(brightness)"
-                } else if let contrast = info["manualContrast"] {
-                    self.infoMenuItem?.title = "Last set contrast: \(contrast)"
-                }
-            }
-        }
-    }
+//    @objc func updateInfoMenuItem(notification: Notification) {
+//        switch displayController.adaptiveModeKey {
+//        case .sensor:
+//            guard let info = notification.userInfo as? [String: Double], let ambientLight = info["ambientLight"] else { return }
+//            mainThread {
+//                self.infoMenuItem?.title = "Ambient light: \(String(format: "%.2f", ambientLight)) lux"
+//            }
+//        case .location:
+//            guard let info = notification.userInfo as? [String: Double], let elevation = info["sunElevation"] else { return }
+//            mainThread {
+//                self.infoMenuItem?.title = "Sun elevation: \(String(format: "%.2f", elevation))°"
+//            }
+//        case .sync:
+//            guard let info = notification.userInfo as? [String: Double], let builtinBrightness = info["brightness"] else { return }
+//            mainThread {
+    ////                log.warning("BUILTIN BRIGHTNESS GOT NOTIFICATION: \(builtinBrightness.str(decimals: 2)) \(builtinBrightness.rounded(.toNearestOrAwayFromZero))")
+//                self.infoMenuItem?.title = "Built-in display brightness: \(builtinBrightness.rounded(.toNearestOrAwayFromZero))%"
+//            }
+//        case .manual, .clock:
+//            guard let info = notification.userInfo as? [String: Double] else { return }
+//            mainThread {
+//                if let brightness = info["manualBrightness"] {
+//                    self.infoMenuItem?.title = "Last set brightness: \(brightness)"
+//                } else if let contrast = info["manualContrast"] {
+//                    self.infoMenuItem?.title = "Last set contrast: \(contrast)"
+//                }
+//            }
+//        }
+//    }
 
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
         log.debug("Started DisplayController in \(mode.str) mode")
@@ -850,12 +838,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             name: currentDataPointChanged,
             object: nil
         )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(updateInfoMenuItem(notification:)),
-            name: currentDataPointChanged,
-            object: nil
-        )
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(updateInfoMenuItem(notification:)),
+//            name: currentDataPointChanged,
+//            object: nil
+//        )
     }
 
     func addObservers() {
@@ -1373,14 +1361,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    @IBAction func badKeys(_: Any) {
-        if let url = URL(string: "https://lunar.fyi/faq#media-keys-not-working") {
+    @IBAction func brightnessNotChanging(_: Any) {
+        if let url = URL(string: "https://lunar.fyi/faq#brightness-not-changing") {
             NSWorkspace.shared.open(url)
         }
     }
 
-    @IBAction func howDoHotkeysWork(_: Any) {
-        if let url = URL(string: "https://lunar.fyi/faq#hotkeys") {
+    @IBAction func changelog(_: Any) {
+        if let url = URL(string: "https://lunar.fyi/changelog") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @IBAction func releases(_: Any) {
+        if let url = URL(string: "https://releases.lunar.fyi") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @IBAction func badKeys(_: Any) {
+        if let url = URL(string: "https://lunar.fyi/faq#media-keys-not-working") {
             NSWorkspace.shared.open(url)
         }
     }
