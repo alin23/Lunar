@@ -161,7 +161,7 @@ let LED_CINEMA_NAME = "LED Cinema"
 let CINEMA_NAME = "Cinema"
 let CINEMA_HD_NAME = "Cinema HD"
 let COLOR_LCD_NAME = "Color LCD"
-let APPLE_DISPLAY_VENDOR_ID = 0x05AC
+let APPLE_DISPLAY_VENDOR_ID = 0x610
 
 // MARK: - Transport
 
@@ -326,6 +326,7 @@ enum ValueType {
 
         let id = try container.decode(CGDirectDisplayID.self, forKey: .id)
         _id = id
+        let isSmartBuiltin = DDC.isSmartBuiltinDisplay(id)
         serial = try container.decode(String.self, forKey: .serial)
 
         adaptive = try container.decode(Bool.self, forKey: .adaptive)
@@ -335,10 +336,10 @@ enum ValueType {
 
         brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
         contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
-        minBrightness = (try container.decode(UInt8.self, forKey: .minBrightness)).ns
-        maxBrightness = (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
-        minContrast = (try container.decode(UInt8.self, forKey: .minContrast)).ns
-        maxContrast = (try container.decode(UInt8.self, forKey: .maxContrast)).ns
+        minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minBrightness)).ns
+        maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
+        minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minContrast)).ns
+        maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxContrast)).ns
 
         defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
@@ -546,14 +547,15 @@ enum ValueType {
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
         self.adaptive = adaptive
 
-        isSource = DDC.isSmartBuiltinDisplay(id)
+        let isSmartBuiltin = DDC.isSmartBuiltinDisplay(id)
+        isSource = isSmartBuiltin
 
-        self.minBrightness = minBrightness.ns
-        self.maxBrightness = maxBrightness.ns
-        self.minContrast = minContrast.ns
-        self.maxContrast = maxContrast.ns
+        self.minBrightness = isSmartBuiltin ? 0 : minBrightness.ns
+        self.maxBrightness = isSmartBuiltin ? 100 : maxBrightness.ns
+        self.minContrast = isSmartBuiltin ? 0 : minContrast.ns
+        self.maxContrast = isSmartBuiltin ? 100 : maxContrast.ns
 
-        enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
+        enabledControls[.gamma] = !isSmartBuiltin
 
         edidName = Self.printableName(id)
         if let n = name, !n.isEmpty {
@@ -691,6 +693,8 @@ enum ValueType {
             .isSource,
             .showVolumeOSD,
             .applyGamma,
+            .faceLightEnabled,
+            .blackOutEnabled,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1423,6 +1427,7 @@ enum ValueType {
 
             let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
             checkSlowWrite(elapsedNS: elapsedTime)
+            NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
 
@@ -1475,6 +1480,7 @@ enum ValueType {
 
             let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
             checkSlowWrite(elapsedNS: elapsedTime)
+            NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
 
@@ -2676,7 +2682,8 @@ enum ValueType {
     }
 
     func isAppleVendorID() -> Bool {
-        CGDisplayVendorNumber(id) == APPLE_DISPLAY_VENDOR_ID
+        guard let vendorID = infoDictionary["DisplayVendorID"] as? Int else { return false }
+        return vendorID == APPLE_DISPLAY_VENDOR_ID
     }
 
     func checkSlowWrite(elapsedNS: UInt64) {
@@ -2787,10 +2794,10 @@ enum ValueType {
 
     func readContrast() -> UInt8? {
         guard !isBuiltin else {
-            guard let (_, contrast) = SyncMode.getSourceBrightnessContrast() else {
+            guard let (_, contrast) = SyncMode.readBrightnessContrast(id: id) else {
                 return nil
             }
-            return contrast.u8
+            return (contrast * 100).u8
         }
         return control?.getContrast()
     }

@@ -50,6 +50,13 @@ class LockButton: NSButton {
         }
     }
 
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        if isEnabled {
+            addCursorRect(bounds, cursor: .pointingHand)
+        }
+    }
+
     func setup(_ locked: Bool = false) {
         wantsLayer = true
 
