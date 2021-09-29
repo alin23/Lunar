@@ -312,6 +312,7 @@ func waitForResponse(
 
     let session = session(timeout: timeoutPerTry.timeInterval)
     var responseString: String?
+    let lock = NSRecursiveLock()
 
     let request = session.dataTaskPublisher(for: url)
         .tryMap { (dataTaskOutput: DataTaskOutput) -> DataTaskResult in
@@ -337,13 +338,14 @@ func waitForResponse(
         }
         .replaceError(with: nil)
         .sink { resp in
-            responseString = resp
+            lock.around { responseString = resp }
             semaphore.signal()
         }
 
     log.debug("Waiting for request on \(url.absoluteString)")
     semaphore.wait(for: timeoutPerTry.timeInterval * retries.d)
-    return responseString
+    let result = lock.around { responseString }
+    return result
 }
 
 extension String {

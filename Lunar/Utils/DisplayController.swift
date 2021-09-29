@@ -540,7 +540,7 @@ class DisplayController {
             return service
         }
 
-        var clcd2Mapping: [Int: CGDirectDisplayID] = [:]
+        var clcd2Mapping: ThreadSafeDictionary<Int, CGDirectDisplayID> = ThreadSafeDictionary()
 
         func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
             guard !isTestID(displayID), NSScreen.isOnline(displayID),

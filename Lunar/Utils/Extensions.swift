@@ -166,6 +166,10 @@ extension String {
         filter { CHARS_NOT_STRIPPED.contains($0) }
     }
 
+    @inline(__always) var trimmed: String {
+        trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     @inline(__always) var d: Double? {
         Double(replacingOccurrences(of: ",", with: "."))
         // NumberFormatter.shared.number(from: self)?.doubleValue

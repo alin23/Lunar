@@ -21,6 +21,7 @@ import Sentry
 import SimplyCoreAudio
 import Sparkle
 import SwiftDate
+import SwiftyMarkdown
 import UserNotifications
 import WAYWindow
 
@@ -74,6 +75,17 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
+// MARK: - NonClosingMenuText
+
+class NonClosingMenuText: NSTextField {
+    var onClick: (() -> Void)?
+
+    override func mouseDown(with event: NSEvent) {
+        log.info("mouseDown: \(event.locationInWindow)")
+        onClick?()
+    }
+}
+
 // MARK: - AppDelegate
 
 @NSApplicationMain
@@ -102,7 +114,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
-//    @IBOutlet var infoMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -124,6 +135,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var activateLicenseMenuItem: NSMenuItem!
     @IBOutlet var faceLightMenuItem: NSMenuItem!
     @IBOutlet var blackOutMenuItem: NSMenuItem!
+    @IBOutlet var faceLightExplanationMenuItem: NSMenuItem!
+    @IBOutlet var blackOutExplanationMenuItem: NSMenuItem!
+    @IBOutlet var infoMenuItem: NSMenuItem!
 
     @Atomic var faceLightOn = false
 
@@ -134,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         delegate: self
     )
 
-    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
     var uiElement: UIElement?
 
@@ -142,6 +156,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
     var brightnessIcon = "brightness"
+
+    lazy var markdown: SwiftyMarkdown = getMarkdownRenderer()
+
+    @IBOutlet var infoMenuToggle: NSMenuItem!
+
+    var menuUpdater: Timer?
 
     var currentPage: Int = Page.display.rawValue {
         didSet {
@@ -165,10 +185,39 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    var externalLux: String {
+        guard SensorMode.wirelessSensorURL != nil else { return "" }
+        return "External light sensor: **\(SensorMode.specific.lastAmbientLight.str(decimals: 2)) lux**\n"
+    }
+
+    var internalLux: String {
+        guard let lux = SensorMode.getInternalSensorLux() else { return "" }
+        return "Internal light sensor: **\(lux) lux**\n"
+    }
+
+    var sun: String {
+        guard let moment = LocationMode.specific.moment, let sun = LocationMode.specific.geolocation?.sun() else { return "" }
+        let sunrise = moment.sunrise.toString(.time(.short))
+        let sunset = moment.sunset.toString(.time(.short))
+        let noon = moment.solarNoon.toString(.time(.short))
+        let elevation = sun.elevation.str(decimals: 1)
+
+        return "Sun: (**sunrise \(sunrise)**) (noon \(noon)) (**sunset \(sunset)**) [elevation \(elevation)°]\n"
+    }
+
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
         initLicensingMenuItems(version)
+        initMenuItems()
+        menuUpdater = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] timer in
+            updateInfoMenuItem()
+        }
+        RunLoop.main.add(menuUpdater!, forMode: .common)
+    }
+
+    func menuDidClose(_: NSMenu) {
+        menuUpdater?.invalidate()
     }
 
     @IBAction func checkForUpdates(_: Any) {
@@ -496,39 +545,60 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         didBecomeActiveAtLeastOnce = true
     }
 
-//    @objc func updateInfoMenuItem(notification: Notification) {
-//        switch displayController.adaptiveModeKey {
-//        case .sensor:
-//            guard let info = notification.userInfo as? [String: Double], let ambientLight = info["ambientLight"] else { return }
-//            mainThread {
-//                self.infoMenuItem?.title = "Ambient light: \(String(format: "%.2f", ambientLight)) lux"
-//            }
-//        case .location:
-//            guard let info = notification.userInfo as? [String: Double], let elevation = info["sunElevation"] else { return }
-//            mainThread {
-//                self.infoMenuItem?.title = "Sun elevation: \(String(format: "%.2f", elevation))°"
-//            }
-//        case .sync:
-//            guard let info = notification.userInfo as? [String: Double], let builtinBrightness = info["brightness"] else { return }
-//            mainThread {
-    ////                log.warning("BUILTIN BRIGHTNESS GOT NOTIFICATION: \(builtinBrightness.str(decimals: 2)) \(builtinBrightness.rounded(.toNearestOrAwayFromZero))")
-//                self.infoMenuItem?.title = "Built-in display brightness: \(builtinBrightness.rounded(.toNearestOrAwayFromZero))%"
-//            }
-//        case .manual, .clock:
-//            guard let info = notification.userInfo as? [String: Double] else { return }
-//            mainThread {
-//                if let brightness = info["manualBrightness"] {
-//                    self.infoMenuItem?.title = "Last set brightness: \(brightness)"
-//                } else if let contrast = info["manualContrast"] {
-//                    self.infoMenuItem?.title = "Last set contrast: \(contrast)"
-//                }
-//            }
-//        }
-//    }
+    func getMarkdownRenderer() -> SwiftyMarkdown {
+        let md = getMD(dark: darkMode)
+
+        md.body.color = infoColor
+        md.body.fontSize = 12
+
+        md.bold.color = dullRed
+
+        md.h6.fontSize = 13
+        md.h6.color = infoColor
+
+        return md
+    }
+
+    func setInfoMenuToggleTitle() {
+        let infoMenuShown = CachedDefaults[.infoMenuShown]
+
+        if infoMenuShown {
+            (infoMenuToggle.view as! NSTextField).attributedStringValue = "      Useful Info"
+                .withFont(.systemFont(ofSize: 13, weight: .regular)) + " (click to hide)"
+                .withFont(monospace(size: 12, weight: .regular)).withTextColor(explanationColor)
+        } else {
+            (infoMenuToggle.view as! NSTextField).attributedStringValue = "      Useful Info"
+                .withFont(.systemFont(ofSize: 13, weight: .regular)) + " (click to show)"
+                .withFont(monospace(size: 12, weight: .regular)).withTextColor(explanationColor)
+        }
+    }
+
+    func toggleInfoMenuItem() {
+        mainThread {
+            CachedDefaults[.infoMenuShown].toggle()
+            infoMenuItem.isHidden = !CachedDefaults[.infoMenuShown]
+            setInfoMenuToggleTitle()
+        }
+    }
+
+    func updateInfoMenuItem() {
+        if CachedDefaults[.showBrightnessMenuBar],
+           let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar] ?
+           displayController.mainExternalDisplay :
+           displayController.cursorDisplay
+        {
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineHeightMultiple = 0.6
+            statusItem.button?.attributedTitle = " B: \(display.brightness.uint8Value)\n C: \(display.contrast.uint8Value)"
+                .withFont(.systemFont(ofSize: 10, weight: .medium)).withBaselineOffset(-5).withParagraphStyle(paragraphStyle)
+        }
+        infoMenuItem.attributedTitle = markdown.attributedString(from: "\(externalLux)\(internalLux)\(sun)".trimmed)
+            .withFont(.systemFont(ofSize: 12, weight: .semibold))
+        infoMenuItem.isEnabled = false
+    }
 
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
         log.debug("Started DisplayController in \(mode.str) mode")
-        updateDataPointObserver()
         displayController.adaptBrightness()
     }
 
@@ -559,12 +629,45 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         POPOVERS["menu"]!!.contentViewController = storyboard
             .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
         POPOVERS["menu"]!!.contentViewController!.loadView()
+
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
+            guard let menuPopover = POPOVERS["menu"]!, menuPopover.isShown else { return }
+            menuPopoverCloser.cancel()
+            POPOVERS["menu"]!!.close()
+        }
+    }
+
+    func setExplanationStyle(_ menuItem: NSMenuItem, title: String? = nil) {
+        menuItem.attributedTitle = (title ?? menuItem.attributedTitle?.string ?? menuItem.title).withTextColor(explanationColor)
+            .withFont(.systemFont(ofSize: 11, weight: .semibold))
+    }
+
+    func initMenuItems() {
+        markdown = getMarkdownRenderer()
+
+        let view = NonClosingMenuText(frame: NSRect(x: 0, y: 0, width: 300, height: 16))
+        view.isEditable = false
+        view.drawsBackground = false
+        view.backgroundColor = .clear
+        view.isBordered = false
+        view.bg = .clear
+        view.onClick = { [self] in
+            toggleInfoMenuItem()
+        }
+        infoMenuToggle.view = view
+        infoMenuItem.isHidden = !CachedDefaults[.infoMenuShown]
+
+        setExplanationStyle(faceLightExplanationMenuItem)
+        setExplanationStyle(blackOutExplanationMenuItem)
+        setInfoMenuToggleTitle()
+        updateInfoMenuItem()
     }
 
     func initMenubarIcon() {
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("MenubarIcon"))
             button.image?.isTemplate = true
+            button.imagePosition = CachedDefaults[.showBrightnessMenuBar] ? .imageLeading : .imageOnly
 
             statusItemButtonController = StatusItemButtonController(button: button)
             statusButtonTrackingArea = NSTrackingArea(
@@ -579,13 +682,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             button.addSubview(statusItemButtonController!)
         }
         statusItem.menu = menu
+        initMenuItems()
 
         if POPOVERS["menu"]!!.contentViewController == nil {
             initMenuPopover()
         }
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
-            .sink { _ in self.recreateWindow() }
+            .sink { [self] _ in
+                mainThread {
+                    initMenuItems()
+                    recreateWindow()
+                }
+            }
             .store(in: &observers)
         colorSchemePublisher
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
@@ -638,7 +747,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .eraseToAnyPublisher().map { $0 as Any? }
             .merge(with: NSWorkspace.shared.publisher(for: \.frontmostApplication).map { $0 as Any? }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
-            .sink { _ in displayController.adaptBrightness(force: true) }
+            .sink { [self] _ in
+                displayController.adaptBrightness(force: true)
+                updateInfoMenuItem()
+            }
             .store(in: &observers)
 
         NotificationCenter.default
@@ -832,20 +944,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func updateDataPointObserver() {
-        NotificationCenter.default.removeObserver(
-            self,
-            name: currentDataPointChanged,
-            object: nil
-        )
-//        NotificationCenter.default.addObserver(
-//            self,
-//            selector: #selector(updateInfoMenuItem(notification:)),
-//            name: currentDataPointChanged,
-//            object: nil
-//        )
-    }
-
     func addObservers() {
         dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
@@ -894,6 +992,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .receive(on: RunLoop.main)
             .sink { _ in appDelegate!.startOrRestartMediaKeyTap() }
             .store(in: &observers)
+        NotificationCenter.default
+            .publisher(for: currentDataPointChanged, object: nil)
+            .receive(on: RunLoop.main)
+            .sink { _ in appDelegate!.updateInfoMenuItem() }
+            .store(in: &observers)
+        showBrightnessMenuBarPublisher.sink { [self] change in
+            if change.newValue {
+                statusItem.button?.imagePosition = .imageLeading
+                updateInfoMenuItem()
+            } else {
+                statusItem.button?.imagePosition = .imageOnly
+            }
+        }.store(in: &observers)
     }
 
     func setKeyEquivalents(_ hotkeys: Set<PersistentHotkey>) {
@@ -1020,11 +1131,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             setLogPath(logPath, logPath.count)
         }
 
-        // #if DEBUG
-        //     asyncEvery(3.seconds) {
-        //         log.debug("Active window", context: activeWindow(on: displayController.currentDisplay?.screen))
-        //     }
-        // #endif
         try? updater.start()
         handleDaemon()
 
@@ -1039,6 +1145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         addObservers()
         initLicensing()
+
         NetworkControl.setup()
         if thisIsFirstRun || TEST_MODE {
             showWindow()

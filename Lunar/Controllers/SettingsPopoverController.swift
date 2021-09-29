@@ -131,7 +131,7 @@ class SettingsPopoverController: NSViewController {
     var displaysObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
 
-    @IBOutlet var applyGammaCheckbox: NSButton!
+    @IBOutlet var applyGammaCheckbox: EnableButton!
     @IBOutlet var _ddcColorGainHelpButton: NSButton?
 
     var ddcLimitsHelpButton: HelpButton? {
@@ -403,11 +403,11 @@ class SettingsPopoverController: NSViewController {
         toggle.callback = callback
     }
 
-    func setupFaceLight(_: Display? = nil) {
+    func setupFaceLight(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
         mainThread {
-            faceLightBrightnessField.intValue = display.faceLightBrightness.int32Value
-            faceLightContrastField.intValue = display.faceLightContrast.int32Value
+            faceLightBrightnessField.integerValue = display.faceLightBrightness.intValue
+            faceLightContrastField.integerValue = display.faceLightContrast.intValue
 
             faceLightBrightnessField.lowerLimit = display.minDDCBrightness.intValue.d
             faceLightContrastField.lowerLimit = display.minDDCContrast.intValue.d
@@ -428,13 +428,13 @@ class SettingsPopoverController: NSViewController {
         guard let display = display ?? self.display else { return }
 
         mainThread {
-            minDDCBrightnessField.intValue = display.minDDCBrightness.int32Value
-            minDDCContrastField.intValue = display.minDDCContrast.int32Value
-            minDDCVolumeField.intValue = display.minDDCVolume.int32Value
+            minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
+            minDDCContrastField.integerValue = display.minDDCContrast.intValue
+            minDDCVolumeField.integerValue = display.minDDCVolume.intValue
 
-            maxDDCBrightnessField.intValue = display.maxDDCBrightness.int32Value
-            maxDDCContrastField.intValue = display.maxDDCContrast.int32Value
-            maxDDCVolumeField.intValue = display.maxDDCVolume.int32Value
+            maxDDCBrightnessField.integerValue = display.maxDDCBrightness.intValue
+            maxDDCContrastField.integerValue = display.maxDDCContrast.intValue
+            maxDDCVolumeField.integerValue = display.maxDDCVolume.intValue
 
             minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d
             maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d
@@ -478,9 +478,9 @@ class SettingsPopoverController: NSViewController {
     func setupDDCColorGain(_ display: Display? = nil) {
         if let display = display ?? self.display {
             mainThread {
-                redGainField.intValue = display.redGain.int32Value
-                greenGainField.intValue = display.greenGain.int32Value
-                blueGainField.intValue = display.blueGain.int32Value
+                redGainField.integerValue = display.redGain.intValue
+                greenGainField.integerValue = display.greenGain.intValue
+                blueGainField.integerValue = display.blueGain.intValue
             }
 
             redGainField.onValueChanged = { [weak self] value in self?.display?.redGain = value.ns }
@@ -674,9 +674,13 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
                 self.toggleWithoutCallback(self.volumeOSDToggle, value: display.showVolumeOSD)
             }
-            self.applyGamma = display.applyGamma
-            self.setupApplyGammaCheckbox()
+            mainThread {
+                self.applyGamma = display.applyGamma
+                self.setupApplyGammaCheckbox()
+            }
         }
+        applyGammaCheckbox.verticalPadding = 0.09
+        applyGammaCheckbox.setup()
     }
 
     override func mouseDown(with event: NSEvent) {

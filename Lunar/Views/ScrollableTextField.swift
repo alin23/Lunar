@@ -155,6 +155,12 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
+    override var intValue: Int32 {
+        didSet {
+            integerValue = intValue.i
+        }
+    }
+
     override var integerValue: Int {
         get { _integerValue }
         set {
