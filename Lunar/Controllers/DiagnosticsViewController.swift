@@ -372,7 +372,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         info: "Was there any noticeable change in brightness?",
                         okButton: "Yes",
                         cancelButton: "No",
-                        window: self.view.window,
+                        window: mainThread { self.view.window },
                         onCompletion: { (changed: Bool) in
                             self.render("\n\n**Was there any noticeable change in brightness? : `\(changed ? "YES" : "NO")`**")
 

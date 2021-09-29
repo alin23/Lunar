@@ -121,6 +121,7 @@ class DisplayValuesView: NSTableView {
               let scrollableBrightness = col1.subviews[0] as? ScrollableTextField,
               let display = col2.objectValue as? Display,
               let inputDropdown = col2.subviews.first(where: { v in (v as? PopUpButton) != nil }) as? PopUpButton,
+              let orientationControl = col2.subviews.first(where: { v in (v as? NSSegmentedControl) != nil }) as? NSSegmentedControl,
               let notConnectedTextField = col2.subviews
               .first(where: { v in (v as? NotConnectedTextField) != nil }) as? NotConnectedTextField,
               let scrollableContrast = col3.subviews[0] as? ScrollableTextField,
@@ -131,6 +132,7 @@ class DisplayValuesView: NSTableView {
         let id = display.id
 
         notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
+        orientationControl.isHidden = !CachedDefaults[.showOrientationInQuickActions]
 
         inputDropdown.isHidden = !display.active
         inputDropdown.isEnabled = display.hasDDC

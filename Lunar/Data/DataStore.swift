@@ -23,6 +23,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .infoMenuShown,
+    .allowBlackOutOnSingleScreen,
     .moreGraphData,
     .enableOrientationHotkeys,
     .detectKeyHold,
@@ -71,6 +73,9 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .scheduleTransition,
     .solarNoon,
     .startAtLogin,
+    .showBrightnessMenuBar,
+    .showOnlyExternalBrightnessMenuBar,
+    .showOrientationInQuickActions,
     .sunrise,
     .sunset,
     .syncPollingSeconds,
@@ -571,6 +576,8 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.infoMenuShown)
+    cacheKey(.allowBlackOutOnSingleScreen)
     cacheKey(.moreGraphData)
     cacheKey(.enableOrientationHotkeys)
     cacheKey(.detectKeyHold)
@@ -589,6 +596,9 @@ func initCache() {
     cacheKey(.showQuickActions)
     cacheKey(.manualLocation)
     cacheKey(.startAtLogin)
+    cacheKey(.showBrightnessMenuBar)
+    cacheKey(.showOnlyExternalBrightnessMenuBar)
+    cacheKey(.showOrientationInQuickActions)
     cacheKey(.clamshellModeDetection)
     cacheKey(.brightnessStep)
     cacheKey(.contrastStep)
@@ -652,6 +662,8 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let infoMenuShown = Key<Bool>("infoMenuShown", default: true)
+    static let allowBlackOutOnSingleScreen = Key<Bool>("allowBlackOutOnSingleScreen", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let detectKeyHold = Key<Bool>("detectKeyHold", default: true)
@@ -670,6 +682,9 @@ extension Defaults.Keys {
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
     static let manualLocation = Key<Bool>("manualLocation", default: false)
     static let startAtLogin = Key<Bool>("startAtLogin", default: true)
+    static let showBrightnessMenuBar = Key<Bool>("showBrightnessMenuBar", default: false)
+    static let showOnlyExternalBrightnessMenuBar = Key<Bool>("showOnlyExternalBrightnessMenuBar", default: false)
+    static let showOrientationInQuickActions = Key<Bool>("showOrientationInQuickActions", default: true)
     static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)
@@ -747,7 +762,13 @@ enum AppSettings {
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let infoMenuShownPublisher = Defaults.publisher(.infoMenuShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let allowBlackOutOnSingleScreenPublisher = Defaults.publisher(.allowBlackOutOnSingleScreen).removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let moreGraphDataPublisher = Defaults.publisher(.moreGraphData).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHotkeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }

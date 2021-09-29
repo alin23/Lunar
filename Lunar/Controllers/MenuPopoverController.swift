@@ -32,6 +32,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        addObservers()
         listenForPopoverEvents()
 //        listenForAdaptiveModeChange()
         listenForDisplaysChange()
@@ -40,6 +41,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        addObservers()
         listenForPopoverEvents()
 //        listenForAdaptiveModeChange()
         listenForDisplaysChange()
@@ -64,6 +66,15 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     var observers = [String: AnyCancellable](minimumCapacity: 3)
 
     var pausedAdaptiveModeObserver: Bool = false
+
+    func addObservers() {
+        showOrientationInQuickActionsPublisher.sink { [weak self] change in
+            mainThread {
+                self?.tableView.rowHeight = change.newValue ? 100 : 70
+                self?.tableView.reloadData()
+            }
+        }.store(in: &observers, for: "orientationShown")
+    }
 
     func listenForPopoverEvents() {
         NotificationCenter.default
@@ -91,6 +102,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
         activeModeButton.page = .hotkeys
 
         tableView.headerView = nil
+        tableView.rowHeight = CachedDefaults[.showOrientationInQuickActions] ? 100 : 70
     }
 
     func adaptViewSize() {

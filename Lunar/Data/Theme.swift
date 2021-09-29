@@ -34,6 +34,9 @@ var darkMode: Bool {
     appDelegate?.darkMode ?? false
 }
 
+var explanationColor: NSColor { darkMode ? white.withAlphaComponent(0.5) : darkMauve.withAlphaComponent(0.35) }
+var infoColor: NSColor { darkMode ? white.withAlphaComponent(0.9) : darkMauve.withAlphaComponent(0.45) }
+
 var dropdownArrowColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : orange.withAlphaComponent(0.7) }
 var dropdownArrowSecondaryColor: NSColor { darkMode ? white.withAlphaComponent(0.7) : mauve.withAlphaComponent(0.5) }
 

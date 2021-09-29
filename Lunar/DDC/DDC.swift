@@ -294,10 +294,10 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
     DDC.sync(barrier: true) {
         #if arch(arm64)
-            DDC.avServiceCache.removeAll(keepingCapacity: true)
-            displayController.clcd2Mapping.removeAll(keepingCapacity: true)
+            DDC.avServiceCache.removeAll()
+            displayController.clcd2Mapping.removeAll()
         #else
-            DDC.i2cControllerCache.removeAll(keepingCapacity: true)
+            DDC.i2cControllerCache.removeAll()
         #endif
 
         displayController.activeDisplays.values.forEach { display in
@@ -345,7 +345,7 @@ enum DDC {
     }
 
     #if arch(arm64)
-        static var avServiceCache: [CGDirectDisplayID: IOAVService?] = Dictionary(minimumCapacity: 10)
+        static var avServiceCache: ThreadSafeDictionary<CGDirectDisplayID, IOAVService?> = ThreadSafeDictionary()
 
         static func hasAVService(displayID: CGDirectDisplayID, display: Display? = nil, ignoreCache: Bool = false) -> Bool {
             guard !isTestID(displayID) else { return false }
@@ -369,7 +369,7 @@ enum DDC {
         }
     #endif
 
-    static var i2cControllerCache: [CGDirectDisplayID: io_service_t?] = Dictionary(minimumCapacity: 10)
+    static var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
 
     static func setup() {
         notifyPort = IONotificationPortCreate(kIOMasterPortDefault)
@@ -440,9 +440,9 @@ enum DDC {
             DDC.readFaults.removeAll()
             DDC.writeFaults.removeAll()
             #if arch(arm64)
-                DDC.avServiceCache.removeAll(keepingCapacity: true)
+                DDC.avServiceCache.removeAll()
             #else
-                DDC.i2cControllerCache.removeAll(keepingCapacity: true)
+                DDC.i2cControllerCache.removeAll()
             #endif
         }
     }
