@@ -1,3 +1,26 @@
+# 4.9.6
+## Features
+
+* **Useful Info** menu item in menu bar that can also be hidden
+* **Allow BlackOut on single screen** advanced setting for people that:
+    * mostly use BlackOut from the keyboard 
+    * have the need to turn off the external monitor while the MacBook is in clamshell mode
+* Option to show brightness and contrast of the active display beside the menu bar icon
+* Option to hide the orientation switcher in the QuickActions menu
+* Hide QuickActions when clicking anywhere outside of it
+
+![menu bar improvements](https://static.lunar.fyi/img/menu-bar-improvements/menu-bar-improvements.png)
+
+## Improvements
+
+* Change **Apply Gamma** checkbox to an enable/disable button that also disables value editing
+* Close Quick Actions menu faster when moving the cursor away from it
+* Better *possible clamshell mode detection* to avoid setting external monitor brightness to 0 when closing the MacBook lid
+
+## Fixes
+
+* Fix crashes that happened because of accessing AVService/I2C cache from multiple threads
+* Make sure to update some text fields that were not updated on launch
 # 4.9.5
 ## Features
 
