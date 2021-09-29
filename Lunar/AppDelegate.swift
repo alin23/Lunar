@@ -998,11 +998,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { _ in appDelegate!.updateInfoMenuItem() }
             .store(in: &observers)
         showBrightnessMenuBarPublisher.sink { [self] change in
-            if change.newValue {
-                statusItem.button?.imagePosition = .imageLeading
-                updateInfoMenuItem()
-            } else {
-                statusItem.button?.imagePosition = .imageOnly
+            mainThread {
+                if change.newValue {
+                    statusItem.button?.imagePosition = .imageLeading
+                    updateInfoMenuItem()
+                } else {
+                    statusItem.button?.imagePosition = .imageOnly
+                }
             }
         }.store(in: &observers)
     }
