@@ -20,8 +20,6 @@ class HotkeyViewController: NSViewController {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-
-        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
     }
 
     // MARK: Internal
@@ -54,8 +52,6 @@ class HotkeyViewController: NSViewController {
     @IBOutlet var shiftBrightnessKeysControlButton: PopUpButton!
     @IBOutlet var shiftBrightnessKeysSyncControlButton: PopUpButton!
 
-    var cachedFnState = Defaults[.fKeysAsFunctionKeys]
-
     @IBAction func resetHotkeys(_: Any) {
         HotKeyCenter.shared.unregisterAll()
         CachedDefaults.reset(.hotkeys)
@@ -82,38 +78,6 @@ class HotkeyViewController: NSViewController {
         }
     }
 
-//    @IBAction func toggleFineAdjustments(_ sender: NSButton) {
-//        var hotkey: PersistentHotkey?
-//
-//        switch sender.tag {
-//        case 1:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessDown.rawValue }
-//        case 2:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseBrightnessUp.rawValue }
-//        case 3:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastDown.rawValue }
-//        case 4:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseContrastUp.rawValue }
-//        case 5:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeDown.rawValue }
-//        case 6:
-//            hotkey = CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.preciseVolumeUp.rawValue }
-//        default:
-//            log.warning("Unknown tag: \(sender.tag)")
-//        }
-//
-//        guard let hk = hotkey else { return }
-//
-//        if sender.state == .on {
-//            hk.register()
-//        } else {
-//            hk.unregister()
-//        }
-//
-//        hk.isEnabled = sender.state == .on
-//        hk.save()
-//    }
-
     func setHotkeys() {
         let hotkeys = CachedDefaults[.hotkeys]
 
@@ -134,38 +98,7 @@ class HotkeyViewController: NSViewController {
         volumeUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }
         volumeDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }
 
-//        brightnessUpHotkeyView.preciseHotkeyCheckbox = preciseBrightnessUpCheckbox
-//        brightnessDownHotkeyView.preciseHotkeyCheckbox = preciseBrightnessDownCheckbox
-//        contrastUpHotkeyView.preciseHotkeyCheckbox = preciseContrastUpCheckbox
-//        contrastDownHotkeyView.preciseHotkeyCheckbox = preciseContrastDownCheckbox
-//        volumeUpHotkeyView.preciseHotkeyCheckbox = preciseVolumeUpCheckbox
-//        volumeDownHotkeyView.preciseHotkeyCheckbox = preciseVolumeDownCheckbox
-
         muteAudioHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }
-    }
-
-    func setupFKeysNotice(asFunctionKeys: Bool? = nil) {
-        let notice: String
-        if asFunctionKeys ?? Defaults[.fKeysAsFunctionKeys] {
-            notice = """
-            Your F keys are configured as **function keys**.
-            You have to **hold `Fn`** while pressing:
-            * `F1`/`F2` for Brightness
-            * `Ctrl+F1`/`Ctrl+F2` for Contrast
-            * `F10`/`F11`/`F12` for Volume/Mute
-            """
-        } else {
-            notice = """
-            Your F keys are configured as **media keys**.
-
-            You have to **hold `Fn`** to be able to activate any of the hotkeys containing keys like `F1,` `F2,` `F10` etc.
-            """
-        }
-        mainAsyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
-            self.fnKeysNotice.attributedStringValue = DARK_MD.attributedString(from: notice)
-            self.fnKeysNotice.isEnabled = false
-        }
     }
 
     @IBAction func disableAll(_ sender: Any) {
@@ -201,7 +134,6 @@ class HotkeyViewController: NSViewController {
         disableButton.resettingText = "Disabling"
 
         setHotkeys()
-        setupFKeysNotice()
 
         brightnessKeysControlButton?.page = .hotkeys
         brightnessKeysControlButton?.origin = .left
@@ -228,26 +160,8 @@ class HotkeyViewController: NSViewController {
         shiftBrightnessKeysSyncControlButton?.fade()
     }
 
-    override func viewDidAppear() {
-        let handler = { [weak self] in
-            guard let self = self, self.cachedFnState != Defaults[.fKeysAsFunctionKeys] else { return }
-            self.cachedFnState = Defaults[.fKeysAsFunctionKeys]
-            self.setupFKeysNotice(asFunctionKeys: self.cachedFnState)
-        }
-        handler()
-        cachedFnState = Defaults[.fKeysAsFunctionKeys]
-        setupFKeysNotice(asFunctionKeys: cachedFnState)
-        asyncEvery(10.seconds, uniqueTaskKey: F_KEYS_SETTING_WATCHER_KEY) { _ in handler() }
-    }
-
-    override func viewDidDisappear() {
-        cancelTask(F_KEYS_SETTING_WATCHER_KEY)
-    }
-
     override func mouseDown(with event: NSEvent) {
         view.window?.makeFirstResponder(nil)
         super.mouseDown(with: event)
     }
 }
-
-let F_KEYS_SETTING_WATCHER_KEY = "fkeysSettingWatcher"

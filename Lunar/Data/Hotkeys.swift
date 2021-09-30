@@ -35,6 +35,7 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          percent100,
          faceLight,
          blackOut,
+         blackOutPowerOff,
          preciseBrightnessUp,
          preciseBrightnessDown,
          preciseContrastUp,
@@ -77,6 +78,7 @@ let preciseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.contrastDown.rawValue: HotkeyIdentifier.preciseContrastDown.rawValue,
     HotkeyIdentifier.volumeUp.rawValue: HotkeyIdentifier.preciseVolumeUp.rawValue,
     HotkeyIdentifier.volumeDown.rawValue: HotkeyIdentifier.preciseVolumeDown.rawValue,
+    HotkeyIdentifier.blackOut.rawValue: HotkeyIdentifier.blackOutPowerOff.rawValue,
 ]
 
 // MARK: - HotkeyPart
@@ -536,6 +538,17 @@ enum Hotkey {
             detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.blackOutPowerOff.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_6,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option])
+            )!,
+            target: appDelegate!,
+            action: handler(identifier: .blackOutPowerOff),
+            actionQueue: .main,
+            detectKeyHold: false
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
             target: appDelegate!,
@@ -698,6 +711,8 @@ enum Hotkey {
             return #selector(AppDelegate.faceLightHotkeyHandler)
         case .blackOut:
             return #selector(AppDelegate.blackOutHotkeyHandler)
+        case .blackOutPowerOff:
+            return #selector(AppDelegate.blackOutPowerOffHotkeyHandler)
         case .preciseBrightnessUp:
             return #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
         case .preciseBrightnessDown:
@@ -1092,6 +1107,12 @@ extension AppDelegate: MediaKeyTapDelegate {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         blackOut(self)
         log.debug("BlackOut Hotkey pressed")
+    }
+
+    @objc func blackOutPowerOffHotkeyHandler() {
+        guard lunarProActive, let display = displayController.mainExternalDisplay else { return }
+        _ = display.control?.setPower(.off)
+        log.debug("BlackOut Power Off Hotkey pressed")
     }
 
     @objc func orientation0Handler() {

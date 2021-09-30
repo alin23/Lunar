@@ -55,24 +55,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
         }
     }
 
-    var preciseHotkeyCheckbox: NSButton? {
-        didSet {
-            guard let checkbox = preciseHotkeyCheckbox,
-                  let hk = hotkey
-            else { return }
-
-            let hotkeys = CachedDefaults[.hotkeys]
-            guard let preciseIdentifier = preciseHotkeysMapping[hk.identifier],
-                  let preciseHotkey = hotkeys.first(where: { $0.identifier == preciseIdentifier })
-            else {
-                return
-            }
-            checkbox.state = NSControl.StateValue(rawValue: preciseHotkey.isEnabled.i)
-            checkbox.isEnabled = isHotkeyCheckboxEnabled(hk)
-            checkbox.toolTip = hotkeyCheckboxTooltip(hk)
-        }
-    }
-
     var hotkeyEnabled: Bool {
         hotkey?.isEnabled ?? false
     }
@@ -105,7 +87,6 @@ class HotkeyView: RecordView, RecordViewDelegate {
         guard let hotkey = hotkey else { return }
         guard let keyCombo = keyCombo else {
             hotkey.isEnabled = false
-            preciseHotkeyCheckbox?.isEnabled = false
 
             return
         }
@@ -128,16 +109,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
         }
         hotkey.isEnabled = true
 
-        guard let checkbox = preciseHotkeyCheckbox else {
-            return
-        }
-
-        if NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(.option) {
-            checkbox.isEnabled = false
-            checkbox.toolTip = fineAdjustmentDisabledBecauseOfOptionKey
-        } else {
-            checkbox.isEnabled = true
-            checkbox.toolTip = nil
+        if !NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(.option) {
             if let preciseIdentifier = preciseHotkeysMapping[hotkey.identifier],
                let hotkey = CachedDefaults[.hotkeys].first(where: { $0.identifier == preciseIdentifier }),
                let kc = KeyCombo(
