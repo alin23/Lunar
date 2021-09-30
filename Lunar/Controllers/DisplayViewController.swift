@@ -1033,7 +1033,13 @@ class DisplayViewController: NSViewController {
         guard let display = display, display.active else { return false }
         guard !display.isInMirrorSet else { return true }
 
-        return (displayController.activeDisplays.count > 1 || (hasDDC ?? display.hasDDC)) && !display.isSidecar && !display.isAirplay
+        return (
+            displayController.activeDisplays.count > 1 ||
+                CachedDefaults[.allowBlackOutOnSingleScreen] ||
+                (hasDDC ?? display.hasDDC)
+        ) &&
+            !display.isSidecar &&
+            !display.isAirplay
     }
 
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String? {
@@ -1044,7 +1050,7 @@ class DisplayViewController: NSViewController {
 
             Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
-            Hold the Option key while clicking the button if you want to power off the monitor completely using DDC.
+            Hold the Option key while clicking the button (or while pressing the hotkey) if you want to power off the monitor completely using DDC.
             Caveats:
               • works only if the monitor can be controlled through DDC
               • can't be used to power on the monitor
@@ -1052,8 +1058,12 @@ class DisplayViewController: NSViewController {
               • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
             """
         }
-        guard displayController.activeDisplays.count > 1 else {
-            return "At least 2 screens need to be visible for this to work."
+        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
+            return """
+            At least 2 screens need to be visible for this to work.
+
+            The option can also be enabled for a single screen in Advanced settings.
+            """
         }
 
         return """
@@ -1074,7 +1084,8 @@ class DisplayViewController: NSViewController {
     }
 
     @IBAction func powerOff(_: Any) {
-        guard let display = display, displayController.activeDisplays.count > 1 else { return }
+        guard let display = display,
+              displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
 
         guard display.hasDDC, optionKeyPressed else {
             guard lunarProOnTrial || lunarProActive else {
