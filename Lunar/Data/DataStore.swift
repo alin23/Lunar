@@ -229,7 +229,6 @@ class DataStore: NSObject {
     static func firstRunAfterLunar4Upgrade() {
         thisIsFirstRunAfterLunar4Upgrade = true
         DataStore.reset()
-        mainThread { appDelegate!.onboard() }
     }
 
     static func firstRunAfterDefaults5Upgrade() {
@@ -265,7 +264,6 @@ class DataStore: NSObject {
                 storeAppException(app: AppException(identifier: id, name: name))
             }
         }
-        mainThread { appDelegate!.onboard() }
     }
 
     func displays(serials: [String]? = nil) -> [Display]? {
@@ -650,7 +648,7 @@ extension Defaults.Keys {
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
     static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
 
-    static let brightnessKeysSyncControl = Key<BrightnessKeyAction>("brightnessKeysSyncControl", default: .builtin)
+    static let brightnessKeysSyncControl = Key<BrightnessKeyAction>("brightnessKeysSyncControl", default: .source)
     static let brightnessKeysControl = Key<BrightnessKeyAction>("brightnessKeysControl", default: .all)
     static let ctrlBrightnessKeysSyncControl = Key<BrightnessKeyAction>("ctrlBrightnessKeysSyncControl", default: .external)
     static let ctrlBrightnessKeysControl = Key<BrightnessKeyAction>("ctrlBrightnessKeysControl", default: .external)

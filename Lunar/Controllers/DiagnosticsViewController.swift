@@ -165,7 +165,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 setPercent(30)
                 guard !self.stopped else { return }
 
-                let coreDisplay = CoreDisplayControl(display: display).isAvailable()
+                let coreDisplay = AppleNativeControl(display: display).isAvailable()
                 let appleDisplay = display.isAppleDisplay()
                 setPercent(40)
                 guard !self.stopped else { return }
@@ -211,10 +211,10 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 	        ?
                 	        (
                 	            coreDisplay ?
-                	                "Should support native control through CoreDisplay" :
-                	                "Should support CoreDisplay but doesn't"
+                	                "Should support native control through DisplayServices" :
+                	                "Should support DisplayServices but doesn't"
                 	        )
-                	        : "Doesn't support CoreDisplay")_
+                	        : "Doesn't support DisplayServices")_
                 * Vendor ID: `\(CGDisplayVendorNumber(display.id))` \(display.isAppleVendorID() ? "_(seems to be an Apple vendor ID)_" : "")
                 """)
                 setPercent(50)
@@ -252,7 +252,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                     let brightnessBeforeTest = display.brightness.uint8Value
                     switch control {
-                    case is CoreDisplayControl:
+                    case is AppleNativeControl:
                         self.render("\n##### Reading brightness...")
                         Thread.sleep(forTimeInterval: 0.5)
 
@@ -402,11 +402,11 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                         """)
                                     }
                                 }
-                            case is CoreDisplayControl:
+                            case is AppleNativeControl:
                                 coreDisplayWorked = changed
                                 if !coreDisplayWorked {
                                     self.renderSeparated("""
-                                    #### This monitor could not be controlled through Apple's native CoreDisplay framework.
+                                    #### This monitor could not be controlled through Apple's native DisplayServices framework.
 
                                     --------
 
@@ -416,9 +416,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     """)
                                     if ddcWorked {
                                         self.renderSeparated("""
-                                            Since DDC worked, you can also disable CoreDisplay and use DDC for this monitor:
-                                            * Click on the ⚙️ (gear) icon near the `RESET` button on the Display page of the Lunar UI
-                                            * Uncheck CoreDisplay
+                                            Since DDC worked, you can also disable DisplayServices and use DDC for this monitor:
+                                            * Click on the `Display Settings` button near the `RESET` button on the Display page of the Lunar UI
+                                            * Uncheck DisplayServices
                                         """)
                                     }
                                 }
@@ -511,7 +511,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 }
 
                 let networkControl = NetworkControl(display: display)
-                let coreDisplayControl = CoreDisplayControl(display: display)
+                let coreDisplayControl = AppleNativeControl(display: display)
                 let ddcControl = DDCControl(display: display)
 
                 #if arch(arm64)
@@ -563,7 +563,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     self.renderSeparated("**This display doesn't support hardware controls.**")
                 }
 
-                if SyncMode.specific.available, !display.isBuiltin {
+                if SyncMode.specific.available, !display.isBuiltin, !display.isSource {
                     self.renderSeparated("### Sync Mode")
                     self.render("Do you want to test Sync Mode?")
 
@@ -580,7 +580,8 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     } else {
                         self.renderSeparated("""
                         **Lunar will launch System Preferences for Displays now**
-                        **Please disable `\"Automatically adjust brightness\"` until this test is done**
+                        **Please disable `\"Automatically adjust brightness\"` on the source display (\(SyncMode.sourceDisplay?
+                            .name ?? "Built-in")) until this test is done**
 
                         Click the `Continue` button below to continue diagnostics _after disabling the setting_...
                         """)
@@ -626,28 +627,14 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             brightnessTransition = .instant
                         }
 
-                        let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0
-                        var iokitBrightness = SyncMode.readBrightnessIOKit()
-                        var armBrightness = SyncMode.readBrightnessARM()
-                        var coreDisplayBrightness = SyncMode.readBrightnessCoreDisplay()
-                        var displayServicesBrightness = SyncMode.readBrightnessDisplayServices()
+                        let sourceBrightness = SyncMode.getSourceBrightnessContrast()?.0
 
                         let printBrightness = {
                             guard !self.stopped else { return }
-                            iokitBrightness = SyncMode.readBrightnessIOKit()
-                            armBrightness = SyncMode.readBrightnessARM()
-                            coreDisplayBrightness = SyncMode.readBrightnessCoreDisplay()
-                            displayServicesBrightness = SyncMode.readBrightnessDisplayServices()
-                            let builtinBrightness = SyncMode.getSourceBrightnessContrast()?.0.str(decimals: 2) ?? "nil"
+                            let sourceBrightness = SyncMode.getSourceBrightnessContrast()?.0.str(decimals: 2) ?? "nil"
 
                             self.renderSeparated("""
-                            **Built-in brightness (as reported by):**
-
-                            * IOKit: `\(iokitBrightness)`
-                            * ARM Props: `\(armBrightness)`
-                            * CoreDisplay: `\(coreDisplayBrightness)`
-                            * DisplayServices: `\(displayServicesBrightness)`
-                            * Sync Mode Consensus: `\(builtinBrightness)`
+                            **Built-in brightness: `\(sourceBrightness)`**
                             """)
 
                             var monitorBrightness = "nil"
@@ -671,24 +658,20 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         printBrightness()
                         Thread.sleep(forTimeInterval: 0.5)
 
-                        let trySync = { (brightness: UInt8, method: CoreDisplayMethod) in
+                        let trySync = { (brightness: UInt8, method: AppleNativeMethod) in
                             guard !self.stopped else { return }
-                            self.render("\n\n##### Setting built-in brightness to `\(brightness)` using `\(method)`")
-                            SyncMode.setBuiltinDisplayBrightness(brightness, method: method)
+                            self.render("\n\n##### Setting source brightness to `\(brightness)`")
+                            display.brightness = brightness.ns
                             Thread.sleep(forTimeInterval: 3)
                             guard !self.stopped else { return }
                             printBrightness()
                             Thread.sleep(forTimeInterval: 1)
                         }
 
-                        // trySync(100, .coreDisplay)
-                        // trySync(10, .coreDisplay)
-                        // trySync(1, .coreDisplay)
                         trySync(100, .displayServices)
                         trySync(10, .displayServices)
                         trySync(1, .displayServices)
-                        if let oldBrightness = builtinBrightness {
-                            // trySync(oldBrightness.u8, .coreDisplay)
+                        if let oldBrightness = sourceBrightness {
                             trySync(oldBrightness.u8, .displayServices)
                         }
                     }

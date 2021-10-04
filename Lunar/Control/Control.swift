@@ -81,7 +81,7 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
 // MARK: - Control
 
 protocol Control {
-    var display: Display! { get set }
+    var display: Display? { get set }
     var str: String { get }
     var displayControl: DisplayControl { get }
 
@@ -121,6 +121,7 @@ protocol Control {
 
 extension Control {
     func reapply() {
+        guard let display = display else { return }
         _ = setBrightness(display.limitedBrightness, oldValue: nil)
         _ = setContrast(display.limitedContrast, oldValue: nil)
     }

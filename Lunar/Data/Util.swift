@@ -1086,6 +1086,8 @@ func createWindow(
                 if stationary {
                     window.collectionBehavior = [.stationary, .canJoinAllSpaces]
                     window.ignoresMouseEvents = true
+                    window.setAccessibilityRole(.popover)
+                    window.setAccessibilitySubrole(.unknown)
                 }
                 if show {
                     log.debug("Showing window '\(window.title)'")
@@ -1939,7 +1941,7 @@ func getModeDetailsJSON(_ mode: MPDisplayMode?) -> [String: Any]? {
     ]
 }
 
-func getMonitorPanelDataJSON(_ display: MPDisplay) -> [String: Any] {
+func getMonitorPanelDataJSON(_ display: MPDisplay, includeModes: Bool = false) -> [String: Any] {
     [
         "id": display.displayID,
         "aliasID": display.aliasID,
@@ -1961,15 +1963,15 @@ func getMonitorPanelDataJSON(_ display: MPDisplay) -> [String: Any] {
         "hasSafeMode": display.hasSafeMode,
         "isSmartDisplay": display.isSmartDisplay,
         "isAppleProDisplay": display.isAppleProDisplay,
-        "uuid": display.uuid?.uuidString as Any,
+        "uuid": (display.uuid?.uuidString ?? "") as Any,
         "isForcedToMirror": display.isForcedToMirror,
         "hasMenuBar": display.hasMenuBar,
         "isBuiltInRetina": display.isBuiltInRetina,
-        "titleName": display.titleName as Any,
-        "name": display.displayName as Any,
+        "titleName": (display.titleName ?? "") as Any,
+        "name": (display.displayName ?? "") as Any,
         "orientation": display.orientation,
         "modes": [String: Any](
-            ((display.allModes() as? [MPDisplayMode]) ?? [])
+            (includeModes ? ((display.allModes() as? [MPDisplayMode]) ?? []) : [])
                 .compactMap { mode in
                     guard let modeJSON = getModeDetailsJSON(mode) else { return nil }
                     return (mode.description.replacingOccurrences(of: "\n", with: ", "), modeJSON)
@@ -2051,4 +2053,38 @@ extension NSView {
 
         return view
     }
+}
+
+func memoryFootprint() -> Double? {
+    // The `TASK_VM_INFO_COUNT` and `TASK_VM_INFO_REV1_COUNT` macros are too
+    // complex for the Swift C importer, so we have to define them ourselves.
+    let TASK_VM_INFO_COUNT = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+    let TASK_VM_INFO_REV1_COUNT = mach_msg_type_number_t(
+        MemoryLayout
+            .offset(of: \task_vm_info_data_t.min_address)! / MemoryLayout<integer_t>.size
+    )
+    var info = task_vm_info_data_t()
+    var count = TASK_VM_INFO_COUNT
+    let kr = withUnsafeMutablePointer(to: &info) { infoPtr in
+        infoPtr.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { intPtr in
+            task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), intPtr, &count)
+        }
+    }
+    guard kr == KERN_SUCCESS,
+          count >= TASK_VM_INFO_REV1_COUNT
+    else { return nil }
+
+    let usedBytes = Double(info.phys_footprint)
+    return usedBytes
+}
+
+func memoryFootprintMB() -> Double? {
+    guard let usedBytes = memoryFootprint() else { return nil }
+    let usedMB = usedBytes / 1024 / 1024
+    return usedMB
+}
+
+func formattedMemoryFootprint() -> String {
+    let usedMBAsString: String = "Memory Used by App: \((memoryFootprintMB() ?? 0).str(decimals: 2)) MB"
+    return usedMBAsString
 }

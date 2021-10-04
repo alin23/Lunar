@@ -68,6 +68,7 @@ private func printDictionary(_ dict: [String: Any], level: Int = 0, longestKeySi
     for (key, value) in dict {
         switch value {
         case let nestedDict as [String: Any]:
+            print("\(indentation)\(spaced(key, longestKeySize))")
             printDictionary(nestedDict, level: level + 1, longestKeySize: longestKeySize)
         case let nestedArray as [Any]:
             printArray(nestedArray, level: level + 1, longestKeySize: longestKeySize)
@@ -241,7 +242,7 @@ struct Lunar: ParsableCommand {
     }
 
     struct CoreDisplay: ParsableCommand {
-        enum CoreDisplayMethod: String, ExpressibleByArgument, CaseIterable {
+        enum AppleNativeMethod: String, ExpressibleByArgument, CaseIterable {
             case GetUserBrightness
             case GetLinearBrightness
             case GetDynamicLinearBrightness
@@ -257,8 +258,8 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup var globals: GlobalOptions
 
-        @Argument(help: "Method to call. One of (\(CoreDisplayMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
-        var method: CoreDisplayMethod
+        @Argument(help: "Method to call. One of (\(AppleNativeMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
+        var method: AppleNativeMethod
 
         @Argument(help: "Display serial/name/id or one of (first, main, all, builtin, source)")
         var display: String
@@ -281,12 +282,12 @@ struct Lunar: ParsableCommand {
             case "all":
                 displayIDs = displays.map(\.id)
             case "builtin":
-                guard let id = SyncMode.builtinDisplay else {
+                guard let id = displayController.builtinDisplay?.id else {
                     throw CommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             case "source":
-                guard let id = SyncMode.sourceDisplayID else {
+                guard let id = displayController.sourceDisplay?.id else {
                     throw CommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
@@ -367,12 +368,12 @@ struct Lunar: ParsableCommand {
             case "all":
                 displayIDs = displays.map(\.id)
             case "builtin":
-                guard let id = SyncMode.builtinDisplay else {
+                guard let id = displayController.builtinDisplay?.id else {
                     throw CommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             case "source":
-                guard let id = SyncMode.sourceDisplayID else {
+                guard let id = displayController.sourceDisplay?.id else {
                     throw CommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
@@ -555,7 +556,7 @@ struct Lunar: ParsableCommand {
 
                 switch property {
                 case .id:
-                    print(SyncMode.builtinDisplay?.s ?? "None")
+                    print(displayController.builtinDisplay?.id.s ?? "None")
                 case .brightness:
                     print(props["property"] ?? "nil")
                 case .contrast:
@@ -576,7 +577,7 @@ struct Lunar: ParsableCommand {
             }
             switch property {
             case .id:
-                print(SyncMode.builtinDisplay?.s ?? "None")
+                print(displayController.builtinDisplay?.id.s ?? "None")
             case .brightness:
                 print(brightness.str(decimals: 2))
             case .contrast:
@@ -584,12 +585,12 @@ struct Lunar: ParsableCommand {
             case .all:
                 if json {
                     print((try! prettyEncoder.encode([
-                        "id": SyncMode.builtinDisplay?.d ?? 0,
+                        "id": displayController.builtinDisplay?.id.d ?? 0,
                         "brightness": brightness,
                         "contrast": contrast,
                     ])).str())
                 } else {
-                    print("ID: \(SyncMode.builtinDisplay?.s ?? "None")")
+                    print("ID: \(displayController.builtinDisplay?.id.s ?? "None")")
                     print("Brightness: \(brightness.str(decimals: 2))")
                     print("Contrast: \(contrast.str(decimals: 2))")
                 }
@@ -661,6 +662,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Include system info in the output.")
         var systemInfo = false
 
+        @Flag(help: "Include panel data in the output.")
+        var panelData = false
+
         @Flag(
             name: .shortAndLong,
             help: "If <property> is passed, try to actively read the property instead of fetching it from cache. Caution: might cause a kernel panic if DDC is too slow to respond!"
@@ -706,6 +710,7 @@ struct Lunar: ParsableCommand {
                         controls: controls,
                         read: read,
                         systemInfo: systemInfo,
+                        panelData: panelData,
                         edid: edid
                     )
                 }
@@ -724,11 +729,12 @@ struct Lunar: ParsableCommand {
                         terminator: (i == displays.count - 1) ? "\n" : ",\n",
                         prefix: "  \"\(display.serial)\": ",
                         systemInfo: systemInfo,
+                        panelData: panelData,
                         edid: edid
                     )
                 } else {
                     print("\(i): \(display.name)")
-                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, edid: edid)
+                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, panelData: panelData, edid: edid)
                     print("")
                 }
             }
@@ -1026,6 +1032,7 @@ private func printDisplay(
     terminator: String = "\n",
     prefix: String = "",
     systemInfo: Bool = false,
+    panelData: Bool = false,
     edid: Bool = false
 ) throws {
     var edidStr = ""
@@ -1044,6 +1051,9 @@ private func printDisplay(
         }
         if systemInfo {
             dict["systemInfo"] = display.infoDictionary
+        }
+        if panelData, let panel = display.panel {
+            dict["panelData"] = getMonitorPanelDataJSON(panel)
         }
         if edid {
             dict["edid"] = edidStr
@@ -1079,6 +1089,17 @@ private func printDisplay(
             print("\(prefix)\(s("Info Dictionary")){}")
         }
     }
+
+    if panelData, let panel = display.panel {
+        let dict = getMonitorPanelDataJSON(panel)
+        if dict.count != 0 {
+            print("\(prefix)\(s("Panel Data"))")
+            printDictionary(dict, level: 6, longestKeySize: longestKeySize)
+        } else {
+            print("\(prefix)\(s("Panel Data")){}")
+        }
+    }
+
     print("\(prefix)\(s("Red Gamma"))\(display.redMin) - \(display.redGamma) - \(display.redMax)")
     print("\(prefix)\(s("Green Gamma"))\(display.greenMin) - \(display.greenGamma) - \(display.greenMax)")
     print("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
@@ -1106,6 +1127,7 @@ private func handleDisplay(
     controls: [DisplayControl] = [.coreDisplay, .ddc, .network, .gamma],
     read: Bool = false,
     systemInfo: Bool = false,
+    panelData: Bool = false,
     edid: Bool = false
 ) throws {
     // MARK: - Apply display filter to get single display

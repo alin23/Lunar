@@ -20,14 +20,15 @@ struct DDCCTLControl: Control {
 
     static let ddcctlBinary = Bundle.main.path(forResource: "ddcctl", ofType: nil)!
 
-    var display: Display!
+    weak var display: Display?
 
     var str: String = "ddcctl"
 
     var displayControl: DisplayControl = .ddcctl
 
     var displayIndex: Int? {
-        display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
+        guard let display = display else { return nil }
+        return display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
     }
 
     func propertyArg(_ property: ControlID) -> String {

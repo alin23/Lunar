@@ -20,8 +20,11 @@ class DDCControl: Control {
 
     var displayControl: DisplayControl = .ddc
 
-    weak var display: Display!
+    weak var display: Display?
     let str = "DDC Control"
+
+    var smoothTransitionBrightnessTask: DispatchWorkItem?
+    var smoothTransitionContrastTask: DispatchWorkItem?
 
     static func resetState(display: Display? = nil) {
         if let display = display {
@@ -46,74 +49,97 @@ class DDCControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard let display = display else { return false }
+
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
         return display.hasI2C || display.isForTesting
     }
 
     func isResponsive() -> Bool {
-        display.responsiveDDC
+        guard let display = display else { return false }
+
+        return display.responsiveDDC
     }
 
     func resetState() {
+        guard let display = display else { return }
+
         Self.resetState(display: display)
     }
 
     func setPower(_ power: PowerState) -> Bool {
-        DDC.setPower(for: display.id, power: power == .on)
+        guard let display = display else { return false }
+
+        return DDC.setPower(for: display.id, power: power == .on)
     }
 
     func setRedGain(_ gain: UInt8) -> Bool {
-        DDC.setRedGain(for: display.id, redGain: gain)
+        guard let display = display else { return false }
+
+        return DDC.setRedGain(for: display.id, redGain: gain)
     }
 
     func setGreenGain(_ gain: UInt8) -> Bool {
-        DDC.setGreenGain(for: display.id, greenGain: gain)
+        guard let display = display else { return false }
+
+        return DDC.setGreenGain(for: display.id, greenGain: gain)
     }
 
     func setBlueGain(_ gain: UInt8) -> Bool {
-        DDC.setBlueGain(for: display.id, blueGain: gain)
+        guard let display = display else { return false }
+
+        return DDC.setBlueGain(for: display.id, blueGain: gain)
     }
 
     func getRedGain() -> UInt8? {
-        DDC.getRedGain(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getRedGain(for: display.id)
     }
 
     func getGreenGain() -> UInt8? {
-        DDC.getGreenGain(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getGreenGain(for: display.id)
     }
 
     func getBlueGain() -> UInt8? {
-        DDC.getBlueGain(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getBlueGain(for: display.id)
     }
 
     func resetColors() -> Bool {
-        DDC.resetColors(for: display.id)
+        guard let display = display else { return false }
+        return DDC.resetColors(for: display.id)
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+        guard let display = display else { return false }
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
            oldValue != brightness
         {
-            var faults = 0
-            display
-                .smoothTransition(
-                    from: oldValue,
-                    to: brightness,
-                    delay: brightnessTransition == .smooth ? nil : 0.01
-                ) { brightness in
-                    if faults > 5 {
-                        return
-                    }
+            if display.inSmoothTransition {
+                display.shouldStopBrightnessTransition = true
+                oldValue = display.lastWrittenBrightness
+            }
 
-                    log.debug(
-                        "Writing brightness using \(self)",
-                        context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
-                    )
-                    if !DDC.setBrightness(for: self.display.id, brightness: brightness) {
-                        faults += 1
-                    }
+            var faults = 0
+            let delay = brightnessTransition == .smooth ? nil : 0.01
+
+            smoothTransitionBrightnessTask?.cancel()
+            smoothTransitionBrightnessTask = display.smoothTransition(
+                from: oldValue, to: brightness, delay: delay,
+                onStart: { display.shouldStopBrightnessTransition = false }
+            ) { [weak self] brightness in
+                guard faults <= 5, let self = self, let display = self.display, !display.shouldStopBrightnessTransition else { return }
+
+                log.debug("Writing brightness=\(brightness) using \(self) for \(display)")
+
+                if DDC.setBrightness(for: display.id, brightness: brightness) {
+                    display.lastWrittenBrightness = brightness
+                } else {
+                    faults += 1
                 }
+            }
             return faults <= 5
         }
 
@@ -121,84 +147,108 @@ class DDCControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
+        guard let display = display else { return false }
+
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), var oldValue = oldValue,
            oldValue != contrast
         {
-            var faults = 0
-            display
-                .smoothTransition(
-                    from: oldValue,
-                    to: contrast,
-                    delay: brightnessTransition == .smooth ? nil : 0.01
-                ) { contrast in
-                    if faults > 5 {
-                        return
-                    }
+            if display.inSmoothTransition {
+                display.shouldStopContrastTransition = true
+                oldValue = display.lastWrittenContrast
+            }
 
-                    log.debug(
-                        "Writing contrast using \(self)",
-                        context: ["name": self.display.name, "id": self.display.id, "serial": self.display.serial]
-                    )
-                    if !DDC.setContrast(for: self.display.id, contrast: contrast) {
-                        faults += 1
-                    }
+            var faults = 0
+            let delay = brightnessTransition == .smooth ? nil : 0.01
+
+            smoothTransitionContrastTask?.cancel()
+            smoothTransitionContrastTask = display.smoothTransition(
+                from: oldValue, to: contrast, delay: delay,
+                onStart: { display.shouldStopContrastTransition = false }
+            ) { [weak self] contrast in
+                guard faults <= 5, let self = self, let display = self.display, !display.shouldStopContrastTransition else { return }
+
+                log.debug("Writing contrast=\(contrast) using \(self) for \(display)")
+
+                if DDC.setContrast(for: display.id, contrast: contrast) {
+                    display.lastWrittenContrast = contrast
+                } else {
+                    faults += 1
                 }
+            }
             return faults <= 5
         }
         return DDC.setContrast(for: display.id, contrast: contrast)
     }
 
     func setVolume(_ volume: UInt8) -> Bool {
-        DDC.setAudioSpeakerVolume(for: display.id, audioSpeakerVolume: volume)
+        guard let display = display else { return false }
+
+        return DDC.setAudioSpeakerVolume(for: display.id, audioSpeakerVolume: volume)
     }
 
     func setMute(_ muted: Bool) -> Bool {
-        DDC.setAudioMuted(for: display.id, audioMuted: muted)
+        guard let display = display else { return false }
+
+        return DDC.setAudioMuted(for: display.id, audioMuted: muted)
     }
 
     func setInput(_ input: InputSource) -> Bool {
-        DDC.setInput(for: display.id, input: input)
+        guard let display = display else { return false }
+
+        return DDC.setInput(for: display.id, input: input)
     }
 
     func getBrightness() -> Brightness? {
-        DDC.getBrightness(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getBrightness(for: display.id)
     }
 
     func getContrast() -> Contrast? {
-        DDC.getContrast(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getContrast(for: display.id)
     }
 
     func getMaxBrightness() -> Brightness? {
-        DDC.getMaxValue(for: display.id, controlID: .BRIGHTNESS)
+        guard let display = display else { return nil }
+        return DDC.getMaxValue(for: display.id, controlID: .BRIGHTNESS)
     }
 
     func getMaxContrast() -> Contrast? {
-        DDC.getMaxValue(for: display.id, controlID: .CONTRAST)
+        guard let display = display else { return nil }
+        return DDC.getMaxValue(for: display.id, controlID: .CONTRAST)
     }
 
     func getMaxVolume() -> UInt8? {
-        DDC.getMaxValue(for: display.id, controlID: .AUDIO_SPEAKER_VOLUME)
+        guard let display = display else { return nil }
+        return DDC.getMaxValue(for: display.id, controlID: .AUDIO_SPEAKER_VOLUME)
     }
 
     func getVolume() -> UInt8? {
-        DDC.getAudioSpeakerVolume(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.getAudioSpeakerVolume(for: display.id)
     }
 
     func getMute() -> Bool? {
-        DDC.isAudioMuted(for: display.id)
+        guard let display = display else { return nil }
+        return DDC.isAudioMuted(for: display.id)
     }
 
     func getInput() -> InputSource? {
+        guard let display = display else { return nil }
         guard let input = DDC.getInput(for: display.id), let inputSource = InputSource(rawValue: input) else { return nil }
         return inputSource
     }
 
     func reset() -> Bool {
+        guard let display = display else { return false }
+
         DDC.reset()
         return DDC.resetBrightnessAndContrast(for: display.id)
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
-        !display.slowWrite
+        guard let display = display else { return false }
+
+        return !display.slowWrite
     }
 }
