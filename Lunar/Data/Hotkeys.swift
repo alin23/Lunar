@@ -391,6 +391,7 @@ enum BrightnessKeyAction: Int, CaseIterable, Defaults.Serializable {
     case external
     case cursor
     case builtin
+    case source
 }
 
 // MARK: - Hotkey
@@ -865,28 +866,29 @@ extension AppDelegate: MediaKeyTapDelegate {
     func adjust(
         _ mediaKey: MediaKey,
         by value: Int? = nil,
-        currentDisplay: Bool = false,
         contrast: Bool = false,
+        currentDisplay: Bool = false,
         builtinDisplay: Bool = false,
+        sourceDisplay: Bool = false,
         allDisplays: Bool = false
     ) {
         guard !(contrast && builtinDisplay) else { return }
 
         switch mediaKey {
         case .brightnessUp where contrast:
-            increaseContrast(by: value, currentDisplay: currentDisplay)
+            increaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessUp where allDisplays:
             increaseBrightness(by: value, builtinDisplay: true)
             increaseBrightness(by: value)
         case .brightnessUp:
-            increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
+            increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where contrast:
-            decreaseContrast(by: value, currentDisplay: currentDisplay)
+            decreaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where allDisplays:
             decreaseBrightness(by: value, builtinDisplay: true)
             decreaseBrightness(by: value)
         case .brightnessDown:
-            decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
+            decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
         default:
             break
         }
@@ -900,7 +902,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
         }
 
-        if builtinDisplay {
+        if sourceDisplay {
+            guard let display = displayController.sourceDisplay else { return }
+            showOSD(display)
+        } else if builtinDisplay {
             guard let display = displayController.builtinDisplay else { return }
             showOSD(display)
         } else if currentDisplay {
@@ -928,9 +933,11 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .external:
             adjust(mediaKey, by: offset, contrast: contrast)
         case .cursor:
-            adjust(mediaKey, by: offset, currentDisplay: true, contrast: contrast)
+            adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
-            adjust(mediaKey, by: offset, currentDisplay: lidClosed, contrast: contrast, builtinDisplay: !lidClosed)
+            adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: !lidClosed)
+        case .source:
+            adjust(mediaKey, by: offset, contrast: contrast, sourceDisplay: true)
         }
     }
 
@@ -1005,7 +1012,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         guard isVolumeKey(mediaKey) else {
-            let lidClosed = displayController.lidClosed || SyncMode.builtinDisplay == nil
+            let lidClosed = displayController.lidClosed || displayController.builtinDisplay == nil
             return handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
         }
 

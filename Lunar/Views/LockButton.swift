@@ -89,6 +89,7 @@ class LockButton: NSButton {
     }
 
     override func mouseEntered(with _: NSEvent) {
+        guard isEnabled else { return }
         transition(0.1)
 
         if state == .on {

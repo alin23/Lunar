@@ -146,7 +146,7 @@ class NetworkControl: Control {
     var displayControl: DisplayControl = .network
 
     let str = "Network Control"
-    weak var display: Display!
+    weak var display: Display?
     var setterTasks = [ControlID: DispatchWorkItem]()
     let getterTasksSemaphore = DispatchSemaphore(value: 1, name: "getterTasksSemaphore")
 
@@ -353,6 +353,8 @@ class NetworkControl: Control {
     }
 
     func manageSendingState(for controlID: ControlID, sending: Bool) {
+        guard let display = display else { return }
+
         switch controlID {
         case .BRIGHTNESS:
             display.sendingBrightness = sending
@@ -398,8 +400,8 @@ class NetworkControl: Control {
             self.responsiveCheckPublisher
                 .debounce(for: .milliseconds(500), scheduler: RunLoop.current)
                 .sink { [weak self] _ in
-                    guard let self = self else { return }
-                    guard let service = NetworkControl.controllersForDisplay[self.display.serial],
+                    guard let self = self, let display = self.display else { return }
+                    guard let service = NetworkControl.controllersForDisplay[display.serial],
                           let url = service.url, let newURL = service.getFirstRespondingURL(
                               urls: service.urls,
                               timeout: 600.milliseconds,
@@ -426,6 +428,8 @@ class NetworkControl: Control {
     }
 
     func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
+        guard let display = display else { return false }
+
         guard let service = NetworkControl.controllersForDisplay[display.serial],
               let url = smooth ? service.smoothTransitionUrl : service.url,
               DDC.apply
@@ -454,6 +458,8 @@ class NetworkControl: Control {
     }
 
     func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
+        guard let display = display else { return nil }
+
         guard !screensSleeping.load(ordering: .relaxed) else { return nil }
 
         _ = getterTasksSemaphore.wait(for: 5.seconds)
@@ -467,14 +473,10 @@ class NetworkControl: Control {
 
         var value: UInt8?
         guard let resp = waitForResponse(from: url / controlID, timeoutPerTry: 1500.milliseconds) else {
-            if let display = display {
-                log.error("Error reading \(controlID) for \(display)")
-            }
+            log.error("Error reading \(controlID) for \(display)")
             return nil
         }
-        if let display = display {
-            log.debug("Read \(controlID), received response `\(resp)` for \(display)")
-        }
+        log.debug("Read \(controlID), received response `\(resp)` for \(display)")
         value = UInt8(resp)
 
         return value
@@ -581,6 +583,8 @@ class NetworkControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard let display = display else { return false }
+
         guard display.active else { return false }
         if display.isForTesting, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay {
             return true
@@ -603,6 +607,8 @@ class NetworkControl: Control {
     }
 
     func isResponsive() -> Bool {
+        guard let display = display else { return false }
+
         #if DEBUG
             if TEST_IDS.contains(display.id) {
                 return true
@@ -627,10 +633,14 @@ class NetworkControl: Control {
     }
 
     func resetState() {
+        guard let display = display else { return }
+
         Self.resetState(serial: display.serial)
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
+        guard let display = display else { return false }
+
         guard let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
         return service.smoothTransitionUrl != nil
     }

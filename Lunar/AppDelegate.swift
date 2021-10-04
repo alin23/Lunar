@@ -13,6 +13,7 @@ import Combine
 import Compression
 import CoreLocation
 import Defaults
+import FuzzyFind
 import LetsMove
 import Magnet
 import MediaKeyTap
@@ -47,7 +48,12 @@ let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
-// let timerQueue = DispatchQueue(label: "fyi.lunar.timer.queue", qos: .utility, attributes: .concurrent)
+let smoothDDCQueue = DispatchQueue(label: "fyi.lunar.smooth.ddc.queue", qos: .userInitiated, attributes: .concurrent)
+let smoothDisplayServicesQueue = DispatchQueue(
+    label: "fyi.lunar.smooth.displayservices.queue",
+    qos: .userInitiated,
+    attributes: .concurrent
+)
 let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let serialSyncQueue = DispatchQueue(label: "fyi.lunar.serialSync.queue", qos: .userInitiated)
@@ -67,6 +73,24 @@ var thisIsFirstRunAfterDefaults5Upgrade = false
 var thisIsFirstRunAfterM1DDCUpgrade = false
 var thisIsFirstRunAfterBuiltinUpgrade = false
 var thisIsFirstRunAfterHotkeysUpgrade = false
+
+func createTransition(
+    duration: TimeInterval,
+    type: CATransitionType,
+    subtype: CATransitionSubtype = .fromTop,
+    start: Float = 0.0,
+    end: Float = 1.0,
+    easing: CAMediaTimingFunctionName = .easeOut
+) -> CATransition {
+    let transition = CATransition()
+    transition.duration = duration
+    transition.type = type
+    transition.subtype = subtype
+    transition.startProgress = start
+    transition.endProgress = end
+    transition.timingFunction = CAMediaTimingFunction(name: easing)
+    return transition
+}
 
 func fadeTransition(duration: TimeInterval) -> CATransition {
     let transition = CATransition()
@@ -93,7 +117,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     // MARK: Internal
 
     enum UIElement {
-        case gear
+        case displaySettings
         case advancedSettingsButton
     }
 
@@ -103,6 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var alsWindowController: ModernWindowController?
     var sshWindowController: ModernWindowController?
     var diagnosticsWindowController: ModernWindowController?
+    var onboardWindowController: ModernWindowController?
 
     var observers: Set<AnyCancellable> = []
 
@@ -163,6 +188,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var menuUpdater: Timer?
 
+    var memoryUsageChecker: Foundation.Thread?
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -205,12 +232,67 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return "Sun: (**sunrise \(sunrise)**) (noon \(noon)) (**sunset \(sunset)**) [elevation \(elevation)°]\n"
     }
 
+    var memory500MBPassed = false {
+        didSet {
+            guard memory500MBPassed, !oldValue else { return }
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: "500MB", key: "memory")
+                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
+                SentrySDK.capture(message: "High Memory Usage")
+            }
+        }
+    }
+
+    var memory1GBPassed = false {
+        didSet {
+            guard memory1GBPassed, !oldValue else { return }
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: "1GB", key: "memory")
+                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
+                SentrySDK.capture(message: "High Memory Usage")
+            }
+        }
+    }
+
+    var memory2GBPassed = false {
+        didSet {
+            guard memory2GBPassed, !oldValue else { return }
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: "2GB", key: "memory")
+                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
+                SentrySDK.capture(message: "High Memory Usage")
+            }
+        }
+    }
+
+    var memory4GBPassed = false {
+        didSet {
+            guard memory4GBPassed, !oldValue else { return }
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: "4GB", key: "memory")
+                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
+                SentrySDK.capture(message: "High Memory Usage")
+            }
+        }
+    }
+
+    var memory8GBPassed = false {
+        didSet {
+            guard memory8GBPassed, !oldValue else { return }
+            SentrySDK.configureScope { scope in
+                scope.setTag(value: "8GB", key: "memory")
+                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
+                SentrySDK.capture(message: "High Memory Usage")
+            }
+        }
+    }
+
     func menuWillOpen(_: NSMenu) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
         initLicensingMenuItems(version)
         initMenuItems()
-        menuUpdater = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] timer in
+        menuUpdater = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] _ in
             updateInfoMenuItem()
         }
         RunLoop.main.add(menuUpdater!, forMode: .common)
@@ -256,20 +338,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 {
                     if let number = firstPath.i, number > 0, number <= displayController.activeDisplays.count {
                         currentPage += (number - 1)
-                    }
-
-                    if firstPath == "builtin" || firstPath == "internal" || firstPath == "built-in" {
-                        if let w = windowController?.window, let view = w.contentView, !view.subviews.isEmpty,
-                           !view.subviews[0].subviews.isEmpty,
+                    } else if firstPath == "builtin" || firstPath == "internal" || firstPath == "built-in" {
+                        if let w = windowController?.window, let view = w.contentView,
+                           !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
                            let pageController = view.subviews[0].subviews[0].nextResponder as? PageController
                         {
                             currentPage = pageController.arrangedObjects.firstIndex {
                                 ($0 as? Display)?.isBuiltin ?? false
                             } ?? currentPage
                         }
+                    } else if firstPath != "settings" && firstPath != "displaySettings" {
+                        if let w = windowController?.window, let view = w.contentView,
+                           !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
+                           let pageController = view.subviews[0].subviews[0].nextResponder as? PageController
+                        {
+                            let alignments = fuzzyFind(queries: [firstPath], inputs: displayController.displays.values.map(\.name))
+                            if let name = alignments.first?.result.asString {
+                                currentPage = pageController.arrangedObjects.firstIndex {
+                                    (($0 as? Display)?.name ?? "") == name
+                                } ?? currentPage
+                            }
+                        }
                     }
-                    if firstPath == "settings" || firstPath == "gear" || lastPath == "settings" || lastPath == "gear" {
-                        uiElement = .gear
+                    if firstPath == "settings" || firstPath == "displaySettings" ||
+                        lastPath == "settings" || lastPath == "displaySettings"
+                    {
+                        uiElement = .displaySettings
                     }
                 }
                 showWindow(after: windowController == nil ? 2000 : nil)
@@ -336,6 +430,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             self.manageDisplayControllerActivity(mode: change.newValue)
         }.store(in: &observers)
+    }
+
+    func checkForHighMemoryUsage() {
+        memoryUsageChecker = asyncEvery(30.seconds) { [self] _ in
+            #if DEBUG
+                log.debug(formattedMemoryFootprint())
+            #endif
+            guard let mb = memoryFootprintMB() else { return }
+
+            if mb >= 8192 {
+                memory8GBPassed = true
+                return
+            }
+            if mb >= 4096 {
+                memory4GBPassed = true
+                return
+            }
+            if mb >= 2048 {
+                memory2GBPassed = true
+                return
+            }
+            if mb >= 1024 {
+                memory1GBPassed = true
+                return
+            }
+            if mb >= 512 {
+                memory500MBPassed = true
+                return
+            }
+        }
     }
 
     func listenForSettingsChange() {
@@ -480,7 +604,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
                 let button = settingsPageController.advancedSettingsButton else { return }
             if highlight { button.highlight() }
-        case .gear:
+        case .displaySettings:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
                   let displayViewController = pageController
                   .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
@@ -561,13 +685,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func setInfoMenuToggleTitle() {
         let infoMenuShown = CachedDefaults[.infoMenuShown]
-
+        let padding = CachedDefaults[.startAtLogin] ? "      " : "    "
         if infoMenuShown {
-            (infoMenuToggle.view as! NSTextField).attributedStringValue = "      Useful Info"
+            (infoMenuToggle.view as! NSTextField).attributedStringValue = "\(padding)Useful Info"
                 .withFont(.systemFont(ofSize: 13, weight: .regular)) + " (click to hide)"
                 .withFont(monospace(size: 12, weight: .regular)).withTextColor(explanationColor)
         } else {
-            (infoMenuToggle.view as! NSTextField).attributedStringValue = "      Useful Info"
+            (infoMenuToggle.view as! NSTextField).attributedStringValue = "\(padding)Useful Info"
                 .withFont(.systemFont(ofSize: 13, weight: .regular)) + " (click to show)"
                 .withFont(monospace(size: 12, weight: .regular)).withTextColor(explanationColor)
         }
@@ -759,8 +883,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { _ in
                 log.debug("Screen configuration changed")
 
-                displayController.adaptBrightness(force: true)
-
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
                 let newLidClosed = IsLidClosed()
                 guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
@@ -788,6 +910,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.manageClamshellMode()
                 displayController.resetDisplayList()
 
+                displayController.adaptBrightness(force: true)
+
                 debounce(ms: 3000, uniqueTaskKey: "resetStates") {
                     self.disableFaceLight(smooth: false)
                     NetworkControl.resetState()
@@ -812,6 +936,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if CachedDefaults[.refreshValues] {
                         self.startValuesReaderThread()
                     }
+                    SyncMode.refresh()
                     if displayController.adaptiveMode.available {
                         displayController.adaptiveMode.watch()
                     }
@@ -1031,7 +1156,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         menu?.update()
     }
 
-    func onboard() {}
+    func onboard() {
+        createAndShowWindow("onboardWindowController", controller: &onboardWindowController)
+    }
 
     func applicationWillFinishLaunching(_: Notification) {
         PFMoveToApplicationsFolderIfNecessary()
@@ -1142,6 +1269,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         listenForAdaptiveModeChange()
         listenForSettingsChange()
+        checkForHighMemoryUsage()
         listenForScreenConfigurationChanged()
         displayController.listenForRunningApps()
 
@@ -1149,8 +1277,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initLicensing()
 
         NetworkControl.setup()
-        if thisIsFirstRun || TEST_MODE {
+        if thisIsFirstRun || thisIsFirstRunAfterLunar4Upgrade || TEST_MODE {
             showWindow()
+            // onboard()
         }
 
         if TEST_MODE {
@@ -1364,30 +1493,54 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        builtinDisplay: Bool = false
+        builtinDisplay: Bool = false,
+        sourceDisplay: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(by: amount, for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
+        displayController.adjustBrightness(
+            by: amount,
+            for: displays,
+            currentDisplay: currentDisplay,
+            builtinDisplay: builtinDisplay,
+            sourceDisplay: sourceDisplay
+        )
     }
 
-    func increaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func increaseContrast(
+        by amount: Int? = nil,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        sourceDisplay: Bool = false
+    ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
     }
 
     func decreaseBrightness(
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        builtinDisplay: Bool = false
+        builtinDisplay: Bool = false,
+        sourceDisplay: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(by: -amount, for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay)
+        displayController.adjustBrightness(
+            by: -amount,
+            for: displays,
+            currentDisplay: currentDisplay,
+            builtinDisplay: builtinDisplay,
+            sourceDisplay: sourceDisplay
+        )
     }
 
-    func decreaseContrast(by amount: Int? = nil, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func decreaseContrast(
+        by amount: Int? = nil,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        sourceDisplay: Bool = false
+    ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay)
+        displayController.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
     }
 
     @IBAction func setLight0Percent(sender _: Any?) {

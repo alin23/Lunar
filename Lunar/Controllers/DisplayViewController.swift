@@ -88,6 +88,30 @@ class DisplayViewController: NSViewController {
     * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
         - *Aim for using as little adapters as possible between your Mac device and your monitor*
     """
+    let SOFTWARE_OVERLAY_HELP_TEXT = """
+    ## Software Overlay
+
+    This monitor's hardware brightness can't be controlled in any way.
+    Because it is a **Virtual/Sidecar/Airplay** display, it doesn't support Gamma table alteration either.
+
+    Lunar has to fallback to mimicking a brightness change through a dark overlay.
+
+    ### Advantages
+    * It works on any monitor no matter what type of connections is used
+
+    ### Disadvantages
+    * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+    * No support for changing volume, contrast or input
+    * Low brightness values can wash out colors
+    * Quitting Lunar resets the brightness to default
+
+    #### Notes
+
+    An **overlay** is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar.
+
+    The overlay is not used on non-Airplay/Virtual monitors because Gamma is a better choice for accurate color rendering
+
+    """
     let SOFTWARE_CONTROLS_HELP_TEXT = """
     ## Gamma tables
 
@@ -103,9 +127,6 @@ class DisplayViewController: NSViewController {
     * Low brightness values can wash out colors
     * Quitting Lunar resets the brightness to default
     * Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
-    * **Airplay**, **iPad Sidecar** and **DisplayLink** monitors don't support Gamma so we have to use an overlay which looks even worse
-        - An overlay is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar
-        - The overlay is not used on non-Airplay/Virtual monitors because Gamma is a better choice for accurate color rendering
     """
     let NO_CONTROLS_HELP_TEXT = """
     ## No controls available
@@ -576,26 +597,31 @@ class DisplayViewController: NSViewController {
         }
 
         mainThread {
-            button.alpha = 1.0
-            button.hoverAlpha = 0.9
+            button.alpha = 0.85
+            button.hoverAlpha = 1.0
             button.circle = false
 
             switch control {
-            case is CoreDisplayControl:
+            case is AppleNativeControl:
                 button.bg = green
-                button.attributedTitle = "Native Controls".withAttribute(.textColor(mauve))
+                button.attributedTitle = "Apple Native".withAttribute(.textColor(mauve))
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
             case is DDCControl:
                 button.bg = darkMode ? peach : lunarYellow
-                button.attributedTitle = "Hardware Controls".withAttribute(.textColor(darkMauve))
+                button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
             case is GammaControl where display.enabledControls[.gamma] ?? false:
                 button.bg = darkMode ? peach.blended(withFraction: 0.5, of: red) : red.withAlphaComponent(0.9)
-                button.attributedTitle = "Software Controls".withAttribute(.textColor(.black))
-                button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
+                if display.supportsGamma {
+                    button.attributedTitle = "Software Gamma".withAttribute(.textColor(.black))
+                    button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
+                } else {
+                    button.attributedTitle = "Software Overlay".withAttribute(.textColor(.black))
+                    button.helpText = SOFTWARE_OVERLAY_HELP_TEXT
+                }
             case is NetworkControl:
                 button.bg = darkMode ? blue.highlight(withLevel: 0.2) : blue.withAlphaComponent(0.9)
-                button.attributedTitle = "Network Controls".withAttribute(.textColor(.black))
+                button.attributedTitle = "Network Pi".withAttribute(.textColor(.black))
                 button.helpText = NETWORK_CONTROLS_HELP_TEXT
             default:
                 button.bg = darkMode ? gray.withAlphaComponent(0.6) : gray.withAlphaComponent(0.9)
@@ -939,11 +965,11 @@ class DisplayViewController: NSViewController {
             self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
             self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
         }.store(in: &displayObservers, for: "hasDDC")
-        display.$activeAndResponsive.receive(on: dataPublisherQueue).sink { [weak self] newActiveAndResponsive in
+        display.$responsiveDDC.receive(on: dataPublisherQueue).sink { [weak self] responsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
-                self.setInputHidden(display.id == GENERIC_DISPLAY_ID || !newActiveAndResponsive || display.isBuiltin)
+                self.setInputHidden(display.id == GENERIC_DISPLAY_ID || (!responsive && display.control is DDCControl) || display.isBuiltin)
 
-                mainThread { textField.isHidden = newActiveAndResponsive }
+                mainThread { textField.isHidden = !display.active || responsive || !(display.control is DDCControl) }
             }
         }.store(in: &displayObservers, for: "activeAndResponsive")
         if !display.adaptive {
