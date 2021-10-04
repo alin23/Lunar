@@ -106,6 +106,14 @@ class DisplayController {
         builtinActiveDisplays.first
     }
 
+    var sourceDisplay: Display? {
+        activeDisplays.values.first { $0.isSource }
+    }
+
+    var targetDisplays: [Display] {
+        activeDisplays.values.filter { !$0.isSource }
+    }
+
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
@@ -729,7 +737,7 @@ class DisplayController {
             includeAirplay: includeAirplay || TEST_MODE,
             includeProjector: includeProjector || TEST_MODE
         )
-        if let builtinDisplayID = SyncMode.builtinDisplay {
+        if let builtinDisplayID = NSScreen.builtinDisplayID {
             ids.append(builtinDisplayID)
         }
         var serials = ids.map { Display.uuid(id: $0) }
@@ -936,8 +944,7 @@ class DisplayController {
                     includeProjector: CachedDefaults[.showProjectorDisplays]
                 )
 
-                SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
-                SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
+                SyncMode.refresh()
                 self.addSentryData()
             }
 
@@ -1053,7 +1060,7 @@ class DisplayController {
 
                 var br: Float = cap(Float(armProps["IOMFBBrightnessLevel"] as! Int) / MAX_IOMFB_BRIGHTNESS.f, minVal: 0.0, maxVal: 1.0)
                 computedProps["ComputedFromIOMFBBrightnessLevel"] = br.str(decimals: 4)
-                if let id = SyncMode.builtinDisplay {
+                if let id = self?.builtinDisplay?.id {
                     DisplayServicesGetLinearBrightness(id, &br)
                     computedProps["DisplayServicesGetLinearBrightness"] = br.str(decimals: 4)
                     computedProps["CoreDisplay_Display_GetUserBrightness"] = CoreDisplay_Display_GetUserBrightness(id).str(decimals: 4)
@@ -1120,14 +1127,14 @@ class DisplayController {
 
     func manageClamshellMode() {
         lidClosed = IsLidClosed()
-        SyncMode.builtinDisplay = SyncMode.getBuiltinDisplay()
+        SyncMode.refresh()
         log.info("Lid closed: \(lidClosed)")
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self else { return }
             scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
         }
 
-        if CachedDefaults[.clamshellModeDetection] {
+        if CachedDefaults[.clamshellModeDetection], SyncMode.sourceDisplay?.isBuiltin ?? true {
             if lidClosed {
                 activateClamshellMode()
             } else if clamshellMode {
@@ -1193,28 +1200,36 @@ class DisplayController {
     func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplays.values.map { $0 }
+
         displays.forEach { display in
             guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin,
                   !display.lockedBrightness
             else { return }
-            display.brightness = manualMode.compute(
-                percent: value,
-                minVal: display.minBrightness.intValue,
-                maxVal: display.maxBrightness.intValue
-            )
+
+            mainAsyncAfter(ms: 1) {
+                display.brightness = manualMode.compute(
+                    percent: value,
+                    minVal: display.minBrightness.intValue,
+                    maxVal: display.maxBrightness.intValue
+                )
+            }
         }
     }
 
     func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplays.values.map { $0 }
+
         displays.forEach { display in
             guard !display.isBuiltin, !display.lockedContrast else { return }
-            display.contrast = manualMode.compute(
-                percent: value,
-                minVal: display.minContrast.intValue,
-                maxVal: display.maxContrast.intValue
-            )
+
+            mainAsyncAfter(ms: 1) {
+                display.contrast = manualMode.compute(
+                    percent: value,
+                    minVal: display.minContrast.intValue,
+                    maxVal: display.maxContrast.intValue
+                )
+            }
         }
     }
 
@@ -1248,12 +1263,23 @@ class DisplayController {
         }
     }
 
-    func adjustBrightness(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false, builtinDisplay: Bool = false) {
+    func adjustBrightness(
+        by offset: Int,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        builtinDisplay: Bool = false,
+        sourceDisplay: Bool = false
+    ) {
         guard checkRemainingAdjustments() else { return }
 
-        adjustValue(for: displays, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay) { (display: Display) in
+        adjustValue(
+            for: displays,
+            currentDisplay: currentDisplay,
+            builtinDisplay: builtinDisplay,
+            sourceDisplay: sourceDisplay
+        ) { (display: Display) in
             if display.isBuiltin {
-                guard builtinDisplay || currentDisplay else { return }
+                guard builtinDisplay || currentDisplay || sourceDisplay else { return }
             }
 
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
@@ -1275,10 +1301,10 @@ class DisplayController {
         }
     }
 
-    func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false) {
+    func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false, sourceDisplay: Bool = false) {
         guard checkRemainingAdjustments() else { return }
 
-        adjustValue(for: displays, currentDisplay: currentDisplay) { (display: Display) in
+        adjustValue(for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay) { (display: Display) in
             guard !display.isBuiltin else { return }
 
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)
@@ -1305,6 +1331,7 @@ class DisplayController {
         currentDisplay: Bool = false,
         currentAudioDisplay: Bool = false,
         builtinDisplay: Bool = false,
+        sourceDisplay: Bool = false,
         _ setValue: (Display) -> Void
     ) {
         if currentAudioDisplay {
@@ -1317,6 +1344,10 @@ class DisplayController {
             }
         } else if builtinDisplay {
             if let display = self.builtinDisplay {
+                setValue(display)
+            }
+        } else if sourceDisplay {
+            if let display = self.sourceDisplay {
                 setValue(display)
             }
         } else if let displays = displays {

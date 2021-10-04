@@ -111,6 +111,13 @@ class PaddedButton: NSButton {
         setColors(fadeDuration: 0.1)
     }
 
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        if isEnabled {
+            addCursorRect(bounds, cursor: .pointingHand)
+        }
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         fade()
 

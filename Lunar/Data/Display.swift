@@ -907,17 +907,16 @@ enum ValueType {
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self, !self.isForTesting, self.isInMirrorSet,
-                      let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(self.id) == $0 })
-                else { return }
-                self.primaryMirrorScreen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+                guard let self = self else { return }
+                self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
+                asyncEvery(2.seconds, uniqueTaskKey: "primaryMirrorScreen-\(self.serial)", runs: 5, skipIfExists: false) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
+                }
             }
             .store(in: &observers)
 
-        guard !isForTesting, self.isInMirrorSet,
-              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
-        else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+        return getPrimaryMirrorScreen()
     }()
 
     lazy var secondaryMirrorScreen: NSScreen? = {
@@ -925,17 +924,21 @@ enum ValueType {
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self, !self.isForTesting, self.isInMirrorSet,
-                      let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == self.id })
-                else { return }
-                self.secondaryMirrorScreen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+                guard let self = self else { return }
+                self.secondaryMirrorScreen = self.getSecondaryMirrorScreen()
+                asyncEvery(
+                    2.seconds,
+                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
+                    runs: 5,
+                    skipIfExists: false
+                ) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.secondaryMirrorScreen = self.getSecondaryMirrorScreen()
+                }
             }
             .store(in: &observers)
 
-        guard !isForTesting, self.isInMirrorSet,
-              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
-        else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+        return getSecondaryMirrorScreen()
     }()
 
     lazy var screen: NSScreen? = {
@@ -944,16 +947,18 @@ enum ValueType {
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.screen = NSScreen.screens.first(where: { screen in screen.hasDisplayID(self.id) })
+                self.screen = self.getScreen()
+                asyncEvery(2.seconds, uniqueTaskKey: "screen-\(self.serial)", runs: 5, skipIfExists: false) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.screen = self.getScreen()
+                }
             }
             .store(in: &observers)
 
-        guard !isForTesting else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
+        return getScreen()
     }()
 
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
-
     @Atomic var force = false
 
     @Atomic var faceLightEnabled = false
@@ -1023,6 +1028,11 @@ enum ValueType {
     var gammaWindowController: NSWindowController?
     var shadeWindowController: NSWindowController?
     var faceLightWindowController: NSWindowController?
+
+    @Atomic var shouldStopBrightnessTransition = true
+    @Atomic var shouldStopContrastTransition = true
+    @Atomic var lastWrittenBrightness: UInt8 = 50
+    @Atomic var lastWrittenContrast: UInt8 = 50
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
@@ -1824,7 +1834,7 @@ enum ValueType {
                     }
                     setGamma()
                 }
-                if control is CoreDisplayControl {
+                if control is AppleNativeControl {
                     alternativeControlForCoreDisplay = getBestAlternativeControlForCoreDisplay()
                 }
                 onControlChange?(control)
@@ -1866,6 +1876,10 @@ enum ValueType {
 
         if DDC.isBuiltinDisplay(id, checkName: false) {
             return "Built-in"
+        }
+
+        if DDC.isSidecarDisplay(id, checkName: false) {
+            return "Sidecar"
         }
 
         if let screen = NSScreen.forDisplayID(id) {
@@ -1938,6 +1952,25 @@ enum ValueType {
         values[featureValue] = targetValue
     }
 
+    func getScreen() -> NSScreen? {
+        guard !isForTesting else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
+    }
+
+    func getSecondaryMirrorScreen() -> NSScreen? {
+        guard !isForTesting, isInMirrorSet,
+              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+    }
+
+    func getPrimaryMirrorScreen() -> NSScreen? {
+        guard !isForTesting, isInMirrorSet,
+              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+    }
+
     func refreshPanel() {
         withoutDDC {
             rotation = CGDisplayRotation(id).intround
@@ -1957,6 +1990,8 @@ enum ValueType {
             return
         }
 
+        let key = "shade-0-\(serial)"
+        cancelTask(key)
         mainThread {
             if shadeWindowController?.window == nil {
                 createWindow(
@@ -1982,14 +2017,22 @@ enum ValueType {
             guard let w = shadeWindowController?.window else { return }
             w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
             w.setFrame(screen.frame, display: false)
-            w.contentView?.transition(brightnessTransition == .slow ? 2.0 : 0.6)
+
+            let delay = brightnessTransition == .slow ? 2.0 : 0.6
+            w.contentView?.transition(delay)
             w.contentView?.alphaValue = mapNumber(
                 cap(amount, minVal: 0.0, maxVal: 1.0),
                 fromLow: 0.0,
                 fromHigh: 1.0,
-                toLow: 0.0,
-                toHigh: 0.9
+                toLow: 0.01,
+                toHigh: 0.85
             )
+
+            if amount == 0 {
+                asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) {
+                    w.contentView?.alphaValue = 0
+                }
+            }
         }
     }
 
@@ -2105,7 +2148,7 @@ enum ValueType {
 
     func getBestControl() -> Control {
         let networkControl = NetworkControl(display: self)
-        let coreDisplayControl = CoreDisplayControl(display: self)
+        let coreDisplayControl = AppleNativeControl(display: self)
         let ddcControl = DDCControl(display: self)
         let gammaControl = GammaControl(display: self)
 
@@ -2695,31 +2738,39 @@ enum ValueType {
         }
     }
 
-    func smoothTransition(from currentValue: UInt8, to value: UInt8, delay: TimeInterval? = nil, adjust: @escaping ((UInt8) -> Void)) {
+    func smoothTransition(
+        from currentValue: UInt8,
+        to value: UInt8,
+        delay: TimeInterval? = nil,
+        onStart: (() -> Void)? = nil,
+        adjust: @escaping ((UInt8) -> Void)
+    ) -> DispatchWorkItem {
         inSmoothTransition = true
 
-        var steps = abs(value.distance(to: currentValue))
-
-        var step: Int
-        let minVal: UInt8
-        let maxVal: UInt8
-        if value < currentValue {
-            step = cap(-smoothStep, minVal: -steps, maxVal: -1)
-            minVal = value
-            maxVal = currentValue
-        } else {
-            step = cap(smoothStep, minVal: 1, maxVal: steps)
-            minVal = currentValue
-            maxVal = value
-        }
-        asyncNow(barrier: true) { [weak self] in
+        let task = DispatchWorkItem(name: "smoothTransitionDDC: \(self)", flags: .barrier) { [weak self] in
             guard let self = self else { return }
+
+            var steps = abs(value.distance(to: currentValue))
+
+            var step: Int
+            let minVal: UInt8
+            let maxVal: UInt8
+            if value < currentValue {
+                step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
+                minVal = value
+                maxVal = currentValue
+            } else {
+                step = cap(self.smoothStep, minVal: 1, maxVal: steps)
+                minVal = currentValue
+                maxVal = value
+            }
 
             let startTime = DispatchTime.now()
             var elapsedTime: UInt64
             var elapsedSeconds: Double
             var elapsedSecondsStr: String
 
+            onStart?()
             adjust((currentValue.i + step).u8)
 
             elapsedTime = DispatchTime.now().rawValue - startTime.rawValue
@@ -2759,6 +2810,8 @@ enum ValueType {
 
             self.inSmoothTransition = false
         }
+        smoothDDCQueue.asyncAfter(deadline: DispatchTime.now(), execute: task.workItem)
+        return task
     }
 
     func readapt<T: Equatable>(newValue: T?, oldValue: T?) {
@@ -2794,7 +2847,7 @@ enum ValueType {
 
     func readContrast() -> UInt8? {
         guard !isBuiltin else {
-            guard let (_, contrast) = SyncMode.readBrightnessContrast(id: id) else {
+            guard let contrast = SyncMode.readBuiltinContrast() else {
                 return nil
             }
             return (contrast * 100).u8
@@ -2850,7 +2903,9 @@ enum ValueType {
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin {
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin,
+               timeSince(lastConnectionTime) > 10
+            {
                 insertBrightnessUserDataPoint(
                     displayController.adaptiveMode.brightnessDataPoint.last,
                     newBrightness.i, modeKey: displayController.adaptiveModeKey
@@ -2876,7 +2931,9 @@ enum ValueType {
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin {
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin,
+               timeSince(lastConnectionTime) > 10
+            {
                 insertContrastUserDataPoint(
                     displayController.adaptiveMode.contrastDataPoint.last,
                     newContrast.i, modeKey: displayController.adaptiveModeKey
@@ -3193,7 +3250,7 @@ enum ValueType {
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve, !adaptivePaused, !isBuiltin else { return }
+        guard !lockedBrightnessCurve, !adaptivePaused, !isBuiltin, !isSource else { return }
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
@@ -3225,7 +3282,7 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve, !adaptivePaused, !isBuiltin else { return }
+        guard !lockedContrastCurve, !adaptivePaused, !isBuiltin, !isSource else { return }
 
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {

@@ -764,6 +764,10 @@ extension NSScreen {
         return id == displayID
     }
 
+    static var builtinDisplayID: CGDirectDisplayID? {
+        onlineDisplayIDs.first(where: { DDC.isBuiltinDisplay($0) })
+    }
+
     var displayID: CGDirectDisplayID? {
         guard let id = deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
         else { return nil }
@@ -853,8 +857,16 @@ extension NSView {
         addTrackingArea(area)
     }
 
-    @inline(__always) func transition(_ duration: TimeInterval = 0.2) {
-        layer?.add(fadeTransition(duration: duration), forKey: "transition")
+    @inline(__always) func transition(
+        _ duration: TimeInterval,
+        type: CATransitionType = .fade,
+        subtype: CATransitionSubtype = .fromTop,
+        start: Float = 0.0,
+        end: Float = 1.0,
+        easing: CAMediaTimingFunctionName = .easeOut,
+        key: String = kCATransition
+    ) {
+        layer?.add(createTransition(duration: duration, type: type, subtype: subtype, start: start, end: end, easing: easing), forKey: key)
     }
 
     func center(within rect: NSRect, horizontally: Bool = true, vertically: Bool = true) {

@@ -80,12 +80,15 @@
 		C78BD04C259B365500FC823F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD04B259B365500FC823F /* Extensions.swift */; };
 		C78BD04E259B369A00FC823F /* Popovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD04D259B369A00FC823F /* Popovers.swift */; };
 		C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD054259B6BAD00FC823F /* SyncMode.swift */; };
+		C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78F121927073278009A3301 /* ModeChoiceViewController.swift */; };
+		C78F121E27073284009A3301 /* ControlChoiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78F121C27073284009A3301 /* ControlChoiceViewController.swift */; };
+		C78F12222707328D009A3301 /* HotkeysChoiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78F12202707328D009A3301 /* HotkeysChoiceViewController.swift */; };
 		C790D4BE259B9DC100868689 /* NanoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = C790D4BD259B9DC100868689 /* NanoID.swift */; };
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
 		C79975D725DEEDE000C797FF /* Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975D625DEEDE000C797FF /* Control.swift */; };
 		C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DA25DEEE9300C797FF /* DDCControl.swift */; };
-		C79975DE25DEEF9200C797FF /* CoreDisplayControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DD25DEEF9200C797FF /* CoreDisplayControl.swift */; };
+		C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */; };
 		C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975E025DEF2EC00C797FF /* GammaControl.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A517A02593C11C00F6CC83 /* PopoverButon.swift */; };
@@ -95,6 +98,7 @@
 		C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */; };
 		C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */; };
 		C7A82DC3261DF513004146A8 /* Pro.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DC2261DF513004146A8 /* Pro.swift */; };
+		C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A9AAB52707130E0058D1B2 /* OnboardPageController.swift */; };
 		C7AB59782396C4A90028E573 /* Transformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AB59762396C4A80028E573 /* Transformers.swift */; };
 		C7AEC7F91FD0B4350039B562 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */; };
 		C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AEC7FA1FD0B4350039B562 /* PageController.swift */; };
@@ -273,12 +277,15 @@
 		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C78BD04D259B369A00FC823F /* Popovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popovers.swift; sourceTree = "<group>"; };
 		C78BD054259B6BAD00FC823F /* SyncMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMode.swift; sourceTree = "<group>"; };
+		C78F121927073278009A3301 /* ModeChoiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeChoiceViewController.swift; sourceTree = "<group>"; };
+		C78F121C27073284009A3301 /* ControlChoiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlChoiceViewController.swift; sourceTree = "<group>"; };
+		C78F12202707328D009A3301 /* HotkeysChoiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeysChoiceViewController.swift; sourceTree = "<group>"; };
 		C790D4BD259B9DC100868689 /* NanoID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NanoID.swift; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
 		C79975D625DEEDE000C797FF /* Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Control.swift; sourceTree = "<group>"; };
 		C79975DA25DEEE9300C797FF /* DDCControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCControl.swift; sourceTree = "<group>"; };
-		C79975DD25DEEF9200C797FF /* CoreDisplayControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDisplayControl.swift; sourceTree = "<group>"; };
+		C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNativeControl.swift; sourceTree = "<group>"; };
 		C79975E025DEF2EC00C797FF /* GammaControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GammaControl.swift; sourceTree = "<group>"; };
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -289,6 +296,7 @@
 		C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallOutputViewController.swift; sourceTree = "<group>"; };
 		C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPopoverController.swift; sourceTree = "<group>"; };
 		C7A82DC2261DF513004146A8 /* Pro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pro.swift; sourceTree = "<group>"; };
+		C7A9AAB52707130E0058D1B2 /* OnboardPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPageController.swift; sourceTree = "<group>"; };
 		C7AB59762396C4A80028E573 /* Transformers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transformers.swift; sourceTree = "<group>"; };
 		C7AEC7F51FD0B4350039B562 /* Lunar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -512,6 +520,10 @@
 				C7BADA11263889CD0058974C /* ProgressViewController.swift */,
 				C7E896D126500DFF0079A328 /* DiagnosticsViewController.swift */,
 				C71F8DB026542E1000C4648A /* GammaViewController.swift */,
+				C7A9AAB52707130E0058D1B2 /* OnboardPageController.swift */,
+				C78F121927073278009A3301 /* ModeChoiceViewController.swift */,
+				C78F121C27073284009A3301 /* ControlChoiceViewController.swift */,
+				C78F12202707328D009A3301 /* HotkeysChoiceViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -586,7 +598,7 @@
 			children = (
 				C79975D625DEEDE000C797FF /* Control.swift */,
 				C79975DA25DEEE9300C797FF /* DDCControl.swift */,
-				C79975DD25DEEF9200C797FF /* CoreDisplayControl.swift */,
+				C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */,
 				C79975E025DEF2EC00C797FF /* GammaControl.swift */,
 				C772BDD625E7A296006A1684 /* NetworkControl.swift */,
 				C71F8DB9265640C400C4648A /* DDCCTLControl.swift */,
@@ -992,7 +1004,9 @@
 				C7E80E302637060F004718A4 /* FileAttributes.swift in Sources */,
 				C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */,
 				C78BD04C259B365500FC823F /* Extensions.swift in Sources */,
+				C78F121E27073284009A3301 /* ControlChoiceViewController.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
+				C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
 				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
 				C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */,
@@ -1022,6 +1036,7 @@
 				C7E80E2B2637060F004718A4 /* Session.swift in Sources */,
 				C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */,
 				C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */,
+				C78F12222707328D009A3301 /* HotkeysChoiceViewController.swift in Sources */,
 				C7683425245227290087946C /* DisplayName.swift in Sources */,
 				C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
@@ -1037,6 +1052,7 @@
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
+				C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */,
 				C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */,
 				C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */,
 				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
@@ -1052,7 +1068,7 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
-				C79975DE25DEEF9200C797FF /* CoreDisplayControl.swift in Sources */,
+				C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */,
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,

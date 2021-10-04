@@ -37,10 +37,11 @@ class GammaControl: Control {
 
     var displayControl: DisplayControl = .gamma
 
-    weak var display: Display!
+    weak var display: Display?
     let str = "Gamma Control"
 
     func fluxChecker(flux: NSRunningApplication) {
+        guard let display = display else { return }
         guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
@@ -100,6 +101,7 @@ class GammaControl: Control {
     }
 
     func isAvailable() -> Bool {
+        guard let display = display else { return false }
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return display.enabledControls.values.allSatisfy { enabled in !enabled }
@@ -122,6 +124,8 @@ class GammaControl: Control {
     func resetColors() -> Bool { true }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+        guard let display = display else { return false }
+
         guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return false
         }
@@ -144,6 +148,8 @@ class GammaControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+        guard let display = display else { return false }
+
         guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return false
         }
@@ -213,6 +219,8 @@ class GammaControl: Control {
     }
 
     func reset() -> Bool {
+        guard let display = display else { return false }
+
         display.resetSoftwareControl()
         return true
     }

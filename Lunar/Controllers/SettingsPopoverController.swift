@@ -189,6 +189,7 @@ class SettingsPopoverController: NSViewController {
                 applyGamma = display.applyGamma
                 setupApplyGammaCheckbox()
                 resolutionsDropdown.fade()
+                gammaControlCheckbox.title = "Software (\(display.supportsGamma ? "Gamma" : "Overlay"))"
             }
             setupDDCLimits(display)
             setupDDCColorGain(display)
@@ -623,8 +624,11 @@ class SettingsPopoverController: NSViewController {
                     }
                 }
                 datastore.storeDisplays(displayController.displays.values.map { $0 })
+            } else if let builtinDisplay = displayController.builtinDisplay, builtinDisplay.serial != display.serial {
+                builtinDisplay.isSource = true
+                datastore.storeDisplays(displayController.displays.values.map { $0 })
             }
-            SyncMode.sourceDisplayID = SyncMode.getSourceDisplay()
+            SyncMode.refresh()
         }
         volumeOSDToggle.callback = { [weak self] isOn in
             guard let self = self, self.display != nil else { return }
@@ -633,6 +637,7 @@ class SettingsPopoverController: NSViewController {
         if let d = display {
             syncModeRoleToggle.isEnabled = d.isSmartDisplay || TEST_MODE
             volumeOSDToggle.isEnabled = !d.isSmartBuiltin
+            gammaControlCheckbox.title = "Software (\(d.supportsGamma ? "Gamma" : "Overlay"))"
         } else {
             syncModeRoleToggle.isEnabled = false
             volumeOSDToggle.isEnabled = false
@@ -673,10 +678,9 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.adaptAutoToggle, value: display.adaptive)
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
                 self.toggleWithoutCallback(self.volumeOSDToggle, value: display.showVolumeOSD)
-            }
-            mainThread {
                 self.applyGamma = display.applyGamma
                 self.setupApplyGammaCheckbox()
+                self.gammaControlCheckbox.title = "Software (\(display.supportsGamma ? "Gamma" : "Overlay"))"
             }
         }
         applyGammaCheckbox.verticalPadding = 0.09

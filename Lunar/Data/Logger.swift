@@ -85,8 +85,8 @@ class Logger: SwiftyBeaver {
 
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
         defer { initialized = true }
-        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \n\t$X"
-        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
+        console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"
+        file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \t$X"
         Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
