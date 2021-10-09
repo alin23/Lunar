@@ -105,6 +105,16 @@ class Button: NSButton {
     var onClick: (() -> Void)?
     var hover = false
 
+    @IBInspectable var horizontalPadding: CGFloat = 0
+    @IBInspectable var verticalPadding: CGFloat = 0
+
+    override var intrinsicContentSize: NSSize {
+        var size = super.intrinsicContentSize
+        size.width += horizontalPadding
+        size.height += verticalPadding
+        return size
+    }
+
     @IBInspectable var circle: Bool = true {
         didSet {
             mainThread {

@@ -180,7 +180,7 @@ class AppleNativeControl: Control {
         return control.resetColors()
     }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
         guard !display.isForTesting else { return false }
 
@@ -217,7 +217,9 @@ class AppleNativeControl: Control {
 
                     // log.debug("Writing brightness=\(brightness) using \(self) to \(display)")
                     _ = self.writeBrightness(0, preciseBrightness: brightness)
-                    display.lastWrittenBrightness = (brightness * 100).intround.u8
+                    let br = (brightness * 100).intround.u8
+                    display.lastWrittenBrightness = br
+                    onChange?(br)
                     Thread.sleep(forTimeInterval: interval)
                 }
                 display.inSmoothTransition = false
@@ -227,13 +229,14 @@ class AppleNativeControl: Control {
             return true
         }
 
+        onChange?(brightness)
         return writeBrightness(brightness)
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
         guard let control = display.alternativeControlForCoreDisplay else { return false }
-        return control.setContrast(contrast, oldValue: oldValue)
+        return control.setContrast(contrast, oldValue: oldValue, onChange: onChange)
     }
 
     func setVolume(_ volume: UInt8) -> Bool {

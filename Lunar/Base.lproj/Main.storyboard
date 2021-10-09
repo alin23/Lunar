@@ -474,6 +474,13 @@
                                                             <action selector="faq:" target="Voe-Tx-rLC" id="gRa-eh-2fV"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem isSeparatorItem="YES" title="Intensity" id="qPB-OP-NQB"/>
+                                                    <menuItem title="Force update display list" id="E1B-xG-WF5">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="forceUpdateDisplayList:" target="Voe-Tx-rLC" id="yPJ-IE-ydo"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -679,9 +686,15 @@ and setting its brightness/contrast to 0</string>
                                                 <action selector="checkForUpdates:" target="Voe-Tx-rLC" id="ibT-20-cPp"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Quit Lunar" keyEquivalent="q" id="8Oe-Go-Jnc">
+                                        <menuItem title="Restart Lunar" id="8Oe-Go-Jnc">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="terminate:" target="Ady-hI-5gd" id="TqM-KS-73o"/>
+                                                <action selector="restartApp:" target="Voe-Tx-rLC" id="DQx-aO-ibg"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Quit Lunar" keyEquivalent="q" id="xH5-nJ-YIp">
+                                            <connections>
+                                                <action selector="terminate:" target="Ady-hI-5gd" id="xlL-5v-ne1"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -720,6 +733,7 @@ and setting its brightness/contrast to 0</string>
                         <outlet property="percent75MenuItem" destination="zDv-Iq-Rje" id="dSQ-lb-a2v"/>
                         <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="h8u-Sa-C7o"/>
                         <outlet property="resetTrialMenuItem" destination="q2e-UA-fI7" id="AGz-dj-nt7"/>
+                        <outlet property="restartMenuItem" destination="8Oe-Go-Jnc" id="zXR-Kx-ueB"/>
                         <outlet property="versionMenuItem" destination="Z7J-9D-kCB" id="nVs-Yw-zGg"/>
                         <outlet property="volumeDownMenuItem" destination="8zH-Ds-rhs" id="86Z-ha-Ydz"/>
                         <outlet property="volumeUpMenuItem" destination="Omt-Sm-w0d" id="XgG-im-1c1"/>
@@ -874,7 +888,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1a4-Ij-BxE" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="192" y="40" width="116" height="18"/>
+                                <rect key="frame" x="192" y="40" width="116" height="30"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="inline" title="Done" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="MtZ-Dd-LeO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1791,11 +1805,6 @@ visible screen left</string>
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="W1d-1k-kwC">
-                                <rect key="frame" x="-375" y="-500" width="1500" height="1500"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <imageCell key="cell" enabled="NO" refusesFirstResponder="YES" alignment="left" imageAlignment="top" imageScaling="proportionallyUpOrDown" image="Moon" id="Qhh-zJ-knZ"/>
-                            </imageView>
                             <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fR4-tr-Hez">
                                 <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                                 <autoresizingMask key="autoresizingMask"/>
@@ -2732,6 +2741,44 @@ visible screen left</string>
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j6a-90-SYD" customClass="DisplayImage" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="325" y="284" width="300" height="254"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <subviews>
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w4b-zt-fho" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="112" y="6" width="76" height="39"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" usesSingleLineMode="YES" id="JRe-Xr-X4E" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                            <font key="font" metaFont="systemHeavy" size="28"/>
+                                            <color key="textColor" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="0.69676117550000005" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="step">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
+                                                <color key="value" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
+                                                <color key="value" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
+                                                <color key="value" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="0.69676117550000005" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="xRc-C4-BGQ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
+                                        <rect key="frame" x="116" y="0.0" width="69" height="17"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="RADIUS" id="Bgb-5j-zdz">
+                                            <font key="font" metaFont="smallSystemBold"/>
+                                            <color key="textColor" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="0.69676117550000005" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                            </customView>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-26" y="-10" width="1001" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2801,11 +2848,6 @@ visible screen left</string>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.chartHidden" id="acp-KF-bgr"/>
                                 </connections>
                             </customView>
-                            <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gjE-bb-i6q" customClass="DisplayView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="325" y="284" width="300" height="300"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <imageCell key="cell" focusRingType="none" alignment="left" imageAlignment="bottom" imageScaling="proportionallyUpOrDown" image="Display" id="GDk-iZ-Y9k"/>
-                            </imageView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mes-5X-Dx6" customClass="NonResponsiveTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="390" y="551" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
@@ -3026,22 +3068,6 @@ visible screen left</string>
                                     <outlet property="minValueCaption" destination="1u6-gf-UFK" id="moA-76-mwR"/>
                                 </connections>
                             </customView>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="343" y="419" width="264" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" size="28" name="Menlo-Bold"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                </textFieldCell>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="editable" keyPath="self.noDisplay" id="q1R-V1-8dn">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brT-Q5-NwT" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="386" y="231" width="173" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3371,6 +3397,22 @@ and contrast to their highest values</string>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="Sh3-Hq-26f"/>
                                 </connections>
                             </popUpButton>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="343" y="419" width="264" height="45"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" size="28" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="editable" keyPath="self.noDisplay" id="q1R-V1-8dn">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="neU-41-LZY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="415" y="221" width="120" height="54"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3495,8 +3537,10 @@ and contrast to their highest values</string>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="builtinBrightnessCaption" destination="uan-gt-LLv" id="hhC-Zo-IGi"/>
                         <outlet property="builtinBrightnessField" destination="neU-41-LZY" id="8P7-ZZ-hP0"/>
+                        <outlet property="cornerRadiusField" destination="w4b-zt-fho" id="oxP-TL-Nn9"/>
+                        <outlet property="cornerRadiusFieldCaption" destination="xRc-C4-BGQ" id="035-re-1gs"/>
+                        <outlet property="displayImage" destination="j6a-90-SYD" id="Ued-mg-2oO"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
-                        <outlet property="displayView" destination="gjE-bb-i6q" id="b51-eD-3o3"/>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
                         <outlet property="inputDropdown" destination="brT-Q5-NwT" id="QQa-4u-t0q"/>
                         <outlet property="lockBrightnessCurveButton" destination="Z5X-YG-FjQ" id="pOc-V1-hxI"/>
@@ -3928,17 +3972,6 @@ and contrast to their highest values</string>
                                     </subviews>
                                 </view>
                             </box>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LsA-6Y-wu2" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="442" y="54" width="66" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="xya-5q-Etj">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetHotkeys:" target="Zhy-oG-VK1" id="4ye-7v-vb5"/>
-                                </connections>
-                            </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
                                 <rect key="frame" x="37" y="-26" width="258" height="126"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -4108,14 +4141,14 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
                             </box>
                             <box fixedFrame="YES" title="Other" translatesAutoresizingMaskIntoConstraints="NO" id="Jar-zK-MXt">
-                                <rect key="frame" x="644" y="93" width="289" height="216"/>
+                                <rect key="frame" x="644" y="48" width="289" height="258"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="7zV-Io-9p9">
-                                    <rect key="frame" x="3" y="3" width="283" height="195"/>
+                                    <rect key="frame" x="3" y="3" width="283" height="237"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-Ei-XW0" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="73" y="142" width="200" height="34"/>
+                                            <rect key="frame" x="73" y="184" width="200" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4124,7 +4157,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hf3-Te-IZZ">
-                                            <rect key="frame" x="9" y="147" width="58" height="19"/>
+                                            <rect key="frame" x="9" y="189" width="58" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="FaceLight" id="Bgs-Vj-Zbp">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4133,7 +4166,7 @@ and contrast to their highest values</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QXA-sE-00g" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="73" y="100" width="200" height="34"/>
+                                            <rect key="frame" x="73" y="142" width="200" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4142,7 +4175,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CGZ-Gs-qg8">
-                                            <rect key="frame" x="9" y="105" width="58" height="19"/>
+                                            <rect key="frame" x="9" y="147" width="58" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="BlackOut" id="Jlp-4e-dee">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4151,7 +4184,7 @@ and contrast to their highest values</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I9n-Ce-GLd" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="73" y="58" width="200" height="34"/>
+                                            <rect key="frame" x="73" y="100" width="200" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4160,7 +4193,7 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TQX-iX-es3">
-                                            <rect key="frame" x="9" y="63" width="58" height="19"/>
+                                            <rect key="frame" x="9" y="105" width="58" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Settings" id="Wyd-cJ-zXz">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4169,7 +4202,7 @@ and contrast to their highest values</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ePE-Eg-2O8" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="73" y="16" width="200" height="34"/>
+                                            <rect key="frame" x="73" y="58" width="200" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4178,9 +4211,27 @@ and contrast to their highest values</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CMl-kH-8Le">
-                                            <rect key="frame" x="-7" y="21" width="74" height="19"/>
+                                            <rect key="frame" x="-7" y="63" width="74" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Toggle" id="y3M-OT-Lp0">
+                                                <font key="font" metaFont="systemSemibold" size="11"/>
+                                                <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5VH-bj-TPf" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="73" y="16" width="200" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="8"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </customView>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ERR-IR-5He">
+                                            <rect key="frame" x="-7" y="21" width="74" height="19"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Restart" id="zdp-bJ-zCh">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
                                                 <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -4333,6 +4384,17 @@ and contrast to their highest values</string>
                                     <binding destination="upY-F0-APc" name="value" keyPath="values.detectKeyHold" id="WHC-cv-KQX"/>
                                 </connections>
                             </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LsA-6Y-wu2" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="766" y="608" width="66" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="xya-5q-Etj">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="resetHotkeys:" target="Zhy-oG-VK1" id="4ye-7v-vb5"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -4356,6 +4418,7 @@ and contrast to their highest values</string>
                         <outlet property="percent50HotkeyView" destination="DOV-Gn-9CC" id="ATH-Ml-yQe"/>
                         <outlet property="percent75HotkeyView" destination="RK8-fq-4VX" id="n6D-qI-4Mu"/>
                         <outlet property="resetButton" destination="LsA-6Y-wu2" id="dde-dt-7uD"/>
+                        <outlet property="restartHotkeyView" destination="5VH-bj-TPf" id="OK8-kG-W74"/>
                         <outlet property="shiftBrightnessKeysControlButton" destination="whW-nP-Sm4" id="R9k-jF-OTi"/>
                         <outlet property="shiftBrightnessKeysSyncControlButton" destination="sQt-gS-ue8" id="3W2-04-rYm"/>
                         <outlet property="toggleHotkeyView" destination="ePE-Eg-2O8" id="rxf-dR-G4W"/>
@@ -4378,7 +4441,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="100" viewBased="YES" floatsGroupRows="NO" id="s3c-0a-2QT" customClass="DisplayValuesView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="25" y="10" width="430" height="0.0"/>
+                                <rect key="frame" x="25" y="10" width="430" height="95"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -6022,7 +6085,7 @@ Lunar will continue to check in the background</string>
                                 <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Nu-nd-J8V" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="312" y="517" width="88" height="40"/>
+                                <rect key="frame" x="310" y="517" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="0.00" usesSingleLineMode="YES" id="NWR-St-EFT" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -6054,7 +6117,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vZd-UR-hMd" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="311" y="501" width="90" height="20"/>
+                                <rect key="frame" x="309" y="501" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MIN" id="qZa-78-cTd">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -6063,7 +6126,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kxu-Lh-RaO" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="401" y="517" width="88" height="40"/>
+                                <rect key="frame" x="399" y="517" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="hTm-l1-nJ1" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -6095,7 +6158,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Qv-hV-OI4" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="400" y="501" width="90" height="20"/>
+                                <rect key="frame" x="398" y="501" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="FACTOR" id="0UB-ah-eZG">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -6104,7 +6167,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nkC-Gv-ZiC" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="490" y="517" width="88" height="40"/>
+                                <rect key="frame" x="488" y="517" width="88" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="1.00" usesSingleLineMode="YES" id="IBq-nX-MN6" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="32"/>
@@ -6136,7 +6199,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="msy-FO-NFg" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="489" y="501" width="90" height="20"/>
+                                <rect key="frame" x="487" y="501" width="90" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="MAX" id="OIX-G5-NwX">
                                     <font key="font" size="11" name="Menlo-Bold"/>
@@ -6933,7 +6996,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TuO-c2-HDu">
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="TuO-c2-HDu">
                                 <rect key="frame" x="366" y="81" width="155" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="rounded" trackingMode="selectOne" id="5pK-38-2uV">
@@ -7937,26 +8000,32 @@ You can choose to send the diagnostics to the developer if you think this is not
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y1l-f7-bs2">
-                                <rect key="frame" x="319" y="573" width="313" height="37"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y1l-f7-bs2">
+                                <rect key="frame" x="319" y="598" width="313" height="37"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="37" id="8o2-Jj-jtZ"/>
+                                    <constraint firstAttribute="width" constant="309" id="mrx-s0-hRF"/>
+                                </constraints>
                                 <textFieldCell key="cell" alignment="center" title="Let's set up your monitors" id="sEM-Re-zz2">
                                     <font key="font" metaFont="systemHeavy" size="24"/>
                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="92a-we-p3U">
-                                <rect key="frame" x="262" y="498" width="427" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92a-we-p3U">
+                                <rect key="frame" x="262" y="523" width="427" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="423" id="5hi-Pa-xI0"/>
+                                    <constraint firstAttribute="height" constant="34" id="ZY6-x1-F21"/>
+                                </constraints>
                                 <textFieldCell key="cell" alignment="center" title="How would you like to use Lunar?" id="YFL-EC-Ah9">
                                     <font key="font" size="20" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.93880208333333337" green="0.9218496532620053" blue="0.84739660838293662" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yJG-vz-QYi">
-                                <rect key="frame" x="285" y="369" width="381" height="34"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yJG-vz-QYi">
+                                <rect key="frame" x="285" y="432" width="381" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="BpA-Vp-aNU"/>
                                     <constraint firstAttribute="width" constant="377" id="uhJ-Bc-Cc7"/>
@@ -7968,21 +8037,21 @@ You can choose to send the diagnostics to the developer if you think this is not
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o5k-6h-YVh">
-                                <rect key="frame" x="285" y="272" width="381" height="34"/>
+                                <rect key="frame" x="285" y="360" width="381" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="377" id="l9s-0C-8Ok"/>
                                     <constraint firstAttribute="height" constant="34" id="sUZ-6P-l3a"/>
                                 </constraints>
                                 <textFieldCell key="cell" alignment="center" id="17K-p4-nsc">
                                     <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Take advantage of the built-in light sensor 
+                                    <string key="title">Take advantage of the built-in light sensor
 inside the source display</string>
                                     <color key="textColor" red="0.93880208330000003" green="0.92184965330000002" blue="0.84739660839999997" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Swc-RH-H6g">
-                                <rect key="frame" x="285" y="178" width="381" height="34"/>
+                                <rect key="frame" x="285" y="291" width="381" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="4JT-jy-qnW"/>
                                     <constraint firstAttribute="width" constant="377" id="D9y-XS-3XP"/>
@@ -7996,7 +8065,7 @@ with lots of natural light</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q0D-9Q-YZ5">
-                                <rect key="frame" x="285" y="84" width="381" height="34"/>
+                                <rect key="frame" x="285" y="222" width="381" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="L9m-xC-3Xa"/>
                                     <constraint firstAttribute="width" constant="377" id="Tr1-Di-VtU"/>
@@ -8010,7 +8079,7 @@ or on a well defined schedule</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wo3-qt-tdi">
-                                <rect key="frame" x="285" y="0.0" width="381" height="34"/>
+                                <rect key="frame" x="285" y="163" width="381" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="377" id="HZI-5U-M4a"/>
                                     <constraint firstAttribute="height" constant="34" id="xbb-Cq-UZK"/>
@@ -8022,10 +8091,10 @@ or on a well defined schedule</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E5r-43-pjX" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="302" y="411" width="346" height="44"/>
+                                <rect key="frame" x="290" y="461" width="370" height="48"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="346" id="C9f-Gy-tnv"/>
-                                    <constraint firstAttribute="height" constant="44" id="hTe-y9-PnQ"/>
+                                    <constraint firstAttribute="width" constant="370" id="C9f-Gy-tnv"/>
+                                    <constraint firstAttribute="height" constant="48" id="hTe-y9-PnQ"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="J1g-0i-5ZS">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -8043,10 +8112,10 @@ to your external monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hxg-dR-YkI" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="302" y="314" width="346" height="44"/>
+                                <rect key="frame" x="290" y="389" width="370" height="48"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="OWv-aC-zZU"/>
-                                    <constraint firstAttribute="width" constant="346" id="jTw-ca-GMa"/>
+                                    <constraint firstAttribute="height" constant="48" id="OWv-aC-zZU"/>
+                                    <constraint firstAttribute="width" constant="370" id="jTw-ca-GMa"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="kSm-z8-GSy">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -8064,10 +8133,10 @@ to the other monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0jr-VS-Ttp" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="302" y="220" width="346" height="44"/>
+                                <rect key="frame" x="290" y="320" width="370" height="48"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="346" id="d6F-2S-Kz1"/>
-                                    <constraint firstAttribute="height" constant="44" id="wXZ-OI-O5Y"/>
+                                    <constraint firstAttribute="width" constant="370" id="d6F-2S-Kz1"/>
+                                    <constraint firstAttribute="height" constant="48" id="wXZ-OI-O5Y"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="vt5-lx-pmi">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -8085,14 +8154,14 @@ based on sunrise and sunset</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QGd-6p-9j0" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="302" y="126" width="346" height="44"/>
+                                <rect key="frame" x="290" y="251" width="370" height="48"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="aAj-IP-IBh"/>
-                                    <constraint firstAttribute="width" constant="346" id="qLX-qu-XpN"/>
+                                    <constraint firstAttribute="height" constant="48" id="aAj-IP-IBh"/>
+                                    <constraint firstAttribute="width" constant="370" id="qLX-qu-XpN"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="mZu-Sh-7vJ">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <string key="title">Schedule presets for changing the 
+                                    <string key="title">Schedule presets for changing the
 brightness at predefined times</string>
                                     <font key="font" metaFont="systemSemibold" size="16"/>
                                 </buttonCell>
@@ -8106,10 +8175,10 @@ brightness at predefined times</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jF6-Up-eoN" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="302" y="42" width="346" height="44"/>
+                                <rect key="frame" x="290" y="192" width="370" height="48"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="346" id="bFf-Gs-28r"/>
-                                    <constraint firstAttribute="height" constant="44" id="cIA-9M-dWq"/>
+                                    <constraint firstAttribute="width" constant="370" id="bFf-Gs-28r"/>
+                                    <constraint firstAttribute="height" constant="48" id="cIA-9M-dWq"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="os4-vy-DuG">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -8126,18 +8195,58 @@ from a wireless light sensor</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bi4-sp-Qur">
+                                <rect key="frame" x="285" y="111" width="381" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="EqS-xJ-yGz"/>
+                                    <constraint firstAttribute="width" constant="377" id="fpC-P6-XMM"/>
+                                </constraints>
+                                <textFieldCell key="cell" alignment="center" title="Ambient Light Sensor tutorial" id="QfU-Er-BUR">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="0.93880208330000003" green="0.92184965330000002" blue="0.84739660839999997" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wJc-xF-vi0" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="290" y="140" width="370" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="370" id="LG6-5l-Pvc"/>
+                                    <constraint firstAttribute="height" constant="48" id="Lt8-Te-gF8"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="bW2-4f-zjb">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <string key="title">Control monitors using
+brightness and volume keys</string>
+                                    <font key="font" metaFont="systemSemibold" size="16"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" red="0.96524234689999999" green="0.69482155400000001" blue="0.057890943270000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="92a-we-p3U" firstAttribute="top" secondItem="Y1l-f7-bs2" secondAttribute="bottom" constant="41" id="AfI-su-G1s"/>
                             <constraint firstItem="Wo3-qt-tdi" firstAttribute="centerX" secondItem="jF6-Up-eoN" secondAttribute="centerX" id="IIe-oN-uoE"/>
                             <constraint firstItem="QGd-6p-9j0" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="Oux-g2-U4F"/>
                             <constraint firstItem="Swc-RH-H6g" firstAttribute="centerX" secondItem="0jr-VS-Ttp" secondAttribute="centerX" id="SPj-tc-3HC"/>
+                            <constraint firstItem="92a-we-p3U" firstAttribute="centerX" secondItem="Y1l-f7-bs2" secondAttribute="centerX" id="Ssc-B7-UkV"/>
                             <constraint firstItem="E5r-43-pjX" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="XrC-A2-mOZ"/>
                             <constraint firstItem="jF6-Up-eoN" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="Yyr-J7-ydT"/>
                             <constraint firstItem="Hxg-dR-YkI" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="aCb-gz-MeQ"/>
+                            <constraint firstItem="yJG-vz-QYi" firstAttribute="top" secondItem="92a-we-p3U" secondAttribute="bottom" constant="57" id="aH0-W2-sN3"/>
                             <constraint firstItem="yJG-vz-QYi" firstAttribute="centerX" secondItem="E5r-43-pjX" secondAttribute="centerX" id="aNf-AB-LJw"/>
                             <constraint firstItem="Q0D-9Q-YZ5" firstAttribute="centerX" secondItem="QGd-6p-9j0" secondAttribute="centerX" id="dSd-Q3-uZq"/>
+                            <constraint firstItem="Y1l-f7-bs2" firstAttribute="top" secondItem="COS-gn-hQs" secondAttribute="top" constant="65" id="gYq-T9-1L9"/>
+                            <constraint firstItem="Y1l-f7-bs2" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="kfr-HQ-IQm"/>
                             <constraint firstItem="0jr-VS-Ttp" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="l9M-r1-fjE"/>
+                            <constraint firstItem="Bi4-sp-Qur" firstAttribute="centerX" secondItem="wJc-xF-vi0" secondAttribute="centerX" id="mtD-RL-i4I"/>
                             <constraint firstItem="o5k-6h-YVh" firstAttribute="centerX" secondItem="Hxg-dR-YkI" secondAttribute="centerX" id="rVY-DZ-CPF"/>
+                            <constraint firstItem="wJc-xF-vi0" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="v91-gD-0gO"/>
                         </constraints>
                     </view>
                     <connections>
@@ -8146,6 +8255,8 @@ from a wireless light sensor</string>
                         <outlet property="heading" destination="Y1l-f7-bs2" id="CqY-nJ-AtG"/>
                         <outlet property="location" destination="0jr-VS-Ttp" id="2bc-qz-43o"/>
                         <outlet property="locationNotice" destination="Swc-RH-H6g" id="OEj-hE-vg1"/>
+                        <outlet property="manual" destination="wJc-xF-vi0" id="DTc-e1-yv3"/>
+                        <outlet property="manualNotice" destination="Bi4-sp-Qur" id="Zk9-Lb-URm"/>
                         <outlet property="sensor" destination="jF6-Up-eoN" id="dcY-W8-zmg"/>
                         <outlet property="sensorNotice" destination="Wo3-qt-tdi" id="OxT-y1-kp0"/>
                         <outlet property="subheading" destination="92a-we-p3U" id="hA9-32-b1H"/>
@@ -8167,12 +8278,374 @@ from a wireless light sensor</string>
                     <view key="view" appearanceType="darkAqua" id="M6H-JW-1ry">
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="W04-tU-sjK" customClass="DisplayImage" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="326" y="205" width="298" height="240"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="16"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ng3-ev-QDB">
+                                <rect key="frame" x="215" y="598" width="521" height="42"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="517" id="gx9-HR-JjE"/>
+                                </constraints>
+                                <textFieldCell key="cell" alignment="center" title="Checking if your monitors can be controlled" id="sRn-xx-zzW">
+                                    <font key="font" metaFont="systemHeavy" size="24"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TQc-kg-RyL" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="343" y="337" width="264" height="33"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="260" id="d3P-Xb-eA9"/>
+                                    <constraint firstAttribute="height" constant="33" id="tca-39-ixB"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="a5s-pd-4xd" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" size="28" name="Menlo-Bold"/>
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="editable" keyPath="self.noDisplay" id="hoh-dh-EpN">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CHe-fT-pCT" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="385" y="522" width="180" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="5RL-Cu-15B"/>
+                                    <constraint firstAttribute="width" constant="180" id="I2I-Z8-gEV"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Using Apple Native Protocol" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="wkk-Cm-smr">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <integer key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="D5q-yR-laV"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Agd-Xu-kab">
+                                <rect key="frame" x="217" y="538" width="516" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="ExM-rW-QP8"/>
+                                    <constraint firstAttribute="width" constant="512" id="Fox-Tj-MhB"/>
+                                </constraints>
+                                <textFieldCell key="cell" alignment="center" title="Reading brightness" id="LMX-6Y-cvU">
+                                    <font key="font" size="20" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.93880208330000003" green="0.92184965330000002" blue="0.84739660839999997" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wsx-pk-SHA" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="115" y="328" width="120" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="Tab-0d-p1M"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="h94-wu-0Oa" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="44"/>
+                                    <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="Field BG"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7F2-cJ-fSR">
+                                <rect key="frame" x="127" y="309" width="97" height="14"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="93" id="D9C-fE-hSL"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="HWl-cp-HZo">
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G0L-3e-eeE" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="713" y="328" width="120" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="NPa-Sm-5v2"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="t1z-Yx-Xbz" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" metaFont="systemHeavy" size="44"/>
+                                    <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="Field BG"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90L-Ir-IQR">
+                                <rect key="frame" x="725" y="309" width="97" height="14"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="93" id="HDX-R6-CyH"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="QW5-FG-zhc">
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YBB-J6-Prx">
+                                <rect key="frame" x="76" y="296" width="200" height="11"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="196" id="G3E-Zw-hgj"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Read Result" id="xVe-Iw-VIX">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Sa-q7-EFW">
+                                <rect key="frame" x="76" y="283" width="200" height="11"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="196" id="Pex-3x-Y5q"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Write Result" id="iyo-wd-6cN">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Hbp-mL-CTN">
+                                <rect key="frame" x="674" y="296" width="200" height="11"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="196" id="WhV-gB-5td"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Read Result" id="GIR-0M-OJ1">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hzM-ha-Hwi">
+                                <rect key="frame" x="674" y="283" width="200" height="11"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="196" id="eLL-yw-Nph"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Write Result" id="DAC-JQ-1GC">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cKn-A2-pZN" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="443" y="84" width="65" height="16"/>
+                                <buttonCell key="cell" type="inline" title="Continue" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ssa-Lx-fNV">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemHeavy" size="13"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Qa-6i-YE6">
+                                <rect key="frame" x="113" y="104" width="722" height="41"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="41" id="ANX-5K-r6z"/>
+                                    <constraint firstAttribute="width" constant="718" id="q1T-O8-Nzc"/>
+                                </constraints>
+                                <textFieldCell key="cell" alignment="center" id="BrE-4Q-plf">
+                                    <font key="font" size="14" name="Menlo-Bold"/>
+                                    <string key="title">Reading didn't work for some values
+Write the missing values manually and click the Continue button</string>
+                                    <color key="textColor" red="0.93880208330000003" green="0.92184965330000002" blue="0.84739660839999997" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AfM-g2-law" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="362" y="84" width="76" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="76" id="Y9s-wC-Dzj"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="No" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="gsZ-SF-nFJ">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemHeavy" size="13"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xOw-g0-96W" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="513" y="84" width="76" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="76" id="jML-Qo-EPr"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Yes" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="fUC-HC-eh8">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemHeavy" size="13"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.84999999999999998"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="centerY" secondItem="M6H-JW-1ry" secondAttribute="centerY" constant="25" id="2F4-Va-kLE"/>
+                            <constraint firstItem="Agd-Xu-kab" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" id="2wg-9V-ptg"/>
+                            <constraint firstItem="Hbp-mL-CTN" firstAttribute="baseline" secondItem="YBB-J6-Prx" secondAttribute="firstBaseline" id="4Z1-Ah-EOH"/>
+                            <constraint firstItem="90L-Ir-IQR" firstAttribute="top" secondItem="G0L-3e-eeE" secondAttribute="bottom" constant="5" id="5ba-EH-oVF"/>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" id="7KR-fR-GGy"/>
+                            <constraint firstItem="YBB-J6-Prx" firstAttribute="centerX" secondItem="7F2-cJ-fSR" secondAttribute="centerX" id="8Df-89-KnM"/>
+                            <constraint firstItem="90L-Ir-IQR" firstAttribute="centerX" secondItem="G0L-3e-eeE" secondAttribute="centerX" id="9JO-Ag-FMT"/>
+                            <constraint firstItem="TQc-kg-RyL" firstAttribute="centerY" secondItem="G0L-3e-eeE" secondAttribute="centerY" constant="0.5" id="9bb-x8-8xA"/>
+                            <constraint firstItem="7F2-cJ-fSR" firstAttribute="top" secondItem="wsx-pk-SHA" secondAttribute="bottom" constant="5" id="BEY-Zj-5ve"/>
+                            <constraint firstItem="xOw-g0-96W" firstAttribute="leading" secondItem="cKn-A2-pZN" secondAttribute="trailing" constant="5" id="BOz-Yy-obP"/>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="top" secondItem="TQc-kg-RyL" secondAttribute="bottom" constant="-108" id="BZc-uc-y2h"/>
+                            <constraint firstItem="hzM-ha-Hwi" firstAttribute="top" secondItem="Hbp-mL-CTN" secondAttribute="bottom" constant="2" id="Cym-gB-hOc"/>
+                            <constraint firstItem="xOw-g0-96W" firstAttribute="centerY" secondItem="cKn-A2-pZN" secondAttribute="centerY" id="D1Y-cj-HXY"/>
+                            <constraint firstAttribute="bottom" secondItem="W04-tU-sjK" secondAttribute="bottom" constant="205" id="ETQ-Bx-U2Z"/>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="leading" secondItem="wsx-pk-SHA" secondAttribute="trailing" constant="91" id="EwQ-Tg-YEB"/>
+                            <constraint firstAttribute="bottom" secondItem="7Qa-6i-YE6" secondAttribute="bottom" constant="104" id="F7c-gH-GNZ"/>
+                            <constraint firstItem="G0L-3e-eeE" firstAttribute="leading" secondItem="W04-tU-sjK" secondAttribute="trailing" constant="89" id="KEO-0Z-Roz"/>
+                            <constraint firstItem="TQc-kg-RyL" firstAttribute="centerX" secondItem="W04-tU-sjK" secondAttribute="centerX" id="L3u-Bd-g0t"/>
+                            <constraint firstItem="TQc-kg-RyL" firstAttribute="centerY" secondItem="wsx-pk-SHA" secondAttribute="centerY" id="LPx-md-jhx"/>
+                            <constraint firstItem="CHe-fT-pCT" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" id="Luv-LA-LDb"/>
+                            <constraint firstItem="hzM-ha-Hwi" firstAttribute="centerX" secondItem="Hbp-mL-CTN" secondAttribute="centerX" id="Ntl-8c-KBn"/>
+                            <constraint firstItem="AfM-g2-law" firstAttribute="centerY" secondItem="cKn-A2-pZN" secondAttribute="centerY" id="Odo-vp-lq7"/>
+                            <constraint firstItem="Hbp-mL-CTN" firstAttribute="leading" secondItem="90L-Ir-IQR" secondAttribute="leading" constant="-51" id="Uvn-KD-M6G"/>
+                            <constraint firstItem="ng3-ev-QDB" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" id="ZwW-qj-9Ed"/>
+                            <constraint firstItem="CHe-fT-pCT" firstAttribute="top" secondItem="ng3-ev-QDB" secondAttribute="bottom" constant="58" id="a61-iG-zRH"/>
+                            <constraint firstItem="ng3-ev-QDB" firstAttribute="top" secondItem="M6H-JW-1ry" secondAttribute="top" constant="60" id="bG1-G6-CZc"/>
+                            <constraint firstItem="4Sa-q7-EFW" firstAttribute="top" secondItem="YBB-J6-Prx" secondAttribute="bottom" constant="2" id="bOU-8K-XNs"/>
+                            <constraint firstItem="YBB-J6-Prx" firstAttribute="top" secondItem="7F2-cJ-fSR" secondAttribute="bottom" constant="2" id="eNW-Fg-8yE"/>
+                            <constraint firstAttribute="bottom" secondItem="cKn-A2-pZN" secondAttribute="bottom" constant="84" id="gHx-QX-Rhk"/>
+                            <constraint firstAttribute="bottom" secondItem="hzM-ha-Hwi" secondAttribute="bottom" constant="283" id="hhr-uo-xal"/>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="leading" secondItem="M6H-JW-1ry" secondAttribute="leading" constant="326" id="ioj-o5-gnH"/>
+                            <constraint firstItem="7Qa-6i-YE6" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" constant="-1" id="jr9-QV-UP2"/>
+                            <constraint firstItem="W04-tU-sjK" firstAttribute="top" secondItem="Agd-Xu-kab" secondAttribute="bottom" constant="93" id="kS6-zV-5dj"/>
+                            <constraint firstItem="Agd-Xu-kab" firstAttribute="top" secondItem="ng3-ev-QDB" secondAttribute="bottom" constant="26" id="nPK-Gt-in5"/>
+                            <constraint firstItem="cKn-A2-pZN" firstAttribute="leading" secondItem="AfM-g2-law" secondAttribute="trailing" constant="5" id="ndV-Jg-ZQl"/>
+                            <constraint firstItem="Hbp-mL-CTN" firstAttribute="top" secondItem="90L-Ir-IQR" secondAttribute="bottom" constant="2" id="r1R-7a-zzD"/>
+                            <constraint firstItem="wsx-pk-SHA" firstAttribute="centerY" secondItem="G0L-3e-eeE" secondAttribute="centerY" id="rqR-57-XuD"/>
+                            <constraint firstItem="cKn-A2-pZN" firstAttribute="centerX" secondItem="M6H-JW-1ry" secondAttribute="centerX" id="ubh-20-h1k"/>
+                            <constraint firstItem="4Sa-q7-EFW" firstAttribute="centerX" secondItem="YBB-J6-Prx" secondAttribute="centerX" id="w2A-ig-30Y"/>
+                            <constraint firstItem="7F2-cJ-fSR" firstAttribute="centerX" secondItem="wsx-pk-SHA" secondAttribute="centerX" id="xKu-vr-ee1"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="_controlButton" destination="CHe-fT-pCT" id="7Ki-l6-pf3"/>
+                        <outlet property="actionButton" destination="cKn-A2-pZN" id="u1p-ye-jlS"/>
+                        <outlet property="actionInfo" destination="7Qa-6i-YE6" id="TAw-gn-OrJ"/>
+                        <outlet property="actionLabel" destination="Agd-Xu-kab" id="WxF-s1-A3h"/>
+                        <outlet property="brightnessCaption" destination="7F2-cJ-fSR" id="6KU-ed-Utp"/>
+                        <outlet property="brightnessField" destination="wsx-pk-SHA" id="tBm-Sm-I1g"/>
+                        <outlet property="brightnessReadResult" destination="YBB-J6-Prx" id="lN6-v9-PkH"/>
+                        <outlet property="brightnessWriteResult" destination="4Sa-q7-EFW" id="ONg-7K-OiG"/>
+                        <outlet property="contrastCaption" destination="90L-Ir-IQR" id="Y9q-fm-7HY"/>
+                        <outlet property="contrastField" destination="G0L-3e-eeE" id="Ty4-rc-JXI"/>
+                        <outlet property="contrastReadResult" destination="Hbp-mL-CTN" id="XGV-Ta-oOj"/>
+                        <outlet property="contrastWriteResult" destination="hzM-ha-Hwi" id="kpQ-3P-7Ii"/>
+                        <outlet property="controlButton" destination="CHe-fT-pCT" id="ciS-dX-9wT"/>
+                        <outlet property="displayImage" destination="W04-tU-sjK" id="o7K-ZY-158"/>
+                        <outlet property="displayName" destination="TQc-kg-RyL" id="PKs-ev-tt0"/>
+                        <outlet property="noButton" destination="AfM-g2-law" id="69h-SD-1kc"/>
+                        <outlet property="yesButton" destination="xOw-g0-96W" id="zul-ib-AS7"/>
+                    </connections>
                 </viewController>
                 <customObject id="rnI-vm-PUu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="edX-fO-EeX"/>
             </objects>
             <point key="canvasLocation" x="-1911" y="4708"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="4nv-fZ-v3w">
+            <objects>
+                <windowController storyboardIdentifier="testWindowController" id="FLl-7H-Z1S" sceneMemberID="viewController">
+                    <window key="window" title="Window" separatorStyle="none" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" id="uhA-i6-v8l">
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="0.0" y="0.0" width="800" height="600"/>
+                        <rect key="screenRect" x="-693" y="1050" width="3008" height="1667"/>
+                        <view key="contentView" id="0Zp-H5-sSP">
+                            <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="FLl-7H-Z1S" id="CcP-aU-vkV"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="Ymi-Qf-JCZ" kind="relationship" relationship="window.shadowedContentViewController" id="KuT-tI-Dov"/>
+                    </connections>
+                </windowController>
+                <customObject id="0pK-vI-APo" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1950" y="5530"/>
+        </scene>
+        <!--Lunar Test View Controller-->
+        <scene sceneID="z1S-Ep-gtl">
+            <objects>
+                <viewController id="Ymi-Qf-JCZ" customClass="LunarTestViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" wantsLayer="YES" id="0fv-pc-aml">
+                        <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BSm-Sn-h11" customClass="GradientView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-99" y="-60" width="841" height="302"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="firstColor">
+                                        <color key="value" red="0.12515047939999999" green="0.1162928007" blue="0.13982780610000001" alpha="0.69676117550000005" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gal-Ax-dzk">
+                                <rect key="frame" x="25" y="41" width="320" height="69"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <shadow key="shadow" blurRadius="5">
+                                    <size key="offset" width="0.0" height="6"/>
+                                    <color key="color" white="0.0" alpha="0.17735927152317882" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <textFieldCell key="cell" alignment="center" title="Lunar Test" id="vRg-TE-3wR">
+                                    <font key="font" metaFont="systemBlack" size="50"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                    <connections>
+                        <outlet property="label" destination="Gal-Ax-dzk" id="NWa-RR-NAI"/>
+                    </connections>
+                </viewController>
+                <customObject id="JeI-MV-gLu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1103" y="5530"/>
         </scene>
         <!--Hotkeys Choice View Controller-->
         <scene sceneID="SRz-mp-hkC">
@@ -8188,10 +8661,46 @@ from a wireless light sensor</string>
             </objects>
             <point key="canvasLocation" x="-899" y="4708"/>
         </scene>
+        <!--Window Controller-->
+        <scene sceneID="SnM-fF-leQ">
+            <objects>
+                <windowController storyboardIdentifier="cornerWindowController" id="NBU-fv-a9H" customClass="CornerWindowController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Monitor Round Corners" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" id="3rs-dk-2o6" customClass="CornerWindow" customModule="Lunar" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="-177" y="1616" width="480" height="270"/>
+                        <rect key="screenRect" x="-693" y="1050" width="3008" height="1667"/>
+                        <view key="contentView" id="J9L-k8-guD">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="NBU-fv-a9H" id="s00-nq-u3a"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="jNz-rc-U9D" kind="relationship" relationship="window.shadowedContentViewController" id="su4-JU-yhv"/>
+                    </connections>
+                </windowController>
+                <customObject id="La3-IL-sHu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2694" y="5302"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="QlZ-G9-zjv">
+            <objects>
+                <viewController id="jNz-rc-U9D" sceneMemberID="viewController">
+                    <view key="view" id="Nn3-MK-V2y">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="OwY-a6-GTz" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2694" y="5769"/>
+        </scene>
     </scenes>
     <resources>
-        <image name="Display" width="250" height="211"/>
-        <image name="Moon" width="780" height="780"/>
         <image name="NSAddTemplate" width="14" height="13"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>

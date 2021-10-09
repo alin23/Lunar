@@ -259,6 +259,7 @@ extension Collection {
 }
 
 extension Data {
+    var s: String? { String(data: self, encoding: .utf8) }
     func str(hex: Bool = false, base64: Bool = false, urlSafe: Bool = false, separator: String = " ") -> String {
         if base64 {
             let b64str = base64EncodedString(options: [])
