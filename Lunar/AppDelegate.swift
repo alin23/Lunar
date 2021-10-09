@@ -139,6 +139,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var versionMenuItem: NSMenuItem!
     @IBOutlet var menu: NSMenu!
     @IBOutlet var preferencesMenuItem: NSMenuItem!
+    @IBOutlet var restartMenuItem: NSMenuItem!
 
     @IBOutlet var percent0MenuItem: NSMenuItem!
     @IBOutlet var percent25MenuItem: NSMenuItem!
@@ -199,17 +200,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var windowController: ModernWindowController? {
         get { _windowControllerLock.around { _windowController } }
         set { _windowControllerLock.around { _windowController = newValue } }
-    }
-
-    var darkMode: Bool {
-        switch CachedDefaults[.colorScheme] {
-        case .system:
-            return (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
-        case .light:
-            return false
-        case .dark:
-            return true
-        }
     }
 
     var externalLux: String {
@@ -882,6 +872,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { _ in
                 log.debug("Screen configuration changed")
+                displayController.activeDisplays.values.forEach { d in
+                    d.updateCornerWindow()
+                }
 
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
                 let newLidClosed = IsLidClosed()
@@ -917,6 +910,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     NetworkControl.resetState()
                     DDCControl.resetState()
                     appDelegate!.startOrRestartMediaKeyTap()
+                    displayController.activeDisplays.values.forEach { d in
+                        d.updateCornerWindow()
+                    }
                 }
             }.store(in: &observers)
 
@@ -1069,6 +1065,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    func addWatchers() {
+        // asyncEvery
+    }
+
     func addObservers() {
         dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
@@ -1136,6 +1136,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func setKeyEquivalents(_ hotkeys: Set<PersistentHotkey>) {
         Hotkey.setKeyEquivalent(HotkeyIdentifier.lunar.rawValue, menuItem: preferencesMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.restart.rawValue, menuItem: restartMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent0.rawValue, menuItem: percent0MenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent25.rawValue, menuItem: percent25MenuItem, hotkeys: hotkeys)
@@ -1273,13 +1274,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         listenForScreenConfigurationChanged()
         displayController.listenForRunningApps()
 
+        addWatchers()
         addObservers()
         initLicensing()
 
         NetworkControl.setup()
         if thisIsFirstRun || thisIsFirstRunAfterLunar4Upgrade || TEST_MODE {
             showWindow()
-            // onboard()
+//            onboard()
         }
 
         if TEST_MODE {
@@ -1326,6 +1328,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBAction func openLunarDiagnostics(_: Any) {
         createAndShowWindow("diagnosticsWindowController", controller: &diagnosticsWindowController)
+    }
+
+    @IBAction func restartApp(_: Any) {
+        _ = shell(
+            command: "while ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do sleep 0.1; done; open '\(Bundle.main.path.string)'",
+            wait: false
+        )
+        exit(0)
     }
 
     func applicationWillTerminate(_: Notification) {

@@ -28,6 +28,7 @@ let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled
 enum HotkeyIdentifier: String, CaseIterable, Codable {
     case toggle,
          lunar,
+         restart,
          percent0,
          percent25,
          percent50,
@@ -451,6 +452,17 @@ enum Hotkey {
             detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.restart.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_L,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .option, .shift])
+            )!,
+            target: appDelegate!,
+            action: handler(identifier: .restart),
+            actionQueue: .main,
+            detectKeyHold: false
+        ), isEnabled: false, register: false),
+        PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.orientation0.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_ANSI_0, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.control]))!,
             target: appDelegate!,
@@ -698,6 +710,8 @@ enum Hotkey {
             return #selector(AppDelegate.toggleHotkeyHandler)
         case .lunar:
             return #selector(AppDelegate.lunarHotkeyHandler)
+        case .restart:
+            return #selector(AppDelegate.restartHotkeyHandler)
         case .percent0:
             return #selector(AppDelegate.percent0HotkeyHandler)
         case .percent25:
@@ -1070,6 +1084,11 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func lunarHotkeyHandler() {
         showWindow()
         log.debug("Show Window Hotkey pressed")
+    }
+
+    @objc func restartHotkeyHandler() {
+        log.debug("Restart Hotkey pressed")
+        restartApp(self)
     }
 
     @objc func percent0HotkeyHandler() {

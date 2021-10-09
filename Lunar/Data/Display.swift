@@ -226,11 +226,12 @@ struct GammaTable: Equatable {
         samples = 256
     }
 
-    init(red: [CGGammaValue], green: [CGGammaValue], blue: [CGGammaValue], samples: UInt32) {
+    init(red: [CGGammaValue], green: [CGGammaValue], blue: [CGGammaValue], samples: UInt32, brightness: Brightness? = nil) {
         self.red = red
         self.green = green
         self.blue = blue
         self.samples = samples
+        self.brightness = brightness
     }
 
     init(for id: CGDirectDisplayID) {
@@ -261,6 +262,7 @@ struct GammaTable: Equatable {
     var green: [CGGammaValue]
     var blue: [CGGammaValue]
     var samples: UInt32
+    var brightness: Brightness?
 
     var isZero: Bool {
         samples == 0 || (
@@ -282,17 +284,17 @@ struct GammaTable: Equatable {
         return true
     }
 
-    func adjust(brightness: UInt8, contrast _: UInt8? = nil) -> GammaTable {
-        let brightness: Float = mapNumber(powf(brightness.f / 100, 0.8), fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00)
+    func adjust(brightness: UInt8) -> GammaTable {
+        let preciseBrightness: Float = mapNumber(powf(brightness.f / 100, 0.8), fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00)
         return GammaTable(
-            red: red.map { $0 * brightness },
-            green: green.map { $0 * brightness },
-            blue: blue.map { $0 * brightness },
-            samples: samples
+            red: red.map { $0 * preciseBrightness },
+            green: green.map { $0 * preciseBrightness },
+            blue: blue.map { $0 * preciseBrightness },
+            samples: samples, brightness: brightness
         )
     }
 
-    func stride(from brightness: Brightness, to newBrightness: Brightness, contrast _: Contrast? = nil) -> [GammaTable] {
+    func stride(from brightness: Brightness, to newBrightness: Brightness) -> [GammaTable] {
         guard brightness != newBrightness else { return [] }
 
         return Swift.stride(from: brightness, through: newBrightness, by: newBrightness < brightness ? -1 : 1).compactMap { b in
@@ -364,6 +366,8 @@ enum ValueType {
         faceLightBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
         faceLightContrast = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightContrast)?.ns) ??
             (_maxDDCContrast.doubleValue * 0.9).intround.ns
+
+        cornerRadius = (try container.decodeIfPresent(Int.self, forKey: .cornerRadius)?.ns) ?? 0
 
         redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
         greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
@@ -579,6 +583,8 @@ enum ValueType {
     deinit {
         gammaWindowController?.close()
         gammaWindowController = nil
+        cornerWindowController?.close()
+        cornerWindowController = nil
     }
 
     // MARK: Internal
@@ -621,6 +627,8 @@ enum ValueType {
         case contrastBeforeFacelight
         case maxBrightnessBeforeFacelight
         case maxContrastBeforeFacelight
+
+        case cornerRadius
 
         case redGain
         case greenGain
@@ -735,6 +743,7 @@ enum ValueType {
             .minDDCVolume,
             .faceLightBrightness,
             .faceLightContrast,
+            .cornerRadius,
             .redGain,
             .greenGain,
             .blueGain,
@@ -1025,6 +1034,7 @@ enum ValueType {
 
     lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
 
+    var cornerWindowController: NSWindowController?
     var gammaWindowController: NSWindowController?
     var shadeWindowController: NSWindowController?
     var faceLightWindowController: NSWindowController?
@@ -1202,6 +1212,13 @@ enum ValueType {
         didSet {
             save()
             reapplyGamma()
+        }
+    }
+
+    @Published @objc dynamic var cornerRadius: NSNumber = 0 {
+        didSet {
+            save()
+            updateCornerWindow()
         }
     }
 
@@ -1428,7 +1445,7 @@ enum ValueType {
             log.verbose("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
             let startTime = DispatchTime.now()
 
-            if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness) {
+            if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness, onChange: nil) {
                 log.warning(
                     "Error writing brightness using \(control.str)",
                     context: context
@@ -1481,7 +1498,7 @@ enum ValueType {
             log.verbose("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
             let startTime = DispatchTime.now()
 
-            if let control = control, !control.setContrast(contrast, oldValue: oldContrast) {
+            if let control = control, !control.setContrast(contrast, oldValue: oldContrast, onChange: nil) {
                 log.warning(
                     "Error writing contrast using \(control.str)",
                     context: context
@@ -1950,6 +1967,25 @@ enum ValueType {
             log.debug("Adding data point \(featureValue) => \(targetValue)")
         }
         values[featureValue] = targetValue
+    }
+
+    func updateCornerWindow() {
+        guard cornerRadius.intValue > 0 else {
+            cornerWindowController?.close()
+            cornerWindowController = nil
+            return
+        }
+        createWindow(
+            "cornerWindowController",
+            controller: &cornerWindowController,
+            screen: screen,
+            show: true,
+            backgroundColor: .clear,
+            level: .screenSaver,
+            fillScreen: true,
+            stationary: true
+        )
+        (cornerWindowController as? CornerWindowController)?.display = self
     }
 
     func getScreen() -> NSScreen? {
@@ -2567,6 +2603,8 @@ enum ValueType {
             try container.encode(maxBrightnessBeforeFacelight.uint8Value, forKey: .maxBrightnessBeforeFacelight)
             try container.encode(maxContrastBeforeFacelight.uint8Value, forKey: .maxContrastBeforeFacelight)
 
+            try container.encode(cornerRadius.intValue, forKey: .cornerRadius)
+
             try container.encode(redGain.uint8Value, forKey: .redGain)
             try container.encode(greenGain.uint8Value, forKey: .greenGain)
             try container.encode(blueGain.uint8Value, forKey: .blueGain)
@@ -3042,7 +3080,7 @@ enum ValueType {
         return result
     }
 
-    func setGamma(brightness: UInt8? = nil, contrast: UInt8? = nil, oldBrightness: UInt8? = nil, oldContrast _: UInt8? = nil) {
+    func setGamma(brightness: UInt8? = nil, oldBrightness: UInt8? = nil, onChange: ((Brightness) -> Void)? = nil) {
         #if DEBUG
             guard !isForTesting else { return }
         #endif
@@ -3054,7 +3092,7 @@ enum ValueType {
 
         let brightness = brightness ?? self.brightness.uint8Value
         let gammaTable = lunarGammaTable ?? defaultGammaTable
-        let newGammaTable = gammaTable.adjust(brightness: brightness, contrast: contrast)
+        let newGammaTable = gammaTable.adjust(brightness: brightness)
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
 
         if let oldBrightness = oldBrightness {
@@ -3066,8 +3104,11 @@ enum ValueType {
                 Thread.sleep(forTimeInterval: 0.005)
 
                 self.gammaChanged = true
-                for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, contrast: contrast) {
+                for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness) {
                     self.apply(gamma: gammaTable)
+                    if let onChange = onChange, let brightness = gammaTable.brightness {
+                        onChange(brightness)
+                    }
                     Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.005)
                 }
                 gammaSemaphore.signal()
@@ -3087,6 +3128,7 @@ enum ValueType {
             if self.apply(gamma: newGammaTable) {
                 self.lastGammaTable = newGammaTable
             }
+            onChange?(brightness)
             gammaSemaphore.signal()
         }
     }

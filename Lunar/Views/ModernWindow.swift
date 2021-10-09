@@ -13,6 +13,69 @@ import WAYWindow
 var navigationHotkeysEnabled = true
 var scrollableAdjustHotkeysEnabled = true
 
+extension NSView {
+    func mask(withRect maskRect: CGRect, cornerRadius: CGFloat, inverse: Bool = false) {
+        let maskLayer = CAShapeLayer()
+        let path = CGMutablePath()
+        if inverse {
+            path.addPath(CGPath(rect: bounds, transform: nil))
+        }
+        path.addPath(CGPath(roundedRect: maskRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil))
+
+        maskLayer.path = path
+        if inverse {
+            maskLayer.fillRule = CAShapeLayerFillRule.evenOdd
+        }
+
+        wantsLayer = true
+        layer?.mask = maskLayer
+    }
+}
+
+// MARK: - CornerWindowController
+
+class CornerWindowController: NSWindowController {
+    // MARK: Internal
+
+    weak var display: Display? {
+        didSet {
+            mainThread {
+                guard let display = display, let screen = display.screen,
+                      let w = window as? CornerWindow, let view = w.contentView
+                else { return }
+
+                view.bg = .black
+                w.setFrame(screen.frame, display: true)
+                view.mask(
+                    withRect: NSRect(x: 0, y: 0, width: w.frame.width, height: w.frame.height),
+                    cornerRadius: CGFloat(display.cornerRadius.floatValue),
+                    inverse: true
+                )
+            }
+        }
+    }
+
+    override func windowDidLoad() {
+        mainThread {
+            if let w = window as? CornerWindow {
+                w.isOpaque = false
+                w.backgroundColor = .clear
+                w.contentView?.bg = .clear
+                w.contentView?.radius = 0
+            }
+        }
+    }
+
+    // MARK: Private
+
+    private let maskLayer = CAShapeLayer()
+    private let roundRectLayer = CALayer()
+}
+
+// MARK: - CornerWindow
+
+class CornerWindow: NSWindow {}
+
 // MARK: - ModernWindow
 
 class ModernWindow: WAYWindow {
@@ -56,6 +119,7 @@ class ModernWindow: WAYWindow {
     }
 
     override func keyDown(with event: NSEvent) {
+        guard event.modifierFlags.isDisjoint(with: [.option, .command, .control, .shift]) else { return }
         guard event.keyCode != kVK_Escape.u16 else {
             undoManager?.undo()
             endEditing(for: nil)

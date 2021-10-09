@@ -57,23 +57,56 @@ struct ResponseError: Error {
 
 struct ProcessStatus {
     var output: Data?
+    var error: Data?
     var success: Bool
+
+    var o: String? {
+        output?.s?.trimmed
+    }
+
+    var e: String? {
+        error?.s?.trimmed
+    }
 }
 
-func shell(
-    _ launchPath: String = "/bin/bash",
-    command: String,
-    timeout: DateComponents? = nil,
-    env _: [String: String]? = nil
-) -> ProcessStatus {
-    shell(launchPath, args: ["-c", command], timeout: timeout)
+func stdout(of process: Process) -> Data? {
+    let stdout = process.standardOutput as! FileHandle
+    try? stdout.close()
+
+    guard let path = process.environment?["__swift_stdout"],
+          let stdoutFile = FileHandle(forReadingAtPath: path) else { return nil }
+    if #available(macOS 10.15.4, *) {
+        return try! stdoutFile.readToEnd()
+    } else {
+        return stdoutFile.readDataToEndOfFile()
+    }
 }
 
-func shell(_ launchPath: String = "/bin/bash", args: [String], env: [String: String]? = nil) -> Process? {
-    let stdoutFilePath = fm.temporaryDirectory.appendingPathComponent(NanoID.new(alphabet: .lowercasedLatinLetters, size: 32)).path
+func stderr(of process: Process) -> Data? {
+    let stderr = process.standardOutput as! FileHandle
+    try? stderr.close()
+
+    guard let path = process.environment?["__swift_stderr"],
+          let stderrFile = FileHandle(forReadingAtPath: path) else { return nil }
+    if #available(macOS 10.15.4, *) {
+        return try! stderrFile.readToEnd()
+    } else {
+        return stderrFile.readDataToEndOfFile()
+    }
+}
+
+func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: String]? = nil) -> Process? {
+    let outputDir = try! fm.url(
+        for: .itemReplacementDirectory,
+        in: .userDomainMask,
+        appropriateFor: fm.homeDirectoryForCurrentUser,
+        create: true
+    )
+
+    let stdoutFilePath = outputDir.appendingPathComponent("stdout").path
     fm.createFile(atPath: stdoutFilePath, contents: nil, attributes: nil)
 
-    let stderrFilePath = fm.temporaryDirectory.appendingPathComponent(NanoID.new(alphabet: .lowercasedLatinLetters, size: 32)).path
+    let stderrFilePath = outputDir.appendingPathComponent("stderr").path
     fm.createFile(atPath: stderrFilePath, contents: nil, attributes: nil)
 
     guard let stdoutFile = FileHandle(forWritingAtPath: stdoutFilePath),
@@ -87,43 +120,56 @@ func shell(_ launchPath: String = "/bin/bash", args: [String], env: [String: Str
     task.standardError = stderrFile
     task.launchPath = launchPath
     task.arguments = args
+
+    var env = env ?? ProcessInfo.processInfo.environment
+    env["__swift_stdout"] = stdoutFilePath
+    env["__swift_stderr"] = stderrFilePath
     task.environment = env
+
     do {
         try task.run()
     } catch {
-        log.error("Error running \(launchPath) \(args): \(error)")
+        print("Error running \(launchPath) \(args): \(error)")
         return nil
     }
 
     return task
 }
 
-func stdout(of process: Process) -> Data? {
-    let stdout = process.standardOutput as! FileHandle
-    try? stdout.seek(toOffset: 0)
-    let data: Data?
-    if #available(macOS 10.15.4, *) {
-        data = try? stdout.readToEnd()
-    } else {
-        data = stdout.readDataToEndOfFile()
-    }
-    return data
+func shell(
+    _ launchPath: String = "/bin/zsh",
+    command: String,
+    timeout: DateComponents? = nil,
+    env: [String: String]? = nil,
+    wait: Bool = true
+) -> ProcessStatus {
+    shell(launchPath, args: ["-c", command], timeout: timeout, env: env, wait: wait)
 }
 
 func shell(
-    _ launchPath: String = "/bin/bash",
+    _ launchPath: String = "/bin/zsh",
     args: [String],
     timeout: DateComponents? = nil,
-    env: [String: String]? = nil
+    env: [String: String]? = nil,
+    wait: Bool = true
 ) -> ProcessStatus {
-    guard let task = shell(launchPath, args: args, env: env) else {
-        return ProcessStatus(output: nil, success: false)
+    guard let task = shellProc(launchPath, args: args, env: env) else {
+        return ProcessStatus(output: nil, error: nil, success: false)
+    }
+
+    guard wait else {
+        return ProcessStatus(
+            output: nil,
+            error: nil,
+            success: true
+        )
     }
 
     guard let timeout = timeout else {
         task.waitUntilExit()
         return ProcessStatus(
             output: stdout(of: task),
+            error: stderr(of: task),
             success: task.terminationStatus == 0
         )
     }
@@ -137,6 +183,7 @@ func shell(
 
     return ProcessStatus(
         output: stdout(of: task),
+        error: stderr(of: task),
         success: task.terminationStatus == 0
     )
 }

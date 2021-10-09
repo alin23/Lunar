@@ -169,7 +169,7 @@ class ALSInstallViewController: NSViewController {
     func startFirmwareInstallation() {
         guard let ssid = ssid, let password = password,
               let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
-              let process = shell(
+              let process = shellProc(
                   args: [installScript],
                   env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH]
               )

@@ -85,8 +85,8 @@ protocol Control {
     var str: String { get }
     var displayControl: DisplayControl { get }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness?) -> Bool
-    func setContrast(_ contrast: Contrast, oldValue: Brightness?) -> Bool
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness?, onChange: ((Brightness) -> Void)?) -> Bool
+    func setContrast(_ contrast: Contrast, oldValue: Contrast?, onChange: ((Contrast) -> Void)?) -> Bool
     func setVolume(_ volume: UInt8) -> Bool
     func setInput(_ input: InputSource) -> Bool
     func setMute(_ muted: Bool) -> Bool
@@ -122,8 +122,8 @@ protocol Control {
 extension Control {
     func reapply() {
         guard let display = display else { return }
-        _ = setBrightness(display.limitedBrightness, oldValue: nil)
-        _ = setContrast(display.limitedContrast, oldValue: nil)
+        _ = setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
+        _ = setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
     }
 
     func read(_ key: Display.CodingKeys) -> Any? {
@@ -159,9 +159,9 @@ extension Control {
     @discardableResult func write(_ key: Display.CodingKeys, _ value: Any) -> Any? {
         switch key {
         case .brightness:
-            return setBrightness(value as! Brightness, oldValue: nil)
+            return setBrightness(value as! Brightness, oldValue: nil, onChange: nil)
         case .contrast:
-            return setContrast(value as! Contrast, oldValue: nil)
+            return setContrast(value as! Contrast, oldValue: nil, onChange: nil)
         case .volume:
             return setVolume(value as! UInt8)
         case .input:

@@ -26,6 +26,7 @@ class HotkeyViewController: NSViewController {
 
     @IBOutlet var toggleHotkeyView: HotkeyView!
     @IBOutlet var lunarHotkeyView: HotkeyView!
+    @IBOutlet var restartHotkeyView: HotkeyView!
     @IBOutlet var percent0HotkeyView: HotkeyView!
     @IBOutlet var percent25HotkeyView: HotkeyView!
     @IBOutlet var percent50HotkeyView: HotkeyView!
@@ -43,7 +44,6 @@ class HotkeyViewController: NSViewController {
 
     @IBOutlet var resetButton: ResetButton!
     @IBOutlet var disableButton: ResetButton!
-    @IBOutlet var fnKeysNotice: NSTextField!
 
     @IBOutlet var brightnessKeysControlButton: PopUpButton!
     @IBOutlet var brightnessKeysSyncControlButton: PopUpButton!
@@ -83,6 +83,7 @@ class HotkeyViewController: NSViewController {
 
         toggleHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.toggle.rawValue }
         lunarHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.lunar.rawValue }
+        restartHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.restart.rawValue }
         percent0HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent0.rawValue }
         percent25HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent25.rawValue }
         percent50HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent50.rawValue }

@@ -123,7 +123,7 @@ class GammaControl: Control {
     func getBlueGain() -> UInt8? { nil }
     func resetColors() -> Bool { true }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
 
         guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
@@ -139,35 +139,38 @@ class GammaControl: Control {
 
         // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
         if let oldValue = oldValue, oldValue != brightness {
-            display.setGamma(brightness: brightness, oldBrightness: oldValue)
+            display.setGamma(brightness: brightness, oldBrightness: oldValue, onChange: onChange)
             return true
         }
 
         display.setGamma(brightness: brightness)
+        onChange?(brightness)
         return true
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
-        guard let display = display else { return false }
+    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+        true
+        // guard let display = display else { return false }
 
-        guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
-            return false
-        }
+        // guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
+        //     return false
+        // }
 
-        let contrast = cap(contrast, minVal: 0, maxVal: 100)
+        // let contrast = cap(contrast, minVal: 0, maxVal: 100)
 
-        guard display.supportsGamma else {
-            return true
-        }
+        // guard display.supportsGamma else {
+        //     return true
+        // }
 
-        // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
-        if let oldValue = oldValue, oldValue != contrast {
-            display.setGamma(contrast: contrast, oldContrast: oldValue)
-            return true
-        }
+        // // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
+        // if let oldValue = oldValue, oldValue != contrast {
+        //     display.setGamma(contrast: contrast, oldContrast: oldValue, onChange: onChange)
+        //     return true
+        // }
 
-        display.setGamma(contrast: contrast)
-        return true
+        // display.setGamma(contrast: contrast)
+        // onChange?(contrast)
+        // return true
     }
 
     func setPower(_: PowerState) -> Bool {

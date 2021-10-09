@@ -338,27 +338,27 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     }
 
                     self.render("\n* _Setting brightness to `1`_")
-                    let try1 = control.setBrightness(10, oldValue: nil)
+                    let try1 = control.setBrightness(10, oldValue: nil, onChange: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
                     self.render("\n* _Setting brightness to `100`_")
-                    let try2 = control.setBrightness(100, oldValue: nil)
+                    let try2 = control.setBrightness(100, oldValue: nil, onChange: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
                     self.render("\n* _Setting brightness to `25`_")
-                    let try3 = control.setBrightness(10, oldValue: nil)
+                    let try3 = control.setBrightness(10, oldValue: nil, onChange: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
                     self.render("\n* _Setting brightness to `50`_")
-                    let try4 = control.setBrightness(50, oldValue: nil)
+                    let try4 = control.setBrightness(50, oldValue: nil, onChange: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 
                     self.render("\n* _Setting brightness back to `\(brightnessBeforeTest)`_")
-                    let try5 = control.setBrightness(brightnessBeforeTest, oldValue: nil)
+                    let try5 = control.setBrightness(brightnessBeforeTest, oldValue: nil, onChange: nil)
                     Thread.sleep(forTimeInterval: 0.5)
                     guard !self.stopped else { return }
 

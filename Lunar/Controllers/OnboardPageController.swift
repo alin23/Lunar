@@ -25,7 +25,7 @@ class OnboardPageController: NSPageController {
 
         view.wantsLayer = true
         view.radius = 12.0.ns
-        view.bg = hotkeysBgColor
+        view.bg = blackMauve
         logo?.textColor = logoColor
 
         arrangedObjects = [modeChoiceViewControllerIdentifier, controlChoiceViewControllerIdentifier, hotkeysChoiceViewControllerIdentifier]
