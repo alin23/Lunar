@@ -270,6 +270,9 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 log.debug("Disabled hotkey \(identifier)")
             }
             handleRegistration()
+            if HotkeyIdentifier(rawValue: identifier) != nil {
+                appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
+            }
         }
     }
 
