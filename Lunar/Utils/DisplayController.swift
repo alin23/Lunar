@@ -132,6 +132,9 @@ class DisplayController {
                 _activeDisplays = newValue
                 CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
                 onActiveDisplaysChange?()
+                newValue.values.forEach { d in
+                    d.updateCornerWindow()
+                }
             }
         }
     }

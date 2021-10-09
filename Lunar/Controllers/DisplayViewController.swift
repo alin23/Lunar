@@ -14,6 +14,186 @@ import Magnet
 import Sauce
 import SwiftDate
 
+let NATIVE_CONTROLS_HELP_TEXT = """
+## CoreDisplay
+
+This monitor's brightness can be controlled natively through the **CoreDisplay framework**.
+
+### Advantages
+* Lunar doesn't need to use less stable methods like *DDC* for the brightness
+* Brightness transitions are smoother
+
+### Disadvantages
+* **Contrast/Volume still needs to be changed through DDC** as there is no API for them in CoreDisplay
+* Needs an additional USB connection for older Apple displays like LED Cinema
+"""
+let HARDWARE_CONTROLS_HELP_TEXT = """
+## DDC/CI
+
+This monitor's **hardware brightness** can be controlled through the **DDC protocol**.
+That is the same brightness that you can control with the physical buttons/controls on your monitor.
+
+### Advantages
+* Support for changing brightness, contrast, volume and input
+* Colors are rendered more correctly than with a software overlay like *QuickShade*
+* Allows the monitor to consume less power on low brightness values
+
+### Disadvantages
+* Not supported by TVs
+* Doesn't work on Mac Mini's HDMI port
+* Can wear out the monitor flash memory
+* Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
+    - *Aim for using as little adapters as possible between your Mac device and your monitor*
+"""
+let SOFTWARE_OVERLAY_HELP_TEXT = """
+## Software Overlay
+
+This monitor's hardware brightness can't be controlled in any way.
+Because it is a **Virtual/Sidecar/Airplay** display, it doesn't support Gamma table alteration either.
+
+Lunar has to fallback to mimicking a brightness change through a dark overlay.
+
+### Advantages
+* It works on any monitor no matter what type of connections is used
+
+### Disadvantages
+* **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+* No support for changing volume, contrast or input
+* Low brightness values can wash out colors
+* Quitting Lunar resets the brightness to default
+
+#### Notes
+
+An **overlay** is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar.
+
+The overlay is not used on non-Airplay/Virtual monitors because Gamma is a better choice for accurate color rendering
+
+"""
+let SOFTWARE_CONTROLS_HELP_TEXT = """
+## Gamma tables
+
+This monitor's hardware brightness can't be controlled in any way.
+Lunar has to fallback to mimicking a brightness change through gamma table alteration.
+
+### Advantages
+* It works on any monitor no matter what cable/adapter/connector you use
+
+### Disadvantages
+* **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+* No support for changing volume or input
+* Low brightness values can wash out colors
+* Quitting Lunar resets the brightness to default
+* Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
+"""
+let NO_CONTROLS_HELP_TEXT = """
+## No controls available
+
+Looks like all available controls for this monitor have been disabled manually.
+
+Click on the **Display Settings** button near the `RESET` dropdown to enable a control.
+"""
+let NETWORK_CONTROLS_HELP_TEXT = """
+## Network control
+
+This monitor's hardware brightness can be controlled through another device accessible on the local network.
+
+That is the same brightness that you can control with the physical buttons/controls on your monitor.
+
+### Advantages
+* Support for changing brightness, contrast, volume and input
+* Colors are rendered more correctly than with a software overlay like *QuickShade*
+* Allows the monitor to consume less power on low brightness values
+
+### Disadvantages
+* Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
+    - *Aim for using as little adapters as possible between your network device and your monitor*
+* Can wear out the monitor flash memory
+* Not supported by TVs
+"""
+
+var monitorStandColor: NSColor { darkMode ? peach : lunarYellow }
+var monitorScreenColor: NSColor { darkMode ? rouge : mauve }
+
+// MARK: - DisplayImage
+
+@IBDesignable
+class DisplayImage: NSView {
+    // MARK: Lifecycle
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        setup(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup(frame: frame)
+    }
+
+    // MARK: Internal
+
+    lazy var standColor = monitorStandColor { didSet { setup(frame: frame) }}
+    lazy var screenColor = monitorScreenColor { didSet { setup(frame: frame) }}
+
+    @IBInspectable var cornerRadius: CGFloat = 0 { didSet {
+        transition(0.2)
+        setup(frame: frame)
+    }}
+
+    func screenLayer() -> CAShapeLayer {
+        let layer = CAShapeLayer()
+        layer.path = CGPath(
+            roundedRect: CGRect(
+                x: 0, y: frame.height * 0.25,
+                width: frame.width,
+                height: frame.height * 0.75
+            ),
+            cornerWidth: cornerRadius,
+            cornerHeight: cornerRadius,
+            transform: nil
+        )
+        layer.fillColor = screenColor.cgColor
+        return layer
+    }
+
+    func standLayer() -> CAShapeLayer {
+        let layer = CAShapeLayer()
+        let path = CGMutablePath()
+        let tip: CGFloat = 85
+        let mid = frame.width / 2
+
+        let tip1 = CGPoint(x: mid, y: tip)
+        let tip2 = CGPoint(x: mid - 50, y: 0)
+        let tip3 = CGPoint(x: mid + 50, y: 0)
+
+        if cornerRadius > 0 {
+            path.move(to: tip3)
+            path.addArc(tangent1End: tip1, tangent2End: tip2, radius: cornerRadius)
+            path.addArc(tangent1End: tip2, tangent2End: tip3, radius: cornerRadius)
+            path.addArc(tangent1End: tip3, tangent2End: tip1, radius: cornerRadius)
+            path.closeSubpath()
+        } else {
+            path.move(to: tip1)
+            path.addLine(to: tip2)
+            path.addLine(to: tip3)
+            path.addLine(to: tip1)
+        }
+
+        layer.path = path
+        layer.cornerRadius = cornerRadius
+        layer.fillColor = standColor.cgColor
+        return layer
+    }
+
+    func setup(frame: NSRect) {
+        wantsLayer = true
+        layer = screenLayer()
+        layer?.addSublayer(standLayer())
+    }
+}
+
+// MARK: - DisplayViewController
+
 class DisplayViewController: NSViewController {
     // MARK: Lifecycle
 
@@ -57,104 +237,7 @@ class DisplayViewController: NSViewController {
     - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
     """
 
-    let NATIVE_CONTROLS_HELP_TEXT = """
-    ## CoreDisplay
-
-    This monitor's brightness can be controlled natively through the **CoreDisplay framework**.
-
-    ### Advantages
-    * Lunar doesn't need to use less stable methods like *DDC* for the brightness
-    * Brightness transitions are smoother
-
-    ### Disadvantages
-    * **Contrast/Volume still needs to be changed through DDC** as there is no API for them in CoreDisplay
-    * Needs an additional USB connection for older Apple displays like LED Cinema
-    """
-    let HARDWARE_CONTROLS_HELP_TEXT = """
-    ## DDC/CI
-
-    This monitor's **hardware brightness** can be controlled through the **DDC protocol**.
-    That is the same brightness that you can control with the physical buttons/controls on your monitor.
-
-    ### Advantages
-    * Support for changing brightness, contrast, volume and input
-    * Colors are rendered more correctly than with a software overlay like *QuickShade*
-    * Allows the monitor to consume less power on low brightness values
-
-    ### Disadvantages
-    * Not supported by TVs
-    * Doesn't work on Mac Mini's HDMI port
-    * Can wear out the monitor flash memory
-    * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
-        - *Aim for using as little adapters as possible between your Mac device and your monitor*
-    """
-    let SOFTWARE_OVERLAY_HELP_TEXT = """
-    ## Software Overlay
-
-    This monitor's hardware brightness can't be controlled in any way.
-    Because it is a **Virtual/Sidecar/Airplay** display, it doesn't support Gamma table alteration either.
-
-    Lunar has to fallback to mimicking a brightness change through a dark overlay.
-
-    ### Advantages
-    * It works on any monitor no matter what type of connections is used
-
-    ### Disadvantages
-    * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
-    * No support for changing volume, contrast or input
-    * Low brightness values can wash out colors
-    * Quitting Lunar resets the brightness to default
-
-    #### Notes
-
-    An **overlay** is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar.
-
-    The overlay is not used on non-Airplay/Virtual monitors because Gamma is a better choice for accurate color rendering
-
-    """
-    let SOFTWARE_CONTROLS_HELP_TEXT = """
-    ## Gamma tables
-
-    This monitor's hardware brightness can't be controlled in any way.
-    Lunar has to fallback to mimicking a brightness change through gamma table alteration.
-
-    ### Advantages
-    * It works on any monitor no matter what cable/adapter/connector you use
-
-    ### Disadvantages
-    * **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
-    * No support for changing volume or input
-    * Low brightness values can wash out colors
-    * Quitting Lunar resets the brightness to default
-    * Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
-    """
-    let NO_CONTROLS_HELP_TEXT = """
-    ## No controls available
-
-    Looks like all available controls for this monitor have been disabled manually.
-
-    Click on the ⚙️ icon near the `RESET` dropdown to enable a control.
-    """
-    let NETWORK_CONTROLS_HELP_TEXT = """
-    ## Network control
-
-    This monitor's hardware brightness can be controlled through another device accessible on the local network.
-
-    That is the same brightness that you can control with the physical buttons/controls on your monitor.
-
-    ### Advantages
-    * Support for changing brightness, contrast, volume and input
-    * Colors are rendered more correctly than with a software overlay like *QuickShade*
-    * Allows the monitor to consume less power on low brightness values
-
-    ### Disadvantages
-    * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
-        - *Aim for using as little adapters as possible between your network device and your monitor*
-    * Can wear out the monitor flash memory
-    * Not supported by TVs
-    """
-
-    @IBOutlet var displayView: DisplayView?
+    @IBOutlet var displayImage: DisplayImage?
     @IBOutlet var displayName: DisplayName?
     @IBOutlet var adaptiveNotice: NSTextField!
     @IBOutlet var gammaNotice: NSTextField!
@@ -165,6 +248,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var builtinBrightnessField: ScrollableTextField?
     @IBOutlet var builtinBrightnessCaption: ScrollableTextFieldCaption?
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
+
+    @IBOutlet var cornerRadiusField: ScrollableTextField?
+    @IBOutlet var cornerRadiusFieldCaption: ScrollableTextFieldCaption?
 
     @IBOutlet var _controlsButton: NSButton!
     @IBOutlet var _proButton: NSButton!
@@ -458,6 +544,28 @@ class DisplayViewController: NSViewController {
 
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
+
+        displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
+        cornerRadiusField?.caption = cornerRadiusFieldCaption
+        cornerRadiusField?.didScrollTextField = true
+        cornerRadiusField?.integerValue = display.cornerRadius.intValue
+        cornerRadiusField?.onValueChangedInstant = { [weak self] value in
+            mainThread {
+                self?.displayImage?.cornerRadius = CGFloat(value)
+                display.cornerRadius = value.ns
+            }
+        }
+        cornerRadiusField?.onMouseEnter = { [weak self] in
+            guard let self = self else { return }
+            self.cornerRadiusFieldCaption?.transition(1.5, easing: .easeInEaseOut)
+            self.cornerRadiusFieldCaption?.textColor = self.cornerRadiusField?.textColor
+            self.cornerRadiusFieldCaption?.alphaValue = 0.8
+        }
+        cornerRadiusField?.onMouseExit = { [weak self] in
+            guard let self = self else { return }
+            self.cornerRadiusFieldCaption?.transition(0.3)
+            self.cornerRadiusFieldCaption?.alphaValue = 0.0
+        }
 
         deleteEnabled = getDeleteEnabled()
         powerOffEnabled = getPowerOffEnabled()

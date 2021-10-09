@@ -514,7 +514,8 @@ class NetworkControl: Control {
         set(1, for: .RESET_COLOR)
     }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
+        defer { onChange?(brightness) }
         if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
            oldValue != brightness
         {
@@ -523,7 +524,8 @@ class NetworkControl: Control {
         return set(brightness, for: .BRIGHTNESS)
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+        defer { onChange?(contrast) }
         if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
            oldValue != contrast
         {

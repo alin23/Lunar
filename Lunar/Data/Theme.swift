@@ -10,6 +10,7 @@ import Cocoa
 
 let mauve = #colorLiteral(red: 0.1921568627, green: 0.1647058824, blue: 0.2980392157, alpha: 1)
 let darkMauve = #colorLiteral(red: 0.1529411765, green: 0.1411764706, blue: 0.1921568627, alpha: 1)
+let blackMauve = #colorLiteral(red: 0.09627126322, green: 0.08964298843, blue: 0.1218377976, alpha: 1)
 let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
 let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
@@ -20,18 +21,26 @@ let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha:
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
 let errorRed = #colorLiteral(red: 0.968627451, green: 0, blue: 0.01568627451, alpha: 1)
 let dullRed = #colorLiteral(red: 0.8352941275, green: 0.3647058904, blue: 0.360784322, alpha: 1)
+let rouge = #colorLiteral(red: 0.5892777443, green: 0.3579139411, blue: 0.3941611946, alpha: 1)
 let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980425, alpha: 1)
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 let faceLightColor = white.blended(withFraction: 0.15, of: orange) ?? white
 
 let bgColor = white
-let hotkeysBgColor = darkMauve
-let settingsBgColor = lunarYellow
+var hotkeysBgColor: NSColor { darkMode ? blackMauve : darkMauve }
+var settingsBgColor: NSColor { darkMode ? peach : lunarYellow }
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
 var darkMode: Bool {
-    appDelegate?.darkMode ?? false
+    switch CachedDefaults[.colorScheme] {
+    case .system:
+        return (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
+    case .light:
+        return false
+    case .dark:
+        return true
+    }
 }
 
 var explanationColor: NSColor { darkMode ? white.withAlphaComponent(0.5) : darkMauve.withAlphaComponent(0.35) }

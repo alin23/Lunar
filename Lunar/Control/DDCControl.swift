@@ -112,7 +112,7 @@ class DDCControl: Control {
         return DDC.resetColors(for: display.id)
     }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
         if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
            oldValue != brightness
@@ -139,14 +139,16 @@ class DDCControl: Control {
                 } else {
                     faults += 1
                 }
+                onChange?(brightness)
             }
             return faults <= 5
         }
 
+        defer { onChange?(brightness) }
         return DDC.setBrightness(for: display.id, brightness: brightness)
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
 
         if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), var oldValue = oldValue,
@@ -174,9 +176,11 @@ class DDCControl: Control {
                 } else {
                     faults += 1
                 }
+                onChange?(contrast)
             }
             return faults <= 5
         }
+        defer { onChange?(contrast) }
         return DDC.setContrast(for: display.id, contrast: contrast)
     }
 
