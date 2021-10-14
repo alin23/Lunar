@@ -184,9 +184,7 @@ class AppleNativeControl: Control {
         guard let display = display else { return false }
         guard !display.isForTesting else { return false }
 
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
-           oldValue != brightness
-        {
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue, oldValue != brightness {
             if display.inSmoothTransition {
                 display.shouldStopBrightnessTransition = true
                 oldValue = display.lastWrittenBrightness
@@ -198,6 +196,31 @@ class AppleNativeControl: Control {
             smoothTransitionTask?.cancel()
             smoothTransitionTask = DispatchWorkItem(name: "smoothTransitionDisplayServices: \(display)", flags: .barrier) { [weak self] in
                 guard let self = self, let display = self.display else {
+                    return
+                }
+
+                guard brightnessTransition == .slow else {
+                    let br = brightness.d / 100.0
+                    var oldBrFloat = oldValue.f / 100.0
+                    DisplayServicesGetBrightness(display.id, &oldBrFloat)
+
+                    let id = display.id
+                    display.inSmoothTransition = true
+                    display.shouldStopBrightnessTransition = false
+
+                    DisplayServicesSetBrightnessSmooth(id, br.f - oldBrFloat)
+
+                    for _ in stride(from: 0, through: 0.5, by: 0.01) {
+                        Thread.sleep(forTimeInterval: 0.01)
+                        guard !display.shouldStopBrightnessTransition else {
+                            log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
+                            display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
+                            return
+                        }
+                    }
+                    DisplayServicesSetBrightness(id, br.f)
+                    display.inSmoothTransition = false
+
                     return
                 }
 
@@ -222,6 +245,9 @@ class AppleNativeControl: Control {
                     onChange?(br)
                     Thread.sleep(forTimeInterval: interval)
                 }
+                _ = self.writeBrightness(brightness)
+                display.lastWrittenBrightness = brightness
+                onChange?(brightness)
                 display.inSmoothTransition = false
             }
 
