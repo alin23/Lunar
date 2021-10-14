@@ -80,7 +80,7 @@ func createTransition(
     subtype: CATransitionSubtype = .fromTop,
     start: Float = 0.0,
     end: Float = 1.0,
-    easing: CAMediaTimingFunctionName = .easeOut
+    easing: CAMediaTimingFunction = .easeOutQuart
 ) -> CATransition {
     let transition = CATransition()
     transition.duration = duration
@@ -88,7 +88,7 @@ func createTransition(
     transition.subtype = subtype
     transition.startProgress = start
     transition.endProgress = end
-    transition.timingFunction = CAMediaTimingFunction(name: easing)
+    transition.timingFunction = easing
     return transition
 }
 
@@ -1166,6 +1166,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        // print(initStuff)
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }
@@ -1281,7 +1282,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         NetworkControl.setup()
         if thisIsFirstRun || thisIsFirstRunAfterLunar4Upgrade || TEST_MODE {
             showWindow()
-//            onboard()
+            // onboard()
         }
 
         if TEST_MODE {

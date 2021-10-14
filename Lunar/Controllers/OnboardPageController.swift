@@ -7,7 +7,43 @@
 //
 
 import Cocoa
+import Combine
 import Foundation
+
+let ONBOARDING_TASK_KEY = "onboarding-task"
+
+// MARK: - OnboardWindowController
+
+class OnboardWindowController: ModernWindowController, NSWindowDelegate {
+    var changes: [() -> Void] = []
+    weak var pageController: OnboardPageController?
+
+    override func windowDidLoad() {
+        super.windowDidLoad()
+        window?.delegate = self
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        testWindowController = nil
+        cancelTask(ONBOARDING_TASK_KEY)
+        for change in changes {
+            change()
+        }
+
+        appDelegate!.onboardWindowController = nil
+    }
+
+    func setupSkipButton(_ button: Button, skip: @escaping (() -> Void)) {
+        button.bg = red
+        button.attributedTitle = button.title.withTextColor(.black)
+        button.hoverAlpha = 0.8
+        button.trackHover()
+        button.onClick = { [weak self] in
+            skip()
+            self?.window?.close()
+        }
+    }
+}
 
 // MARK: - OnboardPageController
 
@@ -32,6 +68,10 @@ class OnboardPageController: NSPageController {
         selectedIndex = 0
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
+    }
+
+    override func viewDidAppear() {
+        (view.window?.windowController as? OnboardWindowController)?.pageController = self
     }
 
     override func viewDidLoad() {

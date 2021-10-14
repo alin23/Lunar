@@ -19,6 +19,10 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
     md.h5.fontSize = 17
     md.h6.fontSize = 15
 
+    md.body.fontSize = 14
+    md.bold.fontSize = 14
+    md.italic.fontSize = 13
+
     md.h1.fontName = "Menlo-Bold"
     md.h2.fontName = "Menlo-Bold"
     md.h3.fontName = "Menlo-Bold"
@@ -27,10 +31,8 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
     md.h6.fontName = "SFCompactText-Bold"
 
     md.body.fontName = "SFCompactText-Regular"
-    md.body.fontSize = 14
 
     md.bold.fontName = "SFCompactText-Bold"
-    md.bold.fontSize = 14
 
     md.italic.fontName = "SFCompactText-MediumItalic"
     if dark {
@@ -38,7 +40,6 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
     } else {
         md.italic.color = violet
     }
-    md.italic.fontSize = 13
 
     md.code.fontName = "Menlo-Bold"
     md.code.color = red
@@ -48,6 +49,39 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
 
 let MD: SwiftyMarkdown = getMD()
 let DARK_MD: SwiftyMarkdown = getMD(dark: true)
+
+// MARK: - OnboardingHelpButton
+
+class OnboardingHelpButton: HelpButton {
+    let md: SwiftyMarkdown = {
+        let md = getMD(dark: true)
+        md.body.fontSize = 15
+        md.bold.fontSize = 15
+        md.italic.fontSize = 15
+        md.code.fontSize = 15
+        md.link.fontSize = 15
+
+        md.code.color = sunYellow
+        md.bold.color = peach
+
+        return md
+    }()
+
+    override func getParsedHelpText() -> NSAttributedString? {
+        md.attributedString(from: helpText)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        popover?.appearance = NSAppearance(named: .vibrantDark)
+        super.mouseDown(with: event)
+    }
+
+    override func open(edge: NSRectEdge = .maxY) {
+        setParsedHelpText()
+        popover?.appearance = NSAppearance(named: .vibrantDark)
+        super.open(edge: edge)
+    }
+}
 
 // MARK: - HelpButton
 
@@ -67,13 +101,13 @@ class HelpButton: PopoverButton<HelpPopoverController> {
         return md.attributedString(from: helpText)
     }
 
-    override func mouseDown(with event: NSEvent) {
+    func setParsedHelpText() {
         if !helpText.isEmpty,
            let parsedHelpText = getParsedHelpText(),
            let c = popoverController
         {
             c.helpTextField?.attributedStringValue = parsedHelpText
-            if let link = self.link {
+            if let link = link {
                 c.onClick = {
                     if let url = URL(string: link) {
                         NSWorkspace.shared.open(url)
@@ -81,6 +115,10 @@ class HelpButton: PopoverButton<HelpPopoverController> {
                 }
             }
         }
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        setParsedHelpText()
         super.mouseDown(with: event)
     }
 }

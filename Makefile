@@ -121,6 +121,8 @@ beta: V=1
 beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$V
 beta: build-version appcast
 	test (defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion) = $(VERSION)
+ifneq ($(DISABLE_UPLOAD),1)
 	spctl -vvv --assess /tmp/Lunar/Lunar.app 2>&1 | grep Notarized
 	upload -d lunar -n Lunar-(defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion).zip /tmp/Lunar/Lunar.zip
 	upload -d lunar Releases/appcast.xml
+endif

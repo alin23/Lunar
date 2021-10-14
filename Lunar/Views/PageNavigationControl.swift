@@ -50,7 +50,7 @@ class PageNavigationControl: NSSegmentedControl {
     override func mouseEntered(with _: NSEvent) {
         if !isEnabled { return }
 
-        transition(0.1)
+        transition(0.2)
         alphaValue = visibleAlpha
 
         onMouseEnter?()
@@ -59,7 +59,7 @@ class PageNavigationControl: NSSegmentedControl {
     override func mouseExited(with _: NSEvent) {
         if !isEnabled { return }
 
-        transition(0.2)
+        transition(0.4)
         alphaValue = standardAlpha
 
         onMouseExit?()

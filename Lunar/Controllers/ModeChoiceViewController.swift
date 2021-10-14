@@ -31,19 +31,34 @@ class ModeChoiceViewController: NSViewController {
     @IBOutlet var manual: PaddedButton!
     @IBOutlet var manualNotice: NSTextField!
 
+    @IBOutlet var skipButton: Button!
+
     lazy var markdown = getMarkdownRenderer()
     lazy var lightMarkdown = getMarkdownRenderer(color: white)
 
     var buttonCount: CGFloat = 0
 
+    var cancelled = false
+    lazy var originalOverride = CachedDefaults[.overrideAdaptiveMode]
+    lazy var originalMode = displayController.adaptiveModeKey
+
+    var apply: (() -> Void)? {
+        didSet {
+            guard let change = apply, let wc = view.window?.windowController as? OnboardWindowController else {
+                return
+            }
+            wc.changes.append(change)
+        }
+    }
+
     func getMarkdownRenderer(color: NSColor? = nil) -> SwiftyMarkdown {
         let md = getMD(dark: true)
 
-        md.body.color = color ?? darkMauve
+        md.body.color = color ?? .black
         md.body.fontSize = 15
         md.body.alignment = .center
 
-        md.bold.color = color ?? mauve
+        md.bold.color = color ?? .black
         md.bold.fontSize = 15
 
         return md
@@ -57,6 +72,7 @@ class ModeChoiceViewController: NSViewController {
         enabled: Bool,
         action: Selector
     ) {
+        button.isEnabled = false
         button.alphaValue = 0
         notice.alphaValue = 0
         guard enabled else {
@@ -76,21 +92,17 @@ class ModeChoiceViewController: NSViewController {
 
         notice.setFrameOrigin(NSPoint(x: notice.frame.origin.x, y: subheading.frame.minY))
 
-//        let y = subheading.frame.minY - 74 - (buttonCount * (button.frame.height + notice.frame.height + 10))
         let y = subheading.frame.minY - 74 - (buttonCount * (button.frame.height + 10))
         let transitionTime = 0.6 + 0.1 * buttonCount
         mainAsyncAfter(ms: 1800) {
             button.transition(0.8)
             button.alphaValue = 0.85
 
-            button.transition(transitionTime, type: .push)
+            button.transition(transitionTime, type: .moveIn, easing: .easeOutBack)
             button.setFrameOrigin(NSPoint(
                 x: button.frame.origin.x,
                 y: y
             ))
-
-//            notice.transition(0.8)
-//            notice.alphaValue = 0.85
 
             notice.transition(1, type: .push)
             notice.setFrameOrigin(NSPoint(
@@ -98,86 +110,114 @@ class ModeChoiceViewController: NSViewController {
                 y: button.frame.minY - 36
             ))
         }
+        mainAsyncAfter(ms: 2700) {
+            button.baseFrame = button.frame
+            button.isEnabled = true
+        }
 
         buttonCount += 1
     }
 
     func next() {
-        guard let pageController = view.superview?.nextResponder as? OnboardPageController else { return }
-        pageController.navigateForward(self)
+        guard let wc = view.window?.windowController as? OnboardWindowController else { return }
+        wc.pageController?.navigateForward(self)
     }
 
     @objc func syncBuiltinClick() {
-        guard let builtin = displayController.builtinDisplay else { return }
-        builtin.isSource = true
-        displayController.displays.values
-            .filter { $0.serial != builtin.serial }
-            .forEach { d in
-                d.isSource = false
-                d.brightnessCurveFactors[.sync] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
-                d.contrastCurveFactors[.sync] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
-                d.userContrast[.sync]?.removeAll()
-                d.userBrightness[.sync]?.removeAll()
-                d.lockedBrightnessCurve = false
-                d.lockedContrastCurve = false
-            }
+        apply = {
+            guard let builtin = displayController.builtinDisplay else { return }
+            builtin.isSource = true
+            displayController.displays.values
+                .filter { $0.serial != builtin.serial }
+                .forEach { d in
+                    d.isSource = false
+                    d.brightnessCurveFactors[.sync] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
+                    d.contrastCurveFactors[.sync] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
+                    d.userContrast[.sync]?.removeAll()
+                    d.userBrightness[.sync]?.removeAll()
+                    d.lockedBrightnessCurve = false
+                    d.lockedContrastCurve = false
+                }
 
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = SyncMode.specific
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .sync
+        }
         next()
     }
 
     @objc func syncSourceClick() {
-        let externals = displayController.externalActiveDisplays
-        guard let source = externals.first(where: { $0.isSmartDisplay && AppleNativeControl.isAvailable(for: $0) })
-        else { return }
+        apply = {
+            let externals = displayController.externalActiveDisplays
+            guard let source = externals.first(where: { $0.isSmartDisplay && AppleNativeControl.isAvailable(for: $0) })
+            else { return }
 
-        source.isSource = true
-        displayController.displays.values
-            .filter { $0.serial != source.serial }
-            .forEach { d in
-                d.isSource = false
-                d.brightnessCurveFactors[.sync] = 1
-                d.contrastCurveFactors[.sync] = 1
-                d.userContrast[.sync]?.removeAll()
-                d.userBrightness[.sync]?.removeAll()
-                if d.name == source.name {
-                    d.lockedBrightnessCurve = true
-                    d.lockedContrastCurve = true
+            source.isSource = true
+            displayController.displays.values
+                .filter { $0.serial != source.serial }
+                .forEach { d in
+                    d.isSource = false
+                    d.brightnessCurveFactors[.sync] = 1
+                    d.contrastCurveFactors[.sync] = 1
+                    d.userContrast[.sync]?.removeAll()
+                    d.userBrightness[.sync]?.removeAll()
+                    if d.name == source.name {
+                        d.lockedBrightnessCurve = true
+                        d.lockedContrastCurve = true
+                    }
                 }
-            }
 
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = SyncMode.specific
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .sync
+        }
         next()
     }
 
     @objc func locationClick() {
-        LocationMode.specific.fetchGeolocation()
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = LocationMode.specific
+        apply = {
+            LocationMode.specific.fetchGeolocation()
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .location
+        }
         next()
     }
 
     @objc func clockClick() {
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = ClockMode.specific
+        apply = {
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .clock
+        }
         next()
     }
 
     @objc func sensorClick() {
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = SensorMode.specific
+        apply = {
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .sensor
+        }
         next()
     }
 
     @objc func manualClick() {
-        CachedDefaults[.overrideAdaptiveMode] = true
-        displayController.adaptiveMode = ManualMode.specific
+        apply = {
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = .manual
+        }
         next()
     }
 
+    func revert() {
+        CachedDefaults[.overrideAdaptiveMode] = originalOverride
+        CachedDefaults[.adaptiveBrightnessMode] = originalMode
+    }
+
     override func viewDidLoad() {
+        super.viewDidLoad()
+
+        originalOverride = CachedDefaults[.overrideAdaptiveMode]
+        originalMode = displayController.adaptiveModeKey
+        CachedDefaults[.overrideAdaptiveMode] = true
+        CachedDefaults[.adaptiveBrightnessMode] = .manual
+
         heading.alphaValue = 0
         subheading.alphaValue = 0
 
@@ -240,8 +280,8 @@ class ModeChoiceViewController: NSViewController {
         setupButton(
             sensor,
             notice: sensorNotice,
-            color: blue,
-            title: lightMarkdown
+            color: blue.highlight(withLevel: 0.2) ?? blue,
+            title: markdown
                 .attributedString(
                     from: "**Adapt** your **\(externalName)** based on readings\nfrom a wireless **ambient light sensor**"
                 ),
@@ -252,8 +292,8 @@ class ModeChoiceViewController: NSViewController {
         setupButton(
             manual,
             notice: manualNotice,
-            color: red,
-            title: lightMarkdown
+            color: red.highlight(withLevel: 0.2) ?? red,
+            title: markdown
                 .attributedString(
                     from: "**Control** your **\(externalName)** manually\nusing brightness and volume **keys**"
                 ),
@@ -271,6 +311,13 @@ class ModeChoiceViewController: NSViewController {
             self.subheading.transition(0.8)
             self.subheading.alphaValue = 1
         }
-        super.viewDidLoad()
+    }
+
+    override func viewDidAppear() {
+        if let wc = view.window?.windowController as? OnboardWindowController {
+            wc.setupSkipButton(skipButton) { [weak self] in
+                self?.revert()
+            }
+        }
     }
 }

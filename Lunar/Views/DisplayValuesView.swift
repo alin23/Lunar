@@ -35,6 +35,8 @@ class DisplayValuesView: NSTableView {
 
     var displayObservers: [CGDirectDisplayID: Set<AnyCancellable>] = [:]
 
+    let displayNameIdentifier = NSUserInterfaceItemIdentifier("displayName")
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
@@ -114,16 +116,60 @@ class DisplayValuesView: NSTableView {
         }
     }
 
+    func isDisplayName(_ view: NSView) -> Bool {
+        guard let textField = view as? NSTextField else { return false }
+        return textField.identifier == displayNameIdentifier
+    }
+
+    func resizeControls(_ column: NSTableCellView, forRow row: Int) {
+        guard let display = column.objectValue as? Display,
+              let volumeSlider = column.subviews.first(where: { v in (v as? VolumeSlider) != nil }) as? VolumeSlider,
+              let inputDropdown = column.subviews.first(where: { v in (v as? PopUpButton) != nil }) as? PopUpButton,
+              let orientationControl = column.subviews.first(where: { v in (v as? NSSegmentedControl) != nil }) as? NSSegmentedControl,
+              let displayName = column.subviews.first(where: { v in isDisplayName(v) }) as? NSTextField,
+              let notConnectedTextField = column.subviews
+              .first(where: { v in (v as? NotConnectedTextField) != nil }) as? NotConnectedTextField
+        else { return }
+
+        let hasDDC = display.hasDDC && !display.isBuiltin
+
+        if CachedDefaults[.showOrientationInQuickActions] {
+            if !hasDDC {
+                displayName.setFrameOrigin(NSPoint(x: displayName.frame.origin.x, y: column.frame.height * 0.5))
+                orientationControl.setFrameOrigin(NSPoint(x: orientationControl.frame.origin.x, y: column.frame.height * 0.35))
+            } else {
+                displayName.setFrameOrigin(NSPoint(x: displayName.frame.origin.x, y: column.frame.height * 0.7))
+                orientationControl.setFrameOrigin(NSPoint(x: orientationControl.frame.origin.x, y: column.frame.height * 0.05))
+            }
+        } else {
+            if !hasDDC {
+                displayName.setFrameOrigin(NSPoint(x: displayName.frame.origin.x, y: column.frame.height * 0.25))
+            } else {
+                displayName.setFrameOrigin(NSPoint(x: displayName.frame.origin.x, y: column.frame.height * 0.6))
+            }
+        }
+
+        notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
+        orientationControl.isHidden = !CachedDefaults[.showOrientationInQuickActions]
+
+        volumeSlider.isEnabled = hasDDC
+        volumeSlider.isHidden = !volumeSlider.isEnabled
+        volumeSlider.minValue = 0
+        volumeSlider.maxValue = 100
+
+        inputDropdown.isEnabled = hasDDC
+        inputDropdown.isHidden = !inputDropdown.isEnabled
+        inputDropdown.page = .hotkeys
+        inputDropdown.tag = display.id.i
+        inputDropdown.fade()
+    }
+
     func addRow(_ rowView: NSTableRowView, forRow row: Int) {
         guard let col1 = rowView.view(atColumn: 0) as? NSTableCellView,
               let col2 = rowView.view(atColumn: 1) as? NSTableCellView,
               let col3 = rowView.view(atColumn: 2) as? NSTableCellView,
               let scrollableBrightness = col1.subviews[0] as? ScrollableTextField,
               let display = col2.objectValue as? Display,
-              let inputDropdown = col2.subviews.first(where: { v in (v as? PopUpButton) != nil }) as? PopUpButton,
-              let orientationControl = col2.subviews.first(where: { v in (v as? NSSegmentedControl) != nil }) as? NSSegmentedControl,
-              let notConnectedTextField = col2.subviews
-              .first(where: { v in (v as? NotConnectedTextField) != nil }) as? NotConnectedTextField,
               let scrollableContrast = col3.subviews[0] as? ScrollableTextField,
               let scrollableBrightnessCaption = (rowView.view(atColumn: 0) as? NSTableCellView)?.subviews[1] as? ScrollableTextFieldCaption,
               let scrollableContrastCaption = col3.subviews[1] as? ScrollableTextFieldCaption
@@ -131,15 +177,7 @@ class DisplayValuesView: NSTableView {
 
         let id = display.id
 
-        notConnectedTextField.onClick = getDeleteAction(displaySerial: display.serial, row: row)
-        orientationControl.isHidden = !CachedDefaults[.showOrientationInQuickActions]
-
-        inputDropdown.isHidden = !display.active
-        inputDropdown.isEnabled = display.hasDDC
-        inputDropdown.page = .hotkeys
-        inputDropdown.tag = id.i
-        inputDropdown.fade()
-
+        resizeControls(col2, forRow: row)
         scrollableBrightness.textFieldColor = textFieldColor
         scrollableBrightness.textFieldColorHover = textFieldColorHover
         scrollableBrightness.textFieldColorLight = textFieldColorLight
@@ -254,11 +292,9 @@ class DisplayValuesView: NSTableView {
     }
 
     func resizeInputs() {
-        enumerateAvailableRowViews { rowView, _ in
-            if let inputDropdown = (rowView.view(atColumn: 1) as? NSTableCellView)?.subviews.first(
-                where: { v in (v as? PopUpButton) != nil }
-            ) as? PopUpButton {
-                inputDropdown.fade()
+        enumerateAvailableRowViews { rowView, row in
+            if let col2 = rowView.view(atColumn: 1) as? NSTableCellView {
+                resizeControls(col2, forRow: row)
             }
         }
     }

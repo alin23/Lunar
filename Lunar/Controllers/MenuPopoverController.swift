@@ -106,13 +106,14 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
     }
 
     func adaptViewSize() {
+        guard !POPOVERS["menu"]!!.isShown else { return }
         #if DEBUG
             log.verbose("Adapting Quick Actions view size")
         #endif
 
         viewHeight = viewHeight ?? view.frame.size.height
 
-        let neededHeight = 50 + tableView.fittingSize.height
+        let neededHeight = 60 + tableView.fittingSize.height
         #if DEBUG
             log.verbose("Needed Height: \(neededHeight)")
         #endif
@@ -179,6 +180,7 @@ class MenuPopoverController: NSViewController, NSTableViewDelegate, NSTableViewD
                 view.removeTrackingArea(area)
             }
             trackingArea = nil
+            adaptViewSize()
         }
     }
 

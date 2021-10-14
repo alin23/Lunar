@@ -132,6 +132,8 @@ class DisplayImage: NSView {
 
     // MARK: Internal
 
+    @IBInspectable var baseCornerRadius: CGFloat = 4
+
     lazy var standColor = monitorStandColor { didSet { setup(frame: frame) }}
     lazy var screenColor = monitorScreenColor { didSet { setup(frame: frame) }}
 
@@ -142,14 +144,18 @@ class DisplayImage: NSView {
 
     func screenLayer() -> CAShapeLayer {
         let layer = CAShapeLayer()
+        layer.cornerCurve = .continuous
+
+        let radius = cornerRadius + baseCornerRadius
+
         layer.path = CGPath(
             roundedRect: CGRect(
                 x: 0, y: frame.height * 0.25,
                 width: frame.width,
                 height: frame.height * 0.75
             ),
-            cornerWidth: cornerRadius,
-            cornerHeight: cornerRadius,
+            cornerWidth: radius,
+            cornerHeight: radius,
             transform: nil
         )
         layer.fillColor = screenColor.cgColor
@@ -158,6 +164,8 @@ class DisplayImage: NSView {
 
     func standLayer() -> CAShapeLayer {
         let layer = CAShapeLayer()
+        layer.cornerCurve = .continuous
+
         let path = CGMutablePath()
         let tip: CGFloat = 85
         let mid = frame.width / 2
@@ -165,12 +173,13 @@ class DisplayImage: NSView {
         let tip1 = CGPoint(x: mid, y: tip)
         let tip2 = CGPoint(x: mid - 50, y: 0)
         let tip3 = CGPoint(x: mid + 50, y: 0)
+        let radius = mapNumber(cornerRadius + baseCornerRadius, fromLow: 0, fromHigh: 24, toLow: 4, toHigh: 18)
 
-        if cornerRadius > 0 {
+        if radius > 0 {
             path.move(to: tip3)
-            path.addArc(tangent1End: tip1, tangent2End: tip2, radius: cornerRadius)
-            path.addArc(tangent1End: tip2, tangent2End: tip3, radius: cornerRadius)
-            path.addArc(tangent1End: tip3, tangent2End: tip1, radius: cornerRadius)
+            path.addArc(tangent1End: tip1, tangent2End: tip2, radius: radius)
+            path.addArc(tangent1End: tip2, tangent2End: tip3, radius: radius)
+            path.addArc(tangent1End: tip3, tangent2End: tip1, radius: radius)
             path.closeSubpath()
         } else {
             path.move(to: tip1)
@@ -180,12 +189,12 @@ class DisplayImage: NSView {
         }
 
         layer.path = path
-        layer.cornerRadius = cornerRadius
+        layer.cornerRadius = radius
         layer.fillColor = standColor.cgColor
         return layer
     }
 
-    func setup(frame: NSRect) {
+    func setup(frame _: NSRect) {
         wantsLayer = true
         layer = screenLayer()
         layer?.addSublayer(standLayer())
@@ -244,6 +253,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var resetDropdown: PopUpButton?
+    @IBOutlet var volumeSlider: NSSlider?
 
     @IBOutlet var builtinBrightnessField: ScrollableTextField?
     @IBOutlet var builtinBrightnessCaption: ScrollableTextFieldCaption?
@@ -296,6 +306,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var schedule5: Schedule!
 
     @objc dynamic var nonResponsiveTextFieldHidden: Bool = true
+
+    var applyVolume = true
+    @objc dynamic var volumeHidden: Bool = false
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -360,9 +373,17 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func getNonResponsiveTextFieldHidden() -> Bool {
-        guard let display = display, display.active else { return true }
-        return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || display.activeAndResponsive
+    @objc dynamic var volume: Double = 50 {
+        didSet {
+            guard applyVolume else { return }
+            display?.volume = volume.ns
+        }
+    }
+
+    func getNonResponsiveTextFieldHidden(display: Display? = nil, responsive: Bool? = nil) -> Bool {
+        guard let display = display ?? self.display, display.active else { return true }
+        return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || !display
+            .active || (responsive ?? display.responsiveDDC) || !(display.control is DDCControl)
     }
 
     @IBAction func lockCurve(_ sender: LockButton) {
@@ -542,8 +563,23 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
+    func getVolumeHidden(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
+        guard let display = display ?? self.display, let control = display.control else {
+            return true
+        }
+
+        return display.isBuiltin || display.id == GENERIC_DISPLAY_ID || control is GammaControl || !display
+            .active || !(hasDDC ?? display.hasDDC)
+    }
+
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
+
+        volumeHidden = getVolumeHidden(display: display)
+        applyVolume = false
+        volume = display.volume.doubleValue
+        applyVolume = true
+        volumeSlider?.isHidden = volumeHidden
 
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
         cornerRadiusField?.caption = cornerRadiusFieldCaption
@@ -567,9 +603,9 @@ class DisplayViewController: NSViewController {
             self.cornerRadiusFieldCaption?.alphaValue = 0.0
         }
 
-        deleteEnabled = getDeleteEnabled()
-        powerOffEnabled = getPowerOffEnabled()
-        powerOffTooltip = getPowerOffTooltip()
+        deleteEnabled = getDeleteEnabled(display: display)
+        powerOffEnabled = getPowerOffEnabled(display: display)
+        powerOffTooltip = getPowerOffTooltip(display: display)
         inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
         chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
 
@@ -637,12 +673,14 @@ class DisplayViewController: NSViewController {
         }
 
         display.onControlChange = { [weak self] control in
-            mainThread {
-                self?.updateControlsButton(control: control)
+            mainAsyncAfter(ms: 10) { [weak self] in
+                guard let self = self else { return }
+                self.updateControlsButton(control: control)
+                self.volumeHidden = self.getVolumeHidden()
                 if control is GammaControl, display.enabledControls[.gamma] ?? false {
-                    self?.showGammaNotice()
+                    self.showGammaNotice()
                 } else {
-                    self?.hideGammaNotice()
+                    self.hideGammaNotice()
                 }
             }
         }
@@ -663,8 +701,16 @@ class DisplayViewController: NSViewController {
             }
         }
 
+        display.$volume.sink { [weak self] value in
+            mainAsyncAfter(ms: 10) { [weak self] in
+                guard let self = self else { return }
+                self.applyVolume = false
+                self.volume = value.doubleValue
+                self.applyVolume = true
+            }
+        }.store(in: &displayObservers, for: "volume")
         display.$input.sink { [weak self] _ in
-            mainAsyncAfter(ms: 1000) {
+            mainAsyncAfter(ms: 1000) { [weak self] in
                 guard let self = self else { return }
                 if !self.inputHidden { self.inputDropdown?.fade() }
             }
@@ -1069,17 +1115,24 @@ class DisplayViewController: NSViewController {
     func listenForDisplayBoolChange() {
         guard let display = display else { return }
         display.$hasDDC.receive(on: dataPublisherQueue).sink { [weak self] hasDDC in
-            guard let self = self else { return }
-            self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
-            self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
+            mainAsyncAfter(ms: 10) { [weak self] in
+                guard let self = self else { return }
+
+                self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
+                self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
+                self.volumeHidden = self.getVolumeHidden(hasDDC: hasDDC)
+            }
         }.store(in: &displayObservers, for: "hasDDC")
         display.$responsiveDDC.receive(on: dataPublisherQueue).sink { [weak self] responsive in
             if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
                 self.setInputHidden(display.id == GENERIC_DISPLAY_ID || (!responsive && display.control is DDCControl) || display.isBuiltin)
 
-                mainThread { textField.isHidden = !display.active || responsive || !(display.control is DDCControl) }
+                mainAsyncAfter(ms: 10) { [weak self] in
+                    guard let self = self else { return }
+                    textField.isHidden = self.getNonResponsiveTextFieldHidden(responsive: responsive)
+                }
             }
-        }.store(in: &displayObservers, for: "activeAndResponsive")
+        }.store(in: &displayObservers, for: "responsiveDDC")
         if !display.adaptive {
             showAdaptiveNotice()
         }
@@ -1100,7 +1153,8 @@ class DisplayViewController: NSViewController {
         graphObserver = moreGraphDataPublisher.sink { [weak self] change in
             log.debug("More graph data: \(change.newValue)")
             guard let self = self else { return }
-            mainAsyncAfter(ms: 1000) {
+            mainAsyncAfter(ms: 1000) { [weak self] in
+                guard let self = self else { return }
                 self.initGraph()
             }
         }
@@ -1156,15 +1210,15 @@ class DisplayViewController: NSViewController {
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
 
-    func getDeleteEnabled() -> Bool {
-        guard let display = display else {
+    func getDeleteEnabled(display: Display? = nil) -> Bool {
+        guard let display = display ?? self.display else {
             return false
         }
         return display.id != GENERIC_DISPLAY_ID && !display.active
     }
 
-    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
-        guard let display = display, display.active else { return false }
+    func getPowerOffEnabled(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
+        guard let display = display ?? self.display, display.active else { return false }
         guard !display.isInMirrorSet else { return true }
 
         return (
@@ -1176,8 +1230,8 @@ class DisplayViewController: NSViewController {
             !display.isAirplay
     }
 
-    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String? {
-        guard let display = display else { return nil }
+    func getPowerOffTooltip(display: Display? = nil, hasDDC: Bool? = nil) -> String? {
+        guard let display = display ?? self.display else { return nil }
         guard !(hasDDC ?? display.hasDDC) else {
             return """
             BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
@@ -1348,6 +1402,9 @@ class DisplayViewController: NSViewController {
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
+        volumeSlider?.minValue = 0
+        volumeSlider?.maxValue = 100
+
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
 
@@ -1384,5 +1441,77 @@ class DisplayViewController: NSViewController {
         powerOffTooltip = getPowerOffTooltip()
 //        scheduleBox?.bg = .black.withAlphaComponent(0.03)
 //        scheduleBox?.radius = 10
+    }
+}
+
+// MARK: - VolumeSliderCell
+
+class VolumeSliderCell: NSSliderCell {
+    // MARK: Lifecycle
+
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+
+    // MARK: Internal
+
+    let volumeImage = NSImage(named: "volume-low")
+
+    override func drawKnob(_ knobRect: NSRect) {
+        super.drawKnob(knobRect)
+        let imageRect = knobRect.smaller(by: 10)
+        volumeImage?.draw(in: imageRect, from: .zero, operation: .sourceOver, fraction: 0.7)
+    }
+
+    override func drawBar(inside aRect: NSRect, flipped _: Bool) {
+        let rect = NSRect(x: aRect.origin.x, y: aRect.origin.y - 2.5, width: aRect.width, height: 10)
+        let barRadius = CGFloat(4)
+        let value = CGFloat((doubleValue - minValue) / (maxValue - minValue))
+        let finalWidth = CGFloat(value * (controlView!.frame.size.width - 8))
+
+        let bg = NSBezierPath(roundedRect: rect, xRadius: barRadius, yRadius: barRadius)
+        let color = isEnabled ? peach : (peach.blended(withFraction: 0.5, of: gray) ?? gray)
+        color.withAlphaComponent(0.3).setFill()
+        bg.fill()
+
+        let leftRect = NSRect(x: rect.origin.x, y: rect.origin.y, width: finalWidth, height: rect.size.height)
+        let active = NSBezierPath(roundedRect: leftRect, xRadius: barRadius, yRadius: barRadius)
+        color.withAlphaComponent(0.7).setFill()
+        active.fill()
+    }
+}
+
+// MARK: - VolumeSlider
+
+class VolumeSlider: NSSlider {
+    // MARK: Lifecycle
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    // MARK: Internal
+
+    override var knobThickness: CGFloat { 6 }
+
+    override func mouseEntered(with _: NSEvent) {
+        guard isEnabled, !isHidden else { return }
+        transition(0.2)
+        alphaValue = 1.0
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        transition(0.5)
+        alphaValue = 0.7
+    }
+
+    func setup() {
+        trackHover()
     }
 }
