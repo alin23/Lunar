@@ -673,7 +673,7 @@ extension Defaults.Keys {
     static let didSwipeLeft = Key<Bool>("didSwipeLeft", default: false)
     static let didSwipeRight = Key<Bool>("didSwipeRight", default: false)
     static let smoothTransition = Key<Bool>("smoothTransition", default: false)
-    static let brightnessTransition = Key<BrightnessTransition>("brightnessTransition", default: .instant)
+    static let brightnessTransition = Key<BrightnessTransition>("brightnessTransition", default: .smooth)
     static let scheduleTransition = Key<ScheduleTransition>("scheduleTransition", default: .minutes30)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
     static let debug = Key<Bool>("debug", default: false)
