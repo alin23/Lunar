@@ -148,10 +148,10 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
             return
         }
 
-        let port = self.port.i32 ?? 22
-        let passphrase = self.passphrase ?? ""
-        let password = self.password ?? ""
-        let sshKeyPath = self.sshKeyPath?.string ?? ""
+        let port = port.i32 ?? 22
+        let passphrase = passphrase ?? ""
+        let password = password ?? ""
+        let sshKeyPath = sshKeyPath?.string ?? ""
         cancelled = false
 
         log.debug("Connecting to SSH", context: [

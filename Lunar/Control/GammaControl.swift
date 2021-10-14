@@ -41,15 +41,18 @@ class GammaControl: Control {
     let str = "Gamma Control"
 
     func fluxChecker(flux: NSRunningApplication) {
-        guard let display = display else { return }
+        guard let display = display, display.supportsGamma else { return }
         guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
 
         fluxPromptTime = Date()
 
-        let completionHandler = { (quitFlux: Bool) in
-            guard quitFlux else { return }
+        let completionHandler = { [weak self] (keepFlux: Bool) in
+            guard !keepFlux else {
+                self?.display?.useOverlay = true
+                return
+            }
 
             flux.terminate()
             if CBBlueLightClient.supportsBlueLightReduction() {
@@ -71,19 +74,19 @@ class GammaControl: Control {
         let resp = ask(
             message: "F.lux app is conflicting with Lunar",
             info: """
-                This display is controlled using gamma tables, the same method that f.lux uses to adjust the colour temperature of your screen.
+                This display is controlled using gamma tables
+
+                F.lux uses the same method to adjust the colour temperature of your screen.
 
                 Unfortunately, only one app is allowed to change the gamma tables.
 
-                For Lunar to work properly, you have to stop using f.lux.
+                For Lunar to work properly, you can either:
 
-                \(CBBlueLightClient.supportsBlueLightReduction()
-                ?
-                "You can switch to macOS Night Shift for a blue light filter that doesn't interfere with Lunar.\n\nDo you want to quit f.lux and activate Night Shift now?"
-                : "Do you want to quit f.lux now?")
+                1. Switch to a dark overlay for brightness dimming
+                2. Or stop using f.lux and switch to Night Shift
             """,
-            okButton: "Yes",
-            cancelButton: "No",
+            okButton: "Use dark overlay",
+            cancelButton: "Quit f.lux",
             screen: display.screen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",

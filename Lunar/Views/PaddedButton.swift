@@ -8,6 +8,16 @@
 
 import Cocoa
 
+let NO_SHADOW: NSShadow = {
+    let s = NSShadow()
+    s.shadowColor = .clear
+    s.shadowOffset = .zero
+    s.shadowBlurRadius = 0
+    return s
+}()
+
+// MARK: - PaddedButton
+
 class PaddedButton: NSButton {
     // MARK: Lifecycle
 
@@ -22,6 +32,9 @@ class PaddedButton: NSButton {
     }
 
     // MARK: Internal
+
+    var buttonShadow: NSShadow!
+    var baseFrame: NSRect!
 
     lazy var disabledBgColor = (bgColor?.blended(withFraction: 0.3, of: gray) ?? gray).withAlphaComponent(0.2)
     lazy var hoverBgColor = bgColor?.blended(withFraction: 0.2, of: red) ?? bg
@@ -41,7 +54,7 @@ class PaddedButton: NSButton {
             } else {
                 alphaValue = 0.7
             }
-            fade()
+            fade(resize: false)
         }
     }
 
@@ -65,8 +78,10 @@ class PaddedButton: NSButton {
         allowsMixedState = false
         setColors()
 
-        let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(area)
+        buttonShadow = shadow
+        baseFrame = frame
+        shadow = NO_SHADOW
+        trackHover()
     }
 
     override func mouseEntered(with _: NSEvent) {
@@ -81,24 +96,32 @@ class PaddedButton: NSButton {
         }
     }
 
-    func setColors(fadeDuration: TimeInterval = 0.2) {
-        layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
+    func setColors(fadeDuration: TimeInterval = 0.3, resize: Bool = true) {
+        transition(fadeDuration)
 
         guard let bgColor = bgColor else { return }
         if hoverState == .hover {
             bg = hoverBgColor
-
+            shadow = buttonShadow
+            if resize {
+                frame = baseFrame.larger(by: 2)
+            }
         } else {
             if isEnabled {
                 bg = bgColor
             } else {
                 bg = disabledBgColor
             }
+            shadow = NO_SHADOW
+            if resize {
+                frame = baseFrame
+            }
         }
+        needsDisplay = true
     }
 
-    func fade() {
-        setColors()
+    func fade(resize: Bool = true) {
+        setColors(resize: resize)
     }
 
     func defocus() {
@@ -108,7 +131,7 @@ class PaddedButton: NSButton {
 
     func hover() {
         hoverState = .hover
-        setColors(fadeDuration: 0.1)
+        setColors(fadeDuration: 0.2)
     }
 
     override func resetCursorRects() {
@@ -119,7 +142,7 @@ class PaddedButton: NSButton {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        fade()
+        fade(resize: false)
 
         super.draw(dirtyRect)
     }

@@ -44,12 +44,12 @@ class ScrollableTextFieldCaption: NSTextField {
     }
 
     func lightenUp(color: NSColor) {
-        transition(0.15)
+        transition(0.2)
         textColor = color
     }
 
     func darken(color: NSColor) {
-        transition(0.3)
+        transition(0.4)
         textColor = color
     }
 

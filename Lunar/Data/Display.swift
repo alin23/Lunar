@@ -379,6 +379,8 @@ enum ValueType {
         lockedBrightnessCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightnessCurve)) ?? false
         lockedContrastCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrastCurve)) ?? false
 
+        useOverlay = (try container.decodeIfPresent(Bool.self, forKey: .useOverlay)) ?? false
+
         alwaysUseNetworkControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysUseNetworkControl)) ?? false
         neverUseNetworkControl = (try container.decodeIfPresent(Bool.self, forKey: .neverUseNetworkControl)) ?? false
         alwaysFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysFallbackControl)) ?? false
@@ -400,7 +402,7 @@ enum ValueType {
 
         brightnessOnInputChange1 = (
             try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
+            .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
         )
         brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
         brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
@@ -655,6 +657,7 @@ enum ValueType {
         case hotkeyInput3
         case userBrightness
         case userContrast
+        case useOverlay
         case alwaysUseNetworkControl
         case neverUseNetworkControl
         case alwaysFallbackControl
@@ -694,6 +697,7 @@ enum ValueType {
             .lockedContrastCurve,
             .audioMuted,
             .power,
+            .useOverlay,
             .alwaysUseNetworkControl,
             .neverUseNetworkControl,
             .alwaysFallbackControl,
@@ -764,6 +768,7 @@ enum ValueType {
             .hotkeyInput1,
             .hotkeyInput2,
             .hotkeyInput3,
+            .useOverlay,
             .alwaysUseNetworkControl,
             .neverUseNetworkControl,
             .alwaysFallbackControl,
@@ -800,6 +805,26 @@ enum ValueType {
         case gamma
     }
 
+    enum Vendor: Int64 {
+        case dell = 4268
+        case lg = 7789
+        case samsung = 19501
+        case benq = 2513
+        case prism = -2
+        case lenovo = 12462
+        case xiaomi = 10007
+        case philips = 16652
+        case sceptre = 19988
+        case huawei = 8950
+        case eizo = 5571
+        case apple = 0x610
+        case asus = 1129
+        case proart = 1715
+        case acer = 1138
+        case hp = 8718
+        case unknown = -1
+    }
+
     static let DEFAULT_SCHEDULES = [
         BrightnessSchedule(type: .sunrise, hour: 0, minute: 30, brightness: 70, contrast: 65, negative: true, enabled: false),
         BrightnessSchedule(type: .time, hour: 10, minute: 20, brightness: 80, contrast: 70, negative: false, enabled: false),
@@ -807,6 +832,8 @@ enum ValueType {
         BrightnessSchedule(type: .sunset, hour: 1, minute: 30, brightness: 60, contrast: 60, negative: false, enabled: false),
         BrightnessSchedule(type: .time, hour: 7, minute: 30, brightness: 20, contrast: 45, negative: false, enabled: false),
     ]
+
+    dynamic var controlResult = ControlResult.allWorked
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
@@ -1016,7 +1043,7 @@ enum ValueType {
     lazy var isVirtual: Bool = DDC.isVirtualDisplay(id, name: edidName)
     lazy var isProjector: Bool = DDC.isProjectorDisplay(id, name: edidName)
 
-    lazy var supportsGamma: Bool = !isSidecar && !isAirplay && !isVirtual
+    lazy var supportsGamma: Bool = !isSidecar && !isAirplay && !isVirtual && !useOverlay
 
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
         let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
@@ -1043,6 +1070,24 @@ enum ValueType {
     @Atomic var shouldStopContrastTransition = true
     @Atomic var lastWrittenBrightness: UInt8 = 50
     @Atomic var lastWrittenContrast: UInt8 = 50
+
+    let DEFAULT_DDC_BLOCKERS = """
+    * Disable any **Ambient Light Sensing** feature
+    * Disable any **Automatic Brightness** or **Dynamic Brightness** feature
+    * Set **Picture Mode** or **Preset** to `Custom`, `Standard` or `User`
+    """
+    let DDC_BLOCKERS_TRAILER = """
+    #### Other possible blockers
+
+    * Some `HDMI-to-USB-C` Cables
+        * If possible, try a `DisplayPort to USB-C` cable
+    * Smart monitors
+        * Samsung M7/M9
+        * Samsung G7/G9
+    * Non-compliant hub/dock/adapter
+
+    For more information, [click here](https://lunar.fyi/faq#brightness-not-changing).
+    """
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
@@ -1521,7 +1566,7 @@ enum ValueType {
 
             guard !isForTesting else { return }
 
-            var volume = self.volume.uint8Value
+            var volume = volume.uint8Value
             if DDC.applyLimits, maxDDCVolume.uint8Value != 100, minDDCVolume.uint8Value != 0, !(control is GammaControl) {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: minDDCVolume.doubleValue, toHigh: maxDDCVolume.doubleValue)
                     .rounded().u8
@@ -1618,7 +1663,7 @@ enum ValueType {
             save()
 
             guard !isForTesting,
-                  let input = InputSource(rawValue: self.input.uint8Value),
+                  let input = InputSource(rawValue: input.uint8Value),
                   input != .unknown
             else { return }
             if let control = control, !control.setInput(input) {
@@ -1727,6 +1772,13 @@ enum ValueType {
     @Published @objc dynamic var hasDDC: Bool = false {
         didSet {
             inputTooltip = hasDDC ? nil : "This monitor doesn't support input switching because DDC is not available"
+        }
+    }
+
+    @Published @objc dynamic var useOverlay: Bool = false {
+        didSet {
+            supportsGamma = !isSidecar && !isAirplay && !isVirtual && !useOverlay
+            save()
         }
     }
 
@@ -1869,6 +1921,13 @@ enum ValueType {
             defaultGammaBlueMin.floatValue != 0 ||
             defaultGammaBlueMax.floatValue != 1 ||
             defaultGammaBlueValue.floatValue != 1
+    }
+
+    var vendor: Vendor {
+        guard let vendorID = infoDictionary[kDisplayVendorID] as? Int64, let v = Vendor(rawValue: vendorID) else {
+            return .unknown
+        }
+        return v
     }
 
     // MARK: EDID
@@ -2128,7 +2187,7 @@ enum ValueType {
 
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
         let name = key.rawValue
-        guard let value = self.value(forKey: name) as? Bool,
+        guard let value = value(forKey: name) as? Bool,
               let condition =
               self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition
         else {
@@ -2182,28 +2241,28 @@ enum ValueType {
         ]
     }
 
-    func getBestControl() -> Control {
+    func getBestControl(reapply: Bool = true) -> Control {
         let networkControl = NetworkControl(display: self)
         let coreDisplayControl = AppleNativeControl(display: self)
         let ddcControl = DDCControl(display: self)
         let gammaControl = GammaControl(display: self)
 
         if coreDisplayControl.isAvailable() {
-            if applyGamma || gammaChanged {
+            if reapply, applyGamma || gammaChanged {
                 if !blackOutEnabled { resetSoftwareControl() }
                 coreDisplayControl.reapply()
             }
             return coreDisplayControl
         }
         if ddcControl.isAvailable() {
-            if applyGamma || gammaChanged {
+            if reapply, applyGamma || gammaChanged {
                 if !blackOutEnabled { resetSoftwareControl() }
                 ddcControl.reapply()
             }
             return ddcControl
         }
         if networkControl.isAvailable() {
-            if applyGamma || gammaChanged {
+            if reapply, applyGamma || gammaChanged {
                 if !blackOutEnabled { resetSoftwareControl() }
                 networkControl.reapply()
             }
@@ -2666,6 +2725,7 @@ enum ValueType {
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.manual], forKey: .manual)
             try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.clock], forKey: .clock)
 
+            try container.encode(useOverlay, forKey: .useOverlay)
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
             try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
             try container.encode(alwaysFallbackControl, forKey: .alwaysFallbackControl)
@@ -2859,6 +2919,89 @@ enum ValueType {
         if adaptive, displayController.adaptiveModeKey != .manual, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
             displayController.adaptBrightness(for: self, force: true)
         }
+    }
+
+    func possibleDDCBlockers() -> String {
+        let specificBlockers: String
+        switch vendor {
+        case .dell:
+            specificBlockers = """
+            * Disable **Uniformity Compensation**
+            * Set **Preset Mode** to `Custom` or `Standard`
+            """
+        case .acer:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .lg:
+            specificBlockers = """
+            * Disable **Uniformity**
+            * Disable **Auto Brightness**
+            * Set **Picture Mode** to `Custom` or `Standard`
+            """
+        case .samsung:
+            specificBlockers = """
+            * Disable **Input Signal Plus**
+            * Disable **Magic Bright**
+            * Disable **Eye Saver Mode**
+            * Disable **Eco Saving Plus**
+            * Disable **Smart ECO Saving**
+            * Disable **Game Mode**
+            * Disable **PIP/PBP Mode**
+            * Disable **Dynamic Brightness**
+            """
+        case .benq:
+            specificBlockers = """
+            * Disable **Bright Intelligence**
+            * Disable **Bright Intelligence Plus** or **B.I.+**
+            * Set **Picture Mode** to `Standard`
+            """
+        case .prism:
+            specificBlockers = """
+            * Set **On-the-Fly Mode** to `Standard`
+            """
+        case .lenovo:
+            specificBlockers = """
+            * Disable **Local Dimming**
+            * Disable **HDR**
+            * Disable **Dynamic Contrast**
+            * Set **Color Mode** to `Custom`
+            * Set **Scenario Modes** to `Panel Native`
+            """
+        case .xiaomi:
+            specificBlockers = """
+            * Disable **Dynamic Brightness**
+            * Set **Smart Mode** to `Standard`
+            """
+        case .eizo:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .apple:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .asus:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .hp:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .huawei:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .philips:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .sceptre:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .proart:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        case .unknown:
+            specificBlockers = DEFAULT_DDC_BLOCKERS
+        }
+
+        return """
+        #### DDC Blocking Settings
+
+        *Note: some settings might not exist in your monitor OSD depending on the monitor model*
+
+        Change the following settings to **unlock DDC controls** for this monitor:
+
+        \(specificBlockers)
+
+        \(DDC_BLOCKERS_TRAILER)
+        """
     }
 
     // MARK: Reading Functions
@@ -3150,6 +3293,7 @@ enum ValueType {
 
         resetDefaultGamma()
 
+        useOverlay = false
         alwaysFallbackControl = false
         neverFallbackControl = false
         alwaysUseNetworkControl = false

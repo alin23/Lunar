@@ -372,7 +372,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         let windowVisible: Bool = mainThread { window?.isVisible ?? false }
 
         guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
-              let caption = self.caption, windowVisible
+              let caption = caption, windowVisible
         else {
             return
         }
@@ -429,13 +429,13 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func lightenUp(color: NSColor) {
-        transition(0.15)
+        transition(0.2)
         textColor = color
         setBgAlpha()
     }
 
     func darken(color: NSColor) {
-        transition(0.3)
+        transition(0.4)
         textColor = color
         setBgAlpha()
     }

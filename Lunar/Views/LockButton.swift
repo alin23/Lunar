@@ -90,7 +90,7 @@ class LockButton: NSButton {
 
     override func mouseEntered(with _: NSEvent) {
         guard isEnabled else { return }
-        transition(0.1)
+        transition(0.2)
 
         if state == .on {
             bg = bgOnHover
@@ -100,7 +100,7 @@ class LockButton: NSButton {
     }
 
     override func mouseExited(with _: NSEvent) {
-        transition(0.2)
+        transition(0.4)
 
         if state == .on {
             bg = bgOn

@@ -23,9 +23,9 @@ You can configure how often Lunar reacts to the ambient light changes by changin
 ## Algorithm
 
 1. **Every 2 seconds** the sensor will send the lux value of the ambient light to Lunar
-1. Lunar will compare the received lux to the last value
-1. If the new value is different, it is passed through the **Curve Algorithm** to compute the best brightness for each monitor
-1. After computing the monitor values, Lunar will set the brightness for each monitor based on their settings
+2. Lunar will compare the received lux to the last value
+3. If the new value is different, it is passed through the **Curve Algorithm** to compute the best brightness for each monitor
+4. After computing the monitor values, Lunar will set the brightness for each monitor based on their settings
 
 *The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
 
@@ -49,8 +49,8 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 ## Algorithm
 
 1. Lunar starts by setting the brightness to a minimum at night
-1. Then, from sunrise to noon, the brightness is raised gradually until it reaches the `MAX` setting at noon
-1. After noon, Lunar lowers the brightness gradually until it reaches the `MIN` setting again at sunset
+2. Then, from sunrise to noon, the brightness is raised gradually until it reaches the `MAX` setting at noon
+3. After noon, Lunar lowers the brightness gradually until it reaches the `MIN` setting again at sunset
 
 ## Settings
 
@@ -72,10 +72,10 @@ Lunar takes advantage of that by periodically reading the display brightness, an
 ## Algorithm
 
 1. **Every 2 seconds** the display brightness is read and compared to the last value
-1. If the brightness has changed, Lunar starts a **fast polling** process where the brightness is read every **100ms**
-1. The built-in brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
-1. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
-1. If **no new brightness** change has been detected in the **last 3 seconds**, Lunar switches back to the efficient polling interval of **2 seconds**
+2. If the brightness has changed, Lunar starts a **fast polling** process where the brightness is read every **100ms**
+3. The built-in brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
+4. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
+5. If **no new brightness** change has been detected in the **last 3 seconds**, Lunar switches back to the efficient polling interval of **2 seconds**
 
 *The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
 
@@ -95,16 +95,16 @@ The adaptive algorithm is disabled in `Manual` mode, but Lunar provides useful h
 This mode is the last resort for people that:
 
 1. Don't have a built-in display (*Mac Mini*)
-1. Don't use the built-in display (*Macbook with lid closed*)
-1. Work in an environment without much natural light (*where Location mode is useless*)
-1. Don't have an Ambient Light Sensor (*Hackintosh*)
-1. Don't trust machines to do their work
+2. Don't use the built-in display (*Macbook with lid closed*)
+3. Work in an environment without much natural light (*where Location mode is useless*)
+4. Don't have an Ambient Light Sensor (*Hackintosh*)
+5. Don't trust machines to do their work
 
 ## Algorithm
 
 1. Percentage Hotkeys: `0%`, `25%`, `50%`, `75%`, `100%`
     - When one of these hotkeys is pressed, Lunar computes the brightness by taking into account the `MIN` and `MAX` limits.
-1. Brightness/Contrast Up/Down Hotkeys
+2. Brightness/Contrast Up/Down Hotkeys
     - When the brightness is adjusted using these hotkeys, it will stay within the `MIN` and `MAX` global limits.
 
 ##### Percentage Hotkeys Example:
@@ -129,9 +129,9 @@ This mode allows you to apply brightness and contrast values based on a custom s
 
 Each schedule can be of the following types:
 1. `Time`: apply values at a specific time of day
-1. `Sunrise`: apply values when the sun starts to rise above the horizon
-1. `Noon`: apply values when the sun is at its highest point in the sky
-1. `Sunset`: apply values when the sun starts to fall below the horizon
+2. `Sunrise`: apply values when the sun starts to rise above the horizon
+3. `Noon`: apply values when the sun is at its highest point in the sky
+4. `Sunset`: apply values when the sun starts to fall below the horizon
 
 ### Sunrise, sunset and noon
 - The time for these types is computed daily
@@ -141,9 +141,9 @@ Each schedule can be of the following types:
 
 ## Schedule Transitions
 1. `None`: the brightness and contrast are applied at the exact time of the schedule
-1. `30 minutes`: the brightness and contrast start transitioning 30 minutes before the schedule time, from your current brightness to the schedule brightness
+2. `30 minutes`: the brightness and contrast start transitioning 30 minutes before the schedule time, from your current brightness to the schedule brightness
     - *When the transition starts, the algorithm applies the computed values every 30 seconds so it doesn't allow for manual adjustments in the 30 minutes before the schedule*
-1. `Full`: the brightness and contrast transition from schedule to schedule
+3. `Full`: the brightness and contrast transition from schedule to schedule
     - *This transition applies the computed values every 30 seconds so it doesn't allow for manual adjustments*
 
 ## Events

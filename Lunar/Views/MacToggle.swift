@@ -272,7 +272,7 @@ class MacToggle: NSView {
         allowedTouchTypes = []
         let push = Double(outlineWidth + width) - Double(height)
 
-        let callback = self.callback
+        let callback = callback
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.3
             context.allowsImplicitAnimation = true

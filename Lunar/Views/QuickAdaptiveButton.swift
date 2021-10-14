@@ -131,7 +131,7 @@ class QuickAdaptiveButton: NSButton {
 
     override func mouseEntered(with _: NSEvent) {
         guard isEnabled else { return }
-        transition(0.1)
+        transition(0.2)
 
         if state == .on {
             bg = buttonBgOnHover
@@ -145,7 +145,7 @@ class QuickAdaptiveButton: NSButton {
     }
 
     func setColor() {
-        transition(0.2)
+        transition(0.4)
         guard isEnabled else {
             bg = buttonBgDisabled
             return
