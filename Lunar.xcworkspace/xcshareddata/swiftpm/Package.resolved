@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "ea5bae4bfb10cd9c5afda6898702489756df313d",
-          "version": "7.4.2"
+          "revision": "a81616a8ac94a35b0761509d1814bfc2ca914e02",
+          "version": "7.4.4"
         }
       },
       {
@@ -264,11 +264,11 @@
       },
       {
         "package": "SwiftyMarkdown",
-        "repositoryURL": "https://github.com/SimonFairbairn/SwiftyMarkdown",
+        "repositoryURL": "https://github.com/alin23/SwiftyMarkdown",
         "state": {
-          "branch": null,
-          "revision": "5b0a1e76332a633726f9f9a00b4bbd840166bccf",
-          "version": "1.2.3"
+          "branch": "master",
+          "revision": "e703e32e97762c78868e3212ecb582adefb0a6fb",
+          "version": null
         }
       }
     ]

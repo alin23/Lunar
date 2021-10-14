@@ -12,6 +12,8 @@ import Combine
 import Defaults
 
 class SettingsPopoverController: NSViewController {
+    var displayObservers = [String: AnyCancellable]()
+
     let VOLUME_OSD_HELP_TEXT = """
     ## Description
 
@@ -131,6 +133,7 @@ class SettingsPopoverController: NSViewController {
     var displaysObserver: Cancellable?
     var adaptiveModeObserver: Cancellable?
 
+    @IBOutlet var useOverlayCheckbox: EnableButton!
     @IBOutlet var applyGammaCheckbox: EnableButton!
     @IBOutlet var _ddcColorGainHelpButton: NSButton?
 
@@ -186,7 +189,9 @@ class SettingsPopoverController: NSViewController {
                 volumeOSDToggle.isOn = display.showVolumeOSD
                 volumeOSDToggle.isEnabled = !display.isSmartBuiltin
 
+                useOverlay = display.useOverlay
                 applyGamma = display.applyGamma
+                setupUseOverlayCheckbox()
                 setupApplyGammaCheckbox()
                 resolutionsDropdown.fade()
                 gammaControlCheckbox.title = "Software (\(display.supportsGamma ? "Gamma" : "Overlay"))"
@@ -220,6 +225,26 @@ class SettingsPopoverController: NSViewController {
 
             display.contrastCurveFactor = contrastCurveFactor
             display.save()
+        }
+    }
+
+    @objc dynamic var useOverlay = false {
+        didSet {
+            guard applySettings, let display = display else { return }
+            display.useOverlay = useOverlay
+            display.resetSoftwareControl()
+            if ddcEnabled {
+                display.resetDDC()
+            } else if networkEnabled {
+                display.resetNetworkController()
+            } else {
+                display.resetControl()
+            }
+
+            let newValue = useOverlay
+            display.thrice { d in
+                displayController.adaptBrightness(for: d, force: true)
+            }
         }
     }
 
@@ -367,6 +392,7 @@ class SettingsPopoverController: NSViewController {
         if !gammaEnabled, display.applyGamma || display.gammaChanged || !display.supportsGamma {
             display.resetSoftwareControl()
         }
+        setupUseOverlayCheckbox()
         setupApplyGammaCheckbox()
 
         display.withForce {
@@ -383,6 +409,15 @@ class SettingsPopoverController: NSViewController {
     }
 
     func setupApplyGammaCheckbox() {
+        display?.$applyGamma.sink { [weak self] value in
+            mainAsyncAfter(ms: 10) { [weak self] in
+                guard let self = self else { return }
+                self.applySettings = false
+                defer { self.applySettings = true }
+                self.applyGamma = value
+            }
+        }.store(in: &displayObservers, for: "applyGamma")
+
         mainAsyncAfter(ms: 10) { [weak self] in
             guard let self = self, let display = self.display else { return }
             if !display.supportsGamma {
@@ -393,6 +428,31 @@ class SettingsPopoverController: NSViewController {
                 self.applyGammaCheckbox.state = self.applyGamma.state
                 self.applyGammaCheckbox.isEnabled = true
                 self.applyGammaCheckbox.toolTip = nil
+            }
+        }
+    }
+
+    func setupUseOverlayCheckbox() {
+        display?.$useOverlay.sink { [weak self] value in
+            mainAsyncAfter(ms: 10) { [weak self] in
+                guard let self = self else { return }
+                self.applySettings = false
+                defer { self.applySettings = true }
+                self.useOverlay = value
+            }
+        }.store(in: &displayObservers, for: "useOverlay")
+
+        mainAsyncAfter(ms: 10) { [weak self] in
+            guard let self = self, let display = self.display else { return }
+            if !display.supportsGamma, !display.useOverlay {
+                self.useOverlayCheckbox.state = .on
+                self.useOverlayCheckbox.isEnabled = false
+                self.useOverlayCheckbox
+                    .toolTip = "Gamma can't be adjusted on virtual, Sidecar or AirPlay displays. Only software overlay is supported."
+            } else {
+                self.useOverlayCheckbox.state = self.useOverlay.state
+                self.useOverlayCheckbox.isEnabled = true
+                self.useOverlayCheckbox.toolTip = nil
             }
         }
     }
@@ -637,7 +697,7 @@ class SettingsPopoverController: NSViewController {
         if let d = display {
             syncModeRoleToggle.isEnabled = d.isSmartDisplay || TEST_MODE
             volumeOSDToggle.isEnabled = !d.isSmartBuiltin
-            gammaControlCheckbox.title = "Software (\(d.supportsGamma ? "Gamma" : "Overlay"))"
+            gammaControlCheckbox.title = "Software Dimming"
         } else {
             syncModeRoleToggle.isEnabled = false
             volumeOSDToggle.isEnabled = false
@@ -679,10 +739,15 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
                 self.toggleWithoutCallback(self.volumeOSDToggle, value: display.showVolumeOSD)
                 self.applyGamma = display.applyGamma
+                self.useOverlay = display.useOverlay
                 self.setupApplyGammaCheckbox()
-                self.gammaControlCheckbox.title = "Software (\(display.supportsGamma ? "Gamma" : "Overlay"))"
+                self.gammaControlCheckbox.title = "Software Dimming"
             }
         }
+
+        useOverlayCheckbox.verticalPadding = -0.1
+        useOverlayCheckbox.setup()
+
         applyGammaCheckbox.verticalPadding = 0.09
         applyGammaCheckbox.setup()
     }

@@ -16,6 +16,7 @@ var scrollableAdjustHotkeysEnabled = true
 extension NSView {
     func mask(withRect maskRect: CGRect, cornerRadius: CGFloat, inverse: Bool = false) {
         let maskLayer = CAShapeLayer()
+        maskLayer.cornerCurve = .continuous
         let path = CGMutablePath()
         if inverse {
             path.addPath(CGPath(rect: bounds, transform: nil))
@@ -35,8 +36,6 @@ extension NSView {
 // MARK: - CornerWindowController
 
 class CornerWindowController: NSWindowController {
-    // MARK: Internal
-
     weak var display: Display? {
         didSet {
             mainThread {
@@ -65,11 +64,6 @@ class CornerWindowController: NSWindowController {
             }
         }
     }
-
-    // MARK: Private
-
-    private let maskLayer = CAShapeLayer()
-    private let roundRectLayer = CALayer()
 }
 
 // MARK: - CornerWindow

@@ -37,13 +37,13 @@ class TextButton: NSButton {
     }
 
     override func mouseExited(with _: NSEvent) {
-        transition(0.2)
+        transition(0.4)
         layer?.backgroundColor = bgColor
         setTitleColor(color: textColor)
     }
 
     override func mouseEntered(with _: NSEvent) {
-        transition(0.1)
+        transition(0.2)
         layer?.backgroundColor = hoverBgColor
         setTitleColor(color: hoverTextColor)
     }

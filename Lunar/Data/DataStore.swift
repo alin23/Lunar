@@ -645,7 +645,7 @@ extension Defaults.Keys {
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let detectResponsiveness = Key<Bool>("detectResponsiveness", default: true)
-    static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: false)
+    static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: true)
     static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
 
     static let brightnessKeysSyncControl = Key<BrightnessKeyAction>("brightnessKeysSyncControl", default: .source)
@@ -682,7 +682,7 @@ extension Defaults.Keys {
     static let startAtLogin = Key<Bool>("startAtLogin", default: true)
     static let showBrightnessMenuBar = Key<Bool>("showBrightnessMenuBar", default: false)
     static let showOnlyExternalBrightnessMenuBar = Key<Bool>("showOnlyExternalBrightnessMenuBar", default: false)
-    static let showOrientationInQuickActions = Key<Bool>("showOrientationInQuickActions", default: true)
+    static let showOrientationInQuickActions = Key<Bool>("showOrientationInQuickActions", default: false)
     static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)

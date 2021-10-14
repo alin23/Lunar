@@ -7,32 +7,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4E5A22BB-B8F7-4DE7-AA66-0E2C5C1A13A5"
+            uuid = "8FDBD5FF-BF52-406F-93E1-4407D21124AB"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Lunar/Views/ModernWindow.swift"
+            filePath = "Lunar/Views/HelpButton.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
-            landmarkName = "display"
-            landmarkType = "24">
+            startingLineNumber = "97"
+            endingLineNumber = "97"
+            landmarkName = "getParsedHelpText()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "55707BDC-2E99-4A86-B695-CCE6C487D032"
+            uuid = "3C37D75E-4F59-4507-85AD-9A9E9D1E6F8E"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Lunar/Views/ModernWindow.swift"
+            filePath = "Lunar/Controllers/ModeChoiceViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "18"
-            endingLineNumber = "18"
-            landmarkName = "mask(withRect:cornerRadius:inverse:)"
+            startingLineNumber = "118"
+            endingLineNumber = "118"
+            landmarkName = "setupButton(_:notice:color:title:enabled:action:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

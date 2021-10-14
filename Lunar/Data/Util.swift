@@ -7,7 +7,12 @@ import Foundation
 import Path
 import Surge
 import SwiftDate
+import SwiftyMarkdown
 import UserNotifications
+
+let initStuff: Bool = {
+    true
+}()
 
 typealias FilePath = Path
 func p(_ string: String) -> FilePath? {
@@ -1131,7 +1136,8 @@ func createWindow(
                 window.isOpaque = false
                 window.backgroundColor = backgroundColor
                 if stationary {
-                    window.collectionBehavior = [.stationary, .canJoinAllSpaces]
+                    window.collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling, .fullScreenNone]
+                    window.sharingType = .none
                     window.ignoresMouseEvents = true
                     window.setAccessibilityRole(.popover)
                     window.setAccessibilitySubrole(.unknown)
@@ -1230,6 +1236,13 @@ func ask(
     )
 
     let semaphore = DispatchSemaphore(value: 0, name: "Panel alert dismissed")
+
+    if let wc = window.windowController {
+        log.debug("Showing window '\(window.title)'")
+        wc.showWindow(nil)
+        window.orderFrontRegardless()
+    }
+
     alert.beginSheetModal(for: window, completionHandler: { resp in
         onCompletion(resp == .alertFirstButtonReturn)
         semaphore.signal()
@@ -1302,6 +1315,7 @@ func ask(
     ultrawide: Bool = false
 ) -> NSApplication.ModalResponse {
     if unique {
+        defer { alertsByMessageSemaphore.signal() }
         switch alertsByMessageSemaphore.wait(for: waitTimeout) {
         case .success:
             if alertsByMessage[message] != nil {
@@ -1312,7 +1326,6 @@ func ask(
             log.warning("Timeout in waiting for alertsForMessage")
             return .cancel
         }
-        alertsByMessageSemaphore.signal()
     }
 
     let response: NSApplication.ModalResponse = mainThread {
@@ -1330,18 +1343,24 @@ func ask(
         )
 
         if let window = window {
+            if let wc = window.windowController {
+                log.debug("Showing window '\(window.title)'")
+                wc.showWindow(nil)
+                window.orderFrontRegardless()
+            }
+
             alert.beginSheetModal(for: window, completionHandler: { resp in
                 onCompletion?(resp)
                 onSuppression?((alert.suppressionButton?.state ?? .off) == .on)
 
                 if unique {
+                    defer { alertsByMessageSemaphore.signal() }
                     switch alertsByMessageSemaphore.wait(for: 5) {
                     case .success:
                         alertsByMessage.removeValue(forKey: message)
                     case .timedOut:
                         log.warning("Timeout in waiting for alertsForMessage")
                     }
-                    alertsByMessageSemaphore.signal()
                 }
             })
             return .cancel
@@ -1354,13 +1373,13 @@ func ask(
         }
 
         if unique {
+            defer { alertsByMessageSemaphore.signal() }
             switch alertsByMessageSemaphore.wait(for: 5) {
             case .success:
                 alertsByMessage.removeValue(forKey: message)
             case .timedOut:
                 log.warning("Timeout in waiting for alertsForMessage")
             }
-            alertsByMessageSemaphore.signal()
         }
         return resp
     }
