@@ -28,7 +28,7 @@ extension AppDelegate: NSWindowDelegate {
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let settingsPageController = pageController
               .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
-              let settingsViewController = settingsPageController.view.subviews[1].subviews[0].nextResponder as? SettingsViewController,
+              let settingsViewController = settingsPageController.view.subviews[0].subviews[0].nextResponder as? SettingsViewController,
               let configurationViewController = settingsViewController.splitViewItems[0].viewController as? ConfigurationViewController,
               let exceptionsViewController = settingsViewController.splitViewItems[1].viewController as? ExceptionsViewController,
               let tableView = exceptionsViewController.tableView

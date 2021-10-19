@@ -81,7 +81,7 @@ class PaddedButton: NSButton {
         buttonShadow = shadow
         baseFrame = frame
         shadow = NO_SHADOW
-        trackHover()
+        trackHover(cursor: true)
     }
 
     override func mouseEntered(with _: NSEvent) {
@@ -134,10 +134,9 @@ class PaddedButton: NSButton {
         setColors(fadeDuration: 0.2)
     }
 
-    override func resetCursorRects() {
-        super.resetCursorRects()
+    override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
-            addCursorRect(bounds, cursor: .pointingHand)
+            NSCursor.pointingHand.set()
         }
     }
 

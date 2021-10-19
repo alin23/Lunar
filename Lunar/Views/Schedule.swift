@@ -111,7 +111,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
 
 // MARK: - Schedule
 
-@IBDesignable
+// @IBDesignable
 class Schedule: NSView {
     // MARK: Lifecycle
 

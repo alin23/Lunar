@@ -73,6 +73,8 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
+    @IBInspectable dynamic var backgroundOpacity: CGFloat = 0.05
+
     @IBInspectable dynamic var lowerLimit: Double = 0.0 {
         didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
     }
@@ -184,6 +186,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     weak var caption: ScrollableTextFieldCaption? {
         didSet {
+            caption?.isHidden = isHidden
             if didScrollTextField {
                 return
             }
@@ -200,6 +203,17 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
+    override var isHidden: Bool {
+        didSet { caption?.isHidden = isHidden }
+    }
+
+    override var isEnabled: Bool {
+        didSet {
+            guard bgColor.alphaComponent > 0 else { return }
+            mainThread { bg = bgColor.withAlphaComponent(isEnabled ? backgroundOpacity : 0.05) }
+        }
+    }
+
     override func viewDidMoveToWindow() {
         trackHover()
         setBgAlpha()
@@ -210,7 +224,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         setBgAlpha()
     }
 
-    override func trackHover() {
+    func trackHover() {
         if let trackingArea = trackingArea {
             removeTrackingArea(trackingArea)
         }
@@ -364,7 +378,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         } else if hover || currentEditor() != nil {
             bg = bgColor.withAlphaComponent(0.25)
         } else {
-            bg = bgColor.withAlphaComponent(0.05)
+            bg = bgColor.withAlphaComponent(isEnabled ? backgroundOpacity : 0.05)
         }
     }
 
@@ -429,13 +443,13 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func lightenUp(color: NSColor) {
-        transition(0.2)
+        transition(0.4)
         textColor = color
         setBgAlpha()
     }
 
     func darken(color: NSColor) {
-        transition(0.4)
+        transition(0.8)
         textColor = color
         setBgAlpha()
     }

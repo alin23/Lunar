@@ -738,7 +738,9 @@ class SettingsPopoverController: NSViewController {
                 self.toggleWithoutCallback(self.adaptAutoToggle, value: display.adaptive)
                 self.toggleWithoutCallback(self.syncModeRoleToggle, value: display.isSource)
                 self.toggleWithoutCallback(self.volumeOSDToggle, value: display.showVolumeOSD)
+                self.applySettings = false
                 self.applyGamma = display.applyGamma
+                self.applySettings = false
                 self.useOverlay = display.useOverlay
                 self.setupApplyGammaCheckbox()
                 self.gammaControlCheckbox.title = "Software Dimming"

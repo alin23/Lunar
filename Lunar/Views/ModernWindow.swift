@@ -108,6 +108,10 @@ class ModernWindow: WAYWindow {
                 c.onClick = nil
             }
         }
+        if let menuPopover = menuPopover, menuPopover.isShown {
+            menuPopover.close()
+        }
+
         endEditing(for: nil)
         super.mouseDown(with: event)
     }

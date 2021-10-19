@@ -50,10 +50,9 @@ class LockButton: NSButton {
         }
     }
 
-    override func resetCursorRects() {
-        super.resetCursorRects()
+    override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
-            addCursorRect(bounds, cursor: .pointingHand)
+            NSCursor.pointingHand.set()
         }
     }
 
@@ -85,7 +84,7 @@ class LockButton: NSButton {
             state = .off
             bg = bgOff
         }
-        trackHover()
+        trackHover(cursor: true)
     }
 
     override func mouseEntered(with _: NSEvent) {

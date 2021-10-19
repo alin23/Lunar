@@ -87,7 +87,7 @@ class Logger: SwiftyBeaver {
         defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \t$X"
-        Logger.addDestination(console)
+        // Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
             enabled || TEST_MODE || AppSettings.beta

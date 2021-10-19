@@ -47,6 +47,7 @@ let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
+let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
 let smoothDDCQueue = DispatchQueue(label: "fyi.lunar.smooth.ddc.queue", qos: .userInitiated, attributes: .concurrent)
 let smoothDisplayServicesQueue = DispatchQueue(
@@ -737,18 +738,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func initMenuPopover() {
-        guard let storyboard = NSStoryboard.main else { return }
+    @discardableResult func initMenuPopover() -> NSPopover {
+        guard let storyboard = NSStoryboard.main else { return NSPopover() }
 
-        POPOVERS["menu"]!!.contentViewController = storyboard
-            .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("MenuPopoverController")) as! MenuPopoverController
-        POPOVERS["menu"]!!.contentViewController!.loadView()
-
-        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuPopover = POPOVERS["menu"]!, menuPopover.isShown else { return }
-            menuPopoverCloser.cancel()
-            POPOVERS["menu"]!!.close()
+        menuPopover = NSPopover()
+        guard let menuPopover = menuPopover else { return NSPopover() }
+        menuPopover.contentViewController = storyboard
+            .instantiateController(
+                withIdentifier: NSStoryboard
+                    .SceneIdentifier("QuickActionsViewController")
+            ) as! QuickActionsViewController
+        menuPopover.contentViewController!.loadView()
+        if let w = menuPopover.contentViewController?.view.window {
+            w.setAccessibilityRole(.popover)
+            w.setAccessibilitySubrole(.unknown)
         }
+
+        menuPopover.animates = false
+        // menuPopover.behavior = .transient
+
+        return menuPopover
     }
 
     func setExplanationStyle(_ menuItem: NSMenuItem, title: String? = nil) {
@@ -795,12 +804,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             button.addSubview(statusItemButtonController!)
         }
-        statusItem.menu = menu
+        statusItem.menu = nil
         initMenuItems()
 
-        if POPOVERS["menu"]!!.contentViewController == nil {
-            initMenuPopover()
-        }
+        initMenuPopover()
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .sink { [self] _ in
@@ -898,7 +905,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     displayController.lidClosed = newLidClosed
                 }
 
-                POPOVERS["menu"]!!.close()
+                menuPopover?.close()
 
                 displayController.manageClamshellMode()
                 displayController.resetDisplayList()
@@ -1267,6 +1274,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         initDisplayControllerActivity()
         initMenubarIcon()
+
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
+            guard let menuPopover = menuPopover, menuPopover.isShown else { return }
+            menuPopover.close()
+        }
+
         initHotkeys()
 
         listenForAdaptiveModeChange()

@@ -28,6 +28,7 @@ enum Page: Int {
     case displayReset
     case displayBrightnessRange
     case displayAlgorithm
+    case quickMenu
 }
 
 // MARK: - ToggleButton
@@ -58,7 +59,7 @@ class ToggleButton: NSButton {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
             radius = circle ? (frame.height / 2).ns : roundedness.ns
-            trackHover()
+            trackHover(cursor: true)
         }
     }
 
@@ -66,7 +67,7 @@ class ToggleButton: NSButton {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
             radius = circle ? (frame.height / 2).ns : roundedness.ns
-            trackHover()
+            trackHover(cursor: true)
         }
     }
 
@@ -74,7 +75,7 @@ class ToggleButton: NSButton {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
             radius = circle ? (frame.height / 2).ns : roundedness.ns
-            trackHover()
+            trackHover(cursor: true)
         }
     }
 
@@ -212,17 +213,16 @@ class ToggleButton: NSButton {
         allowsMixedState = false
         setColors()
 
-        trackHover()
+        trackHover(cursor: true)
     }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
 
-    override func resetCursorRects() {
-        super.resetCursorRects()
+    override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
-            addCursorRect(bounds, cursor: .pointingHand)
+            NSCursor.pointingHand.set()
         }
     }
 }

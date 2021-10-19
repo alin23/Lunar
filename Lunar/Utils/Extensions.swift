@@ -399,6 +399,10 @@ extension NumberFormatter {
     }
 }
 
+extension NSAppearance {
+    var isDark: Bool { name == .vibrantDark || name == .darkAqua }
+}
+
 extension NSAttributedString {
     func appending(_ other: NSAttributedString) -> NSAttributedString {
         let mutable = NSMutableAttributedString(attributedString: self)
@@ -885,11 +889,16 @@ extension CAMediaTimingFunction {
 }
 
 extension NSView {
-    @objc func trackHover() {
+    func trackHover(owner: Any? = nil, rect: NSRect? = nil, cursor: Bool = false) {
         for area in trackingAreas {
             removeTrackingArea(area)
         }
-        let area = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        let area = NSTrackingArea(
+            rect: rect ?? bounds,
+            options: cursor ? [.mouseEnteredAndExited, .cursorUpdate, .activeInActiveApp] : [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: owner ?? self,
+            userInfo: nil
+        )
         addTrackingArea(area)
     }
 
@@ -1112,7 +1121,7 @@ extension NSPopUpButton {
     var selectionPublisher: AnyPublisher<Int, Never> {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
-            .map { _ in self.indexOfSelectedItem }
+            .map { _ in self.selectedTag() }
             .eraseToAnyPublisher()
     }
 }
@@ -1126,5 +1135,21 @@ extension NSRect {
     func larger(by offset: CGFloat) -> NSRect {
         let offset = -offset / 2
         return NSRect(x: origin.x + (offset / 2), y: origin.y - (offset / 2), width: width - offset, height: height - offset)
+    }
+}
+
+// MARK: - AutoRemovingSegmentedControl
+
+class AutoRemovingSegmentedControl: NSSegmentedControl {
+    override var isHidden: Bool {
+        didSet { if isHidden { removeFromSuperview() } }
+    }
+}
+
+// MARK: - AutoRemovingBox
+
+class AutoRemovingBox: NSBox {
+    override var isHidden: Bool {
+        didSet { if isHidden { removeFromSuperview() } }
     }
 }

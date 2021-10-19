@@ -47,6 +47,16 @@ class AppleNativeControl: Control {
         )
     }
 
+    static func readBrightnessDisplayServices(id: CGDirectDisplayID) -> Double {
+        var br: Float = 0.0
+        DisplayServicesGetBrightness(id, &br)
+        return br.d
+    }
+
+    static func readBrightnessCoreDisplay(id: CGDirectDisplayID) -> Double {
+        CoreDisplay_Display_GetUserBrightness(id)
+    }
+
     func testReadAndWrite(method: AppleNativeMethod) -> Bool {
         guard let display = display else { return false }
 
