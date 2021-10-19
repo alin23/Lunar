@@ -1247,12 +1247,17 @@ enum ValueType {
                 if apply(gamma: defaultGammaTable) {
                     lastGammaTable = defaultGammaTable
                 }
+                gammaChanged = false
             } else {
                 reapplyGamma()
             }
+
             if control is GammaControl {
                 displayController.adaptBrightness(for: self, force: true)
             } else {
+                if applyGamma || gammaChanged {
+                    resetSoftwareControl()
+                }
                 readapt(newValue: applyGamma, oldValue: oldValue)
             }
         }
@@ -1339,6 +1344,58 @@ enum ValueType {
         didSet {
             save()
             updateCornerWindow()
+        }
+    }
+
+    @objc dynamic var blacks: Double = 0.0 {
+        didSet {
+            defaultGammaRedMin = blacks.ns
+            defaultGammaGreenMin = blacks.ns
+            defaultGammaBlueMin = blacks.ns
+        }
+    }
+
+    @objc dynamic var whites: Double = 1.0 {
+        didSet {
+            defaultGammaRedMax = whites.ns
+            defaultGammaGreenMax = whites.ns
+            defaultGammaBlueMax = whites.ns
+        }
+    }
+
+    @objc dynamic var red: Double = 0.5 {
+        didSet {
+            if red == 0.5 {
+                defaultGammaRedValue = 1.0
+            } else if red > 0.5 {
+                defaultGammaRedValue = mapNumber(red, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
+            } else {
+                defaultGammaRedValue = mapNumber(red, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
+            }
+        }
+    }
+
+    @objc dynamic var green: Double = 0.5 {
+        didSet {
+            if green == 0.5 {
+                defaultGammaGreenValue = 1.0
+            } else if green > 0.5 {
+                defaultGammaGreenValue = mapNumber(green, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
+            } else {
+                defaultGammaGreenValue = mapNumber(green, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
+            }
+        }
+    }
+
+    @objc dynamic var blue: Double = 0.5 {
+        didSet {
+            if blue == 0.5 {
+                defaultGammaBlueValue = 1.0
+            } else if blue > 0.5 {
+                defaultGammaBlueValue = mapNumber(blue, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
+            } else {
+                defaultGammaBlueValue = mapNumber(blue, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
+            }
         }
     }
 
@@ -2840,16 +2897,21 @@ enum ValueType {
         }
     }
 
-    func resetDefaultGamma() {
-        defaultGammaRedMin = 0.0
-        defaultGammaRedMax = 1.0
-        defaultGammaRedValue = 1.0
-        defaultGammaGreenMin = 0.0
-        defaultGammaGreenMax = 1.0
-        defaultGammaGreenValue = 1.0
-        defaultGammaBlueMin = 0.0
-        defaultGammaBlueMax = 1.0
-        defaultGammaBlueValue = 1.0
+    @objc func resetDefaultGamma() {
+        red = 0.5
+        green = 0.5
+        blue = 0.5
+        blacks = 0
+        whites = 1
+        // defaultGammaRedMin = 0.0
+        // defaultGammaRedMax = 1.0
+        // defaultGammaRedValue = 1.0
+        // defaultGammaGreenMin = 0.0
+        // defaultGammaGreenMax = 1.0
+        // defaultGammaGreenValue = 1.0
+        // defaultGammaBlueMin = 0.0
+        // defaultGammaBlueMax = 1.0
+        // defaultGammaBlueValue = 1.0
         lunarGammaTable = nil
     }
 

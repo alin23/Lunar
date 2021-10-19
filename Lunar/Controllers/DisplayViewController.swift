@@ -267,6 +267,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var _lockContrastHelpButton: NSButton?
     @IBOutlet var _lockBrightnessHelpButton: NSButton?
     @IBOutlet var _settingsButton: NSButton?
+    @IBOutlet var _colorsButton: NSButton?
     @IBOutlet var lockContrastCurveButton: LockButton!
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
@@ -348,6 +349,10 @@ class DisplayViewController: NSViewController {
 
     var settingsButton: SettingsButton? {
         _settingsButton as? SettingsButton
+    }
+
+    var colorsButton: ColorsButton? {
+        _colorsButton as? ColorsButton
     }
 
     @objc dynamic weak var display: Display? {
@@ -610,6 +615,10 @@ class DisplayViewController: NSViewController {
         // inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
         chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
 
+        if let button = colorsButton {
+            button.display = display
+            button.bg = lockButtonBgOff
+        }
         if let button = settingsButton {
             button.display = display
             button.displayViewController = self

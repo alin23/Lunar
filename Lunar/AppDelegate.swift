@@ -1031,6 +1031,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             controllerType: SettingsPopoverController.self,
             appearance: darkMode ? .vibrantDark : .vibrantLight
         )
+        initPopover(
+            "colors",
+            identifier: "ColorsPopoverController",
+            controllerType: ColorsPopoverController.self,
+            appearance: darkMode ? .vibrantDark : .vibrantLight
+        )
     }
 
     func showAdvancedSettings(highlight: Bool = false) {
