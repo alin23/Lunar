@@ -116,7 +116,7 @@ var monitorScreenColor: NSColor { darkMode ? rouge : mauve }
 
 // MARK: - DisplayImage
 
-@IBDesignable
+// @IBDesignable
 class DisplayImage: NSView {
     // MARK: Lifecycle
 
@@ -132,7 +132,8 @@ class DisplayImage: NSView {
 
     // MARK: Internal
 
-    @IBInspectable var baseCornerRadius: CGFloat = 4
+    @IBInspectable var baseCornerRadius: CGFloat = 14
+    @IBInspectable var maxCornerRadius: CGFloat = 24
 
     lazy var standColor = monitorStandColor { didSet { setup(frame: frame) }}
     lazy var screenColor = monitorScreenColor { didSet { setup(frame: frame) }}
@@ -146,7 +147,7 @@ class DisplayImage: NSView {
         let layer = CAShapeLayer()
         layer.cornerCurve = .continuous
 
-        let radius = cornerRadius + baseCornerRadius
+        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: baseCornerRadius, toHigh: 24)
 
         layer.path = CGPath(
             roundedRect: CGRect(
@@ -173,7 +174,7 @@ class DisplayImage: NSView {
         let tip1 = CGPoint(x: mid, y: tip)
         let tip2 = CGPoint(x: mid - 50, y: 0)
         let tip3 = CGPoint(x: mid + 50, y: 0)
-        let radius = mapNumber(cornerRadius + baseCornerRadius, fromLow: 0, fromHigh: 24, toLow: 4, toHigh: 18)
+        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: baseCornerRadius, toHigh: 18)
 
         if radius > 0 {
             path.move(to: tip3)
@@ -253,10 +254,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var resetDropdown: PopUpButton?
-    @IBOutlet var volumeSlider: NSSlider?
+    @IBOutlet var brightnessSlider: Slider?
+    @IBOutlet var brightnessContrastSlider: Slider?
 
-    @IBOutlet var builtinBrightnessField: ScrollableTextField?
-    @IBOutlet var builtinBrightnessCaption: ScrollableTextFieldCaption?
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
     @IBOutlet var cornerRadiusField: ScrollableTextField?
@@ -271,7 +271,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
     @objc dynamic var noDisplay: Bool = false
-    @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
+    // @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin || displayController
         .adaptiveModeKey == .clock
 
@@ -290,7 +290,7 @@ class DisplayViewController: NSViewController {
 
     @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
-    @IBOutlet var inputDropdown: PopUpButton?
+    // @IBOutlet var inputDropdown: PopUpButton?
 
     @objc dynamic lazy var deleteEnabled = getDeleteEnabled()
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
@@ -305,10 +305,10 @@ class DisplayViewController: NSViewController {
     @IBOutlet var schedule4: Schedule!
     @IBOutlet var schedule5: Schedule!
 
-    @objc dynamic var nonResponsiveTextFieldHidden: Bool = true
+    // @objc dynamic var nonResponsiveTextFieldHidden: Bool = true
 
-    var applyVolume = true
-    @objc dynamic var volumeHidden: Bool = false
+    // var applyVolume = true
+    // @objc dynamic var volumeHidden: Bool = false
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -330,13 +330,13 @@ class DisplayViewController: NSViewController {
         _proButton as? Button
     }
 
-    @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
-        didSet {
-            mainThread {
-                nonResponsiveTextField?.isHidden = getNonResponsiveTextFieldHidden()
-            }
-        }
-    }
+    // @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
+    //     didSet {
+    //         mainThread {
+    //             nonResponsiveTextField?.isHidden = getNonResponsiveTextFieldHidden()
+    //         }
+    //     }
+    // }
 
     var lockContrastHelpButton: HelpButton? {
         _lockContrastHelpButton as? HelpButton
@@ -373,18 +373,18 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @objc dynamic var volume: Double = 50 {
-        didSet {
-            guard applyVolume else { return }
-            display?.volume = volume.ns
-        }
-    }
+    // @objc dynamic var volume: Double = 50 {
+    //     didSet {
+    //         guard applyVolume else { return }
+    //         display?.volume = volume.ns
+    //     }
+    // }
 
-    func getNonResponsiveTextFieldHidden(display: Display? = nil, responsive: Bool? = nil) -> Bool {
-        guard let display = display ?? self.display, display.active else { return true }
-        return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || !display
-            .active || (responsive ?? display.responsiveDDC) || !(display.control is DDCControl)
-    }
+    // func getNonResponsiveTextFieldHidden(display: Display? = nil, responsive: Bool? = nil) -> Bool {
+    //     guard let display = display ?? self.display, display.active else { return true }
+    //     return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || !display
+    //         .active || (responsive ?? display.responsiveDDC) || !(display.control is DDCControl)
+    // }
 
     @IBAction func lockCurve(_ sender: LockButton) {
         switch sender.tag {
@@ -405,12 +405,12 @@ class DisplayViewController: NSViewController {
         super.mouseDown(with: ev)
     }
 
-    func setInputHidden(_ hidden: Bool) {
-        mainThread {
-            inputDropdown?.isHidden = hidden
-            inputDropdownHotkeyButton?.isHidden = hidden
-        }
-    }
+    // func setInputHidden(_ hidden: Bool) {
+    //     mainThread {
+    //         inputDropdown?.isHidden = hidden
+    //         inputDropdownHotkeyButton?.isHidden = hidden
+    //     }
+    // }
 
     func refreshView() {
         mainThread {
@@ -563,24 +563,25 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
-    func getVolumeHidden(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
-        guard let display = display ?? self.display, let control = display.control else {
-            return true
-        }
+    // func getVolumeHidden(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
+    //     guard let display = display ?? self.display, let control = display.control else {
+    //         return true
+    //     }
 
-        return display.isBuiltin || display.id == GENERIC_DISPLAY_ID || control is GammaControl || !display
-            .active || !(hasDDC ?? display.hasDDC)
-    }
+    //     return display.isBuiltin || display.id == GENERIC_DISPLAY_ID || control is GammaControl || !display
+    //         .active || !(hasDDC ?? display.hasDDC)
+    // }
 
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
 
-        volumeHidden = getVolumeHidden(display: display)
-        applyVolume = false
-        volume = display.volume.doubleValue
-        applyVolume = true
-        volumeSlider?.isHidden = volumeHidden
+        // volumeHidden = getVolumeHidden(display: display)
+        // applyVolume = false
+        // volume = display.volume.doubleValue
+        // applyVolume = true
+        // volumeSlider?.isHidden = volumeHidden
 
+        display.withoutDDC { display.panelMode = display.panel?.currentMode }
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
         cornerRadiusField?.caption = cornerRadiusFieldCaption
         cornerRadiusField?.didScrollTextField = true
@@ -599,14 +600,14 @@ class DisplayViewController: NSViewController {
         }
         cornerRadiusField?.onMouseExit = { [weak self] in
             guard let self = self else { return }
-            self.cornerRadiusFieldCaption?.transition(0.3)
+            self.cornerRadiusFieldCaption?.transition(1)
             self.cornerRadiusFieldCaption?.alphaValue = 0.0
         }
 
         deleteEnabled = getDeleteEnabled(display: display)
         powerOffEnabled = getPowerOffEnabled(display: display)
         powerOffTooltip = getPowerOffTooltip(display: display)
-        inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
+        // inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
         chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
 
         if let button = settingsButton {
@@ -629,16 +630,7 @@ class DisplayViewController: NSViewController {
         schedule3?.display = display
         schedule4?.display = display
         schedule5?.display = display
-        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
-
-        if display.isBuiltin {
-            builtinBrightnessField?.onValueChanged = { value in
-                display
-                    .withBrightnessTransition(brightnessTransition == .instant ? .smooth : brightnessTransition) {
-                        display.brightness = value.ns
-                    }
-            }
-        }
+        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock || display.isBuiltin
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
             guard let self = self, let display = self.display,
@@ -676,7 +668,7 @@ class DisplayViewController: NSViewController {
             mainAsyncAfter(ms: 10) { [weak self] in
                 guard let self = self else { return }
                 self.updateControlsButton(control: control)
-                self.volumeHidden = self.getVolumeHidden()
+                // self.volumeHidden = self.getVolumeHidden()
                 if control is GammaControl, display.enabledControls[.gamma] ?? false {
                     self.showGammaNotice()
                 } else {
@@ -691,33 +683,33 @@ class DisplayViewController: NSViewController {
         } else {
             displayName?.stringValue = display.name
             displayName?.display = self.display
-            nonResponsiveTextField?.onClick = { [weak self] in
-                mainThread { [weak self] in
-                    guard let self = self, let display = self.display else { return }
-                    display.control?.resetState()
-                    self.setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
-                    self.refreshView()
-                }
-            }
+            // nonResponsiveTextField?.onClick = { [weak self] in
+            //     mainThread { [weak self] in
+            //         guard let self = self, let display = self.display else { return }
+            //         display.control?.resetState()
+            //         // self.setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
+            //         self.refreshView()
+            //     }
+            // }
         }
 
-        display.$volume.sink { [weak self] value in
-            mainAsyncAfter(ms: 10) { [weak self] in
-                guard let self = self else { return }
-                self.applyVolume = false
-                self.volume = value.doubleValue
-                self.applyVolume = true
-            }
-        }.store(in: &displayObservers, for: "volume")
-        display.$input.sink { [weak self] _ in
-            mainAsyncAfter(ms: 1000) { [weak self] in
-                guard let self = self else { return }
-                if !self.inputHidden { self.inputDropdown?.fade() }
-            }
-        }.store(in: &displayObservers, for: "input")
+        // display.$volume.sink { [weak self] value in
+        //     mainAsyncAfter(ms: 10) { [weak self] in
+        //         guard let self = self else { return }
+        //         self.applyVolume = false
+        //         self.volume = value.doubleValue
+        //         self.applyVolume = true
+        //     }
+        // }.store(in: &displayObservers, for: "volume")
+        // display.$input.sink { [weak self] _ in
+        //     mainAsyncAfter(ms: 1000) { [weak self] in
+        //         guard let self = self else { return }
+        //         if !self.inputHidden { self.inputDropdown?.fade() }
+        //     }
+        // }.store(in: &displayObservers, for: "input")
 
         initHotkeys()
-        setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
+        // setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
         refreshView()
 
         listenForSendingBrightnessContrast()
@@ -782,6 +774,8 @@ class DisplayViewController: NSViewController {
                 button.attributedTitle = "No Controls".withAttribute(.textColor(.darkGray))
                 button.helpText = NO_CONTROLS_HELP_TEXT
             }
+            brightnessSlider?.color = button.bg!
+            brightnessContrastSlider?.color = button.bg!
         }
     }
 
@@ -1101,13 +1095,14 @@ class DisplayViewController: NSViewController {
             guard let self = self else { return }
             mainThread {
                 self.scrollableBrightness?.currentValue.integerValue = value.intValue
-                self.builtinBrightnessField?.integerValue = value.intValue
+                self.scrollableBrightness?.onCurrentValueChanged?(value.intValue)
             }
         }.store(in: &displayObservers, for: "brightness")
         display?.$contrast.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
             mainThread {
                 self.scrollableContrast?.currentValue.integerValue = value.intValue
+                self.scrollableContrast?.onCurrentValueChanged?(value.intValue)
             }
         }.store(in: &displayObservers, for: "contrast")
     }
@@ -1120,19 +1115,19 @@ class DisplayViewController: NSViewController {
 
                 self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
                 self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
-                self.volumeHidden = self.getVolumeHidden(hasDDC: hasDDC)
+                // self.volumeHidden = self.getVolumeHidden(hasDDC: hasDDC)
             }
         }.store(in: &displayObservers, for: "hasDDC")
-        display.$responsiveDDC.receive(on: dataPublisherQueue).sink { [weak self] responsive in
-            if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
-                self.setInputHidden(display.id == GENERIC_DISPLAY_ID || (!responsive && display.control is DDCControl) || display.isBuiltin)
+        // display.$responsiveDDC.receive(on: dataPublisherQueue).sink { [weak self] responsive in
+        //     if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
+        //         // self.setInputHidden(display.id == GENERIC_DISPLAY_ID || (!responsive && display.control is DDCControl) || display.isBuiltin)
 
-                mainAsyncAfter(ms: 10) { [weak self] in
-                    guard let self = self else { return }
-                    textField.isHidden = self.getNonResponsiveTextFieldHidden(responsive: responsive)
-                }
-            }
-        }.store(in: &displayObservers, for: "responsiveDDC")
+        //         mainAsyncAfter(ms: 10) { [weak self] in
+        //             guard let self = self else { return }
+        //             textField.isHidden = self.getNonResponsiveTextFieldHidden(responsive: responsive)
+        //         }
+        //     }
+        // }.store(in: &displayObservers, for: "responsiveDDC")
         if !display.adaptive {
             showAdaptiveNotice()
         }
@@ -1169,7 +1164,7 @@ class DisplayViewController: NSViewController {
             self.pausedAdaptiveModeObserver = true
             mainThread {
                 self.chartHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue == .clock
-                self.scheduleBox?.isHidden = change.newValue != .clock
+                self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue != .clock
             }
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
@@ -1402,19 +1397,18 @@ class DisplayViewController: NSViewController {
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
-        volumeSlider?.minValue = 0
-        volumeSlider?.maxValue = 100
+        // volumeSlider?.minValue = 0
+        // volumeSlider?.maxValue = 100
 
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
 
-            inputDropdown?.page = darkMode ? .hotkeys : .display
-            inputDropdown?.fade()
+            // inputDropdown?.page = darkMode ? .hotkeys : .display
+            // inputDropdown?.fade()
             resetDropdown?.page = darkMode ? .hotkeysReset : .displayReset
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor
-            builtinBrightnessField?.caption = builtinBrightnessCaption
 
             scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u8) }
             scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u8) }
@@ -1422,96 +1416,25 @@ class DisplayViewController: NSViewController {
             scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u8) }
 
             initGraph()
-        } else {
-            mainThread {
-                setInputHidden(true)
-
-                settingsButton?.isHidden = true
-                resetDropdown?.isHidden = true
-
-                nonResponsiveTextField?.isHidden = true
-                scrollableBrightness?.isHidden = true
-                scrollableContrast?.isHidden = true
-                brightnessContrastChart?.isHidden = true
-            }
         }
+        //  else {
+        //     mainThread {
+        //         setInputHidden(true)
+
+        //         settingsButton?.isHidden = true
+        //         resetDropdown?.isHidden = true
+
+        //         nonResponsiveTextField?.isHidden = true
+        //         scrollableBrightness?.isHidden = true
+        //         scrollableContrast?.isHidden = true
+        //         brightnessContrastChart?.isHidden = true
+        //     }
+        // }
 
         deleteEnabled = getDeleteEnabled()
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
 //        scheduleBox?.bg = .black.withAlphaComponent(0.03)
 //        scheduleBox?.radius = 10
-    }
-}
-
-// MARK: - VolumeSliderCell
-
-class VolumeSliderCell: NSSliderCell {
-    // MARK: Lifecycle
-
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-
-    // MARK: Internal
-
-    let volumeImage = NSImage(named: "volume-low")
-
-    override func drawKnob(_ knobRect: NSRect) {
-        super.drawKnob(knobRect)
-        let imageRect = knobRect.smaller(by: 10)
-        volumeImage?.draw(in: imageRect, from: .zero, operation: .sourceOver, fraction: 0.7)
-    }
-
-    override func drawBar(inside aRect: NSRect, flipped _: Bool) {
-        let rect = NSRect(x: aRect.origin.x, y: aRect.origin.y - 2.5, width: aRect.width, height: 10)
-        let barRadius = CGFloat(4)
-        let value = CGFloat((doubleValue - minValue) / (maxValue - minValue))
-        let finalWidth = CGFloat(value * (controlView!.frame.size.width - 8))
-
-        let bg = NSBezierPath(roundedRect: rect, xRadius: barRadius, yRadius: barRadius)
-        let color = isEnabled ? peach : (peach.blended(withFraction: 0.5, of: gray) ?? gray)
-        color.withAlphaComponent(0.3).setFill()
-        bg.fill()
-
-        let leftRect = NSRect(x: rect.origin.x, y: rect.origin.y, width: finalWidth, height: rect.size.height)
-        let active = NSBezierPath(roundedRect: leftRect, xRadius: barRadius, yRadius: barRadius)
-        color.withAlphaComponent(0.7).setFill()
-        active.fill()
-    }
-}
-
-// MARK: - VolumeSlider
-
-class VolumeSlider: NSSlider {
-    // MARK: Lifecycle
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-
-    // MARK: Internal
-
-    override var knobThickness: CGFloat { 6 }
-
-    override func mouseEntered(with _: NSEvent) {
-        guard isEnabled, !isHidden else { return }
-        transition(0.2)
-        alphaValue = 1.0
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        transition(0.5)
-        alphaValue = 0.7
-    }
-
-    func setup() {
-        trackHover()
     }
 }

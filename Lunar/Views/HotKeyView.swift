@@ -37,6 +37,10 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     var hoverState: HoverState = .noHover
 
+    var hotkeyColor: [HoverState: [String: NSColor]] {
+        effectiveAppearance.isDark ? hotkeyColorDarkMode : hotkeyColorLightMode
+    }
+
     var hotkey: PersistentHotkey? {
         didSet {
             mainThread {
@@ -58,6 +62,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
     var hotkeyEnabled: Bool {
         hotkey?.isEnabled ?? false
     }
+
+    override var frame: NSRect { didSet { trackHover() } }
+    override var bounds: NSRect { didSet { trackHover() } }
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
         log.debug("Begin hotkey recording: \(hotkey?.identifier ?? "")")
@@ -157,8 +164,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
         borderColor = NSColor.clear
         backgroundColor = hotkeyColor[hoverState]!["background"]!
         tintColor = hotkeyColor[hoverState]!["tint"]!
-        cornerRadius = 8
-        addTrackingRect(visibleRect, owner: self, userData: nil, assumeInside: false)
+        radius = 8
+        trackHover()
+        transition()
     }
 
     func transition() {
@@ -185,6 +193,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     override func draw(_ dirtyRect: NSRect) {
         radius = 8.ns
+        transition()
         super.draw(dirtyRect)
     }
 }

@@ -86,6 +86,10 @@ class DisplayController {
 
     lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay()
 
+    var activeDisplayList: [Display] {
+        activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+    }
+
     var externalActiveDisplays: [Display] {
         activeDisplays.values.filter { !$0.isBuiltin }
     }
@@ -126,7 +130,7 @@ class DisplayController {
     }
 
     var activeDisplays: [CGDirectDisplayID: Display] {
-        get { _activeDisplaysLock.around { _activeDisplays } }
+        get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
         set {
             _activeDisplaysLock.around {
                 _activeDisplays = newValue
@@ -356,6 +360,12 @@ class DisplayController {
             }
             if let task = self.modeWatcherTask {
                 lowprioQueue.cancel(timer: task)
+            }
+        }.store(in: &observers)
+        showOrientationInQuickActionsPublisher.sink { [self] change in
+            mainThread {
+                menuPopover?.close()
+                displays.values.forEach { $0.showOrientation = $0.canRotate && change.newValue }
             }
         }.store(in: &observers)
     }
@@ -913,8 +923,8 @@ class DisplayController {
         if adaptiveModeKey != .manual {
             adaptiveMode = ManualMode.shared
         }
-        if !CachedDefaults[.overrideAdaptiveMode] {
-            lastModeWasAuto = true
+        lastModeWasAuto = !CachedDefaults[.overrideAdaptiveMode]
+        if lastModeWasAuto {
             CachedDefaults[.overrideAdaptiveMode] = true
         }
         CachedDefaults[.adaptiveBrightnessMode] = AdaptiveModeKey.manual
@@ -1292,7 +1302,16 @@ class DisplayController {
                 minVal: display.minBrightness.intValue,
                 maxVal: display.maxBrightness.intValue
             )
-            display.brightness = value.ns
+            let preciseValue = mapNumber(
+                value.d,
+                fromLow: display.minBrightness.doubleValue,
+                fromHigh: display.maxBrightness.doubleValue,
+                toLow: 0,
+                toHigh: 100
+            ) / 100
+
+            // display.brightness = value.ns
+            display.preciseBrightnessContrast = preciseValue
 
             if adaptiveModeKey != .manual {
                 display.insertBrightnessUserDataPoint(

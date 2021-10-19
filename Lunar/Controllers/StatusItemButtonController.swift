@@ -1,16 +1,7 @@
-//
-//  StatusItemButton.swift
-//  Lunar
-//
-//  Created by Alin Panaitiu on 25/11/2019.
-//  Copyright © 2019 Alin. All rights reserved.
-//
-
 import Atomics
 import Cocoa
-import Defaults
 
-class StatusItemButtonController: NSView {
+class StatusItemButtonController: NSView, NSPopoverDelegate {
     // MARK: Lifecycle
 
     convenience init(button: NSStatusBarButton) {
@@ -21,46 +12,37 @@ class StatusItemButtonController: NSView {
     // MARK: Internal
 
     var statusButton: NSStatusBarButton?
-    var menuPopoverOpener: DispatchWorkItem?
-    @Atomic var clicked = false
 
-    override func mouseEntered(with event: NSEvent) {
-        if !CachedDefaults[.showQuickActions] || displayController.displays.count == 0 || clicked {
-            return
+    func popoverDidClose(_: Notification) {
+        let positioningView = statusButton?.subviews.first {
+            $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
         }
-
-        menuPopoverOpener = menuPopoverOpener ?? DispatchWorkItem(name: "menuPopoverOpener") { [unowned self] in
-            if let area = event.trackingArea, let button = self.statusButton, !self.clicked {
-                POPOVERS["menu"]!!.show(relativeTo: area.rect, of: button, preferredEdge: .maxY)
-                POPOVERS["menu"]!!.becomeFirstResponder()
-            }
-            self.menuPopoverOpener = nil
-        }
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(500_000_000))
-
-        DispatchQueue.main.asyncAfter(deadline: deadline, execute: menuPopoverOpener!.workItem)
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if let opener = menuPopoverOpener {
-            opener.cancel()
-            menuPopoverOpener = nil
-        }
-        closeMenuPopover(after: 2000)
+        positioningView?.removeFromSuperview()
     }
 
     override func mouseDown(with event: NSEvent) {
-        clicked = true
-        asyncAfter(ms: 3000) { [weak self] in
-            self?.clicked = false
+        if let menuPopover = menuPopover, menuPopover.isShown {
+            menuPopover.close()
+            return
+        }
+        let menuPopover = appDelegate!.initMenuPopover()
+
+        guard let button = statusButton, let controller = menuPopover.contentViewController as? QuickActionsViewController
+        else {
+            return
         }
 
-        POPOVERS["menu"]!!.close()
-        closeMenuPopover(after: 1500)
+        menuPopover.delegate = self
 
+        let positioningView = NSView(frame: button.bounds)
+        positioningView.identifier = NSUserInterfaceItemIdentifier(rawValue: "positioningView")
+        button.addSubview(positioningView)
+
+        menuPopover.show(relativeTo: positioningView.bounds, of: positioningView, preferredEdge: .maxY)
+        positioningView.bounds = positioningView.bounds.offsetBy(dx: 0, dy: positioningView.bounds.height)
+        if let popoverWindow = menuPopover.contentViewController?.view.window {
+            popoverWindow.setFrame(popoverWindow.frame.offsetBy(dx: 0, dy: 12), display: false)
+        }
         super.mouseDown(with: event)
-//        if let button = statusButton {
-//            button.mouseDown(with: event)
-//        }
     }
 }

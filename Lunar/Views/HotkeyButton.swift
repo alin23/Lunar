@@ -9,6 +9,7 @@
 import Cocoa
 import Foundation
 import Magnet
+import Regex
 
 class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     // MARK: Lifecycle
@@ -59,6 +60,30 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
                     .map { input in input.str } + InputSource.leastUsed
                     .map { input in input.str } + ["Unknown"]
             )
+            for item in dropdown.itemArray {
+                switch item.title.lowercased() {
+                case "thunderbolt".r:
+                    item.image = NSImage(named: "usbc")
+                case "hdmi".r:
+                    item.image = NSImage(named: "hdmi")
+                case "dvi".r:
+                    item.image = NSImage(named: "dvi")
+                case "displayport".r:
+                    item.image = NSImage(named: "displayport")
+                case "tuner".r:
+                    item.image = NSImage(named: "tuner")
+                case "composite".r:
+                    item.image = NSImage(named: "composite")
+                case "component".r:
+                    item.image = NSImage(named: "component")
+                case "s-video".r:
+                    item.image = NSImage(named: "svideo")
+                case "vga".r:
+                    item.image = NSImage(named: "vga")
+                default:
+                    break
+                }
+            }
 
             dropdown.menu?.insertItem(.separator(), at: InputSource.mostUsed.count)
             for item in dropdown.itemArray {
@@ -68,7 +93,8 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
                 if input == .unknown {
                     item.isEnabled = true
                     item.isHidden = true
-                    item.title = "Select input"
+                    item.title = "Video input"
+                    item.image = NSImage(named: "input")
                 }
             }
             switch dropdown.tag {
