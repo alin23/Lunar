@@ -79,7 +79,12 @@ class ToggleButton: NSButton {
         }
     }
 
-    var page = Page.display {
+    var page: Page {
+        get { Page(rawValue: pageType)! }
+        set { pageType = newValue.rawValue }
+    }
+
+    @IBInspectable dynamic var pageType = Page.display.rawValue {
         didSet {
             setColors()
         }

@@ -145,7 +145,7 @@ class Schedule: NSView {
     @IBOutlet var box: NSBox!
     @IBOutlet var enableButton: LockButton!
 
-    @IBOutlet var dropdown: PopUpButton!
+    @IBOutlet var dropdown: NSPopUpButton!
     @IBInspectable dynamic var title = "Schedule 1"
     @IBInspectable dynamic var number = 1
     @objc dynamic lazy var isTimeSchedule = type == ScheduleType.time.rawValue
@@ -239,7 +239,7 @@ class Schedule: NSView {
             negativeState = schedule.negative ? .on : .off
             enabled = schedule.enabled
             dropdown.selectItem(withTag: schedule.type.rawValue)
-            dropdown.resizeToFitTitle()
+//            dropdown.resizeToFitTitle()
 
             hour.onValueChanged = { [weak self] value in
                 guard let self = self, let display = self.display,
@@ -323,7 +323,7 @@ class Schedule: NSView {
         view.frame = bounds
         addSubview(view)
         signButton?.page = darkMode ? .hotkeys : .display
-        dropdown?.page = darkMode ? .hotkeys : .display
+//        dropdown?.page = darkMode ? .hotkeys : .display
         for item in dropdown.itemArray {
             guard let type = ScheduleType(rawValue: item.tag) else { continue }
             switch type {
@@ -340,7 +340,7 @@ class Schedule: NSView {
                 break
             }
         }
-        dropdown?.resizeToFitTitle()
+//        dropdown?.resizeToFitTitle()
     }
 
     override func draw(_ dirtyRect: NSRect) {

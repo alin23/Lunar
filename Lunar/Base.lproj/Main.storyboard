@@ -3748,9 +3748,36 @@ and contrast to their highest values</string>
                                     </binding>
                                 </connections>
                             </box>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vhk-ki-ybJ" customClass="ColorsButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="434" y="258" width="80" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Colors" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="jPn-0s-7r6">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.80000000000000004"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <integer key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" name="Caption Tertiary"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.active" id="aht-rR-3rM">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="_colorsButton" destination="Vhk-ki-ybJ" id="fb8-0t-J1o"/>
                         <outlet property="_controlsButton" destination="HuJ-7T-Fgg" id="TV2-Sx-NX0"/>
                         <outlet property="_inputDropdownHotkeyButton" destination="s4q-W2-ta1" id="sIR-FG-rPK"/>
                         <outlet property="_lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>
@@ -5173,7 +5200,7 @@ and contrast to their highest values</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box fixedFrame="YES" title="Input Hotkey 1" translatesAutoresizingMaskIntoConstraints="NO" id="TtZ-WU-d64">
-                                <rect key="frame" x="9" y="471" width="410" height="150"/>
+                                <rect key="frame" x="5" y="471" width="410" height="150"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="87T-n8-qsS">
                                     <rect key="frame" x="3" y="3" width="404" height="126"/>
@@ -5182,7 +5209,7 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <box fixedFrame="YES" title="Input Hotkey 2" translatesAutoresizingMaskIntoConstraints="NO" id="AUg-hB-5hT">
-                                <rect key="frame" x="9" y="295" width="410" height="150"/>
+                                <rect key="frame" x="5" y="295" width="410" height="150"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Oqw-0y-d8X">
                                     <rect key="frame" x="3" y="3" width="404" height="126"/>
@@ -5482,7 +5509,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Input Hotkey 3" translatesAutoresizingMaskIntoConstraints="NO" id="p6a-2M-XBu">
-                                <rect key="frame" x="9" y="119" width="410" height="150"/>
+                                <rect key="frame" x="5" y="119" width="410" height="150"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="UeR-8a-f3r">
                                     <rect key="frame" x="3" y="3" width="404" height="126"/>
@@ -5491,7 +5518,7 @@ and contrast to their highest values</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="15"/>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p">
-                                <rect key="frame" x="146" y="167" width="125" height="22"/>
+                                <rect key="frame" x="145" y="167" width="125" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="r6T-el-KBe" id="sg9-44-wbG">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -7761,6 +7788,280 @@ control automatically</string>
                 <userDefaultsController id="MYZ-fE-EBq"/>
             </objects>
             <point key="canvasLocation" x="899" y="3378.5"/>
+        </scene>
+        <!--Colors Popover Controller-->
+        <scene sceneID="LcY-BN-6rN">
+            <objects>
+                <viewController storyboardIdentifier="ColorsPopoverController" id="nX7-a1-Ggz" customClass="ColorsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Zvk-a3-Jd9">
+                        <rect key="frame" x="0.0" y="0.0" width="321" height="254"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="xJf-g4-pvH" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="79" y="169" width="220" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="216" id="4bc-p0-mdn"/>
+                                    <constraint firstAttribute="height" constant="20" id="pBs-uN-tx3"/>
+                                </constraints>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="UOg-zl-mFy" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.red" id="Foa-TQ-bu0"/>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="24i-WR-hhK" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="79" y="134" width="220" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="uDD-fL-8Uw"/>
+                                    <constraint firstAttribute="width" constant="216" id="uDN-3B-QcE"/>
+                                </constraints>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="VL4-jY-ISy" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" name="systemGreenColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" name="systemGreenColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.green" id="jdH-ld-ru4"/>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="eOP-NJ-wxV" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="79" y="99" width="220" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="216" id="42k-LY-Yjt"/>
+                                    <constraint firstAttribute="height" constant="20" id="XaY-vJ-OrU"/>
+                                </constraints>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="s8u-ln-jOT" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.blue" id="Qay-NQ-Ix0"/>
+                                </connections>
+                            </slider>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ium-k3-3BT">
+                                <rect key="frame" x="13" y="215" width="83" height="25"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Gamma" id="cxp-ek-Eg0">
+                                    <font key="font" metaFont="systemHeavy" size="21"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SBj-vv-rYi">
+                                <rect key="frame" x="13" y="177" width="32" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Red" id="TKY-NL-Ye2">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fEp-XD-Xa5">
+                                <rect key="frame" x="13" y="142" width="47" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Green" id="Cuv-7l-lor">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="43A-zg-cG3">
+                                <rect key="frame" x="13" y="107" width="36" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Blue" id="9ca-AA-0bw">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="GhA-MN-iPc" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="79" y="57" width="220" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="55S-JA-7bT"/>
+                                    <constraint firstAttribute="width" constant="216" id="eTY-bj-rEe"/>
+                                </constraints>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="UGY-dT-5BQ" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" white="0.10153592687074831" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.blacks" previousBinding="7gX-NH-Lfl" id="Z6T-6e-Igb"/>
+                                    <binding destination="nX7-a1-Ggz" name="maxValue" keyPath="self.display.whites" id="7gX-NH-Lfl"/>
+                                </connections>
+                            </slider>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88B-o4-DdE">
+                                <rect key="frame" x="13" y="65" width="52" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Blacks" id="plo-wK-KSM">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="dqJ-Ws-iFA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="79" y="22" width="220" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="216" id="KTM-VD-Ygr"/>
+                                    <constraint firstAttribute="height" constant="20" id="fe9-g8-KXR"/>
+                                </constraints>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="U9C-up-Edb" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="minValue" keyPath="self.display.blacks" id="xmv-EE-ngF"/>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.whites" previousBinding="xmv-EE-ngF" id="bVh-io-s7n"/>
+                                </connections>
+                            </slider>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlP-z7-qa1">
+                                <rect key="frame" x="13" y="30" width="55" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Whites" id="JXX-Ub-ygV">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mmh-YL-IXM" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="236" y="217" width="66" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="E0x-qO-0y4"/>
+                                    <constraint firstAttribute="height" constant="22" id="xHd-Bx-Y8G"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="PkE-Wf-rSj">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="roundedness">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="pageType">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="resetGamma:" target="21a-h6-6He" id="hCc-UL-Huz"/>
+                                    <binding destination="nX7-a1-Ggz" name="target" keyPath="self.display" id="CLQ-aY-1Pi">
+                                        <dictionary key="options">
+                                            <string key="NSSelectorName">resetDefaultGamma</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" misplaced="YES" alphaValue="0.90000000000000002" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="6rV-Qv-PJI" customClass="EnableButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="169" y="217" width="80" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="I0i-F0-Gwf"/>
+                                    <constraint firstAttribute="height" constant="22" id="MXk-fD-baS"/>
+                                </constraints>
+                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
+                                    <configuration>
+                                        <null key="inputBackgroundImage"/>
+                                        <null key="inputImage"/>
+                                    </configuration>
+                                </ciFilter>
+                                <buttonCell key="cell" type="inline" title="Disabled" alternateTitle="Enabled" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="GHT-vj-u3q">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemHeavy" size="11"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.applyGamma" id="rJ1-td-Gea"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="fEp-XD-Xa5" firstAttribute="centerY" secondItem="24i-WR-hhK" secondAttribute="centerY" id="0fg-JH-EFs"/>
+                            <constraint firstItem="SBj-vv-rYi" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="15" id="1jR-ki-oBV"/>
+                            <constraint firstItem="dqJ-Ws-iFA" firstAttribute="centerX" secondItem="GhA-MN-iPc" secondAttribute="centerX" id="2qz-Ke-FBd"/>
+                            <constraint firstItem="fEp-XD-Xa5" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="15" id="3Vi-8t-HED"/>
+                            <constraint firstItem="GhA-MN-iPc" firstAttribute="top" secondItem="eOP-NJ-wxV" secondAttribute="bottom" constant="22" id="6V6-lu-X9U"/>
+                            <constraint firstItem="eOP-NJ-wxV" firstAttribute="centerX" secondItem="24i-WR-hhK" secondAttribute="centerX" id="6d3-Ca-uHO"/>
+                            <constraint firstItem="eOP-NJ-wxV" firstAttribute="top" secondItem="24i-WR-hhK" secondAttribute="bottom" constant="15" id="7M2-Vw-sER"/>
+                            <constraint firstItem="dqJ-Ws-iFA" firstAttribute="top" secondItem="GhA-MN-iPc" secondAttribute="bottom" constant="15" id="B6N-wE-vKs"/>
+                            <constraint firstItem="43A-zg-cG3" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="15" id="FUH-b2-mLN"/>
+                            <constraint firstItem="xJf-g4-pvH" firstAttribute="centerX" secondItem="Zvk-a3-Jd9" secondAttribute="centerX" constant="28.5" id="Min-zy-zKB"/>
+                            <constraint firstItem="Ium-k3-3BT" firstAttribute="top" secondItem="Zvk-a3-Jd9" secondAttribute="top" constant="16" id="OI2-Ek-Bfz"/>
+                            <constraint firstItem="24i-WR-hhK" firstAttribute="centerX" secondItem="xJf-g4-pvH" secondAttribute="centerX" id="T0K-Gg-fiV"/>
+                            <constraint firstItem="43A-zg-cG3" firstAttribute="centerY" secondItem="eOP-NJ-wxV" secondAttribute="centerY" id="THZ-WX-FCl"/>
+                            <constraint firstItem="Ium-k3-3BT" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="15" id="UON-Xh-PFM"/>
+                            <constraint firstItem="6rV-Qv-PJI" firstAttribute="centerY" secondItem="Ium-k3-3BT" secondAttribute="centerY" id="bVk-oz-aMn"/>
+                            <constraint firstItem="xJf-g4-pvH" firstAttribute="top" secondItem="Ium-k3-3BT" secondAttribute="bottom" constant="18" id="gXz-fw-Szb"/>
+                            <constraint firstItem="mmh-YL-IXM" firstAttribute="centerY" secondItem="6rV-Qv-PJI" secondAttribute="centerY" id="i3U-TX-8UK"/>
+                            <constraint firstItem="SBj-vv-rYi" firstAttribute="centerY" secondItem="xJf-g4-pvH" secondAttribute="centerY" id="iZy-6F-qT8"/>
+                            <constraint firstItem="88B-o4-DdE" firstAttribute="centerY" secondItem="GhA-MN-iPc" secondAttribute="centerY" id="jYB-uf-9rQ"/>
+                            <constraint firstItem="24i-WR-hhK" firstAttribute="top" secondItem="xJf-g4-pvH" secondAttribute="bottom" constant="15" id="kau-sz-Gx1"/>
+                            <constraint firstAttribute="trailing" secondItem="mmh-YL-IXM" secondAttribute="trailing" constant="15" id="nCI-Ha-lqF"/>
+                            <constraint firstItem="mmh-YL-IXM" firstAttribute="leading" secondItem="6rV-Qv-PJI" secondAttribute="trailing" constant="7" id="ozw-ys-PzC"/>
+                            <constraint firstItem="GhA-MN-iPc" firstAttribute="centerX" secondItem="eOP-NJ-wxV" secondAttribute="centerX" id="qIH-mo-z5p"/>
+                            <constraint firstItem="hlP-z7-qa1" firstAttribute="centerY" secondItem="dqJ-Ws-iFA" secondAttribute="centerY" id="xTH-9V-peQ"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="nVb-f7-XW9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="822.5" y="3915"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="ydf-Mv-Uuy">

@@ -57,6 +57,7 @@
 		C753799B26A5E6AD0017B784 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C753799826A5D8820017B784 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
 		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
+		C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */; };
 		C765E4FB26FF9F3500FD6463 /* CryptorECC in Frameworks */ = {isa = PBXBuildFile; productRef = C765E4FA26FF9F3500FD6463 /* CryptorECC */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
@@ -257,6 +258,7 @@
 		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = gencode.sh; path = bin/gencode.sh; sourceTree = "<group>"; };
 		C7574F812354691700358397 /* buildscript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = buildscript.sh; path = bin/buildscript.sh; sourceTree = "<group>"; };
+		C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorsPopoverController.swift; sourceTree = "<group>"; };
 		C7683424245227290087946C /* DisplayName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayName.swift; sourceTree = "<group>"; };
 		C76A129B20D795A7005D4BE3 /* ModernWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindow.swift; sourceTree = "<group>"; };
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */,
 				C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
 				C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */,
@@ -1045,6 +1048,7 @@
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
+				C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */,
 				C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */,

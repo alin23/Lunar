@@ -159,6 +159,7 @@ class Slider: NSSlider {
     }
 
     func setup() {
+        refusesFirstResponder = true
         trackHover()
     }
 

@@ -111,41 +111,30 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aM2-4L-F67" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="51" y="61" width="73" height="12"/>
+                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aM2-4L-F67">
+                                <rect key="frame" x="14" y="56" width="150" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="inline" title="Time" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="mWN-NX-YTt" id="YbL-ef-oU2" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                <popUpButtonCell key="cell" type="inline" title="Time" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="mWN-NX-YTt" id="YbL-ef-oU2">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="hfV-2e-8ze">
                                         <items>
-                                            <menuItem title="Time" state="on" id="mWN-NX-YTt">
+                                            <menuItem title="Time" state="on" image="clock" catalog="system" id="mWN-NX-YTt">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem isSeparatorItem="YES" id="icR-hV-Z92"/>
-                                            <menuItem title="Sunrise" tag="1" id="57x-tm-j2n">
+                                            <menuItem title="Sunrise" image="sunrise" catalog="system" tag="1" id="57x-tm-j2n">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Noon" tag="3" id="cFO-VO-s4l">
+                                            <menuItem title="Noon" image="sun.max" catalog="system" tag="3" id="cFO-VO-s4l">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Sunset" tag="2" id="bh9-Vk-Odr">
+                                            <menuItem title="Sunset" image="sunset" catalog="system" tag="2" id="bh9-Vk-Odr">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
                                     </menu>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼ "/>
-                                    </userDefinedRuntimeAttributes>
                                 </popUpButtonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
-                                        <real key="value" value="34"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                        <real key="value" value="0.0"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="-2" name="enabled" keyPath="self.enabled" id="5LM-Dv-Rsp"/>
                                     <binding destination="-2" name="selectedTag" keyPath="self.type" id="Y86-Ke-W1N"/>
@@ -299,6 +288,10 @@
         </customView>
     </objects>
     <resources>
+        <image name="clock" catalog="system" width="15" height="15"/>
+        <image name="sun.max" catalog="system" width="16" height="16"/>
+        <image name="sunrise" catalog="system" width="20" height="16"/>
+        <image name="sunset" catalog="system" width="20" height="16"/>
         <namedColor name="Caption">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
