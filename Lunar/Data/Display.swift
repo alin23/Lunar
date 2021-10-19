@@ -284,12 +284,15 @@ struct GammaTable: Equatable {
         return true
     }
 
-    func adjust(brightness: UInt8) -> GammaTable {
-        let preciseBrightness: Float = mapNumber(powf(brightness.f / 100, 0.8), fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00)
+    func adjust(brightness: UInt8, preciseBrightness: Double? = nil) -> GammaTable {
+        let gammaBrightness: Float = mapNumber(
+            powf(preciseBrightness?.f ?? (brightness.f / 100), 0.8),
+            fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00
+        )
         return GammaTable(
-            red: red.map { $0 * preciseBrightness },
-            green: green.map { $0 * preciseBrightness },
-            blue: blue.map { $0 * preciseBrightness },
+            red: red.map { $0 * gammaBrightness },
+            green: green.map { $0 * gammaBrightness },
+            blue: blue.map { $0 * gammaBrightness },
             samples: samples, brightness: brightness
         )
     }
@@ -329,6 +332,8 @@ enum ValueType {
         let id = try container.decode(CGDirectDisplayID.self, forKey: .id)
         _id = id
         let isSmartBuiltin = DDC.isSmartBuiltinDisplay(id)
+        let coreDisplayControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .coreDisplay) ?? false
+        let isNative = isSmartBuiltin && coreDisplayControlEnabled
         serial = try container.decode(String.self, forKey: .serial)
 
         adaptive = try container.decode(Bool.self, forKey: .adaptive)
@@ -336,12 +341,26 @@ enum ValueType {
         edidName = try container.decode(String.self, forKey: .edidName)
         active = try container.decode(Bool.self, forKey: .active)
 
-        brightness = (try container.decode(UInt8.self, forKey: .brightness)).ns
-        contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
-        minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minBrightness)).ns
-        maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
+        let brightness = isNative ? (AppleNativeControl.readBrightnessDisplayServices(id: id) * 100)
+            .ns : (try container.decode(UInt8.self, forKey: .brightness)).ns
+        self.brightness = brightness
+        preciseBrightness = brightness.doubleValue / 100.0
+        let contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
+        self.contrast = contrast
+        preciseContrast = contrast.doubleValue / 100.0
+        let minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minBrightness)).ns
+        let maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
+        self.minBrightness = minBrightness
+        self.maxBrightness = maxBrightness
         minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minContrast)).ns
         maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxContrast)).ns
+        preciseBrightnessContrast = mapNumber(
+            cap(brightness.doubleValue, minVal: 0, maxVal: 100),
+            fromLow: minBrightness.doubleValue,
+            fromHigh: maxBrightness.doubleValue,
+            toLow: 0,
+            toHigh: 100
+        ) / 100.0
 
         defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
@@ -353,15 +372,15 @@ enum ValueType {
         defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
         defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
 
-        let _maxDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
-        let _maxDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
-        maxDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+        let _maxDDCBrightness = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
+        let _maxDDCContrast = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
+        maxDDCVolume = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
         maxDDCBrightness = _maxDDCBrightness
         maxDDCContrast = _maxDDCContrast
 
-        minDDCBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
-        minDDCContrast = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
-        minDDCVolume = (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
+        minDDCBrightness = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
+        minDDCContrast = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
+        minDDCVolume = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
 
         faceLightBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
         faceLightContrast = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightContrast)?.ns) ??
@@ -386,7 +405,9 @@ enum ValueType {
         alwaysFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysFallbackControl)) ?? false
         neverFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .neverFallbackControl)) ?? false
 
-        volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
+        let volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
+        self.volume = volume
+        preciseVolume = volume.doubleValue / 100.0
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
@@ -413,6 +434,10 @@ enum ValueType {
         )
         contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
         contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
+
+        applyBrightnessOnInputChange1 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange1)) ?? true
+        applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? false
+        applyBrightnessOnInputChange3 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange3)) ?? false
 
         if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
             userBrightness[.sync] = syncUserBrightness.threadSafe
@@ -528,13 +553,12 @@ enum ValueType {
         {
             schedules = value
         }
+        setupHotkeys()
+        guard active else { return }
 
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
-
-        setupHotkeys()
-        refreshGamma()
     }
 
     init(
@@ -561,6 +585,19 @@ enum ValueType {
         self.minContrast = isSmartBuiltin ? 0 : minContrast.ns
         self.maxContrast = isSmartBuiltin ? 100 : maxContrast.ns
 
+        if isSmartBuiltin {
+            preciseBrightness = AppleNativeControl.readBrightnessDisplayServices(id: id)
+            brightness = (preciseBrightness * 100).ns
+        } else {
+            preciseBrightnessContrast = mapNumber(
+                50,
+                fromLow: minBrightness.d,
+                fromHigh: maxBrightness.d,
+                toLow: 0,
+                toHigh: 100
+            ) / 100.0
+        }
+
         enabledControls[.gamma] = !isSmartBuiltin
 
         edidName = Self.printableName(id)
@@ -573,6 +610,7 @@ enum ValueType {
 
         super.init()
 
+        guard active else { return }
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
@@ -580,6 +618,12 @@ enum ValueType {
         startControls()
         setupHotkeys()
         refreshGamma()
+        if supportsGamma {
+            reapplyGamma()
+        } else {
+            shade(amount: 1.0 - preciseBrightness)
+        }
+        updateCornerWindow()
     }
 
     deinit {
@@ -685,6 +729,9 @@ enum ValueType {
         case contrastOnInputChange1
         case contrastOnInputChange2
         case contrastOnInputChange3
+        case applyBrightnessOnInputChange1
+        case applyBrightnessOnInputChange2
+        case applyBrightnessOnInputChange3
         case rotation
 
         // MARK: Internal
@@ -851,7 +898,6 @@ enum ValueType {
                     POPOVERS[serial] = _hotkeyPopover
                     popover.contentViewController = controller
                     popover.contentViewController!.loadView()
-                    popover.appearance = NSAppearance(named: .vibrantDark)
                 }
 
                 return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
@@ -1043,7 +1089,7 @@ enum ValueType {
     lazy var isVirtual: Bool = DDC.isVirtualDisplay(id, name: edidName)
     lazy var isProjector: Bool = DDC.isProjectorDisplay(id, name: edidName)
 
-    lazy var supportsGamma: Bool = !isSidecar && !isAirplay && !isVirtual && !useOverlay
+    lazy var supportsGamma: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector && !useOverlay
 
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
         let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
@@ -1060,11 +1106,6 @@ enum ValueType {
     lazy var isOnline = NSScreen.isOnline(id)
 
     lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
-
-    var cornerWindowController: NSWindowController?
-    var gammaWindowController: NSWindowController?
-    var shadeWindowController: NSWindowController?
-    var faceLightWindowController: NSWindowController?
 
     @Atomic var shouldStopBrightnessTransition = true
     @Atomic var shouldStopContrastTransition = true
@@ -1088,6 +1129,40 @@ enum ValueType {
 
     For more information, [click here](https://lunar.fyi/faq#brightness-not-changing).
     """
+
+    @Atomic var applyPreciseValue = true
+
+    @objc dynamic lazy var preciseMaxBrightness: Double = maxBrightness.doubleValue / 100.0
+    @objc dynamic lazy var preciseMinBrightness: Double = minBrightness.doubleValue / 100.0
+    @objc dynamic lazy var preciseMaxContrast: Double = maxContrast.doubleValue / 100.0
+    @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
+
+    @objc dynamic lazy var showOrientation: Bool = canRotate && CachedDefaults[.showOrientationInQuickActions]
+
+    let preciseBrightnessKey = "setPreciseBrightness"
+    let preciseContrastKey = "setPreciseContrast"
+    lazy var preciseBrightnessSubscriberKey = "\(preciseBrightnessKey)-\(serial)"
+    lazy var preciseContrastSubscriberKey = "\(preciseContrastKey)-\(serial)"
+
+    var cornerWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner") }
+        set { Self.setWindowController(id, type: "corner", windowController: newValue) }
+    }
+
+    var gammaWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "gamma") }
+        set { Self.setWindowController(id, type: "gamma", windowController: newValue) }
+    }
+
+    var shadeWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "shade") }
+        set { Self.setWindowController(id, type: "shade", windowController: newValue) }
+    }
+
+    var faceLightWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "faceLight") }
+        set { Self.setWindowController(id, type: "faceLight", windowController: newValue) }
+    }
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
@@ -1386,6 +1461,7 @@ enum ValueType {
     @Published @objc dynamic var minBrightness: NSNumber = DEFAULT_MIN_BRIGHTNESS.ns {
         didSet {
             save()
+            preciseMinBrightness = minBrightness.doubleValue / 100
             readapt(newValue: minBrightness, oldValue: oldValue)
         }
     }
@@ -1393,6 +1469,7 @@ enum ValueType {
     @Published @objc dynamic var maxBrightness: NSNumber = DEFAULT_MAX_BRIGHTNESS.ns {
         didSet {
             save()
+            preciseMaxBrightness = maxBrightness.doubleValue / 100
             readapt(newValue: maxBrightness, oldValue: oldValue)
         }
     }
@@ -1400,6 +1477,7 @@ enum ValueType {
     @Published @objc dynamic var minContrast: NSNumber = DEFAULT_MIN_CONTRAST.ns {
         didSet {
             save()
+            preciseMinContrast = minContrast.doubleValue / 100
             readapt(newValue: minContrast, oldValue: oldValue)
         }
     }
@@ -1407,6 +1485,7 @@ enum ValueType {
     @Published @objc dynamic var maxContrast: NSNumber = DEFAULT_MAX_CONTRAST.ns {
         didSet {
             save()
+            preciseMaxContrast = maxContrast.doubleValue / 100
             readapt(newValue: maxContrast, oldValue: oldValue)
         }
     }
@@ -1450,9 +1529,142 @@ enum ValueType {
         ).rounded().u8
     }
 
+    @objc dynamic var preciseBrightnessContrast: Double = 0.5 {
+        didSet {
+            guard applyPreciseValue else { return }
+
+            let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
+
+            if control is AppleNativeControl || control is GammaControl {
+                let smallDiff = abs(brightness.i - self.brightness.intValue) < 5
+                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    self.brightness = brightness.ns
+                }
+            } else {
+                debounce(
+                    ms: 100,
+                    uniqueTaskKey: preciseBrightnessKey,
+                    value: brightness,
+                    subscriberKey: preciseBrightnessSubscriberKey
+                ) { [weak self] brightness in
+                    guard let self = self else { return }
+                    let smallDiff = abs(brightness.i - self.brightness.intValue) < 5
+                    self.withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                        mainThread { self.brightness = brightness.ns }
+                    }
+                }
+            }
+
+            debounce(
+                ms: 100,
+                uniqueTaskKey: preciseContrastKey,
+                value: contrast,
+                subscriberKey: preciseContrastSubscriberKey
+            ) { [weak self] contrast in
+                guard let self = self else { return }
+                let smallDiff = abs(contrast.i - self.contrast.intValue) < 5
+                self.withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    mainThread { self.contrast = contrast.ns }
+                }
+            }
+        }
+    }
+
+    @objc dynamic var preciseBrightness: Double = 0.5 {
+        didSet {
+            guard applyPreciseValue else { return }
+
+            let smallDiff = abs(preciseBrightness - oldValue) < 0.15
+
+            guard !(control is GammaControl) else {
+                if supportsGamma {
+                    setGamma(oldBrightness: smallDiff ? nil : (oldValue * 100).u8, preciseBrightness: preciseBrightness)
+                } else {
+                    shade(amount: 1.0 - preciseBrightness, smooth: !smallDiff)
+                }
+                withoutDDC { self.brightness = (preciseBrightness * 100).ns }
+                return
+            }
+            guard !(control is AppleNativeControl) else {
+                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    self.brightness = (preciseBrightness * 100).ns
+                }
+                return
+            }
+
+            let brightness = (mapNumber(
+                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minBrightness.doubleValue / 100.0,
+                toHigh: maxBrightness.doubleValue / 100.0
+            ) * 100).intround
+
+            debounce(
+                ms: 100,
+                uniqueTaskKey: preciseBrightnessKey,
+                value: brightness,
+                subscriberKey: preciseBrightnessSubscriberKey
+            ) { [weak self] brightness in
+                guard let self = self else { return }
+
+                let smallDiff = abs(brightness - self.brightness.intValue) < 5
+                self.withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    mainThread { self.brightness = brightness.ns }
+                }
+            }
+        }
+    }
+
+    @objc dynamic var preciseContrast: Double = 0.5 {
+        didSet {
+            guard applyPreciseValue else { return }
+
+            let contrast = (mapNumber(
+                cap(preciseContrast, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minContrast.doubleValue / 100.0,
+                toHigh: maxContrast.doubleValue / 100.0
+            ) * 100).intround
+
+            debounce(
+                ms: 100,
+                uniqueTaskKey: preciseContrastKey,
+                value: contrast,
+                subscriberKey: preciseContrastSubscriberKey
+            ) { [weak self] contrast in
+                guard let self = self else { return }
+
+                let smallDiff = abs(contrast - self.contrast.intValue) < 5
+                self.withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    mainThread { self.contrast = contrast.ns }
+                }
+            }
+        }
+    }
+
+    @objc dynamic var preciseVolume: Double = 0.5 {
+        didSet {
+            guard applyPreciseValue else { return }
+            volume = (preciseVolume * 100).ns
+        }
+    }
+
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()
+
+            applyPreciseValue = false
+            preciseBrightness = brightness.doubleValue / 100
+            preciseBrightnessContrast = mapNumber(
+                cap(brightness.doubleValue, minVal: 0, maxVal: 100),
+                fromLow: minBrightness.doubleValue,
+                fromHigh: maxBrightness.doubleValue,
+                toLow: 0,
+                toHigh: 100
+            ) / 100.0
+            applyPreciseValue = true
 
             guard DDC.apply, !lockedBrightness, force || brightness != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
@@ -1463,7 +1675,7 @@ enum ValueType {
 
             guard !isForTesting else { return }
             var brightness: UInt8
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
+            if displayController.adaptiveModeKey == AdaptiveModeKey.manual || control is GammaControl {
                 brightness = cap(self.brightness.uint8Value, minVal: 0, maxVal: 100)
             } else {
                 brightness = cap(self.brightness.uint8Value, minVal: minBrightness.uint8Value, maxVal: maxBrightness.uint8Value)
@@ -1507,6 +1719,10 @@ enum ValueType {
         didSet {
             save()
 
+            applyPreciseValue = false
+            preciseContrast = contrast.doubleValue / 100
+            applyPreciseValue = true
+
             guard DDC.apply, !lockedContrast, force || contrast != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
@@ -1516,7 +1732,7 @@ enum ValueType {
 
             guard !isForTesting else { return }
             var contrast: UInt8
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual {
+            if displayController.adaptiveModeKey == AdaptiveModeKey.manual || control is GammaControl {
                 contrast = cap(self.contrast.uint8Value, minVal: 0, maxVal: 100)
             } else {
                 contrast = cap(self.contrast.uint8Value, minVal: minContrast.uint8Value, maxVal: maxContrast.uint8Value)
@@ -1564,6 +1780,10 @@ enum ValueType {
 
             save()
 
+            applyPreciseValue = false
+            preciseVolume = volume.doubleValue / 100
+            applyPreciseValue = true
+
             guard !isForTesting else { return }
 
             var volume = volume.uint8Value
@@ -1592,6 +1812,7 @@ enum ValueType {
     @objc dynamic lazy var canRotate: Bool = canChangeOrientation {
         didSet {
             rotationTooltip = canRotate ? nil : "This monitor doesn't support rotation"
+            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
         }
     }
 
@@ -1685,6 +1906,11 @@ enum ValueType {
     @Published @objc dynamic var contrastOnInputChange1: NSNumber = 75 { didSet { save() } }
     @Published @objc dynamic var contrastOnInputChange2: NSNumber = 75 { didSet { save() } }
     @Published @objc dynamic var contrastOnInputChange3: NSNumber = 75 { didSet { save() } }
+
+    @Published @objc dynamic var applyBrightnessOnInputChange1: Bool = true { didSet { save() } }
+    @Published @objc dynamic var applyBrightnessOnInputChange2: Bool = false { didSet { save() } }
+    @Published @objc dynamic var applyBrightnessOnInputChange3: Bool = false { didSet { save() } }
+
     @Published @objc dynamic var audioMuted: Bool = false {
         didSet {
             save()
@@ -1714,6 +1940,13 @@ enum ValueType {
         didSet {
             if active {
                 startControls()
+                refreshGamma()
+                if supportsGamma {
+                    reapplyGamma()
+                } else {
+                    shade(amount: 1.0 - preciseBrightness)
+                }
+
                 if let controller = hotkeyPopoverController {
                     #if DEBUG
                         log.info("Display \(description) is now active, enabling hotkeys")
@@ -1725,19 +1958,24 @@ enum ValueType {
                     if let h = controller.hotkey2, h.isEnabled { h.register() }
                     if let h = controller.hotkey3, h.isEnabled { h.register() }
                 }
-            } else if let controller = hotkeyPopoverController {
-                #if DEBUG
-                    log.info("Display \(description) is now inactive, disabling hotkeys")
-                #endif
+            } else {
+                if let controller = hotkeyPopoverController {
+                    #if DEBUG
+                        log.info("Display \(description) is now inactive, disabling hotkeys")
+                    #endif
 
-                controller.hotkey1?.unregister()
-                controller.hotkey2?.unregister()
-                controller.hotkey3?.unregister()
+                    controller.hotkey1?.unregister()
+                    controller.hotkey2?.unregister()
+                    controller.hotkey3?.unregister()
+                }
             }
+
+            updateCornerWindow()
 
             save()
             mainThread {
                 activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
+                hasDDC = active && (hasI2C || hasNetworkControl)
             }
         }
     }
@@ -1751,11 +1989,11 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var hasI2C: Bool = true {
+    @Published @objc dynamic var hasI2C: Bool = false {
         didSet {
             context = getContext()
             mainThread {
-                hasDDC = hasI2C || hasNetworkControl
+                hasDDC = active && (hasI2C || hasNetworkControl)
             }
         }
     }
@@ -1764,7 +2002,7 @@ enum ValueType {
         didSet {
             context = getContext()
             mainThread {
-                hasDDC = hasI2C || hasNetworkControl
+                hasDDC = active && (hasI2C || hasNetworkControl)
             }
         }
     }
@@ -1777,7 +2015,7 @@ enum ValueType {
 
     @Published @objc dynamic var useOverlay: Bool = false {
         didSet {
-            supportsGamma = !isSidecar && !isAirplay && !isVirtual && !useOverlay
+            supportsGamma = !isSidecar && !isAirplay && !isVirtual && !isProjector && !useOverlay
             save()
         }
     }
@@ -1930,6 +2168,14 @@ enum ValueType {
         return v
     }
 
+    static func getWindowController(_ id: CGDirectDisplayID, type: String) -> NSWindowController? {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] as? NSWindowController }
+    }
+
+    static func setWindowController(_ id: CGDirectDisplayID, type: String, windowController: NSWindowController?) {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] = windowController }
+    }
+
     // MARK: EDID
 
     static func printableName(_ id: CGDirectDisplayID) -> String {
@@ -2028,23 +2274,53 @@ enum ValueType {
         values[featureValue] = targetValue
     }
 
-    func updateCornerWindow() {
-        guard cornerRadius.intValue > 0 else {
-            cornerWindowController?.close()
-            cornerWindowController = nil
-            return
+    func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
+        var brightness = brightness.uint8Value
+        var contrast = contrast.uint8Value
+
+        if !lockedBrightness {
+            brightness = (mapNumber(
+                cap(value, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minBrightness.doubleValue / 100.0,
+                toHigh: maxBrightness.doubleValue / 100.0
+            ) * 100).intround.u8
         }
-        createWindow(
-            "cornerWindowController",
-            controller: &cornerWindowController,
-            screen: screen,
-            show: true,
-            backgroundColor: .clear,
-            level: .screenSaver,
-            fillScreen: true,
-            stationary: true
-        )
-        (cornerWindowController as? CornerWindowController)?.display = self
+        if !lockedContrast {
+            contrast = (mapNumber(
+                pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minContrast.doubleValue / 100.0,
+                toHigh: maxContrast.doubleValue / 100.0
+            ) * 100).intround.u8
+        }
+
+        return (brightness, contrast)
+    }
+
+    func updateCornerWindow() {
+        mainThread {
+            guard cornerRadius.intValue > 0, active else {
+                cornerWindowController?.close()
+                cornerWindowController = nil
+                return
+            }
+            createWindow(
+                "cornerWindowController",
+                controller: &cornerWindowController,
+                screen: screen,
+                show: true,
+                backgroundColor: .clear,
+                level: .screenSaver,
+                fillScreen: true,
+                stationary: true
+            )
+            if let wc = cornerWindowController as? CornerWindowController {
+                wc.display = self
+            }
+        }
     }
 
     func getScreen() -> NSScreen? {
@@ -2078,7 +2354,7 @@ enum ValueType {
         }
     }
 
-    func shade(amount: Double) {
+    func shade(amount: Double, smooth: Bool = true) {
         guard !isInMirrorSet, let screen = screen else {
             shadeWindowController?.close()
             shadeWindowController = nil
@@ -2114,7 +2390,7 @@ enum ValueType {
             w.setFrame(screen.frame, display: false)
 
             let delay = brightnessTransition == .slow ? 2.0 : 0.6
-            w.contentView?.transition(delay)
+            if smooth { w.contentView?.transition(delay) }
             w.contentView?.alphaValue = mapNumber(
                 cap(amount, minVal: 0.0, maxVal: 1.0),
                 fromLow: 0.0,
@@ -2123,7 +2399,7 @@ enum ValueType {
                 toHigh: 0.85
             )
 
-            if amount == 0 {
+            if amount == 0, smooth {
                 asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) {
                     w.contentView?.alphaValue = 0
                 }
@@ -2242,10 +2518,12 @@ enum ValueType {
     }
 
     func getBestControl(reapply: Bool = true) -> Control {
+        let gammaControl = GammaControl(display: self)
+        // guard supportsGamma else {return gammaControl}
+
         let networkControl = NetworkControl(display: self)
         let coreDisplayControl = AppleNativeControl(display: self)
         let ddcControl = DDCControl(display: self)
-        let gammaControl = GammaControl(display: self)
 
         if coreDisplayControl.isAvailable() {
             if reapply, applyGamma || gammaChanged {
@@ -2347,18 +2625,21 @@ enum ValueType {
         control = getBestControl()
 
         guard isSmartBuiltin else { return }
-        asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] _ in
-            guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
+        asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
+            guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
+                timer.tolerance = 10
                 return
             }
-
+            if timer.tolerance != 1 { timer.tolerance = 1 }
             self.refreshBrightness()
         }
-        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true) { [weak self] _ in
-            guard let self = self, !screensSleeping.load(ordering: .relaxed) else {
+        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true) { [weak self] timer in
+            guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
+                timer.tolerance = 30
                 return
             }
 
+            if timer.tolerance != 10 { timer.tolerance = 10 }
             self.refreshContrast()
         }
     }
@@ -2410,7 +2691,7 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGamma else {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGamma || useOverlay else {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
@@ -2452,6 +2733,7 @@ enum ValueType {
         let taskKey = "i2c-detector-\(serial)"
         asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15, eager: true) { [weak self] _ in
             guard let self = self else { return }
+            self.updateCornerWindow()
             self.detectI2C()
             if self.hasI2C {
                 cancelTask(taskKey)
@@ -2694,6 +2976,11 @@ enum ValueType {
             try container.encode(contrastOnInputChange1.uint8Value, forKey: .contrastOnInputChange1)
             try container.encode(contrastOnInputChange2.uint8Value, forKey: .contrastOnInputChange2)
             try container.encode(contrastOnInputChange3.uint8Value, forKey: .contrastOnInputChange3)
+
+            try container.encode(applyBrightnessOnInputChange1, forKey: .applyBrightnessOnInputChange1)
+            try container.encode(applyBrightnessOnInputChange2, forKey: .applyBrightnessOnInputChange2)
+            try container.encode(applyBrightnessOnInputChange3, forKey: .applyBrightnessOnInputChange3)
+
             try container.encode(rotation, forKey: .rotation)
 
             try userBrightnessContainer.encodeIfPresent(userBrightness[.sync]?.dictionary, forKey: .sync)
@@ -3223,7 +3510,12 @@ enum ValueType {
         return result
     }
 
-    func setGamma(brightness: UInt8? = nil, oldBrightness: UInt8? = nil, onChange: ((Brightness) -> Void)? = nil) {
+    func setGamma(
+        brightness: UInt8? = nil,
+        oldBrightness: UInt8? = nil,
+        preciseBrightness: Double? = nil,
+        onChange: ((Brightness) -> Void)? = nil
+    ) {
         #if DEBUG
             guard !isForTesting else { return }
         #endif
@@ -3235,7 +3527,7 @@ enum ValueType {
 
         let brightness = brightness ?? self.brightness.uint8Value
         let gammaTable = lunarGammaTable ?? defaultGammaTable
-        let newGammaTable = gammaTable.adjust(brightness: brightness)
+        let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness)
         let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
 
         if let oldBrightness = oldBrightness {

@@ -13,10 +13,14 @@ import SwiftyAttributes
 
 // MARK: - PopUpButtonCell
 
+let DOT_PREFIX = "⚫︎  "
+
+// MARK: - PopUpButtonCell
+
 class PopUpButtonCell: NSPopUpButtonCell {
     var textColor: NSColor?
     var dotColor: NSColor?
-    @IBInspectable var prefix: String = ""
+    @IBInspectable dynamic var prefix: String = ""
 
     override func drawTitle(_ title: NSAttributedString, withFrame frame: NSRect, in controlView: NSView) -> NSRect {
         guard let color = textColor else {
@@ -24,8 +28,14 @@ class PopUpButtonCell: NSPopUpButtonCell {
         }
 
         let titleString = "\(prefix)\(title.string)"
-        let title = titleString.withAttribute(.textColor(color))
-        if titleString.count > 5, let dotColor = dotColor, let font = NSFont(name: "HiraKakuProN-W3", size: 11.0) {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        var title = title.string.withTextColor(color).withFont(.boldSystemFont(ofSize: NSFont.smallSystemFontSize))
+            .withParagraphStyle(paragraphStyle)
+        if !prefix.isEmpty || titleString.starts(with: DOT_PREFIX), titleString.count > 5, let dotColor = dotColor,
+           let font = NSFont(name: "HiraKakuProN-W3", size: 11.0)
+        {
+            title = titleString.withAttribute(.textColor(color))
             title.addAttributes([.font(font), .textColor(dotColor)], range: 0 ..< 3)
             title.addAttributes([.font(.boldSystemFont(ofSize: NSFont.smallSystemFontSize)), .textColor(color)], range: 3 ..< title.length)
         }
@@ -35,10 +45,43 @@ class PopUpButtonCell: NSPopUpButtonCell {
 
 // MARK: - Origin
 
-enum Origin {
+enum Origin: Int {
     case left
     case center
     case right
+    case none
+}
+
+// MARK: - InputDropdown
+
+class InputDropdown: NSPopUpButton {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+        selectItem(withTag: InputSource.unknown.rawValue.i)
+        title = "Video Input"
+    }
+
+    // MARK: Internal
+
+    var observers: Set<AnyCancellable> = []
+
+    func setup() {
+        selectionPublisher
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [weak self] selectedTag in
+                guard selectedTag != InputSource.unknown.rawValue else { return }
+                self?.selectItem(withTag: InputSource.unknown.rawValue.i)
+            }
+            .store(in: &observers)
+    }
 }
 
 // MARK: - PopUpButton
@@ -65,25 +108,43 @@ class PopUpButton: NSPopUpButton {
 
     var observers: Set<AnyCancellable> = []
 
-    var origin = Origin.center
+    @IBInspectable dynamic var originType = Origin.center.rawValue
 
-    @IBInspectable var padding: CGFloat = 16 {
+    var origin: Origin {
+        get { Origin(rawValue: originType)! }
+        set { originType = newValue.rawValue }
+    }
+
+    @IBInspectable dynamic var padding: CGFloat = 16 {
         didSet { resizeToFitTitle() }
     }
 
-    @IBInspectable var verticalPadding: CGFloat = 10 {
+    override var frame: NSRect {
         didSet {
-            setFrameSize(NSSize(width: frame.width, height: frame.height + verticalPadding))
             radius = (frame.height / 2).ns
             trackHover()
         }
     }
 
-    @IBInspectable var maxWidth: CGFloat = 0 {
+    @IBInspectable dynamic var verticalPadding: CGFloat = 10 {
+        didSet {
+            let size = intrinsicContentSize
+            setFrameSize(NSSize(width: size.width, height: size.height + verticalPadding))
+            radius = (size.height / 2).ns
+            trackHover()
+        }
+    }
+
+    @IBInspectable dynamic var maxWidth: CGFloat = 0 {
         didSet { resizeToFitTitle() }
     }
 
-    var page = Page.display {
+    var page: Page {
+        get { Page(rawValue: pageType)! }
+        set { pageType = newValue.rawValue }
+    }
+
+    @IBInspectable dynamic var pageType = Page.display.rawValue {
         didSet {
             setColors()
         }
@@ -139,14 +200,21 @@ class PopUpButton: NSPopUpButton {
     }
 
     func resizeToFitTitle() {
+        guard origin != .none else { return }
         var width = sizeThatFits(attributedTitle.size()).width + padding
         if maxWidth > 0 {
             width = cap(width, minVal: 0, maxVal: maxWidth)
         }
 
+        // guard origin != .none else {
+        //     setFrameSize(NSSize(width: width, height: frame.height))
+        //     trackHover()
+        //     return
+        // }
+
         let x: CGFloat
         switch origin {
-        case .left:
+        case .left, .none:
             x = frame.minX
         case .center:
             if width > frame.width {
@@ -163,8 +231,8 @@ class PopUpButton: NSPopUpButton {
         }
 
         setFrameOrigin(NSPoint(x: x, y: frame.minY))
-
         setFrameSize(NSSize(width: width, height: frame.height))
+
         trackHover()
     }
 
@@ -196,7 +264,9 @@ class PopUpButton: NSPopUpButton {
     func setup() {
         wantsLayer = true
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + verticalPadding))
+        if verticalPadding > 0 {
+            setFrameSize(NSSize(width: frame.width, height: frame.height + verticalPadding))
+        }
         radius = (frame.height / 2).ns
         allowsMixedState = false
         setColors()
@@ -209,6 +279,7 @@ class PopUpButton: NSPopUpButton {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        resizeToFitTitle()
         super.draw(dirtyRect)
     }
 }

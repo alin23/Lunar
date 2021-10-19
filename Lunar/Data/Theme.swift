@@ -15,7 +15,7 @@ let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.43921
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941275, blue: 0.5254902244, alpha: 1)
 let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
 let orange = #colorLiteral(red: 1, green: 0.6532859206, blue: 0.4175746441, alpha: 1)
-let peach = #colorLiteral(red: 0.9982646108, green: 0.7837697268, blue: 0.5843595266, alpha: 1)
+let peach = #colorLiteral(red: 1, green: 0.7843137255, blue: 0.5843137255, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
 let blue = #colorLiteral(red: 0.0862745098, green: 0.4823529412, blue: 1, alpha: 1)
 let red = #colorLiteral(red: 0.9490196078, green: 0.2, blue: 0.262745098, alpha: 1)
@@ -91,7 +91,7 @@ var enableButtonLabelOn: NSColor { darkMode ? darkMauve : darkMauve.withAlphaCom
 var enableButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray }
 var enableButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.5) : mauve.withAlphaComponent(0.45) }
 
-let hotkeyColor: [HoverState: [String: NSColor]] = [
+let hotkeyColorDarkMode: [HoverState: [String: NSColor]] = [
     .hover: [
         "background": white.withAlphaComponent(0.4),
         "tint": lunarYellow,
@@ -105,6 +105,20 @@ let hotkeyColor: [HoverState: [String: NSColor]] = [
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
 ]
+let hotkeyColorLightMode: [HoverState: [String: NSColor]] = [
+    .hover: [
+        "background": orange.withAlphaComponent(0.4),
+        "tint": blackMauve,
+        "tintDisabled": darkMauve.withAlphaComponent(0.25),
+        "tintRecording": red,
+    ],
+    .noHover: [
+        "background": orange.withAlphaComponent(0.2),
+        "tint": blackMauve,
+        "tintDisabled": darkMauve.withAlphaComponent(0.25),
+        "tintRecording": red,
+    ],
+]
 let offStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
     .hover: [
         .hotkeys: mauve,
@@ -114,6 +128,7 @@ let offStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
         .hotkeysReset: white,
         .displayReset: white,
         .settingsReset: white,
+        .quickMenu: blackMauve,
     ],
     .noHover: [
         .hotkeys: white,
@@ -123,6 +138,7 @@ let offStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
         .hotkeysReset: white.withAlphaComponent(0.8),
         .settingsReset: mauve.withAlphaComponent(0.7),
         .displayReset: mauve.withAlphaComponent(0.55),
+        .quickMenu: darkMauve.withAlphaComponent(0.8),
     ],
 ]
 let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
@@ -134,6 +150,7 @@ let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
         .hotkeysReset: mauve,
         .settingsReset: lunarYellow,
         .displayReset: mauve,
+        .quickMenu: blackMauve,
     ],
     .noHover: [
         .hotkeys: white,
@@ -146,6 +163,7 @@ let onStateButtonLabelColor: [HoverState: [Page: NSColor]] = [
 
         .displayBrightnessRange: mauve,
         .displayAlgorithm: mauve,
+        .quickMenu: darkMauve.withAlphaComponent(0.8),
     ],
 ]
 
@@ -161,6 +179,7 @@ let offStateButtonColor: [HoverState: [Page: NSColor]] = [
 
         .displayBrightnessRange: green.withAlphaComponent(0.8),
         .displayAlgorithm: lunarYellow.withAlphaComponent(0.8),
+        .quickMenu: lunarYellow,
     ],
     .noHover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.3),
@@ -173,6 +192,7 @@ let offStateButtonColor: [HoverState: [Page: NSColor]] = [
 
         .displayBrightnessRange: gray.withAlphaComponent(0.8),
         .displayAlgorithm: gray.withAlphaComponent(0.8),
+        .quickMenu: lunarYellow.withAlphaComponent(0.8),
     ],
 ]
 
@@ -188,6 +208,7 @@ let onStateButtonColor: [HoverState: [Page: NSColor]] = [
 
         .displayBrightnessRange: red.withAlphaComponent(0.8),
         .displayAlgorithm: red.withAlphaComponent(0.8),
+        .quickMenu: lunarYellow,
     ],
     .noHover: [
         .hotkeys: lunarYellow.withAlphaComponent(0.3),
@@ -200,6 +221,7 @@ let onStateButtonColor: [HoverState: [Page: NSColor]] = [
 
         .displayBrightnessRange: green.withAlphaComponent(0.8),
         .displayAlgorithm: lunarYellow.withAlphaComponent(0.8),
+        .quickMenu: lunarYellow.withAlphaComponent(0.8),
     ],
 ]
 

@@ -469,9 +469,9 @@ enum DDC {
             return [
                 // TEST_DISPLAY_ID,
                 TEST_DISPLAY_PERSISTENT_ID,
-                // TEST_DISPLAY_PERSISTENT2_ID,
-                // TEST_DISPLAY_PERSISTENT3_ID,
-                // TEST_DISPLAY_PERSISTENT4_ID,
+                TEST_DISPLAY_PERSISTENT2_ID,
+                TEST_DISPLAY_PERSISTENT3_ID,
+                TEST_DISPLAY_PERSISTENT4_ID,
             ]
         #else
             return displayIDs

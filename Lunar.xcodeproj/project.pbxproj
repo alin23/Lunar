@@ -19,6 +19,8 @@
 		C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
+		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
+		C722FBA0271AC83200ED4C94 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9E271AC83200ED4C94 /* Button.swift */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
@@ -72,7 +74,6 @@
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C780CF98269F241A007FFB58 /* tsl2591.h in Resources */ = {isa = PBXBuildFile; fileRef = C780CF96269F2370007FFB58 /* tsl2591.h */; };
-		C7816BD82406A17200C30975 /* NonResponsiveTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7816BD62406A17200C30975 /* NonResponsiveTextField.swift */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
 		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
@@ -91,7 +92,7 @@
 		C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975E025DEF2EC00C797FF /* GammaControl.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A517A02593C11C00F6CC83 /* PopoverButon.swift */; };
-		C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* MenuPopoverController.swift */; };
+		C7A63205238C04C10005D792 /* QuickActionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* QuickActionsViewController.swift */; };
 		C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C247259391C200745637 /* HotkeyPopoverController.swift */; };
 		C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C2492593B5EA00745637 /* HotkeyButton.swift */; };
 		C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */; };
@@ -112,7 +113,6 @@
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
 		C7BAD9C3263869920058974C /* Pro Meteor.png in Resources */ = {isa = PBXBuildFile; fileRef = C7BAD9BC263869920058974C /* Pro Meteor.png */; };
 		C7BADA12263889CD0058974C /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BADA11263889CD0058974C /* ProgressViewController.swift */; };
-		C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */; };
 		C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */; };
 		C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */ = {isa = PBXBuildFile; productRef = C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
@@ -131,7 +131,6 @@
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
 		C7CA0D4C26C1144B00E12CE5 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
-		C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622026120B7600B07B31 /* RaspberryPageController.swift */; };
@@ -226,6 +225,8 @@
 		C7151944224E34BA0024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
 		C71F8DB026542E1000C4648A /* GammaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GammaViewController.swift; sourceTree = "<group>"; };
 		C71F8DB9265640C400C4648A /* DDCCTLControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCCTLControl.swift; sourceTree = "<group>"; };
+		C722FB9C271AC83200ED4C94 /* Slider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
+		C722FB9E271AC83200ED4C94 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		C72776E8201F1BED0055934F /* ExceptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsView.swift; sourceTree = "<group>"; };
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
@@ -271,7 +272,6 @@
 		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C780CF96269F2370007FFB58 /* tsl2591.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsl2591.h; sourceTree = "<group>"; };
-		C7816BD62406A17200C30975 /* NonResponsiveTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonResponsiveTextField.swift; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		C78BD043259B2FB100FC823F /* SensorMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMode.swift; sourceTree = "<group>"; };
 		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -290,7 +290,7 @@
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		C7A517A02593C11C00F6CC83 /* PopoverButon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverButon.swift; sourceTree = "<group>"; };
-		C7A63204238C04C10005D792 /* MenuPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPopoverController.swift; sourceTree = "<group>"; };
+		C7A63204238C04C10005D792 /* QuickActionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewController.swift; sourceTree = "<group>"; };
 		C7A7C247259391C200745637 /* HotkeyPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyPopoverController.swift; sourceTree = "<group>"; };
 		C7A7C2492593B5EA00745637 /* HotkeyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyButton.swift; sourceTree = "<group>"; };
 		C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallOutputViewController.swift; sourceTree = "<group>"; };
@@ -311,7 +311,6 @@
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
 		C7BAD9BC263869920058974C /* Pro Meteor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Pro Meteor.png"; sourceTree = "<group>"; };
 		C7BADA11263889CD0058974C /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
-		C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotConnectedTextField.swift; sourceTree = "<group>"; };
 		C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveModeButton.swift; sourceTree = "<group>"; };
 		C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernWindowController.swift; sourceTree = "<group>"; };
@@ -327,7 +326,6 @@
 		C7C68F0A201D356800F49A2B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
-		C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayValuesView.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
 		C7DD622026120B7600B07B31 /* RaspberryPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaspberryPageController.swift; sourceTree = "<group>"; };
@@ -504,7 +502,7 @@
 				C72776EA201F1DE50055934F /* ExceptionsViewController.swift */,
 				C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */,
 				C75083612222DC3C0020270E /* HotKeyViewController.swift */,
-				C7A63204238C04C10005D792 /* MenuPopoverController.swift */,
+				C7A63204238C04C10005D792 /* QuickActionsViewController.swift */,
 				C7C1F7001FD5D2C10039507C /* ModernWindowController.swift */,
 				C7AEC7FA1FD0B4350039B562 /* PageController.swift */,
 				C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */,
@@ -531,18 +529,17 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C722FB9E271AC83200ED4C94 /* Button.swift */,
+				C722FB9C271AC83200ED4C94 /* Slider.swift */,
 				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
 				C7C68F08201B75C700F49A2B /* DeleteButton.swift */,
 				C7683424245227290087946C /* DisplayName.swift */,
-				C7CBEFF6238C47D600031E93 /* DisplayValuesView.swift */,
 				C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */,
 				C72776E8201F1BED0055934F /* ExceptionsView.swift */,
 				C731260B22B38899001ED199 /* HelpButton.swift */,
 				C75083632222DC9F0020270E /* HotKeyView.swift */,
 				C7E242642119A65B0020326C /* LockButton.swift */,
 				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
-				C7816BD62406A17200C30975 /* NonResponsiveTextField.swift */,
-				C7BEF9D52399550F00F3DC93 /* NotConnectedTextField.swift */,
 				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
 				C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */,
 				C77200021FF072CB0078E155 /* ScrollableBrightness.swift */,
@@ -997,7 +994,6 @@
 				C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */,
 				C7521D34226C762B0062EC81 /* DDC.c in Sources */,
 				C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */,
-				C7BEF9D62399550F00F3DC93 /* NotConnectedTextField.swift in Sources */,
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C7A82DC3261DF513004146A8 /* Pro.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
@@ -1028,8 +1024,6 @@
 				C7BADA12263889CD0058974C /* ProgressViewController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
 				C7DD622C261240A800B07B31 /* SSHConnectionViewController.swift in Sources */,
-				C7CBEFF7238C47D600031E93 /* DisplayValuesView.swift in Sources */,
-				C7816BD82406A17200C30975 /* NonResponsiveTextField.swift in Sources */,
 				C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
 				C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */,
@@ -1051,11 +1045,12 @@
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
+				C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */,
 				C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */,
 				C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */,
-				C7A63205238C04C10005D792 /* MenuPopoverController.swift in Sources */,
+				C7A63205238C04C10005D792 /* QuickActionsViewController.swift in Sources */,
 				C7E80E2E2637060F004718A4 /* Agent.swift in Sources */,
 				C7E80E312637060F004718A4 /* SSHError.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
@@ -1072,6 +1067,7 @@
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
+				C722FBA0271AC83200ED4C94 /* Button.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C76B775F26447EC6007CAAC5 /* Weather.swift in Sources */,
 				C7E80E322637060F004718A4 /* SSH.swift in Sources */,
@@ -1183,6 +1179,7 @@
 			buildSettings = {
 				APPCAST_URL = "https://static.lunar.fyi/appcast-test.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -1300,6 +1297,7 @@
 			buildSettings = {
 				APPCAST_URL = "https://static.lunar.fyi/appcast-beta.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = YES;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -1478,6 +1476,7 @@
 			buildSettings = {
 				APPCAST_URL = "https://lunar.fyi/appcast.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -1541,6 +1540,7 @@
 			buildSettings = {
 				APPCAST_URL = "https://lunar.fyi/appcast.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;

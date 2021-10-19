@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "ff-sun.max.fill.png",
       "idiom" : "universal",
-      "filename" : "brightness.pdf",
       "scale" : "1x"
     },
     {
+      "filename" : "ff-sun.max.fill@2x.png",
       "idiom" : "universal",
-      "filename" : "brightness@2x.pdf",
       "scale" : "2x"
     },
     {
+      "filename" : "ff-sun.max.fill@3x.png",
       "idiom" : "universal",
-      "filename" : "brightness@3x.pdf",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }
