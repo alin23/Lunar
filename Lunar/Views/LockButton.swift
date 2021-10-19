@@ -50,6 +50,12 @@ class LockButton: NSButton {
         }
     }
 
+    @IBInspectable dynamic lazy var cornerRadius: CGFloat = (frame.height / 2) {
+        didSet {
+            radius = cornerRadius.ns
+        }
+    }
+
     override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
             NSCursor.pointingHand.set()
@@ -76,7 +82,7 @@ class LockButton: NSButton {
         attributedAlternateTitle = activeTitle
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * verticalPadding)))
-        radius = (frame.height / 2).ns
+        radius = cornerRadius.ns
         if locked {
             state = .on
             bg = bgOn
