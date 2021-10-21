@@ -578,23 +578,24 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     if self.keyPressed != kVK_Return {
                         self.render("_Skipped Sync Mode test..._")
                     } else {
-                        self.renderSeparated("""
-                        **Lunar will launch System Preferences for Displays now**
-                        **Please disable `\"Automatically adjust brightness\"` on the source display (\(SyncMode.sourceDisplay?
-                            .name ?? "Built-in")) until this test is done**
+                        // self.renderSeparated("""
+                        // **Lunar will launch System Preferences for Displays now**
+                        // **Please disable `\"Automatically adjust brightness\"` on the source display (\(SyncMode.sourceDisplay?
+                        //     .name ?? "Built-in")) until this test is done**
 
-                        Click the `Continue` button below to continue diagnostics _after disabling the setting_...
-                        """)
-                        self.waiting = true
-                        self.setSendButtonEnabled(text: "Continue", color: lunarYellow, textColor: darkMauve)
-                        Thread.sleep(forTimeInterval: 1)
-                        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
-                        self.continueTestCondition.wait()
-                        guard !self.stopped else { return }
+                        // Click the `Continue` button below to continue diagnostics _after disabling the setting_...
+                        // """)
+                        // self.waiting = true
+                        // self.setSendButtonEnabled(text: "Continue", color: lunarYellow, textColor: darkMauve)
+                        // Thread.sleep(forTimeInterval: 1)
+                        // NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Displays.prefPane"))
+                        // self.continueTestCondition.wait()
+                        // guard !self.stopped else { return }
 
                         let lastMode = displayController.adaptiveMode
                         let lastPollingInterval = SyncMode.pollingSeconds
                         let oldBrightnessTransition = CachedDefaults[.brightnessTransition]
+                        let oldAmbientLightAdaptiveBrightnessEnabled = display.ambientLightAdaptiveBrightnessEnabled
                         defer {
                             if lastMode.key != .sync {
                                 self.render("\nGoing back from Sync to \(lastMode.str) Mode")
@@ -608,6 +609,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                 self.render("\nRe-enabling smooth transition")
                                 brightnessTransition = oldBrightnessTransition
                             }
+                            if oldAmbientLightAdaptiveBrightnessEnabled {
+                                display.ambientLightAdaptiveBrightnessEnabled = true
+                            }
+                        }
+                        if oldAmbientLightAdaptiveBrightnessEnabled {
+                            display.ambientLightAdaptiveBrightnessEnabled = false
                         }
                         if lastMode.key != .sync {
                             self.render("\nChanging from \(lastMode.str) to Sync Mode")
