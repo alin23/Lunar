@@ -140,6 +140,8 @@ class Slider: NSSlider {
 
     // MARK: Internal
 
+    @IBInspectable dynamic var scrollPrecision: CGFloat = 1
+
     var color: NSColor {
         get { (cell as! SliderCell).color }
         set { (cell as! SliderCell).color = newValue }
@@ -177,7 +179,7 @@ class Slider: NSSlider {
         if event.isDirectionInvertedFromDevice {
             delta *= -1
         }
-        let increment = range * (delta / 150)
+        let increment = range * (delta / (150 * Float(scrollPrecision)))
         floatValue = floatValue + increment
         sendAction(action, to: target)
     }

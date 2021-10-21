@@ -29,6 +29,7 @@ enum Page: Int {
     case displayBrightnessRange
     case displayAlgorithm
     case quickMenu
+    case quickMenuReset
 }
 
 // MARK: - ToggleButton
@@ -50,7 +51,6 @@ class ToggleButton: NSButton {
 
     var hoverState = HoverState.noHover
     weak var notice: NSTextField?
-
     @AtomicLock var highlighterTask: CFRunLoopTimer?
 
     lazy var initialHeight = frame.height

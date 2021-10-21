@@ -347,6 +347,18 @@ extension Double {
         UInt32(self)
     }
 
+    @inline(__always) var i8: Int8 {
+        Int8(cap(intround, minVal: 0, maxVal: 255))
+    }
+
+    @inline(__always) var i16: Int16 {
+        Int16(self)
+    }
+
+    @inline(__always) var i32: Int32 {
+        Int32(self)
+    }
+
     @inline(__always) var intround: Int {
         rounded().i
     }

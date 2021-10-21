@@ -47,6 +47,7 @@ let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
 let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
 let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
+let sensorHostnameQueue = RunloopQueue(named: "fyi.lunar.sensor.hostname.queue")
 let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
 let smoothDDCQueue = DispatchQueue(label: "fyi.lunar.smooth.ddc.queue", qos: .userInitiated, attributes: .concurrent)
@@ -120,6 +121,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     enum UIElement {
         case displaySettings
         case advancedSettingsButton
+    }
+
+    enum LunarError: Error {
+        case highMemoryUsage(Int)
     }
 
     var locationManager: CLLocationManager?
@@ -225,55 +230,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory500MBPassed = false {
         didSet {
-            guard memory500MBPassed, !oldValue else { return }
+            guard memory500MBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "500MB", key: "memory")
-                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
-                SentrySDK.capture(message: "High Memory Usage")
+                scope.setExtra(value: mb, key: "usedMB")
+                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
             }
         }
     }
 
     var memory1GBPassed = false {
         didSet {
-            guard memory1GBPassed, !oldValue else { return }
+            guard memory1GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "1GB", key: "memory")
-                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
-                SentrySDK.capture(message: "High Memory Usage")
+                scope.setExtra(value: mb, key: "usedMB")
+                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
             }
         }
     }
 
     var memory2GBPassed = false {
         didSet {
-            guard memory2GBPassed, !oldValue else { return }
+            guard memory2GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "2GB", key: "memory")
-                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
-                SentrySDK.capture(message: "High Memory Usage")
+                scope.setExtra(value: mb, key: "usedMB")
+                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
             }
         }
     }
 
     var memory4GBPassed = false {
         didSet {
-            guard memory4GBPassed, !oldValue else { return }
+            guard memory4GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "4GB", key: "memory")
-                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
-                SentrySDK.capture(message: "High Memory Usage")
+                scope.setExtra(value: mb, key: "usedMB")
+                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
             }
         }
     }
 
     var memory8GBPassed = false {
         didSet {
-            guard memory8GBPassed, !oldValue else { return }
+            guard memory8GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "8GB", key: "memory")
-                scope.setExtra(value: memoryFootprintMB(), key: "usedMB")
-                SentrySDK.capture(message: "High Memory Usage")
+                scope.setExtra(value: mb, key: "usedMB")
+                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
             }
         }
     }
@@ -405,6 +411,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForAdaptiveModeChange() {
+        CachedDefaults[.nonManualMode] = CachedDefaults[.adaptiveBrightnessMode] != .manual
+        CachedDefaults[.clockMode] = CachedDefaults[.adaptiveBrightnessMode] == .clock
+        CachedDefaults[.syncMode] = CachedDefaults[.adaptiveBrightnessMode] == .sync
+
         adaptiveBrightnessModePublisher.sink { change in
             SentrySDK.configureScope { scope in
                 scope.setTag(value: change.newValue.str, key: "adaptiveMode")
@@ -417,7 +427,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             mainThread {
                 CachedDefaults[.nonManualMode] = change.newValue != .manual
                 CachedDefaults[.clockMode] = change.newValue == .clock
+                CachedDefaults[.syncMode] = change.newValue == .sync
                 self.resetElements()
+                self.windowController?.window?.displayIfNeeded()
             }
             self.manageDisplayControllerActivity(mode: change.newValue)
         }.store(in: &observers)
@@ -813,6 +825,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { [self] _ in
                 mainThread {
                     initMenuItems()
+                    for (key, popover) in POPOVERS {
+                        guard let popover = popover else { continue }
+                        popover.close()
+                        POPOVERS[key] = nil
+                    }
                     recreateWindow()
                 }
             }
@@ -1035,6 +1052,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             "colors",
             identifier: "ColorsPopoverController",
             controllerType: ColorsPopoverController.self,
+            appearance: darkMode ? .vibrantDark : .vibrantLight
+        )
+        initPopover(
+            "ddc",
+            identifier: "DDCPopoverController",
+            controllerType: DDCPopoverController.self,
+            appearance: darkMode ? .vibrantDark : .vibrantLight
+        )
+        initPopover(
+            "reset",
+            identifier: "ResetPopoverController",
+            controllerType: ResetPopoverController.self,
             appearance: darkMode ? .vibrantDark : .vibrantLight
         )
     }

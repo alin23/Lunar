@@ -9,32 +9,6 @@
 import Cocoa
 import Foundation
 
-// MARK: - SettingsButton
-
-class SettingsButton: PopoverButton<SettingsPopoverController> {
-    weak var displayViewController: DisplayViewController? {
-        didSet {
-            popoverController?.displayViewController = displayViewController
-        }
-    }
-
-    weak var display: Display? {
-        didSet {
-            popoverController?.display = display
-        }
-    }
-
-    override var popoverKey: String {
-        "settings"
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        popoverController?.display = display
-        popoverController?.displayViewController = displayViewController
-        super.mouseDown(with: event)
-    }
-}
-
 // MARK: - PopoverButton
 
 class PopoverButton<T: NSViewController>: Button {

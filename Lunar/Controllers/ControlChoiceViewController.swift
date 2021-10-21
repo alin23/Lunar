@@ -365,7 +365,7 @@ class ControlChoiceViewController: NSViewController {
             guard !cancelled, let button = controlButton else { return }
 
             switch control {
-            case .coreDisplay:
+            case .appleNative:
                 button.bg = green
                 button.attributedTitle = "Using Apple Native Protocol".withTextColor(mauve)
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
@@ -866,15 +866,15 @@ class ControlChoiceViewController: NSViewController {
                 }
 
                 let networkControl = NetworkControl(display: d)
-                let coreDisplayControl = AppleNativeControl(display: d)
+                let appleNativeControl = AppleNativeControl(display: d)
                 let ddcControl = DDCControl(display: d)
                 let gammaControl = GammaControl(display: d)
 
                 var result = ControlResult.noneWorked
                 defer { d.controlResult = result }
-                if coreDisplayControl.isAvailable(), !self.cancelled {
-                    self.setControl(.coreDisplay, display: d)
-                    result = self.testControl(coreDisplayControl, for: d)
+                if appleNativeControl.isAvailable(), !self.cancelled {
+                    self.setControl(.appleNative, display: d)
+                    result = self.testControl(appleNativeControl, for: d)
 
                     if !result.write.brightness, d.isLEDCinema() || d.isCinema() {
                         var nextStep = true
@@ -883,7 +883,7 @@ class ControlChoiceViewController: NSViewController {
                             yesButtonText: "Next", noButtonText: "Retry"
                         ) { nextStep = $0 }
                         if !nextStep {
-                            result = self.testControl(coreDisplayControl, for: d)
+                            result = self.testControl(appleNativeControl, for: d)
                         }
                     }
                 }

@@ -20,7 +20,7 @@ enum PowerState {
 
 enum DisplayControl: Int, Codable, EnumerableFlag {
     case network
-    case coreDisplay
+    case appleNative
     case ddc
     case gamma
     case ddcctl
@@ -44,8 +44,8 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
         switch self {
         case .network:
             return "Network"
-        case .coreDisplay:
-            return "CoreDisplay"
+        case .appleNative:
+            return "AppleNative"
         case .ddc:
             return "DDC"
         case .gamma:
@@ -59,8 +59,8 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
         switch strValue.lowercased().stripped {
         case "network", DisplayControl.network.rawValue.s:
             return .network
-        case "coredisplay", DisplayControl.coreDisplay.rawValue.s:
-            return .coreDisplay
+        case "appleNative", "coreDisplay", DisplayControl.appleNative.rawValue.s:
+            return .appleNative
         case "ddc", DisplayControl.ddc.rawValue.s:
             return .ddc
         case "gamma", DisplayControl.gamma.rawValue.s:

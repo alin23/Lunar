@@ -573,7 +573,7 @@ func getSerialNumberHash() -> String? {
     return nil
 }
 
-func mainThreadSerial(_ action: () -> Void) {
+@inline(__always) func mainThreadSerial(_ action: () -> Void) {
     if Thread.isMainThread {
         action()
     } else {
@@ -583,7 +583,7 @@ func mainThreadSerial(_ action: () -> Void) {
     }
 }
 
-func mainThreadSerial<T>(_ action: () -> T) -> T {
+@inline(__always) func mainThreadSerial<T>(_ action: () -> T) -> T {
     if Thread.isMainThread {
         return action()
     } else {
@@ -593,45 +593,49 @@ func mainThreadSerial<T>(_ action: () -> T) -> T {
     }
 }
 
-func mainThread(_ action: () -> Void) {
-    if Thread.isMainThread {
+@inline(__always) func mainThread(_ action: () -> Void) {
+    guard !Thread.isMainThread else {
         action()
-        // } else if let label = DispatchQueue.currentQueueLabel, label == "Dictionary Barrier Queue" {
-        //     #if DEBUG
-        //         log.error("POSSIBLE DEADLOCK ON MAIN THREAD")
-        //     #endif
-        //     action()
-    } else if mainThreadLocked.load(ordering: .relaxed) {
-        #if DEBUG
-            log.error("DEADLOCK ON MAIN THREAD")
-        #endif
-        action()
-    } else {
-        DispatchQueue.main.sync {
-            action()
-        }
+        return
     }
+    DispatchQueue.main.sync { action() }
 }
 
 @discardableResult
-func mainThread<T>(_ action: () -> T) -> T {
-    if Thread.isMainThread {
+@inline(__always) func mainThread<T>(_ action: () -> T) -> T {
+    guard !Thread.isMainThread else {
         return action()
-        // } else if let label = DispatchQueue.currentQueueLabel, label == "Dictionary Barrier Queue" {
-        //     #if DEBUG
-        //         log.error("POSSIBLE DEADLOCK ON MAIN THREAD")
-        //     #endif
-        //     return action()
-    } else if mainThreadLocked.load(ordering: .relaxed) {
-        #if DEBUG
-            log.error("DEADLOCK ON MAIN THREAD")
-        #endif
-        return action()
-    } else {
-        return DispatchQueue.main.sync {
-            return action()
-        }
     }
+    return DispatchQueue.main.sync { return action() }
+}
+
+func stringRepresentation(forAddress address: Data) -> String? {
+    address.withUnsafeBytes { pointer in
+        var hostStr = [Int8](repeating: 0, count: Int(NI_MAXHOST))
+
+        let result = getnameinfo(
+            pointer.baseAddress?.assumingMemoryBound(to: sockaddr.self),
+            socklen_t(address.count),
+            &hostStr,
+            socklen_t(hostStr.count),
+            nil,
+            0,
+            NI_NUMERICHOST
+        )
+        guard result == 0 else { return nil }
+        return String(cString: hostStr)
+    }
+}
+
+func resolve(hostname: String) -> String? {
+    let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
+    CFHostStartInfoResolution(host, .addresses, nil)
+    var success: DarwinBoolean = false
+    guard let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray?,
+          let theAddress = addresses.firstObject as? NSData
+    else { return nil }
+
+    return stringRepresentation(forAddress: theAddress as Data)
 }
 
 func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
@@ -696,11 +700,13 @@ func asyncEvery(
     runs: Int? = nil,
     skipIfExists: Bool = false,
     eager: Bool = false,
+    queue: RunloopQueue? = nil,
     onSuccess: (() -> Void)? = nil,
     onCancelled: (() -> Void)? = nil,
     _ action: @escaping (Timer) -> Void
 ) {
-    timerQueue.async {
+    let queue = queue ?? timerQueue
+    queue.async {
         if skipIfExists, let key = uniqueTaskKey, let timer = Thread.current.threadDictionary[key] as? Timer, timer.isValid {
             return
         }
@@ -726,7 +732,7 @@ func asyncEvery(
         if eager { action(timer) }
 
         if let key = uniqueTaskKey {
-            taskQueueLock.around { taskQueue[key] = timerQueue }
+            taskQueueLock.around { taskQueue[key] = queue }
             (Thread.current.threadDictionary[key] as? Timer)?.invalidate()
             Thread.current.threadDictionary[key] = timer
 

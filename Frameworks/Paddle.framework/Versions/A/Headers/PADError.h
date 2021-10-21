@@ -160,6 +160,12 @@ typedef NS_ENUM(NSInteger, PADErrorCode) {
     PADErrorLicenseCodeUtilized = -122,
 
     PADErrorLicenseExpired = -123,
+    
+    PADErrorLicenseCodeDoesNotMatchProduct = -124,
+    
+    PADErrorInvalidEmail = -125,
+    
+    PADErrorTooManyActivationsOrExpired = -126,
 };
 
 /**

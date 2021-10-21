@@ -69,6 +69,7 @@
 		C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A725CFD954007624DE /* ResetButton.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C772BDD625E7A296006A1684 /* NetworkControl.swift */; };
+		C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C776416E272139A100C7C308 /* ResetPopoverController.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
 		C77AB65C269A032E0046BA78 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C77AB65B269A032E0046BA78 /* Magnet */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
@@ -133,6 +134,7 @@
 		C7CA0D4C26C1144B00E12CE5 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
+		C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFF492271FF280002CB549 /* DDCPopoverController.swift */; };
 		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622026120B7600B07B31 /* RaspberryPageController.swift */; };
 		C7DD62292612331700B07B31 /* PaddedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD62282612331700B07B31 /* PaddedTextField.swift */; };
@@ -269,6 +271,7 @@
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
+		C776416E272139A100C7C308 /* ResetPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPopoverController.swift; sourceTree = "<group>"; };
 		C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableContrast.swift; sourceTree = "<group>"; };
 		C77CC7541FED5501009AA718 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
@@ -330,6 +333,7 @@
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
+		C7CFF492271FF280002CB549 /* DDCPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDCPopoverController.swift; sourceTree = "<group>"; };
 		C7DD622026120B7600B07B31 /* RaspberryPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaspberryPageController.swift; sourceTree = "<group>"; };
 		C7DD62282612331700B07B31 /* PaddedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedTextField.swift; sourceTree = "<group>"; };
 		C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHConnectionViewController.swift; sourceTree = "<group>"; };
@@ -498,6 +502,8 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C776416E272139A100C7C308 /* ResetPopoverController.swift */,
+				C7CFF492271FF280002CB549 /* DDCPopoverController.swift */,
 				C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */,
 				C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */,
 				C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */,
@@ -1007,6 +1013,7 @@
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
 				C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
+				C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */,
 				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
 				C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
@@ -1044,6 +1051,7 @@
 				C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
+				C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */,
 				C790D4BE259B9DC100868689 /* NanoID.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
