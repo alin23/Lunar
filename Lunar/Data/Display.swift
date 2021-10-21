@@ -2377,7 +2377,6 @@ enum ValueType {
             }
 
             display.withoutDDC {
-                print("New brightness \(newBrightness)")
                 display.brightness = newBrightness.ns
             }
         }
