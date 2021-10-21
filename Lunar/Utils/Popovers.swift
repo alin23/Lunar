@@ -15,4 +15,6 @@ var POPOVERS: [String: NSPopover?] = [
     "hotkey": nil,
     "settings": nil,
     "colors": nil,
+    "ddc": nil,
+    "reset": nil,
 ]

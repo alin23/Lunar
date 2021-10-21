@@ -12,6 +12,14 @@ import Foundation
 class ResetButton: ToggleButton {
     var resettingText = "Resetting"
 
+    override var bgColor: NSColor {
+        if !isEnabled {
+            if highlighterTask != nil { stopHighlighting() }
+            return (effectiveAppearance.isDark ? .white : blackMauve).withAlphaComponent(0.8)
+        }
+        return super.bgColor
+    }
+
     override func mouseDown(with event: NSEvent) {
         guard isEnabled else { return }
 

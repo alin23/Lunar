@@ -763,6 +763,11 @@ class DisplayController {
         let idForSerial = Dictionary(zip(serials, ids), uniquingKeysWith: first(this:other:))
         let serialForID = Dictionary(zip(ids, serials), uniquingKeysWith: first(this:other:))
 
+        Display.applySource = false
+        defer {
+            Display.applySource = true
+        }
+
         CGDisplayRestoreColorSyncSettings()
         DisplayController.panelManager = MPDisplayMgr()
         guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
@@ -956,6 +961,12 @@ class DisplayController {
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
                     includeProjector: CachedDefaults[.showProjectorDisplays]
                 )
+                let d = self.displays.values
+                if !d.contains(where: \.isSource),
+                   let possibleSource = (d.first(where: \.isSmartBuiltin) ?? d.first(where: \.canChangeBrightnessDS))
+                {
+                    mainThread { possibleSource.isSource = true }
+                }
 
                 SyncMode.refresh()
                 self.addSentryData()

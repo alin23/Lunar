@@ -332,10 +332,24 @@ struct Lunar: ParsableCommand {
             case SetBrightness
             case SetBrightnessSmooth
             case CanChangeBrightness
-            case HasAmbientLightCompensation
-            case AmbientLightCompensationEnabled
             case IsSmartDisplay
             case BrightnessChanged
+
+            case GetPowerMode
+            case SetPowerMode
+
+            case GetBrightnessIncrement
+            case NeedsBrightnessSmoothing
+            case EnableAmbientLightCompensation
+            case AmbientLightCompensationEnabled
+            case HasAmbientLightCompensation
+            case ResetAmbientLight
+            case ResetAmbientLightAll
+            case CanResetAmbientLight
+            case GetLinearBrightnessUsableRange
+            case CreateBrightnessTable
+            case RegisterForBrightnessChangeNotifications
+            case RegisterForAmbientLightCompensationNotifications
         }
 
         static let configuration = CommandConfiguration(
@@ -404,16 +418,61 @@ struct Lunar: ParsableCommand {
                     DisplayServicesSetBrightnessSmooth(id, brightness)
                 case .CanChangeBrightness:
                     print(DisplayServicesCanChangeBrightness(id))
-                case .HasAmbientLightCompensation:
-                    print(DisplayServicesHasAmbientLightCompensation(id))
-                case .AmbientLightCompensationEnabled:
-                    print(DisplayServicesAmbientLightCompensationEnabled(id))
                 case .IsSmartDisplay:
                     print(DisplayServicesIsSmartDisplay(id))
                 case .BrightnessChanged:
                     print("Sending brightness change notification")
                     DisplayServicesBrightnessChanged(id, value)
+
+                case .GetPowerMode:
+                    print(DisplayServicesGetPowerMode(id))
+                case .SetPowerMode:
+                    print(DisplayServicesSetPowerMode(id, value.u8))
+
+                case .GetBrightnessIncrement:
+                    print(DisplayServicesGetBrightnessIncrement(id))
+                case .NeedsBrightnessSmoothing:
+                    print(DisplayServicesNeedsBrightnessSmoothing(id))
+                case .EnableAmbientLightCompensation:
+                    print(DisplayServicesEnableAmbientLightCompensation(id, value == 1))
+                case .AmbientLightCompensationEnabled:
+                    var enabled = false
+                    print(DisplayServicesAmbientLightCompensationEnabled(id, &enabled))
+                    print(enabled)
+                case .HasAmbientLightCompensation:
+                    print(DisplayServicesHasAmbientLightCompensation(id))
+                case .ResetAmbientLight:
+                    print(DisplayServicesResetAmbientLight(id, id))
+                case .ResetAmbientLightAll:
+                    print(DisplayServicesResetAmbientLightAll())
+                case .CanResetAmbientLight:
+                    print(DisplayServicesCanResetAmbientLight(id, 1))
+                case .GetLinearBrightnessUsableRange:
+                    var min: Int32 = 0
+                    var max: Int32 = 0
+                    print(DisplayServicesGetLinearBrightnessUsableRange(id, &min, &max))
+                    print("\(min) - \(max)")
+                case .CreateBrightnessTable:
+                    guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { globalExit(0) }
+                    print(table)
+                case .RegisterForBrightnessChangeNotifications:
+                    DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
+                        guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
+                        let displayID = CGDirectDisplayID(UInt(bitPattern: id))
+                        print("\(displayID): \(value)")
+                    }
+                case .RegisterForAmbientLightCompensationNotifications:
+                    DisplayServicesRegisterForAmbientLightCompensationNotifications(id, id) { _, observer, _, _, userInfo in
+                        guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
+                        let displayID = CGDirectDisplayID(UInt(bitPattern: id))
+                        print("\(displayID): \(value)")
+                    }
                 }
+            }
+            guard method != .RegisterForAmbientLightCompensationNotifications,
+                  method != .RegisterForBrightnessChangeNotifications
+            else {
+                return
             }
             globalExit(0)
         }
@@ -672,7 +731,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.coreDisplay, .ddc, .network]
+        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Argument(help: "Display serial or name or one of (first, main)")
         var display: String?
@@ -760,7 +819,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.coreDisplay, .ddc, .network]
+        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Argument(
             help: "Display property to get. One of (\(Display.CodingKeys.allCases.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
@@ -799,7 +858,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.coreDisplay, .ddc, .network]
+        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Option(name: .shortAndLong, help: "How many milliseconds to wait for network controls to be ready")
         var waitms: Int = 1000
@@ -1124,10 +1183,10 @@ private func handleDisplay(
     property: Display.CodingKeys? = nil,
     value: String? = nil,
     json: Bool = false,
-    controls: [DisplayControl] = [.coreDisplay, .ddc, .network, .gamma],
+    controls: [DisplayControl] = [.appleNative, .ddc, .network, .gamma],
     read: Bool = false,
     systemInfo: Bool = false,
-    panelData: Bool = false,
+    panelData _: Bool = false,
     edid: Bool = false
 ) throws {
     // MARK: - Apply display filter to get single display
@@ -1145,7 +1204,7 @@ private func handleDisplay(
 
     display.enabledControls = [
         .network: controls.contains(.network),
-        .coreDisplay: controls.contains(.coreDisplay),
+        .appleNative: controls.contains(.appleNative),
         .ddc: controls.contains(.ddc),
         .gamma: controls.contains(.gamma),
     ]

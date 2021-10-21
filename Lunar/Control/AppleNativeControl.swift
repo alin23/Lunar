@@ -28,7 +28,7 @@ class AppleNativeControl: Control {
 
     // MARK: Internal
 
-    var displayControl: DisplayControl = .coreDisplay
+    var displayControl: DisplayControl = .appleNative
 
     weak var display: Display?
     lazy var responsive: Bool = testReadAndWrite(method: .displayServices) || testReadAndWrite(method: .coreDisplay)
@@ -39,7 +39,7 @@ class AppleNativeControl: Control {
 
     static func isAvailable(for display: Display) -> Bool {
         guard display.active else { return false }
-        guard let enabledForDisplay = display.enabledControls[.coreDisplay], enabledForDisplay else { return false }
+        guard let enabledForDisplay = display.enabledControls[.appleNative], enabledForDisplay else { return false }
         return (
             display.isAppleDisplay() ||
                 (display.isBuiltin && (DisplayController.panel(with: display.id)?.isSmartDisplay ?? false)) ||
@@ -144,49 +144,49 @@ class AppleNativeControl: Control {
 
     func setPower(_ power: PowerState) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setPower(power)
     }
 
     func setRedGain(_ gain: UInt8) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setRedGain(gain)
     }
 
     func setGreenGain(_ gain: UInt8) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setGreenGain(gain)
     }
 
     func setBlueGain(_ gain: UInt8) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setBlueGain(gain)
     }
 
     func getRedGain() -> UInt8? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getRedGain()
     }
 
     func getGreenGain() -> UInt8? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getGreenGain()
     }
 
     func getBlueGain() -> UInt8? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getBlueGain()
     }
 
     func resetColors() -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.resetColors()
     }
 
@@ -271,25 +271,25 @@ class AppleNativeControl: Control {
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setContrast(contrast, oldValue: oldValue, onChange: onChange)
     }
 
     func setVolume(_ volume: UInt8) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setVolume(volume)
     }
 
     func setMute(_ muted: Bool) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setMute(muted)
     }
 
     func setInput(_ input: InputSource) -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setInput(input)
     }
 
@@ -307,49 +307,49 @@ class AppleNativeControl: Control {
 
     func getContrast() -> Contrast? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getContrast()
     }
 
     func getMaxBrightness() -> Brightness? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxBrightness()
     }
 
     func getMaxContrast() -> Contrast? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxContrast()
     }
 
     func getMaxVolume() -> UInt8? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxVolume()
     }
 
     func getVolume() -> UInt8? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getVolume()
     }
 
     func getMute() -> Bool? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMute()
     }
 
     func getInput() -> InputSource? {
         guard let display = display else { return nil }
-        guard let control = display.alternativeControlForCoreDisplay else { return nil }
+        guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getInput()
     }
 
     func reset() -> Bool {
         guard let display = display else { return false }
-        guard let control = display.alternativeControlForCoreDisplay else { return false }
+        guard let control = display.alternativeControlForAppleNative else { return false }
         return control.reset()
     }
 
@@ -359,7 +359,7 @@ class AppleNativeControl: Control {
             return true
         default:
             guard let display = display else { return false }
-            guard let control = display.alternativeControlForCoreDisplay else { return false }
+            guard let control = display.alternativeControlForAppleNative else { return false }
             return control.supportsSmoothTransition(for: controlID)
         }
     }
