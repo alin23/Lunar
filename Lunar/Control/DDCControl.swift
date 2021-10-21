@@ -18,6 +18,11 @@ class DDCControl: Control {
 
     // MARK: Internal
 
+    struct ValueRange: Equatable {
+        let value: UInt8
+        let oldValue: UInt8?
+    }
+
     var displayControl: DisplayControl = .ddc
 
     weak var display: Display?
@@ -110,6 +115,50 @@ class DDCControl: Control {
     func resetColors() -> Bool {
         guard let display = display else { return false }
         return DDC.resetColors(for: display.id)
+    }
+
+    func setBrightnessDebounced(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+        guard let display = display else { return false }
+
+        let key = display.preciseBrightnessKey
+        let subscriberKey = display.preciseBrightnessSubscriberKey
+        let value = ValueRange(value: brightness, oldValue: oldValue)
+
+        debounce(
+            ms: 50,
+            uniqueTaskKey: key,
+            value: value,
+            subscriberKey: subscriberKey
+        ) { [weak self] range in
+            guard let self = self else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
+            _ = self.setBrightness(range.value, oldValue: range.oldValue, onChange: nil)
+        }
+        return true
+    }
+
+    func setContrastDebounced(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+        guard let display = display else { return false }
+
+        let key = display.preciseContrastKey
+        let subscriberKey = display.preciseContrastSubscriberKey
+        let value = ValueRange(value: contrast, oldValue: oldValue)
+
+        debounce(
+            ms: 50,
+            uniqueTaskKey: key,
+            value: value,
+            subscriberKey: subscriberKey
+        ) { [weak self] range in
+            guard let self = self else {
+                cancelTask(key, subscriberKey: subscriberKey)
+                return
+            }
+            _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)
+        }
+        return true
     }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {

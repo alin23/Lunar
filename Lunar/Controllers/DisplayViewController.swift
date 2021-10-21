@@ -116,7 +116,7 @@ var monitorScreenColor: NSColor { darkMode ? rouge : mauve }
 
 // MARK: - DisplayImage
 
-// @IBDesignable
+@IBDesignable
 class DisplayImage: NSView {
     // MARK: Lifecycle
 
@@ -253,7 +253,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var gammaNotice: NSTextField!
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
-    @IBOutlet var resetDropdown: PopUpButton?
+    // @IBOutlet var resetDropdown: PopUpButton?
     @IBOutlet var brightnessSlider: Slider?
     @IBOutlet var brightnessContrastSlider: Slider?
 
@@ -267,7 +267,9 @@ class DisplayViewController: NSViewController {
     @IBOutlet var _lockContrastHelpButton: NSButton?
     @IBOutlet var _lockBrightnessHelpButton: NSButton?
     @IBOutlet var _settingsButton: NSButton?
+    @IBOutlet var _resetButton: NSButton?
     @IBOutlet var _colorsButton: NSButton?
+    @IBOutlet var _ddcButton: NSButton?
     @IBOutlet var lockContrastCurveButton: LockButton!
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
@@ -351,8 +353,16 @@ class DisplayViewController: NSViewController {
         _settingsButton as? SettingsButton
     }
 
+    var resetButton: ResetPopoverButton? {
+        _resetButton as? ResetPopoverButton
+    }
+
     var colorsButton: ColorsButton? {
         _colorsButton as? ColorsButton
+    }
+
+    var ddcButton: DDCButton? {
+        _ddcButton as? DDCButton
     }
 
     @objc dynamic weak var display: Display? {
@@ -617,12 +627,22 @@ class DisplayViewController: NSViewController {
 
         if let button = colorsButton {
             button.display = display
-            button.bg = lockButtonBgOff
+            // button.bg = lockButtonBgOff
+        }
+        if let button = ddcButton {
+            button.display = display
+            // button.bg = lockButtonBgOff
         }
         if let button = settingsButton {
             button.display = display
             button.displayViewController = self
-            button.bg = lockButtonBgOff
+            button.notice = adaptiveNotice
+            // button.bg = lockButtonBgOff
+        }
+        if let button = resetButton {
+            button.display = display
+            button.displayViewController = self
+            // button.bg = lockButtonBgOff
         }
 
         scrollableBrightness?.display = display
@@ -640,6 +660,16 @@ class DisplayViewController: NSViewController {
         schedule4?.display = display
         schedule5?.display = display
         scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock || display.isBuiltin
+
+        display.onBrightnessCurveFactorChange = { [weak self] factor in
+            guard let self = self else { return }
+            self.updateDataset(brightnessFactor: factor)
+        }
+
+        display.onContrastCurveFactorChange = { [weak self] factor in
+            guard let self = self else { return }
+            self.updateDataset(contrastFactor: factor)
+        }
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
             guard let self = self, let display = self.display,
@@ -926,41 +956,65 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    func resetDDC() {
+    @objc func resetDDC() {
         guard let display = display else { return }
         display.resetDDC()
     }
 
-    func resetNetworkController() {
+    @objc func resetNetworkController() {
         guard let display = display else { return }
         display.resetNetworkController()
     }
 
+    @objc func resetAlgorithmCurve() {
+        guard let display = display else {
+            return
+        }
+
+        display.adaptivePaused = true
+        defer {
+            display.adaptivePaused = false
+            display.readapt(newValue: false, oldValue: true)
+        }
+
+        display.userContrast[displayController.adaptiveModeKey]?.removeAll()
+        display.userBrightness[displayController.adaptiveModeKey]?.removeAll()
+        display.save()
+        updateDataset(force: true)
+    }
+
+    @objc func resetBrightnessAndContrast() {
+        guard let display = display else {
+            return
+        }
+        display.adaptive = false
+        _ = display.control?.reset()
+    }
+
+    @objc func resetLunarSettings() {
+        resetDisplay(askBefore: false, resetControl: false)
+    }
+
+    @objc func fullReset() {
+        resetDisplay()
+    }
+
     @IBAction func reset(_ sender: NSPopUpButton) {
-        guard let display = display, let action = ResetAction(rawValue: sender.selectedTag()) else { return }
+        guard display != nil, let action = ResetAction(rawValue: sender.selectedTag()) else { return }
+
         switch action {
         case .algorithmCurve:
-            display.adaptivePaused = true
-            defer {
-                display.adaptivePaused = false
-                display.readapt(newValue: false, oldValue: true)
-            }
-
-            display.userContrast[displayController.adaptiveModeKey]?.removeAll()
-            display.userBrightness[displayController.adaptiveModeKey]?.removeAll()
-            display.save()
-            updateDataset(force: true)
+            resetAlgorithmCurve()
         case .networkControl:
             resetNetworkController()
         case .ddcState:
             resetDDC()
         case .brightnessAndContrast:
-            display.adaptive = false
-            _ = display.control?.reset()
+            resetBrightnessAndContrast()
         case .lunarSettings:
-            resetDisplay(askBefore: false, resetControl: false)
+            resetLunarSettings()
         case .fullReset:
-            resetDisplay()
+            fullReset()
         default:
             break
         }
@@ -1104,14 +1158,14 @@ class DisplayViewController: NSViewController {
             guard let self = self else { return }
             mainThread {
                 self.scrollableBrightness?.currentValue.integerValue = value.intValue
-                self.scrollableBrightness?.onCurrentValueChanged?(value.intValue)
+//                self.scrollableBrightness?.onCurrentValueChanged?(value.intValue)
             }
         }.store(in: &displayObservers, for: "brightness")
         display?.$contrast.receive(on: dataPublisherQueue).sink { [weak self] value in
             guard let self = self else { return }
             mainThread {
                 self.scrollableContrast?.currentValue.integerValue = value.intValue
-                self.scrollableContrast?.onCurrentValueChanged?(value.intValue)
+//                self.scrollableContrast?.onCurrentValueChanged?(value.intValue)
             }
         }.store(in: &displayObservers, for: "contrast")
     }
@@ -1329,7 +1383,7 @@ class DisplayViewController: NSViewController {
                     gammaNotice.needsDisplay = true
                 } else {
                     gammaNotice.transition(3)
-                    gammaNotice.alphaValue = 0.0
+                    gammaNotice.alphaValue = 0.01
                     gammaNotice.needsDisplay = true
                 }
             }
@@ -1351,52 +1405,13 @@ class DisplayViewController: NSViewController {
     }
 
     func showAdaptiveNotice() {
-        let windowVisible = mainThread { view.window?.isVisible ?? false }
-
-        guard adaptiveHighlighterTask == nil || !realtimeQueue.isValid(timer: adaptiveHighlighterTask!), windowVisible
-        else {
-            return
-        }
-
-        adaptiveHighlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
-            guard let s = self else {
-                if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            let windowVisible: Bool = mainThread { s.view.window?.isVisible ?? false }
-            guard windowVisible, let adaptiveNotice = s.adaptiveNotice
-            else {
-                if let timer = self?.adaptiveHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            mainThread {
-                if adaptiveNotice.alphaValue == 0 {
-                    adaptiveNotice.transition(1)
-                    adaptiveNotice.alphaValue = 0.9
-                    adaptiveNotice.needsDisplay = true
-                } else {
-                    adaptiveNotice.transition(3)
-                    adaptiveNotice.alphaValue = 0.0
-                    adaptiveNotice.needsDisplay = true
-                }
-            }
-        }
+        guard let button = settingsButton else { return }
+        button.highlight()
     }
 
     func hideAdaptiveNotice() {
-        if let timer = adaptiveHighlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        adaptiveHighlighterTask = nil
-
-        mainThread { [weak self] in
-            guard let adaptiveNotice = self?.adaptiveNotice else { return }
-            adaptiveNotice.transition(0.5)
-            adaptiveNotice.alphaValue = 0.0
-            adaptiveNotice.needsDisplay = true
-        }
+        guard let button = settingsButton else { return }
+        button.stopHighlighting()
     }
 
     override func viewDidLoad() {
@@ -1414,7 +1429,7 @@ class DisplayViewController: NSViewController {
 
             // inputDropdown?.page = darkMode ? .hotkeys : .display
             // inputDropdown?.fade()
-            resetDropdown?.page = darkMode ? .hotkeysReset : .displayReset
+            // resetDropdown?.page = darkMode ? .hotkeysReset : .displayReset
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor

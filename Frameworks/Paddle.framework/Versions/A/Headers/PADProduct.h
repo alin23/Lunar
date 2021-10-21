@@ -443,6 +443,18 @@ typedef NS_ENUM(NSInteger, PADProductType) {
 - (void)verifyActivationWithCompletion:(nullable void (^)(PADVerificationState state, NSError *_Nullable error))completion;
 
 /**
+ * @discussion Verify the activation for the current product with additional verification data
+ * @discussion If no completion handler is given, then the error is passed to the delegate, if the delegate
+ * is set and it responds to `paddleDidError:`.
+ *
+ * @param completion The completion handler to call when the verification has been completed.
+ * This handler is executed on the main dispatch queue, but it may not be executed asynchronously.
+ * The completion handler is given the verification state of the product and, if unable to verify, an error.
+ * Additionally this completion handler returns raw verification data including license usage and expiry dates
+ */
+- (void)verifyActivationDetailsWithCompletion:(nullable void (^)(PADVerificationState state, NSError *_Nullable error, NSDictionary *_Nullable verificationData))completion;
+
+/**
  * @discussion Destroy the activation for the current product locally. This will not deactivate an activation
  */
 - (void)destroyActivation;

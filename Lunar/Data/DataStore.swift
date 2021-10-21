@@ -64,6 +64,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .neverAskAboutFlux,
     .nonManualMode,
     .clockMode,
+    .syncMode,
     .overrideAdaptiveMode,
     .refreshValues,
     .sensorPollingSeconds,
@@ -327,10 +328,6 @@ class DataStore: NSObject {
 
     @discardableResult
     func storeDisplays(_ displays: [Display], now: Bool = false) -> [Display] {
-        // let displays = displays.filter {
-        //     display in !DDC.isBuiltinDisplay(display.id)
-        // }
-
         guard let storedDisplays = self.displays() else {
             CachedDefaults[.displays] = displays
             if now { Defaults[.displays] = displays }
@@ -341,7 +338,7 @@ class DataStore: NSObject {
 
         let inactiveDisplays = storedDisplays.filter { d in !newDisplaySerials.contains(d.serial) }
         for display in inactiveDisplays {
-            display.active = false
+            mainThread { display.active = false }
             while newDisplayIDs.contains(display.id) {
                 display.id = UInt32.random(in: 100 ... 100_000)
             }
@@ -453,66 +450,97 @@ enum CachedDefaults {
 
     public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
-            displayEncodingLock.around(ignoreMainThread: true) {
-                let lock = locks[key.name] ?? Self.lock
-                return lock.around(ignoreMainThread: true) {
-                    if let value = cache[key.name]?.value as? Value {
-                        return value
-                    }
-
-                    let value = key.suite[key]
-
-                    cache[key.name] = AnyCodable(value)
+            mainThread {
+                if let value = cache[key.name]?.value as? Value {
                     return value
                 }
+
+                let value = key.suite[key]
+
+                cache[key.name] = AnyCodable(value)
+                return value
             }
+
+//            displayEncodingLock.around(ignoreMainThread: true) {
+//                let lock = locks[key.name] ?? Self.lock
+//                return lock.around(ignoreMainThread: true) {
+//                    if let value = cache[key.name]?.value as? Value {
+//                        return value
+//                    }
+//
+//                    let value = key.suite[key]
+//
+//                    cache[key.name] = AnyCodable(value)
+//                    return value
+//                }
+//            }
         }
         set {
-            displayEncodingLock.around(ignoreMainThread: true) {
-                guard let lock = locks[key.name] else {
-                    Self.lock.around(ignoreMainThread: true) {
-                        cache[key.name] = AnyCodable(newValue)
-                        asyncNow {
-                            Self.lock.around(ignoreMainThread: true) {
-                                key.suite[key] = newValue
-                            }
-                        }
+            mainAsyncAfter(ms: 10) {
+                cache[key.name] = AnyCodable(newValue)
+                if key == .displays, let displays = newValue as? [Display] {
+                    displaysPublisher.send(displays)
+                    Defaults.withoutPropagation {
+                        key.suite[key] = newValue
                     }
                     return
                 }
-                lock.around(ignoreMainThread: true) {
-                    cache[key.name] = AnyCodable(newValue)
 
-                    if key == .displays, let displays = newValue as? [Display] {
-                        asyncNow { displaysPublisher.send(displays) }
-                        asyncNow {
-                            lock.around(ignoreMainThread: true) {
-                                Defaults.withoutPropagation {
-                                    key.suite[key] = newValue
-                                }
-                            }
-                        }
-                        return
+                if key == .hotkeys {
+                    Defaults.withoutPropagation {
+                        key.suite[key] = newValue
                     }
-
-                    if key == .hotkeys {
-                        asyncNow {
-                            lock.around(ignoreMainThread: true) {
-                                Defaults.withoutPropagation {
-                                    key.suite[key] = newValue
-                                }
-                            }
-                        }
-                        return
-                    }
-
-                    asyncNow {
-                        lock.around(ignoreMainThread: true) {
-                            key.suite[key] = newValue
-                        }
-                    }
+                    return
                 }
+                key.suite[key] = newValue
             }
+            return
+
+//                    displayEncodingLock.around(ignoreMainThread: true) {
+//                        guard let lock = locks[key.name] else {
+//                            Self.lock.around(ignoreMainThread: true) {
+//                                cache[key.name] = AnyCodable(newValue)
+//                                asyncNow {
+//                                    Self.lock.around(ignoreMainThread: true) {
+//                                        key.suite[key] = newValue
+//                                    }
+//                                }
+//                            }
+//                            return
+//                        }
+//                        lock.around(ignoreMainThread: true) {
+//                            cache[key.name] = AnyCodable(newValue)
+//
+//                            if key == .displays, let displays = newValue as? [Display] {
+//                                asyncNow { displaysPublisher.send(displays) }
+//                                asyncNow {
+//                                    lock.around(ignoreMainThread: true) {
+//                                        Defaults.withoutPropagation {
+//                                            key.suite[key] = newValue
+//                                        }
+//                                    }
+//                                }
+//                                return
+//                            }
+//
+//                            if key == .hotkeys {
+//                                asyncNow {
+//                                    lock.around(ignoreMainThread: true) {
+//                                        Defaults.withoutPropagation {
+//                                            key.suite[key] = newValue
+//                                        }
+//                                    }
+//                                }
+//                                return
+//                            }
+//
+//                            asyncNow {
+//                                lock.around(ignoreMainThread: true) {
+//                                    key.suite[key] = newValue
+//                                }
+//                            }
+//                        }
+//                    }
         }
     }
 
@@ -608,6 +636,7 @@ func initCache() {
     cacheKey(.colorScheme)
     cacheKey(.nonManualMode)
     cacheKey(.clockMode)
+    cacheKey(.syncMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
     cacheKey(.sunrise)
@@ -694,6 +723,7 @@ extension Defaults.Keys {
     static let colorScheme = Key<ColorScheme>("colorScheme", default: .system)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
     static let clockMode = Key<Bool>("clockMode", default: false)
+    static let syncMode = Key<Bool>("syncMode", default: false)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
     static let hotkeys = Key<Set<PersistentHotkey>>("hotkeys", default: Hotkey.defaults)

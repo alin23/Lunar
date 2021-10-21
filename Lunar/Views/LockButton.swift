@@ -8,6 +8,14 @@
 
 import Cocoa
 
+// MARK: - LockButtonCell
+
+class LockButtonCell: NSButtonCell {
+    override func _shouldDrawTextWithDisabledAppearance() -> Bool {
+        (controlView as! LockButton).grayDisabledText
+    }
+}
+
 // MARK: - LockButton
 
 class LockButton: NSButton {
@@ -25,24 +33,49 @@ class LockButton: NSButton {
 
     // MARK: Internal
 
+    @IBInspectable dynamic var grayDisabledText: Bool = true
     @IBInspectable dynamic var verticalPadding: CGFloat = 0.7
 
-    var bgOn: NSColor { lockButtonBgOn }
-    var bgOff: NSColor { lockButtonBgOff }
-    var bgOnHover: NSColor {
-        darkMode ?
-            bgOn.highlight(withLevel: 0.2) ?? bgOn :
-            bgOn.highlight(withLevel: 0.2) ?? bgOn
+    @IBInspectable dynamic var bgOn: NSColor = lockButtonBgOn
+    @IBInspectable dynamic var bgOff: NSColor = lockButtonBgOff
+
+    var bgOnHover: NSColor { bgOn.blended(withFraction: 0.3, of: bgOff) ?? bgOff
+        // darkMode ?
+        //     bgOn.highlight(withLevel: 0.2) ?? bgOn :
+        //     bgOn.highlight(withLevel: 0.2) ?? bgOn
     }
 
-    var bgOffHover: NSColor {
-        darkMode ?
-            bgOn.highlight(withLevel: 0.4) ?? bgOn :
-            bgOn.highlight(withLevel: 0.4) ?? bgOn
+    var bgOffHover: NSColor { bgOff.blended(withFraction: 0.3, of: bgOn) ?? bgOn
+        // darkMode ?
+        //     bgOn.highlight(withLevel: 0.4) ?? bgOn :
+        //     bgOn.highlight(withLevel: 0.4) ?? bgOn
     }
 
-    var labelOn: NSColor { lockButtonLabelOn }
-    var labelOff: NSColor { lockButtonLabelOff }
+    @IBInspectable dynamic var labelOn: NSColor = lockButtonLabelOn {
+        didSet {
+            attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
+        }
+    }
+
+    @IBInspectable dynamic var labelOff: NSColor = lockButtonLabelOff {
+        didSet {
+            attributedTitle = attributedTitle.withTextColor(labelOff)
+        }
+    }
+
+    override var isEnabled: Bool {
+        didSet {
+            if isEnabled {
+                attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
+                attributedTitle = attributedTitle.withTextColor(labelOff)
+                bg = state == .on ? bgOn : bgOff
+            } else {
+                attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn.with(alpha: -0.2))
+                attributedTitle = attributedTitle.withTextColor(labelOff.with(alpha: -0.2))
+                bg = state == .on ? bgOn.with(alpha: -0.2) : bgOff.with(alpha: -0.2)
+            }
+        }
+    }
 
     override var state: NSControl.StateValue {
         didSet {
@@ -65,21 +98,8 @@ class LockButton: NSButton {
     func setup(_ locked: Bool = false) {
         wantsLayer = true
 
-        let activeTitle = NSMutableAttributedString(attributedString: attributedAlternateTitle)
-        activeTitle.addAttribute(
-            NSAttributedString.Key.foregroundColor,
-            value: labelOn,
-            range: NSMakeRange(0, activeTitle.length)
-        )
-        let inactiveTitle = NSMutableAttributedString(attributedString: attributedTitle)
-        inactiveTitle.addAttribute(
-            NSAttributedString.Key.foregroundColor,
-            value: labelOff,
-            range: NSMakeRange(0, inactiveTitle.length)
-        )
-
-        attributedTitle = inactiveTitle
-        attributedAlternateTitle = activeTitle
+        attributedTitle = attributedTitle.withTextColor(labelOff)
+        attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
 
         setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * verticalPadding)))
         radius = cornerRadius.ns
@@ -105,6 +125,7 @@ class LockButton: NSButton {
     }
 
     override func mouseExited(with _: NSEvent) {
+        guard isEnabled else { return }
         transition(0.4)
 
         if state == .on {
@@ -122,8 +143,19 @@ class LockButton: NSButton {
 // MARK: - EnableButton
 
 class EnableButton: LockButton {
-    override var bgOn: NSColor { enableButtonBgOn }
-    override var bgOff: NSColor { enableButtonBgOff }
-    override var labelOn: NSColor { enableButtonLabelOn }
-    override var labelOff: NSColor { enableButtonLabelOff }
+    override var bgOn: NSColor { get { enableButtonBgOn }
+        set {}
+    }
+
+    override var bgOff: NSColor { get { enableButtonBgOff }
+        set {}
+    }
+
+    override var labelOn: NSColor { get { enableButtonLabelOn }
+        set {}
+    }
+
+    override var labelOff: NSColor { get { enableButtonLabelOff }
+        set {}
+    }
 }

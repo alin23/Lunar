@@ -165,7 +165,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 setPercent(30)
                 guard !self.stopped else { return }
 
-                let coreDisplay = AppleNativeControl(display: display).isAvailable()
+                let appleNative = AppleNativeControl(display: display).isAvailable()
                 let appleDisplay = display.isAppleDisplay()
                 setPercent(40)
                 guard !self.stopped else { return }
@@ -210,7 +210,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 	    (appleDisplay || display.isSmartDisplay)
                 	        ?
                 	        (
-                	            coreDisplay ?
+                	            appleNative ?
                 	                "Should support native control through DisplayServices" :
                 	                "Should support DisplayServices but doesn't"
                 	        )
@@ -225,12 +225,12 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                 var ddcWorked = false
                 var ddcctlWorked = false
-                var coreDisplayWorked = false
+                var appleNativeWorked = false
                 var networkWorked = false
 
                 var ddcReadWorked = false
                 var ddcctlReadWorked = false
-                var coreDisplayReadWorked = false
+                var appleNativeReadWorked = false
                 var networkReadWorked = false
 
                 let tryBrightness = { (control: Control) in
@@ -258,7 +258,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                         if let br = control.getBrightness() {
                             self.renderSeparated("Received brightness value: `\(br)` *(\(br.asPercentage(of: 100)))*")
-                            coreDisplayReadWorked = true
+                            appleNativeReadWorked = true
                         } else {
                             self.renderSeparated("`Could not read brightness value!`")
                         }
@@ -403,8 +403,8 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     }
                                 }
                             case is AppleNativeControl:
-                                coreDisplayWorked = changed
-                                if !coreDisplayWorked {
+                                appleNativeWorked = changed
+                                if !appleNativeWorked {
                                     self.renderSeparated("""
                                     #### This monitor could not be controlled through Apple's native DisplayServices framework.
 
@@ -511,7 +511,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                 }
 
                 let networkControl = NetworkControl(display: display)
-                let coreDisplayControl = AppleNativeControl(display: display)
+                let appleNativeControl = AppleNativeControl(display: display)
                 let ddcControl = DDCControl(display: display)
 
                 #if arch(arm64)
@@ -521,9 +521,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     let ddcAvailable = !display
                         .isSmartBuiltin && (ddcControl.isAvailable() || DDC.hasI2CController(displayID: display.id, ignoreCache: true))
                 #endif
-                let coreDisplayAvailable = coreDisplayControl.isAvailable() || display.isAppleDisplay() || display.isSmartBuiltin
+                let appleNativeAvailable = appleNativeControl.isAvailable() || display.isAppleDisplay() || display.isSmartBuiltin
                 let networkAvailable = !display.isSmartBuiltin && networkControl.isAvailable()
-                let shouldStartTests = ddcAvailable || coreDisplayAvailable || networkAvailable
+                let shouldStartTests = ddcAvailable || appleNativeAvailable || networkAvailable
 
                 if shouldStartTests {
                     display.adaptivePaused = true
@@ -548,8 +548,8 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             guard !self.stopped else { return }
                         #endif
                     }
-                    if coreDisplayAvailable {
-                        tryBrightness(coreDisplayControl)
+                    if appleNativeAvailable {
+                        tryBrightness(appleNativeControl)
                         setPercent(80)
                         guard !self.stopped else { return }
                     }
@@ -639,9 +639,9 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
 
                             var monitorBrightness = "nil"
 
-                            if coreDisplayReadWorked {
-                                monitorBrightness = coreDisplayControl.getBrightness()?.s ?? "nil"
-                                self.render("**\(display.name) monitor brightness (as reported by CoreDisplay): `\(monitorBrightness)`**")
+                            if appleNativeReadWorked {
+                                monitorBrightness = appleNativeControl.getBrightness()?.s ?? "nil"
+                                self.render("**\(display.name) monitor brightness (as reported by AppleNative): `\(monitorBrightness)`**")
                             }
                             if networkReadWorked {
                                 monitorBrightness = networkControl.getBrightness()?.s ?? "nil"

@@ -143,6 +143,13 @@ class MacToggle: NSView {
 
     var callback: ((_ isOn: Bool) -> Void)?
 
+    @inline(__always) func toggleWithoutCallback(value: Bool) {
+        let oldCallback = callback
+        callback = nil
+        isOn = value
+        callback = oldCallback
+    }
+
     override func mouseDown(with _: NSEvent) {
         guard isEnabled else { return }
         let push = Double(outlineWidth + width) - Double(height)

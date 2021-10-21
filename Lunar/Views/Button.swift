@@ -23,6 +23,9 @@ class Button: NSButton {
     var onClick: (() -> Void)?
     var hover = false
 
+    weak var notice: NSTextField?
+    @AtomicLock var highlighterTask: CFRunLoopTimer?
+
     @IBInspectable var horizontalPadding: CGFloat = 0 { didSet { mainThread { invalidateIntrinsicContentSize() }}}
     @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainThread { invalidateIntrinsicContentSize() }}}
     @IBInspectable var color: NSColor = .clear { didSet { mainThread { bg = color }}}
@@ -43,6 +46,10 @@ class Button: NSButton {
         size.width += horizontalPadding
         size.height += verticalPadding
         return size
+    }
+
+    @IBInspectable var cornerRadius: CGFloat = -1 {
+        didSet { setShape() }
     }
 
     @IBInspectable var circle: Bool = true {
@@ -73,10 +80,72 @@ class Button: NSButton {
         }
     }
 
+    func highlight() {
+        guard !isHidden else { return }
+
+        let windowVisible = mainThread { window?.isVisible ?? false }
+
+        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!), windowVisible
+        else {
+            return
+        }
+
+        highlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
+            guard let s = self else {
+                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
+
+            let windowVisible: Bool = mainThread { s.window?.isVisible ?? false }
+            guard windowVisible, let notice = s.notice else {
+                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
+                return
+            }
+
+            mainThread {
+                if notice.alphaValue <= 0.02 {
+                    notice.transition(1)
+                    notice.alphaValue = 0.9
+                    notice.needsDisplay = true
+
+                    s.hover(fadeDuration: 1)
+                    s.needsDisplay = true
+                } else {
+                    notice.transition(3)
+                    notice.alphaValue = 0.01
+                    notice.needsDisplay = true
+
+                    s.defocus(fadeDuration: 3)
+                    s.needsDisplay = true
+                }
+            }
+        }
+    }
+
+    func stopHighlighting() {
+        if let timer = highlighterTask {
+            realtimeQueue.cancel(timer: timer)
+        }
+        highlighterTask = nil
+
+        mainThread {
+            if let notice = notice {
+                notice.transition(0.3)
+                notice.alphaValue = 0.0
+                notice.needsDisplay = true
+            }
+
+            defocus(fadeDuration: 0.3)
+            needsDisplay = true
+        }
+    }
+
     func setShape() {
         mainThread {
             let buttonSize = frame
-            if circle, abs(buttonSize.height - buttonSize.width) < 3 {
+            if cornerRadius >= 0 {
+                radius = cornerRadius.ns
+            } else if circle, abs(buttonSize.height - buttonSize.width) < 3 {
                 setFrameSize(NSSize(width: buttonSize.width, height: buttonSize.width))
                 radius = (min(frame.width, frame.height) / 2).ns
             } else if circle {
@@ -102,7 +171,7 @@ class Button: NSButton {
         trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
     }
 
-    override func cursorUpdate(with event: NSEvent) {
+    override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
             NSCursor.pointingHand.set()
         }
@@ -113,25 +182,37 @@ class Button: NSButton {
         super.mouseDown(with: event)
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        if !isEnabled { return }
+    func defocus(fadeDuration: TimeInterval = 0.6) {
+        hover = false
+
+        transition(fadeDuration)
+        alphaValue = alpha
+        shadow = NO_SHADOW
+    }
+
+    func hover(fadeDuration: TimeInterval = 0.3) {
         hover = true
 
-        transition(0.3)
+        transition(fadeDuration)
         alphaValue = hoverAlpha
         shadow = buttonShadow
+    }
 
+    override func mouseEntered(with _: NSEvent) {
+        guard isEnabled else {
+            if highlighterTask != nil {
+                stopHighlighting()
+            }
+            return
+        }
+
+        hover()
         onMouseEnter?()
     }
 
     override func mouseExited(with _: NSEvent) {
         if !isEnabled { return }
-        hover = false
-
-        transition(0.6)
-        alphaValue = alpha
-        shadow = NO_SHADOW
-
+        defocus()
         onMouseExit?()
     }
 
