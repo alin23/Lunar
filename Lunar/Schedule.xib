@@ -10,10 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
             <connections>
                 <outlet property="box" destination="wRp-Hv-A02" id="R0e-6f-cvX"/>
-                <outlet property="brightness" destination="I1p-Og-pFP" id="f0d-bW-jQ5"/>
-                <outlet property="contrast" destination="khb-uC-8y7" id="rzv-AX-6Cp"/>
                 <outlet property="dropdown" destination="aM2-4L-F67" id="wuf-eQ-7RW"/>
-                <outlet property="enableButton" destination="I1D-Qq-7ue" id="ZiY-P3-reg"/>
                 <outlet property="hour" destination="IRQ-gP-bkE" id="iJs-BK-4RT"/>
                 <outlet property="minute" destination="7vR-RW-TFl" id="V2S-xS-tsE"/>
                 <outlet property="signButton" destination="t7r-Q4-jDN" id="mgU-0x-5m4"/>
@@ -119,115 +116,30 @@
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="hfV-2e-8ze">
                                         <items>
-                                            <menuItem title="Time" state="on" image="clock" catalog="system" id="mWN-NX-YTt">
+                                            <menuItem title="Time" state="on" image="clock" id="mWN-NX-YTt">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem isSeparatorItem="YES" id="icR-hV-Z92"/>
-                                            <menuItem title="Sunrise" image="sunrise" catalog="system" tag="1" id="57x-tm-j2n">
+                                            <menuItem title="Sunrise" image="sunrise" tag="1" id="57x-tm-j2n">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Noon" image="sun.max" catalog="system" tag="3" id="cFO-VO-s4l">
+                                            <menuItem title="Noon" image="sun" tag="3" id="cFO-VO-s4l">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Sunset" image="sunset" catalog="system" tag="2" id="bh9-Vk-Odr">
+                                            <menuItem title="Sunset" image="sunset" tag="2" id="bh9-Vk-Odr">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="kSB-mM-QaR"/>
+                                            <menuItem title="Disabled" tag="-1" id="3mW-nS-Ud1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="5LM-Dv-Rsp"/>
                                     <binding destination="-2" name="selectedTag" keyPath="self.type" id="Y86-Ke-W1N"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="khb-uC-8y7" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="93" y="17" width="70" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="000" usesSingleLineMode="YES" id="JTB-nw-LXC" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="26"/>
-                                    <color key="textColor" name="Caption Secondary"/>
-                                    <color key="backgroundColor" name="Field BG no color"/>
-                                </textFieldCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" name="Caption Tertiary"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <real key="value" value="10"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <real key="value" value="100"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="step">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
-                                        <color key="value" name="Field BG no color"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="ROy-DA-Dfz"/>
-                                </connections>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I1p-Og-pFP" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="18" y="17" width="70" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="000" usesSingleLineMode="YES" id="pMC-fR-fNr" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="26"/>
-                                    <color key="textColor" name="Caption Secondary"/>
-                                    <color key="backgroundColor" name="Field BG no color"/>
-                                </textFieldCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
-                                        <color key="value" name="Caption Tertiary"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorHover">
-                                        <color key="value" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="textFieldColorLight">
-                                        <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerLimit">
-                                        <real key="value" value="10"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <real key="value" value="255"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="step">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
-                                        <color key="value" name="Field BG no color"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="YEu-iZ-CcL"/>
-                                </connections>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ks2-cD-K5q" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="99" y="4" width="57" height="11"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CONTRAST" id="tDO-wA-Kld">
-                                    <font key="font" size="10" name="Menlo-Bold"/>
-                                    <color key="textColor" name="Caption"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0hL-9O-5I5" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="19" y="4" width="69" height="11"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="BRIGHTNESS" id="psi-s9-pv9">
-                                    <font key="font" size="10" name="Menlo-Bold"/>
-                                    <color key="textColor" name="Caption"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t7r-Q4-jDN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="7" y="95" width="22" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -245,11 +157,64 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="-2" name="hidden2" keyPath="self.enabled" previousBinding="AcV-fv-t6K" id="Hwb-Gg-g8t">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="-2" name="enabled" keyPath="self.enabled" id="UjL-CO-HHI"/>
                                     <binding destination="-2" name="hidden" keyPath="self.isTimeSchedule" previousBinding="UjL-CO-HHI" id="AcV-fv-t6K"/>
                                     <binding destination="-2" name="value" keyPath="self.negativeState" id="sAH-3c-3WQ"/>
                                 </connections>
                             </button>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="j3P-BV-qub" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="13" y="4" width="154" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="8GJ-hW-12T" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
+                                        <real key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="elf-6K-nfd"/>
+                                    <binding destination="-2" name="value" keyPath="self.preciseBrightnessContrast" id="uDu-uC-4L9"/>
+                                </connections>
+                            </slider>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="H8e-MD-Hcf" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="21" y="19" width="12" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <contentFilters>
+                                    <ciFilter name="CIFalseColor">
+                                        <configuration>
+                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="x2M-u2-mr5"/>
+                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            </imageView>
                         </subviews>
                     </view>
                     <font key="titleFont" metaFont="systemHeavy" size="13"/>
@@ -257,44 +222,16 @@
                         <binding destination="-2" name="title" keyPath="self.title" id="XLc-eZ-oDB"/>
                     </connections>
                 </box>
-                <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="I1D-Qq-7ue" customClass="EnableButton" customModule="Lunar" customModuleProvider="target">
-                    <rect key="frame" x="58" y="123" width="65" height="13"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <shadow key="shadow" blurRadius="3">
-                        <size key="offset" width="0.0" height="2"/>
-                        <color key="color" red="0.16671776140914291" green="0.12363559705776707" blue="0.19145939625850339" alpha="0.54260658112582782" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                    </shadow>
-                    <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                        <configuration>
-                            <null key="inputBackgroundImage"/>
-                            <null key="inputImage"/>
-                        </configuration>
-                    </ciFilter>
-                    <buttonCell key="cell" type="inline" title="Disabled" alternateTitle="Enabled" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="3mh-QJ-U4d">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="systemHeavy" size="11"/>
-                    </buttonCell>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                            <real key="value" value="0.10000000000000001"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                    <connections>
-                        <binding destination="-2" name="value" keyPath="self.enabled" id="6sj-TF-hd1"/>
-                    </connections>
-                </button>
             </subviews>
             <point key="canvasLocation" x="-16" y="71"/>
         </customView>
     </objects>
     <resources>
-        <image name="clock" catalog="system" width="15" height="15"/>
-        <image name="sun.max" catalog="system" width="16" height="16"/>
-        <image name="sunrise" catalog="system" width="20" height="16"/>
-        <image name="sunset" catalog="system" width="20" height="16"/>
-        <namedColor name="Caption">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
+        <image name="brightness" width="50.5" height="50.5"/>
+        <image name="clock" width="14" height="14"/>
+        <image name="sun" width="14" height="14.5"/>
+        <image name="sunrise" width="14" height="12"/>
+        <image name="sunset" width="14" height="12"/>
         <namedColor name="Caption Secondary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

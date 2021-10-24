@@ -1343,6 +1343,8 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
         return "\n\t" + (value as! [[String: Any]]).map { scheduleDict in
             let schedule = BrightnessSchedule.from(dict: scheduleDict)
             switch schedule.type {
+            case .disabled:
+                return "Disabled"
             case .time:
                 return "\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
             case .sunrise:

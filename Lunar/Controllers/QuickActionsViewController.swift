@@ -49,7 +49,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
     func resize() {
         mainThread {
             table.intercellSpacing = NSSize(width: 0, height: showOrientation ? 20 : 0)
-            var height = sum(displays.map { $0.hasDDC ? 150 : 80 }) + (table.intercellSpacing.height * CGFloat(displays.count))
+            var height = sum(displays.map { $0.hasDDC ? 160 : 80 }) + (table.intercellSpacing.height * CGFloat(displays.count))
             if let display = display {
                 if display.hasDDC {
                     height += 114 + (display.showOrientation ? 30 : 0)

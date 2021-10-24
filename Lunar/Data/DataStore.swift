@@ -23,6 +23,10 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .showTwoSchedules,
+    .showThreeSchedules,
+    .showFourSchedules,
+    .showFiveSchedules,
     .infoMenuShown,
     .allowBlackOutOnSingleScreen,
     .moreGraphData,
@@ -602,6 +606,10 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.showTwoSchedules)
+    cacheKey(.showThreeSchedules)
+    cacheKey(.showFourSchedules)
+    cacheKey(.showFiveSchedules)
     cacheKey(.infoMenuShown)
     cacheKey(.allowBlackOutOnSingleScreen)
     cacheKey(.moreGraphData)
@@ -675,7 +683,7 @@ extension Defaults.Keys {
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let detectResponsiveness = Key<Bool>("detectResponsiveness", default: true)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: true)
-    static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: false)
+    static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: true)
 
     static let brightnessKeysSyncControl = Key<BrightnessKeyAction>("brightnessKeysSyncControl", default: .source)
     static let brightnessKeysControl = Key<BrightnessKeyAction>("brightnessKeysControl", default: .all)
@@ -689,6 +697,10 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let showTwoSchedules = Key<Bool>("showTwoSchedules", default: false)
+    static let showThreeSchedules = Key<Bool>("showThreeSchedules", default: false)
+    static let showFourSchedules = Key<Bool>("showFourSchedules", default: false)
+    static let showFiveSchedules = Key<Bool>("showFiveSchedules", default: false)
     static let infoMenuShown = Key<Bool>("infoMenuShown", default: true)
     static let allowBlackOutOnSingleScreen = Key<Bool>("allowBlackOutOnSingleScreen", default: false)
     static let moreGraphData = Key<Bool>("moreGraphData", default: false)
@@ -795,6 +807,10 @@ let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientation
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let infoMenuShownPublisher = Defaults.publisher(.infoMenuShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showTwoSchedulesPublisher = Defaults.publisher(.showTwoSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showThreeSchedulesPublisher = Defaults.publisher(.showThreeSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showFourSchedulesPublisher = Defaults.publisher(.showFourSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showFiveSchedulesPublisher = Defaults.publisher(.showFiveSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let allowBlackOutOnSingleScreenPublisher = Defaults.publisher(.allowBlackOutOnSingleScreen).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let moreGraphDataPublisher = Defaults.publisher(.moreGraphData).removeDuplicates().filter { $0.oldValue != $0.newValue }
