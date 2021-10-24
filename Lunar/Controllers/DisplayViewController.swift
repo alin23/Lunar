@@ -253,7 +253,6 @@ class DisplayViewController: NSViewController {
     @IBOutlet var gammaNotice: NSTextField!
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
-    // @IBOutlet var resetDropdown: PopUpButton?
     @IBOutlet var brightnessSlider: Slider?
     @IBOutlet var brightnessContrastSlider: Slider?
 
@@ -274,8 +273,8 @@ class DisplayViewController: NSViewController {
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
     @objc dynamic var noDisplay: Bool = false
-    // @objc dynamic lazy var inputHidden: Bool = display == nil || noDisplay || display!.isBuiltin || !display!.activeAndResponsive
-    @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!.isBuiltin || displayController
+    @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
+        .ambientLightAdaptiveBrightnessEnabled || displayController
         .adaptiveModeKey == .clock
 
     var graphObserver: Cancellable?
@@ -293,8 +292,6 @@ class DisplayViewController: NSViewController {
 
     @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
 
-    // @IBOutlet var inputDropdown: PopUpButton?
-
     @objc dynamic lazy var deleteEnabled = getDeleteEnabled()
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
@@ -308,10 +305,68 @@ class DisplayViewController: NSViewController {
     @IBOutlet var schedule4: Schedule!
     @IBOutlet var schedule5: Schedule!
 
-    // @objc dynamic var nonResponsiveTextFieldHidden: Bool = true
+    @IBOutlet var addScheduleButton: Button!
 
-    // var applyVolume = true
-    // @objc dynamic var volumeHidden: Bool = false
+    func placeAddScheduleButton() {
+        guard
+            let addScheduleButton = addScheduleButton,
+            let schedule2 = schedule2,
+            let schedule3 = schedule3,
+            let schedule4 = schedule4,
+            let schedule5 = schedule5
+        else { return }
+
+        if schedule5.isEnabled {
+            addScheduleButton.isHidden = true
+            return
+        }
+
+        addScheduleButton.isHidden = false
+        if schedule4.isEnabled {
+            addScheduleButton.frame = schedule5.frame
+        } else if schedule3.isEnabled {
+            addScheduleButton.frame = schedule4.frame
+        } else if schedule2.isEnabled {
+            addScheduleButton.frame = schedule3.frame
+        } else {
+            addScheduleButton.frame = schedule2.frame
+        }
+        addScheduleButton.needsDisplay = true
+    }
+
+    @IBAction func showMoreSchedules(_: Any) {
+        if !CachedDefaults[.showTwoSchedules] {
+            CachedDefaults[.showTwoSchedules] = true
+            schedule2.isEnabled = true
+        } else if !CachedDefaults[.showThreeSchedules] {
+            CachedDefaults[.showThreeSchedules] = true
+            schedule3.isEnabled = true
+        } else if !CachedDefaults[.showFourSchedules] {
+            CachedDefaults[.showFourSchedules] = true
+            schedule4.isEnabled = true
+        } else if !CachedDefaults[.showFiveSchedules] {
+            CachedDefaults[.showFiveSchedules] = true
+            schedule5.isEnabled = true
+        }
+        placeAddScheduleButton()
+    }
+
+    @IBAction func showFewerSchedules(_: Any) {
+        if CachedDefaults[.showFiveSchedules] {
+            CachedDefaults[.showFiveSchedules] = false
+            schedule5.isEnabled = false
+        } else if CachedDefaults[.showFourSchedules] {
+            CachedDefaults[.showFourSchedules] = false
+            schedule4.isEnabled = false
+        } else if CachedDefaults[.showThreeSchedules] {
+            CachedDefaults[.showThreeSchedules] = false
+            schedule3.isEnabled = false
+        } else if CachedDefaults[.showTwoSchedules] {
+            CachedDefaults[.showTwoSchedules] = false
+            schedule2.isEnabled = false
+        }
+        placeAddScheduleButton()
+    }
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -332,14 +387,6 @@ class DisplayViewController: NSViewController {
     var proButton: Button? {
         _proButton as? Button
     }
-
-    // @IBOutlet var nonResponsiveTextField: NonResponsiveTextField? {
-    //     didSet {
-    //         mainThread {
-    //             nonResponsiveTextField?.isHidden = getNonResponsiveTextFieldHidden()
-    //         }
-    //     }
-    // }
 
     var lockContrastHelpButton: HelpButton? {
         _lockContrastHelpButton as? HelpButton
@@ -388,19 +435,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    // @objc dynamic var volume: Double = 50 {
-    //     didSet {
-    //         guard applyVolume else { return }
-    //         display?.volume = volume.ns
-    //     }
-    // }
-
-    // func getNonResponsiveTextFieldHidden(display: Display? = nil, responsive: Bool? = nil) -> Bool {
-    //     guard let display = display ?? self.display, display.active else { return true }
-    //     return display.id == GENERIC_DISPLAY_ID || display.isBuiltin || !display
-    //         .active || (responsive ?? display.responsiveDDC) || !(display.control is DDCControl)
-    // }
-
     @IBAction func lockCurve(_ sender: LockButton) {
         switch sender.tag {
         case 1:
@@ -419,13 +453,6 @@ class DisplayViewController: NSViewController {
         }
         super.mouseDown(with: ev)
     }
-
-    // func setInputHidden(_ hidden: Bool) {
-    //     mainThread {
-    //         inputDropdown?.isHidden = hidden
-    //         inputDropdownHotkeyButton?.isHidden = hidden
-    //     }
-    // }
 
     func refreshView() {
         mainThread {
@@ -578,23 +605,8 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
-    // func getVolumeHidden(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
-    //     guard let display = display ?? self.display, let control = display.control else {
-    //         return true
-    //     }
-
-    //     return display.isBuiltin || display.id == GENERIC_DISPLAY_ID || control is GammaControl || !display
-    //         .active || !(hasDDC ?? display.hasDDC)
-    // }
-
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
-
-        // volumeHidden = getVolumeHidden(display: display)
-        // applyVolume = false
-        // volume = display.volume.doubleValue
-        // applyVolume = true
-        // volumeSlider?.isHidden = volumeHidden
 
         display.withoutDDC { display.panelMode = display.panel?.currentMode }
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
@@ -622,27 +634,22 @@ class DisplayViewController: NSViewController {
         deleteEnabled = getDeleteEnabled(display: display)
         powerOffEnabled = getPowerOffEnabled(display: display)
         powerOffTooltip = getPowerOffTooltip(display: display)
-        // inputHidden = noDisplay || display.isBuiltin || !display.activeAndResponsive
-        chartHidden = noDisplay || display.isBuiltin || displayController.adaptiveModeKey == .clock
+        chartHidden = noDisplay || display.ambientLightAdaptiveBrightnessEnabled || displayController.adaptiveModeKey == .clock
 
         if let button = colorsButton {
             button.display = display
-            // button.bg = lockButtonBgOff
         }
         if let button = ddcButton {
             button.display = display
-            // button.bg = lockButtonBgOff
         }
         if let button = settingsButton {
             button.display = display
             button.displayViewController = self
             button.notice = adaptiveNotice
-            // button.bg = lockButtonBgOff
         }
         if let button = resetButton {
             button.display = display
             button.displayViewController = self
-            // button.bg = lockButtonBgOff
         }
 
         scrollableBrightness?.display = display
@@ -659,7 +666,15 @@ class DisplayViewController: NSViewController {
         schedule3?.display = display
         schedule4?.display = display
         schedule5?.display = display
-        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock || display.isBuiltin
+
+        schedule2?.isEnabled = CachedDefaults[.showTwoSchedules]
+        schedule3?.isEnabled = CachedDefaults[.showThreeSchedules]
+        schedule4?.isEnabled = CachedDefaults[.showFourSchedules]
+        schedule5?.isEnabled = CachedDefaults[.showFiveSchedules]
+
+        placeAddScheduleButton()
+
+        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
 
         display.onBrightnessCurveFactorChange = { [weak self] factor in
             guard let self = self else { return }
@@ -707,7 +722,6 @@ class DisplayViewController: NSViewController {
             mainAsyncAfter(ms: 10) { [weak self] in
                 guard let self = self else { return }
                 self.updateControlsButton(control: control)
-                // self.volumeHidden = self.getVolumeHidden()
                 if control is GammaControl, display.enabledControls[.gamma] ?? false {
                     self.showGammaNotice()
                 } else {
@@ -722,33 +736,9 @@ class DisplayViewController: NSViewController {
         } else {
             displayName?.stringValue = display.name
             displayName?.display = self.display
-            // nonResponsiveTextField?.onClick = { [weak self] in
-            //     mainThread { [weak self] in
-            //         guard let self = self, let display = self.display else { return }
-            //         display.control?.resetState()
-            //         // self.setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
-            //         self.refreshView()
-            //     }
-            // }
         }
 
-        // display.$volume.sink { [weak self] value in
-        //     mainAsyncAfter(ms: 10) { [weak self] in
-        //         guard let self = self else { return }
-        //         self.applyVolume = false
-        //         self.volume = value.doubleValue
-        //         self.applyVolume = true
-        //     }
-        // }.store(in: &displayObservers, for: "volume")
-        // display.$input.sink { [weak self] _ in
-        //     mainAsyncAfter(ms: 1000) { [weak self] in
-        //         guard let self = self else { return }
-        //         if !self.inputHidden { self.inputDropdown?.fade() }
-        //     }
-        // }.store(in: &displayObservers, for: "input")
-
         initHotkeys()
-        // setInputHidden(display.id == GENERIC_DISPLAY_ID || display.isBuiltin)
         refreshView()
 
         listenForSendingBrightnessContrast()
@@ -1100,73 +1090,35 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForBrightnessContrastChange() {
-        display?.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$maxBrightness.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableBrightness?.maxValue.integerValue = value.intValue
-                self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
-
-                self.schedule1?.brightness.upperLimit = value.doubleValue
-                self.schedule2?.brightness.upperLimit = value.doubleValue
-                self.schedule3?.brightness.upperLimit = value.doubleValue
-                self.schedule4?.brightness.upperLimit = value.doubleValue
-                self.schedule5?.brightness.upperLimit = value.doubleValue
-            }
+            self.scrollableBrightness?.maxValue.integerValue = value.intValue
+            self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
         }.store(in: &displayObservers, for: "maxBrightness")
-        display?.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$maxContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableContrast?.maxValue.integerValue = value.intValue
-                self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
-
-                self.schedule1?.contrast.upperLimit = value.doubleValue
-                self.schedule2?.contrast.upperLimit = value.doubleValue
-                self.schedule3?.contrast.upperLimit = value.doubleValue
-                self.schedule4?.contrast.upperLimit = value.doubleValue
-                self.schedule5?.contrast.upperLimit = value.doubleValue
-            }
+            self.scrollableContrast?.maxValue.integerValue = value.intValue
+            self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
         }.store(in: &displayObservers, for: "maxContrast")
 
-        display?.$minBrightness.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$minBrightness.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableBrightness?.minValue.integerValue = value.intValue
-                self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
-
-                self.schedule1?.brightness.lowerLimit = value.doubleValue
-                self.schedule2?.brightness.lowerLimit = value.doubleValue
-                self.schedule3?.brightness.lowerLimit = value.doubleValue
-                self.schedule4?.brightness.lowerLimit = value.doubleValue
-                self.schedule5?.brightness.lowerLimit = value.doubleValue
-            }
+            self.scrollableBrightness?.minValue.integerValue = value.intValue
+            self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
         }.store(in: &displayObservers, for: "minBrightness")
-        display?.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$minContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableContrast?.minValue.integerValue = value.intValue
-                self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
-
-                self.schedule1?.contrast.lowerLimit = value.doubleValue
-                self.schedule2?.contrast.lowerLimit = value.doubleValue
-                self.schedule3?.contrast.lowerLimit = value.doubleValue
-                self.schedule4?.contrast.lowerLimit = value.doubleValue
-                self.schedule5?.contrast.lowerLimit = value.doubleValue
-            }
+            self.scrollableContrast?.minValue.integerValue = value.intValue
+            self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
         }.store(in: &displayObservers, for: "minContrast")
 
-        display?.$brightness.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$brightness.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableBrightness?.currentValue.integerValue = value.intValue
-//                self.scrollableBrightness?.onCurrentValueChanged?(value.intValue)
-            }
+            self.scrollableBrightness?.currentValue.integerValue = value.intValue
         }.store(in: &displayObservers, for: "brightness")
-        display?.$contrast.receive(on: dataPublisherQueue).sink { [weak self] value in
+        display?.$contrast.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
-            mainThread {
-                self.scrollableContrast?.currentValue.integerValue = value.intValue
-//                self.scrollableContrast?.onCurrentValueChanged?(value.intValue)
-            }
+            self.scrollableContrast?.currentValue.integerValue = value.intValue
         }.store(in: &displayObservers, for: "contrast")
     }
 
@@ -1178,26 +1130,23 @@ class DisplayViewController: NSViewController {
 
                 self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
                 self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
-                // self.volumeHidden = self.getVolumeHidden(hasDDC: hasDDC)
             }
         }.store(in: &displayObservers, for: "hasDDC")
-        // display.$responsiveDDC.receive(on: dataPublisherQueue).sink { [weak self] responsive in
-        //     if let self = self, let display = self.display, let textField = self.nonResponsiveTextField {
-        //         // self.setInputHidden(display.id == GENERIC_DISPLAY_ID || (!responsive && display.control is DDCControl) || display.isBuiltin)
 
-        //         mainAsyncAfter(ms: 10) { [weak self] in
-        //             guard let self = self else { return }
-        //             textField.isHidden = self.getNonResponsiveTextFieldHidden(responsive: responsive)
-        //         }
-        //     }
-        // }.store(in: &displayObservers, for: "responsiveDDC")
-        if !display.adaptive {
+        if !display.adaptive, !display.ambientLightAdaptiveBrightnessEnabled {
             showAdaptiveNotice()
         }
         display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
             if let self = self {
                 mainThread {
-                    if !newAdaptive {
+                    guard let display = self.display else {
+                        self.hideAdaptiveNotice()
+                        return
+                    }
+                    self.chartHidden = self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || displayController
+                        .adaptiveModeKey == .clock
+
+                    if !newAdaptive, !display.ambientLightAdaptiveBrightnessEnabled {
                         self.showAdaptiveNotice()
                     } else {
                         self.hideAdaptiveNotice()
@@ -1218,6 +1167,8 @@ class DisplayViewController: NSViewController {
         }
     }
 
+    var observers: Set<AnyCancellable> = []
+
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             guard let self = self, !self.pausedAdaptiveModeObserver else {
@@ -1226,8 +1177,9 @@ class DisplayViewController: NSViewController {
 
             self.pausedAdaptiveModeObserver = true
             mainThread {
-                self.chartHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue == .clock
-                self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || self.display!.isBuiltin || change.newValue != .clock
+                self.chartHidden = self.display == nil || self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || change
+                    .newValue == .clock
+                self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || change.newValue != .clock
             }
             Defaults.withoutPropagation {
                 let adaptiveMode = change.newValue
@@ -1421,15 +1373,8 @@ class DisplayViewController: NSViewController {
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
-        // volumeSlider?.minValue = 0
-        // volumeSlider?.maxValue = 100
-
         if let display = display, display.id != GENERIC_DISPLAY_ID {
             update()
-
-            // inputDropdown?.page = darkMode ? .hotkeys : .display
-            // inputDropdown?.fade()
-            // resetDropdown?.page = darkMode ? .hotkeysReset : .displayReset
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor
@@ -1441,24 +1386,9 @@ class DisplayViewController: NSViewController {
 
             initGraph()
         }
-        //  else {
-        //     mainThread {
-        //         setInputHidden(true)
-
-        //         settingsButton?.isHidden = true
-        //         resetDropdown?.isHidden = true
-
-        //         nonResponsiveTextField?.isHidden = true
-        //         scrollableBrightness?.isHidden = true
-        //         scrollableContrast?.isHidden = true
-        //         brightnessContrastChart?.isHidden = true
-        //     }
-        // }
 
         deleteEnabled = getDeleteEnabled()
         powerOffEnabled = getPowerOffEnabled()
         powerOffTooltip = getPowerOffTooltip()
-//        scheduleBox?.bg = .black.withAlphaComponent(0.03)
-//        scheduleBox?.radius = 10
     }
 }

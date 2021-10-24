@@ -148,7 +148,7 @@ class ModeChoiceViewController: NSViewController {
     @objc func syncSourceClick() {
         apply = {
             let externals = displayController.externalActiveDisplays
-            guard let source = externals.first(where: { $0.isSmartDisplay && AppleNativeControl.isAvailable(for: $0) })
+            guard let source = externals.first(where: { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) })
             else { return }
 
             source.isSource = true
@@ -236,7 +236,7 @@ class ModeChoiceViewController: NSViewController {
             action: #selector(syncBuiltinClick)
         )
 
-        let source = externals.first { $0.isSmartDisplay && AppleNativeControl.isAvailable(for: $0) }
+        let source = externals.first { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) }
         let targets = externals.filter { source == nil || $0.serial != source!.serial }
         let sourceName = source?.name ?? "Source Display"
         let targetName =

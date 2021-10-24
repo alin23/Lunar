@@ -336,7 +336,7 @@ enum ValueType {
         let isNative = isSmartBuiltin && appleNativeControlEnabled
         serial = try container.decode(String.self, forKey: .serial)
 
-        adaptive = try container.decode(Bool.self, forKey: .adaptive)
+        adaptive = try container.decode(Bool.self, forKey: .adaptive) && !Self.ambientLightCompensationEnabled(id)
         name = try container.decode(String.self, forKey: .name)
         edidName = try container.decode(String.self, forKey: .edidName)
         active = try container.decode(Bool.self, forKey: .active)
@@ -580,7 +580,7 @@ enum ValueType {
         _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
-        self.adaptive = adaptive
+        self.adaptive = adaptive && !Self.ambientLightCompensationEnabled(id)
 
         let isSmartBuiltin = DDC.isSmartBuiltinDisplay(id)
         isSource = isSmartBuiltin
@@ -879,16 +879,16 @@ enum ValueType {
     }
 
     static let DEFAULT_SCHEDULES = [
-        BrightnessSchedule(type: .sunrise, hour: 0, minute: 30, brightness: 70, contrast: 65, negative: true, enabled: false),
-        BrightnessSchedule(type: .time, hour: 10, minute: 20, brightness: 80, contrast: 70, negative: false, enabled: false),
-        BrightnessSchedule(type: .noon, hour: 0, minute: 0, brightness: 100, contrast: 75, negative: false, enabled: false),
-        BrightnessSchedule(type: .sunset, hour: 1, minute: 30, brightness: 60, contrast: 60, negative: false, enabled: false),
-        BrightnessSchedule(type: .time, hour: 7, minute: 30, brightness: 20, contrast: 45, negative: false, enabled: false),
+        BrightnessSchedule(type: .disabled, hour: 0, minute: 30, brightness: 70, contrast: 65, negative: true),
+        BrightnessSchedule(type: .disabled, hour: 10, minute: 20, brightness: 80, contrast: 70, negative: false),
+        BrightnessSchedule(type: .disabled, hour: 0, minute: 0, brightness: 100, contrast: 75, negative: false),
+        BrightnessSchedule(type: .disabled, hour: 1, minute: 30, brightness: 60, contrast: 60, negative: false),
+        BrightnessSchedule(type: .disabled, hour: 7, minute: 30, brightness: 20, contrast: 45, negative: false),
     ]
 
     @Atomic static var applySource = true
 
-    lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
+    @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
     dynamic var controlResult = ControlResult.allWorked
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
@@ -1160,7 +1160,7 @@ enum ValueType {
 
     @Atomic var initialised = false
 
-    var ambientLightAdaptiveBrightnessEnabled: Bool {
+    @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
         set { DisplayServicesEnableAmbientLightCompensation(id, newValue) }
     }
@@ -1187,15 +1187,23 @@ enum ValueType {
 
     var prevSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
-        return schedules.filter(\.enabled).sorted().reversed().first { sch in
+        return schedules.prefix(schedulesToConsider).filter(\.enabled).sorted().reversed().first { sch in
             guard let date = sch.dateInRegion else { return false }
             return date <= now
         }
     }
 
+    var schedulesToConsider: Int {
+        if CachedDefaults[.showFiveSchedules] { return 5 }
+        if CachedDefaults[.showFourSchedules] { return 4 }
+        if CachedDefaults[.showThreeSchedules] { return 3 }
+        if CachedDefaults[.showTwoSchedules] { return 2 }
+        return 1
+    }
+
     var currentSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
-        return schedules.filter(\.enabled).sorted().first { sch in
+        return schedules.prefix(schedulesToConsider).filter(\.enabled).sorted().first { sch in
             guard let (hour, minute) = sch.getHourMinute() else { return false }
             return hour == now.hour && minute == now.minute
         }
@@ -1203,7 +1211,7 @@ enum ValueType {
 
     var nextSchedule: BrightnessSchedule? {
         let now = DateInRegion().convertTo(region: Region.local)
-        return schedules.filter(\.enabled).sorted().first { sch in
+        return schedules.prefix(schedulesToConsider).filter(\.enabled).sorted().first { sch in
             guard let date = sch.dateInRegion else { return false }
             return date >= now
         }
@@ -1290,11 +1298,13 @@ enum ValueType {
         }
     }
 
-    var shouldAdapt: Bool { adaptive && !adaptivePaused && !isBuiltin }
+    var shouldAdapt: Bool { adaptive && !adaptivePaused && !ambientLightAdaptiveBrightnessEnabled }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()
             readapt(newValue: adaptive, oldValue: oldValue)
+            guard hasAmbientLightAdaptiveBrightness else { return }
+            ambientLightAdaptiveBrightnessEnabled = !adaptive
         }
     }
 
@@ -2196,7 +2206,7 @@ enum ValueType {
                 }
             } else if let builtinDisplay = displayController.builtinDisplay, builtinDisplay.serial != serial {
                 builtinDisplay.isSource = true
-            } else if isSmartBuiltin, let smartDisplay = displayController.externalActiveDisplays.first(where: \.isSmartDisplay) {
+            } else if let smartDisplay = displayController.externalActiveDisplays.first(where: \.hasAmbientLightAdaptiveBrightness), smartDisplay.serial != serial {
                 smartDisplay.isSource = true
             }
 
@@ -3648,7 +3658,7 @@ enum ValueType {
         if newBrightness != brightness.uint8Value {
             log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
 
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin,
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                timeSince(lastConnectionTime) > 10
             {
                 insertBrightnessUserDataPoint(
@@ -3676,7 +3686,7 @@ enum ValueType {
         if newContrast != contrast.uint8Value {
             log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
 
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock, !isBuiltin,
+            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                timeSince(lastConnectionTime) > 10
             {
                 insertContrastUserDataPoint(
@@ -4005,7 +4015,7 @@ enum ValueType {
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve, !adaptivePaused, !isBuiltin, !isSource, timeSince(lastConnectionTime) > 5 else { return }
+        guard !lockedBrightnessCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource, timeSince(lastConnectionTime) > 5 else { return }
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
@@ -4037,7 +4047,7 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve, !adaptivePaused, !isBuiltin, !isSource, timeSince(lastConnectionTime) > 5 else { return }
+        guard !lockedContrastCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource, timeSince(lastConnectionTime) > 5 else { return }
 
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {
