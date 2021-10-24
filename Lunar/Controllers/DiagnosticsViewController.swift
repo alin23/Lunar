@@ -563,7 +563,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                     self.renderSeparated("**This display doesn't support hardware controls.**")
                 }
 
-                if SyncMode.specific.available, !display.isBuiltin, !display.isSource {
+                if SyncMode.specific.available, !display.ambientLightAdaptiveBrightnessEnabled, !display.isSource {
                     self.renderSeparated("### Sync Mode")
                     self.render("Do you want to test Sync Mode?")
 

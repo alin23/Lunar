@@ -40,11 +40,12 @@ class AppleNativeControl: Control {
     static func isAvailable(for display: Display) -> Bool {
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[.appleNative], enabledForDisplay else { return false }
-        return (
-            display.isAppleDisplay() ||
-                (display.isBuiltin && (DisplayController.panel(with: display.id)?.isSmartDisplay ?? false)) ||
-                display.isForTesting
-        )
+        return display.canChangeBrightnessDS
+        // return (
+        //     display.isAppleDisplay() ||
+        //         (display.isBuiltin && (DisplayController.panel(with: display.id)?.isSmartDisplay ?? false)) ||
+        //         display.isForTesting
+        // )
     }
 
     static func readBrightnessDisplayServices(id: CGDirectDisplayID) -> Double {

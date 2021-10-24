@@ -38,7 +38,10 @@ class Button: NSButton {
     }
 
     override var isHidden: Bool {
-        didSet { trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true) }
+        didSet {
+            trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
+            defocus()
+        }
     }
 
     override var intrinsicContentSize: NSSize {

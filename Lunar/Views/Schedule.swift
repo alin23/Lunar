@@ -9,6 +9,7 @@
 import Cocoa
 import Defaults
 import SwiftDate
+import Combine
 
 // MARK: - ScheduleTransition
 
@@ -21,6 +22,7 @@ enum ScheduleTransition: Int, CaseIterable, Defaults.Serializable {
 // MARK: - ScheduleType
 
 enum ScheduleType: Int, CaseIterable, Codable, Defaults.Serializable {
+    case disabled = -1
     case time = 0
     case sunrise = 1
     case sunset = 2
@@ -36,7 +38,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
     let brightness: Brightness
     let contrast: Contrast
     let negative: Bool
-    let enabled: Bool
+
+    var enabled: Bool { type != .disabled }
 
     var dateInRegion: DateInRegion? {
         guard let (hour, minute) = getHourMinute() else { return nil }
@@ -57,8 +60,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
             minute: dict["minute"] as! UInt8,
             brightness: dict["brightness"] as! UInt8,
             contrast: dict["contrast"] as! UInt8,
-            negative: dict["negative"] as! Bool,
-            enabled: dict["enabled"] as! Bool
+            negative: dict["negative"] as! Bool
         )
     }
 
@@ -67,6 +69,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
         var minute: UInt8
 
         switch type {
+        case .disabled:
+            return nil
         case .time:
             hour = self.hour
             minute = self.minute
@@ -94,8 +98,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
         minute: UInt8? = nil,
         brightness: UInt8? = nil,
         contrast: UInt8? = nil,
-        negative: Bool? = nil,
-        enabled: Bool? = nil
+        negative: Bool? = nil
     ) -> Self {
         BrightnessSchedule(
             type: type ?? self.type,
@@ -103,8 +106,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
             minute: minute ?? self.minute,
             brightness: brightness ?? self.brightness,
             contrast: contrast ?? self.contrast,
-            negative: negative ?? self.negative,
-            enabled: enabled ?? self.enabled
+            negative: negative ?? self.negative
         )
     }
 }
@@ -139,29 +141,28 @@ class Schedule: NSView {
     let nibName = "Schedule"
     @IBOutlet var hour: ScrollableTextField!
     @IBOutlet var minute: ScrollableTextField!
-    @IBOutlet var brightness: ScrollableTextField!
-    @IBOutlet var contrast: ScrollableTextField!
     @IBOutlet var signButton: ToggleButton!
     @IBOutlet var box: NSBox!
-    @IBOutlet var enableButton: LockButton!
 
     @IBOutlet var dropdown: NSPopUpButton!
     @IBInspectable dynamic var title = "Schedule 1"
     @IBInspectable dynamic var number = 1
+    var schedule: BrightnessSchedule? { display?.schedules[number - 1] }
     @objc dynamic lazy var isTimeSchedule = type == ScheduleType.time.rawValue
-
-    @objc dynamic var enabled = false {
-        didSet {
-            guard let display = display, let schedule = display.schedules.prefix(number).last
-            else {
-                return
+    @objc dynamic var preciseBrightnessContrast: Double {
+        get {
+            guard let display = display, let schedule = schedule else {
+                return 0.5
             }
 
-            let newSchedule = schedule.with(enabled: enabled)
-            display.schedules[number - 1] = newSchedule
-            display.save()
-            box?.alphaValue = enabled ? 1.0 : 0.2
-            enableButton.layer?.shadowOpacity = enabled ? 0.7 : 0
+            return display.brightnessToSliderValue(schedule.brightness.ns)
+        }
+        set {
+            guard let display = display, let schedule = schedule else {
+                return
+            }
+            let (brightness, contrast) = display.sliderValueToBrightnessContrast(newValue)
+            display.schedules[number - 1] = schedule.with(brightness: brightness, contrast: contrast)
         }
     }
 
@@ -178,18 +179,23 @@ class Schedule: NSView {
         }
     }
 
+    @objc dynamic lazy var enabled: Bool = type != ScheduleType.disabled.rawValue
+
+    var lastType: Int = ScheduleType.time.rawValue
     @objc dynamic var type: Int = ScheduleType.time.rawValue {
         didSet {
             guard let display = display, let schedule = display.schedules.prefix(number).last
             else {
                 return
             }
+            lastType = oldValue
+            enabled = type != ScheduleType.disabled.rawValue
 
             isTimeSchedule = type == ScheduleType.time.rawValue
 
             let scheduleType = ScheduleType(rawValue: type) ?? .time
-            var hour: UInt8
-            var minute: UInt8
+            var hour: UInt8 = schedule.hour
+            var minute: UInt8 = schedule.minute
 
             switch scheduleType {
             case .time:
@@ -204,7 +210,10 @@ class Schedule: NSView {
             case .noon:
                 hour = noonOffsetHour
                 minute = noonOffsetMinute
+            case .disabled:
+                break
             }
+            box?.alphaValue = (scheduleType == .disabled) ? 0.8 : 1.0
 
             let newSchedule = schedule.with(type: scheduleType, hour: hour, minute: minute)
             display.schedules[number - 1] = newSchedule
@@ -219,12 +228,6 @@ class Schedule: NSView {
                 return
             }
 
-            brightness.upperLimit = display.maxBrightness.doubleValue
-            brightness.lowerLimit = display.minBrightness.doubleValue
-
-            contrast.upperLimit = display.maxContrast.doubleValue
-            contrast.lowerLimit = display.minContrast.doubleValue
-
             guard let schedule = display.schedules.prefix(number).last else {
                 return
             }
@@ -233,17 +236,15 @@ class Schedule: NSView {
 
             hour.integerValue = schedule.hour.i
             minute.integerValue = schedule.minute.i
-            brightness.integerValue = schedule.brightness.i
-            contrast.integerValue = schedule.contrast.i
             type = schedule.type.rawValue
             negativeState = schedule.negative ? .on : .off
-            enabled = schedule.enabled
             dropdown.selectItem(withTag: schedule.type.rawValue)
 //            dropdown.resizeToFitTitle()
 
             hour.onValueChanged = { [weak self] value in
                 guard let self = self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last
+                      let schedule = display.schedules.prefix(self.number).last,
+                      schedule.enabled
                 else { return }
 
                 display.schedules[self.number - 1] = schedule.with(hour: value.u8)
@@ -256,11 +257,14 @@ class Schedule: NSView {
                     self.sunsetOffsetHour = value.u8
                 case .noon:
                     self.noonOffsetHour = value.u8
+                case .disabled:
+                    break
                 }
             }
             minute.onValueChanged = { [weak self] value in
                 guard let self = self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last
+                      let schedule = display.schedules.prefix(self.number).last,
+                      schedule.enabled
                 else { return }
 
                 display.schedules[self.number - 1] = schedule.with(minute: value.u8)
@@ -273,21 +277,9 @@ class Schedule: NSView {
                     self.sunsetOffsetMinute = value.u8
                 case .noon:
                     self.noonOffsetMinute = value.u8
+                case .disabled:
+                    break
                 }
-            }
-            brightness.onValueChanged = { [weak self] value in
-                guard let self = self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last
-                else { return }
-
-                display.schedules[self.number - 1] = schedule.with(brightness: value.u8)
-            }
-            contrast.onValueChanged = { [weak self] value in
-                guard let self = self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last
-                else { return }
-
-                display.schedules[self.number - 1] = schedule.with(contrast: value.u8)
             }
         }
     }
@@ -311,7 +303,38 @@ class Schedule: NSView {
         case .noon:
             noonOffsetHour = schedule.hour
             noonOffsetMinute = schedule.minute
+        case .disabled:
+            break
         }
+    }
+
+    var observers: Set<AnyCancellable> = []
+
+    func addObservers() {
+        showTwoSchedulesPublisher.sink { [weak self] change in
+            guard let self = self else { return }
+            if self.number == 2 {
+                self.isEnabled = change.newValue
+            }
+        }.store(in: &observers)
+        showThreeSchedulesPublisher.sink { [weak self] change in
+            guard let self = self else { return }
+            if self.number == 3 {
+                self.isEnabled = change.newValue
+            }
+        }.store(in: &observers)
+        showFourSchedulesPublisher.sink { [weak self] change in
+            guard let self = self else { return }
+            if self.number == 4 {
+                self.isEnabled = change.newValue
+            }
+        }.store(in: &observers)
+        showFiveSchedulesPublisher.sink { [weak self] change in
+            guard let self = self else { return }
+            if self.number == 5 {
+                self.isEnabled = change.newValue
+            }
+        }.store(in: &observers)
     }
 
     func setup() {
@@ -319,6 +342,11 @@ class Schedule: NSView {
         view = NSView.loadFromNib(withName: nibName, for: self)
 
         guard let view = view else { return }
+
+        addObservers()
+
+        alphaValue = isEnabled ? 1.0 : alpha
+        trackHover()
 
         view.frame = bounds
         addSubview(view)
@@ -329,21 +357,92 @@ class Schedule: NSView {
             switch type {
             case .noon:
                 guard let moment = LocationMode.specific.moment?.solarNoon else { continue }
-                item.title = "Noon (\(moment.toString(.time(.short))))"
+                let momentString = moment.toString(.time(.short))
+                item.title = "Noon (\(momentString))"
             case .sunrise:
                 guard let moment = LocationMode.specific.moment?.sunrise else { continue }
-                item.title = "Sunrise (\(moment.toString(.time(.short))))"
+                let momentString = moment.toString(.time(.short))
+                item.title = "Sunrise (\(momentString))"
             case .sunset:
                 guard let moment = LocationMode.specific.moment?.sunset else { continue }
-                item.title = "Sunset (\(moment.toString(.time(.short))))"
+                let momentString = moment.toString(.time(.short))
+                item.title = "Sunset (\(momentString))"
             default:
                 break
             }
         }
-//        dropdown?.resizeToFitTitle()
     }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+    }
+
+    // MARK: Internal
+
+    var hover = false
+
+    @IBInspectable var alpha: CGFloat = 0.1 {
+        didSet {
+            fade()
+        }
+    }
+
+    @IBInspectable var hoverAlpha: CGFloat = 0.3 {
+        didSet {
+            fade()
+        }
+    }
+
+    override var frame: NSRect {
+        didSet { trackHover() }
+    }
+
+    override var isHidden: Bool {
+        didSet {
+            trackHover()
+            hover = false
+            fade()
+        }
+    }
+
+    func fade() {
+        mainThread {
+            if isHidden || isEnabled {
+                transition(0.4)
+                alphaValue = 1.0
+                return
+            }
+
+            if hover {
+                transition(0.4)
+                alphaValue = hoverAlpha
+            } else {
+                transition(0.8)
+                alphaValue = alpha
+            }
+        }
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        if isHidden || isEnabled { return }
+        hover = true
+
+        fade()
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        if isHidden || isEnabled {
+            hover = false
+            return
+        }
+        hover = false
+
+        fade()
+        super.mouseExited(with: event)
+    }
+
+    @objc dynamic var isEnabled: Bool = true {
+        didSet { fade() }
     }
 }

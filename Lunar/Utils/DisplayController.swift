@@ -368,6 +368,37 @@ class DisplayController {
                 displays.values.forEach { $0.showOrientation = $0.canRotate && change.newValue }
             }
         }.store(in: &observers)
+
+        showThreeSchedulesPublisher.sink { [self] change in
+            guard !change.newValue else { return }
+
+            if CachedDefaults[.showFiveSchedules] {
+                CachedDefaults[.showFiveSchedules] = false
+            }
+
+            displays.values.forEach { d in
+                if let schedule = d.schedules[safe: 1] {
+                    d.schedules[1] = schedule.with(type: .disabled)
+                }
+                if let schedule = d.schedules[safe: 2] {
+                    d.schedules[2] = schedule.with(type: .disabled)
+                }
+                d.save()
+            }
+        }.store(in: &observers)
+        showFiveSchedulesPublisher.sink { [self] change in
+            guard !change.newValue else { return }
+
+            displays.values.forEach { d in
+                if let schedule = d.schedules[safe: 3] {
+                    d.schedules[3] = schedule.with(type: .disabled)
+                }
+                if let schedule = d.schedules[safe: 4] {
+                    d.schedules[4] = schedule.with(type: .disabled)
+                }
+                d.save()
+            }
+        }.store(in: &observers)
     }
 
     func getMatchingDisplay(
