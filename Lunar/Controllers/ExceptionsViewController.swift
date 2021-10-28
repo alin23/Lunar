@@ -9,12 +9,11 @@
 import Cocoa
 import Combine
 import Defaults
+import Paddle
 
 class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var arrayController: NSArrayController!
-    @IBOutlet var brightnessColumn: NSTableColumn!
-    @IBOutlet var contrastColumn: NSTableColumn!
     @IBOutlet var addAppButton: NSButton!
     var addAppButtonTrackingArea: NSTrackingArea!
     var addAppButtonShadow: NSShadow!
@@ -53,7 +52,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         if !(CachedDefaults[.appExceptions]?.contains(where: { $0.identifier == id }) ?? false) {
             let app = AppException(identifier: id, name: name)
             DataStore.storeAppException(app: app)
-            appDelegate!.acquirePrivileges(
+            acquirePrivileges(
                 notificationTitle: "Lunar can now watch for app exceptions",
                 notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
             )
@@ -85,7 +84,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func mouseEntered(with _: NSEvent) {
         if let button = addAppButton {
-            button.transition(0.2)
+            button.transition(0.5)
             button.alphaValue = 1.0
             button.shadow = addAppButtonShadow
         }
@@ -93,7 +92,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func mouseExited(with _: NSEvent) {
         if let button = addAppButton {
-            button.transition(0.4)
+            button.transition(1.0)
             button.alphaValue = 0.8
             button.shadow = nil
         }
@@ -114,5 +113,21 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
 
     override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
         axis == .horizontal
+    }
+
+    @IBAction func proButtonClick(_: Any) {
+        if lunarProActive, !lunarProOnTrial {
+            NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
+        } else if lunarProBadSignature {
+            NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
+        } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
+            if lunarProProduct.licenseCode != nil {
+                deactivateLicense {
+                    paddle.showProductAccessDialog(with: lunarProProduct)
+                }
+            } else {
+                paddle.showProductAccessDialog(with: lunarProProduct)
+            }
+        }
     }
 }

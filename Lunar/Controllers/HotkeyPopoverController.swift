@@ -149,9 +149,9 @@ class HotkeyPopoverController: NSViewController {
         #if DEBUG
             log.info("Trying to setup \(self) from \(display)")
         #endif
-        self.display = display
 
         mainThread {
+            self.display = display
             // dropdown1.page = .quickMenu
             // dropdown2.page = .quickMenu
             // dropdown3.page = .quickMenu

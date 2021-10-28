@@ -23,6 +23,10 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .notificationsPermissionsGranted,
+    .accessibilityPermissionsGranted,
+    .cliInstalled,
+    .lunarProActive,
     .showTwoSchedules,
     .showThreeSchedules,
     .showFourSchedules,
@@ -142,6 +146,7 @@ class DataStore: NSObject {
             Defaults[.firstRunAfterDefaults5Upgrade] = true
             Defaults[.firstRunAfterBuiltinUpgrade] = true
             Defaults[.firstRunAfterHotkeysUpgrade] = true
+            shouldOnboard = true
         }
 
         if Defaults[.firstRunAfterHotkeysUpgrade] == nil {
@@ -157,6 +162,7 @@ class DataStore: NSObject {
         if Defaults[.firstRunAfterLunar4Upgrade] == nil {
             DataStore.firstRunAfterLunar4Upgrade()
             Defaults[.firstRunAfterLunar4Upgrade] = true
+            shouldOnboard = true
         }
 
         if Defaults[.firstRunAfterDefaults5Upgrade] == nil {
@@ -173,6 +179,8 @@ class DataStore: NSObject {
     }
 
     // MARK: Internal
+
+    var shouldOnboard = false
 
     static func storeAppException(app: AppException, now: Bool = false) {
         guard var appExceptions = CachedDefaults[.appExceptions] else {
@@ -606,6 +614,7 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.lunarProActive)
     cacheKey(.showTwoSchedules)
     cacheKey(.showThreeSchedules)
     cacheKey(.showFourSchedules)
@@ -697,6 +706,10 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
+    static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
+    static let cliInstalled = Key<Bool>("cliInstalled", default: false)
+    static let lunarProActive = Key<Bool>("lunarProActive", default: true)
     static let showTwoSchedules = Key<Bool>("showTwoSchedules", default: false)
     static let showThreeSchedules = Key<Bool>("showThreeSchedules", default: false)
     static let showFourSchedules = Key<Bool>("showFourSchedules", default: false)
@@ -806,6 +819,7 @@ let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).
 let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let lunarProActivePublisher = Defaults.publisher(.lunarProActive).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let infoMenuShownPublisher = Defaults.publisher(.infoMenuShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showTwoSchedulesPublisher = Defaults.publisher(.showTwoSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showThreeSchedulesPublisher = Defaults.publisher(.showThreeSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
@@ -851,4 +865,6 @@ let showProjectorDisplaysPublisher = Defaults.publisher(.showProjectorDisplays).
 let showDisconnectedDisplaysPublisher = Defaults.publisher(.showDisconnectedDisplays).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let detectResponsivenessPublisher = Defaults.publisher(.detectResponsiveness).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let nonManualModePublisher = Defaults.publisher(.nonManualMode).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }

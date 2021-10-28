@@ -26,6 +26,7 @@ class ManualMode: AdaptiveMode {
     var displayObservers = Set<AnyCancellable>()
 
     var available: Bool { true }
+    var availableForOnboarding: Bool { true }
 
     func stopWatching() {
         guard watching else { return }
@@ -47,19 +48,39 @@ class ManualMode: AdaptiveMode {
     }
 
     func adapt(_ display: Display) {
-        // display.withoutDDCLimits {
+        guard displayController.adaptiveModeKey == .manual else { return }
+
+        let lastAppPreset = display.appPreset
+        var (brightness, contrast) = (display.brightness.intValue, display.contrast.intValue)
+
+        if let (br, cr) = displayController.appBrightnessContrastOffset(for: display) {
+            (brightness, contrast) = (br, cr)
+            if lastAppPreset == nil {
+                display.preciseBrightnessContrastBeforeAppPreset = display.preciseBrightnessContrast
+            }
+            if display.ambientLightAdaptiveBrightnessEnabled {
+                display.ambientLightAdaptiveBrightnessEnabled = false
+            }
+        } else if let lastAppPreset = lastAppPreset {
+            if display.hasAmbientLightAdaptiveBrightness, !display.ambientLightAdaptiveBrightnessEnabled {
+                display.ambientLightAdaptiveBrightnessEnabled = true
+            }
+            if lastAppPreset.reapplyPreviousBrightness {
+                let (br, cr) = display.sliderValueToBrightnessContrast(display.preciseBrightnessContrastBeforeAppPreset)
+                (brightness, contrast) = (br.i, cr.i)
+            }
+        }
+
         display.withForce(force || display.force) {
             #if DEBUG
-                log.debug("Setting brightness to \(display.brightness) for \(display)")
+                log.debug("Setting brightness to \(brightness) for \(display)")
+                log.debug("Setting contrast to \(contrast) for \(display)")
             #endif
-            display.brightness = display.brightness.uint8Value.ns
-
-            #if DEBUG
-                log.debug("Setting contrast to \(display.contrast) for \(display)")
-            #endif
-            display.contrast = display.contrast.uint8Value.ns
+            mainThread {
+                display.brightness = brightness.ns
+                display.contrast = contrast.ns
+            }
         }
-        // }
     }
 
     func compute(percent: Int8, minVal: Int, maxVal: Int) -> NSNumber {

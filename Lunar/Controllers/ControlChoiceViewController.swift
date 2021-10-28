@@ -82,6 +82,7 @@ class LunarTestViewController: NSViewController {
 // MARK: - ControlReadResult
 
 struct ControlReadResult {
+    static var onlyBrightnessWorked = ControlReadResult(brightness: true, contrast: false, volume: false)
     static var allWorked = ControlReadResult(brightness: true, contrast: true, volume: true)
     static var noneWorked = ControlReadResult(brightness: false, contrast: false, volume: false)
 
@@ -95,6 +96,7 @@ struct ControlReadResult {
 // MARK: - ControlWriteResult
 
 struct ControlWriteResult {
+    static var onlyBrightnessWorked = ControlWriteResult(brightness: true, contrast: false, volume: false)
     static var allWorked = ControlWriteResult(brightness: true, contrast: true, volume: true)
     static var noneWorked = ControlWriteResult(brightness: false, contrast: false, volume: false)
 
@@ -108,6 +110,7 @@ struct ControlWriteResult {
 // MARK: - ControlResult
 
 struct ControlResult {
+    static var onlyBrightnessWorked = ControlResult(type: .appleNative, read: .onlyBrightnessWorked, write: .onlyBrightnessWorked)
     static var allWorked = ControlResult(type: .ddc, read: .allWorked, write: .allWorked)
     static var noneWorked = ControlResult(type: .ddc, read: .noneWorked, write: .noneWorked)
 
@@ -153,6 +156,7 @@ class ControlChoiceViewController: NSViewController {
 
     var observers: Set<AnyCancellable> = []
 
+    @objc dynamic var progress: Double = 0.0
     @objc dynamic var volume: Double = 50
 
     var actionLabelColor = white.blended(withFraction: 0.2, of: lunarYellow)
@@ -163,6 +167,11 @@ class ControlChoiceViewController: NSViewController {
 
     var semaphore = DispatchSemaphore(value: 0, name: "Control Choice")
     var currentDisplay: Display?
+
+    var displayProgressStep: Double = 0
+    var controlProgressStep: Double = 0
+    var progressForLastDisplay: Double = 0
+    var progressForDisplay: Double = 0
 
     var controlButton: HelpButton? { _controlButton as? HelpButton }
     var ddcBlockersButton: OnboardingHelpButton? { _ddcBlockersButton as? OnboardingHelpButton }
@@ -295,7 +304,7 @@ class ControlChoiceViewController: NSViewController {
                 ddcBlockersButton.isHidden = false
                 ddcBlockersButton.transition(0.8, easing: .easeOutExpo)
                 ddcBlockersButton.alphaValue = 1.0
-                ddcBlockersButton.open(edge: .minY)
+                ddcBlockersButton.open(edge: .maxX)
             }
         }
         var answerResult = false
@@ -366,24 +375,24 @@ class ControlChoiceViewController: NSViewController {
 
             switch control {
             case .appleNative:
-                button.bg = green
-                button.attributedTitle = "Using Apple Native Protocol".withTextColor(mauve)
+                button.bg = .clear
+                button.attributedTitle = "Using Apple Native Protocol".withTextColor(green)
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
             case .ddc:
-                button.bg = peach
-                button.attributedTitle = "Using DDC Protocol".withTextColor(darkMauve)
+                button.bg = .clear
+                button.attributedTitle = "Using DDC Protocol".withTextColor(peach)
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
             case .network:
-                button.bg = blue.highlight(withLevel: 0.2)
-                button.attributedTitle = "Using DDC-over-Network Protocol".withTextColor(.black)
+                button.bg = .clear
+                button.attributedTitle = "Using DDC-over-Network Protocol".withTextColor(blue.highlight(withLevel: 0.2) ?? blue)
                 button.helpText = NETWORK_CONTROLS_HELP_TEXT
             case .gamma:
-                button.bg = red
+                button.bg = .clear
                 if display.supportsGamma {
-                    button.attributedTitle = "Using Gamma Approximation".withAttribute(.textColor(.black))
+                    button.attributedTitle = "Using Gamma Approximation".withTextColor(red)
                     button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
                 } else {
-                    button.attributedTitle = "Using Dark Overlay".withAttribute(.textColor(.black))
+                    button.attributedTitle = "Using Dark Overlay".withTextColor(red)
                     button.helpText = SOFTWARE_OVERLAY_HELP_TEXT
                 }
             default:
@@ -428,6 +437,7 @@ class ControlChoiceViewController: NSViewController {
         hideQuestion()
 
         let readWorked = testControlRead(control, for: display)
+        setControlProgress(0.5)
         guard wait(1) else { return .allWorked }
 
         guard readWorked.all else {
@@ -450,9 +460,9 @@ class ControlChoiceViewController: NSViewController {
     }
 
     func testControlWrite(_ control: Control, for display: Display) -> ControlWriteResult {
-        #if DEBUG
-            return .noneWorked
-        #endif
+        // #if DEBUG
+        //     return .noneWorked
+        // #endif
 
         let currentBrightness = brightnessField.integerValue.u8
         let currentContrast = contrastField.integerValue.u8
@@ -461,7 +471,9 @@ class ControlChoiceViewController: NSViewController {
         var contrastWriteWorked = false
         var volumeWriteWorked = false
 
+        let setWriteProgress = { value in self.setControlProgress(0.5 + (0.5 * value)) }
         info("Writing brightness", color: peach)
+        setWriteProgress(0.1)
         guard wait(1.1) else { return .allWorked }
 
         display.withBrightnessTransition {
@@ -471,14 +483,19 @@ class ControlChoiceViewController: NSViewController {
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             guard wait(4) else { return }
+            setWriteProgress(0.15)
+
             let write2Worked = control.setBrightness(75, oldValue: 0, onChange: { [weak self] br in self?.setBrightness(br) })
             guard wait(4) else { return }
+            setWriteProgress(0.2)
+
             let write3Worked = control.setBrightness(
                 67,
                 oldValue: 75,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             brightnessWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
+            setWriteProgress(0.25)
         }
 
         guard !(control is GammaControl) || display.supportsGamma else {
@@ -488,7 +505,7 @@ class ControlChoiceViewController: NSViewController {
             setResult(contrastWriteResult, text: "Write not supported", color: peach)
             setResult(volumeWriteResult, text: "Write not supported", color: peach)
 
-            return ControlWriteResult(brightness: true, contrast: true, volume: true)
+            return ControlWriteResult(brightness: true, contrast: false, volume: false)
         }
 
         if brightnessWriteWorked {
@@ -518,22 +535,29 @@ class ControlChoiceViewController: NSViewController {
             setResult(contrastWriteResult, text: "Write not supported", color: peach)
             setResult(volumeWriteResult, text: "Write not supported", color: peach)
 
-            return ControlWriteResult(brightness: true, contrast: true, volume: true)
+            return ControlWriteResult(brightness: true, contrast: false, volume: false)
         }
 
+        setWriteProgress(0.3)
         info("Writing contrast", color: peach)
         guard wait(1.1) else { return .allWorked }
 
         display.withBrightnessTransition {
+            setWriteProgress(0.35)
             let write1Worked = control.setContrast(
                 currentContrast != 0 ? 0 : 50,
                 oldValue: currentContrast, onChange: { [weak self] br in self?.setContrast(br) }
             )
             guard wait(4) else { return }
+            setWriteProgress(0.4)
+
             let write2Worked = control.setContrast(75, oldValue: 0, onChange: { [weak self] br in self?.setContrast(br) })
             guard wait(4) else { return }
+            setWriteProgress(0.45)
+
             let write3Worked = control.setContrast(67, oldValue: 75, onChange: { [weak self] br in self?.setContrast(br) })
             contrastWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
+            setWriteProgress(0.5)
         }
 
         if contrastWriteWorked {
@@ -554,18 +578,24 @@ class ControlChoiceViewController: NSViewController {
         }
         guard wait(1.1) else { return .allWorked }
 
+        setWriteProgress(0.55)
         info("Writing volume", color: peach)
         guard wait(1.1) else { return .allWorked }
 
         setVolume(0)
         let write1Worked = control.setVolume(0)
         guard wait(1) else { return .allWorked }
+        setWriteProgress(0.6)
+
         setVolume(75)
         let write2Worked = control.setVolume(75)
         guard wait(1) else { return .allWorked }
+        setWriteProgress(0.65)
+
         setVolume(23)
         let write3Worked = control.setVolume(23)
         volumeWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
+        setWriteProgress(0.7)
 
         if volumeWriteWorked {
             setResult(volumeWriteResult, text: "Write seemed to work", color: peach)
@@ -585,25 +615,29 @@ class ControlChoiceViewController: NSViewController {
         }
         guard wait(1.1) else { return .allWorked }
 
+        setWriteProgress(0.8)
         info("Setting values before test", color: peach)
         guard wait(2) else { return .allWorked }
 
         _ = control.setBrightness(currentBrightness, oldValue: nil, onChange: nil)
         setBrightness(currentBrightness)
+        setWriteProgress(0.85)
 
         _ = control.setContrast(currentContrast, oldValue: nil, onChange: nil)
         setContrast(currentContrast)
+        setWriteProgress(0.9)
 
         _ = control.setVolume(currentVolume)
         setVolume(currentVolume)
+        setWriteProgress(0.95)
 
         return ControlWriteResult(brightness: brightnessWriteWorked, contrast: contrastWriteWorked, volume: volumeWriteWorked)
     }
 
     func wait(_ seconds: TimeInterval) -> Bool {
-        #if DEBUG
-            return !cancelled
-        #endif
+        // #if DEBUG
+        //     return !cancelled
+        // #endif
 
         Thread.sleep(forTimeInterval: seconds)
         return !cancelled
@@ -613,6 +647,8 @@ class ControlChoiceViewController: NSViewController {
         var brightnessReadWorked = false
         var contrastReadWorked = false
         var volumeReadWorked = false
+
+        let setReadProgress = { value in self.setControlProgress(0.5 * value) }
 
         guard !(control is GammaControl) else {
             setBrightness(100)
@@ -632,14 +668,19 @@ class ControlChoiceViewController: NSViewController {
             brightnessReadWorked = true
             setBrightness(br)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.15)
+
             setResult(brightnessReadResult, text: "Read worked", color: green)
             guard wait(1.1) else { return .allWorked }
         } else {
             setBrightness(0)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.15)
+
             setResult(brightnessReadResult, text: "Failed to read", color: red)
             guard wait(1.1) else { return .allWorked }
         }
+        setReadProgress(0.33)
 
         info("Reading contrast", color: peach)
         guard wait(1.1) else { return .allWorked }
@@ -647,14 +688,19 @@ class ControlChoiceViewController: NSViewController {
             contrastReadWorked = true
             setContrast(cr)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.45)
+
             setResult(contrastReadResult, text: "Read worked", color: green)
             guard wait(1.1) else { return .allWorked }
         } else {
             setContrast(0)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.45)
+
             setResult(contrastReadResult, text: "Failed to read", color: red)
             guard wait(1.1) else { return .allWorked }
         }
+        setReadProgress(0.66)
 
         info("Reading volume", color: peach)
         guard wait(1.1) else { return .allWorked }
@@ -662,14 +708,19 @@ class ControlChoiceViewController: NSViewController {
             volumeReadWorked = true
             setVolume(vol)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.8)
+
             setResult(volumeReadResult, text: "Read worked", color: white)
             guard wait(1.1) else { return .allWorked }
         } else {
             setVolume(0)
             guard wait(1.1) else { return .allWorked }
+            setReadProgress(0.8)
+
             setResult(volumeReadResult, text: "Failed to read", color: peach)
             guard wait(1.1) else { return .allWorked }
         }
+        setReadProgress(0.9)
 
         return ControlReadResult(brightness: brightnessReadWorked, contrast: contrastReadWorked, volume: volumeReadWorked)
     }
@@ -706,8 +757,18 @@ class ControlChoiceViewController: NSViewController {
         }
     }
 
+    func queueChange(_ change: @escaping () -> Void) {
+        mainThread {
+            guard let wc = view.window?.windowController as? OnboardWindowController else {
+                return
+            }
+            wc.changes.append(change)
+        }
+    }
+
     func next() {
         guard let wc = view.window?.windowController as? OnboardWindowController else { return }
+        wc.applyChanges()
         wc.pageController?.navigateForward(self)
     }
 
@@ -786,7 +847,22 @@ class ControlChoiceViewController: NSViewController {
         """
     }
 
-    override func viewDidAppear() {
+    func setDisplayProgress(_ value: Double, controlStep: Double) {
+        mainThread {
+            progress = progressForLastDisplay + displayProgressStep * value
+            controlProgressStep = controlStep
+            progressForDisplay = value
+        }
+    }
+
+    func setControlProgress(_ value: Double) {
+        mainThread {
+            progress = progressForLastDisplay + displayProgressStep * progressForDisplay + value *
+                (controlProgressStep * displayProgressStep * progressForDisplay)
+        }
+    }
+
+    func listenForDisplayConnections() {
         NotificationCenter.default
             .publisher(for: displayListChanged, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
@@ -833,6 +909,11 @@ class ControlChoiceViewController: NSViewController {
                 )
 
             }.store(in: &observers)
+    }
+
+    override func viewDidAppear() {
+        listenForDisplayConnections()
+
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton) { [weak self] in
                 self?.cancelled = true
@@ -855,130 +936,15 @@ class ControlChoiceViewController: NSViewController {
                 buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
             ) {}
 
-            displayController.externalActiveDisplays.forEach { d in
-                guard !self.cancelled else { return }
-                self.currentDisplay = d
-                self.showTestWindow()
-                mainThread {
-                    self.displayName.transition(0.5, easing: .easeOutExpo)
-                    self.displayName.alphaValue = 1.0
-                    self.displayName.display = d
+            self.displayProgressStep = 1.0 / displayController.externalActiveDisplays.count.d
+            displayController.externalActiveDisplays.enumerated().forEach { i, d in
+                self.testDisplay(d, index: i)
+            }
+
+            self.queueChange {
+                displayController.externalActiveDisplays.forEach { d in
+                    d.resetControl()
                 }
-
-                let networkControl = NetworkControl(display: d)
-                let appleNativeControl = AppleNativeControl(display: d)
-                let ddcControl = DDCControl(display: d)
-                let gammaControl = GammaControl(display: d)
-
-                var result = ControlResult.noneWorked
-                defer { d.controlResult = result }
-                if appleNativeControl.isAvailable(), !self.cancelled {
-                    self.setControl(.appleNative, display: d)
-                    result = self.testControl(appleNativeControl, for: d)
-
-                    if !result.write.brightness, d.isLEDCinema() || d.isCinema() {
-                        var nextStep = true
-                        self.askQuestion(
-                            "On Cinema displays, you need to plug in the USB cable to get brightness controls\nYou can try that now and retry the test, or continue to the next step",
-                            yesButtonText: "Next", noButtonText: "Retry"
-                        ) { nextStep = $0 }
-                        if !nextStep {
-                            result = self.testControl(appleNativeControl, for: d)
-                        }
-                    }
-                }
-
-                if result.write.all {
-                    self.waitForAction(
-                        "The monitor is fully functional and ready to be used with Lunar",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                } else if result.write.brightness {
-                    self.waitForAction(
-                        "The monitor supports brightness controls and is ready to be used with Lunar",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                }
-
-                self.ddcBlockersButton?.md.code.fontSize = 15
-                if ddcControl.isAvailable(), !self.cancelled {
-                    self.setControl(.ddc, display: d)
-                    result = self.testControl(ddcControl, for: d)
-
-                    var nextStep = false
-                    while !result.write.brightness, !nextStep {
-                        self.askQuestion(
-                            "Some monitor settings can block brightness controls\nYou can try changing the listed settings and then retry the test",
-                            yesButtonText: "Next", noButtonText: "Retry",
-                            ddcBlockerText: d.possibleDDCBlockers()
-                        ) { nextStep = $0 }
-                        if !nextStep {
-                            result = self.testControl(ddcControl, for: d)
-                        }
-                    }
-                }
-
-                if result.write.all {
-                    self.waitForAction(
-                        "The monitor is fully functional and ready to be used with Lunar",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                } else if result.write.brightness {
-                    self.waitForAction(
-                        "The monitor supports brightness controls and is ready to be used with Lunar\nUnfortunately, not all monitors support \(result.write.volume ? "contrast" : "volume") controls",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                }
-
-                self.ddcBlockersButton?.md.code.fontSize = 13
-                if networkControl.isAvailable(), !self.cancelled {
-                    self.setControl(.network, display: d)
-                    result = self.testControl(networkControl, for: d)
-
-                    var nextStep = false
-                    while !result.write.brightness, !nextStep {
-                        self.askQuestion(
-                            "The assigned network controller wasn't able to control this monitor",
-                            yesButtonText: "Next", noButtonText: "Retry",
-                            ddcBlockerText: self.networkProblemText(d, control: networkControl)
-                        ) { nextStep = $0 }
-                        if !nextStep {
-                            result = self.testControl(ddcControl, for: d)
-                        }
-                    }
-                }
-
-                if result.write.all {
-                    self.waitForAction(
-                        "The monitor is fully functional and ready to be used with Lunar",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                } else if result.write.brightness {
-                    self.waitForAction(
-                        "The monitor supports brightness controls and is ready to be used with Lunar",
-                        buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                    ) {}
-                    return
-                }
-
-                self.setControl(.gamma, display: d)
-                result = self.testControl(gammaControl, for: d)
-
-                if d.supportsGamma, !result.write.brightness {
-                    d.useOverlay = true
-                    self.setControl(.gamma, display: d)
-                    result = self.testControl(gammaControl, for: d)
-                }
-
-                self.waitForAction(
-                    "The monitor only supports software brightness dimming\nThe monitor's brightness should be set to its highest values manually using its physical buttons",
-                    buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
-                ) {}
             }
 
             mainThread {
@@ -987,6 +953,159 @@ class ControlChoiceViewController: NSViewController {
                 self.next()
             }
         }
+    }
+
+    func testDisplay(_ d: Display, index: Int) {
+        guard !cancelled else { return }
+        progressForLastDisplay = displayProgressStep * index.d
+        setDisplayProgress(0, controlStep: 0.25)
+        defer { self.progress = self.displayProgressStep * (index + 1).d }
+
+        currentDisplay = d
+        showTestWindow()
+        mainThread {
+            self.displayName.transition(0.5, easing: .easeOutExpo)
+            self.displayName.alphaValue = 1.0
+            self.displayName.display = d
+        }
+
+        let networkControl = NetworkControl(display: d)
+        let appleNativeControl = AppleNativeControl(display: d)
+        let ddcControl = DDCControl(display: d)
+        let gammaControl = GammaControl(display: d)
+
+        var result = ControlResult.noneWorked
+        defer { d.controlResult = result }
+        if appleNativeControl.isAvailable(), !cancelled {
+            setControl(.appleNative, display: d)
+            result = testControl(appleNativeControl, for: d)
+            setDisplayProgress(0.25, controlStep: 0.25)
+
+            if !result.write.brightness, d.isLEDCinema() || d.isCinema() {
+                var nextStep = true
+                askQuestion(
+                    "On Cinema displays, you need to plug in the USB cable to get brightness controls\nYou can try that now and retry the test, or continue to the next step",
+                    yesButtonText: "Next", noButtonText: "Retry"
+                ) { nextStep = $0 }
+
+                if nextStep {
+                    queueChange {
+                        d.enabledControls[.appleNative] = false
+                        d.save()
+                    }
+                } else {
+                    setDisplayProgress(0, controlStep: 0.25)
+                    result = testControl(appleNativeControl, for: d)
+                    setDisplayProgress(0.25, controlStep: 0.25)
+                }
+            }
+        } else { setDisplayProgress(0.25, controlStep: 0.25) }
+
+        if result.write.all {
+            waitForAction(
+                "The monitor is fully functional and ready to be used with Lunar",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        } else if result.write.brightness {
+            waitForAction(
+                "The monitor supports brightness controls and is ready to be used with Lunar",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        }
+
+        ddcBlockersButton?.md.code.fontSize = 15
+        if ddcControl.isAvailable(), !cancelled {
+            setControl(.ddc, display: d)
+            result = testControl(ddcControl, for: d)
+            setDisplayProgress(0.5, controlStep: 0.25)
+
+            var nextStep = false
+            while !result.write.brightness, !nextStep {
+                askQuestion(
+                    "Some monitor settings can block brightness controls\nYou can try changing the listed settings and then retry the test",
+                    yesButtonText: "Next", noButtonText: "Retry",
+                    ddcBlockerText: d.possibleDDCBlockers()
+                ) { nextStep = $0 }
+                if nextStep {
+                    let ddcEnabled = result.write.volume || result.write.contrast
+                    queueChange {
+                        d.enabledControls[.ddc] = ddcEnabled
+                        d.save()
+                    }
+                } else {
+                    setDisplayProgress(0.25, controlStep: 0.25)
+                    result = testControl(ddcControl, for: d)
+                    setDisplayProgress(0.5, controlStep: 0.25)
+                }
+            }
+        } else { setDisplayProgress(0.5, controlStep: 0.25) }
+
+        if result.write.all {
+            waitForAction(
+                "The monitor is fully functional and ready to be used with Lunar",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        } else if result.write.brightness {
+            waitForAction(
+                "The monitor supports brightness controls and is ready to be used with Lunar\nUnfortunately, not all monitors support \(result.write.volume ? "contrast" : "volume") controls",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        }
+
+        ddcBlockersButton?.md.code.fontSize = 13
+        if networkControl.isAvailable(), !cancelled {
+            setControl(.network, display: d)
+            result = testControl(networkControl, for: d)
+            setDisplayProgress(0.75, controlStep: 0.25)
+
+            var nextStep = false
+            while !result.write.brightness, !nextStep {
+                askQuestion(
+                    "The assigned network controller wasn't able to control this monitor",
+                    yesButtonText: "Next", noButtonText: "Retry",
+                    ddcBlockerText: networkProblemText(d, control: networkControl)
+                ) { nextStep = $0 }
+                if !nextStep {
+                    setDisplayProgress(0.5, controlStep: 0.25)
+                    result = testControl(ddcControl, for: d)
+                    setDisplayProgress(0.75, controlStep: 0.25)
+                }
+            }
+        } else { setDisplayProgress(0.75, controlStep: 0.1) }
+
+        if result.write.all {
+            waitForAction(
+                "The monitor is fully functional and ready to be used with Lunar",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        } else if result.write.brightness {
+            waitForAction(
+                "The monitor supports brightness controls and is ready to be used with Lunar",
+                buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+            ) {}
+            return
+        }
+
+        setControl(.gamma, display: d)
+        result = testControl(gammaControl, for: d)
+        setDisplayProgress(0.8, controlStep: 0.1)
+
+        if d.supportsGamma, !result.write.brightness {
+            d.useOverlay = true
+            setControl(.gamma, display: d)
+            result = testControl(gammaControl, for: d)
+            setDisplayProgress(0.9, controlStep: 0.1)
+        }
+
+        waitForAction(
+            "The monitor only supports software brightness dimming\nThe monitor's brightness should be set to its highest values manually using its physical buttons",
+            buttonColor: lunarYellow, buttonText: "Next step".withTextColor(mauve)
+        ) {}
     }
 
     override func viewDidLoad() {

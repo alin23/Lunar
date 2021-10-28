@@ -943,8 +943,10 @@ extension NSView {
             return NSColor(cgColor: backgroundColor)
         }
         set {
-            wantsLayer = true
-            layer?.backgroundColor = newValue?.cgColor
+            mainThread {
+                wantsLayer = true
+                layer?.backgroundColor = newValue?.cgColor
+            }
         }
     }
 
@@ -1163,5 +1165,14 @@ class AutoRemovingSegmentedControl: NSSegmentedControl {
 class AutoRemovingBox: NSBox {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
+    }
+}
+
+extension FileManager {
+    func isExecutableBinary(atPath path: String) -> Bool {
+        var isDir = ObjCBool(false)
+        guard fileExists(atPath: path, isDirectory: &isDir) else { return false }
+        guard !isDir.boolValue else { return false }
+        return isExecutableFile(atPath: path)
     }
 }

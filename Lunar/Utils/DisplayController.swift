@@ -369,20 +369,30 @@ class DisplayController {
             }
         }.store(in: &observers)
 
+        showTwoSchedulesPublisher.sink { [self] change in
+            guard !change.newValue else { return }
+
+            displays.values.forEach { d in
+                guard let schedule = d.schedules[safe: 1] else { return }
+                d.schedules[1] = schedule.with(type: .disabled)
+                d.save()
+            }
+        }.store(in: &observers)
         showThreeSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 
-            if CachedDefaults[.showFiveSchedules] {
-                CachedDefaults[.showFiveSchedules] = false
+            displays.values.forEach { d in
+                guard let schedule = d.schedules[safe: 2] else { return }
+                d.schedules[2] = schedule.with(type: .disabled)
+                d.save()
             }
+        }.store(in: &observers)
+        showFourSchedulesPublisher.sink { [self] change in
+            guard !change.newValue else { return }
 
             displays.values.forEach { d in
-                if let schedule = d.schedules[safe: 1] {
-                    d.schedules[1] = schedule.with(type: .disabled)
-                }
-                if let schedule = d.schedules[safe: 2] {
-                    d.schedules[2] = schedule.with(type: .disabled)
-                }
+                guard let schedule = d.schedules[safe: 3] else { return }
+                d.schedules[3] = schedule.with(type: .disabled)
                 d.save()
             }
         }.store(in: &observers)
@@ -390,12 +400,8 @@ class DisplayController {
             guard !change.newValue else { return }
 
             displays.values.forEach { d in
-                if let schedule = d.schedules[safe: 3] {
-                    d.schedules[3] = schedule.with(type: .disabled)
-                }
-                if let schedule = d.schedules[safe: 4] {
-                    d.schedules[4] = schedule.with(type: .disabled)
-                }
+                guard let schedule = d.schedules[safe: 4] else { return }
+                d.schedules[4] = schedule.with(type: .disabled)
                 d.save()
             }
         }.store(in: &observers)
@@ -581,10 +587,10 @@ class DisplayController {
         func firstServiceMatching(_ iterator: io_iterator_t, names: [String]) -> io_service_t? {
             var service: io_service_t?
 
-            while case let t810xIOChild = IOIteratorNext(iterator), t810xIOChild != 0 {
-                if IOServiceNameMatches(t810xIOChild, names: names) {
-                    service = t810xIOChild
-                    log.info("Found service \(t810xIOChild) in iterator \(iterator): (names: \(names))")
+            while case let txIOChild = IOIteratorNext(iterator), txIOChild != 0 {
+                if IOServiceNameMatches(txIOChild, names: names) {
+                    service = txIOChild
+                    log.info("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
                     break
                 }
             }
@@ -607,31 +613,37 @@ class DisplayController {
             }
 
             var clcd2Num = 0
-            var t810xIOIterator = io_iterator_t()
-            let t810xIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
+            var txIOIterator = io_iterator_t()
+            var txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
+            if txIOService == 0 {
+                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT600xIO"))
+            }
 
-            guard t810xIOService != 0,
-                  IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) == KERN_SUCCESS
+            guard txIOService != 0,
+                  IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) == KERN_SUCCESS
             else {
                 log
                     .info(
-                        "No AVService for display \(displayID): (t810xIOService: \(t810xIOService), childIteratorErr: \((t810xIOService != 0) ? IORegistryEntryGetChildIterator(t810xIOService, kIOServicePlane, &t810xIOIterator) : KERN_SUCCESS)))"
+                        "No AVService for display \(displayID): (txIOService: \(txIOService), childIteratorErr: \((txIOService != 0) ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) : KERN_SUCCESS)))"
                     )
                 return nil
             }
 
             defer {
-                assert(IOObjectRelease(t810xIOIterator) == KERN_SUCCESS)
+                assert(IOObjectRelease(txIOIterator) == KERN_SUCCESS)
             }
 
             var matchedDisplay: Display?
-            while case let t810xIOChild = IOIteratorNext(t810xIOIterator), t810xIOChild != 0 {
-                if IOServiceNameMatches(t810xIOChild, names: ["dispext0", "disp0"]) {
+            while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
+                if IOServiceNameMatches(
+                    txIOChild,
+                    names: ["dispext0", "disp0", "dispext1", "disp1", "dispext2", "disp2", "dispext3", "disp3"]
+                ) {
                     clcd2Num += 1
                     guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
 
                     if let d = displayForIOService(
-                        t810xIOChild,
+                        txIOChild,
                         displays: display != nil ? [display!] : nil,
                         match: match
                     ), d.id == displayID {
@@ -662,7 +674,7 @@ class DisplayController {
             }
 
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard let dcpService = firstServiceMatching(t810xIOIterator, names: ["dcp", "dcpext"]),
+            guard let dcpService = firstServiceMatching(txIOIterator, names: ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3"]),
                   let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
                   let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
                   !CFEqual(ioAvService, 0 as IOAVService),
@@ -881,13 +893,25 @@ class DisplayController {
         }
     }
 
-    func appBrightnessContrastOffset(for display: Display) -> (Int, Int) {
-        guard let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else { return (0, 0) }
+    func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
+        guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
+            display.appPreset = nil
+            return nil
+        }
 
         if let app = activeWindow(on: screen)?.appException {
             #if DEBUG
+                print(
+                    "App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast) \(app.manualBrightnessContrast) \(app.applyBuiltin)"
+                )
                 log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
             #endif
+            display.appPreset = app
+            if adaptiveModeKey == .manual {
+                guard !display.isBuiltin || app.applyBuiltin else { return nil }
+                let (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
+                return (br.i, cr.i)
+            }
             return (app.brightness.i, app.contrast.i)
         }
 
@@ -910,11 +934,24 @@ class DisplayController {
         let windowsOnScreen = windows.filter { w in w.screen?.displayID == screen.displayID }
         guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
               let app = focusedWindow.appException
-        else { return (0, 0) }
+        else {
+            display.appPreset = nil
+            return nil
+        }
 
         #if DEBUG
+            print(
+                "App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast) \(app.manualBrightnessContrast) \(app.applyBuiltin)"
+            )
             log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
         #endif
+        display.appPreset = app
+
+        if adaptiveModeKey == .manual {
+            guard !display.isBuiltin || app.applyBuiltin else { return nil }
+            let (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
+            return (br.i, cr.i)
+        }
 
         return (app.brightness.i, app.contrast.i)
     }
@@ -1245,7 +1282,7 @@ class DisplayController {
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
         guard adaptiveMode.available else { return }
-        for display in (displays ?? externalActiveDisplays).filter({ !$0.blackOutEnabled }) {
+        for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
             }

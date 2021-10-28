@@ -1,6 +1,16 @@
 import Cocoa
 import Foundation
 
+// MARK: - ButtonCell
+
+class ButtonCell: NSButtonCell {
+    override func _shouldDrawTextWithDisabledAppearance() -> Bool {
+        (controlView as! Button).grayDisabledText
+    }
+}
+
+// MARK: - Button
+
 class Button: NSButton {
     // MARK: Lifecycle
 
@@ -16,6 +26,9 @@ class Button: NSButton {
 
     // MARK: Internal
 
+    @IBInspectable dynamic var grayDisabledText: Bool = true
+    @IBInspectable dynamic var alternateTitleWhenDisabled: Bool = false
+
     var buttonShadow: NSShadow!
 
     var onMouseEnter: (() -> Void)?
@@ -30,7 +43,33 @@ class Button: NSButton {
     @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainThread { invalidateIntrinsicContentSize() }}}
     @IBInspectable var color: NSColor = .clear { didSet { mainThread { bg = color }}}
     @IBInspectable var textColor: NSColor = .labelColor {
-        didSet { mainThread { attributedTitle = NSAttributedString(string: title, attributes: [.foregroundColor: textColor]) }}
+        didSet { mainThread {
+            guard !alternateTitleWhenDisabled else {
+                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                return
+            }
+            attributedTitle = title.withTextColor(textColor)
+        }}
+    }
+
+    override var title: String {
+        didSet { mainThread {
+            guard !alternateTitleWhenDisabled else {
+                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                return
+            }
+            attributedTitle = title.withTextColor(textColor)
+        }}
+    }
+
+    override var alternateTitle: String {
+        didSet { mainThread {
+            guard !alternateTitleWhenDisabled else {
+                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                return
+            }
+            attributedTitle = title.withTextColor(textColor)
+        }}
     }
 
     override var frame: NSRect {
@@ -41,6 +80,18 @@ class Button: NSButton {
         didSet {
             trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
             defocus()
+        }
+    }
+
+    override var isEnabled: Bool {
+        didSet {
+            guard !grayDisabledText else { return }
+            mainThread {
+                alphaValue = isEnabled ? alpha : alpha - 0.3
+                if alternateTitleWhenDisabled {
+                    attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                }
+            }
         }
     }
 
@@ -165,7 +216,7 @@ class Button: NSButton {
         setShape()
 
         bg = color
-        attributedTitle = NSAttributedString(string: title, attributes: [.foregroundColor: textColor])
+        attributedTitle = title.withTextColor(textColor)
         alphaValue = alpha
 
         buttonShadow = shadow

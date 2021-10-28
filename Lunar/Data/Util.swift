@@ -573,34 +573,6 @@ func getSerialNumberHash() -> String? {
     return nil
 }
 
-@inline(__always) func mainThreadSerial(_ action: () -> Void) {
-    if Thread.isMainThread {
-        action()
-    } else {
-        mainSerialQueue.sync {
-            action()
-        }
-    }
-}
-
-@inline(__always) func mainThreadSerial<T>(_ action: () -> T) -> T {
-    if Thread.isMainThread {
-        return action()
-    } else {
-        return mainSerialQueue.sync {
-            return action()
-        }
-    }
-}
-
-@inline(__always) func mainThread(_ action: () -> Void) {
-    guard !Thread.isMainThread else {
-        action()
-        return
-    }
-    DispatchQueue.main.sync { action() }
-}
-
 @discardableResult
 @inline(__always) func mainThread<T>(_ action: () -> T) -> T {
     guard !Thread.isMainThread else {
@@ -662,19 +634,18 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 
     let task: DispatchWorkItem
     if let key = uniqueTaskKey {
-        let queue = mainThread ? mainQueue : timerQueue
-        taskQueueLock.around { taskQueue[key] = queue }
+//        let queue = mainThread ? mainQueue : timerQueue
+//        taskQueueLock.around { taskQueue[key] = queue }
         task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
             guard !isCancelled(key) else {
-                queue.async { Thread.current.threadDictionary[key] = nil }
+                taskManager(key, nil)
                 return
             }
             action()
-
-            queue.async { Thread.current.threadDictionary[key] = nil }
+            taskManager(key, nil)
         }
 
-        sync(queue: queue) {
+        sync(queue: taskManagerQueue) {
             (Thread.current.threadDictionary[key] as? DispatchWorkItem)?.cancel()
             Thread.current.threadDictionary["\(key)-cancelled"] = false
             Thread.current.threadDictionary[key] = task
@@ -707,59 +678,59 @@ func asyncEvery(
 ) {
     let queue = queue ?? timerQueue
     queue.async {
-        if skipIfExists, let key = uniqueTaskKey, let timer = Thread.current.threadDictionary[key] as? Timer, timer.isValid {
+        if skipIfExists, let key = uniqueTaskKey, let timer = taskManager(key) as? Timer, timer.isValid {
             return
         }
 
         let timer = Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { timer in
             action(timer)
             guard let key = uniqueTaskKey,
-                  let runs = Thread.current.threadDictionary["\(key)-runs"] as? Int,
-                  let maxRuns = Thread.current.threadDictionary["\(key)-maxRuns"] as? Int
+                  let runs = taskManager("\(key)-runs") as? Int,
+                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
             else {
                 return
             }
 
             if runs >= maxRuns || isCancelled(key) {
                 timer.invalidate()
-                Thread.current.threadDictionary[key] = nil
+                taskManager(key, nil)
                 if runs >= maxRuns { onSuccess?() } else { onCancelled?() }
             } else {
-                Thread.current.threadDictionary["\(key)-runs"] = runs + 1
+                taskManager("\(key)-runs", runs + 1)
             }
         }
 
         if eager { action(timer) }
 
         if let key = uniqueTaskKey {
-            taskQueueLock.around { taskQueue[key] = queue }
-            (Thread.current.threadDictionary[key] as? Timer)?.invalidate()
-            Thread.current.threadDictionary[key] = timer
+//            taskQueueLock.around { taskQueue[key] = queue }
+            (taskManager(key) as? Timer)?.invalidate()
+            taskManager(key, timer)
 
             if let runs = runs {
-                Thread.current.threadDictionary["\(key)-maxRuns"] = runs
-                Thread.current.threadDictionary["\(key)-runs"] = 0
+                taskManager("\(key)-maxRuns", runs)
+                taskManager("\(key)-runs", 0)
             }
         }
     }
 }
 
 func cancelTask(_ key: String, subscriberKey: String? = nil) {
-    guard let queue = taskQueueLock.around({ taskQueue[key] }) else { return }
+//    guard let queue = taskQueueLock.around({ taskQueue[key] }) else { return }
 
-    queue.async {
-        guard let task = Thread.current.threadDictionary[key] else { return }
+//    queue.async {
+    guard let task = taskManager(key) else { return }
 
-        Thread.current.threadDictionary["\(key)-cancelled"] = true
-        if let task = task as? DispatchWorkItem {
-            task.cancel()
-        } else if let task = task as? Timer {
-            task.invalidate()
-        }
-
-        globalObservers.removeValue(forKey: subscriberKey ?? key)
-        Thread.current.threadDictionary.removeObject(forKey: key)
+    taskManager("\(key)-cancelled", true)
+    if let task = task as? DispatchWorkItem {
+        task.cancel()
+    } else if let task = task as? Timer {
+        task.invalidate()
     }
+
+    globalObservers.removeValue(forKey: subscriberKey ?? key)
+    taskManager(key, delete: true)
+//    }
 }
 
 @discardableResult func asyncNow(
@@ -858,8 +829,8 @@ func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ acti
 }
 
 var globalObservers: [String: AnyCancellable] = Dictionary(minimumCapacity: 100)
-var taskQueue: [String: RunloopQueue] = Dictionary(minimumCapacity: 100)
-let taskQueueLock = NSRecursiveLock()
+// var taskQueue: [String: RunloopQueue] = Dictionary(minimumCapacity: 100)
+// let taskQueueLock = NSRecursiveLock()
 
 func sync<T>(queue: RunloopQueue, _ action: @escaping () -> T) -> T {
     if let q = DispatchQueue.current, queue == q {
@@ -870,8 +841,7 @@ func sync<T>(queue: RunloopQueue, _ action: @escaping () -> T) -> T {
 }
 
 func isCancelled(_ key: String) -> Bool {
-    guard let queue = taskQueueLock.around({ taskQueue[key] }) else { return false }
-    return sync(queue: queue) {
+    sync(queue: taskManagerQueue) {
         Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
     }
 }
@@ -896,6 +866,21 @@ func debounce(
     ) { (_: Bool?) in action() }
 }
 
+func taskManager(_ key: String, _ value: Any?) {
+    sync(queue: taskManagerQueue) { Thread.current.threadDictionary[key] = value }
+}
+
+@discardableResult func taskManager(_ key: String, delete: Bool = false) -> Any? {
+    sync(queue: taskManagerQueue) {
+        let value = Thread.current.threadDictionary[key]
+        if delete {
+            Thread.current.threadDictionary.removeObject(forKey: key)
+        }
+
+        return value
+    }
+}
+
 func debounce<T: Equatable>(
     ms: Int,
     uniqueTaskKey: String,
@@ -907,10 +892,10 @@ func debounce<T: Equatable>(
     _ action: @escaping (T) -> Void
 ) {
     let queue = mainThread ? mainQueue : queue
-    taskQueueLock.around { taskQueue[uniqueTaskKey] = queue }
+//    taskQueueLock.around { taskQueue[uniqueTaskKey] = queue }
     queue.async {
-        Thread.current.threadDictionary["\(uniqueTaskKey)-cancelled"] = false
-        if Thread.current.threadDictionary[uniqueTaskKey] == nil || replace {
+        taskManager("\(uniqueTaskKey)-cancelled", false)
+        if taskManager(uniqueTaskKey) == nil || replace {
             #if DEBUG
                 if replace {
                     log.verbose("Replacing subscriber for '\(uniqueTaskKey)'. Current subscriber count: \(globalObservers.count)")
@@ -919,12 +904,12 @@ func debounce<T: Equatable>(
                 }
             #endif
 
-            let pub = (Thread.current.threadDictionary[uniqueTaskKey] as? PassthroughSubject<T, Never>) ?? PassthroughSubject<T, Never>()
+            let pub = (taskManager(uniqueTaskKey) as? PassthroughSubject<T, Never>) ?? PassthroughSubject<T, Never>()
             pub
                 .debounce(for: .milliseconds(ms), scheduler: mainThread ? RunLoop.main : RunLoop.current)
                 .sink(receiveValue: action)
                 .store(in: &globalObservers, for: subscriberKey ?? uniqueTaskKey)
-            Thread.current.threadDictionary[uniqueTaskKey] = pub
+            taskManager(uniqueTaskKey, pub)
 
             #if DEBUG
                 if replace {
@@ -935,7 +920,7 @@ func debounce<T: Equatable>(
             #endif
         }
 
-        guard let pub = Thread.current.threadDictionary[uniqueTaskKey] as? PassthroughSubject<T, Never> else { return }
+        guard let pub = taskManager(uniqueTaskKey) as? PassthroughSubject<T, Never> else { return }
         pub.send(value)
     }
 }
@@ -1791,7 +1776,7 @@ struct AXWindow {
 
         self.runningApp = runningApp
         self.appException = appException
-        screen = NSScreen.screens.filter { !$0.isBuiltin && $0.frame.intersects(frame) }.max(by: { s1, s2 in
+        screen = NSScreen.screens.filter { $0.frame.intersects(frame) }.max(by: { s1, s2 in
             s1.frame.intersectedArea(frame) < s2.frame.intersectedArea(frame)
         })
     }

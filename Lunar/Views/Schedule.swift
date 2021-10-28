@@ -7,9 +7,9 @@
 //
 
 import Cocoa
+import Combine
 import Defaults
 import SwiftDate
-import Combine
 
 // MARK: - ScheduleTransition
 
@@ -147,8 +147,15 @@ class Schedule: NSView {
     @IBOutlet var dropdown: NSPopUpButton!
     @IBInspectable dynamic var title = "Schedule 1"
     @IBInspectable dynamic var number = 1
-    var schedule: BrightnessSchedule? { display?.schedules[number - 1] }
     @objc dynamic lazy var isTimeSchedule = type == ScheduleType.time.rawValue
+    @objc dynamic lazy var enabled: Bool = type != ScheduleType.disabled.rawValue
+
+    var lastType: Int = ScheduleType.time.rawValue
+    var observers: Set<AnyCancellable> = []
+
+    var hover = false
+
+    var schedule: BrightnessSchedule? { display?.schedules[number - 1] }
     @objc dynamic var preciseBrightnessContrast: Double {
         get {
             guard let display = display, let schedule = schedule else {
@@ -179,9 +186,6 @@ class Schedule: NSView {
         }
     }
 
-    @objc dynamic lazy var enabled: Bool = type != ScheduleType.disabled.rawValue
-
-    var lastType: Int = ScheduleType.time.rawValue
     @objc dynamic var type: Int = ScheduleType.time.rawValue {
         didSet {
             guard let display = display, let schedule = display.schedules.prefix(number).last
@@ -284,6 +288,34 @@ class Schedule: NSView {
         }
     }
 
+    @IBInspectable var alpha: CGFloat = 0.1 {
+        didSet {
+            fade()
+        }
+    }
+
+    @IBInspectable var hoverAlpha: CGFloat = 0.3 {
+        didSet {
+            fade()
+        }
+    }
+
+    override var frame: NSRect {
+        didSet { trackHover() }
+    }
+
+    override var isHidden: Bool {
+        didSet {
+            trackHover()
+            hover = false
+            fade()
+        }
+    }
+
+    @objc dynamic var isEnabled: Bool = true {
+        didSet { fade() }
+    }
+
     func setTimeValues(from schedule: BrightnessSchedule) {
         hour.integerValue = schedule.hour.i
         minute.integerValue = schedule.minute.i
@@ -307,8 +339,6 @@ class Schedule: NSView {
             break
         }
     }
-
-    var observers: Set<AnyCancellable> = []
 
     func addObservers() {
         showTwoSchedulesPublisher.sink { [weak self] change in
@@ -377,34 +407,6 @@ class Schedule: NSView {
         super.draw(dirtyRect)
     }
 
-    // MARK: Internal
-
-    var hover = false
-
-    @IBInspectable var alpha: CGFloat = 0.1 {
-        didSet {
-            fade()
-        }
-    }
-
-    @IBInspectable var hoverAlpha: CGFloat = 0.3 {
-        didSet {
-            fade()
-        }
-    }
-
-    override var frame: NSRect {
-        didSet { trackHover() }
-    }
-
-    override var isHidden: Bool {
-        didSet {
-            trackHover()
-            hover = false
-            fade()
-        }
-    }
-
     func fade() {
         mainThread {
             if isHidden || isEnabled {
@@ -440,9 +442,5 @@ class Schedule: NSView {
 
         fade()
         super.mouseExited(with: event)
-    }
-
-    @objc dynamic var isEnabled: Bool = true {
-        didSet { fade() }
     }
 }
