@@ -27,7 +27,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         }
         let menuPopover = appDelegate!.initMenuPopover()
 
-        guard let button = statusButton, let controller = menuPopover.contentViewController as? QuickActionsViewController
+        guard let button = statusButton, (menuPopover.contentViewController as? QuickActionsViewController) != nil
         else {
             return
         }

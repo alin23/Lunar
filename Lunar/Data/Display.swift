@@ -17,6 +17,7 @@ import Defaults
 import Foundation
 import Magnet
 import OSLog
+import Regex
 import Sentry
 import Surge
 import SwiftDate
@@ -888,8 +889,19 @@ enum ValueType {
 
     @Atomic static var applySource = true
 
+    static let nonDDCNamePattern = "dummy|28e850".r!
+
+    @objc dynamic var appPreset: AppException? = nil
+
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
-    dynamic var controlResult = ControlResult.allWorked
+    dynamic lazy var controlResult = isBuiltin ? ControlResult.onlyBrightnessWorked : ControlResult.allWorked
+    @objc dynamic lazy var brightnessReadWorks = controlResult.read.brightness
+    @objc dynamic lazy var contrastReadWorks = controlResult.read.contrast
+    @objc dynamic lazy var volumeReadWorks = controlResult.read.volume
+
+    @objc dynamic lazy var brightnessWriteWorks = controlResult.write.brightness
+    @objc dynamic lazy var contrastWriteWorks = controlResult.write.contrast
+    @objc dynamic lazy var volumeWriteWorks = controlResult.write.volume
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
@@ -1160,9 +1172,31 @@ enum ValueType {
 
     @Atomic var initialised = false
 
+    var preciseBrightnessContrastBeforeAppPreset: Double = 0.5
+
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
-        set { DisplayServicesEnableAmbientLightCompensation(id, newValue) }
+        set {
+            guard ambientLightCompensationEnabledByUser else { return }
+            DisplayServicesEnableAmbientLightCompensation(id, newValue)
+        }
+    }
+
+    var ambientLightCompensationEnabledByUser: Bool {
+        guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
+        else {
+            // First time checking out this flag, set it manually
+            let value = ambientLightAdaptiveBrightnessEnabled
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
+            return value
+        }
+        if enabled { return true }
+        if ambientLightAdaptiveBrightnessEnabled {
+            // User must have enabled this manually in the meantime, set it to true manually
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
+            return true
+        }
+        return false
     }
 
     var cornerWindowController: NSWindowController? {
@@ -1785,7 +1819,7 @@ enum ValueType {
             let startTime = DispatchTime.now()
 
             if let control = control as? DDCControl {
-                control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
+                _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
             } else if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness, onChange: nil) {
                 log.warning(
                     "Error writing brightness using \(control.str)",
@@ -1847,7 +1881,7 @@ enum ValueType {
             let startTime = DispatchTime.now()
 
             if let control = control as? DDCControl {
-                control.setContrastDebounced(contrast, oldValue: oldContrast)
+                _ = control.setContrastDebounced(contrast, oldValue: oldContrast)
             } else if let control = control, !control.setContrast(contrast, oldValue: oldContrast, onChange: nil) {
                 log.warning(
                     "Error writing contrast using \(control.str)",
@@ -2206,7 +2240,9 @@ enum ValueType {
                 }
             } else if let builtinDisplay = displayController.builtinDisplay, builtinDisplay.serial != serial {
                 builtinDisplay.isSource = true
-            } else if let smartDisplay = displayController.externalActiveDisplays.first(where: \.hasAmbientLightAdaptiveBrightness), smartDisplay.serial != serial {
+            } else if let smartDisplay = displayController.externalActiveDisplays.first(where: \.hasAmbientLightAdaptiveBrightness),
+                      smartDisplay.serial != serial
+            {
                 smartDisplay.isSource = true
             }
 
@@ -2387,11 +2423,19 @@ enum ValueType {
             }
 
             display.withoutDDC {
-                display.brightness = newBrightness.ns
+                mainThread { display.brightness = newBrightness.ns }
             }
         }
 
         return true
+    }
+
+    static func getThreadDictValue(_ id: CGDirectDisplayID, type: String) -> Any? {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] }
+    }
+
+    static func setThreadDictValue(_ id: CGDirectDisplayID, type: String, value: Any?) {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] = value }
     }
 
     static func getWindowController(_ id: CGDirectDisplayID, type: String) -> NSWindowController? {
@@ -2876,7 +2920,7 @@ enum ValueType {
 
         control = getBestControl()
 
-        observeBrightnessChangeDS()
+        _ = observeBrightnessChangeDS()
         guard isSmartBuiltin, !hasBrightnessChangeObserver else { return }
         asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
@@ -2944,12 +2988,17 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault else {
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault,
+              !Self.nonDDCNamePattern.matches(name)
+        else {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
             if !supportsGammaByDefault {
                 log.debug("Virtual/Airplay displays don't support DDC, ignoring for display \(description)")
+            }
+            if Self.nonDDCNamePattern.matches(name) {
+                log.debug("Dummy displays don't support DDC, ignoring for display \(description)")
             }
             mainThread { hasI2C = false }
             return
@@ -4015,7 +4064,8 @@ enum ValueType {
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource, timeSince(lastConnectionTime) > 5 else { return }
+        guard !lockedBrightnessCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
+              timeSince(lastConnectionTime) > 5 else { return }
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
@@ -4047,7 +4097,8 @@ enum ValueType {
     }
 
     func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource, timeSince(lastConnectionTime) > 5 else { return }
+        guard !lockedContrastCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
+              timeSince(lastConnectionTime) > 5 else { return }
 
         contrastDataPointInsertionTask?.cancel()
         if userContrast[modeKey] == nil {

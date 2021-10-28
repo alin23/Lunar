@@ -79,7 +79,7 @@ class LockButton: NSButton {
 
     override var state: NSControl.StateValue {
         didSet {
-            bg = state == .on ? bgOn : bgOff
+            mainThread { bg = state == .on ? bgOn : bgOff }
         }
     }
 

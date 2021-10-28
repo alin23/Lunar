@@ -42,13 +42,11 @@ class ModeChoiceViewController: NSViewController {
     lazy var originalOverride = CachedDefaults[.overrideAdaptiveMode]
     lazy var originalMode = displayController.adaptiveModeKey
 
-    var apply: (() -> Void)? {
-        didSet {
-            guard let change = apply, let wc = view.window?.windowController as? OnboardWindowController else {
-                return
-            }
-            wc.changes.append(change)
+    func queueChange(_ change: @escaping (() -> Void)) {
+        guard let wc = view.window?.windowController as? OnboardWindowController else {
+            return
         }
+        wc.changes.append(change)
     }
 
     func getMarkdownRenderer(color: NSColor? = nil) -> SwiftyMarkdown {
@@ -124,7 +122,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func syncBuiltinClick() {
-        apply = {
+        queueChange {
             guard let builtin = displayController.builtinDisplay else { return }
             builtin.isSource = true
             displayController.displays.values
@@ -146,7 +144,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func syncSourceClick() {
-        apply = {
+        queueChange {
             let externals = displayController.externalActiveDisplays
             guard let source = externals.first(where: { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) })
             else { return }
@@ -173,7 +171,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func locationClick() {
-        apply = {
+        queueChange {
             LocationMode.specific.fetchGeolocation()
             CachedDefaults[.overrideAdaptiveMode] = true
             CachedDefaults[.adaptiveBrightnessMode] = .location
@@ -182,7 +180,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func clockClick() {
-        apply = {
+        queueChange {
             CachedDefaults[.overrideAdaptiveMode] = true
             CachedDefaults[.adaptiveBrightnessMode] = .clock
         }
@@ -190,7 +188,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func sensorClick() {
-        apply = {
+        queueChange {
             CachedDefaults[.overrideAdaptiveMode] = true
             CachedDefaults[.adaptiveBrightnessMode] = .sensor
         }
@@ -198,7 +196,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     @objc func manualClick() {
-        apply = {
+        queueChange {
             CachedDefaults[.overrideAdaptiveMode] = true
             CachedDefaults[.adaptiveBrightnessMode] = .manual
         }

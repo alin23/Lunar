@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Combine
 
 class ExceptionsView: NSTableView {
     override func draw(_ dirtyRect: NSRect) {
@@ -14,7 +15,7 @@ class ExceptionsView: NSTableView {
     }
 
     override func didRemove(_ rowView: NSTableRowView, forRow _: Int) {
-        guard let app = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? AppException
+        guard let app = (rowView.view(atColumn: 0) as? NSTableCellView)?.objectValue as? AppException
         else { return }
 
         displayController.runningAppExceptions.removeAll(where: { $0.identifier == app.identifier })
@@ -22,27 +23,8 @@ class ExceptionsView: NSTableView {
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
-        guard let app = (rowView.view(atColumn: 1) as? NSTableCellView)?.objectValue as? AppException,
-              let scrollableBrightness = (rowView.view(atColumn: 2) as? NSTableCellView)?.subviews[0] as? ScrollableTextField,
-              let scrollableContrast = (rowView.view(atColumn: 3) as? NSTableCellView)?.subviews[0] as? ScrollableTextField
+        guard let app = (rowView.view(atColumn: 0) as? NSTableCellView)?.objectValue as? AppException
         else { return }
-
-        scrollableBrightness.textFieldColor = scrollableTextFieldColorWhite
-        scrollableBrightness.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        scrollableBrightness.textFieldColorLight = scrollableTextFieldColorLightWhite
-        scrollableBrightness.showPlusSign = true
-
-        scrollableContrast.textFieldColor = scrollableTextFieldColorWhite
-        scrollableContrast.textFieldColorHover = scrollableTextFieldColorHoverWhite
-        scrollableContrast.textFieldColorLight = scrollableTextFieldColorLightWhite
-        scrollableContrast.showPlusSign = true
-
-        scrollableBrightness.onValueChanged = { [weak app] value in
-            app?.brightness = value.i8
-        }
-        scrollableContrast.onValueChanged = { [weak app] value in
-            app?.contrast = value.i8
-        }
 
         let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: app.identifier)
         if !runningApps.isEmpty {

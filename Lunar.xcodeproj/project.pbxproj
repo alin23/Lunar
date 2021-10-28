@@ -25,6 +25,8 @@
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
+		C72BB4B62727E03500941708 /* Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C72BB4B32727E03400941708 /* Extensions.h */; };
+		C72BB4B72727E03500941708 /* Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C72BB4B52727E03400941708 /* Extensions.m */; };
 		C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; };
 		C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
@@ -234,6 +236,8 @@
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
 		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
+		C72BB4B32727E03400941708 /* Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Extensions.h; sourceTree = "<group>"; };
+		C72BB4B52727E03400941708 /* Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Extensions.m; sourceTree = "<group>"; };
 		C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = NSPageControl.xcodeproj; path = NSPageControl/NSPageControl.xcodeproj; sourceTree = "<group>"; };
 		C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = WAYWindow.xcodeproj; path = WAYWindow/WAYWindow.xcodeproj; sourceTree = "<group>"; };
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
@@ -742,6 +746,8 @@
 		C7E896D72652C0F60079A328 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				C72BB4B32727E03400941708 /* Extensions.h */,
+				C72BB4B52727E03400941708 /* Extensions.m */,
 				C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */,
 				C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */,
 				C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */,
@@ -772,6 +778,7 @@
 				C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */,
 				C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */,
 				C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */,
+				C72BB4B62727E03500941708 /* Extensions.h in Headers */,
 				C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */,
 				C7E80E362637060F004718A4 /* libssh2_sftp.h in Headers */,
 				C7E80E372637060F004718A4 /* libssh2.h in Headers */,
@@ -1058,6 +1065,7 @@
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
 				C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */,
 				C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */,
+				C72BB4B72727E03500941708 /* Extensions.m in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */,
 				C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */,

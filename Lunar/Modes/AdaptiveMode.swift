@@ -157,6 +157,7 @@ protocol AdaptiveMode: AnyObject {
     static var shared: AdaptiveMode { get }
     var key: AdaptiveModeKey { get }
     var available: Bool { get }
+    var availableForOnboarding: Bool { get }
     var str: String { get }
 
     func stopWatching()

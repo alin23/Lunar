@@ -8,7 +8,10 @@
 
 import Cocoa
 import Combine
+import Defaults
 import Foundation
+import Paddle
+import UserNotifications
 
 let ONBOARDING_TASK_KEY = "onboarding-task"
 
@@ -23,24 +26,51 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         window?.delegate = self
     }
 
-    func windowWillClose(_ notification: Notification) {
-        testWindowController = nil
-        cancelTask(ONBOARDING_TASK_KEY)
+    func applyChanges() {
         for change in changes {
             change()
         }
+        changes = []
+    }
 
+    func windowWillClose(_: Notification) {
+        testWindowController = nil
+        cancelTask(ONBOARDING_TASK_KEY)
+        applyChanges()
         appDelegate!.onboardWindowController = nil
     }
 
-    func setupSkipButton(_ button: Button, skip: @escaping (() -> Void)) {
-        button.bg = red
+    func setupSkipButton(_ button: Button, color: NSColor? = nil, skip: @escaping (() -> Void)) {
+        button.bg = color ?? red
         button.attributedTitle = button.title.withTextColor(.black)
         button.hoverAlpha = 0.8
         button.trackHover()
         button.onClick = { [weak self] in
             skip()
             self?.window?.close()
+
+            appDelegate!.showWindow(after: 100)
+            if !lunarProAccessDialogShown {
+                lunarProAccessDialogShown = true
+                mainThread {
+                    guard let paddle = paddle, let lunarProProduct = lunarProProduct else { return }
+                    paddle.showProductAccessDialog(with: lunarProProduct)
+                }
+            }
+
+            let nc = UNUserNotificationCenter.current()
+            nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
+                mainThread { Defaults[.notificationsPermissionsGranted] = granted }
+            })
+
+            if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
+                appDelegate!.startOrRestartMediaKeyTap(checkPermissions: true)
+            } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
+                acquirePrivileges(
+                    notificationTitle: "Lunar can now watch for app exceptions",
+                    notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+                )
+            }
         }
     }
 }

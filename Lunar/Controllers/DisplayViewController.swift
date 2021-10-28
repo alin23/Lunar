@@ -307,66 +307,7 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var addScheduleButton: Button!
 
-    func placeAddScheduleButton() {
-        guard
-            let addScheduleButton = addScheduleButton,
-            let schedule2 = schedule2,
-            let schedule3 = schedule3,
-            let schedule4 = schedule4,
-            let schedule5 = schedule5
-        else { return }
-
-        if schedule5.isEnabled {
-            addScheduleButton.isHidden = true
-            return
-        }
-
-        addScheduleButton.isHidden = false
-        if schedule4.isEnabled {
-            addScheduleButton.frame = schedule5.frame
-        } else if schedule3.isEnabled {
-            addScheduleButton.frame = schedule4.frame
-        } else if schedule2.isEnabled {
-            addScheduleButton.frame = schedule3.frame
-        } else {
-            addScheduleButton.frame = schedule2.frame
-        }
-        addScheduleButton.needsDisplay = true
-    }
-
-    @IBAction func showMoreSchedules(_: Any) {
-        if !CachedDefaults[.showTwoSchedules] {
-            CachedDefaults[.showTwoSchedules] = true
-            schedule2.isEnabled = true
-        } else if !CachedDefaults[.showThreeSchedules] {
-            CachedDefaults[.showThreeSchedules] = true
-            schedule3.isEnabled = true
-        } else if !CachedDefaults[.showFourSchedules] {
-            CachedDefaults[.showFourSchedules] = true
-            schedule4.isEnabled = true
-        } else if !CachedDefaults[.showFiveSchedules] {
-            CachedDefaults[.showFiveSchedules] = true
-            schedule5.isEnabled = true
-        }
-        placeAddScheduleButton()
-    }
-
-    @IBAction func showFewerSchedules(_: Any) {
-        if CachedDefaults[.showFiveSchedules] {
-            CachedDefaults[.showFiveSchedules] = false
-            schedule5.isEnabled = false
-        } else if CachedDefaults[.showFourSchedules] {
-            CachedDefaults[.showFourSchedules] = false
-            schedule4.isEnabled = false
-        } else if CachedDefaults[.showThreeSchedules] {
-            CachedDefaults[.showThreeSchedules] = false
-            schedule3.isEnabled = false
-        } else if CachedDefaults[.showTwoSchedules] {
-            CachedDefaults[.showTwoSchedules] = false
-            schedule2.isEnabled = false
-        }
-        placeAddScheduleButton()
-    }
+    var observers: Set<AnyCancellable> = []
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -433,6 +374,66 @@ class DisplayViewController: NSViewController {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state
         }
+    }
+
+    func placeAddScheduleButton() {
+        guard let addScheduleButton = addScheduleButton,
+              let schedule2 = schedule2,
+              let schedule3 = schedule3,
+              let schedule4 = schedule4,
+              let schedule5 = schedule5
+        else { return }
+
+        if schedule5.isEnabled {
+            addScheduleButton.isHidden = true
+            return
+        }
+
+        addScheduleButton.isHidden = false
+        if schedule4.isEnabled {
+            addScheduleButton.frame = schedule5.frame
+        } else if schedule3.isEnabled {
+            addScheduleButton.frame = schedule4.frame
+        } else if schedule2.isEnabled {
+            addScheduleButton.frame = schedule3.frame
+        } else {
+            addScheduleButton.frame = schedule2.frame
+        }
+        addScheduleButton.needsDisplay = true
+    }
+
+    @IBAction func showMoreSchedules(_: Any) {
+        if !CachedDefaults[.showTwoSchedules] {
+            CachedDefaults[.showTwoSchedules] = true
+            schedule2.isEnabled = true
+        } else if !CachedDefaults[.showThreeSchedules] {
+            CachedDefaults[.showThreeSchedules] = true
+            schedule3.isEnabled = true
+        } else if !CachedDefaults[.showFourSchedules] {
+            CachedDefaults[.showFourSchedules] = true
+            schedule4.isEnabled = true
+        } else if !CachedDefaults[.showFiveSchedules] {
+            CachedDefaults[.showFiveSchedules] = true
+            schedule5.isEnabled = true
+        }
+        placeAddScheduleButton()
+    }
+
+    @IBAction func showFewerSchedules(_: Any) {
+        if CachedDefaults[.showFiveSchedules] {
+            CachedDefaults[.showFiveSchedules] = false
+            schedule5.isEnabled = false
+        } else if CachedDefaults[.showFourSchedules] {
+            CachedDefaults[.showFourSchedules] = false
+            schedule4.isEnabled = false
+        } else if CachedDefaults[.showThreeSchedules] {
+            CachedDefaults[.showThreeSchedules] = false
+            schedule3.isEnabled = false
+        } else if CachedDefaults[.showTwoSchedules] {
+            CachedDefaults[.showTwoSchedules] = false
+            schedule2.isEnabled = false
+        }
+        placeAddScheduleButton()
     }
 
     @IBAction func lockCurve(_ sender: LockButton) {
@@ -1166,8 +1167,6 @@ class DisplayViewController: NSViewController {
             }
         }
     }
-
-    var observers: Set<AnyCancellable> = []
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in

@@ -57,6 +57,7 @@ let smoothDisplayServicesQueue = DispatchQueue(
     attributes: .concurrent
 )
 let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
+let taskManagerQueue = RunloopQueue(named: "fyi.lunar.taskManager.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let serialSyncQueue = DispatchQueue(label: "fyi.lunar.serialSync.queue", qos: .userInitiated)
 let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
@@ -407,7 +408,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         setKeyEquivalents(hotkeys)
-        startOrRestartMediaKeyTap(checkPermissions: true)
+        startOrRestartMediaKeyTap(checkPermissions: !datastore.shouldOnboard)
     }
 
     func listenForAdaptiveModeChange() {
@@ -510,43 +511,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         mainAsyncAfter(ms: ms) { [self] in
             createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse, position: position)
-        }
-    }
-
-    func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
-        let onAcquire = {
-            guard !CachedDefaults[.mediaKeysNotified] else { return }
-            CachedDefaults[.mediaKeysNotified] = true
-
-            var body = notificationBody ??
-                "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
-
-            if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
-                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
-            } else if CachedDefaults[.brightnessKeysEnabled] {
-                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness")
-            } else {
-                body = body.replacingOccurrences(of: "PLACEHOLDER", with: "volume")
-            }
-            notify(identifier: "mediaKeysListener", title: notificationTitle, body: body)
-        }
-
-        let options = [
-            kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
-        ]
-        let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
-
-        if accessEnabled {
-            onAcquire()
-            return
-        }
-        CachedDefaults[.mediaKeysNotified] = false
-
-        asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") { _ in
-            if AXIsProcessTrusted() {
-                onAcquire()
-                cancelTask("AXPermissionsChecker")
-            }
         }
     }
 
@@ -1207,6 +1171,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         PFMoveToApplicationsFolderIfNecessary()
     }
 
+    func addGlobalMouseDownMonitor() {
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
+            guard let menuPopover = menuPopover, menuPopover.isShown else { return }
+            menuPopover.close()
+        }
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         // print(initStuff)
         if !CommandLine.arguments.contains("@") {
@@ -1240,11 +1211,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
 
+        Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
+        Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()
         let nc = UNUserNotificationCenter.current()
-        nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
+        nc.getNotificationSettings { settings in
+            mainThread { Defaults[.notificationsPermissionsGranted] = settings.alertSetting == .enabled }
+        }
+        // nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
 
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        ValueTransformer.setValueTransformer(AppExceptionTransformer(), forName: .appExceptionTransformerName)
+        ValueTransformer.setValueTransformer(StringNumberTransformer(), forName: .stringNumberTransformerName)
         ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
         ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
         ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
@@ -1281,15 +1257,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         DDC.setup()
 
-        if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
-            startOrRestartMediaKeyTap(checkPermissions: true)
-        } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
-            acquirePrivileges(
-                notificationTitle: "Lunar can now watch for app exceptions",
-                notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
-            )
-        }
-
         displayController.displays = displayController.getDisplaysLock.around {
             DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
@@ -1310,11 +1277,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initDisplayControllerActivity()
         initMenubarIcon()
 
-        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuPopover = menuPopover, menuPopover.isShown else { return }
-            menuPopover.close()
-        }
-
+        addGlobalMouseDownMonitor()
         initHotkeys()
 
         listenForAdaptiveModeChange()
@@ -1328,7 +1291,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initLicensing()
 
         NetworkControl.setup()
-        if thisIsFirstRun || thisIsFirstRunAfterLunar4Upgrade || TEST_MODE {
+        if datastore.shouldOnboard {
+            onboard()
+        } else if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
+            startOrRestartMediaKeyTap(checkPermissions: true)
+        } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
+            acquirePrivileges(
+                notificationTitle: "Lunar can now watch for app exceptions",
+                notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+            )
+        }
+
+        if TEST_MODE, !datastore.shouldOnboard {
             showWindow()
             // onboard()
         }
@@ -1723,41 +1697,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             unique: true
         )
         if shouldInstall {
-            if !fm.fileExists(atPath: "/usr/local/bin") {
-                do {
-                    try fm.createDirectory(atPath: "/usr/local/bin", withIntermediateDirectories: false)
-                } catch {
-                    log.error("Error on creating /usr/local/bin: \(error)")
-                    dialog(
-                        message: "Lunar CLI could not be installed",
-                        info: "Error on creating the '/usr/local/bin' directory: \(error)"
-                    ).runModal()
-                    return
-                }
+            do {
+                try installCLIBinary()
+                dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
+            } catch let error as InstallCLIError {
+                dialog(message: error.message, info: error.info, cancelButton: nil).runModal()
+            } catch {
+                dialog(message: "Error installing Lunar CLI", info: "\(error)", cancelButton: nil).runModal()
             }
-
-            fm.createFile(
-                atPath: "/usr/local/bin/lunar",
-                contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
-                attributes: [.posixPermissions: 0o755]
-            )
-
-            guard fm.fileExists(atPath: "/usr/local/bin/lunar") else {
-                dialog(
-                    message: "Error installing Lunar CLI",
-                    info: """
-                    This is most likely a permissions problem.
-
-                    You can fix permissions by running the following commands in a terminal:
-
-                    sudo chown -R $(whoami) /usr/local/bin
-                    sudo chmod 755 /usr/local/bin
-                    """,
-                    cancelButton: nil
-                ).runModal()
-                return
-            }
-            dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
         }
     }
 
@@ -1765,5 +1712,84 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @objc private func activate() {
         NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
+    }
+}
+
+// MARK: - InstallCLIError
+
+struct InstallCLIError: Error {
+    let message: String
+    let info: String
+}
+
+func installCLIBinary() throws {
+    if !fm.fileExists(atPath: "/usr/local/bin") {
+        do {
+            try fm.createDirectory(atPath: "/usr/local/bin", withIntermediateDirectories: false)
+        } catch {
+            log.error("Error on creating /usr/local/bin: \(error)")
+            throw InstallCLIError(
+                message: "Missing /usr/local/bin",
+                info: "Error on creating the '/usr/local/bin' directory: \(error)"
+            )
+        }
+    }
+
+    fm.createFile(
+        atPath: "/usr/local/bin/lunar",
+        contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
+        attributes: [.posixPermissions: 0o755]
+    )
+
+    guard fm.isExecutableBinary(atPath: "/usr/local/bin/lunar") else {
+        throw InstallCLIError(
+            message: "File permissions error",
+            info: """
+            You can fix permissions by running the following commands in a terminal:
+
+            sudo chown -R $(whoami) /usr/local/bin
+            sudo chmod 755 /usr/local/bin
+            """
+        )
+    }
+    Defaults[.cliInstalled] = true
+}
+
+func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
+    let onAcquire = {
+        mainThread { Defaults[.accessibilityPermissionsGranted] = true }
+        guard !CachedDefaults[.mediaKeysNotified] else { return }
+        CachedDefaults[.mediaKeysNotified] = true
+
+        var body = notificationBody ??
+            "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
+
+        if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
+            body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
+        } else if CachedDefaults[.brightnessKeysEnabled] {
+            body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness")
+        } else {
+            body = body.replacingOccurrences(of: "PLACEHOLDER", with: "volume")
+        }
+        notify(identifier: "mediaKeysListener", title: notificationTitle, body: body)
+    }
+
+    let options = [
+        kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
+    ]
+    let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
+    mainThread { Defaults[.accessibilityPermissionsGranted] = accessEnabled }
+
+    if accessEnabled {
+        onAcquire()
+        return
+    }
+    CachedDefaults[.mediaKeysNotified] = false
+
+    asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") { _ in
+        if AXIsProcessTrusted() {
+            onAcquire()
+            cancelTask("AXPermissionsChecker")
+        }
     }
 }
