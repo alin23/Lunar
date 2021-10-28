@@ -2,27 +2,6 @@ import Cocoa
 import Defaults
 import Foundation
 
-// MARK: - AppExceptionTransformer
-
-class AppExceptionTransformer: ValueTransformer {
-    override class func transformedValueClass() -> AnyClass {
-        AppException.self
-    }
-
-    override class func allowsReverseTransformation() -> Bool {
-        true
-    }
-
-    override func transformedValue(_ value: Any?) -> Any? {
-        guard let config = value as? [String: Any] else { return nil }
-        return AppException.fromDictionary(config)
-    }
-
-    override func reverseTransformedValue(_ value: Any?) -> Any? {
-        (value as? AppException)?.dictionary
-    }
-}
-
 // MARK: - UpdateCheckIntervalTransformer
 
 class UpdateCheckIntervalTransformer: ValueTransformer {
@@ -117,10 +96,32 @@ class SignedIntTransformer: ValueTransformer {
     }
 }
 
+// MARK: - StringNumberTransformer
+
+class StringNumberTransformer: ValueTransformer {
+    override class func transformedValueClass() -> AnyClass {
+        NSString.self
+    }
+
+    override class func allowsReverseTransformation() -> Bool {
+        true
+    }
+
+    override func transformedValue(_ value: Any?) -> Any? {
+        guard let number = value as? NSNumber else { return String(describing: value) }
+        return number.intValue.s
+    }
+
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
+        guard let value = value as? String else { return 0 }
+        return value.i?.ns ?? 0
+    }
+}
+
 extension NSValueTransformerName {
-    static let appExceptionTransformerName = NSValueTransformerName(rawValue: "AppExceptionTransformer")
     static let displayTransformerName = NSValueTransformerName(rawValue: "DisplayTransformer")
     static let updateCheckIntervalTransformerName = NSValueTransformerName(rawValue: "UpdateCheckIntervalTransformer")
     static let signedIntTransformerName = NSValueTransformerName(rawValue: "SignedIntTransformer")
     static let colorSchemeTransformerName = NSValueTransformerName(rawValue: "ColorSchemeTransformer")
+    static let stringNumberTransformerName = NSValueTransformerName(rawValue: "StringNumberTransformer")
 }

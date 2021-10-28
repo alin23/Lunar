@@ -14,6 +14,7 @@ class SliderCell: NSSliderCell {
 
     @Atomic var pressed = false
 
+    @IBInspectable dynamic var fillOrigin: CGFloat = 0
     @IBInspectable dynamic var knobImage: NSImage? = nil
     @IBInspectable dynamic var imageOpacity: CGFloat = 1.0
     @IBInspectable dynamic var verticalPadding: CGFloat = 10
@@ -106,12 +107,70 @@ class SliderCell: NSSliderCell {
             toHigh: 1.0
         ))
 
-        guard doubleValue > minValue else { return }
-        let fillWidth = (rect.width - rect.height) * value + rect.height
-        let leftRect = NSRect(x: rect.origin.x, y: rect.origin.y + 0.5, width: fillWidth, height: rect.size.height - 1)
-        let active = NSBezierPath(roundedRect: leftRect, xRadius: cornerRadius, yRadius: cornerRadius)
-        color.setFill()
-        active.fill()
+        var fillWidth: CGFloat
+        var fillRect: NSRect
+        var active: NSBezierPath
+
+        if fillOrigin == 0 {
+            guard doubleValue > minValue else { return }
+
+            fillWidth = (rect.width - rect.height) * value + rect.height
+            fillRect = NSRect(x: rect.origin.x, y: rect.origin.y + 0.5, width: fillWidth, height: rect.size.height - 1)
+            active = NSBezierPath(roundedRect: fillRect, xRadius: cornerRadius, yRadius: cornerRadius)
+            color.setFill()
+            active.fill()
+        } else {
+            guard abs(value - fillOrigin) > 0.02 else { return }
+
+            let left = value < fillOrigin
+            fillWidth = (rect.width - rect.height) * abs(value - fillOrigin) + (rect.height / 2)
+            let x = CGFloat(mapNumber(
+                fillOrigin,
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: rect.minX,
+                toHigh: rect.maxX
+            ))
+            fillRect = NSRect(
+                x: left ? x - fillWidth : x,
+                y: rect.origin.y + 0.5,
+                width: fillWidth,
+                height: rect.size.height - 1
+            )
+            active = NSBezierPath(
+                roundedRectangle: fillRect,
+                byRoundingCorners: left ? [.minXMinY, .minXMaxY] : [.maxXMinY, .maxXMaxY],
+                withRadius: cornerRadius
+            )
+            color.setFill()
+            active.fill()
+//
+//            guard let context = NSGraphicsContext.current?.cgContext else {
+//                color.setFill()
+//                active.fill()
+//                return
+//            }
+//
+//            context.beginTransparencyLayer(auxiliaryInfo: nil)
+//            color.setFill()
+//            active.fill()
+//            context.setBlendMode(.sourceIn)
+//
+//            let colors = [.clear, color.cgColor]
+//            let colorSpace = CGColorSpaceCreateDeviceRGB()
+//            let colorLocations: [CGFloat] = left ? [0.0, 0.5] : [0.5, 0.0]
+//            guard let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations) else {
+//                context.endTransparencyLayer()
+//                color.setFill()
+//                active.fill()
+//                return
+//            }
+//            let startPoint = CGPoint(x: fillRect.size.width, y: fillRect.size.height / 2)
+//            let endPoint = CGPoint(x: 0.0, y: fillRect.size.height / 2)
+//
+//            context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions.drawsBeforeStartLocation)
+//            context.endTransparencyLayer()
+        }
     }
 }
 

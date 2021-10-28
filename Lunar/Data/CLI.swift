@@ -350,6 +350,7 @@ struct Lunar: ParsableCommand {
             case CreateBrightnessTable
             case RegisterForBrightnessChangeNotifications
             case RegisterForAmbientLightCompensationNotifications
+            case SetBrightnessWithType
         }
 
         static let configuration = CommandConfiguration(
@@ -366,6 +367,9 @@ struct Lunar: ParsableCommand {
 
         @Argument(help: "Value for the method's second argument")
         var value: Double = 1.0
+
+        @Argument(help: "Value for the method's third argument")
+        var value2: Double = 0
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -400,6 +404,7 @@ struct Lunar: ParsableCommand {
 
             for id in displayIDs {
                 var brightness: Float = value.f
+                var type: UInt32 = value2.u32
                 switch method {
                 case .GetLinearBrightness:
                     DisplayServicesGetLinearBrightness(id, &brightness)
@@ -416,6 +421,9 @@ struct Lunar: ParsableCommand {
                 case .SetBrightnessSmooth:
                     print("Setting BrightnessSmooth to \(brightness) for ID: \(id)")
                     DisplayServicesSetBrightnessSmooth(id, brightness)
+                case .SetBrightnessWithType:
+                    print("Setting BrightnessWithType to \(brightness) with type \(type) for ID: \(id)")
+                    DisplayServicesSetBrightnessWithType(id, type, brightness)
                 case .CanChangeBrightness:
                     print(DisplayServicesCanChangeBrightness(id))
                 case .IsSmartDisplay:

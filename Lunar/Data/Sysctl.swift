@@ -62,6 +62,7 @@ public enum Sysctl {
 
     public static var isMacMini = modelLowercased.hasPrefix("macmini")
     public static var isiMac = modelLowercased.hasPrefix("imac")
+    public static var isMacBook = modelLowercased.hasPrefix("macbook")
 
     /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
     /// "My-Name-iPhone" (from Settings -> General -> About -> Name)

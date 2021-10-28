@@ -11,8 +11,9 @@ import Cocoa
 import Defaults
 import Sentry
 
-let APP_MAX_BRIGHTNESS: Int8 = 30
-let APP_MAX_CONTRAST: Int8 = 30
+let APP_MAX_BRIGHTNESS_OFFSET: Int8 = 30
+let APP_MAX_CONTRAST_OFFSET: Int8 = 20
+let DEFAULT_APP_BRIGHTNESS_CONTRAST: Double = 0.8
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
 // MARK: - AppException
@@ -20,15 +21,36 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
 @objc class AppException: NSObject, Codable, Defaults.Serializable {
     // MARK: Lifecycle
 
-    init(identifier: String, name: String, brightness: Int8 = APP_MAX_BRIGHTNESS, contrast: Int8 = APP_MAX_CONTRAST) {
+    init(identifier: String, name: String) {
         self.identifier = identifier
         self.name = name
-        self.brightness = brightness
-        self.contrast = contrast
         super.init()
     }
 
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        identifier = try container.decode(String.self, forKey: .identifier)
+        name = try container.decode(String.self, forKey: .name)
+        brightness = try container.decodeIfPresent(Int8.self, forKey: .brightness) ?? APP_MAX_BRIGHTNESS_OFFSET
+        contrast = try container.decodeIfPresent(Int8.self, forKey: .contrast) ?? APP_MAX_CONTRAST_OFFSET
+        manualBrightnessContrast = try container
+            .decodeIfPresent(Double.self, forKey: .manualBrightnessContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+        applyBuiltin = try container.decodeIfPresent(Bool.self, forKey: .applyBuiltin) ?? false
+        reapplyPreviousBrightness = try container.decodeIfPresent(Bool.self, forKey: .reapplyPreviousBrightness) ?? true
+    }
+
     // MARK: Internal
+
+    enum CodingKeys: String, CodingKey {
+        case identifier
+        case name
+        case brightness
+        case contrast
+        case manualBrightnessContrast
+        case applyBuiltin
+        case reapplyPreviousBrightness
+    }
 
     override var description: String {
         "\(name)[\(identifier)]"
@@ -50,30 +72,30 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         }
     }
 
-    @objc dynamic var brightness: Int8 {
+    @objc dynamic var brightness: Int8 = APP_MAX_BRIGHTNESS_OFFSET {
         didSet {
             save()
             log.verbose("\(name): Set brightness to \(brightness)")
         }
     }
 
-    @objc dynamic var contrast: Int8 {
+    @objc dynamic var contrast: Int8 = APP_MAX_CONTRAST_OFFSET {
         didSet {
             save()
             log.verbose("\(name): Set contrast to \(contrast)")
         }
     }
 
-    static func fromDictionary(_ config: [String: Any]) -> AppException? {
-        guard let identifier = config["identifier"] as? String,
-              let name = config["name"] as? String else { return nil }
+    @objc dynamic var manualBrightnessContrast: Double = DEFAULT_APP_BRIGHTNESS_CONTRAST {
+        didSet { save() }
+    }
 
-        return AppException(
-            identifier: identifier,
-            name: name,
-            brightness: (config["brightness"] as? Int8) ?? APP_MAX_BRIGHTNESS,
-            contrast: (config["contrast"] as? Int8) ?? APP_MAX_CONTRAST
-        )
+    @objc dynamic var applyBuiltin: Bool = false {
+        didSet { save() }
+    }
+
+    @objc dynamic var reapplyPreviousBrightness: Bool = true {
+        didSet { save() }
     }
 
     func save() {

@@ -3,6 +3,7 @@
 //
 
 #import "ExceptionCatcher.h"
+#import "Extensions.h"
 // #import "BrightnessSystemClient.h"
 #import "CBBlueLightClient.h"
 // #import "CBTrueToneClient.h"
@@ -48,6 +49,7 @@ bool DisplayServicesCanChangeBrightness(CGDirectDisplayID display);
 bool DisplayServicesIsSmartDisplay(CGDirectDisplayID display);
 void DisplayServicesBrightnessChanged(CGDirectDisplayID display, double brightness);
 
+int DisplayServicesSetBrightnessWithType(CGDirectDisplayID display, UInt32 type, float brightness);
 int DisplayServicesGetPowerMode(CGDirectDisplayID display);
 int DisplayServicesSetPowerMode(CGDirectDisplayID display, UInt8 mode);
 int DisplayServicesGetDevice(CGDirectDisplayID display);
