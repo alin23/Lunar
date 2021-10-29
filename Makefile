@@ -118,7 +118,7 @@ beta: ENV=Release
 beta: DISABLE_PACKING=1
 beta: DISABLE_SENTRY=1
 beta: V=1
-beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$V
+beta: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings 2>/dev/null | rg -o -r '$$1' 'MARKETING_VERSION = (\S+)')-beta$(V)
 beta: build-version appcast
 	test (defaults read /tmp/Lunar/Lunar.app/Contents/Info.plist CFBundleVersion) = $(VERSION)
 ifneq ($(DISABLE_UPLOAD),1)

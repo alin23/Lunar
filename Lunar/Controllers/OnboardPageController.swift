@@ -58,18 +58,21 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
                 }
             }
 
-            let nc = UNUserNotificationCenter.current()
-            nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
-                mainThread { Defaults[.notificationsPermissionsGranted] = granted }
-            })
-
-            if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
-                appDelegate!.startOrRestartMediaKeyTap(checkPermissions: true)
-            } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
-                acquirePrivileges(
-                    notificationTitle: "Lunar can now watch for app exceptions",
-                    notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
-                )
+            mainAsyncAfter(ms: 1000) {
+                let nc = UNUserNotificationCenter.current()
+                nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
+                    mainThread { Defaults[.notificationsPermissionsGranted] = granted }
+                })
+            }
+            mainAsyncAfter(ms: 3000) {
+                if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
+                    appDelegate!.startOrRestartMediaKeyTap(checkPermissions: true)
+                } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
+                    acquirePrivileges(
+                        notificationTitle: "Lunar can now watch for app exceptions",
+                        notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+                    )
+                }
             }
         }
     }
@@ -110,6 +113,11 @@ class OnboardPageController: NSPageController {
     }
 
     override func scrollWheel(with _: NSEvent) {}
+    func select(index: Int) {
+        NSAnimationContext.runAnimationGroup({ _ in animator().selectedIndex = index }) { [weak self] in
+            self?.completeTransition()
+        }
+    }
 }
 
 // MARK: NSPageControllerDelegate

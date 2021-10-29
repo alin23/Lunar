@@ -118,6 +118,10 @@ class ModeChoiceViewController: NSViewController {
 
     func next() {
         guard let wc = view.window?.windowController as? OnboardWindowController else { return }
+        guard !displayController.externalActiveDisplays.isEmpty else {
+            wc.pageController?.select(index: 2)
+            return
+        }
         wc.pageController?.navigateForward(self)
     }
 

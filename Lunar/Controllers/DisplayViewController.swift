@@ -611,7 +611,7 @@ class DisplayViewController: NSViewController {
 
         display.withoutDDC { display.panelMode = display.panel?.currentMode }
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
-        cornerRadiusField?.caption = cornerRadiusFieldCaption
+        // cornerRadiusField?.caption = cornerRadiusFieldCaption
         cornerRadiusField?.didScrollTextField = true
         cornerRadiusField?.integerValue = display.cornerRadius.intValue
         cornerRadiusField?.onValueChangedInstant = { [weak self] value in
