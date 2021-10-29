@@ -20,6 +20,11 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         positioningView?.removeFromSuperview()
     }
 
+    override func rightMouseDown(with event: NSEvent) {
+        guard let button = statusButton else { return }
+        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 6), in: button)
+    }
+
     override func mouseDown(with event: NSEvent) {
         if let menuPopover = menuPopover, menuPopover.isShown {
             menuPopover.close()
@@ -31,7 +36,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         else {
             return
         }
-
+        button.menu = nil
         menuPopover.delegate = self
 
         let positioningView = NSView(frame: button.bounds)

@@ -179,12 +179,12 @@ class ControlChoiceViewController: NSViewController {
     func info(_ text: String, color: NSColor) {
         mainThread {
             actionLabel.stringValue = text
-            actionLabel.transition(0.5, easing: .easeOutCubic)
+            actionLabel.transition(0.9, easing: .easeOutCubic)
             actionLabel.textColor = color
         }
-        mainAsyncAfter(ms: 600) { [weak self] in
+        mainAsyncAfter(ms: 1000) { [weak self] in
             guard let self = self else { return }
-            self.actionLabel.transition(0.5, easing: .easeInCubic)
+            self.actionLabel.transition(1.0, easing: .easeOutCubic)
             self.actionLabel.textColor = self.actionLabelColor
         }
     }
@@ -243,15 +243,15 @@ class ControlChoiceViewController: NSViewController {
 
         mainThread {
             actionInfo.stringValue = text
-            actionInfo.transition(0.5, easing: .easeOutExpo)
+            actionInfo.transition(0.8, easing: .easeOutCubic)
             actionInfo.alphaValue = 1.0
-            actionInfo.transition(1.0, easing: .easeInOutExpo)
+            actionInfo.transition(1.0, easing: .easeOutCubic)
             actionInfo.textColor = peach
 
             actionButton.bg = buttonColor
             actionButton.attributedTitle = buttonText
             actionButton.isEnabled = true
-            actionButton.transition(0.8, easing: .easeOutExpo)
+            actionButton.transition(0.8, easing: .easeOutCubic)
             actionButton.alphaValue = 1.0
         }
         actionButton.onClick = { [weak self] in
@@ -277,23 +277,23 @@ class ControlChoiceViewController: NSViewController {
     ) {
         mainAsyncAfter(ms: 1100) { [weak self] in
             guard let self = self else { return }
-            self.actionInfo.transition(0.5, easing: .easeInOutExpo)
+            self.actionInfo.transition(0.8, easing: .easeOutCubic)
             self.actionInfo.textColor = self.actionInfoColor
         }
 
         mainThread {
             actionInfo.stringValue = question
-            actionInfo.transition(0.8, easing: .easeOutExpo)
+            actionInfo.transition(0.8, easing: .easeOutCubic)
             actionInfo.alphaValue = 1.0
-            actionInfo.transition(1.0, easing: .easeInOutExpo)
+            actionInfo.transition(1.0, easing: .easeOutCubic)
             actionInfo.textColor = peach
 
-            noButton.transition(0.8, easing: .easeOutExpo)
+            noButton.transition(0.8, easing: .easeOutCubic)
             noButton.alphaValue = 1.0
             noButton.isEnabled = true
             noButton.attributedTitle = noButtonText.withTextColor(white)
 
-            yesButton.transition(0.8, easing: .easeOutExpo)
+            yesButton.transition(0.8, easing: .easeOutCubic)
             yesButton.alphaValue = 1.0
             yesButton.isEnabled = true
             yesButton.attributedTitle = yesButtonText.withTextColor(white)
@@ -302,7 +302,7 @@ class ControlChoiceViewController: NSViewController {
                 ddcBlockersButton.helpText = ddcBlockerText
                 ddcBlockersButton.isEnabled = true
                 ddcBlockersButton.isHidden = false
-                ddcBlockersButton.transition(0.8, easing: .easeOutExpo)
+                ddcBlockersButton.transition(0.8, easing: .easeOutCubic)
                 ddcBlockersButton.alphaValue = 1.0
                 ddcBlockersButton.open(edge: .maxX)
             }
