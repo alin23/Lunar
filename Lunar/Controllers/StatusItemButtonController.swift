@@ -22,7 +22,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
 
     override func rightMouseDown(with event: NSEvent) {
         guard let button = statusButton else { return }
-        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 6), in: button)
+        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
     }
 
     override func mouseDown(with event: NSEvent) {

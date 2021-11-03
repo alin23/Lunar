@@ -94,6 +94,14 @@ class DisplayController {
         activeDisplays.values.filter { !$0.isBuiltin }
     }
 
+    var nonDummyDisplays: [Display] {
+        activeDisplayList.filter { !$0.isDummy }
+    }
+
+    var nonDummyDisplay: Display? {
+        nonDummyDisplays.first
+    }
+
     var builtinActiveDisplays: [Display] {
         activeDisplays.values.filter(\.isBuiltin)
     }
@@ -111,7 +119,15 @@ class DisplayController {
     }
 
     var sourceDisplay: Display? {
-        activeDisplays.values.first { $0.isSource }
+        guard let source = activeDisplays.values.first(where: \.isSource) else {
+            if let builtin = builtinDisplay {
+                mainAsync { builtin.isSource = true }
+                return builtin
+            }
+            return nil
+        }
+
+        return source
     }
 
     var targetDisplays: [Display] {
@@ -185,11 +201,17 @@ class DisplayController {
               let id = screen.displayID
         else { return nil }
 
-        return activeDisplays[id]
+        if let d = activeDisplays[id], !d.isDummy {
+            return d
+        }
+        if let secondary = Display.getSecondaryMirrorScreenID(id), let d = activeDisplays[secondary], !d.isDummy {
+            return d
+        }
+        return nil
     }
 
     var mainExternalOrCGMainDisplay: Display? {
-        if let display = mainExternalDisplay {
+        if let display = mainExternalDisplay, !display.isIndependentDummy {
             return display
         }
 
@@ -198,7 +220,7 @@ class DisplayController {
             return displays[0]
         } else {
             for display in displays {
-                if CGDisplayIsMain(display.id) == 1 {
+                if CGDisplayIsMain(display.id) == 1, !display.isIndependentDummy {
                     return display
                 }
             }
@@ -211,9 +233,9 @@ class DisplayController {
             return CachedDefaults[.adaptiveBrightnessMode].mode
         } else {
             let mode = autoMode()
-            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
-                CachedDefaults[.adaptiveBrightnessMode] = mode.key
-            }
+//            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
+//                CachedDefaults[.adaptiveBrightnessMode] = mode.key
+//            }
             return mode
         }
     }
@@ -363,7 +385,7 @@ class DisplayController {
             }
         }.store(in: &observers)
         showOrientationInQuickActionsPublisher.sink { [self] change in
-            mainThread {
+            mainAsync { [self] in
                 menuPopover?.close()
                 displays.values.forEach { $0.showOrientation = $0.canRotate && change.newValue }
             }
@@ -786,12 +808,14 @@ class DisplayController {
     static func getDisplays(
         includeVirtual: Bool = true,
         includeAirplay: Bool = false,
-        includeProjector: Bool = false
+        includeProjector: Bool = false,
+        includeDummy: Bool = false
     ) -> [CGDirectDisplayID: Display] {
         var ids = DDC.findExternalDisplays(
-            includeVirtual: includeVirtual || TEST_MODE,
-            includeAirplay: includeAirplay || TEST_MODE,
-            includeProjector: includeProjector || TEST_MODE
+            includeVirtual: includeVirtual,
+            includeAirplay: includeAirplay,
+            includeProjector: includeProjector,
+            includeDummy: includeDummy
         )
         if let builtinDisplayID = NSScreen.builtinDisplayID {
             ids.append(builtinDisplayID)
@@ -895,18 +919,12 @@ class DisplayController {
 
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
         guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
-            display.appPreset = nil
+            mainAsync { display.appPreset = nil }
             return nil
         }
 
         if let app = activeWindow(on: screen)?.appException {
-            #if DEBUG
-                print(
-                    "App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast) \(app.manualBrightnessContrast) \(app.applyBuiltin)"
-                )
-                log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
-            #endif
-            display.appPreset = app
+            mainAsync { display.appPreset = app }
             if adaptiveModeKey == .manual {
                 guard !display.isBuiltin || app.applyBuiltin else { return nil }
                 let (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
@@ -935,17 +953,14 @@ class DisplayController {
         guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
               let app = focusedWindow.appException
         else {
-            display.appPreset = nil
+            mainAsync { display.appPreset = nil }
             return nil
         }
 
         #if DEBUG
-            print(
-                "App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast) \(app.manualBrightnessContrast) \(app.applyBuiltin)"
-            )
             log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
         #endif
-        display.appPreset = app
+        mainAsync { display.appPreset = app }
 
         if adaptiveModeKey == .manual {
             guard !display.isBuiltin || app.applyBuiltin else { return nil }
@@ -971,11 +986,12 @@ class DisplayController {
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver else {
-                return
-            }
-            Defaults.withoutPropagation {
-                mainThread {
+            mainAsync {
+                guard let self = self, !self.pausedAdaptiveModeObserver else {
+                    return
+                }
+
+                Defaults.withoutPropagation {
                     self.pausedAdaptiveModeObserver = true
                     self.adaptiveMode = change.newValue.mode
                     self.pausedAdaptiveModeObserver = false
@@ -1027,7 +1043,8 @@ class DisplayController {
                 self.displays = DisplayController.getDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
-                    includeProjector: CachedDefaults[.showProjectorDisplays]
+                    includeProjector: CachedDefaults[.showProjectorDisplays],
+                    includeDummy: CachedDefaults[.showDummyDisplays]
                 )
                 let d = self.displays.values
                 if !d.contains(where: \.isSource),
@@ -1039,14 +1056,37 @@ class DisplayController {
                 SyncMode.refresh()
                 self.addSentryData()
             }
+            windowControllerQueue.sync {
+                let idsWithWindows: Set<CGDirectDisplayID> = Set(
+                    Thread.current.threadDictionary.allKeys
+                        .compactMap { $0 as? String }
+                        .filter { $0.starts(with: "window-") }
+                        .compactMap { $0.split(separator: "-").last?.u32 }
+                )
+                let currentIDs: Set<CGDirectDisplayID> = Set(self.displays.keys)
 
-            mainThread {
+                let idsToRemove = idsWithWindows.subtracting(currentIDs)
+                Thread.current.threadDictionary.allKeys
+                    .compactMap { $0 as? String }
+                    .filter {
+                        guard $0.starts(with: "window-"), let id = $0.split(separator: "-").last?.u32 else { return false }
+                        return idsToRemove.contains(id)
+                    }.forEach { key in
+                        guard let wc = Thread.current.threadDictionary[key] as? NSWindowController else {
+                            return
+                        }
+                        wc.close()
+                        Thread.current.threadDictionary.removeObject(forKey: key)
+                    }
+            }
+
+            mainAsync {
                 appDelegate!.recreateWindow(
                     page: (advancedSettings || configurationPage) ? Page.settings.rawValue : nil,
                     advancedSettings: advancedSettings
                 )
+                NotificationCenter.default.post(name: displayListChanged, object: nil)
             }
-            NotificationCenter.default.post(name: displayListChanged, object: nil)
         }
     }
 
@@ -1240,7 +1280,7 @@ class DisplayController {
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
-        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { [unowned self] _, change in
+        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { [self] _, change in
             let oldAppIdentifiers = change.oldValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
             let newAppIdentifiers = change.newValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
 
@@ -1252,14 +1292,14 @@ class DisplayController {
             }
 
             if let identifiers = newAppIdentifiers, let newApps = datastore.appExceptions(identifiers: identifiers) {
-                self.runningAppExceptions.append(contentsOf: newApps)
+                runningAppExceptions.append(contentsOf: newApps)
             }
             if let identifiers = oldAppIdentifiers, let exceptions = datastore.appExceptions(identifiers: identifiers) {
                 for exception in exceptions {
-                    self.runningAppExceptions.removeAll(where: { $0.identifier == exception.identifier })
+                    runningAppExceptions.removeAll(where: { $0.identifier == exception.identifier })
                 }
             }
-            self.adaptBrightness()
+            adaptBrightness()
         })
     }
 
@@ -1268,7 +1308,7 @@ class DisplayController {
             display.refreshBrightness()
             display.refreshContrast()
             display.refreshVolume()
-            display.refreshInput()
+            // display.refreshInput()
             display.refreshColors()
         }
     }
@@ -1299,9 +1339,10 @@ class DisplayController {
             else { return }
 
             mainAsyncAfter(ms: 1) {
+                let minBr = display.minBrightness.intValue
                 display.brightness = manualMode.compute(
                     percent: value,
-                    minVal: display.minBrightness.intValue,
+                    minVal: (display.isBuiltin && minBr == 0) ? 1 : minBr,
                     maxVal: display.maxBrightness.intValue
                 )
             }
@@ -1370,6 +1411,7 @@ class DisplayController {
             builtinDisplay: builtinDisplay,
             sourceDisplay: sourceDisplay
         ) { (display: Display) in
+            guard !display.noControls, !display.blackOutEnabled else { return }
             if display.isBuiltin {
                 guard builtinDisplay || currentDisplay || sourceDisplay else { return }
             }
@@ -1406,7 +1448,7 @@ class DisplayController {
         guard checkRemainingAdjustments() else { return }
 
         adjustValue(for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay) { (display: Display) in
-            guard !display.isBuiltin else { return }
+            guard !display.isBuiltin, !display.blackOutEnabled else { return }
 
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)
 
@@ -1441,7 +1483,11 @@ class DisplayController {
             }
         } else if currentDisplay {
             if let display = cursorDisplay {
-                setValue(display)
+                if let mirrors = display.displaysInMirrorSet {
+                    mirrors.filter { !$0.blackOutEnabled }.forEach { display in setValue(display) }
+                } else {
+                    setValue(display)
+                }
             }
         } else if builtinDisplay {
             if let display = self.builtinDisplay {
@@ -1456,7 +1502,7 @@ class DisplayController {
                 setValue(display)
             }
         } else {
-            activeDisplays.values.forEach { display in
+            activeDisplayList.forEach { display in
                 setValue(display)
             }
         }

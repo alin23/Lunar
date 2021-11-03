@@ -288,10 +288,6 @@ class DisplayViewController: NSViewController {
 
     var pausedAdaptiveModeObserver: Bool = false
 
-    @AtomicLock var gammaHighlighterTask: CFRunLoopTimer?
-
-    @AtomicLock var adaptiveHighlighterTask: CFRunLoopTimer?
-
     @objc dynamic lazy var deleteEnabled = getDeleteEnabled()
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
@@ -311,8 +307,8 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
-            mainThread {
-                initHotkeys()
+            mainAsync { [weak self] in
+                self?.initHotkeys()
             }
         }
     }
@@ -356,7 +352,7 @@ class DisplayViewController: NSViewController {
     @objc dynamic weak var display: Display? {
         didSet {
             if let display = display {
-                mainThread { update(display) }
+                mainAsync { [weak self] in self?.update(display) }
                 noDisplay = display.id == GENERIC_DISPLAY_ID
             }
         }
@@ -373,6 +369,12 @@ class DisplayViewController: NSViewController {
         didSet {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state
+        }
+    }
+
+    lazy var gammaNoticeHighlighterTaskKey = "gammaNoticeHighlighter-\(display?.serial ?? "display")" {
+        didSet {
+            cancelTask(oldValue)
         }
     }
 
@@ -456,8 +458,9 @@ class DisplayViewController: NSViewController {
     }
 
     func refreshView() {
-        mainThread {
-            view.setNeedsDisplay(view.visibleRect)
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            self.view.setNeedsDisplay(self.view.visibleRect)
         }
     }
 
@@ -579,9 +582,10 @@ class DisplayViewController: NSViewController {
     }
 
     func setupProButton() {
-        guard let button = proButton else { return }
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            guard let button = self.proButton else { return }
 
-        mainThread {
             let width = button.frame.width
             if lunarProActive {
                 button.bg = red
@@ -597,7 +601,7 @@ class DisplayViewController: NSViewController {
                 button.setFrameSize(NSSize(width: 70, height: button.frame.height))
             }
             if button.frame.width != width {
-                button.center(within: view, vertically: false)
+                button.center(within: self.view, vertically: false)
             }
         }
     }
@@ -615,7 +619,7 @@ class DisplayViewController: NSViewController {
         cornerRadiusField?.didScrollTextField = true
         cornerRadiusField?.integerValue = display.cornerRadius.intValue
         cornerRadiusField?.onValueChangedInstant = { [weak self] value in
-            mainThread {
+            mainAsync {
                 self?.displayImage?.cornerRadius = CGFloat(value)
                 display.cornerRadius = value.ns
             }
@@ -759,20 +763,21 @@ class DisplayViewController: NSViewController {
     }
 
     func updateControlsButton(control: Control? = nil) {
-        guard let button = controlsButton, let display = display else {
-            return
-        }
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            guard let button = self.controlsButton, let display = self.display else {
+                return
+            }
 
-        guard display.active else {
-            setDisconnected()
-            return
-        }
+            guard display.active else {
+                self.setDisconnected()
+                return
+            }
 
-        guard let control = control ?? display.control else {
-            return
-        }
+            guard let control = control ?? display.control else {
+                return
+            }
 
-        mainThread {
             button.alpha = 0.85
             button.hoverAlpha = 1.0
             button.circle = false
@@ -804,8 +809,8 @@ class DisplayViewController: NSViewController {
                 button.attributedTitle = "No Controls".withAttribute(.textColor(.darkGray))
                 button.helpText = NO_CONTROLS_HELP_TEXT
             }
-            brightnessSlider?.color = button.bg!
-            brightnessContrastSlider?.color = button.bg!
+            self.brightnessSlider?.color = button.bg!
+            self.brightnessContrastSlider?.color = button.bg!
         }
     }
 
@@ -893,7 +898,13 @@ class DisplayViewController: NSViewController {
                     factor: brightnessFactor,
                     userValues: userBrightness
                 )
-                for (x, b) in zip(xs, values.striding(by: 30)) {
+                let curveAdjustedValues = mode.adjustCurveSIMD(
+                    [Double](values.striding(by: 30)),
+                    factor: mode.visualCurveFactor,
+                    minVal: minBrightness?.d ?? display.minBrightness.doubleValue,
+                    maxVal: maxBrightness?.d ?? display.maxBrightness.doubleValue
+                )
+                for (x, b) in zip(xs, curveAdjustedValues) {
                     brightnessChartEntry[x].y = b
                 }
             }
@@ -906,7 +917,13 @@ class DisplayViewController: NSViewController {
                     factor: contrastFactor,
                     userValues: userContrast
                 )
-                for (x, b) in zip(xs, values.striding(by: 30)) {
+                let curveAdjustedValues = mode.adjustCurveSIMD(
+                    [Double](values.striding(by: 30)),
+                    factor: mode.visualCurveFactor,
+                    minVal: minContrast?.d ?? display.minContrast.doubleValue,
+                    maxVal: maxContrast?.d ?? display.maxContrast.doubleValue
+                )
+                for (x, b) in zip(xs, curveAdjustedValues) {
                     contrastChartEntry[x].y = b
                 }
             }
@@ -942,8 +959,8 @@ class DisplayViewController: NSViewController {
             adaptiveMode: displayController.adaptiveMode, for: display,
             brightness: currentBrightness?.d, contrast: currentContrast?.d
         )
-        mainThread {
-            brightnessContrastChart.notifyDataSetChanged()
+        mainAsync { [weak self] in
+            self?.brightnessContrastChart?.notifyDataSetChanged()
         }
     }
 
@@ -1138,20 +1155,19 @@ class DisplayViewController: NSViewController {
             showAdaptiveNotice()
         }
         display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
-            if let self = self {
-                mainThread {
-                    guard let display = self.display else {
-                        self.hideAdaptiveNotice()
-                        return
-                    }
-                    self.chartHidden = self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || displayController
-                        .adaptiveModeKey == .clock
+            mainAsync { [weak self] in
+                guard let self = self else { return }
+                guard let display = self.display else {
+                    self.hideAdaptiveNotice()
+                    return
+                }
+                self.chartHidden = self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || displayController
+                    .adaptiveModeKey == .clock
 
-                    if !newAdaptive, !display.ambientLightAdaptiveBrightnessEnabled {
-                        self.showAdaptiveNotice()
-                    } else {
-                        self.hideAdaptiveNotice()
-                    }
+                if !newAdaptive, !display.ambientLightAdaptiveBrightnessEnabled {
+                    self.showAdaptiveNotice()
+                } else {
+                    self.hideAdaptiveNotice()
                 }
             }
         }.store(in: &displayObservers, for: "adaptive")
@@ -1170,24 +1186,21 @@ class DisplayViewController: NSViewController {
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver else {
-                return
-            }
+            mainAsync {
+                guard let self = self, !self.pausedAdaptiveModeObserver else { return }
+                self.pausedAdaptiveModeObserver = true
 
-            self.pausedAdaptiveModeObserver = true
-            mainThread {
                 self.chartHidden = self.display == nil || self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || change
                     .newValue == .clock
                 self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || change.newValue != .clock
-            }
-            Defaults.withoutPropagation {
-                let adaptiveMode = change.newValue
-                mainThread {
+
+                Defaults.withoutPropagation {
+                    let adaptiveMode = change.newValue
                     if self.brightnessContrastChart != nil {
                         self.initGraph(mode: adaptiveMode.mode)
                     }
+                    self.pausedAdaptiveModeObserver = false
                 }
-                self.pausedAdaptiveModeObserver = false
             }
         }
     }
@@ -1236,7 +1249,8 @@ class DisplayViewController: NSViewController {
                 (hasDDC ?? display.hasDDC)
         ) &&
             !display.isSidecar &&
-            !display.isAirplay
+            !display.isAirplay &&
+            !display.isDummy
     }
 
     func getPowerOffTooltip(display: Display? = nil, hasDDC: Bool? = nil) -> String? {
@@ -1292,7 +1306,7 @@ class DisplayViewController: NSViewController {
                 return
             }
 
-            if !display.isInMirrorSet {
+            if !display.blackOutEnabled {
                 displayController.blackOut(display: display.id, state: .on)
             } else {
                 let mirrored = CGDisplayMirrorsDisplay(display.id)
@@ -1307,29 +1321,27 @@ class DisplayViewController: NSViewController {
     }
 
     func showGammaNotice() {
-        guard display?.active ?? false else { return }
-        let windowVisible = mainThread { view.window?.isVisible ?? false }
-        guard gammaHighlighterTask == nil || !realtimeQueue.isValid(timer: gammaHighlighterTask!), windowVisible
-        else {
-            return
-        }
+        mainAsync { [weak self] in
+            guard let self = self, self.display?.active ?? false, self.view.window?.isVisible ?? false
+            else { return }
 
-        gammaHighlighterTask = realtimeQueue.async(every: 10.seconds) { [weak self] (_: CFRunLoopTimer?) in
-            guard let s = self else {
-                if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
+            asyncEvery(
+                5.seconds,
+                uniqueTaskKey: self.gammaNoticeHighlighterTaskKey,
+                skipIfExists: true,
+                eager: true,
+                queue: DispatchQueue.main
+            ) { [weak self] in
+                guard let self = self else { return }
 
-            let windowVisible: Bool = mainThread { s.view.window?.isVisible ?? false }
-            guard windowVisible, let gammaNotice = s.gammaNotice
-            else {
-                if let timer = self?.gammaHighlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
+                guard self.view.window?.isVisible ?? false, let gammaNotice = self.gammaNotice
+                else {
+                    cancelTask(self.gammaNoticeHighlighterTaskKey)
+                    return
+                }
 
-            mainThread {
-                if gammaNotice.alphaValue == 0 {
-                    gammaNotice.transition(1)
+                if gammaNotice.alphaValue <= 0.1 {
+                    gammaNotice.transition(2)
                     gammaNotice.alphaValue = 0.9
                     gammaNotice.needsDisplay = true
                 } else {
@@ -1342,13 +1354,11 @@ class DisplayViewController: NSViewController {
     }
 
     func hideGammaNotice() {
-        if let timer = gammaHighlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        gammaHighlighterTask = nil
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            cancelTask(self.gammaNoticeHighlighterTaskKey)
 
-        mainThread { [weak self] in
-            guard let gammaNotice = self?.gammaNotice else { return }
+            guard let gammaNotice = self.gammaNotice else { return }
             gammaNotice.transition(0.3)
             gammaNotice.alphaValue = 0.0
             gammaNotice.needsDisplay = true

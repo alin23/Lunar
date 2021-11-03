@@ -23,6 +23,11 @@ func displayIsInMirrorSet(_ id: CGDirectDisplayID) -> Bool {
     CGDisplayIsInMirrorSet(id) != 0
 }
 
+func displayIsInHardwareMirrorSet(_ id: CGDirectDisplayID) -> Bool {
+    guard let primary = Display.getPrimaryMirrorScreen(id) else { return displayIsInMirrorSet(id) }
+    return !primary.isDummy
+}
+
 @inline(__always) func isGeneric(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
         return id == GENERIC_DISPLAY_ID || id == TEST_DISPLAY_ID
@@ -41,7 +46,7 @@ func displayIsInMirrorSet(_ id: CGDirectDisplayID) -> Bool {
 
 @inline(__always) func isTestID(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
-//        return id == GENERIC_DISPLAY_ID
+        return id == GENERIC_DISPLAY_ID
         return TEST_IDS.contains(id)
     #else
         return id == GENERIC_DISPLAY_ID
@@ -134,7 +139,7 @@ func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: 
     do {
         try task.run()
     } catch {
-        print("Error running \(launchPath) \(args): \(error)")
+        log.error("Error running \(launchPath) \(args): \(error)")
         return nil
     }
 
@@ -459,7 +464,7 @@ var appDelegate: AppDelegate? =
     NSApplication.shared.delegate as? AppDelegate
 
 func refreshScreen(refocus: Bool = true) {
-    mainThread {
+    mainAsync {
         let focusedApp = NSWorkspace.shared.runningApplications.first(where: { app in app.isActive })
         if refocus {
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
@@ -581,6 +586,14 @@ func getSerialNumberHash() -> String? {
     return DispatchQueue.main.sync { return action() }
 }
 
+@inline(__always) func mainAsync(_ action: @escaping () -> Void) {
+    guard !Thread.isMainThread else {
+        action()
+        return
+    }
+    DispatchQueue.main.async { action() }
+}
+
 func stringRepresentation(forAddress address: Data) -> String? {
     address.withUnsafeBytes { pointer in
         var hostStr = [Int8](repeating: 0, count: Int(NI_MAXHOST))
@@ -665,6 +678,81 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     return task
 }
 
+func taskIsRunning(_ key: String) -> Bool {
+    if let timer = taskManager(key) as? DispatchSourceTimer { return !timer.isCancelled }
+    if let timer = taskManager(key) as? DispatchWorkItem { return !timer.isCancelled }
+    if let timer = taskManager(key) as? Timer { return timer.isValid }
+    return false
+}
+
+func asyncEvery(
+    _ interval: DateComponents,
+    leeway: DateComponents = 0.seconds,
+    uniqueTaskKey: String? = nil,
+    runs: Int? = nil,
+    skipIfExists: Bool = false,
+    eager: Bool = false,
+    queue: DispatchQueue? = nil,
+    onSuccess: (() -> Void)? = nil,
+    onCancelled: (() -> Void)? = nil,
+    _ action: @escaping () -> Void
+) {
+    let queue = queue ?? concurrentQueue
+    queue.async {
+        if skipIfExists, let key = uniqueTaskKey, let timer = taskManager(key) as? DispatchSourceTimer, !timer.isCancelled {
+            return
+        }
+
+        let timer = DispatchSource.makeTimerSource(flags: [], queue: queue)
+        timer.schedule(
+            deadline: DispatchTime.now() + (eager ? 0 : interval.timeInterval),
+            repeating: interval.timeInterval,
+            leeway: .milliseconds((leeway.timeInterval * 1000).intround)
+        )
+        timer.setEventHandler {
+            action()
+            guard let key = uniqueTaskKey,
+                  let runs = taskManager("\(key)-runs") as? Int,
+                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
+            else {
+                return
+            }
+
+            if runs >= maxRuns || isCancelled(key) {
+                cancelTask(key)
+            } else {
+                taskManager("\(key)-runs", runs + 1)
+            }
+        }
+        timer.setCancelHandler {
+            guard let key = uniqueTaskKey,
+                  let runs = taskManager("\(key)-runs") as? Int,
+                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
+            else {
+                return
+            }
+
+            if runs >= maxRuns {
+                onSuccess?()
+            } else {
+                onCancelled?()
+            }
+        }
+
+        if let key = uniqueTaskKey {
+//            taskQueueLock.around { taskQueue[key] = queue }
+            (taskManager(key) as? DispatchSourceTimer)?.cancel()
+            taskManager(key, timer)
+
+            if let runs = runs {
+                taskManager("\(key)-maxRuns", runs)
+                taskManager("\(key)-runs", 0)
+            }
+        }
+        timer.activate()
+    }
+}
+
 func asyncEvery(
     _ interval: DateComponents,
     uniqueTaskKey: String? = nil,
@@ -723,6 +811,8 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
 
     taskManager("\(key)-cancelled", true)
     if let task = task as? DispatchWorkItem {
+        task.cancel()
+    } else if let task = task as? DispatchSourceTimer {
         task.cancel()
     } else if let task = task as? Timer {
         task.invalidate()
@@ -1663,15 +1753,35 @@ func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     max(min(number, maxVal), minVal)
 }
 
+import Defaults
+
 func notify(identifier: String, title: String, body: String) {
-    let content = UNMutableNotificationContent()
-    content.title = title
-    content.body = body
-    content.sound = UNNotificationSound.default
-    UNUserNotificationCenter.current().add(
-        UNNotificationRequest(identifier: identifier, content: content, trigger: nil),
-        withCompletionHandler: nil
-    )
+    let sendNotification = { (nc: UNUserNotificationCenter) in
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = UNNotificationSound.default
+        nc.add(
+            UNNotificationRequest(identifier: identifier, content: content, trigger: nil),
+            withCompletionHandler: nil
+        )
+    }
+
+    let nc = UNUserNotificationCenter.current()
+    nc.getNotificationSettings { settings in
+        mainAsync {
+            let enabled = settings.alertSetting == .enabled
+            Defaults[.notificationsPermissionsGranted] = enabled
+            guard enabled else {
+                nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
+                    guard granted else { return }
+                    sendNotification(nc)
+                })
+                return
+            }
+            sendNotification(nc)
+        }
+    }
 }
 
 func removeNotifications(withIdentifiers ids: [String]) {

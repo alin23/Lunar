@@ -241,14 +241,14 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         mainThread {
             let modifiers = keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
                 switch char {
-                case "⌥": return "option"
-                case "⌘": return "command"
-                case "⌃": return "control"
-                case "⇧": return "shift"
+                case "⌥": return "Option"
+                case "⌘": return "Command"
+                case "⌃": return "Control"
+                case "⇧": return "Shift"
                 default: return char
                 }
             }
-            return "\(String(modifiers.joined(by: "+")))-\(keyChar)"
+            return "\(String(modifiers.joined(by: "-")))-\(keyChar)"
         }
     }
 
@@ -800,7 +800,8 @@ enum Hotkey {
             break
         }
 
-        let locked = display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false)
+        let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
+            || display.noControls
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = mirroredID != kCGNullDirectDisplay ? mirroredID : display.id
         manager.showImage(

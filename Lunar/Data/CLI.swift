@@ -273,7 +273,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
-                includeProjector: false
+                includeProjector: false,
+                includeDummy: false
             )
             let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
@@ -377,7 +378,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
-                includeProjector: false
+                includeProjector: false,
+                includeDummy: false
             )
             let displays = displayController.activeDisplays.values.map { $0 }
             var displayIDs: [CGDirectDisplayID] = []
@@ -518,7 +520,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
-                includeProjector: false
+                includeProjector: false,
+                includeDummy: false
             )
             var displays = displayController.activeDisplays.values.map { $0 }
             if display != "all" {
@@ -723,6 +726,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "If projectors should be included.")
         var projector = false
 
+        @Flag(help: "If dummy displays should be included.")
+        var dummy = false
+
         @Flag(name: .shortAndLong, help: "Include EDID in the output.")
         var edid = false
 
@@ -758,7 +764,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: virtual || all,
                 includeAirplay: airplay || all,
-                includeProjector: projector || all
+                includeProjector: projector || all,
+                includeDummy: dummy || all
             )
 
             let displays = (all ? displayController.displays : displayController.activeDisplays).sorted(by: { d1, d2 in
@@ -840,7 +847,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
-                includeProjector: CachedDefaults[.showProjectorDisplays]
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -892,7 +900,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
-                includeProjector: CachedDefaults[.showProjectorDisplays]
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
@@ -958,7 +967,8 @@ struct Lunar: ParsableCommand {
             displayController.displays = DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
-                includeProjector: CachedDefaults[.showProjectorDisplays]
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
             let displays = displayController.activeDisplays.sorted(by: { d1, d2 in

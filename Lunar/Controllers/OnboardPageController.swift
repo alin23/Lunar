@@ -40,19 +40,20 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         appDelegate!.onboardWindowController = nil
     }
 
-    func setupSkipButton(_ button: Button, color: NSColor? = nil, skip: @escaping (() -> Void)) {
+    func setupSkipButton(_ button: Button, color: NSColor? = nil, text: String? = nil, skip: @escaping (() -> Void)) {
         button.bg = color ?? red
-        button.attributedTitle = button.title.withTextColor(.black)
+        button.attributedTitle = (text ?? button.title).withTextColor(.black)
         button.hoverAlpha = 0.8
         button.trackHover()
         button.onClick = { [weak self] in
             skip()
+            guard !useOnboardingForDiagnostics else { return }
             self?.window?.close()
 
             appDelegate!.showWindow(after: 100)
             if !lunarProAccessDialogShown {
                 lunarProAccessDialogShown = true
-                mainThread {
+                mainAsync {
                     guard let paddle = paddle, let lunarProProduct = lunarProProduct else { return }
                     paddle.showProductAccessDialog(with: lunarProProduct)
                 }
@@ -61,7 +62,7 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
             mainAsyncAfter(ms: 1000) {
                 let nc = UNUserNotificationCenter.current()
                 nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
-                    mainThread { Defaults[.notificationsPermissionsGranted] = granted }
+                    mainAsync { Defaults[.notificationsPermissionsGranted] = granted }
                 })
             }
             mainAsyncAfter(ms: 3000) {
@@ -77,6 +78,9 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         }
     }
 }
+
+var useOnboardingForDiagnostics = false
+var adaptiveModeDisabledByDiagnostics = false
 
 // MARK: - OnboardPageController
 
@@ -98,7 +102,7 @@ class OnboardPageController: NSPageController {
         logo?.textColor = logoColor
 
         arrangedObjects = [modeChoiceViewControllerIdentifier, controlChoiceViewControllerIdentifier, hotkeysChoiceViewControllerIdentifier]
-        selectedIndex = 0
+        selectedIndex = useOnboardingForDiagnostics ? 1 : 0
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }

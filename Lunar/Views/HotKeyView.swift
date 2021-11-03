@@ -43,7 +43,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
     var hotkey: PersistentHotkey? {
         didSet {
-            mainThread {
+            mainAsync { [self] in
                 if let h = hotkey {
                     keyCombo = h.keyCombo
                     if hotkeyEnabled {

@@ -20,7 +20,7 @@ class SliderCell: NSSliderCell {
     @IBInspectable dynamic var verticalPadding: CGFloat = 10
     @IBInspectable dynamic var cornerRadius: CGFloat = 4
 
-    @IBInspectable dynamic var color = NSColor(named: "AccentColor")! {
+    @IBInspectable dynamic var color = NSColor(named: "Slider")! {
         didSet { controlView?.needsDisplay = true }
     }
 
@@ -37,6 +37,14 @@ class SliderCell: NSSliderCell {
         pressed = false
         super.stopTracking(last: lastPoint, current: stopPoint, in: controlView, mouseIsUp: flag)
     }
+
+//     override func knobRect(flipped: Bool) -> NSRect {
+//         let knob = super.knobRect(flipped: flipped)
+//         let size = verticalPadding
+//         let rect = NSRect(x: knob.midX - (size / 2) + 0.5, y: knob.midY - (size / 2) - 1.5, width: size - 1, height: size - 1)
+//
+//         return rect
+//     }
 
     override func drawKnob(_ knobRect: NSRect) {
         let size = verticalPadding
@@ -87,6 +95,16 @@ class SliderCell: NSSliderCell {
             operation: .sourceOver,
             fraction: imageOpacity
         )
+    }
+
+    override func barRect(flipped: Bool) -> NSRect {
+        let bar = super.barRect(flipped: flipped)
+        let knob = knobRect(flipped: flipped)
+
+        let height = max(verticalPadding, knob.height)
+        let rect = NSRect(x: bar.origin.x, y: knob.origin.y - 2, width: bar.width, height: height)
+
+        return rect
     }
 
     override func drawBar(inside aRect: NSRect, flipped _: Bool) {

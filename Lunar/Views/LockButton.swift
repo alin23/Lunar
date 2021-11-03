@@ -33,11 +33,22 @@ class LockButton: NSButton {
 
     // MARK: Internal
 
+    lazy var frameSize = frame.size
     @IBInspectable dynamic var grayDisabledText: Bool = true
-    @IBInspectable dynamic var verticalPadding: CGFloat = 0.7
+    // @IBInspectable dynamic var horizontalPadding: CGFloat = 0.2 {
+    //     didSet {
+    //         adaptSize()
+    //     }
+    // }
 
     @IBInspectable dynamic var bgOn: NSColor = lockButtonBgOn
     @IBInspectable dynamic var bgOff: NSColor = lockButtonBgOff
+
+    @IBInspectable dynamic var verticalPadding: CGFloat = 0.7 {
+        didSet {
+            adaptSize()
+        }
+    }
 
     var bgOnHover: NSColor { bgOn.blended(withFraction: 0.3, of: bgOff) ?? bgOff
         // darkMode ?
@@ -79,14 +90,22 @@ class LockButton: NSButton {
 
     override var state: NSControl.StateValue {
         didSet {
-            mainThread { bg = state == .on ? bgOn : bgOff }
+            mainAsync { [self] in bg = state == .on ? bgOn : bgOff }
         }
     }
 
     @IBInspectable dynamic lazy var cornerRadius: CGFloat = (frame.height / 2) {
         didSet {
-            radius = cornerRadius.ns
+            radius = min(frame.height / 2, cornerRadius).ns
         }
+    }
+
+    func adaptSize() {
+        let size = frameSize
+        // let width = size.width + (size.width * horizontalPadding)
+        let height = size.height + (size.height * verticalPadding)
+        setFrameSize(NSSize(width: size.width, height: height))
+        cornerRadius = min(height / 2, cornerRadius)
     }
 
     override func cursorUpdate(with _: NSEvent) {
@@ -101,7 +120,8 @@ class LockButton: NSButton {
         attributedTitle = attributedTitle.withTextColor(labelOff)
         attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
 
-        setFrameSize(NSSize(width: frame.width, height: frame.height + (frame.height * verticalPadding)))
+        let size = frameSize
+        setFrameSize(NSSize(width: size.width, height: size.height + (size.height * verticalPadding)))
         radius = cornerRadius.ns
         if locked {
             state = .on
