@@ -746,7 +746,7 @@ extension NSScreen {
     }
 
     static var externalScreens: [NSScreen] {
-        screens.filter { !$0.isBuiltin }
+        screens.filter { !$0.isBuiltin && !$0.isDummy }
     }
 
     static var withMouse: NSScreen? {
@@ -754,7 +754,7 @@ extension NSScreen {
     }
 
     static var externalWithMouse: NSScreen? {
-        screens.first { !$0.isBuiltin && $0.hasMouse }
+        externalScreens.first { $0.hasMouse }
     }
 
     var hasMouse: Bool {
@@ -797,6 +797,10 @@ extension NSScreen {
 
     var isVirtual: Bool {
         displayID != nil && DDC.isVirtualDisplay(displayID!)
+    }
+
+    var isDummy: Bool {
+        Display.dummyNamePattern.matches(localizedName)
     }
 
     var isScreen: Bool {
@@ -937,20 +941,20 @@ extension NSView {
         center(within: view.visibleRect, horizontally: horizontally, vertically: vertically)
     }
 
-    var bg: NSColor? {
+    @objc dynamic var bg: NSColor? {
         get {
             guard let layer = layer, let backgroundColor = layer.backgroundColor else { return nil }
             return NSColor(cgColor: backgroundColor)
         }
         set {
-            mainThread {
+            mainAsync { [self] in
                 wantsLayer = true
                 layer?.backgroundColor = newValue?.cgColor
             }
         }
     }
 
-    var radius: NSNumber? {
+    @objc dynamic var radius: NSNumber? {
         get {
             guard let layer = layer else { return nil }
             return NSNumber(value: Float(layer.cornerRadius))
@@ -1030,7 +1034,7 @@ func address(from bytes: UnsafeRawBufferPointer) -> String? {
         if let cString = inet_ntop(AF_INET, &addr, buffer, socklen_t(size)) {
             return String(cString: cString)
         } else {
-            print("inet_ntop errno \(errno) from \(bytes)")
+            log.error("inet_ntop errno \(errno) from \(bytes)")
         }
         buffer.deallocate()
     case AF_INET6:
@@ -1040,11 +1044,11 @@ func address(from bytes: UnsafeRawBufferPointer) -> String? {
         if let cString = inet_ntop(AF_INET6, &addr, buffer, socklen_t(size)) {
             return String(cString: cString)
         } else {
-            print("inet_ntop errno \(errno) from \(bytes)")
+            log.error("inet_ntop errno \(errno) from \(bytes)")
         }
         buffer.deallocate()
     default:
-        print("Unknown family \(pointer.pointee.sa_family)")
+        log.error("Unknown family \(pointer.pointee.sa_family)")
     }
     return nil
 }
@@ -1155,6 +1159,14 @@ extension NSRect {
 // MARK: - AutoRemovingSegmentedControl
 
 class AutoRemovingSegmentedControl: NSSegmentedControl {
+    override var isHidden: Bool {
+        didSet { if isHidden { removeFromSuperview() } }
+    }
+}
+
+// MARK: - AutoRemovingTextField
+
+class AutoRemovingTextField: NSTextField {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
     }

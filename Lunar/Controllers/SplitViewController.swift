@@ -245,7 +245,8 @@ class SplitViewController: NSSplitViewController {
         overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in
             guard let self = self, let button = self.activeModeButton else { return }
 
-            mainThread {
+            mainAsync { [weak self] in
+                guard let self = self else { return }
                 Defaults.withoutPropagation {
                     button.update()
                     self.updateHelpButton()
@@ -254,13 +255,10 @@ class SplitViewController: NSSplitViewController {
         }
 
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver,
-                  let button = self.activeModeButton
-            else {
-                return
-            }
+            mainAsync {
+                guard let self = self, !self.pausedAdaptiveModeObserver, let button = self.activeModeButton
+                else { return }
 
-            mainThread {
                 self.pausedAdaptiveModeObserver = true
                 Defaults.withoutPropagation {
                     button.update(modeKey: change.newValue)

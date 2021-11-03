@@ -1146,20 +1146,8 @@ and setting its brightness/contrast to 0</string>
                                     </menu>
                                 </popUpButtonCell>
                             </popUpButton>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="94s-ei-4SF">
-                                <rect key="frame" x="417" y="643" width="116" height="13"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="v4.5.5" id="Ulu-cW-ply">
-                                    <font key="font" size="11" name="Menlo-Bold"/>
-                                    <color key="textColor" name="Gray"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <connections>
-                                    <binding destination="cu7-9X-1cE" name="value" keyPath="self.version" id="3Wt-ej-pJv"/>
-                                </connections>
-                            </textField>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="YBA-Wk-tfq" customClass="PageNavigationControl" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="335" y="19" width="280" height="24"/>
+                                <rect key="frame" x="335" y="11" width="280" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <shadow key="shadow" blurRadius="3">
                                     <size key="offset" width="0.0" height="2"/>
@@ -1834,7 +1822,7 @@ visible screen left</string>
                                 </connections>
                             </containerView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YP9-Eb-WEN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="430" y="618" width="90" height="14"/>
+                                <rect key="frame" x="430" y="633" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Advanced" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gCp-ah-VHk">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2417,14 +2405,25 @@ visible screen left</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="R0g-6e-j2A">
-                                <rect key="frame" x="42" y="204" width="170" height="18"/>
+                                <rect key="frame" x="42" y="204" width="173" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Disconnected monitors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AWI-5a-gca">
+                                <buttonCell key="cell" type="check" title="Dummy (BetterDummy)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AWI-5a-gca">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                 </buttonCell>
                                 <connections>
-                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showDisconnectedDisplays" id="GYv-BC-u8k"/>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showDummyDisplays" id="oaU-By-zNi"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="h5h-y0-wY6">
+                                <rect key="frame" x="42" y="182" width="170" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Disconnected monitors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cuN-9k-nEq">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="PK4-lO-oV8" name="value" keyPath="values.showDisconnectedDisplays" id="IcK-MA-hTA"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -2629,7 +2628,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kiv-mk-M5q" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="219" y="39" width="12" height="12"/>
+                                                                    <rect key="frame" x="215" y="39" width="12" height="12"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="12" id="jo2-iD-Or3"/>
                                                                         <constraint firstAttribute="width" constant="12" id="wRa-ry-f9u"/>
@@ -2654,7 +2653,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="b0y-87-zYg" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="266" y="71" width="12" height="12"/>
+                                                                    <rect key="frame" x="262" y="71" width="12" height="12"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="12" id="7g1-yG-I5X"/>
                                                                         <constraint firstAttribute="height" constant="12" id="RjX-vg-mLR"/>
@@ -2675,7 +2674,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="RSR-3x-myv" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="217" y="8" width="14" height="14"/>
+                                                                    <rect key="frame" x="213" y="8" width="14" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="14" id="IZH-cu-etH"/>
                                                                         <constraint firstAttribute="height" constant="14" id="lZE-LE-oXF"/>
@@ -2821,7 +2820,7 @@ visible screen left</string>
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstItem="bPk-JH-iHh" firstAttribute="top" secondItem="RB2-V9-vwF" secondAttribute="top" constant="11" id="3Mu-Xe-Bee"/>
-                                                                <constraint firstItem="9eQ-mp-6BP" firstAttribute="leading" secondItem="kiv-mk-M5q" secondAttribute="trailing" constant="-20" id="4UB-zu-DwI"/>
+                                                                <constraint firstItem="9eQ-mp-6BP" firstAttribute="leading" secondItem="kiv-mk-M5q" secondAttribute="trailing" constant="-16" id="4UB-zu-DwI"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="top" secondItem="9eQ-mp-6BP" secondAttribute="bottom" id="6c3-Tf-TdW"/>
                                                                 <constraint firstItem="dCR-ep-nRF" firstAttribute="leading" secondItem="9eQ-mp-6BP" secondAttribute="trailing" constant="16" id="6vg-pa-as8"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="width" secondItem="9eQ-mp-6BP" secondAttribute="width" id="7td-Pj-gKK"/>
@@ -2834,9 +2833,9 @@ visible screen left</string>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="centerY" secondItem="RSR-3x-myv" secondAttribute="centerY" id="JpZ-hr-O9S"/>
                                                                 <constraint firstAttribute="bottom" secondItem="WQ3-j3-c4C" secondAttribute="bottom" id="Kn8-ai-7cP"/>
                                                                 <constraint firstItem="Yfs-eH-oiE" firstAttribute="centerY" secondItem="WQ3-j3-c4C" secondAttribute="centerY" id="MCx-RS-Kw3"/>
-                                                                <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="b0y-87-zYg" secondAttribute="trailing" constant="-20" id="Mff-IU-PL4"/>
+                                                                <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="b0y-87-zYg" secondAttribute="trailing" constant="-16" id="Mff-IU-PL4"/>
                                                                 <constraint firstItem="4EQ-S2-v6N" firstAttribute="top" secondItem="yNh-or-HM8" secondAttribute="bottom" constant="15" id="RkO-9p-bhg"/>
-                                                                <constraint firstItem="WQ3-j3-c4C" firstAttribute="leading" secondItem="RSR-3x-myv" secondAttribute="trailing" constant="-20" id="VHv-ky-ASB"/>
+                                                                <constraint firstItem="WQ3-j3-c4C" firstAttribute="leading" secondItem="RSR-3x-myv" secondAttribute="trailing" constant="-16" id="VHv-ky-ASB"/>
                                                                 <constraint firstItem="38T-rK-uwv" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" id="Y2T-Uc-Onb"/>
                                                                 <constraint firstItem="4EQ-S2-v6N" firstAttribute="leading" secondItem="yNh-or-HM8" secondAttribute="leading" id="eJj-AS-syi"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="centerX" secondItem="9eQ-mp-6BP" secondAttribute="centerX" id="fbk-W6-f5t"/>
@@ -3035,6 +3034,13 @@ visible screen left</string>
                                                 <real key="value" value="24"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="ibX-UE-wSD">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="xRc-C4-BGQ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="115" y="0.0" width="69" height="17"/>
@@ -3048,7 +3054,7 @@ visible screen left</string>
                                 </subviews>
                             </customView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="lgI-7B-gyu" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="335" y="506" width="80" height="13"/>
+                                <rect key="frame" x="335" y="509" width="80" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Sync Target" alternateTitle="Sync Source" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Ggq-QK-tFg" customClass="LockButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3057,9 +3063,6 @@ visible screen left</string>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                         <real key="value" value="10"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                        <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="bgOff">
                                         <color key="value" white="1" alpha="0.25688120860927155" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -3074,6 +3077,9 @@ visible screen left</string>
                                         <color key="value" name="Caption Tertiary Inverted"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="grayDisabledText" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="0.5"/>
+                                    </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="5Zz-Qx-8X0" id="P20-Sb-9ha">
@@ -3134,6 +3140,15 @@ visible screen left</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
+                                            <binding destination="rew-Tm-BHz" name="hidden3" keyPath="values.showAdvancedDisplaySettings" previousBinding="OvN-HS-8r9" id="GG8-CR-Wft">
+                                                <dictionary key="options">
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
                                         </connections>
                                     </button>
                                     <button toolTip="Stops the auto-learning algorithm from recomputing the brightness curve when changing the brightness of this monitor manually." focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.69999999999999996" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="Z5X-YG-FjQ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
@@ -3161,6 +3176,15 @@ visible screen left</string>
                                             </binding>
                                             <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="Gol-fQ-E4K">
                                                 <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
+                                            <binding destination="rew-Tm-BHz" name="hidden3" keyPath="values.showAdvancedDisplaySettings" previousBinding="Oc8-WB-s1m" id="9rR-na-fwr">
+                                                <dictionary key="options">
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
@@ -3221,9 +3245,9 @@ visible screen left</string>
                                         </textFieldCell>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="53f-Gg-bId" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="83" y="15" width="83" height="16"/>
+                                        <rect key="frame" x="64" y="15" width="122" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OEK-mm-GWN">
+                                        <buttonCell key="cell" type="inline" title="Lock Brightness" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OEK-mm-GWN">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
@@ -3240,27 +3264,6 @@ visible screen left</string>
                                             <color key="backgroundColor" name="Field BG"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="who-Wm-5BR" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="59" y="20" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <shadow key="shadow" blurRadius="4">
-                                            <size key="offset" width="0.0" height="4"/>
-                                            <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                        </shadow>
-                                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="76E-sq-sm6">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                                <real key="value" value="0.20000000000000001"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                                <real key="value" value="0.69999999999999996"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                    </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zt1-xU-YsD" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="137" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
@@ -3337,9 +3340,9 @@ visible screen left</string>
                                         </textFieldCell>
                                     </textField>
                                     <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ffG-pW-9dT" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="83" y="15" width="83" height="16"/>
+                                        <rect key="frame" x="64" y="15" width="122" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="inline" title="Unlocked" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="eST-GN-uHq">
+                                        <buttonCell key="cell" type="inline" title="Lock Contrast" alternateTitle="Locked" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="eST-GN-uHq">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
@@ -3356,27 +3359,6 @@ visible screen left</string>
                                             <color key="backgroundColor" name="Field BG"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="09R-D2-mY8" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="59" y="20" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <shadow key="shadow" blurRadius="4">
-                                            <size key="offset" width="0.0" height="4"/>
-                                            <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
-                                        </shadow>
-                                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSInfo" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="OfU-Pn-GBK">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                                <real key="value" value="0.20000000000000001"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                                <real key="value" value="0.69999999999999996"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                    </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VM8-Rs-rmy" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="137" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
@@ -3404,7 +3386,7 @@ visible screen left</string>
                                 </connections>
                             </customView>
                             <popUpButton id="BV9-vT-ncX">
-                                <rect key="frame" x="409" y="228" width="131" height="22"/>
+                                <rect key="frame" x="409" y="252" width="131" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="UC7-EP-hrS" id="i0g-IR-OO6">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3505,7 +3487,7 @@ visible screen left</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="446" y="623" width="53" height="18"/>
+                                <rect key="frame" x="446" y="638" width="53" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3591,7 +3573,7 @@ The display will reappear with default settings on reconnection.</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="422" y="209" width="103" height="22"/>
+                                <rect key="frame" x="422" y="233" width="103" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -3617,10 +3599,19 @@ The display will reappear with default settings on reconnection.</string>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="X0y-Bm-zlD" id="vj6-3d-XuB">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="ZlW-Lv-Oa8">
-                                <rect key="frame" x="541" y="283" width="122" height="28"/>
+                                <rect key="frame" x="574" y="283" width="57" height="28"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="taZ-lk-cLI">
                                     <font key="font" metaFont="systemSemibold" size="11"/>
@@ -3631,6 +3622,15 @@ disabled</string>
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="oHc-hs-F6O"/>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="oHc-hs-F6O" id="gP0-hx-Odv">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
@@ -3747,7 +3747,7 @@ disabled</string>
                                 </connections>
                             </slider>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="UGS-Ey-cgx" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="370" y="375" width="12" height="12"/>
+                                <rect key="frame" x="366" y="375" width="12" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -3876,7 +3876,7 @@ disabled</string>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="inline" title="Show fewer schedules" alternateTitle="Less" bezelStyle="inline" image="arrow.left.circle.fill" imagePosition="leading" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h1u-Bi-fDD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="systemBold" size="12"/>
+                                                <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="color">
@@ -3887,6 +3887,9 @@ disabled</string>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                                     <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                                    <real key="value" value="0.90000000000000002"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
@@ -3909,67 +3912,40 @@ disabled</string>
                                     </binding>
                                 </connections>
                             </box>
-                            <box fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LO4-YJ-RM8" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="371" y="191" width="208" height="59"/>
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi">
+                                <rect key="frame" x="378" y="253" width="193" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <view key="contentView" id="tjo-iu-Vk1">
-                                    <rect key="frame" x="1" y="1" width="206" height="57"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5mh-fJ-EgO">
-                                            <rect key="frame" x="23" y="35" width="160" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="QKy-5L-01m">
-                                                <font key="font" metaFont="systemSemibold" size="13"/>
-                                                <segments>
-                                                    <segment label="0°" toolTip="No rotation" imageScaling="proportionallyUpOrDown" selected="YES"/>
-                                                    <segment label="90°" toolTip="90 degree rotation (vertical)" tag="90"/>
-                                                    <segment label="180°" toolTip="180 degree rotation (upside down)" tag="180"/>
-                                                    <segment label="270°" toolTip="270 degree rotation (vertical)" tag="270"/>
-                                                </segments>
-                                            </segmentedCell>
-                                            <connections>
-                                                <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.rotation" id="5bT-ay-1hS"/>
-                                            </connections>
-                                        </segmentedControl>
-                                        <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi">
-                                            <rect key="frame" x="23" y="8" width="160" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
-                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystemBold"/>
-                                                <menu key="menu" id="tWl-6K-XFy">
-                                                    <items>
-                                                        <menuItem title="Item" state="on" tag="246" enabled="NO" id="Aqc-oL-X3H">
-                                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                                        </menuItem>
-                                                    </items>
-                                                </menu>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="selectItem:" target="VkT-77-mId" id="kUc-hp-8Kk"/>
-                                                <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="EzW-Wq-S4N" id="Ev3-mN-3Nu"/>
-                                                <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="EzW-Wq-S4N"/>
-                                            </connections>
-                                        </popUpButton>
-                                    </subviews>
-                                </view>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="tWl-6K-XFy">
+                                        <items>
+                                            <menuItem title="Item" state="on" tag="246" enabled="NO" id="Aqc-oL-X3H">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" id="cYv-FI-0F9">
+                                    <action selector="selectItem:" target="VkT-77-mId" id="kUc-hp-8Kk"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="qyp-NH-cxV" id="yjV-vz-r45">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="EzW-Wq-S4N" id="Ev3-mN-3Nu"/>
+                                    <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="EzW-Wq-S4N"/>
+                                    <binding destination="wZs-lo-pp8" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="qyp-NH-cxV">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
                                 </connections>
-                            </box>
+                            </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vhk-ki-ybJ" customClass="ColorsButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="325" y="311" width="40" height="30"/>
                                 <constraints>
@@ -4001,6 +3977,15 @@ disabled</string>
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.supportsGammaByDefault" id="qeK-RV-cIY"/>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="4eO-mx-15O" id="YBW-1r-Ai8">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ssq-HP-Ivu" customClass="DDCButton" customModule="Lunar" customModuleProvider="target">
@@ -4034,6 +4019,15 @@ disabled</string>
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="MNV-Mj-xeI"/>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="DRM-iH-KoD" id="Sd0-LM-yj6">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Zc-wW-De5" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
@@ -4063,6 +4057,15 @@ disabled</string>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.active" id="WwD-QX-SkP">
                                         <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="WwD-QX-SkP" id="mON-NI-Obw">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
@@ -4098,6 +4101,15 @@ disabled</string>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="YEO-Vn-fw1" id="aEk-W5-xpy">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="GJn-hd-DZ0">
@@ -4111,6 +4123,57 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="396" y="40" width="157" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="inline" title="Show advanced settings" alternateTitle="Hide advanced settings" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="0.10000000000000001"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="labelOn">
+                                        <color key="value" name="Caption Tertiary"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOff">
+                                        <color key="value" name="Field BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOn">
+                                        <color key="value" name="Button BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="toggleLock:" target="XVS-nO-2Mf" id="KyR-ua-zbU"/>
+                                    <binding destination="rew-Tm-BHz" name="value" keyPath="values.showAdvancedDisplaySettings" id="5Ie-4a-I5L"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="BGp-R3-21E">
+                                <rect key="frame" x="595" y="495" width="21" height="10"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="OFF" id="WvA-cP-xX8">
+                                    <font key="font" size="9" name="Menlo-Bold"/>
+                                    <color key="textColor" name="Power"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="5kL-gq-pFi" id="Or7-WX-2od">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="5kL-gq-pFi">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -4118,8 +4181,6 @@ and contrast to their highest values</string>
                         <outlet property="_controlsButton" destination="HuJ-7T-Fgg" id="TV2-Sx-NX0"/>
                         <outlet property="_ddcButton" destination="ssq-HP-Ivu" id="gXZ-dh-xLB"/>
                         <outlet property="_inputDropdownHotkeyButton" destination="s4q-W2-ta1" id="sIR-FG-rPK"/>
-                        <outlet property="_lockBrightnessHelpButton" destination="who-Wm-5BR" id="3y9-ZY-rFr"/>
-                        <outlet property="_lockContrastHelpButton" destination="09R-D2-mY8" id="qzo-9G-SQM"/>
                         <outlet property="_proButton" destination="OZD-Gw-TTp" id="GdC-vI-6lp"/>
                         <outlet property="_resetButton" destination="TJO-8a-xfO" id="x3I-L4-3qx"/>
                         <outlet property="_settingsButton" destination="5Zc-wW-De5" id="vMa-qZ-kKc"/>
@@ -4301,7 +4362,6 @@ and contrast to their highest values</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="vsR-DS-4b3"/>
                                                 <binding destination="upY-F0-APc" name="selectedTag" keyPath="values.brightnessKeysSyncControl" id="nVx-xW-guO"/>
                                             </connections>
                                         </popUpButton>
@@ -4411,7 +4471,6 @@ and contrast to their highest values</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="CgJ-4b-lob"/>
                                                 <binding destination="sqj-Qq-bef" name="selectedTag" keyPath="values.ctrlBrightnessKeysSyncControl" id="COy-xt-aWw"/>
                                             </connections>
                                         </popUpButton>
@@ -4521,7 +4580,6 @@ and contrast to their highest values</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="2xW-7j-bMU"/>
                                                 <binding destination="sqj-Qq-bef" name="selectedTag" keyPath="values.shiftBrightnessKeysSyncControl" id="gMA-HZ-NAN"/>
                                             </connections>
                                         </popUpButton>
@@ -6310,11 +6368,7 @@ Lunar will continue to check in the background</string>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="21a-h6-6He" name="hidden" keyPath="self.display.hasAmbientLightAdaptiveBrightness" id="32W-uQ-kGC">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
+                                                <binding destination="21a-h6-6He" name="value" keyPath="self.adaptiveBrightnessNotice" id="hcL-7Z-BCj"/>
                                             </connections>
                                         </textField>
                                     </subviews>
@@ -6458,7 +6512,7 @@ control automatically</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4kr-gJ-8yr" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="60" y="47" width="12" height="12"/>
+                                            <rect key="frame" x="56" y="47" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="12" id="KLS-ZL-ycy"/>
                                                 <constraint firstAttribute="height" constant="12" id="q4z-pW-3Rr"/>
@@ -6522,7 +6576,7 @@ control automatically</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="DRw-k0-DIe" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="58" y="16" width="14" height="14"/>
+                                            <rect key="frame" x="54" y="16" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="14" id="5gk-OU-Dxw"/>
                                                 <constraint firstAttribute="height" constant="14" id="ToB-KD-la1"/>
@@ -6579,11 +6633,11 @@ when FaceLight is activated</string>
                                         <constraint firstItem="hfj-gY-8Aw" firstAttribute="leading" secondItem="yhm-tF-nP8" secondAttribute="leading" constant="23" id="AeS-pq-e39"/>
                                         <constraint firstAttribute="trailing" secondItem="GiR-DL-Wzk" secondAttribute="trailing" constant="52" id="E2s-j8-Yri"/>
                                         <constraint firstItem="GiR-DL-Wzk" firstAttribute="leading" secondItem="yhm-tF-nP8" secondAttribute="leading" constant="52" id="PTg-3M-1VN"/>
-                                        <constraint firstItem="bLS-7f-U2y" firstAttribute="leading" secondItem="DRw-k0-DIe" secondAttribute="trailing" constant="-20" id="Pga-Kd-d5e"/>
+                                        <constraint firstItem="bLS-7f-U2y" firstAttribute="leading" secondItem="DRw-k0-DIe" secondAttribute="trailing" constant="-16" id="Pga-Kd-d5e"/>
                                         <constraint firstItem="bLS-7f-U2y" firstAttribute="centerY" secondItem="DRw-k0-DIe" secondAttribute="centerY" id="YnH-Y6-8CM"/>
                                         <constraint firstItem="bLS-7f-U2y" firstAttribute="top" secondItem="GiR-DL-Wzk" secondAttribute="bottom" id="dlp-Aa-gDz"/>
                                         <constraint firstItem="GiR-DL-Wzk" firstAttribute="top" secondItem="hfj-gY-8Aw" secondAttribute="bottom" constant="36" id="dnU-B5-pBe"/>
-                                        <constraint firstItem="GiR-DL-Wzk" firstAttribute="leading" secondItem="4kr-gJ-8yr" secondAttribute="trailing" constant="-20" id="jrJ-lh-zr2"/>
+                                        <constraint firstItem="GiR-DL-Wzk" firstAttribute="leading" secondItem="4kr-gJ-8yr" secondAttribute="trailing" constant="-16" id="jrJ-lh-zr2"/>
                                         <constraint firstItem="bLS-7f-U2y" firstAttribute="width" secondItem="GiR-DL-Wzk" secondAttribute="width" id="kKm-jI-kvv"/>
                                         <constraint firstItem="bLS-7f-U2y" firstAttribute="centerX" secondItem="GiR-DL-Wzk" secondAttribute="centerX" id="vNa-SG-c0z"/>
                                     </constraints>
@@ -6652,7 +6706,7 @@ should rise or fall based on the adaptive input</string>
                                             </textFieldCell>
                                         </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="O8y-8c-iHO" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="60" y="47" width="12" height="12"/>
+                                            <rect key="frame" x="56" y="47" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="AQJ-gn-P2S"/>
                                                 <constraint firstAttribute="width" constant="12" id="ZXk-4b-TZA"/>
@@ -6720,7 +6774,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="XM0-I5-whZ" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="58" y="16" width="14" height="14"/>
+                                            <rect key="frame" x="54" y="16" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="moh-la-Wa8"/>
                                                 <constraint firstAttribute="width" constant="14" id="x9d-Kf-NI5"/>
@@ -6763,14 +6817,14 @@ should rise or fall based on the adaptive input</string>
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="hJU-3S-kh0" firstAttribute="leading" secondItem="XM0-I5-whZ" secondAttribute="trailing" constant="-20" id="11y-jV-JIu"/>
+                                        <constraint firstItem="hJU-3S-kh0" firstAttribute="leading" secondItem="XM0-I5-whZ" secondAttribute="trailing" constant="-16" id="11y-jV-JIu"/>
                                         <constraint firstAttribute="bottom" secondItem="hJU-3S-kh0" secondAttribute="bottom" constant="8" id="2x0-MY-Oo4"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="top" secondItem="dLw-UF-aJD" secondAttribute="bottom" id="7Fx-tX-ApG"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="centerY" secondItem="O8y-8c-iHO" secondAttribute="centerY" id="94B-dA-eAJ"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="leading" secondItem="MR1-5D-jfX" secondAttribute="leading" constant="52" id="Dk3-Eh-q6n"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="top" secondItem="7Bd-iP-EOm" secondAttribute="bottom" constant="36" id="KPG-i9-esK"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="centerX" secondItem="dLw-UF-aJD" secondAttribute="centerX" id="LZ7-vc-oVr"/>
-                                        <constraint firstItem="dLw-UF-aJD" firstAttribute="leading" secondItem="O8y-8c-iHO" secondAttribute="trailing" constant="-20" id="Pa7-x9-R75"/>
+                                        <constraint firstItem="dLw-UF-aJD" firstAttribute="leading" secondItem="O8y-8c-iHO" secondAttribute="trailing" constant="-16" id="Pa7-x9-R75"/>
                                         <constraint firstAttribute="trailing" secondItem="dLw-UF-aJD" secondAttribute="trailing" constant="52" id="S4H-Ov-oPf"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="width" secondItem="dLw-UF-aJD" secondAttribute="width" id="dvQ-vt-inW"/>
                                         <constraint firstItem="sDs-j8-6hM" firstAttribute="leading" secondItem="7Bd-iP-EOm" secondAttribute="leading" id="f3I-of-pCU"/>
@@ -8962,7 +9016,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                 </scroller>
                             </scrollView>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jEJ-Jc-vrc" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="40" y="125" width="269" height="20"/>
+                                <rect key="frame" x="40" y="125" width="266" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="1uX-0h-k6P"/>
                                 </constraints>
@@ -9003,11 +9057,11 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Q2V-b0-pWy">
-                                <rect key="frame" x="38" y="82" width="273" height="39"/>
+                                <rect key="frame" x="38" y="82" width="270" height="39"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" id="Ahp-hR-scA">
                                     <font key="font" metaFont="systemMedium" size="10"/>
                                     <string key="title">Lunar needs Accessibility permissions to listen for
-brightness and volume keys, and to apply app presets 
+brightness and volume keys, and to apply app presets
 based on the app window placement</string>
                                     <color key="textColor" red="1" green="0.95121173469387754" blue="0.93234481292517002" alpha="0.69875310430463577" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -9204,7 +9258,7 @@ to send arbitrary DDC commands to monitors</string>
                     <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vGd-1C-1a0">
                         <rect key="frame" x="0.0" y="0.0" width="310" height="600"/>
                         <subviews>
-                            <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
+                            <tableView focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
                                 <rect key="frame" x="0.0" y="30" width="310" height="283"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
@@ -9262,7 +9316,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="lzD-m0-SY0" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="66" y="33" width="12" height="12"/>
+                                                        <rect key="frame" x="62" y="33" width="12" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="12" id="aVw-N6-r2Z"/>
                                                             <constraint firstAttribute="width" constant="12" id="xrc-DE-dK1"/>
@@ -9270,7 +9324,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         <contentFilters>
                                                             <ciFilter name="CIFalseColor">
                                                                 <configuration>
-                                                                    <ciColor key="inputColor0" red="0.29999999999999999" green="0.0" blue="0.0" alpha="1"/>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
                                                                     <ciColor key="inputColor1" red="1" green="0.90000000000000002" blue="0.80000000000000004" alpha="1"/>
                                                                     <null key="inputImage"/>
                                                                 </configuration>
@@ -9308,7 +9362,7 @@ to send arbitrary DDC commands to monitors</string>
                                                     <constraint firstItem="Ni0-ms-RPU" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="0nn-LJ-MSm"/>
                                                     <constraint firstItem="PvO-H1-mOH" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="6GO-oH-hQb"/>
                                                     <constraint firstItem="Ni0-ms-RPU" firstAttribute="top" secondItem="PvO-H1-mOH" secondAttribute="bottom" constant="4" id="DDO-BS-pyq"/>
-                                                    <constraint firstItem="PvO-H1-mOH" firstAttribute="leading" secondItem="lzD-m0-SY0" secondAttribute="trailing" constant="-20" id="Uxl-uC-cIz"/>
+                                                    <constraint firstItem="PvO-H1-mOH" firstAttribute="leading" secondItem="lzD-m0-SY0" secondAttribute="trailing" constant="-16" id="Uxl-uC-cIz"/>
                                                     <constraint firstItem="DGy-An-71R" firstAttribute="top" secondItem="nKX-LM-MgX" secondAttribute="top" constant="5" id="VDr-UM-ehe"/>
                                                     <constraint firstAttribute="bottom" secondItem="Ni0-ms-RPU" secondAttribute="bottom" id="YQE-Qs-Sh9"/>
                                                     <constraint firstItem="PvO-H1-mOH" firstAttribute="top" secondItem="DGy-An-71R" secondAttribute="bottom" constant="6" id="ceo-Nn-c3V"/>
@@ -9446,7 +9500,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="9t9-h6-nGA" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="66" y="98" width="12" height="12"/>
+                                                        <rect key="frame" x="62" y="98" width="12" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="12" id="Ome-uZ-pSQ"/>
                                                             <constraint firstAttribute="width" constant="12" id="uMg-SE-Vb3"/>
@@ -9454,7 +9508,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         <contentFilters>
                                                             <ciFilter name="CIFalseColor">
                                                                 <configuration>
-                                                                    <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
                                                                     <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
                                                                     <null key="inputImage"/>
                                                                 </configuration>
@@ -9491,7 +9545,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="WXp-hm-NXm" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="64" y="67" width="14" height="14"/>
+                                                        <rect key="frame" x="61" y="67" width="14" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="14" id="evG-YK-lIX"/>
                                                             <constraint firstAttribute="width" constant="14" id="oEC-Yh-E8M"/>
@@ -9499,7 +9553,7 @@ to send arbitrary DDC commands to monitors</string>
                                                         <contentFilters>
                                                             <ciFilter name="CIFalseColor">
                                                                 <configuration>
-                                                                    <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
                                                                     <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
                                                                     <null key="inputImage"/>
                                                                 </configuration>
@@ -9536,8 +9590,8 @@ to send arbitrary DDC commands to monitors</string>
                                                     <constraint firstItem="9t9-h6-nGA" firstAttribute="centerY" secondItem="OaN-2H-RQX" secondAttribute="centerY" id="8Zc-6Z-UEV"/>
                                                     <constraint firstItem="5VK-Ej-krq" firstAttribute="top" secondItem="sy4-S7-iPw" secondAttribute="bottom" constant="8" id="Ftd-ge-z4b"/>
                                                     <constraint firstItem="DrO-3E-miA" firstAttribute="top" secondItem="prI-Gh-RKd" secondAttribute="top" constant="5" id="H36-lb-w89"/>
-                                                    <constraint firstItem="wbs-Qz-lUz" firstAttribute="leading" secondItem="WXp-hm-NXm" secondAttribute="trailing" constant="-20" id="IC7-Sv-83d"/>
-                                                    <constraint firstItem="OaN-2H-RQX" firstAttribute="leading" secondItem="9t9-h6-nGA" secondAttribute="trailing" constant="-20" id="OjG-4c-Epq"/>
+                                                    <constraint firstItem="wbs-Qz-lUz" firstAttribute="leading" secondItem="WXp-hm-NXm" secondAttribute="trailing" constant="-17" id="IC7-Sv-83d"/>
+                                                    <constraint firstItem="OaN-2H-RQX" firstAttribute="leading" secondItem="9t9-h6-nGA" secondAttribute="trailing" constant="-16" id="OjG-4c-Epq"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="bottom" id="Z5S-KC-GTG"/>
                                                     <constraint firstItem="WXp-hm-NXm" firstAttribute="centerY" secondItem="wbs-Qz-lUz" secondAttribute="centerY" id="a3Z-b7-1Cf"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="wbs-Qz-lUz" secondAttribute="bottom" constant="4" id="ajP-EN-W2A"/>
@@ -9712,17 +9766,28 @@ to send arbitrary DDC commands to monitors</string>
                                     <action selector="setPercent:" target="XpJ-ho-P7z" id="4ff-1g-wvx"/>
                                 </connections>
                             </button>
-                            <box title="Box" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="435" width="316" height="167"/>
+                            <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-3" y="427" width="316" height="175"/>
                                 <view key="contentView" id="xED-Xy-oTv">
-                                    <rect key="frame" x="3" y="9" width="310" height="137"/>
+                                    <rect key="frame" x="3" y="9" width="310" height="157"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
+                                            <rect key="frame" x="13" y="134" width="130" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="8it-gt-vwn">
+                                                <font key="font" size="16" name="Menlo-Bold"/>
+                                                <color key="textColor" name="Caption Secondary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="PLk-Zt-V6X"/>
+                                            </connections>
+                                        </textField>
                                         <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="0Wk-V9-tNW">
-                                            <rect key="frame" x="88" y="51" width="134" height="22"/>
+                                            <rect key="frame" x="88" y="47" width="134" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="134" id="HP7-yo-gqM"/>
-                                                <constraint firstAttribute="height" constant="22" id="gJY-U3-Rkv"/>
+                                                <constraint firstAttribute="height" constant="21" id="gJY-U3-Rkv"/>
                                             </constraints>
                                             <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="87o-hG-ch3" id="pxa-JF-08B">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -9801,7 +9866,7 @@ to send arbitrary DDC commands to monitors</string>
                                             </connections>
                                         </popUpButton>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Z8-Q7-p7U" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="71" y="21" width="168" height="23"/>
+                                            <rect key="frame" x="71" y="17" width="168" height="23"/>
                                             <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="nHO-9M-9Q7">
                                                 <font key="font" metaFont="systemSemibold" size="13"/>
                                                 <segments>
@@ -9821,7 +9886,7 @@ to send arbitrary DDC commands to monitors</string>
                                             </connections>
                                         </segmentedControl>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tqt-X1-RJG" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="66" y="101" width="178" height="38"/>
+                                            <rect key="frame" x="66" y="96" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="9Wh-Ue-uRn"/>
                                                 <constraint firstAttribute="height" constant="30" id="yS8-20-Mcf"/>
@@ -9841,7 +9906,7 @@ to send arbitrary DDC commands to monitors</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="MNZ-Jn-RAr" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="116" width="12" height="12"/>
+                                            <rect key="frame" x="72" y="111" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="12" id="6CL-ab-eyX"/>
                                                 <constraint firstAttribute="height" constant="12" id="Itw-Vs-hki"/>
@@ -9849,8 +9914,8 @@ to send arbitrary DDC commands to monitors</string>
                                             <contentFilters>
                                                 <ciFilter name="CIFalseColor">
                                                     <configuration>
-                                                        <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
-                                                        <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                        <ciColor key="inputColor1" red="1" green="0.89803921568627454" blue="0.80000000000000004" alpha="1"/>
                                                         <null key="inputImage"/>
                                                     </configuration>
                                                 </ciFilter>
@@ -9859,7 +9924,7 @@ to send arbitrary DDC commands to monitors</string>
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OSL-cA-38n" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="66" y="71" width="178" height="38"/>
+                                            <rect key="frame" x="66" y="66" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="vZz-v5-zRN"/>
                                                 <constraint firstAttribute="width" constant="174" id="xgs-8B-bjh"/>
@@ -9879,7 +9944,7 @@ to send arbitrary DDC commands to monitors</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JaP-5h-FMy" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="74" y="85" width="14" height="14"/>
+                                            <rect key="frame" x="71" y="80" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="Hds-gp-QFx"/>
                                                 <constraint firstAttribute="width" constant="14" id="KNW-ro-MYY"/>
@@ -9887,7 +9952,7 @@ to send arbitrary DDC commands to monitors</string>
                                             <contentFilters>
                                                 <ciFilter name="CIFalseColor">
                                                     <configuration>
-                                                        <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
                                                         <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
                                                         <null key="inputImage"/>
                                                     </configuration>
@@ -9896,8 +9961,8 @@ to send arbitrary DDC commands to monitors</string>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="volume-low" id="Alt-3Z-b1D"/>
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76">
-                                            <rect key="frame" x="3" y="4" width="115" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="otl-pY-cnj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -9911,8 +9976,8 @@ to send arbitrary DDC commands to monitors</string>
                                                 </binding>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h">
-                                            <rect key="frame" x="117" y="4" width="98" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="V3L-vf-P4Z">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -9930,21 +9995,24 @@ to send arbitrary DDC commands to monitors</string>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="centerY" secondItem="D87-Cq-r76" secondAttribute="centerY" id="7Xy-mP-5yd"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="4" id="8Hf-OL-Lrj"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="leading" secondItem="D87-Cq-r76" secondAttribute="trailing" constant="3" id="BVX-Qt-Cny"/>
+                                        <constraint firstItem="D87-Cq-r76" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="499" constant="6" id="FOi-Ro-2A2"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="I8P-g4-hIO"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
-                                        <constraint firstItem="D87-Cq-r76" firstAttribute="leading" secondItem="xED-Xy-oTv" secondAttribute="leading" constant="5" id="QKn-JN-AEh"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="2" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
-                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" id="Uoe-aX-aq0"/>
-                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-20" id="cvs-CK-h0B"/>
+                                        <constraint firstItem="D87-Cq-r76" firstAttribute="leading" secondItem="Hup-6D-J0e" secondAttribute="leading" id="c7K-w6-Hov"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-16" id="cvs-CK-h0B"/>
                                         <constraint firstItem="MNZ-Jn-RAr" firstAttribute="centerY" secondItem="Tqt-X1-RJG" secondAttribute="centerY" id="dkt-2V-rz0"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="leading" secondItem="xED-Xy-oTv" secondAttribute="leading" constant="15" id="eEm-TZ-Vsd"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="eKY-QN-ieL"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="g17-EW-0gJ"/>
-                                        <constraint firstItem="OSL-cA-38n" firstAttribute="leading" secondItem="JaP-5h-FMy" secondAttribute="trailing" constant="-20" id="gXX-hV-vrq"/>
+                                        <constraint firstItem="OSL-cA-38n" firstAttribute="leading" secondItem="JaP-5h-FMy" secondAttribute="trailing" constant="-17" id="gXX-hV-vrq"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="mxi-wy-m9O"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="qW5-xo-Qe0"/>
-                                        <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" constant="4" id="sNb-T1-tu5"/>
+                                        <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" id="sNb-T1-tu5"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" constant="8" id="wr5-uK-0dY"/>
                                     </constraints>
                                 </view>
@@ -9953,6 +10021,11 @@ to send arbitrary DDC commands to monitors</string>
                                 </constraints>
                                 <size key="contentViewMargins" width="0.0" height="6"/>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bg">
+                                        <color key="value" name="Field BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display" id="kXM-yh-WSA">
                                         <dictionary key="options">
@@ -9971,14 +10044,14 @@ to send arbitrary DDC commands to monitors</string>
                                     <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.name" id="YF3-pL-ngY"/>
                                 </connections>
                             </box>
-                            <box title="Box" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="501" width="316" height="101"/>
+                            <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-3" y="486" width="316" height="116"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
-                                    <rect key="frame" x="3" y="3" width="310" height="77"/>
+                                    <rect key="frame" x="3" y="9" width="310" height="98"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="66" y="41" width="178" height="38"/>
+                                            <rect key="frame" x="66" y="37" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="10o-lf-zvS"/>
                                                 <constraint firstAttribute="height" constant="30" id="a6o-T5-lQV"/>
@@ -9997,8 +10070,19 @@ to send arbitrary DDC commands to monitors</string>
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseBrightness" id="rTV-Sp-akj"/>
                                             </connections>
                                         </slider>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
+                                            <rect key="frame" x="13" y="75" width="130" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="RjJ-T2-HEe">
+                                                <font key="font" size="16" name="Menlo-Bold"/>
+                                                <color key="textColor" name="Caption Secondary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="h7j-6y-G1m"/>
+                                            </connections>
+                                        </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="SME-Wy-2pc" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="56" width="12" height="12"/>
+                                            <rect key="frame" x="72" y="52" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="GCB-04-0TS"/>
                                                 <constraint firstAttribute="width" constant="12" id="gsT-ad-FtE"/>
@@ -10006,8 +10090,8 @@ to send arbitrary DDC commands to monitors</string>
                                             <contentFilters>
                                                 <ciFilter name="CIFalseColor">
                                                     <configuration>
-                                                        <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
-                                                        <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="0.97081953642384111"/>
+                                                        <ciColor key="inputColor1" red="1" green="0.89803921568627454" blue="0.80000000000000004" alpha="1"/>
                                                         <null key="inputImage"/>
                                                     </configuration>
                                                 </ciFilter>
@@ -10016,7 +10100,7 @@ to send arbitrary DDC commands to monitors</string>
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pc0-Ic-fRC" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="71" y="21" width="168" height="23"/>
+                                            <rect key="frame" x="71" y="17" width="168" height="23"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="166" id="CGL-Gg-nNl"/>
                                                 <constraint firstAttribute="height" constant="20" id="Kkl-XW-mZu"/>
@@ -10039,8 +10123,8 @@ to send arbitrary DDC commands to monitors</string>
                                                 </binding>
                                             </connections>
                                         </segmentedControl>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P">
-                                            <rect key="frame" x="3" y="4" width="115" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="S7N-nf-buj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -10054,8 +10138,8 @@ to send arbitrary DDC commands to monitors</string>
                                                 </binding>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid">
-                                            <rect key="frame" x="117" y="4" width="98" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="6AG-Ma-ayy">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -10074,21 +10158,30 @@ to send arbitrary DDC commands to monitors</string>
                                     <constraints>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="pc0-Ic-fRC" secondAttribute="bottom" constant="6" id="2Ue-HN-qPT"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
-                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-20" id="Ch7-G0-7uf"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-16" id="Ch7-G0-7uf"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
-                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" id="GPp-iL-bU9"/>
+                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="leading" secondItem="GuV-5N-Ajh" secondAttribute="leading" id="LuT-YH-oxK"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="2" id="NLt-qN-Af8"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="centerY" secondItem="ddL-Y9-B9P" secondAttribute="centerY" id="Oji-Si-pFa"/>
-                                        <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" constant="4" id="TJr-8A-iUn"/>
+                                        <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" id="TJr-8A-iUn"/>
+                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="leading" secondItem="ddL-Y9-B9P" secondAttribute="trailing" constant="3" id="nEV-fD-L8b"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
-                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="leading" secondItem="j9b-qV-Iv1" secondAttribute="leading" constant="5" id="tla-IG-KXL"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="4" id="nZ7-4a-hWM"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="leading" secondItem="j9b-qV-Iv1" secondAttribute="leading" constant="15" id="uBe-tO-W71"/>
                                     </constraints>
                                 </view>
                                 <constraints>
                                     <constraint firstAttribute="height" priority="250" constant="70" id="HZ8-1c-qVk"/>
                                 </constraints>
+                                <size key="contentViewMargins" width="0.0" height="6"/>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bg">
+                                        <color key="value" name="Field BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display" id="Jl5-82-aP0">
                                         <dictionary key="options">
@@ -11172,6 +11265,9 @@ settings for this monitor.</string>
         <namedColor name="AccentColor">
             <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <namedColor name="Button BG">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="Caption">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -11188,7 +11284,7 @@ settings for this monitor.</string>
             <color red="1" green="1" blue="1" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.063000001010000001" green="0.0120000001" blue="0.20000000300000001" alpha="0.035000000150000002" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG no color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

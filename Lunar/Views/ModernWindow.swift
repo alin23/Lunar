@@ -38,8 +38,8 @@ extension NSView {
 class CornerWindowController: NSWindowController {
     weak var display: Display? {
         didSet {
-            mainThread {
-                guard let display = display, let screen = display.screen,
+            mainAsync { [self] in
+                guard let display = display, let screen = display.screen ?? display.primaryMirrorScreen,
                       let w = window as? CornerWindow, let view = w.contentView
                 else { return }
 
@@ -55,7 +55,7 @@ class CornerWindowController: NSWindowController {
     }
 
     override func windowDidLoad() {
-        mainThread {
+        mainAsync { [self] in
             if let w = window as? CornerWindow {
                 w.isOpaque = false
                 w.backgroundColor = .clear

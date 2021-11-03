@@ -51,10 +51,11 @@ class ToggleButton: NSButton {
 
     var hoverState = HoverState.noHover
     weak var notice: NSTextField?
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
+    lazy var highlighterKey: String = "highlighter-\(accessibilityIdentifier())"
 
     lazy var initialHeight = frame.height
 
+    var highlighting: Bool { taskIsRunning(highlighterKey) }
     @IBInspectable dynamic var verticalPadding: CGFloat = 10 {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
@@ -96,7 +97,7 @@ class ToggleButton: NSButton {
 
     var bgColor: NSColor {
         if !isEnabled {
-            if highlighterTask != nil { stopHighlighting() }
+            if highlighting { stopHighlighting() }
             return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
                 .with(saturation: -0.2, brightness: -0.1)
         } else if state == .on {
@@ -118,69 +119,64 @@ class ToggleButton: NSButton {
     }
 
     func highlight() {
-        guard !isHidden else { return }
+        mainAsync { [weak self] in
+            guard let self = self, !self.isHidden, self.window?.isVisible ?? false
+            else { return }
 
-        let windowVisible = mainThread { window?.isVisible ?? false }
+            asyncEvery(
+                5.seconds,
+                uniqueTaskKey: self.highlighterKey,
+                skipIfExists: true,
+                eager: true,
+                queue: DispatchQueue.main
+            ) { [weak self] in
+                guard let self = self else { return }
 
-        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!), windowVisible
-        else {
-            return
-        }
+                guard self.window?.isVisible ?? false, let notice = self.notice
+                else {
+                    cancelTask(self.highlighterKey)
+                    return
+                }
 
-        highlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
-            guard let s = self else {
-                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            let windowVisible: Bool = mainThread { s.window?.isVisible ?? false }
-            guard windowVisible, let notice = s.notice else {
-                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            mainThread {
                 if notice.alphaValue <= 0.02 {
                     notice.transition(1)
                     notice.alphaValue = 0.9
                     notice.needsDisplay = true
 
-                    s.hover(fadeDuration: 1)
-                    s.needsDisplay = true
+                    self.hover(fadeDuration: 1)
+                    self.needsDisplay = true
                 } else {
                     notice.transition(3)
                     notice.alphaValue = 0.01
                     notice.needsDisplay = true
 
-                    s.defocus(fadeDuration: 3)
-                    s.needsDisplay = true
+                    self.defocus(fadeDuration: 3)
+                    self.needsDisplay = true
                 }
             }
         }
     }
 
     func stopHighlighting() {
-        if let timer = highlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        highlighterTask = nil
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            cancelTask(self.highlighterKey)
 
-        mainThread {
-            if let notice = notice {
+            if let notice = self.notice {
                 notice.transition(0.3)
                 notice.alphaValue = 0.0
                 notice.needsDisplay = true
             }
 
-            defocus(fadeDuration: 0.3)
-            needsDisplay = true
+            self.defocus(fadeDuration: 0.3)
+            self.needsDisplay = true
         }
     }
 
     override func mouseEntered(with _: NSEvent) {
         if isEnabled {
             hover()
-        } else if highlighterTask != nil {
+        } else if highlighting {
             stopHighlighting()
         }
     }

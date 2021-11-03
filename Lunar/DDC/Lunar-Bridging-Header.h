@@ -48,6 +48,7 @@ int DisplayServicesSetBrightnessSmooth(CGDirectDisplayID display, float brightne
 bool DisplayServicesCanChangeBrightness(CGDirectDisplayID display);
 bool DisplayServicesIsSmartDisplay(CGDirectDisplayID display);
 void DisplayServicesBrightnessChanged(CGDirectDisplayID display, double brightness);
+void DisplayServicesBrightnessChangeNotificationImmediate(CGDirectDisplayID display, double brightness);
 
 int DisplayServicesSetBrightnessWithType(CGDirectDisplayID display, UInt32 type, float brightness);
 int DisplayServicesGetPowerMode(CGDirectDisplayID display);

@@ -103,10 +103,11 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         tableView.headerView = nil
         initAddAppButton()
         observer = appExceptionsPublisher.sink { [weak self] change in
-            if let newVal = change.newValue, newVal.count != self?.appExceptions.count {
-                mainThread {
-                    self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
-                }
+            guard let self = self, let newVal = change.newValue, newVal.count != self.appExceptions.count else {
+                return
+            }
+            mainAsync { [weak self] in
+                self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
             }
         }
     }

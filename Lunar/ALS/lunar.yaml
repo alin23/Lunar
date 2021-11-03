@@ -71,7 +71,7 @@ sensor:
     on_raw_value:
       then:
         - lambda: |-
-            if (isnan(x)) {
+            if (isnan(x) || x == -1) {
               id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_1X);
               id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_14MS);
             } else if (x < 30) {

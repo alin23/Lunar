@@ -18,8 +18,8 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
-            guard let self = self, !self.pausedAdaptiveModeObserver else { return }
-            mainThread {
+            mainAsync {
+                guard let self = self, !self.pausedAdaptiveModeObserver else { return }
                 self.pausedAdaptiveModeObserver = true
                 Defaults.withoutPropagation { self.update(modeKey: change.newValue) }
                 self.pausedAdaptiveModeObserver = false

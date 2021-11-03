@@ -17,7 +17,8 @@ class GammaViewController: NSViewController {
     }
 
     func change() {
-        mainThread {
+        mainAsync { [weak self] in
+            guard let dot = self?.dot else { return }
             if dot.alphaValue == 0.0 {
                 dot.alphaValue = 0.1
             } else {
@@ -28,7 +29,8 @@ class GammaViewController: NSViewController {
     }
 
     func hide() {
-        mainThread {
+        mainAsync { [weak self] in
+            guard let dot = self?.dot else { return }
             dot.alphaValue = 0.0
             dot.needsDisplay = true
         }
