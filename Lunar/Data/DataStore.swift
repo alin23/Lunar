@@ -23,6 +23,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
     .accessibilityPermissionsGranted,
     .cliInstalled,
@@ -40,6 +41,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .muteVolumeZero,
     .hotkeysAffectBuiltin,
     .showVirtualDisplays,
+    .showDummyDisplays,
     .showAirplayDisplays,
     .showProjectorDisplays,
     .showDisconnectedDisplays,
@@ -356,9 +358,6 @@ class DataStore: NSObject {
             }
         }
 
-        // let allDisplays = (inactiveDisplays + displays).filter {
-        //     display in !DDC.isBuiltinDisplay(display.id)
-        // }
         let allDisplays = (inactiveDisplays + displays)
         CachedDefaults[.displays] = allDisplays
         if now { Defaults[.displays] = allDisplays }
@@ -472,23 +471,9 @@ enum CachedDefaults {
                 cache[key.name] = AnyCodable(value)
                 return value
             }
-
-//            displayEncodingLock.around(ignoreMainThread: true) {
-//                let lock = locks[key.name] ?? Self.lock
-//                return lock.around(ignoreMainThread: true) {
-//                    if let value = cache[key.name]?.value as? Value {
-//                        return value
-//                    }
-//
-//                    let value = key.suite[key]
-//
-//                    cache[key.name] = AnyCodable(value)
-//                    return value
-//                }
-//            }
         }
         set {
-            mainAsyncAfter(ms: 10) {
+            mainAsync {
                 cache[key.name] = AnyCodable(newValue)
                 if key == .displays, let displays = newValue as? [Display] {
                     displaysPublisher.send(displays)
@@ -504,55 +489,10 @@ enum CachedDefaults {
                     }
                     return
                 }
+
                 key.suite[key] = newValue
             }
             return
-
-//                    displayEncodingLock.around(ignoreMainThread: true) {
-//                        guard let lock = locks[key.name] else {
-//                            Self.lock.around(ignoreMainThread: true) {
-//                                cache[key.name] = AnyCodable(newValue)
-//                                asyncNow {
-//                                    Self.lock.around(ignoreMainThread: true) {
-//                                        key.suite[key] = newValue
-//                                    }
-//                                }
-//                            }
-//                            return
-//                        }
-//                        lock.around(ignoreMainThread: true) {
-//                            cache[key.name] = AnyCodable(newValue)
-//
-//                            if key == .displays, let displays = newValue as? [Display] {
-//                                asyncNow { displaysPublisher.send(displays) }
-//                                asyncNow {
-//                                    lock.around(ignoreMainThread: true) {
-//                                        Defaults.withoutPropagation {
-//                                            key.suite[key] = newValue
-//                                        }
-//                                    }
-//                                }
-//                                return
-//                            }
-//
-//                            if key == .hotkeys {
-//                                asyncNow {
-//                                    lock.around(ignoreMainThread: true) {
-//                                        Defaults.withoutPropagation {
-//                                            key.suite[key] = newValue
-//                                        }
-//                                    }
-//                                }
-//                                return
-//                            }
-//
-//                            asyncNow {
-//                                lock.around(ignoreMainThread: true) {
-//                                    key.suite[key] = newValue
-//                                }
-//                            }
-//                        }
-//                    }
         }
     }
 
@@ -610,10 +550,12 @@ func initCache() {
     cacheKey(.shiftBrightnessKeysControl)
 
     cacheKey(.showVirtualDisplays)
+    cacheKey(.showDummyDisplays)
     cacheKey(.showAirplayDisplays)
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
     cacheKey(.showTwoSchedules)
     cacheKey(.showThreeSchedules)
@@ -702,10 +644,12 @@ extension Defaults.Keys {
     static let shiftBrightnessKeysControl = Key<BrightnessKeyAction>("shiftBrightnessKeysControl", default: .builtin)
 
     static let showVirtualDisplays = Key<Bool>("showVirtualDisplays", default: true)
+    static let showDummyDisplays = Key<Bool>("showDummyDisplays", default: false)
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: true)
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
     static let cliInstalled = Key<Bool>("cliInstalled", default: false)
@@ -812,13 +756,16 @@ enum AppSettings {
     }
 }
 
-let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode)
+
 let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let lunarProActivePublisher = Defaults.publisher(.lunarProActive).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let infoMenuShownPublisher = Defaults.publisher(.infoMenuShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showTwoSchedulesPublisher = Defaults.publisher(.showTwoSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
@@ -856,6 +803,8 @@ let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBright
 let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .mediaKeysControlAllMonitors)
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showDummyDisplaysPublisher = Defaults.publisher(.showDummyDisplays).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).dropFirst().removeDuplicates()

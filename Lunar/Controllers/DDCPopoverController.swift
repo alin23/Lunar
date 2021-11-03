@@ -53,21 +53,22 @@ class DDCPopoverController: NSViewController {
             self.volumeOSDToggle.toggleWithoutCallback(value: value)
         }.store(in: &displayObservers, for: "showVolumeOSD")
 
-        mainThread {
-            minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
-            minDDCContrastField.integerValue = display.minDDCContrast.intValue
-            minDDCVolumeField.integerValue = display.minDDCVolume.intValue
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            self.minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
+            self.minDDCContrastField.integerValue = display.minDDCContrast.intValue
+            self.minDDCVolumeField.integerValue = display.minDDCVolume.intValue
 
-            maxDDCBrightnessField.integerValue = display.maxDDCBrightness.intValue
-            maxDDCContrastField.integerValue = display.maxDDCContrast.intValue
-            maxDDCVolumeField.integerValue = display.maxDDCVolume.intValue
+            self.maxDDCBrightnessField.integerValue = display.maxDDCBrightness.intValue
+            self.maxDDCContrastField.integerValue = display.maxDDCContrast.intValue
+            self.maxDDCVolumeField.integerValue = display.maxDDCVolume.intValue
 
-            minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d
-            maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d
-            minDDCContrastField.upperLimit = maxDDCContrastField.intValue.d
-            maxDDCContrastField.lowerLimit = minDDCContrastField.intValue.d
-            minDDCVolumeField.upperLimit = maxDDCVolumeField.intValue.d
-            maxDDCVolumeField.lowerLimit = minDDCVolumeField.intValue.d
+            self.minDDCBrightnessField.upperLimit = self.maxDDCBrightnessField.intValue.d
+            self.maxDDCBrightnessField.lowerLimit = self.minDDCBrightnessField.intValue.d
+            self.minDDCContrastField.upperLimit = self.maxDDCContrastField.intValue.d
+            self.maxDDCContrastField.lowerLimit = self.minDDCContrastField.intValue.d
+            self.minDDCVolumeField.upperLimit = self.maxDDCVolumeField.intValue.d
+            self.maxDDCVolumeField.lowerLimit = self.minDDCVolumeField.intValue.d
         }
 
         minDDCBrightnessField.onValueChanged = { [weak self] value in

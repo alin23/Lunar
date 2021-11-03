@@ -222,8 +222,8 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForLocationChange() {
-        locationObserver = locationObserver ?? locationPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        locationObserver = locationObserver ?? locationPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.locationLatField?.doubleValue = change.newValue?.latitude ?? 0.0
                 self?.locationLonField?.doubleValue = change.newValue?.longitude ?? 0.0
             }
@@ -231,48 +231,48 @@ class ConfigurationViewController: NSViewController {
     }
 
     func listenForBrightnessStepChange() {
-        brightnessStepObserver = brightnessStepObserver ?? brightnessStepPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        brightnessStepObserver = brightnessStepObserver ?? brightnessStepPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.brightnessStepField?.stringValue = String(change.newValue)
             }
         }
     }
 
     func listenForSyncPollingIntervalChange() {
-        syncPollingSecondsObserver = syncPollingSecondsObserver ?? syncPollingSecondsPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        syncPollingSecondsObserver = syncPollingSecondsObserver ?? syncPollingSecondsPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.syncPollingIntervalField?.stringValue = String(change.newValue)
             }
         }
     }
 
     func listenForSensorPollingIntervalChange() {
-        sensorPollingSecondsObserver = sensorPollingSecondsObserver ?? sensorPollingSecondsPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        sensorPollingSecondsObserver = sensorPollingSecondsObserver ?? sensorPollingSecondsPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.sensorPollingIntervalField?.stringValue = String(change.newValue)
             }
         }
     }
 
     func listenForContrastStepChange() {
-        contrastStepObserver = contrastStepObserver ?? contrastStepPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        contrastStepObserver = contrastStepObserver ?? contrastStepPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.contrastStepField?.stringValue = String(change.newValue)
             }
         }
     }
 
     func listenForVolumeStepChange() {
-        volumeStepObserver = volumeStepObserver ?? volumeStepPublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        volumeStepObserver = volumeStepObserver ?? volumeStepPublisher.sink { [weak self] change in
+            mainAsync {
                 self?.volumeStepField?.stringValue = String(change.newValue)
             }
         }
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? adaptiveBrightnessModePublisher.sink { [unowned self] change in
-            mainThread { [weak self] in
+        adaptiveBrightnessModeObserver = adaptiveBrightnessModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
+            mainAsync {
                 self?.showRelevantSettings(change.newValue)
             }
         }
@@ -468,7 +468,7 @@ class ConfigurationViewController: NSViewController {
 
     @IBAction func resetLocation(_: Any?) {
         CachedDefaults[.manualLocation] = false
-        mainThread { appDelegate!.startReceivingSignificantLocationChanges() }
+        mainAsync { appDelegate!.startReceivingSignificantLocationChanges() }
     }
 
     func setup() {

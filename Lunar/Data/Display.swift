@@ -526,7 +526,8 @@ enum ValueType {
             enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
         }
 
-        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && displayIsInMirrorSet(id)
+        mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
+        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
             brightnessBeforeBlackout = value
         }
@@ -669,6 +670,7 @@ enum ValueType {
         case faceLightBrightness
         case faceLightContrast
 
+        case mirroredBeforeBlackOut
         case blackOutEnabled
         case brightnessBeforeBlackout
         case contrastBeforeBlackout
@@ -761,6 +763,7 @@ enum ValueType {
             .applyGamma,
             .faceLightEnabled,
             .blackOutEnabled,
+            .mirroredBeforeBlackOut,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -889,7 +892,7 @@ enum ValueType {
 
     @Atomic static var applySource = true
 
-    static let nonDDCNamePattern = "dummy|28e850".r!
+    static let dummyNamePattern = "dummy|28e850".r!
 
     @objc dynamic var appPreset: AppException? = nil
 
@@ -1023,13 +1026,13 @@ enum ValueType {
         return getPrimaryMirrorScreen()
     }()
 
-    lazy var secondaryMirrorScreen: NSScreen? = {
+    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.secondaryMirrorScreen = self.getSecondaryMirrorScreen()
+                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
                 asyncEvery(
                     2.seconds,
                     uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
@@ -1037,12 +1040,12 @@ enum ValueType {
                     skipIfExists: false
                 ) { [weak self] _ in
                     guard let self = self else { return }
-                    self.secondaryMirrorScreen = self.getSecondaryMirrorScreen()
+                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
                 }
             }
             .store(in: &observers)
 
-        return getSecondaryMirrorScreen()
+        return getSecondaryMirrorScreenID()
     }()
 
     lazy var screen: NSScreen? = {
@@ -1071,7 +1074,8 @@ enum ValueType {
     lazy var maxBrightnessBeforeFacelight = maxBrightness
     lazy var maxContrastBeforeFacelight = maxContrast
 
-    @Atomic var blackOutEnabled = false
+    @Atomic var mirroredBeforeBlackOut = false
+    @Atomic @objc dynamic var blackOutEnabled = false
     lazy var brightnessBeforeBlackout = brightness
     lazy var contrastBeforeBlackout = contrast
     lazy var minBrightnessBeforeBlackout = minBrightness
@@ -1173,6 +1177,13 @@ enum ValueType {
     @Atomic var initialised = false
 
     var preciseBrightnessContrastBeforeAppPreset: Double = 0.5
+
+    @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name)
+
+    var noControls: Bool {
+        guard let control = control else { return true }
+        return control is GammaControl && !gammaEnabled
+    }
 
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
@@ -1688,13 +1699,17 @@ enum ValueType {
             var smallDiff = abs(preciseBrightness - oldValue) < 0.05
 
             guard !(control is GammaControl) else {
+                let brightness = (preciseBrightness * 100)
                 if supportsGamma {
-                    setGamma(oldBrightness: smallDiff ? nil : (oldValue * 100).u8, preciseBrightness: preciseBrightness)
+                    setGamma(
+                        brightness: brightness.u8,
+                        oldBrightness: smallDiff ? nil : (oldValue * 100).u8,
+                        preciseBrightness: preciseBrightness
+                    )
                 } else {
                     shade(amount: 1.0 - preciseBrightness, smooth: !smallDiff)
                 }
                 withoutDDC {
-                    let brightness = (preciseBrightness * 100)
                     self.brightness = brightness.ns
                     self.insertBrightnessUserDataPoint(
                         displayController.adaptiveMode.brightnessDataPoint.last,
@@ -2397,6 +2412,49 @@ enum ValueType {
 
     var hasBrightnessChangeObserver: Bool { Self.isObservingBrightnessChangeDS(id) }
 
+    var displaysInMirrorSet: [Display]? {
+        guard isInMirrorSet else { return nil }
+        return displayController.activeDisplayList.filter { d in
+            d.id == id || d.primaryMirrorScreen?.displayID == id || d.secondaryMirrorScreenID == id
+        }
+    }
+
+    var primaryMirror: Display? {
+        guard let id = primaryMirrorScreen?.displayID else { return nil }
+        return displayController.activeDisplays[id]
+    }
+
+    var secondaryMirror: Display? {
+        guard let id = secondaryMirrorScreenID else { return nil }
+        return displayController.activeDisplays[id]
+    }
+
+    var isInHardwareMirrorSet: Bool {
+        guard isInMirrorSet else { return false }
+
+        if let primary = primaryMirrorScreen {
+            return !primary.isDummy
+        }
+        return true
+    }
+
+    var isInDummyMirrorSet: Bool {
+        guard isInMirrorSet else { return false }
+
+        if isDummy { return true }
+        if let primary = primaryMirrorScreen {
+            return primary.isDummy
+        }
+        if let secondary = secondaryMirrorScreenID {
+            return DDC.isDummyDisplay(secondary)
+        }
+        return false
+    }
+
+    var isIndependentDummy: Bool {
+        isDummy && !isInMirrorSet
+    }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         var enabled = false
         DisplayServicesAmbientLightCompensationEnabled(id, &enabled)
@@ -2439,11 +2497,11 @@ enum ValueType {
     }
 
     static func getWindowController(_ id: CGDirectDisplayID, type: String) -> NSWindowController? {
-        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] as? NSWindowController }
+        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] as? NSWindowController }
     }
 
     static func setWindowController(_ id: CGDirectDisplayID, type: String, windowController: NSWindowController?) {
-        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] = windowController }
+        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] = windowController }
     }
 
     // MARK: EDID
@@ -2544,6 +2602,20 @@ enum ValueType {
         values[featureValue] = targetValue
     }
 
+    static func getSecondaryMirrorScreenID(_ id: CGDirectDisplayID) -> CGDirectDisplayID? {
+        guard displayIsInMirrorSet(id),
+              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
+        else { return nil }
+        return secondaryID
+    }
+
+    static func getPrimaryMirrorScreen(_ id: CGDirectDisplayID) -> NSScreen? {
+        guard displayIsInMirrorSet(id),
+              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+    }
+
     func observeBrightnessChangeDS() -> Bool {
         Self.observeBrightnessChangeDS(id)
     }
@@ -2598,7 +2670,9 @@ enum ValueType {
 
     func updateCornerWindow() {
         mainThread {
-            guard cornerRadius.intValue > 0, active else {
+            guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
+                  !isIndependentDummy, let screen = screen ?? primaryMirrorScreen
+            else {
                 cornerWindowController?.close()
                 cornerWindowController = nil
                 return
@@ -2624,18 +2698,14 @@ enum ValueType {
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
     }
 
-    func getSecondaryMirrorScreen() -> NSScreen? {
-        guard !isForTesting, isInMirrorSet,
-              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
-        else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(secondaryID) })
+    func getSecondaryMirrorScreenID() -> CGDirectDisplayID? {
+        guard !isForTesting else { return nil }
+        return Self.getSecondaryMirrorScreenID(id)
     }
 
     func getPrimaryMirrorScreen() -> NSScreen? {
-        guard !isForTesting, isInMirrorSet,
-              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
-        else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+        guard !isForTesting else { return nil }
+        return Self.getPrimaryMirrorScreen(id)
     }
 
     func refreshPanel() {
@@ -2651,12 +2721,17 @@ enum ValueType {
     }
 
     func shade(amount: Double, smooth: Bool = true) {
-        guard !isInMirrorSet, let screen = screen else {
+        print("shade for \(description)")
+        guard !isInHardwareMirrorSet, !isIndependentDummy, let screen = screen ?? primaryMirrorScreen,
+              timeSince(lastConnectionTime) >= 5
+        else {
+            print("nope, no shade for \(description)")
             shadeWindowController?.close()
             shadeWindowController = nil
             return
         }
 
+        print("yep, doing shade for \(description)")
         let key = "shade-0-\(serial)"
         cancelTask(key)
         mainThread {
@@ -2909,7 +2984,7 @@ enum ValueType {
                 self.refreshBrightness()
                 self.refreshContrast()
                 self.refreshVolume()
-                self.refreshInput()
+                // self.refreshInput()
                 self.refreshColors()
             }
         }
@@ -2988,8 +3063,7 @@ enum ValueType {
     }
 
     func detectI2C() {
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault,
-              !Self.nonDDCNamePattern.matches(name)
+        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault, !isDummy
         else {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
@@ -2997,7 +3071,7 @@ enum ValueType {
             if !supportsGammaByDefault {
                 log.debug("Virtual/Airplay displays don't support DDC, ignoring for display \(description)")
             }
-            if Self.nonDDCNamePattern.matches(name) {
+            if isDummy {
                 log.debug("Dummy displays don't support DDC, ignoring for display \(description)")
             }
             mainThread { hasI2C = false }
@@ -3268,6 +3342,7 @@ enum ValueType {
             try container.encode(faceLightBrightness.uint8Value, forKey: .faceLightBrightness)
             try container.encode(faceLightContrast.uint8Value, forKey: .faceLightContrast)
 
+            try container.encode(mirroredBeforeBlackOut, forKey: .mirroredBeforeBlackOut)
             try container.encode(blackOutEnabled, forKey: .blackOutEnabled)
             try container.encode(brightnessBeforeBlackout.uint8Value, forKey: .brightnessBeforeBlackout)
             try container.encode(contrastBeforeBlackout.uint8Value, forKey: .contrastBeforeBlackout)
@@ -3619,7 +3694,7 @@ enum ValueType {
 
         *Note: some settings might not exist in your monitor OSD depending on the monitor model*
 
-        Change the following settings to **unlock DDC controls** for this monitor:
+        Use the physical buttons of your monitor to change the following settings and try to unlock DDC controls for this monitor:
 
         \(specificBlockers)
 
@@ -3872,7 +3947,7 @@ enum ValueType {
                     gammaSemaphore.signal()
                     return
                 }
-                Thread.sleep(forTimeInterval: 0.005)
+                Thread.sleep(forTimeInterval: 0.002)
 
                 self.gammaChanged = true
                 for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness) {
@@ -3880,7 +3955,7 @@ enum ValueType {
                     if let onChange = onChange, let brightness = gammaTable.brightness {
                         onChange(brightness)
                     }
-                    Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.005)
+                    Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.002)
                 }
                 gammaSemaphore.signal()
             }

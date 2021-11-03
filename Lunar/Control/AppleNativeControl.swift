@@ -220,6 +220,7 @@ class AppleNativeControl: Control {
                     display.shouldStopBrightnessTransition = false
 
                     DisplayServicesSetBrightnessSmooth(id, br.f - oldBrFloat)
+                    DisplayServicesBrightnessChanged(id, br)
 
                     for _ in stride(from: 0, through: 0.5, by: 0.01) {
                         Thread.sleep(forTimeInterval: 0.01)
@@ -230,6 +231,7 @@ class AppleNativeControl: Control {
                         }
                     }
                     DisplayServicesSetBrightness(id, br.f)
+                    DisplayServicesBrightnessChanged(id, br)
                     display.inSmoothTransition = false
 
                     return

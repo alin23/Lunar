@@ -14,7 +14,7 @@ class ResetButton: ToggleButton {
 
     override var bgColor: NSColor {
         if !isEnabled {
-            if highlighterTask != nil { stopHighlighting() }
+            if highlighting { stopHighlighting() }
             return (effectiveAppearance.isDark ? .white : blackMauve).withAlphaComponent(0.8)
         }
         return super.bgColor

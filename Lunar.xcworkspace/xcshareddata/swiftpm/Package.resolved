@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "d6e3fd7c6180507e2dea8c470edd7fffe975a0cd",
-          "version": "7.4.6"
+          "revision": "fa1ba77bd74a227875a585a8ee569f330564926b",
+          "version": "7.5.0"
         }
       },
       {
@@ -213,7 +213,7 @@
         "repositoryURL": "https://github.com/launchdarkly/swift-eventsource",
         "state": {
           "branch": "master",
-          "revision": "66f0466d5a18bb2536a2e40e1c4f6dc532819383",
+          "revision": "cecc8638784cd28e20fe58bcd8b7bd0bae14906f",
           "version": null
         }
       },

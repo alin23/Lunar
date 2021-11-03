@@ -83,10 +83,10 @@ class QuickAdaptiveButton: NSButton {
 
         display?.$adaptive
             .receive(on: dataPublisherQueue)
-            .sink { [unowned self] newAdaptive in
-                guard let display = self.display else { return }
+            .sink { [weak self] newAdaptive in
+                guard let self = self, let display = self.display else { return }
                 mainThread {
-                    if !isEnabled {
+                    if !self.isEnabled {
                         self.bg = buttonBgDisabled
                         self.state = newAdaptive ? .on : .off
                     } else if newAdaptive {

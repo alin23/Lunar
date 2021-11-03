@@ -124,8 +124,9 @@ class DDCControl: Control {
         let subscriberKey = display.preciseBrightnessSubscriberKey
         let value = ValueRange(value: brightness, oldValue: oldValue)
 
+//        print("SETTING BRIGHTNESS TO \(brightness)")
         debounce(
-            ms: 50,
+            ms: 3,
             uniqueTaskKey: key,
             value: value,
             subscriberKey: subscriberKey
@@ -134,6 +135,12 @@ class DDCControl: Control {
                 cancelTask(key, subscriberKey: subscriberKey)
                 return
             }
+//            if let oldValue = range.oldValue {
+//                print("SETTING BRIGHTNESS FROM \(oldValue) TO \(range.value)")
+//            } else {
+//                print("SETTING BRIGHTNESS TO \(range.value)")
+//            }
+
             _ = self.setBrightness(range.value, oldValue: range.oldValue, onChange: nil)
         }
         return true
@@ -147,7 +154,7 @@ class DDCControl: Control {
         let value = ValueRange(value: contrast, oldValue: oldValue)
 
         debounce(
-            ms: 50,
+            ms: 3,
             uniqueTaskKey: key,
             value: value,
             subscriberKey: subscriberKey

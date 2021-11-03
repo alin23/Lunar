@@ -66,7 +66,7 @@ class BrightnessContrastChartView: LineChartView {
         contrast: Double? = nil,
         now: Date? = nil
     ) {
-        mainThread {
+        mainAsync { [self] in
             guard let data = data, data.dataSetCount >= 2 else { return }
 
             guard CachedDefaults[.moreGraphData] else {
@@ -137,7 +137,7 @@ class BrightnessContrastChartView: LineChartView {
     }
 
     func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
-        mainThread {
+        mainAsync { [self] in
             if display == nil || display?.id == GENERIC_DISPLAY_ID {
                 isHidden = true
             } else {
@@ -170,9 +170,15 @@ class BrightnessContrastChartView: LineChartView {
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
+                let curveAdjustedBrightness = mode.adjustCurveSIMD(
+                    [Double](values.striding(by: 30)),
+                    factor: mode.visualCurveFactor,
+                    minVal: display.minBrightness.doubleValue,
+                    maxVal: display.maxBrightness.doubleValue
+                )
                 brightnessChartEntry.append(
                     contentsOf: zip(
-                        xs, values.striding(by: 30)
+                        xs, curveAdjustedBrightness
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
@@ -180,9 +186,15 @@ class BrightnessContrastChartView: LineChartView {
                 if values.count < mode.maxChartDataPoints {
                     values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
                 }
+                let curveAdjustedContrast = mode.adjustCurveSIMD(
+                    [Double](values.striding(by: 30)),
+                    factor: mode.visualCurveFactor,
+                    minVal: display.minContrast.doubleValue,
+                    maxVal: display.maxContrast.doubleValue
+                )
                 contrastChartEntry.append(
                     contentsOf: zip(
-                        xs, values.striding(by: 30)
+                        xs, curveAdjustedContrast
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as LocationMode:
@@ -255,7 +267,7 @@ class BrightnessContrastChartView: LineChartView {
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
             default:
-                print("Unknown mode")
+                log.error("Unknown mode")
             }
             brightnessGraph.replaceEntries(brightnessChartEntry)
             contrastGraph.replaceEntries(contrastChartEntry)

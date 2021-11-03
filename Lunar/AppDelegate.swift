@@ -17,6 +17,7 @@ import FuzzyFind
 import LetsMove
 import Magnet
 import MediaKeyTap
+import Regex
 import Sauce
 import Sentry
 import SimplyCoreAudio
@@ -120,7 +121,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     // MARK: Internal
 
     enum UIElement {
-        case displaySettings
+        case displayControls
+        case displayDDC
+        case displayGamma
+        case displayReset
         case advancedSettingsButton
     }
 
@@ -226,7 +230,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let noon = moment.solarNoon.toString(.time(.short))
         let elevation = sun.elevation.str(decimals: 1)
 
-        return "Sun: (**sunrise \(sunrise)**) (noon \(noon)) (**sunset \(sunset)**) [elevation \(elevation)°]\n"
+        return "Sun: (**sunrise \(sunrise)**) (**sunset \(sunset)**)\n       (noon \(noon)) [elevation \(elevation)°]\n"
     }
 
     var memory500MBPassed = false {
@@ -308,7 +312,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for url in urls {
             guard let scheme = url.scheme, let host = url.host, scheme == "lunar" else { continue }
 
-            mainThread {
+            mainAsync {
                 CachedDefaults[.advancedSettingsShown] = host == "advanced"
             }
 
@@ -358,10 +362,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             }
                         }
                     }
-                    if firstPath == "settings" || firstPath == "displaySettings" ||
-                        lastPath == "settings" || lastPath == "displaySettings"
-                    {
-                        uiElement = .displaySettings
+                    if firstPath =~ "(display)?settings|controls?" || lastPath =~ "(display)?settings|controls?" {
+                        uiElement = .displayControls
+                    } else if firstPath =~ "ddc|dcc" || lastPath =~ "ddc|dcc" {
+                        uiElement = .displayDDC
+                    } else if firstPath =~ "gamm?a|colors?|rgb" || lastPath =~ "gamm?a|colors?|rgb" {
+                        uiElement = .displayGamma
+                    } else if firstPath =~ "reset" || lastPath =~ "reset" {
+                        uiElement = .displayReset
                     }
                 }
                 showWindow(after: windowController == nil ? 2000 : nil)
@@ -412,9 +420,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForAdaptiveModeChange() {
-        CachedDefaults[.nonManualMode] = CachedDefaults[.adaptiveBrightnessMode] != .manual
-        CachedDefaults[.clockMode] = CachedDefaults[.adaptiveBrightnessMode] == .clock
-        CachedDefaults[.syncMode] = CachedDefaults[.adaptiveBrightnessMode] == .sync
+        let mode = CachedDefaults[.adaptiveBrightnessMode]
+        CachedDefaults[.nonManualMode] = mode != .manual
+        CachedDefaults[.clockMode] = mode == .clock
+        CachedDefaults[.syncMode] = mode == .sync
 
         adaptiveBrightnessModePublisher.sink { change in
             SentrySDK.configureScope { scope in
@@ -423,16 +432,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             }
 
-            displayController.adaptiveMode = change.newValue.mode
-
-            mainThread {
-                CachedDefaults[.nonManualMode] = change.newValue != .manual
-                CachedDefaults[.clockMode] = change.newValue == .clock
-                CachedDefaults[.syncMode] = change.newValue == .sync
+            let modeKey = change.newValue
+            mainAsync {
+                CachedDefaults[.nonManualMode] = modeKey != .manual
+                CachedDefaults[.clockMode] = modeKey == .clock
+                CachedDefaults[.syncMode] = modeKey == .sync
+                displayController.adaptiveMode = modeKey.mode
                 self.resetElements()
                 self.windowController?.window?.displayIfNeeded()
+                self.manageDisplayControllerActivity(mode: modeKey)
             }
-            self.manageDisplayControllerActivity(mode: change.newValue)
         }.store(in: &observers)
     }
 
@@ -472,6 +481,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
         checkForUpdatePublisher.sink { change in
             self.updater.automaticallyChecksForUpdates = change.newValue
+        }.store(in: &observers)
+        showDummyDisplaysPublisher.sink { _ in
+            displayController.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showVirtualDisplaysPublisher.sink { _ in
             displayController.resetDisplayList(configurationPage: true)
@@ -571,25 +583,50 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
                 let button = settingsPageController.advancedSettingsButton else { return }
             if highlight { button.highlight() }
-        case .displaySettings:
+        case .displayControls:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
                   let displayViewController = pageController
                   .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
-                  let button = displayViewController.settingsButton,
-                  let event = NSEvent.mouseEvent(
-                      with: .leftMouseDown,
-                      location: button.frame.origin.applying(.init(translationX: 2, y: 2)),
-                      modifierFlags: [],
-                      timestamp: ProcessInfo.processInfo.systemUptime,
-                      windowNumber: w.windowNumber,
-                      context: nil,
-                      eventNumber: 1,
-                      clickCount: 0,
-                      pressure: 0.0
-                  )
+                  let button = displayViewController.settingsButton
             else { return }
-            log.debug("Clicking on settingsButton")
-            button.mouseDown(with: event)
+            log.debug("Clicking on Controls")
+            if !CachedDefaults[.showAdvancedDisplaySettings] {
+                CachedDefaults[.showAdvancedDisplaySettings] = true
+            }
+            mainAsyncAfter(ms: 300) { button.open() }
+        case .displayDDC:
+            guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
+                  let displayViewController = pageController
+                  .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
+                  let button = displayViewController.ddcButton
+            else { return }
+            log.debug("Clicking on DDC")
+            if !CachedDefaults[.showAdvancedDisplaySettings] {
+                CachedDefaults[.showAdvancedDisplaySettings] = true
+            }
+            mainAsyncAfter(ms: 300) { button.open() }
+        case .displayGamma:
+            guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
+                  let displayViewController = pageController
+                  .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
+                  let button = displayViewController.colorsButton
+            else { return }
+            log.debug("Clicking on Colors")
+            if !CachedDefaults[.showAdvancedDisplaySettings] {
+                CachedDefaults[.showAdvancedDisplaySettings] = true
+            }
+            mainAsyncAfter(ms: 300) { button.open() }
+        case .displayReset:
+            guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
+                  let displayViewController = pageController
+                  .viewControllers[NSPageController.ObjectIdentifier(display.serial)] as? DisplayViewController,
+                  let button = displayViewController.resetButton
+            else { return }
+            log.debug("Clicking on Reset")
+            if !CachedDefaults[.showAdvancedDisplaySettings] {
+                CachedDefaults[.showAdvancedDisplaySettings] = true
+            }
+            mainAsyncAfter(ms: 300) { button.open() }
         }
     }
 
@@ -639,6 +676,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func getMarkdownRenderer() -> SwiftyMarkdown {
         let md = getMD(dark: darkMode)
 
+        md.code.color = infoColor
         md.body.color = infoColor
         md.body.fontSize = 12
 
@@ -650,9 +688,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return md
     }
 
-    func setInfoMenuToggleTitle() {
-        let infoMenuShown = CachedDefaults[.infoMenuShown]
-        let padding = CachedDefaults[.startAtLogin] ? "      " : "    "
+    func setInfoMenuToggleTitle(show infoMenuShown: Bool? = nil) {
+        let infoMenuShown = infoMenuShown ?? CachedDefaults[.infoMenuShown]
+        let padding = (CachedDefaults[.startAtLogin] || blackOutMenuItem.state == .on || faceLightMenuItem.state == .on) ? "      " : "   "
         if infoMenuShown {
             (infoMenuToggle.view as! NSTextField).attributedStringValue = "\(padding)Useful Info"
                 .withFont(.systemFont(ofSize: 13, weight: .regular)) + " (click to hide)"
@@ -665,10 +703,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func toggleInfoMenuItem() {
-        mainThread {
-            CachedDefaults[.infoMenuShown].toggle()
-            infoMenuItem.isHidden = !CachedDefaults[.infoMenuShown]
-            setInfoMenuToggleTitle()
+        mainAsync { [self] in
+            let show = !CachedDefaults[.infoMenuShown]
+            CachedDefaults[.infoMenuShown] = show
+            infoMenuItem.isHidden = !show
+            setInfoMenuToggleTitle(show: show)
         }
     }
 
@@ -787,7 +826,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .sink { [self] _ in
-                mainThread {
+                mainAsync {
                     initMenuItems()
                     for (key, popover) in POPOVERS {
                         guard let popover = popover else { continue }
@@ -810,7 +849,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         asyncEvery(3.seconds, uniqueTaskKey: "zeroGammaChecker") { _ in
             displayController.activeDisplays.values
                 .filter { d in
-                    !d.isForTesting && !d.settingGamma && d.control is GammaControl && !d.isInMirrorSet && GammaTable(for: d.id).isZero
+                    !d.isForTesting && !d.settingGamma && d.control is GammaControl && !d.blackOutEnabled && GammaTable(for: d.id).isZero
                 }
                 .forEach { d in
                     log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")
@@ -1129,7 +1168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { _ in appDelegate!.updateInfoMenuItem() }
             .store(in: &observers)
         showBrightnessMenuBarPublisher.sink { [self] change in
-            mainThread {
+            mainAsync {
                 if change.newValue {
                     statusItem.button?.imagePosition = .imageLeading
                     updateInfoMenuItem()
@@ -1164,6 +1203,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func onboard() {
+        useOnboardingForDiagnostics = false
         createAndShowWindow("onboardWindowController", controller: &onboardWindowController)
     }
 
@@ -1215,9 +1255,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()
         let nc = UNUserNotificationCenter.current()
         nc.getNotificationSettings { settings in
-            mainThread { Defaults[.notificationsPermissionsGranted] = settings.alertSetting == .enabled }
+            mainAsync {
+                let enabled = settings.alertSetting == .enabled
+                Defaults[.notificationsPermissionsGranted] = enabled
+                // if !enabled, !datastore.shouldOnboard {
+                //     nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
+                // }
+            }
         }
-        // nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
 
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
         ValueTransformer.setValueTransformer(StringNumberTransformer(), forName: .stringNumberTransformerName)
@@ -1261,7 +1306,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
-                includeProjector: CachedDefaults[.showProjectorDisplays]
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
             )
         }
         displayController.addSentryData()
@@ -1350,7 +1396,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func openLunarDiagnostics(_: Any) {
-        createAndShowWindow("diagnosticsWindowController", controller: &diagnosticsWindowController)
+        useOnboardingForDiagnostics = true
+        createAndShowWindow("onboardWindowController", controller: &onboardWindowController)
+        // createAndShowWindow("diagnosticsWindowController", controller: &diagnosticsWindowController)
     }
 
     @IBAction func restartApp(_: Any) {
@@ -1462,7 +1510,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func resetElements() {
-        mainThread {
+        mainAsync { [self] in
             if let splitView = windowController?.window?.contentViewController as? SplitViewController {
                 splitView.activeModeButton?.needsDisplay = true
             }
@@ -1757,7 +1805,8 @@ func installCLIBinary() throws {
 
 func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
     let onAcquire = {
-        mainThread { Defaults[.accessibilityPermissionsGranted] = true }
+        mainAsync { Defaults[.accessibilityPermissionsGranted] = true }
+        appDelegate!.startOrRestartMediaKeyTap()
         guard !CachedDefaults[.mediaKeysNotified] else { return }
         CachedDefaults[.mediaKeysNotified] = true
 
@@ -1778,7 +1827,7 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
         kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean,
     ]
     let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
-    mainThread { Defaults[.accessibilityPermissionsGranted] = accessEnabled }
+    mainAsync { Defaults[.accessibilityPermissionsGranted] = accessEnabled }
 
     if accessEnabled {
         onAcquire()

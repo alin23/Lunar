@@ -912,14 +912,31 @@ class ControlChoiceViewController: NSViewController {
     }
 
     override func viewDidAppear() {
+        adaptiveModeDisabledByDiagnostics = false
+        if displayController.adaptiveModeKey != .manual {
+            displayController.disable()
+            adaptiveModeDisabledByDiagnostics = true
+        }
+
         listenForDisplayConnections()
 
         if let wc = view.window?.windowController as? OnboardWindowController {
-            wc.setupSkipButton(skipButton) { [weak self] in
+            wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
                 self?.cancelled = true
                 testWindowController?.close()
                 testWindowController = nil
                 self?.semaphore.signal()
+
+                guard useOnboardingForDiagnostics else { return }
+                self?.skipButton.isEnabled = false
+                self?.skipButton.attributedTitle = "Stopping".withTextColor(.black)
+
+                mainAsyncAfter(ms: 1500) {
+                    self?.view.window?.close()
+                    if adaptiveModeDisabledByDiagnostics {
+                        displayController.enable()
+                    }
+                }
             }
         }
 
@@ -950,6 +967,7 @@ class ControlChoiceViewController: NSViewController {
             mainThread {
                 testWindowController?.close()
                 testWindowController = nil
+                if useOnboardingForDiagnostics, self.cancelled { return }
                 self.next()
             }
         }

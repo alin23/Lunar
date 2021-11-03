@@ -76,7 +76,16 @@ class HotkeysChoiceViewController: NSViewController {
     override func viewDidAppear() {
         displays = displayController.activeDisplays.values.map { $0 }
         if let wc = view.window?.windowController as? OnboardWindowController {
-            wc.setupSkipButton(skipButton, color: peach) {}
+            wc.setupSkipButton(skipButton, color: peach, text: useOnboardingForDiagnostics ? "Complete Diagnostics" : nil) {
+                guard useOnboardingForDiagnostics else { return }
+
+                mainAsync {
+                    self.view.window?.close()
+                    if adaptiveModeDisabledByDiagnostics {
+                        displayController.enable()
+                    }
+                }
+            }
         }
     }
 
@@ -103,7 +112,7 @@ class HotkeysChoiceViewController: NSViewController {
     @IBAction func requestNotificationPermissions(_: Any) {
         let nc = UNUserNotificationCenter.current()
         nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
-            mainThread { Defaults[.notificationsPermissionsGranted] = granted }
+            mainAsync { Defaults[.notificationsPermissionsGranted] = granted }
         })
     }
 

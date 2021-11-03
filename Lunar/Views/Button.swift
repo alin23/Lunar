@@ -37,13 +37,14 @@ class Button: NSButton {
     var hover = false
 
     weak var notice: NSTextField?
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
 
-    @IBInspectable var horizontalPadding: CGFloat = 0 { didSet { mainThread { invalidateIntrinsicContentSize() }}}
-    @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainThread { invalidateIntrinsicContentSize() }}}
-    @IBInspectable var color: NSColor = .clear { didSet { mainThread { bg = color }}}
+    lazy var highlighterKey: String = "highlighter-\(accessibilityIdentifier())"
+
+    @IBInspectable var horizontalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
+    @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
+    @IBInspectable var color: NSColor = .clear { didSet { mainAsync { [self] in bg = color }}}
     @IBInspectable var textColor: NSColor = .labelColor {
-        didSet { mainThread {
+        didSet { mainAsync { [self] in
             guard !alternateTitleWhenDisabled else {
                 attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
                 return
@@ -53,7 +54,7 @@ class Button: NSButton {
     }
 
     override var title: String {
-        didSet { mainThread {
+        didSet { mainAsync { [self] in
             guard !alternateTitleWhenDisabled else {
                 attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
                 return
@@ -63,7 +64,7 @@ class Button: NSButton {
     }
 
     override var alternateTitle: String {
-        didSet { mainThread {
+        didSet { mainAsync { [self] in
             guard !alternateTitleWhenDisabled else {
                 attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
                 return
@@ -86,7 +87,7 @@ class Button: NSButton {
     override var isEnabled: Bool {
         didSet {
             guard !grayDisabledText else { return }
-            mainThread {
+            mainAsync { [self] in
                 alphaValue = isEnabled ? alpha : alpha - 0.3
                 if alternateTitleWhenDisabled {
                     attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
@@ -108,7 +109,7 @@ class Button: NSButton {
 
     @IBInspectable var circle: Bool = true {
         didSet {
-            mainThread {
+            mainAsync { [self] in
                 setShape()
             }
         }
@@ -117,7 +118,7 @@ class Button: NSButton {
     @IBInspectable var alpha: CGFloat = 0.8 {
         didSet {
             if !hover {
-                mainThread {
+                mainAsync { [self] in
                     alphaValue = alpha
                 }
             }
@@ -127,75 +128,72 @@ class Button: NSButton {
     @IBInspectable var hoverAlpha: CGFloat = 1.0 {
         didSet {
             if hover {
-                mainThread {
+                mainAsync { [self] in
                     alphaValue = hoverAlpha
                 }
             }
         }
     }
 
+    var highlighting: Bool { taskIsRunning(highlighterKey) }
+
     func highlight() {
-        guard !isHidden else { return }
+        mainAsync { [weak self] in
+            guard let self = self, !self.isHidden, self.window?.isVisible ?? false
+            else { return }
 
-        let windowVisible = mainThread { window?.isVisible ?? false }
+            asyncEvery(
+                5.seconds,
+                uniqueTaskKey: self.highlighterKey,
+                skipIfExists: true,
+                eager: true,
+                queue: DispatchQueue.main
+            ) { [weak self] in
+                guard let self = self else { return }
 
-        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!), windowVisible
-        else {
-            return
-        }
+                guard self.window?.isVisible ?? false, let notice = self.notice
+                else {
+                    cancelTask(self.highlighterKey)
+                    return
+                }
 
-        highlighterTask = realtimeQueue.async(every: 5.seconds) { [weak self] (_: CFRunLoopTimer?) in
-            guard let s = self else {
-                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            let windowVisible: Bool = mainThread { s.window?.isVisible ?? false }
-            guard windowVisible, let notice = s.notice else {
-                if let timer = self?.highlighterTask { realtimeQueue.cancel(timer: timer) }
-                return
-            }
-
-            mainThread {
                 if notice.alphaValue <= 0.02 {
-                    notice.transition(1)
+                    notice.transition(2)
                     notice.alphaValue = 0.9
                     notice.needsDisplay = true
 
-                    s.hover(fadeDuration: 1)
-                    s.needsDisplay = true
+                    self.hover(fadeDuration: 1)
+                    self.needsDisplay = true
                 } else {
                     notice.transition(3)
                     notice.alphaValue = 0.01
                     notice.needsDisplay = true
 
-                    s.defocus(fadeDuration: 3)
-                    s.needsDisplay = true
+                    self.defocus(fadeDuration: 3)
+                    self.needsDisplay = true
                 }
             }
         }
     }
 
     func stopHighlighting() {
-        if let timer = highlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-        highlighterTask = nil
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            cancelTask(self.highlighterKey)
 
-        mainThread {
-            if let notice = notice {
-                notice.transition(0.3)
+            if let notice = self.notice {
+                notice.transition(0.8)
                 notice.alphaValue = 0.0
                 notice.needsDisplay = true
             }
 
-            defocus(fadeDuration: 0.3)
-            needsDisplay = true
+            self.defocus(fadeDuration: 0.8)
+            self.needsDisplay = true
         }
     }
 
     func setShape() {
-        mainThread {
+        mainAsync { [self] in
             let buttonSize = frame
             if cornerRadius >= 0 {
                 radius = cornerRadius.ns
@@ -254,7 +252,7 @@ class Button: NSButton {
 
     override func mouseEntered(with _: NSEvent) {
         guard isEnabled else {
-            if highlighterTask != nil {
+            if highlighting {
                 stopHighlighting()
             }
             return

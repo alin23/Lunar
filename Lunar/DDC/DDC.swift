@@ -450,18 +450,20 @@ enum DDC {
     static func findExternalDisplays(
         includeVirtual: Bool = true,
         includeAirplay: Bool = false,
-        includeProjector: Bool = false
+        includeProjector: Bool = false,
+        includeDummy: Bool = false
     ) -> [CGDirectDisplayID] {
         var displayIDs = NSScreen.onlineDisplayIDs.filter { id in
             let name = Display.printableName(id)
             return !isBuiltinDisplay(id) &&
                 (includeVirtual || !isVirtualDisplay(id, name: name)) &&
                 (includeProjector || !isProjectorDisplay(id, name: name)) &&
+                (includeDummy || !isDummyDisplay(id, name: name)) &&
                 (includeAirplay || !(isSidecarDisplay(id, name: name) || isAirplayDisplay(id, name: name)))
         }
 
         #if DEBUG
-//            return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
@@ -471,7 +473,7 @@ enum DDC {
                 TEST_DISPLAY_PERSISTENT_ID,
                 // TEST_DISPLAY_PERSISTENT2_ID,
                 // TEST_DISPLAY_PERSISTENT3_ID,
-                TEST_DISPLAY_PERSISTENT4_ID,
+                // TEST_DISPLAY_PERSISTENT4_ID,
             ]
         #else
             return displayIDs
@@ -494,6 +496,15 @@ enum DDC {
         }
 
         return false
+    }
+
+    static func isDummyDisplay(_ id: CGDirectDisplayID, name: String? = nil) -> Bool {
+        guard !isGeneric(id) else {
+            return false
+        }
+
+        let realName = (name ?? Display.printableName(id)).lowercased()
+        return realName =~ Display.dummyNamePattern
     }
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {

@@ -66,7 +66,7 @@ class SettingsPageController: NSViewController {
 
     @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
         advancedSettingsShown = sender.state == .on
-        if advancedSettingsButton.highlighterTask != nil {
+        if advancedSettingsButton.highlighting {
             advancedSettingsButton.stopHighlighting()
         }
     }
@@ -78,8 +78,8 @@ class SettingsPageController: NSViewController {
         drawMoon(color: darkMauve)
 
         advancedSettingsShownObserver = advancedSettingsShownPublisher.sink { [weak self] shown in
-            guard let self = self else { return }
-            mainThread {
+            mainAsync { [weak self] in
+                guard let self = self else { return }
                 self.advancedSettingsShown = shown.newValue
                 self.advancedSettingsButton?.state = shown.newValue ? .on : .off
                 self.advancedSettingsButton?.fade()

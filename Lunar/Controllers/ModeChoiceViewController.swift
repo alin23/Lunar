@@ -214,6 +214,7 @@ class ModeChoiceViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard !useOnboardingForDiagnostics else { return }
 
         originalOverride = CachedDefaults[.overrideAdaptiveMode]
         originalMode = displayController.adaptiveModeKey
