@@ -196,6 +196,11 @@ class ModeChoiceViewController: NSViewController {
             CachedDefaults[.overrideAdaptiveMode] = true
             CachedDefaults[.adaptiveBrightnessMode] = .sensor
         }
+
+        if let url = URL(string: "https://lunar.fyi/sensor") {
+            NSWorkspace.shared.open(url)
+        }
+
         next()
     }
 
@@ -317,6 +322,7 @@ class ModeChoiceViewController: NSViewController {
     }
 
     override func viewDidAppear() {
+        uiCrumb("Mode Choice")
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton) { [weak self] in
                 self?.revert()

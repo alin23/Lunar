@@ -39,11 +39,11 @@ class PopoverButton<T: NSViewController>: Button {
         popover?.close()
     }
 
-    func open(edge _: NSRectEdge = .maxY) {
-        guard let popover = popover, (popover.contentViewController as? T) != nil else {
+    func open(edge: NSRectEdge = .maxY) {
+        guard let popover = popover, (popover.contentViewController as? T) != nil, self.superview?.window != nil else {
             return
         }
-        popover.show(relativeTo: visibleRect, of: self, preferredEdge: .maxY)
+        popover.show(relativeTo: visibleRect, of: self, preferredEdge: edge)
         popover.becomeFirstResponder()
     }
 

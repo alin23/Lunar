@@ -114,6 +114,12 @@ class NonClosingMenuText: NSTextField {
     }
 }
 
+// MARK: - MemoryUsageError
+
+enum MemoryUsageError: Error {
+    case highMemoryUsage(Int)
+}
+
 // MARK: - AppDelegate
 
 @NSApplicationMain
@@ -126,10 +132,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case displayGamma
         case displayReset
         case advancedSettingsButton
-    }
-
-    enum LunarError: Error {
-        case highMemoryUsage(Int)
     }
 
     var locationManager: CLLocationManager?
@@ -240,7 +242,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "500MB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
+                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
             }
         }
     }
@@ -251,7 +253,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "1GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
+                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                self.restartApp(self)
             }
         }
     }
@@ -262,7 +265,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "2GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
+                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                self.restartApp(self)
             }
         }
     }
@@ -273,7 +277,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "4GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
+                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                self.restartApp(self)
             }
         }
     }
@@ -284,7 +289,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "8GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: LunarError.highMemoryUsage(mb.intround))
+                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                self.restartApp(self)
             }
         }
     }

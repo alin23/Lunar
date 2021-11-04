@@ -986,6 +986,7 @@ class DisplayController {
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
+            adaptiveCrumb("Changed mode from \(change.oldValue) to \(change.newValue)")
             mainAsync {
                 guard let self = self, !self.pausedAdaptiveModeObserver else {
                     return

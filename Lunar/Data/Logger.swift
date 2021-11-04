@@ -87,7 +87,7 @@ class Logger: SwiftyBeaver {
         defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \t$X"
-        // Logger.addDestination(console)
+        Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
             enabled || TEST_MODE || AppSettings.beta
@@ -139,3 +139,19 @@ class Logger: SwiftyBeaver {
 }
 
 let log = Logger.self
+
+import Sentry
+
+func crumb(_ msg: String, level: SentryLevel = .info, category: String) {
+    let crumb = Breadcrumb(level: level, category: category)
+    crumb.message = msg
+    SentrySDK.addBreadcrumb(crumb: crumb)
+}
+
+func adaptiveCrumb(_ msg: String) {
+    crumb(msg, category: "Adaptive")
+}
+
+func uiCrumb(_ msg: String) {
+    crumb(msg, category: "UI")
+}

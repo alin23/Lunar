@@ -471,6 +471,15 @@ class ControlChoiceViewController: NSViewController {
         var contrastWriteWorked = false
         var volumeWriteWorked = false
 
+        if let control = control as? DDCControl {
+            control.ignoreFaults = true
+        }
+        defer {
+            if let control = control as? DDCControl {
+                control.ignoreFaults = false
+            }
+        }
+
         let setWriteProgress = { value in self.setControlProgress(0.5 + (0.5 * value)) }
         info("Writing brightness", color: peach)
         setWriteProgress(0.1)
@@ -912,6 +921,8 @@ class ControlChoiceViewController: NSViewController {
     }
 
     override func viewDidAppear() {
+        uiCrumb("Control Tester")
+
         adaptiveModeDisabledByDiagnostics = false
         if displayController.adaptiveModeKey != .manual {
             displayController.disable()
