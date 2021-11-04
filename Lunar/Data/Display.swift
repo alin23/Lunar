@@ -2721,17 +2721,14 @@ enum ValueType {
     }
 
     func shade(amount: Double, smooth: Bool = true) {
-        print("shade for \(description)")
         guard !isInHardwareMirrorSet, !isIndependentDummy, let screen = screen ?? primaryMirrorScreen,
               timeSince(lastConnectionTime) >= 5
         else {
-            print("nope, no shade for \(description)")
             shadeWindowController?.close()
             shadeWindowController = nil
             return
         }
 
-        print("yep, doing shade for \(description)")
         let key = "shade-0-\(serial)"
         cancelTask(key)
         mainThread {
