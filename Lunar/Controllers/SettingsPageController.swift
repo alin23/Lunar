@@ -80,6 +80,7 @@ class SettingsPageController: NSViewController {
         advancedSettingsShownObserver = advancedSettingsShownPublisher.sink { [weak self] shown in
             mainAsync { [weak self] in
                 guard let self = self else { return }
+                uiCrumb("Advanced Settings \(shown.newValue ? "Open" : "Close")")
                 self.advancedSettingsShown = shown.newValue
                 self.advancedSettingsButton?.state = shown.newValue ? .on : .off
                 self.advancedSettingsButton?.fade()

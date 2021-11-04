@@ -31,6 +31,8 @@ class DDCControl: Control {
     var smoothTransitionBrightnessTask: DispatchWorkItem?
     var smoothTransitionContrastTask: DispatchWorkItem?
 
+    @Atomic var ignoreFaults = false
+
     static func resetState(display: Display? = nil) {
         if let display = display {
             DDC.skipWritingPropertyById[display.id]?.removeAll()
@@ -186,7 +188,8 @@ class DDCControl: Control {
                 from: oldValue, to: brightness, delay: delay,
                 onStart: { display.shouldStopBrightnessTransition = false }
             ) { [weak self] brightness in
-                guard faults <= 5, let self = self, let display = self.display, !display.shouldStopBrightnessTransition else { return }
+                guard let self = self, faults <= 5 || self.ignoreFaults, let display = self.display,
+                      !display.shouldStopBrightnessTransition else { return }
 
                 log.debug("Writing brightness=\(brightness) using \(self) for \(display)")
 
@@ -223,7 +226,8 @@ class DDCControl: Control {
                 from: oldValue, to: contrast, delay: delay,
                 onStart: { display.shouldStopContrastTransition = false }
             ) { [weak self] contrast in
-                guard faults <= 5, let self = self, let display = self.display, !display.shouldStopContrastTransition else { return }
+                guard let self = self, faults <= 5 || self.ignoreFaults, let display = self.display,
+                      !display.shouldStopContrastTransition else { return }
 
                 log.debug("Writing contrast=\(contrast) using \(self) for \(display)")
 

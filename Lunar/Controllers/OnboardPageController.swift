@@ -21,6 +21,10 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     var changes: [() -> Void] = []
     weak var pageController: OnboardPageController?
 
+    var clickedSkipButton = false
+
+    var skip: (() -> Void)?
+
     override func windowDidLoad() {
         super.windowDidLoad()
         window?.delegate = self
@@ -38,6 +42,40 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         cancelTask(ONBOARDING_TASK_KEY)
         applyChanges()
         appDelegate!.onboardWindowController = nil
+
+        guard !clickedSkipButton else { return }
+        skip?()
+
+        guard !useOnboardingForDiagnostics else { return }
+        completeOnboarding()
+    }
+
+    func completeOnboarding() {
+        appDelegate!.showWindow(after: 100)
+        if !lunarProAccessDialogShown {
+            lunarProAccessDialogShown = true
+            mainAsync {
+                guard let paddle = paddle, let lunarProProduct = lunarProProduct else { return }
+                paddle.showProductAccessDialog(with: lunarProProduct)
+            }
+        }
+
+        mainAsyncAfter(ms: 1000) {
+            let nc = UNUserNotificationCenter.current()
+            nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
+                mainAsync { Defaults[.notificationsPermissionsGranted] = granted }
+            })
+        }
+        mainAsyncAfter(ms: 3000) {
+            if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
+                appDelegate!.startOrRestartMediaKeyTap(checkPermissions: true)
+            } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
+                acquirePrivileges(
+                    notificationTitle: "Lunar can now watch for app exceptions",
+                    notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+                )
+            }
+        }
     }
 
     func setupSkipButton(_ button: Button, color: NSColor? = nil, text: String? = nil, skip: @escaping (() -> Void)) {
@@ -45,36 +83,14 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         button.attributedTitle = (text ?? button.title).withTextColor(.black)
         button.hoverAlpha = 0.8
         button.trackHover()
+        self.skip = skip
         button.onClick = { [weak self] in
-            skip()
+            self?.clickedSkipButton = true
+
+            self?.skip?()
             guard !useOnboardingForDiagnostics else { return }
             self?.window?.close()
-
-            appDelegate!.showWindow(after: 100)
-            if !lunarProAccessDialogShown {
-                lunarProAccessDialogShown = true
-                mainAsync {
-                    guard let paddle = paddle, let lunarProProduct = lunarProProduct else { return }
-                    paddle.showProductAccessDialog(with: lunarProProduct)
-                }
-            }
-
-            mainAsyncAfter(ms: 1000) {
-                let nc = UNUserNotificationCenter.current()
-                nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
-                    mainAsync { Defaults[.notificationsPermissionsGranted] = granted }
-                })
-            }
-            mainAsyncAfter(ms: 3000) {
-                if CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] {
-                    appDelegate!.startOrRestartMediaKeyTap(checkPermissions: true)
-                } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
-                    acquirePrivileges(
-                        notificationTitle: "Lunar can now watch for app exceptions",
-                        notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
-                    )
-                }
-            }
+            self?.completeOnboarding()
         }
     }
 }

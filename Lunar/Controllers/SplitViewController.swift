@@ -9,6 +9,7 @@
 import Cocoa
 import Combine
 import Defaults
+import Sentry
 
 let NOTE_TEXT = """
 **Note:** The same logic applies for both brightness and contrast
@@ -300,6 +301,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func whiteBackground() {
+        uiCrumb("Display Page \(pageController?.selectedIndex ?? 0)")
         setPage(pageController?.selectedIndex)
         view.transition(0.2)
         if let logo = logo {
@@ -330,6 +332,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func yellowBackground() {
+        uiCrumb("Configuration Page")
         setPage(pageController?.selectedIndex)
         if let logo = logo {
             logo.transition(0.2)
@@ -345,6 +348,8 @@ class SplitViewController: NSSplitViewController {
     }
 
     func mauveBackground() {
+        uiCrumb("Hotkeys Page")
+
         setPage(pageController?.selectedIndex)
         if let logo = logo {
             logo.transition(0.2)
