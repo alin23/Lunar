@@ -123,7 +123,6 @@ class DDCControl: Control {
         guard let display = display else { return false }
 
         let key = display.preciseBrightnessKey
-        let subscriberKey = display.preciseBrightnessSubscriberKey
         let value = ValueRange(value: brightness, oldValue: oldValue)
 
 //        print("SETTING BRIGHTNESS TO \(brightness)")
@@ -131,10 +130,10 @@ class DDCControl: Control {
             ms: 3,
             uniqueTaskKey: key,
             value: value,
-            subscriberKey: subscriberKey
+            subscriberKey: key
         ) { [weak self] range in
             guard let self = self else {
-                cancelTask(key, subscriberKey: subscriberKey)
+                cancelTask(key, subscriberKey: key)
                 return
             }
 //            if let oldValue = range.oldValue {
@@ -152,17 +151,16 @@ class DDCControl: Control {
         guard let display = display else { return false }
 
         let key = display.preciseContrastKey
-        let subscriberKey = display.preciseContrastSubscriberKey
         let value = ValueRange(value: contrast, oldValue: oldValue)
 
         debounce(
             ms: 3,
             uniqueTaskKey: key,
             value: value,
-            subscriberKey: subscriberKey
+            subscriberKey: key
         ) { [weak self] range in
             guard let self = self else {
-                cancelTask(key, subscriberKey: subscriberKey)
+                cancelTask(key, subscriberKey: key)
                 return
             }
             _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)

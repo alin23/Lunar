@@ -24,33 +24,33 @@ class HotkeyViewController: NSViewController {
 
     // MARK: Internal
 
-    @IBOutlet var toggleHotkeyView: HotkeyView!
-    @IBOutlet var lunarHotkeyView: HotkeyView!
-    @IBOutlet var restartHotkeyView: HotkeyView!
-    @IBOutlet var percent0HotkeyView: HotkeyView!
-    @IBOutlet var percent25HotkeyView: HotkeyView!
-    @IBOutlet var percent50HotkeyView: HotkeyView!
-    @IBOutlet var percent75HotkeyView: HotkeyView!
-    @IBOutlet var percent100HotkeyView: HotkeyView!
-    @IBOutlet var brightnessUpHotkeyView: HotkeyView!
-    @IBOutlet var brightnessDownHotkeyView: HotkeyView!
-    @IBOutlet var contrastUpHotkeyView: HotkeyView!
-    @IBOutlet var contrastDownHotkeyView: HotkeyView!
-    @IBOutlet var volumeDownHotkeyView: HotkeyView!
-    @IBOutlet var volumeUpHotkeyView: HotkeyView!
-    @IBOutlet var muteAudioHotkeyView: HotkeyView!
-    @IBOutlet var faceLightHotkeyView: HotkeyView!
-    @IBOutlet var blackOutHotkeyView: HotkeyView!
+    @IBOutlet var toggleHotkeyView: HotkeyView?
+    @IBOutlet var lunarHotkeyView: HotkeyView?
+    @IBOutlet var restartHotkeyView: HotkeyView?
+    @IBOutlet var percent0HotkeyView: HotkeyView?
+    @IBOutlet var percent25HotkeyView: HotkeyView?
+    @IBOutlet var percent50HotkeyView: HotkeyView?
+    @IBOutlet var percent75HotkeyView: HotkeyView?
+    @IBOutlet var percent100HotkeyView: HotkeyView?
+    @IBOutlet var brightnessUpHotkeyView: HotkeyView?
+    @IBOutlet var brightnessDownHotkeyView: HotkeyView?
+    @IBOutlet var contrastUpHotkeyView: HotkeyView?
+    @IBOutlet var contrastDownHotkeyView: HotkeyView?
+    @IBOutlet var volumeDownHotkeyView: HotkeyView?
+    @IBOutlet var volumeUpHotkeyView: HotkeyView?
+    @IBOutlet var muteAudioHotkeyView: HotkeyView?
+    @IBOutlet var faceLightHotkeyView: HotkeyView?
+    @IBOutlet var blackOutHotkeyView: HotkeyView?
 
-    @IBOutlet var resetButton: ResetButton!
-    @IBOutlet var disableButton: ResetButton!
+    @IBOutlet var resetButton: ResetButton?
+    @IBOutlet var disableButton: ResetButton?
 
-    @IBOutlet var brightnessKeysControlButton: PopUpButton!
-    @IBOutlet var brightnessKeysSyncControlButton: PopUpButton!
-    @IBOutlet var ctrlBrightnessKeysControlButton: PopUpButton!
-    @IBOutlet var ctrlBrightnessKeysSyncControlButton: PopUpButton!
-    @IBOutlet var shiftBrightnessKeysControlButton: PopUpButton!
-    @IBOutlet var shiftBrightnessKeysSyncControlButton: PopUpButton!
+    @IBOutlet var brightnessKeysControlButton: PopUpButton?
+    @IBOutlet var brightnessKeysSyncControlButton: PopUpButton?
+    @IBOutlet var ctrlBrightnessKeysControlButton: PopUpButton?
+    @IBOutlet var ctrlBrightnessKeysSyncControlButton: PopUpButton?
+    @IBOutlet var shiftBrightnessKeysControlButton: PopUpButton?
+    @IBOutlet var shiftBrightnessKeysSyncControlButton: PopUpButton?
 
     @IBAction func resetHotkeys(_: Any) {
         HotKeyCenter.shared.unregisterAll()
@@ -81,25 +81,25 @@ class HotkeyViewController: NSViewController {
     func setHotkeys() {
         let hotkeys = CachedDefaults[.hotkeys]
 
-        toggleHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.toggle.rawValue }
-        lunarHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.lunar.rawValue }
-        restartHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.restart.rawValue }
-        percent0HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent0.rawValue }
-        percent25HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent25.rawValue }
-        percent50HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent50.rawValue }
-        percent75HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent75.rawValue }
-        percent100HotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent100.rawValue }
-        faceLightHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.faceLight.rawValue }
-        blackOutHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.blackOut.rawValue }
+        toggleHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.toggle.rawValue }
+        lunarHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.lunar.rawValue }
+        restartHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.restart.rawValue }
+        percent0HotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent0.rawValue }
+        percent25HotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent25.rawValue }
+        percent50HotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent50.rawValue }
+        percent75HotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent75.rawValue }
+        percent100HotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.percent100.rawValue }
+        faceLightHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.faceLight.rawValue }
+        blackOutHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.blackOut.rawValue }
 
-        brightnessUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessUp.rawValue }
-        brightnessDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessDown.rawValue }
-        contrastUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastUp.rawValue }
-        contrastDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastDown.rawValue }
-        volumeUpHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }
-        volumeDownHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }
+        brightnessUpHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessUp.rawValue }
+        brightnessDownHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.brightnessDown.rawValue }
+        contrastUpHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastUp.rawValue }
+        contrastDownHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.contrastDown.rawValue }
+        volumeUpHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }
+        volumeDownHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }
 
-        muteAudioHotkeyView.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }
+        muteAudioHotkeyView?.hotkey = hotkeys.first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }
     }
 
     @IBAction func disableAll(_ sender: Any) {
@@ -130,9 +130,9 @@ class HotkeyViewController: NSViewController {
         view.wantsLayer = true
         view.bg = hotkeysBgColor
 
-        resetButton.page = .hotkeysReset
-        disableButton.page = .hotkeysReset
-        disableButton.resettingText = "Disabling"
+        resetButton?.page = .hotkeysReset
+        disableButton?.page = .hotkeysReset
+        disableButton?.resettingText = "Disabling"
 
         setHotkeys()
 

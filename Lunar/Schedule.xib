@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -22,15 +22,15 @@
             <rect key="frame" x="0.0" y="0.0" width="180" height="146"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <box fixedFrame="YES" title="Schedule 1" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wRp-Hv-A02">
-                    <rect key="frame" x="-3" y="-4" width="186" height="141"/>
+                <box fixedFrame="YES" title="Schedule 1" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wRp-Hv-A02">
+                    <rect key="frame" x="-3" y="-4" width="186" height="143"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <view key="contentView" id="ss9-Y3-B8i">
-                        <rect key="frame" x="3" y="3" width="180" height="121"/>
+                        <rect key="frame" x="3" y="3" width="180" height="137"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7vR-RW-TFl" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="97" y="89" width="49" height="30"/>
+                                <rect key="frame" x="97" y="105" width="49" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" alignment="center" title="08" usesSingleLineMode="YES" id="pZF-ks-q6x" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="26"/>
@@ -65,7 +65,7 @@
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IRQ-gP-bkE" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="34" y="89" width="49" height="30"/>
+                                <rect key="frame" x="34" y="105" width="49" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" alignment="center" title="07" usesSingleLineMode="YES" id="LIh-nt-JpK" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemHeavy" size="26"/>
@@ -100,7 +100,7 @@
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3gW-b8-1eB">
-                                <rect key="frame" x="82" y="91" width="16" height="30"/>
+                                <rect key="frame" x="82" y="107" width="16" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title=":" id="6Jf-G9-h7u">
                                     <font key="font" metaFont="systemHeavy" size="26"/>
@@ -109,7 +109,7 @@
                                 </textFieldCell>
                             </textField>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aM2-4L-F67">
-                                <rect key="frame" x="14" y="56" width="150" height="22"/>
+                                <rect key="frame" x="14" y="79" width="150" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Time" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="mWN-NX-YTt" id="YbL-ef-oU2">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -141,7 +141,7 @@
                                 </connections>
                             </popUpButton>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t7r-Q4-jDN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="7" y="95" width="22" height="21"/>
+                                <rect key="frame" x="7" y="111" width="22" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="＋" alternateTitle="－" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" imageScaling="proportionallyDown" inset="2" id="JZt-yk-zvD">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -172,7 +172,7 @@
                                 </connections>
                             </button>
                             <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="j3P-BV-qub" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="13" y="4" width="154" height="38"/>
+                                <rect key="frame" x="13" y="10" width="154" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="8GJ-hW-12T" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                     <userDefinedRuntimeAttributes>
@@ -201,7 +201,7 @@
                                 </connections>
                             </slider>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="H8e-MD-Hcf" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="21" y="19" width="12" height="12"/>
+                                <rect key="frame" x="19" y="25" width="12" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -215,6 +215,29 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="x2M-u2-mr5"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             </imageView>
+                            <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g9u-50-b3N" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="18" y="44" width="144" height="13"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="144" id="XJp-0G-ZpQ"/>
+                                    <constraint firstAttribute="height" constant="16" id="Z7L-lL-B6v"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Use current brightness" bezelStyle="inline" alignment="center" inset="2" id="35i-gK-3qp">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemBold" size="10"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="Field BG no color"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="-2" name="target" keyPath="self" id="ACy-b2-ijJ">
+                                        <dictionary key="options">
+                                            <string key="NSSelectorName">useCurrentBrightness</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <font key="titleFont" metaFont="systemHeavy" size="13"/>
