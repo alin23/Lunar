@@ -10,6 +10,7 @@ import ArgumentParser
 import Cocoa
 import CoreGraphics
 import Foundation
+import FuzzyFind
 import Regex
 
 let MAX_REQUESTS = 10
@@ -172,53 +173,127 @@ let inputSourceMapping: [String: InputSource] = Dictionary(uniqueKeysWithValues:
 // MARK: - ControlID
 
 enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
-    case RESET = 0x04
-    case RESET_BRIGHTNESS_AND_CONTRAST = 0x05
-    case RESET_GEOMETRY = 0x06
-    case RESET_COLOR = 0x08
-    case BRIGHTNESS = 0x10
-    case CONTRAST = 0x12
-    case COLOR_PRESET_A = 0x14
-    case RED_GAIN = 0x16
-    case GREEN_GAIN = 0x18
-    case BLUE_GAIN = 0x1A
-    case AUTO_SIZE_CENTER = 0x1E
-    case WIDTH = 0x22
-    case HEIGHT = 0x32
-    case VERTICAL_POS = 0x30
-    case HORIZONTAL_POS = 0x20
-    case PINCUSHION_AMP = 0x24
-    case PINCUSHION_PHASE = 0x42
-    case KEYSTONE_BALANCE = 0x40
-    case PINCUSHION_BALANCE = 0x26
-    case TOP_PINCUSHION_AMP = 0x46
-    case TOP_PINCUSHION_BALANCE = 0x48
-    case BOTTOM_PINCUSHION_AMP = 0x4A
-    case BOTTOM_PINCUSHION_BALANCE = 0x4C
-    case VERTICAL_LINEARITY = 0x3A
-    case VERTICAL_LINEARITY_BALANCE = 0x3C
-    case HORIZONTAL_STATIC_CONVERGENCE = 0x28
-    case VERTICAL_STATIC_CONVERGENCE = 0x38
-    case MOIRE_CANCEL = 0x56
-    case INPUT_SOURCE = 0x60
-    case AUDIO_SPEAKER_VOLUME = 0x62
-    case RED_BLACK_LEVEL = 0x6C
-    case GREEN_BLACK_LEVEL = 0x6E
-    case BLUE_BLACK_LEVEL = 0x70
-    case ORIENTATION = 0xAA
-    case AUDIO_MUTE = 0x8D
-    case SETTINGS = 0xB0
-    case ON_SCREEN_DISPLAY = 0xCA
-    case OSD_LANGUAGE = 0xCC
-    case DPMS = 0xD6
-    case COLOR_PRESET_B = 0xDC
-    case VCP_VERSION = 0xDF
-    case COLOR_PRESET_C = 0xE0
-    case POWER_CONTROL = 0xE1
-    case TOP_LEFT_SCREEN_PURITY = 0xE8
-    case TOP_RIGHT_SCREEN_PURITY = 0xE9
-    case BOTTOM_LEFT_SCREEN_PURITY = 0xEA
-    case BOTTOM_RIGHT_SCREEN_PURITY = 0xEB
+    /* 0x01 */ case DEGAUSS = 0x01
+    /* 0x04 */ case RESET = 0x04
+    /* 0x05 */ case RESET_BRIGHTNESS_AND_CONTRAST = 0x05
+    /* 0x06 */ case RESET_GEOMETRY = 0x06
+    /* 0x08 */ case RESET_COLOR = 0x08
+    /* 0x0A */ case RESTORE_FACTORY_TV_DEFAULTS = 0x0A
+    /* 0x0B */ case COLOR_TEMPERATURE_INCREMENT = 0x0B
+    /* 0x0C */ case COLOR_TEMPERATURE_REQUEST = 0x0C
+    /* 0x0E */ case CLOCK = 0x0E
+    /* 0x10 */ case BRIGHTNESS = 0x10
+    /* 0x11 */ case FLESH_TONE_ENHANCEMENT = 0x11
+    /* 0x12 */ case CONTRAST = 0x12
+    /* 0x14 */ case COLOR_PRESET_A = 0x14
+    /* 0x16 */ case RED_GAIN = 0x16
+    /* 0x17 */ case USER_VISION_COMPENSATION = 0x17
+    /* 0x18 */ case GREEN_GAIN = 0x18
+    /* 0x1A */ case BLUE_GAIN = 0x1A
+    /* 0x1C */ case FOCUS = 0x1C
+    /* 0x1E */ case AUTO_SIZE_CENTER = 0x1E
+    /* 0x1F */ case AUTO_COLOR_SETUP = 0x1F
+    /* 0x20 */ case HORIZONTAL_POSITION_PHASE = 0x20
+    /* 0x22 */ case WIDTH = 0x22
+    /* 0x24 */ case HORIZONTAL_PINCUSHION = 0x24
+    /* 0x26 */ case HORIZONTAL_PINCUSHION_BALANCE = 0x26
+    /* 0x28 */ case HORIZONTAL_STATIC_CONVERGENCE = 0x28
+    /* 0x29 */ case HORIZONTAL_CONVERGENCE_MG = 0x29
+    /* 0x2A */ case HORIZONTAL_LINEARITY = 0x2A
+    /* 0x2C */ case HORIZONTAL_LINEARITY_BALANCE = 0x2C
+    /* 0x2E */ case GREY_SCALE_EXPANSION = 0x2E
+    /* 0x30 */ case VERTICAL_POSITION_PHASE = 0x30
+    /* 0x32 */ case HEIGHT = 0x32
+    /* 0x34 */ case VERTICAL_PINCUSHION = 0x34
+    /* 0x36 */ case VERTICAL_PINCUSHION_BALANCE = 0x36
+    /* 0x38 */ case VERTICAL_STATIC_CONVERGENCE = 0x38
+    /* 0x3A */ case VERTICAL_LINEARITY = 0x3A
+    /* 0x3C */ case VERTICAL_LINEARITY_BALANCE = 0x3C
+    /* 0x3E */ case CLOCK_PHASE = 0x3E
+    /* 0x40 */ case HORIZONTAL_PARALLELOGRAM = 0x40
+    /* 0x41 */ case VERTICAL_PARALLELOGRAM = 0x41
+    /* 0x42 */ case HORIZONTAL_KEYSTONE = 0x42
+    /* 0x43 */ case VERTICAL_KEYSTONE = 0x43
+    /* 0x44 */ case VERTICAL_ROTATION = 0x44
+    /* 0x46 */ case TOP_PINCUSHION_AMP = 0x46
+    /* 0x48 */ case TOP_PINCUSHION_BALANCE = 0x48
+    /* 0x4A */ case BOTTOM_PINCUSHION_AMP = 0x4A
+    /* 0x4C */ case BOTTOM_PINCUSHION_BALANCE = 0x4C
+    /* 0x52 */ case ACTIVE_CONTROL = 0x52
+    /* 0x54 */ case PERFORMANCE_PRESERVATION = 0x54
+    /* 0x56 */ case HORIZONTAL_MOIRE = 0x56
+    /* 0x58 */ case VERTICAL_MOIRE = 0x58
+    /* 0x59 */ case RED_SATURATION = 0x59
+    /* 0x5A */ case YELLOW_SATURATION = 0x5A
+    /* 0x5B */ case GREEN_SATURATION = 0x5B
+    /* 0x5C */ case CYAN_SATURATION = 0x5C
+    /* 0x5D */ case BLUE_SATURATION = 0x5D
+    /* 0x5E */ case MAGENTA_SATURATION = 0x5E
+    /* 0x60 */ case INPUT_SOURCE = 0x60
+    /* 0x62 */ case AUDIO_SPEAKER_VOLUME = 0x62
+    /* 0x63 */ case AUDIO_SPEAKER_PAIR_SELECT = 0x63
+    /* 0x64 */ case AUDIO_MICROPHONE_VOLUME = 0x64
+    /* 0x65 */ case AUDIO_JACK_CONNECTION_STATUS = 0x65
+    /* 0x6B */ case BACKLIGHT_LEVEL_WHITE = 0x6B
+    /* 0x6C */ case RED_BLACK_LEVEL = 0x6C
+    /* 0x6D */ case BACKLIGHT_LEVEL_RED = 0x6D
+    /* 0x6E */ case GREEN_BLACK_LEVEL = 0x6E
+    /* 0x6F */ case BACKLIGHT_LEVEL_GREEN = 0x6F
+    /* 0x70 */ case BLUE_BLACK_LEVEL = 0x70
+    /* 0x71 */ case BACKLIGHT_LEVEL_BLUE = 0x71
+    /* 0x72 */ case GAMMA = 0x72
+    /* 0x7C */ case ADJUST_ZOOM = 0x7C
+    /* 0x82 */ case HORIZONTAL_MIRROR_FLIP = 0x82
+    /* 0x84 */ case VERTICAL_MIRROR_FLIP = 0x84
+    /* 0x86 */ case DISPLAY_SCALING = 0x86
+    /* 0x88 */ case VELOCITY_SCAN_MODULATION = 0x88
+    /* 0x8A */ case COLOR_SATURATION = 0x8A
+    /* 0x8B */ case TV_CHANNEL_UP_DOWN = 0x8B
+    /* 0x8C */ case TV_SHARPNESS = 0x8C
+    /* 0x8D */ case AUDIO_MUTE = 0x8D
+    /* 0x8E */ case TV_CONTRAST = 0x8E
+    /* 0x8F */ case AUDIO_TREBLE = 0x8F
+    /* 0x90 */ case HUE = 0x90
+    /* 0x91 */ case AUDIO_BASS = 0x91
+    /* 0x92 */ case TV_BLACK_LEVEL_LUMINANCE = 0x92
+    /* 0x95 */ case WINDOW_POSITION_TL_X = 0x95
+    /* 0x96 */ case WINDOW_POSITION_TL_Y = 0x96
+    /* 0x97 */ case WINDOW_POSITION_BR_X = 0x97
+    /* 0x98 */ case WINDOW_POSITION_BR_Y = 0x98
+    /* 0x9A */ case WINDOW_BACKGROUND = 0x9A
+    /* 0x9B */ case RED_HUE = 0x9B
+    /* 0x9C */ case YELLOW_HUE = 0x9C
+    /* 0x9D */ case GREEN_HUE = 0x9D
+    /* 0x9E */ case CYAN_HUE = 0x9E
+    /* 0x9F */ case BLUE_HUE = 0x9F
+    /* 0xA0 */ case MAGENTA_HUE = 0xA0
+    /* 0xA2 */ case AUTO_SETUP_ON_OFF = 0xA2
+    /* 0xA4 */ case WINDOW_MASK_CONTROL = 0xA4
+    /* 0xA5 */ case WINDOW_SELECT = 0xA5
+    /* 0xAA */ case ORIENTATION = 0xAA
+    /* 0xB0 */ case STORE_RESTORE_SETTINGS = 0xB0
+    /* 0xB7 */ case MONITOR_STATUS = 0xB7
+    /* 0xB8 */ case PACKET_COUNT = 0xB8
+    /* 0xB9 */ case MONITOR_X_ORIGIN = 0xB9
+    /* 0xBA */ case MONITOR_Y_ORIGIN = 0xBA
+    /* 0xBB */ case HEADER_ERROR_COUNT = 0xBB
+    /* 0xBC */ case BAD_CRC_ERROR_COUNT = 0xBC
+    /* 0xBD */ case CLIENT_ID = 0xBD
+    /* 0xBE */ case LINK_CONTROL = 0xBE
+    /* 0xCA */ case ON_SCREEN_DISPLAY = 0xCA
+    /* 0xCC */ case OSD_LANGUAGE = 0xCC
+    /* 0xD4 */ case STEREO_VIDEO_MODE = 0xD4
+    /* 0xD6 */ case DPMS = 0xD6
+    /* 0xDA */ case SCAN_MODE = 0xDA
+    /* 0xDB */ case IMAGE_MODE = 0xDB
+    /* 0xDC */ case COLOR_PRESET_B = 0xDC
+    /* 0xDF */ case VCP_VERSION = 0xDF
+    /* 0xE0 */ case COLOR_PRESET_C = 0xE0
+    /* 0xE1 */ case POWER_CONTROL = 0xE1
+    /* 0xE8 */ case TOP_LEFT_SCREEN_PURITY = 0xE8
+    /* 0xE9 */ case TOP_RIGHT_SCREEN_PURITY = 0xE9
+    /* 0xEA */ case BOTTOM_LEFT_SCREEN_PURITY = 0xEA
+    /* 0xEB */ case BOTTOM_RIGHT_SCREEN_PURITY = 0xEB
 
     // MARK: Lifecycle
 
@@ -237,46 +312,121 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
             self = control
         }
 
-        switch arg.lowercased().stripped.replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "_", with: " ") {
+        let filter = arg.lowercased().stripped.replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "_", with: " ")
+        switch filter {
+        case "degauss": self = ControlID.DEGAUSS
         case "reset": self = ControlID.RESET
         case "reset brightness and contrast": self = ControlID.RESET_BRIGHTNESS_AND_CONTRAST
         case "reset geometry": self = ControlID.RESET_GEOMETRY
         case "reset color": self = ControlID.RESET_COLOR
+        case "restore factory tv defaults": self = ControlID.RESTORE_FACTORY_TV_DEFAULTS
+        case "color temperature increment": self = ControlID.COLOR_TEMPERATURE_INCREMENT
+        case "color temperature request": self = ControlID.COLOR_TEMPERATURE_REQUEST
+        case "clock": self = ControlID.CLOCK
         case "brightness": self = ControlID.BRIGHTNESS
+        case "flesh tone enhancement": self = ControlID.FLESH_TONE_ENHANCEMENT
         case "contrast": self = ControlID.CONTRAST
         case "color preset a": self = ControlID.COLOR_PRESET_A
         case "red gain": self = ControlID.RED_GAIN
+        case "user vision compensation": self = ControlID.USER_VISION_COMPENSATION
         case "green gain": self = ControlID.GREEN_GAIN
         case "blue gain": self = ControlID.BLUE_GAIN
+        case "focus": self = ControlID.FOCUS
         case "auto size center": self = ControlID.AUTO_SIZE_CENTER
+        case "auto color setup": self = ControlID.AUTO_COLOR_SETUP
+        case "horizontal position phase": self = ControlID.HORIZONTAL_POSITION_PHASE
         case "width": self = ControlID.WIDTH
+        case "horizontal pincushion": self = ControlID.HORIZONTAL_PINCUSHION
+        case "horizontal pincushion balance": self = ControlID.HORIZONTAL_PINCUSHION_BALANCE
+        case "horizontal static convergence": self = ControlID.HORIZONTAL_STATIC_CONVERGENCE
+        case "horizontal convergence mg": self = ControlID.HORIZONTAL_CONVERGENCE_MG
+        case "horizontal linearity": self = ControlID.HORIZONTAL_LINEARITY
+        case "horizontal linearity balance": self = ControlID.HORIZONTAL_LINEARITY_BALANCE
+        case "grey scale expansion": self = ControlID.GREY_SCALE_EXPANSION
+        case "vertical position phase": self = ControlID.VERTICAL_POSITION_PHASE
         case "height": self = ControlID.HEIGHT
-        case "vertical pos": self = ControlID.VERTICAL_POS
-        case "horizontal pos": self = ControlID.HORIZONTAL_POS
-        case "pincushion amp": self = ControlID.PINCUSHION_AMP
-        case "pincushion phase": self = ControlID.PINCUSHION_PHASE
-        case "keystone balance": self = ControlID.KEYSTONE_BALANCE
-        case "pincushion balance": self = ControlID.PINCUSHION_BALANCE
+        case "vertical pincushion": self = ControlID.VERTICAL_PINCUSHION
+        case "vertical pincushion balance": self = ControlID.VERTICAL_PINCUSHION_BALANCE
+        case "vertical static convergence": self = ControlID.VERTICAL_STATIC_CONVERGENCE
+        case "vertical linearity": self = ControlID.VERTICAL_LINEARITY
+        case "vertical linearity balance": self = ControlID.VERTICAL_LINEARITY_BALANCE
+        case "clock phase": self = ControlID.CLOCK_PHASE
+        case "horizontal parallelogram": self = ControlID.HORIZONTAL_PARALLELOGRAM
+        case "vertical parallelogram": self = ControlID.VERTICAL_PARALLELOGRAM
+        case "horizontal keystone": self = ControlID.HORIZONTAL_KEYSTONE
+        case "vertical keystone": self = ControlID.VERTICAL_KEYSTONE
+        case "vertical rotation": self = ControlID.VERTICAL_ROTATION
         case "top pincushion amp": self = ControlID.TOP_PINCUSHION_AMP
         case "top pincushion balance": self = ControlID.TOP_PINCUSHION_BALANCE
         case "bottom pincushion amp": self = ControlID.BOTTOM_PINCUSHION_AMP
         case "bottom pincushion balance": self = ControlID.BOTTOM_PINCUSHION_BALANCE
-        case "vertical linearity": self = ControlID.VERTICAL_LINEARITY
-        case "vertical linearity balance": self = ControlID.VERTICAL_LINEARITY_BALANCE
-        case "horizontal static convergence": self = ControlID.HORIZONTAL_STATIC_CONVERGENCE
-        case "vertical static convergence": self = ControlID.VERTICAL_STATIC_CONVERGENCE
-        case "moire cancel": self = ControlID.MOIRE_CANCEL
+        case "active control": self = ControlID.ACTIVE_CONTROL
+        case "performance preservation": self = ControlID.PERFORMANCE_PRESERVATION
+        case "horizontal moire": self = ControlID.HORIZONTAL_MOIRE
+        case "vertical moire": self = ControlID.VERTICAL_MOIRE
+        case "red saturation": self = ControlID.RED_SATURATION
+        case "yellow saturation": self = ControlID.YELLOW_SATURATION
+        case "green saturation": self = ControlID.GREEN_SATURATION
+        case "cyan saturation": self = ControlID.CYAN_SATURATION
+        case "blue saturation": self = ControlID.BLUE_SATURATION
+        case "magenta saturation": self = ControlID.MAGENTA_SATURATION
         case "input source": self = ControlID.INPUT_SOURCE
         case "audio speaker volume": self = ControlID.AUDIO_SPEAKER_VOLUME
+        case "audio speaker pair select": self = ControlID.AUDIO_SPEAKER_PAIR_SELECT
+        case "audio microphone volume": self = ControlID.AUDIO_MICROPHONE_VOLUME
+        case "audio jack connection status": self = ControlID.AUDIO_JACK_CONNECTION_STATUS
+        case "backlight level white": self = ControlID.BACKLIGHT_LEVEL_WHITE
         case "red black level": self = ControlID.RED_BLACK_LEVEL
+        case "backlight level red": self = ControlID.BACKLIGHT_LEVEL_RED
         case "green black level": self = ControlID.GREEN_BLACK_LEVEL
+        case "backlight level green": self = ControlID.BACKLIGHT_LEVEL_GREEN
         case "blue black level": self = ControlID.BLUE_BLACK_LEVEL
-        case "orientation": self = ControlID.ORIENTATION
+        case "backlight level blue": self = ControlID.BACKLIGHT_LEVEL_BLUE
+        case "gamma": self = ControlID.GAMMA
+        case "adjust zoom": self = ControlID.ADJUST_ZOOM
+        case "horizontal mirror flip": self = ControlID.HORIZONTAL_MIRROR_FLIP
+        case "vertical mirror flip": self = ControlID.VERTICAL_MIRROR_FLIP
+        case "display scaling": self = ControlID.DISPLAY_SCALING
+        case "velocity scan modulation": self = ControlID.VELOCITY_SCAN_MODULATION
+        case "color saturation": self = ControlID.COLOR_SATURATION
+        case "tv channel up down": self = ControlID.TV_CHANNEL_UP_DOWN
+        case "tv sharpness": self = ControlID.TV_SHARPNESS
         case "audio mute": self = ControlID.AUDIO_MUTE
-        case "settings": self = ControlID.SETTINGS
+        case "tv contrast": self = ControlID.TV_CONTRAST
+        case "audio treble": self = ControlID.AUDIO_TREBLE
+        case "hue": self = ControlID.HUE
+        case "audio bass": self = ControlID.AUDIO_BASS
+        case "tv black level luminance": self = ControlID.TV_BLACK_LEVEL_LUMINANCE
+        case "window position tl x": self = ControlID.WINDOW_POSITION_TL_X
+        case "window position tl y": self = ControlID.WINDOW_POSITION_TL_Y
+        case "window position br x": self = ControlID.WINDOW_POSITION_BR_X
+        case "window position br y": self = ControlID.WINDOW_POSITION_BR_Y
+        case "window background": self = ControlID.WINDOW_BACKGROUND
+        case "red hue": self = ControlID.RED_HUE
+        case "yellow hue": self = ControlID.YELLOW_HUE
+        case "green hue": self = ControlID.GREEN_HUE
+        case "cyan hue": self = ControlID.CYAN_HUE
+        case "blue hue": self = ControlID.BLUE_HUE
+        case "magenta hue": self = ControlID.MAGENTA_HUE
+        case "auto setup on off": self = ControlID.AUTO_SETUP_ON_OFF
+        case "window mask control": self = ControlID.WINDOW_MASK_CONTROL
+        case "window select": self = ControlID.WINDOW_SELECT
+        case "orientation": self = ControlID.ORIENTATION
+        case "store restore settings": self = ControlID.STORE_RESTORE_SETTINGS
+        case "monitor status": self = ControlID.MONITOR_STATUS
+        case "packet count": self = ControlID.PACKET_COUNT
+        case "monitor x origin": self = ControlID.MONITOR_X_ORIGIN
+        case "monitor y origin": self = ControlID.MONITOR_Y_ORIGIN
+        case "header error count": self = ControlID.HEADER_ERROR_COUNT
+        case "bad crc error count": self = ControlID.BAD_CRC_ERROR_COUNT
+        case "client id": self = ControlID.CLIENT_ID
+        case "link control": self = ControlID.LINK_CONTROL
         case "on screen display": self = ControlID.ON_SCREEN_DISPLAY
         case "osd language": self = ControlID.OSD_LANGUAGE
+        case "stereo video mode": self = ControlID.STEREO_VIDEO_MODE
         case "dpms": self = ControlID.DPMS
+        case "scan mode": self = ControlID.SCAN_MODE
+        case "image mode": self = ControlID.IMAGE_MODE
         case "color preset b": self = ControlID.COLOR_PRESET_B
         case "vcp version": self = ControlID.VCP_VERSION
         case "color preset c": self = ControlID.COLOR_PRESET_C
@@ -286,10 +436,15 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
         case "bottom left screen purity": self = ControlID.BOTTOM_LEFT_SCREEN_PURITY
         case "bottom right screen purity": self = ControlID.BOTTOM_RIGHT_SCREEN_PURITY
         default:
-            return nil
+            let alignments = fuzzyFind(queries: [filter], inputs: CONTROLS_BY_NAME.keys.map { $0 })
+            guard let control = alignments.first?.result.asString, let controlID = CONTROLS_BY_NAME[control] else { return nil }
+
+            self = controlID
         }
     }
 }
+
+let CONTROLS_BY_NAME = [String: ControlID](uniqueKeysWithValues: ControlID.allCases.map { (String(describing: $0), $0) })
 
 func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
     DDC.sync(barrier: true) {
@@ -471,7 +626,7 @@ enum DDC {
             return [
                 // TEST_DISPLAY_ID,
                 TEST_DISPLAY_PERSISTENT_ID,
-                // TEST_DISPLAY_PERSISTENT2_ID,
+                TEST_DISPLAY_PERSISTENT2_ID,
                 // TEST_DISPLAY_PERSISTENT3_ID,
                 // TEST_DISPLAY_PERSISTENT4_ID,
             ]

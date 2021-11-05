@@ -155,7 +155,15 @@ class Schedule: NSView {
 
     var hover = false
 
-    var schedule: BrightnessSchedule? { display?.schedules[number - 1] }
+    var schedule: BrightnessSchedule? {
+        get { display?.schedules[number - 1] }
+        set {
+            guard let display = display, let newValue = newValue else { return }
+            display.schedules[number - 1] = newValue
+            display.save()
+        }
+    }
+
     @objc dynamic var preciseBrightnessContrast: Double {
         get {
             guard let display = display, let schedule = schedule else {
@@ -169,7 +177,8 @@ class Schedule: NSView {
                 return
             }
             let (brightness, contrast) = display.sliderValueToBrightnessContrast(newValue)
-            display.schedules[number - 1] = schedule.with(brightness: brightness, contrast: contrast)
+            self.schedule = schedule.with(brightness: brightness, contrast: contrast)
+            display.save()
         }
     }
 
@@ -238,12 +247,12 @@ class Schedule: NSView {
 
             setTempValues(from: schedule)
 
+            preciseBrightnessContrast = display.brightnessToSliderValue(schedule.brightness.ns)
             hour.integerValue = schedule.hour.i
             minute.integerValue = schedule.minute.i
             type = schedule.type.rawValue
             negativeState = schedule.negative ? .on : .off
             dropdown.selectItem(withTag: schedule.type.rawValue)
-//            dropdown.resizeToFitTitle()
 
             hour.onValueChanged = { [weak self] value in
                 guard let self = self, let display = self.display,
@@ -314,6 +323,14 @@ class Schedule: NSView {
 
     @objc dynamic var isEnabled: Bool = true {
         didSet { fade() }
+    }
+
+    @objc func useCurrentBrightness() {
+        guard let display = display, let schedule = schedule else {
+            return
+        }
+        self.schedule = schedule.with(brightness: display.brightness.uint8Value, contrast: display.contrast.uint8Value)
+        preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
     }
 
     func setTimeValues(from schedule: BrightnessSchedule) {
