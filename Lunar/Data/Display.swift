@@ -1166,10 +1166,8 @@ enum ValueType {
 
     @objc dynamic lazy var showOrientation: Bool = canRotate && CachedDefaults[.showOrientationInQuickActions]
 
-    let preciseBrightnessKey = "setPreciseBrightness"
-    let preciseContrastKey = "setPreciseContrast"
-    lazy var preciseBrightnessSubscriberKey = "\(preciseBrightnessKey)-\(serial)"
-    lazy var preciseContrastSubscriberKey = "\(preciseContrastKey)-\(serial)"
+    lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
+    lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
 
     var onBrightnessCurveFactorChange: ((Double) -> Void)? = nil
     var onContrastCurveFactorChange: ((Double) -> Void)? = nil
@@ -1186,7 +1184,7 @@ enum ValueType {
     }
 
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
-        get { Self.ambientLightCompensationEnabled(id) }
+        get { Self.ambientLightCompensationEnabled(id) && hasAmbientLightAdaptiveBrightness }
         set {
             guard ambientLightCompensationEnabledByUser else { return }
             DisplayServicesEnableAmbientLightCompensation(id, newValue)
@@ -1348,7 +1346,7 @@ enum ValueType {
         didSet {
             save()
             readapt(newValue: adaptive, oldValue: oldValue)
-            guard hasAmbientLightAdaptiveBrightness else { return }
+            guard hasAmbientLightAdaptiveBrightness || (ambientLightAdaptiveBrightnessEnabled && adaptive) else { return }
             ambientLightAdaptiveBrightnessEnabled = !adaptive
         }
     }
@@ -2008,7 +2006,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic lazy var modeNumber: Int32 = panel?.currentMode.modeNumber ?? -1 {
+    @objc dynamic lazy var modeNumber: Int32 = panel?.currentMode?.modeNumber ?? -1 {
         didSet {
             guard modeNumber != -1, DDC.apply else { return }
             reconfigure { panel in
@@ -2716,7 +2714,7 @@ enum ValueType {
             panel = mgr.display(withID: id.i32) as? MPDisplay
 
             panelMode = panel?.currentMode
-            modeNumber = panel?.currentMode.modeNumber ?? -1
+            modeNumber = panel?.currentMode?.modeNumber ?? -1
         }
     }
 

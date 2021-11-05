@@ -769,7 +769,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 withIdentifier: NSStoryboard
                     .SceneIdentifier("QuickActionsViewController")
             ) as! QuickActionsViewController
-        menuPopover.contentViewController!.loadView()
+        menuPopover.contentViewController?.loadView()
         if let w = menuPopover.contentViewController?.view.window {
             w.setAccessibilityRole(.popover)
             w.setAccessibilitySubrole(.unknown)

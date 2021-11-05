@@ -1,3 +1,9 @@
+# 5.0.1
+## Fixes
+
+* Fix crash in diagnostics/onboarding when closing the window
+* Automatically restart app when memory usage goes above 1GB
+* The **Advanced** button on the Configuration page was not clickable on the top part
 # 5.0.0
 ## Features
 
