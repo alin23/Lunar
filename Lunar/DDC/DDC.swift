@@ -290,10 +290,37 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
     /* 0xDF */ case VCP_VERSION = 0xDF
     /* 0xE0 */ case COLOR_PRESET_C = 0xE0
     /* 0xE1 */ case POWER_CONTROL = 0xE1
-    /* 0xE8 */ case TOP_LEFT_SCREEN_PURITY = 0xE8
-    /* 0xE9 */ case TOP_RIGHT_SCREEN_PURITY = 0xE9
-    /* 0xEA */ case BOTTOM_LEFT_SCREEN_PURITY = 0xEA
-    /* 0xEB */ case BOTTOM_RIGHT_SCREEN_PURITY = 0xEB
+
+    /* 0xE2 */ case MANUFACTURER_SPECIFIC_E2 = 0xE2
+    /* 0xE3 */ case MANUFACTURER_SPECIFIC_E3 = 0xE3
+    /* 0xE4 */ case MANUFACTURER_SPECIFIC_E4 = 0xE4
+    /* 0xE5 */ case MANUFACTURER_SPECIFIC_E5 = 0xE5
+    /* 0xE6 */ case MANUFACTURER_SPECIFIC_E6 = 0xE6
+    /* 0xE7 */ case MANUFACTURER_SPECIFIC_E7 = 0xE7
+    /* 0xE8 */ case MANUFACTURER_SPECIFIC_E8 = 0xE8
+    /* 0xE9 */ case MANUFACTURER_SPECIFIC_E9 = 0xE9
+    /* 0xEA */ case MANUFACTURER_SPECIFIC_EA = 0xEA
+    /* 0xEB */ case MANUFACTURER_SPECIFIC_EB = 0xEB
+    /* 0xEC */ case MANUFACTURER_SPECIFIC_EC = 0xEC
+    /* 0xED */ case MANUFACTURER_SPECIFIC_ED = 0xED
+    /* 0xEE */ case MANUFACTURER_SPECIFIC_EE = 0xEE
+    /* 0xEF */ case MANUFACTURER_SPECIFIC_EF = 0xEF
+
+    /* 0xF1 */ case MANUFACTURER_SPECIFIC_F1 = 0xF1
+    /* 0xF2 */ case MANUFACTURER_SPECIFIC_F2 = 0xF2
+    /* 0xF3 */ case MANUFACTURER_SPECIFIC_F3 = 0xF3
+    /* 0xF4 */ case MANUFACTURER_SPECIFIC_F4 = 0xF4
+    /* 0xF5 */ case MANUFACTURER_SPECIFIC_F5 = 0xF5
+    /* 0xF6 */ case MANUFACTURER_SPECIFIC_F6 = 0xF6
+    /* 0xF7 */ case MANUFACTURER_SPECIFIC_F7 = 0xF7
+    /* 0xF8 */ case MANUFACTURER_SPECIFIC_F8 = 0xF8
+    /* 0xF9 */ case MANUFACTURER_SPECIFIC_F9 = 0xF9
+    /* 0xFA */ case MANUFACTURER_SPECIFIC_FA = 0xFA
+    /* 0xFB */ case MANUFACTURER_SPECIFIC_FB = 0xFB
+    /* 0xFC */ case MANUFACTURER_SPECIFIC_FC = 0xFC
+    /* 0xFD */ case MANUFACTURER_SPECIFIC_FD = 0xFD
+    /* 0xFE */ case MANUFACTURER_SPECIFIC_FE = 0xFE
+    /* 0xFF */ case MANUFACTURER_SPECIFIC_FF = 0xFF
 
     // MARK: Lifecycle
 
@@ -310,6 +337,12 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
                   let control = ControlID(rawValue: value.u8)
             else { return nil }
             self = control
+            return
+        }
+
+        if let controlID = CONTROLS_BY_NAME[arg] {
+            self = controlID
+            return
         }
 
         let filter = arg.lowercased().stripped.replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "_", with: " ")
@@ -431,14 +464,15 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
         case "vcp version": self = ControlID.VCP_VERSION
         case "color preset c": self = ControlID.COLOR_PRESET_C
         case "power control": self = ControlID.POWER_CONTROL
-        case "top left screen purity": self = ControlID.TOP_LEFT_SCREEN_PURITY
-        case "top right screen purity": self = ControlID.TOP_RIGHT_SCREEN_PURITY
-        case "bottom left screen purity": self = ControlID.BOTTOM_LEFT_SCREEN_PURITY
-        case "bottom right screen purity": self = ControlID.BOTTOM_RIGHT_SCREEN_PURITY
         default:
-            let alignments = fuzzyFind(queries: [filter], inputs: CONTROLS_BY_NAME.keys.map { $0 })
-            guard let control = alignments.first?.result.asString, let controlID = CONTROLS_BY_NAME[control] else { return nil }
-
+            let alignments = fuzzyFind(
+                queries: [arg],
+                inputs: CONTROLS_BY_NAME.keys.map { $0 },
+                match: Score(integerLiteral: Score.defaultMatch.value / 2),
+                camelCaseBonus: Score(integerLiteral: Score.defaultCamelCase.value + 3)
+            )
+            guard let control = alignments.first?.result.asString else { return nil }
+            guard let controlID = CONTROLS_BY_NAME[control] else { return nil }
             self = controlID
         }
     }

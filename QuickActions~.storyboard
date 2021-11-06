@@ -9271,6 +9271,995 @@ to send arbitrary DDC commands to monitors</string>
             </objects>
             <point key="canvasLocation" x="-2694" y="5769"/>
         </scene>
+        <!--Quick Actions View Controller-->
+        <scene sceneID="mBf-QP-0sI">
+            <objects>
+                <viewController storyboardIdentifier="QuickActionsViewController" id="XpJ-ho-P7z" customClass="QuickActionsViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vGd-1C-1a0">
+                        <rect key="frame" x="0.0" y="0.0" width="310" height="600"/>
+                        <subviews>
+                            <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
+                                <rect key="frame" x="0.0" y="30" width="310" height="283"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <size key="intercellSpacing" width="0.0" height="20"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="gridColor" red="0.90196078430000004" green="0.90196078430000004" blue="0.90196078430000004" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                <tableColumns>
+                                    <tableColumn editable="NO" width="278" minWidth="278" maxWidth="278" id="MGA-3S-uM8">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center">
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" title="Text Cell" id="Cr6-NW-S6P">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                        <prototypeCellViews>
+                                            <tableCellView identifier="cellWithoutDDC" wantsLayer="YES" id="nKX-LM-MgX">
+                                                <rect key="frame" x="10" y="10" width="290" height="89"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="DGy-An-71R">
+                                                        <rect key="frame" x="33" y="60" width="224" height="24"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="220" id="jrt-4P-PFp"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Second screen" id="Y36-3Y-IWj">
+                                                            <font key="font" size="20" name="Menlo-Bold"/>
+                                                            <color key="textColor" name="Caption Secondary"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="nKX-LM-MgX" name="value" keyPath="objectValue.name" id="nvL-YK-2O6"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PvO-H1-mOH" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="56" y="18" width="178" height="38"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="30" id="Pza-RU-mGU"/>
+                                                            <constraint firstAttribute="width" constant="174" id="XuC-ho-bki"/>
+                                                        </constraints>
+                                                        <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="aGQ-Uy-5CI" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                            <userDefinedRuntimeAttributes>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                                    <real key="value" value="20"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                    <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                            </userDefinedRuntimeAttributes>
+                                                        </sliderCell>
+                                                        <connections>
+                                                            <binding destination="nKX-LM-MgX" name="value" keyPath="objectValue.preciseBrightness" id="kJS-IJ-7nc"/>
+                                                        </connections>
+                                                    </slider>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="lzD-m0-SY0" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="62" y="33" width="12" height="12"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="12" id="aVw-N6-r2Z"/>
+                                                            <constraint firstAttribute="width" constant="12" id="xrc-DE-dK1"/>
+                                                        </constraints>
+                                                        <contentFilters>
+                                                            <ciFilter name="CIFalseColor">
+                                                                <configuration>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                                    <ciColor key="inputColor1" red="1" green="0.90000000000000002" blue="0.80000000000000004" alpha="1"/>
+                                                                    <null key="inputImage"/>
+                                                                </configuration>
+                                                            </ciFilter>
+                                                        </contentFilters>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="VXC-0b-coK"/>
+                                                        <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                    </imageView>
+                                                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ni0-ms-RPU">
+                                                        <rect key="frame" x="61" y="-2" width="168" height="23"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="166" id="Wdm-TU-eU2"/>
+                                                            <constraint firstAttribute="height" constant="20" id="y9L-aa-hYF"/>
+                                                        </constraints>
+                                                        <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="Fx1-MH-UMo">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <segments>
+                                                                <segment label="0°" toolTip="No rotation" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                                <segment label="90°" toolTip="90 degree rotation (vertical)" tag="90"/>
+                                                                <segment label="180°" toolTip="180 degree rotation (upside down)" tag="180"/>
+                                                                <segment label="270°" toolTip="270 degree rotation (vertical)" tag="270"/>
+                                                            </segments>
+                                                        </segmentedCell>
+                                                        <connections>
+                                                            <binding destination="nKX-LM-MgX" name="selectedTag" keyPath="objectValue.rotation" id="8M4-mI-nU5"/>
+                                                            <binding destination="nKX-LM-MgX" name="hidden" keyPath="objectValue.showOrientation" id="fD7-X6-JOq">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </segmentedControl>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="Ni0-ms-RPU" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="0nn-LJ-MSm"/>
+                                                    <constraint firstItem="PvO-H1-mOH" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="6GO-oH-hQb"/>
+                                                    <constraint firstItem="Ni0-ms-RPU" firstAttribute="top" secondItem="PvO-H1-mOH" secondAttribute="bottom" constant="4" id="DDO-BS-pyq"/>
+                                                    <constraint firstItem="PvO-H1-mOH" firstAttribute="leading" secondItem="lzD-m0-SY0" secondAttribute="trailing" constant="-16" id="Uxl-uC-cIz"/>
+                                                    <constraint firstItem="DGy-An-71R" firstAttribute="top" secondItem="nKX-LM-MgX" secondAttribute="top" constant="5" id="VDr-UM-ehe"/>
+                                                    <constraint firstAttribute="bottom" secondItem="Ni0-ms-RPU" secondAttribute="bottom" id="YQE-Qs-Sh9"/>
+                                                    <constraint firstItem="PvO-H1-mOH" firstAttribute="top" secondItem="DGy-An-71R" secondAttribute="bottom" constant="6" id="ceo-Nn-c3V"/>
+                                                    <constraint firstItem="DGy-An-71R" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="uYV-XV-CNE"/>
+                                                    <constraint firstItem="lzD-m0-SY0" firstAttribute="centerY" secondItem="PvO-H1-mOH" secondAttribute="centerY" id="xpq-TQ-wFz"/>
+                                                </constraints>
+                                                <connections>
+                                                    <outlet property="textField" destination="DGy-An-71R" id="Vn5-uV-uEp"/>
+                                                </connections>
+                                            </tableCellView>
+                                            <tableCellView identifier="cellWithDDC" wantsLayer="YES" id="prI-Gh-RKd">
+                                                <rect key="frame" x="10" y="119" width="290" height="154"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="sy4-S7-iPw">
+                                                        <rect key="frame" x="78" y="33" width="134" height="22"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="134" id="QDP-gl-ce0"/>
+                                                            <constraint firstAttribute="height" constant="22" id="bRz-Kk-8Da"/>
+                                                        </constraints>
+                                                        <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="kbB-9o-xEP" id="TKU-7K-PcJ">
+                                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                            <menu key="menu" id="Ofc-hf-Q0F">
+                                                                <items>
+                                                                    <menuItem title="Video Input" state="on" image="input" tag="246" hidden="YES" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="kbB-9o-xEP">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thunderbolt 3 (DDC 27)" image="usbc" tag="27" id="bVt-GY-0Mh">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thunderbolt 3 (DDC 25)" image="usbc" tag="25" id="May-cU-reV">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DisplayPort 1" image="displayport" tag="15" id="ZvI-Bx-8OF">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DisplayPort 2" image="displayport" tag="16" id="FUg-07-BD2">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="HDMI 1" image="hdmi" tag="17" id="PVi-zD-pWw">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="HDMI 2" image="hdmi" tag="18" id="msC-ZI-gX9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem isSeparatorItem="YES" id="y8A-Kg-KRu"/>
+                                                                    <menuItem title="VGA 1" image="vga" tag="1" id="gLw-FE-Zu4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="VGA 2" image="vga" tag="2" id="n12-rt-Ken">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DVI 1" image="dvi" tag="3" id="9JK-EV-KCd">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DVI 2" image="dvi" tag="4" id="ail-qR-Gdh">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Composite video 1" image="composite" tag="5" id="uaI-ht-s7w">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Composite video 2" image="composite" tag="6" id="ban-AR-SSh">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="S-Video 1" image="svideo" tag="7" id="oME-3A-I3h">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="S-Video 2" image="svideo" tag="8" id="hqo-Qc-HXW">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 1" image="tuner" tag="9" id="iLP-i8-epr">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 2" image="tuner" tag="10" id="2VT-kU-94k">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tuner 3" image="tuner" tag="11" id="lCG-QI-cSa">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 1" image="component" tag="12" id="8pC-52-7Kw">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 2" image="component" tag="13" id="G8a-qA-c2f">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Component video (YPrPb/YCrCb) 3" image="component" tag="14" id="Fkj-gN-fjj">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="selectedTag" keyPath="objectValue.input" id="f4s-vo-XgL"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5VK-Ej-krq">
+                                                        <rect key="frame" x="61" y="3" width="168" height="23"/>
+                                                        <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="EHU-Ec-otG">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <segments>
+                                                                <segment label="0°" toolTip="No rotation" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                                <segment label="90°" toolTip="90 degree rotation (vertical)" tag="90"/>
+                                                                <segment label="180°" toolTip="180 degree rotation (upside down)" tag="180"/>
+                                                                <segment label="270°" toolTip="270 degree rotation (vertical)" tag="270"/>
+                                                            </segments>
+                                                        </segmentedCell>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="selectedTag" keyPath="objectValue.rotation" id="Pxe-c5-FCg"/>
+                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.showOrientation" id="m4H-rb-Kfz">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </segmentedControl>
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OaN-2H-RQX" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="56" y="83" width="178" height="38"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="30" id="fyP-z2-ZO5"/>
+                                                            <constraint firstAttribute="width" constant="174" id="quO-P5-pmt"/>
+                                                        </constraints>
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="yag-dO-RNx" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                            <userDefinedRuntimeAttributes>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                                    <real key="value" value="20"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                    <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                            </userDefinedRuntimeAttributes>
+                                                        </sliderCell>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.preciseBrightnessContrast" id="6fS-5Z-h5r"/>
+                                                        </connections>
+                                                    </slider>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="9t9-h6-nGA" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="62" y="98" width="12" height="12"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="12" id="Ome-uZ-pSQ"/>
+                                                            <constraint firstAttribute="width" constant="12" id="uMg-SE-Vb3"/>
+                                                        </constraints>
+                                                        <contentFilters>
+                                                            <ciFilter name="CIFalseColor">
+                                                                <configuration>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                                    <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                                    <null key="inputImage"/>
+                                                                </configuration>
+                                                            </ciFilter>
+                                                        </contentFilters>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="oJU-gy-c0S"/>
+                                                        <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.hasDDC" id="58e-cI-3jJ">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </imageView>
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wbs-Qz-lUz" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="56" y="53" width="178" height="38"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="174" id="I8h-63-JCN"/>
+                                                            <constraint firstAttribute="height" constant="30" id="pXE-oc-xNO"/>
+                                                        </constraints>
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.53107244318181823" tickMarkPosition="above" sliderType="linear" id="HsP-9N-heG" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                            <userDefinedRuntimeAttributes>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                                    <real key="value" value="20"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                    <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                            </userDefinedRuntimeAttributes>
+                                                        </sliderCell>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.preciseVolume" id="0VA-Lp-aAB"/>
+                                                        </connections>
+                                                    </slider>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="WXp-hm-NXm" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                                        <rect key="frame" x="61" y="67" width="14" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="14" id="evG-YK-lIX"/>
+                                                            <constraint firstAttribute="width" constant="14" id="oEC-Yh-E8M"/>
+                                                        </constraints>
+                                                        <contentFilters>
+                                                            <ciFilter name="CIFalseColor">
+                                                                <configuration>
+                                                                    <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                                    <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                                    <null key="inputImage"/>
+                                                                </configuration>
+                                                            </ciFilter>
+                                                        </contentFilters>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="volume-low" id="dSd-Gf-gBD"/>
+                                                        <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.hasDDC" id="f18-6j-PYN">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </imageView>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="DrO-3E-miA">
+                                                        <rect key="frame" x="33" y="125" width="224" height="24"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="220" id="8Wv-tn-44H"/>
+                                                            <constraint firstAttribute="height" constant="24" id="k0H-oq-W8q"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="First Screen" id="Xex-3G-aFC">
+                                                            <font key="font" size="20" name="Menlo-Bold"/>
+                                                            <color key="textColor" name="Caption Secondary"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.name" id="xdR-Tl-qGA"/>
+                                                        </connections>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="sy4-S7-iPw" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="1jl-w5-Kxx"/>
+                                                    <constraint firstItem="9t9-h6-nGA" firstAttribute="centerY" secondItem="OaN-2H-RQX" secondAttribute="centerY" id="8Zc-6Z-UEV"/>
+                                                    <constraint firstItem="5VK-Ej-krq" firstAttribute="top" secondItem="sy4-S7-iPw" secondAttribute="bottom" constant="8" id="Ftd-ge-z4b"/>
+                                                    <constraint firstItem="DrO-3E-miA" firstAttribute="top" secondItem="prI-Gh-RKd" secondAttribute="top" constant="5" id="H36-lb-w89"/>
+                                                    <constraint firstItem="wbs-Qz-lUz" firstAttribute="leading" secondItem="WXp-hm-NXm" secondAttribute="trailing" constant="-17" id="IC7-Sv-83d"/>
+                                                    <constraint firstItem="OaN-2H-RQX" firstAttribute="leading" secondItem="9t9-h6-nGA" secondAttribute="trailing" constant="-16" id="OjG-4c-Epq"/>
+                                                    <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="bottom" id="Z5S-KC-GTG"/>
+                                                    <constraint firstItem="WXp-hm-NXm" firstAttribute="centerY" secondItem="wbs-Qz-lUz" secondAttribute="centerY" id="a3Z-b7-1Cf"/>
+                                                    <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="wbs-Qz-lUz" secondAttribute="bottom" constant="4" id="ajP-EN-W2A"/>
+                                                    <constraint firstItem="5VK-Ej-krq" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="cz4-Ga-Wfo"/>
+                                                    <constraint firstItem="wbs-Qz-lUz" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="eDV-1v-TWg"/>
+                                                    <constraint firstItem="DrO-3E-miA" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="fqp-Qk-Zbq"/>
+                                                    <constraint firstAttribute="bottom" secondItem="5VK-Ej-krq" secondAttribute="bottom" constant="5" id="ncJ-Hz-gpd"/>
+                                                    <constraint firstItem="OaN-2H-RQX" firstAttribute="top" secondItem="DrO-3E-miA" secondAttribute="bottom" constant="6" id="saP-mI-b7E"/>
+                                                    <constraint firstItem="OaN-2H-RQX" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="t3w-56-h0M"/>
+                                                </constraints>
+                                            </tableCellView>
+                                        </prototypeCellViews>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <binding destination="oVA-xU-vxa" name="content" keyPath="arrangedObjects" id="jcp-5j-XMD"/>
+                                    <outlet property="delegate" destination="XpJ-ho-P7z" id="cGB-cU-Oez"/>
+                                </connections>
+                            </tableView>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U3O-vh-AKs" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="272" y="563" width="26" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="26" id="D7U-0p-uP5"/>
+                                    <constraint firstAttribute="width" constant="26" id="pYh-u5-2SG"/>
+                                </constraints>
+                                <shadow key="shadow" blurRadius="4">
+                                    <size key="offset" width="0.0" height="4"/>
+                                    <color key="color" red="0.22166593309999999" green="0.2865867077" blue="0.88616857390000003" alpha="0.55144146130000005" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSActionTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="nsA-z8-UJp">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.69999999999999996"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="hoverAlpha">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="showMenu:" target="XpJ-ho-P7z" id="Vcx-PX-eUZ"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" tag="50" translatesAutoresizingMaskIntoConstraints="NO" id="pEd-3X-Kup" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="189" y="10" width="31" height="14"/>
+                                <buttonCell key="cell" type="inline" title="50%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Oi3-QX-pzN">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.13231756286179469" green="0.12205065804422853" blue="0.14811862244897958" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="setPercent:" target="XpJ-ho-P7z" id="Tnn-V8-BNz"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" tag="25" translatesAutoresizingMaskIntoConstraints="NO" id="SEc-Qb-jN3" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="151" y="10" width="30" height="14"/>
+                                <buttonCell key="cell" type="inline" title="25%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="fXN-9u-RgP">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="setPercent:" target="XpJ-ho-P7z" id="E9C-me-Upc"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ajr-Nz-yJI" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="119" y="10" width="24" height="14"/>
+                                <buttonCell key="cell" type="inline" title="0%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Kmq-Om-QOG">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="setPercent:" target="XpJ-ho-P7z" id="1LJ-p1-tps"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" tag="75" translatesAutoresizingMaskIntoConstraints="NO" id="qKp-A7-ckL" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="228" y="10" width="30" height="14"/>
+                                <buttonCell key="cell" type="inline" title="75%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="krD-md-bcQ">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="setPercent:" target="XpJ-ho-P7z" id="zeV-RD-PmE"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DhA-7Q-tV4">
+                                <rect key="frame" x="13" y="9" width="64" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Presets:" id="5ss-DQ-CYp">
+                                    <font key="font" metaFont="systemHeavy" size="14"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="WXW-NR-yy6" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="263" y="10" width="37" height="14"/>
+                                <buttonCell key="cell" type="inline" title="100%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="0Wm-eA-Yxm">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="setPercent:" target="XpJ-ho-P7z" id="4ff-1g-wvx"/>
+                                </connections>
+                            </button>
+                            <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-3" y="427" width="316" height="175"/>
+                                <view key="contentView" id="xED-Xy-oTv">
+                                    <rect key="frame" x="3" y="9" width="310" height="157"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
+                                            <rect key="frame" x="13" y="134" width="130" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="8it-gt-vwn">
+                                                <font key="font" size="16" name="Menlo-Bold"/>
+                                                <color key="textColor" name="Caption Secondary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="PLk-Zt-V6X"/>
+                                            </connections>
+                                        </textField>
+                                        <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="0Wk-V9-tNW">
+                                            <rect key="frame" x="88" y="47" width="134" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="134" id="HP7-yo-gqM"/>
+                                                <constraint firstAttribute="height" constant="21" id="gJY-U3-Rkv"/>
+                                            </constraints>
+                                            <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="87o-hG-ch3" id="pxa-JF-08B">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <menu key="menu" id="FWA-Gn-i6m">
+                                                    <items>
+                                                        <menuItem title="Video Input" state="on" image="input" tag="246" hidden="YES" enabled="NO" allowsKeyEquivalentWhenHidden="YES" id="87o-hG-ch3">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Thunderbolt 3 (DDC 27)" image="usbc" tag="27" id="jxa-7B-Uw3">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Thunderbolt 3 (DDC 25)" image="usbc" tag="25" id="db0-tr-hN5">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="DisplayPort 1" image="displayport" tag="15" id="w44-Lk-B7c">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="DisplayPort 2" image="displayport" tag="16" id="W1c-N3-cCQ">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="HDMI 1" image="hdmi" tag="17" id="OBP-gQ-2c4">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="HDMI 2" image="hdmi" tag="18" id="EW1-5Z-Ych">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="4rn-CH-zjO"/>
+                                                        <menuItem title="VGA 1" image="vga" tag="1" id="y2e-l4-I1f">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="VGA 2" image="vga" tag="2" id="FgC-bE-Puo">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="DVI 1" image="dvi" tag="3" id="Tv1-eb-0Ew">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="DVI 2" image="dvi" tag="4" id="0Ix-dE-cw0">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Composite video 1" image="composite" tag="5" id="iiu-W5-0xU">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Composite video 2" image="composite" tag="6" id="4JG-VK-9yc">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="S-Video 1" image="svideo" tag="7" id="L4d-ws-u2n">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="S-Video 2" image="svideo" tag="8" id="w0g-NR-U8g">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Tuner 1" image="tuner" tag="9" id="WMM-Fc-1LK">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Tuner 2" image="tuner" tag="10" id="YsF-UZ-Jqu">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Tuner 3" image="tuner" tag="11" id="vDi-8C-xVv">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Component video (YPrPb/YCrCb) 1" image="component" tag="12" id="TBE-dg-Hrh">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Component video (YPrPb/YCrCb) 2" image="component" tag="13" id="snY-Iq-2c9">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Component video (YPrPb/YCrCb) 3" image="component" tag="14" id="ZtC-jd-NJ2">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="selectedTag" keyPath="self.display.input" id="r3A-J2-yIN"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Z8-Q7-p7U" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="71" y="17" width="168" height="23"/>
+                                            <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="nHO-9M-9Q7">
+                                                <font key="font" metaFont="systemSemibold" size="13"/>
+                                                <segments>
+                                                    <segment label="0°" toolTip="No rotation" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                    <segment label="90°" toolTip="90 degree rotation (vertical)" tag="90"/>
+                                                    <segment label="180°" toolTip="180 degree rotation (upside down)" tag="180"/>
+                                                    <segment label="270°" toolTip="270 degree rotation (vertical)" tag="270"/>
+                                                </segments>
+                                            </segmentedCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="selectedTag" keyPath="self.display.rotation" id="3UN-ny-MoV"/>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showOrientation" id="Sat-fS-Frd">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </segmentedControl>
+                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tqt-X1-RJG" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="66" y="96" width="178" height="38"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="174" id="9Wh-Ue-uRn"/>
+                                                <constraint firstAttribute="height" constant="30" id="yS8-20-Mcf"/>
+                                            </constraints>
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="6Na-m9-LnM" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                        <real key="value" value="20"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </sliderCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseBrightnessContrast" id="278-an-xbY"/>
+                                            </connections>
+                                        </slider>
+                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="MNZ-Jn-RAr" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="72" y="111" width="12" height="12"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="12" id="6CL-ab-eyX"/>
+                                                <constraint firstAttribute="height" constant="12" id="Itw-Vs-hki"/>
+                                            </constraints>
+                                            <contentFilters>
+                                                <ciFilter name="CIFalseColor">
+                                                    <configuration>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                        <ciColor key="inputColor1" red="1" green="0.89803921568627454" blue="0.80000000000000004" alpha="1"/>
+                                                        <null key="inputImage"/>
+                                                    </configuration>
+                                                </ciFilter>
+                                            </contentFilters>
+                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="ean-37-l36"/>
+                                            <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        </imageView>
+                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OSL-cA-38n" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="66" y="66" width="178" height="38"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="30" id="vZz-v5-zRN"/>
+                                                <constraint firstAttribute="width" constant="174" id="xgs-8B-bjh"/>
+                                            </constraints>
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" maxValue="1" doubleValue="0.53107244318181823" tickMarkPosition="above" sliderType="linear" id="gLI-Gd-v2W" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                        <real key="value" value="20"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </sliderCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseVolume" id="IjG-iY-7r4"/>
+                                            </connections>
+                                        </slider>
+                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JaP-5h-FMy" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="71" y="80" width="14" height="14"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="14" id="Hds-gp-QFx"/>
+                                                <constraint firstAttribute="width" constant="14" id="KNW-ro-MYY"/>
+                                            </constraints>
+                                            <contentFilters>
+                                                <ciFilter name="CIFalseColor">
+                                                    <configuration>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="1"/>
+                                                        <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                        <null key="inputImage"/>
+                                                    </configuration>
+                                                </ciFilter>
+                                            </contentFilters>
+                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="volume-low" id="Alt-3Z-b1D"/>
+                                            <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        </imageView>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="otl-pY-cnj">
+                                                <font key="font" metaFont="systemMedium" size="10"/>
+                                                <color key="textColor" name="Caption Tertiary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.appPreset" id="VQP-NG-4aG">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSIsNil</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="V3L-vf-P4Z">
+                                                <font key="font" metaFont="systemHeavy" size="10"/>
+                                                <color key="textColor" name="Caption Tertiary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.appPreset" id="SLy-0K-q6h">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSIsNil</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.appPreset.name" id="jWw-k0-tro"/>
+                                            </connections>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="centerY" secondItem="D87-Cq-r76" secondAttribute="centerY" id="7Xy-mP-5yd"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="4" id="8Hf-OL-Lrj"/>
+                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="leading" secondItem="D87-Cq-r76" secondAttribute="trailing" constant="3" id="BVX-Qt-Cny"/>
+                                        <constraint firstItem="D87-Cq-r76" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="499" constant="6" id="FOi-Ro-2A2"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="I8P-g4-hIO"/>
+                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="2" id="Nnz-oO-qw1"/>
+                                        <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
+                                        <constraint firstItem="D87-Cq-r76" firstAttribute="leading" secondItem="Hup-6D-J0e" secondAttribute="leading" id="c7K-w6-Hov"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-16" id="cvs-CK-h0B"/>
+                                        <constraint firstItem="MNZ-Jn-RAr" firstAttribute="centerY" secondItem="Tqt-X1-RJG" secondAttribute="centerY" id="dkt-2V-rz0"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="leading" secondItem="xED-Xy-oTv" secondAttribute="leading" constant="15" id="eEm-TZ-Vsd"/>
+                                        <constraint firstItem="0Wk-V9-tNW" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="eKY-QN-ieL"/>
+                                        <constraint firstItem="OSL-cA-38n" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="g17-EW-0gJ"/>
+                                        <constraint firstItem="OSL-cA-38n" firstAttribute="leading" secondItem="JaP-5h-FMy" secondAttribute="trailing" constant="-17" id="gXX-hV-vrq"/>
+                                        <constraint firstItem="OSL-cA-38n" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="mxi-wy-m9O"/>
+                                        <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
+                                        <constraint firstItem="5Z8-Q7-p7U" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="qW5-xo-Qe0"/>
+                                        <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" id="sNb-T1-tu5"/>
+                                        <constraint firstItem="5Z8-Q7-p7U" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" constant="8" id="wr5-uK-0dY"/>
+                                    </constraints>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" priority="250" constant="120" id="9PB-hF-MgO"/>
+                                </constraints>
+                                <size key="contentViewMargins" width="0.0" height="6"/>
+                                <font key="titleFont" size="14" name="Menlo-Bold"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bg">
+                                        <color key="value" name="Field BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display" id="kXM-yh-WSA">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNil</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="XpJ-ho-P7z" name="hidden2" keyPath="self.display.hasDDC" previousBinding="kXM-yh-WSA" id="7cn-He-e8B">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.name" id="YF3-pL-ngY"/>
+                                </connections>
+                            </box>
+                            <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="-3" y="486" width="316" height="116"/>
+                                <view key="contentView" id="j9b-qV-Iv1">
+                                    <rect key="frame" x="3" y="9" width="310" height="98"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="66" y="37" width="178" height="38"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="174" id="10o-lf-zvS"/>
+                                                <constraint firstAttribute="height" constant="30" id="a6o-T5-lQV"/>
+                                            </constraints>
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="QVY-Qg-p73" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                        <real key="value" value="20"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </sliderCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseBrightness" id="rTV-Sp-akj"/>
+                                            </connections>
+                                        </slider>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
+                                            <rect key="frame" x="13" y="75" width="130" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="RjJ-T2-HEe">
+                                                <font key="font" size="16" name="Menlo-Bold"/>
+                                                <color key="textColor" name="Caption Secondary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="h7j-6y-G1m"/>
+                                            </connections>
+                                        </textField>
+                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="SME-Wy-2pc" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="72" y="52" width="12" height="12"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="12" id="GCB-04-0TS"/>
+                                                <constraint firstAttribute="width" constant="12" id="gsT-ad-FtE"/>
+                                            </constraints>
+                                            <contentFilters>
+                                                <ciFilter name="CIFalseColor">
+                                                    <configuration>
+                                                        <ciColor key="inputColor0" red="0.15686274509803921" green="0.12549019607843137" blue="0.12549019607843137" alpha="0.97081953642384111"/>
+                                                        <ciColor key="inputColor1" red="1" green="0.89803921568627454" blue="0.80000000000000004" alpha="1"/>
+                                                        <null key="inputImage"/>
+                                                    </configuration>
+                                                </ciFilter>
+                                            </contentFilters>
+                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="ySS-PV-SSm"/>
+                                            <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        </imageView>
+                                        <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pc0-Ic-fRC" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="71" y="17" width="168" height="23"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="166" id="CGL-Gg-nNl"/>
+                                                <constraint firstAttribute="height" constant="20" id="Kkl-XW-mZu"/>
+                                            </constraints>
+                                            <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="B4s-c8-wdq">
+                                                <font key="font" metaFont="systemSemibold" size="13"/>
+                                                <segments>
+                                                    <segment label="0°" toolTip="No rotation" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                    <segment label="90°" toolTip="90 degree rotation (vertical)" tag="90"/>
+                                                    <segment label="180°" toolTip="180 degree rotation (upside down)" tag="180"/>
+                                                    <segment label="270°" toolTip="270 degree rotation (vertical)" tag="270"/>
+                                                </segments>
+                                            </segmentedCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="selectedTag" keyPath="self.display.rotation" id="XEF-YB-Ixt"/>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showOrientation" id="QKi-am-0NU">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </segmentedControl>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="S7N-nf-buj">
+                                                <font key="font" metaFont="systemMedium" size="10"/>
+                                                <color key="textColor" name="Caption Tertiary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.appPreset" id="CdZ-pd-lhc">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSIsNil</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="6AG-Ma-ayy">
+                                                <font key="font" metaFont="systemHeavy" size="10"/>
+                                                <color key="textColor" name="Caption Tertiary"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.appPreset" id="9UC-qO-hsr">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSIsNil</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.appPreset.name" id="eUx-ZG-4cU"/>
+                                            </connections>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="pc0-Ic-fRC" secondAttribute="bottom" constant="6" id="2Ue-HN-qPT"/>
+                                        <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-16" id="Ch7-G0-7uf"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
+                                        <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
+                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="leading" secondItem="GuV-5N-Ajh" secondAttribute="leading" id="LuT-YH-oxK"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="2" id="NLt-qN-Af8"/>
+                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="centerY" secondItem="ddL-Y9-B9P" secondAttribute="centerY" id="Oji-Si-pFa"/>
+                                        <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" id="TJr-8A-iUn"/>
+                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
+                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="leading" secondItem="ddL-Y9-B9P" secondAttribute="trailing" constant="3" id="nEV-fD-L8b"/>
+                                        <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="4" id="nZ7-4a-hWM"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="leading" secondItem="j9b-qV-Iv1" secondAttribute="leading" constant="15" id="uBe-tO-W71"/>
+                                    </constraints>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" priority="250" constant="70" id="HZ8-1c-qVk"/>
+                                </constraints>
+                                <size key="contentViewMargins" width="0.0" height="6"/>
+                                <font key="titleFont" size="14" name="Menlo-Bold"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bg">
+                                        <color key="value" name="Field BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display" id="Jl5-82-aP0">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNil</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="XpJ-ho-P7z" name="hidden2" keyPath="self.display.hasDDC" previousBinding="Jl5-82-aP0" id="QI9-fJ-b2f">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.name" id="8Qx-KG-aAh"/>
+                                </connections>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="qKp-A7-ckL" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="5sy-14-JQf"/>
+                            <constraint firstItem="qKp-A7-ckL" firstAttribute="leading" secondItem="pEd-3X-Kup" secondAttribute="trailing" constant="8" symbolic="YES" id="9ZL-x7-ff0"/>
+                            <constraint firstAttribute="trailing" secondItem="U3O-vh-AKs" secondAttribute="trailing" constant="12" id="Aqj-ot-0ha"/>
+                            <constraint firstItem="DhA-7Q-tV4" firstAttribute="centerY" secondItem="Ajr-Nz-yJI" secondAttribute="centerY" id="BW4-YF-sA3"/>
+                            <constraint firstItem="WXW-NR-yy6" firstAttribute="leading" secondItem="qKp-A7-ckL" secondAttribute="trailing" constant="5" id="Bxs-xQ-7Vz"/>
+                            <constraint firstItem="qbu-vX-wt7" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="Ckt-uA-c3k"/>
+                            <constraint firstItem="DhA-7Q-tV4" firstAttribute="leading" secondItem="vGd-1C-1a0" secondAttribute="leading" constant="15" id="Dfx-4m-GWU"/>
+                            <constraint firstItem="U3O-vh-AKs" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" constant="8" id="KS1-us-Jfl"/>
+                            <constraint firstItem="SEc-Qb-jN3" firstAttribute="leading" secondItem="Ajr-Nz-yJI" secondAttribute="trailing" constant="8" symbolic="YES" id="Khi-eX-NE4"/>
+                            <constraint firstItem="pEd-3X-Kup" firstAttribute="leading" secondItem="SEc-Qb-jN3" secondAttribute="trailing" constant="8" symbolic="YES" id="LMv-Pm-jnO"/>
+                            <constraint firstItem="qbu-vX-wt7" firstAttribute="width" secondItem="vGd-1C-1a0" secondAttribute="width" id="Lon-hh-zBw"/>
+                            <constraint firstItem="J4o-rg-1UD" firstAttribute="width" secondItem="vGd-1C-1a0" secondAttribute="width" id="MAN-DX-FgL"/>
+                            <constraint firstAttribute="height" constant="600" placeholder="YES" id="MkK-dC-YGb"/>
+                            <constraint firstItem="J4o-rg-1UD" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="R5S-6t-zAk"/>
+                            <constraint firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" constant="10" id="afe-I7-aEK"/>
+                            <constraint firstItem="SEc-Qb-jN3" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="eHk-bQ-xYF"/>
+                            <constraint firstItem="qbu-vX-wt7" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="jZ9-f9-ELe"/>
+                            <constraint firstAttribute="bottom" secondItem="pEd-3X-Kup" secondAttribute="bottom" constant="10" id="nOg-pP-yky"/>
+                            <constraint firstItem="WXW-NR-yy6" firstAttribute="centerY" secondItem="qKp-A7-ckL" secondAttribute="centerY" id="v4h-Ea-PGB"/>
+                            <constraint firstItem="Ajr-Nz-yJI" firstAttribute="centerY" secondItem="SEc-Qb-jN3" secondAttribute="centerY" id="vOS-yS-DDE"/>
+                            <constraint firstItem="J4o-rg-1UD" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="xwJ-hC-Omm"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="menuButton" destination="U3O-vh-AKs" id="1aj-pZ-wXp"/>
+                        <outlet property="table" destination="1sj-jk-KiM" id="uxs-1S-dyx"/>
+                    </connections>
+                </viewController>
+                <customObject id="yR6-VX-2y8" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <arrayController objectClassName="[Portabl.Display]" automaticallyPreparesContent="YES" selectsInsertedObjects="NO" automaticallyRearrangesObjects="YES" id="oVA-xU-vxa">
+                    <classReference key="objectClass" className="Display]" moduleName="[Portabl"/>
+                    <connections>
+                        <binding destination="XpJ-ho-P7z" name="contentArray" keyPath="self.displays" id="AJ4-m9-f9X"/>
+                    </connections>
+                </arrayController>
+                <userDefaultsController id="ke2-vP-JQy"/>
+            </objects>
+            <point key="canvasLocation" x="788" y="1716"/>
+        </scene>
         <!--Popover Controller-->
         <scene sceneID="7ik-2e-ouh">
             <objects>
@@ -10266,16 +11255,9 @@ settings for this monitor.</string>
             </objects>
             <point key="canvasLocation" x="99.5" y="3826.5"/>
         </scene>
-        <!--QuickActionsViewController-->
-        <scene sceneID="gWc-Mv-q1e">
-            <objects>
-                <controllerPlaceholder storyboardIdentifier="QuickActionsViewController" storyboardName="QuickActions" referencedIdentifier="QuickActionsViewController" id="Nm4-O6-0nB" sceneMemberID="viewController"/>
-                <customObject id="tbh-yz-ckn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="788" y="1716"/>
-        </scene>
     </scenes>
     <resources>
+        <image name="NSActionTemplate" width="15" height="15"/>
         <image name="NSAddTemplate" width="14" height="13"/>
         <image name="NSAdvanced" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
@@ -10299,6 +11281,7 @@ settings for this monitor.</string>
         <image name="tuner" width="14" height="14"/>
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>
+        <image name="volume-low" width="24" height="24"/>
         <namedColor name="AccentColor">
             <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

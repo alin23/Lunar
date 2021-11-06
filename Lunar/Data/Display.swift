@@ -1164,7 +1164,11 @@ enum ValueType {
     @objc dynamic lazy var preciseMaxContrast: Double = maxContrast.doubleValue / 100.0
     @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
 
-    @objc dynamic lazy var showOrientation: Bool = canRotate && CachedDefaults[.showOrientationInQuickActions]
+    #if DEBUG
+        @objc dynamic lazy var showOrientation: Bool = CachedDefaults[.showOrientationInQuickActions]
+    #else
+        @objc dynamic lazy var showOrientation: Bool = canRotate && CachedDefaults[.showOrientationInQuickActions]
+    #endif
 
     lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
     lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
@@ -1948,7 +1952,11 @@ enum ValueType {
     @objc dynamic lazy var canRotate: Bool = canChangeOrientation {
         didSet {
             rotationTooltip = canRotate ? nil : "This monitor doesn't support rotation"
-            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
+            #if DEBUG
+                showOrientation = CachedDefaults[.showOrientationInQuickActions]
+            #else
+                showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
+            #endif
         }
     }
 
@@ -2142,6 +2150,8 @@ enum ValueType {
             }
         }
     }
+
+    @objc dynamic var noDDCOrMergedBrightnessContrast: Bool { !hasDDC || CachedDefaults[.mergeBrightnessContrast] }
 
     @Published @objc dynamic var hasDDC: Bool = false {
         didSet {
@@ -2618,6 +2628,26 @@ enum ValueType {
         Self.observeBrightnessChangeDS(id)
     }
 
+    func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
+        (mapNumber(
+            cap(brightness, minVal: 0.0, maxVal: 1.0),
+            fromLow: 0.0,
+            fromHigh: 1.0,
+            toLow: minBrightness.doubleValue / 100.0,
+            toHigh: maxBrightness.doubleValue / 100.0
+        ) * 100).intround.ns
+    }
+
+    func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
+        (mapNumber(
+            cap(contrast, minVal: 0.0, maxVal: 1.0),
+            fromLow: 0.0,
+            fromHigh: 1.0,
+            toLow: minContrast.doubleValue / 100.0,
+            toHigh: maxContrast.doubleValue / 100.0
+        ) * 100).intround.ns
+    }
+
     func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
         mapNumber(
             cap(brightness.doubleValue, minVal: 0, maxVal: 100),
@@ -2628,7 +2658,7 @@ enum ValueType {
         ) / 100.0
     }
 
-    func contrastToSliderValue(_ contrast: NSNumber) -> PreciseContrast {
+    func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
         let c = mapNumber(
             cap(contrast.doubleValue, minVal: 0, maxVal: 100),
             fromLow: minContrast.doubleValue,
@@ -2637,7 +2667,7 @@ enum ValueType {
             toHigh: 100
         ) / 100.0
 
-        return pow(c, 2)
+        return merged ? pow(c, 2) : c
     }
 
     func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {

@@ -24,19 +24,24 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 
     @objc dynamic lazy var showOrientation = CachedDefaults[.showOrientationInQuickActions]
 
-//    #if DEBUG
-//    @objc dynamic lazy var display: Display? = displayController.externalActiveDisplays.first
-//    @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial && !$0.isBuiltin }) {
-//        didSet { resize() }
-//    }
-//    #else
-    @objc dynamic lazy var display: Display? = displayController.cursorDisplay
+    #if DEBUG
+        @objc dynamic lazy var display: Display? = {
+            guard let display = displayController.externalActiveDisplays.first else { return nil }
+            display.appPreset = CachedDefaults[.appExceptions]?.first
 
-    @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
-        didSet { resize() }
-    }
+            return display
+        }()
 
-//    #endif
+        @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
+            didSet { resize() }
+        }
+    #else
+        @objc dynamic lazy var display: Display? = displayController.cursorDisplay
+
+        @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
+            didSet { resize() }
+        }
+    #endif
 
     @IBAction func setPercent(_ sender: Button) {
         appDelegate!.setLightPercent(percent: sender.tag.i8)
@@ -57,13 +62,14 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
     func resize() {
         mainAsync { [weak self] in
             guard let self = self else { return }
-            self.table.intercellSpacing = NSSize(width: 0, height: (self.showOrientation && !self.displays.isEmpty) ? 20 : 0)
-            var height = sum(self.displays.map { $0.hasDDC ? 160 : 80 }) +
+            self.table.intercellSpacing = NSSize(width: 0, height: !self.displays.isEmpty ? 20 : 0)
+            let merged = CachedDefaults[.mergeBrightnessContrast]
+            var height = sum(self.displays.map { $0.hasDDC ? ((merged ? 120 : 150) + ($0.showOrientation ? 30 : 0)) : 80 }) +
                 (self.table.intercellSpacing.height * CGFloat(self.displays.count))
 
             if let display = self.display {
                 if display.hasDDC {
-                    height += 114 + (display.showOrientation ? 30 : 0) + (display.appPreset != nil ? 20 : 0)
+                    height += 114 + (display.showOrientation ? 30 : 0) + (display.appPreset != nil ? 20 : 0) + (merged ? 0 : 30)
                 } else {
                     height += 60 + (display.showOrientation ? 20 : 0) + (display.appPreset != nil ? 20 : 0)
                 }
@@ -76,5 +82,37 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
     override func viewDidLoad() {
         super.viewDidLoad()
         resize()
+    }
+}
+
+// MARK: - CellWithDDC
+
+class CellWithDDC: NSTableCellView {
+    @IBOutlet var orientationControl: NSSegmentedControl?
+
+    override var objectValue: Any? {
+        didSet {
+            guard let display = objectValue as? Display, let orientationControl = orientationControl else { return }
+
+            if !display.showOrientation {
+                orientationControl.removeFromSuperview()
+            }
+        }
+    }
+}
+
+// MARK: - CellWithoutDDC
+
+class CellWithoutDDC: NSTableCellView {
+    @IBOutlet var orientationControl: NSSegmentedControl?
+
+    override var objectValue: Any? {
+        didSet {
+            guard let display = objectValue as? Display, let orientationControl = orientationControl else { return }
+
+            if !display.showOrientation {
+                orientationControl.removeFromSuperview()
+            }
+        }
     }
 }
