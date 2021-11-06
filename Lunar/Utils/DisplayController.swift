@@ -387,7 +387,13 @@ class DisplayController {
         showOrientationInQuickActionsPublisher.sink { [self] change in
             mainAsync { [self] in
                 menuPopover?.close()
-                displays.values.forEach { $0.showOrientation = $0.canRotate && change.newValue }
+                displays.values.forEach {
+                    #if DEBUG
+                        $0.showOrientation = change.newValue
+                    #else
+                        $0.showOrientation = $0.canRotate && change.newValue
+                    #endif
+                }
             }
         }.store(in: &observers)
 
@@ -1424,16 +1430,19 @@ class DisplayController {
                 minVal: display.minBrightness.intValue,
                 maxVal: display.maxBrightness.intValue
             )
-            let preciseValue = mapNumber(
-                value.d,
-                fromLow: display.minBrightness.doubleValue,
-                fromHigh: display.maxBrightness.doubleValue,
-                toLow: 0,
-                toHigh: 100
-            ) / 100
+            if CachedDefaults[.mergeBrightnessContrast] {
+                let preciseValue = mapNumber(
+                    value.d,
+                    fromLow: display.minBrightness.doubleValue,
+                    fromHigh: display.maxBrightness.doubleValue,
+                    toLow: 0,
+                    toHigh: 100
+                ) / 100
 
-            // display.brightness = value.ns
-            display.preciseBrightnessContrast = preciseValue
+                display.preciseBrightnessContrast = preciseValue
+            } else {
+                display.brightness = value.ns
+            }
 
             if adaptiveModeKey != .manual {
                 display.insertBrightnessUserDataPoint(

@@ -162,6 +162,20 @@ extension NSColor {
 
 let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
 extension String {
+    func parseHex() -> Int? {
+        var sub = self
+
+        if sub.starts(with: "0x") {
+            sub = String(sub.suffix(from: sub.index(sub.startIndex, offsetBy: 2)))
+        }
+
+        if sub.starts(with: "x") {
+            sub = String(sub.suffix(from: sub.index(after: sub.startIndex)))
+        }
+
+        return Int(sub, radix: 16)
+    }
+
     @inline(__always) var stripped: String {
         filter { CHARS_NOT_STRIPPED.contains($0) }
     }
@@ -1156,11 +1170,29 @@ extension NSRect {
     }
 }
 
+extension NSView {
+    func removeAsync() {
+        mainAsyncAfter(ms: 100) {
+            if self.isHidden {
+                guard let view = self.superview else { return }
+                self.removeFromSuperview()
+                view.needsLayout = true
+                view.needsUpdateConstraints = true
+                view.layout()
+            }
+        }
+    }
+}
+
 // MARK: - AutoRemovingSegmentedControl
 
 class AutoRemovingSegmentedControl: NSSegmentedControl {
     override var isHidden: Bool {
-        didSet { if isHidden { removeFromSuperview() } }
+        didSet {
+            if isHidden {
+                removeFromSuperview()
+            }
+        }
     }
 }
 
@@ -1175,6 +1207,14 @@ class AutoRemovingTextField: NSTextField {
 // MARK: - AutoRemovingBox
 
 class AutoRemovingBox: NSBox {
+    override var isHidden: Bool {
+        didSet { if isHidden { removeFromSuperview() } }
+    }
+}
+
+// MARK: - AutoRemovingSlider
+
+class AutoRemovingSlider: Slider {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
     }

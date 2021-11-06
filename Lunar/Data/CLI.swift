@@ -34,7 +34,7 @@ private var prettyEncoder: JSONEncoder = {
 
 // MARK: - CommandError
 
-private enum CommandError: Error {
+private enum CommandError: Error, CustomStringConvertible {
     case displayNotFound(String)
     case propertyNotValid(String)
     case cantReadProperty(String)
@@ -44,6 +44,31 @@ private enum CommandError: Error {
     case ddcError(String)
     case gammaError(String)
     case noUUID(CGDirectDisplayID)
+
+    // MARK: Internal
+
+    var description: String {
+        switch self {
+        case let .displayNotFound(string):
+            return "Display Not Found: \(string)"
+        case let .propertyNotValid(string):
+            return "Property Not Valid: \(string)"
+        case let .cantReadProperty(string):
+            return "Cant Read Property: \(string)"
+        case let .controlNotAvailable(string):
+            return "Control Not Available: \(string)"
+        case let .serializationError(string):
+            return "Serialization Error: \(string)"
+        case let .invalidValue(string):
+            return "Invalid Value: \(string)"
+        case let .ddcError(string):
+            return "DDC Error: \(string)"
+        case let .gammaError(string):
+            return "Gamma Error: \(string)"
+        case let .noUUID(cgDirectDisplayID):
+            return "No UUID for \(cgDirectDisplayID)"
+        }
+    }
 }
 
 private func printArray(_ array: [Any], level: Int = 0, longestKeySize: Int = 0) {
@@ -498,21 +523,18 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup var globals: GlobalOptions
 
-        @Flag(help: "Fetch max value instead of current")
-        var max: Bool = false
-
         @Argument(help: "Display serial/name/id or one of (first, main, all)")
         var display: String
 
         @Argument(
-            help: "DDC control ID (VCP)\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))"
+            help: "DDC control ID (VCP)\n\tCan be passed as hex VCP values (e.g. 0x10, E1) or constants\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))"
         )
         var control: ControlID
 
         @Argument(
-            help: "Value to set for the control. Caution: if this argument is omitted, Lunar will send a read message which can cause kernel panics if your DDC connection is slow!"
+            help: "Value(s) to set for the control. Pass the value 'read' to fetch the current value from the monitor. Pass 'readmax' to fetch the max value for the control."
         )
-        var value: UInt8?
+        var values: [String]
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -531,36 +553,38 @@ struct Lunar: ParsableCommand {
                 displays = [display]
             }
 
-            guard let value = value else {
+            if values.isEmpty || values.first!.lowercased() =~ "(read|get|fetch)-?(max|val)?" {
+                let max = values.first?.lowercased().hasSuffix("max") ?? false
                 for display in displays {
                     if let result = DDC.read(displayID: display.id, controlID: control) {
                         if displays.count == 1 {
                             print(max ? result.maxValue : result.currentValue)
                         } else {
-                            print("\(display.name)[\(display.serial)]: \(max ? result.maxValue : result.currentValue)")
+                            print("\(display): \(max ? result.maxValue : result.currentValue)")
                         }
                     } else {
                         if displays.count == 1 {
-                            throw CommandError.ddcError("Can't read \(control) for display \(display.name)[\(display.serial)]")
+                            throw CommandError.ddcError("Can't read \(control) for display \(display)")
                         }
-                        print("\(display.name)[\(display.serial)]: Can't read \(control)")
+                        print("\(display): Can't read \(control)")
                     }
                 }
                 globalExit(0)
             }
 
             for display in displays {
-                if DDC.write(displayID: display.id, controlID: control, newValue: value) {
-                    if displays.count == 1 {
+                for value in values {
+                    guard let value = value.parseHex() ?? Int(value) else {
+                        print("Can't parse value \(value) as number")
+                        continue
+                    }
+                    print("\(display): Writing \(value) for \(control)", terminator: ": ")
+                    if DDC.write(displayID: display.id, controlID: control, newValue: value.u8) {
                         print("Ok")
                     } else {
-                        print("\(display.name)[\(display.serial)]: Ok")
+                        print("Error")
+//                        print("\(display): Error writing \(value) for \(control)")
                     }
-                } else {
-                    if displays.count == 1 {
-                        throw CommandError.ddcError("Can't write \(control) for display \(display.name)[\(display.serial)]")
-                    }
-                    print("\(display.name)[\(display.serial)]: \("Can't write \(control)")")
                 }
             }
             globalExit(0)

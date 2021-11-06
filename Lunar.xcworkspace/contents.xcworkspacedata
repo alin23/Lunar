@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/alin/Projects/Lunar/Lunar/QuickActions.storyboard">
+   </FileRef>
+   <FileRef
       location = "container:Lunar.xcodeproj">
    </FileRef>
 </Workspace>

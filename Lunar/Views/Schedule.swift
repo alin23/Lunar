@@ -182,6 +182,43 @@ class Schedule: NSView {
         }
     }
 
+    @objc dynamic var preciseBrightness: Double {
+        get {
+            guard let display = display, let schedule = schedule else {
+                return 0.5
+            }
+
+            return display.brightnessToSliderValue(schedule.brightness.ns)
+        }
+        set {
+            guard let display = display, let schedule = schedule else {
+                return
+            }
+            let brightness = display.sliderValueToBrightness(newValue)
+            self.schedule = schedule.with(brightness: brightness.uint8Value)
+            display.save()
+        }
+    }
+
+    @objc dynamic var preciseContrast: Double {
+        get {
+            guard let display = display, let schedule = schedule else {
+                return 0.5
+            }
+
+            return display.contrastToSliderValue(schedule.contrast.ns, merged: CachedDefaults[.mergeBrightnessContrast])
+        }
+        set {
+            guard let display = display, let schedule = schedule else {
+                return
+            }
+
+            let contrast = display.sliderValueToContrast(newValue)
+            self.schedule = schedule.with(contrast: contrast.uint8Value)
+            display.save()
+        }
+    }
+
     @objc dynamic var negativeState = NSControl.StateValue.off {
         didSet {
             guard let display = display, let schedule = display.schedules.prefix(number).last
@@ -247,7 +284,13 @@ class Schedule: NSView {
 
             setTempValues(from: schedule)
 
-            preciseBrightnessContrast = display.brightnessToSliderValue(schedule.brightness.ns)
+            if CachedDefaults[.mergeBrightnessContrast] {
+                preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+            } else {
+                preciseBrightness = display.brightnessToSliderValue(display.brightness)
+                preciseContrast = display.contrastToSliderValue(display.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+            }
+
             hour.integerValue = schedule.hour.i
             minute.integerValue = schedule.minute.i
             type = schedule.type.rawValue
@@ -329,8 +372,13 @@ class Schedule: NSView {
         guard let display = display, let schedule = schedule else {
             return
         }
-        self.schedule = schedule.with(brightness: display.brightness.uint8Value, contrast: display.contrast.uint8Value)
-        preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+        // self.schedule = schedule.with(brightness: display.brightness.uint8Value, contrast: display.contrast.uint8Value)
+        if CachedDefaults[.mergeBrightnessContrast] {
+            preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+        } else {
+            preciseBrightness = display.brightnessToSliderValue(display.brightness)
+            preciseContrast = display.contrastToSliderValue(display.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+        }
     }
 
     func setTimeValues(from schedule: BrightnessSchedule) {
@@ -358,6 +406,16 @@ class Schedule: NSView {
     }
 
     func addObservers() {
+        mergeBrightnessContrastPublisher.sink { [weak self] change in
+            guard let self = self, let display = self.display else { return }
+            if change.newValue {
+                self.preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+            } else {
+                self.preciseBrightness = display.brightnessToSliderValue(display.brightness)
+                self.preciseContrast = display.contrastToSliderValue(display.contrast, merged: change.newValue)
+            }
+        }.store(in: &observers)
+
         showTwoSchedulesPublisher.sink { [weak self] change in
             guard let self = self else { return }
             if self.number == 2 {
