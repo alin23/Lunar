@@ -23,6 +23,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .mergeBrightnessContrast,
     .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
     .accessibilityPermissionsGranted,
@@ -555,6 +556,7 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.mergeBrightnessContrast)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
     cacheKey(.showTwoSchedules)
@@ -649,6 +651,7 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
@@ -764,6 +767,7 @@ let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).
 let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let mergeBrightnessContrastPublisher = Defaults.publisher(.mergeBrightnessContrast).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let lunarProActivePublisher = Defaults.publisher(.lunarProActive).removeDuplicates().filter { $0.oldValue != $0.newValue }

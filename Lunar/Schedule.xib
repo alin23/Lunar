@@ -172,7 +172,7 @@
                                 </connections>
                             </button>
                             <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="j3P-BV-qub" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="13" y="10" width="154" height="38"/>
+                                <rect key="frame" x="13" y="20" width="154" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="8GJ-hW-12T" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                     <userDefinedRuntimeAttributes>
@@ -196,12 +196,47 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="DKe-Lj-zOO" name="hidden" keyPath="values.mergeBrightnessContrast" previousBinding="elf-6K-nfd" id="AFG-WI-Gfi">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="-2" name="enabled" keyPath="self.enabled" id="elf-6K-nfd"/>
                                     <binding destination="-2" name="value" keyPath="self.preciseBrightnessContrast" id="uDu-uC-4L9"/>
                                 </connections>
                             </slider>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="h4W-3S-uug" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="13" y="20" width="154" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="3LK-5D-5CR" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
+                                        <real key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="ur6-O1-YMj"/>
+                                    <binding destination="DKe-Lj-zOO" name="hidden" keyPath="values.mergeBrightnessContrast" previousBinding="ur6-O1-YMj" id="bki-RE-A09"/>
+                                    <binding destination="-2" name="value" keyPath="self.preciseBrightness" id="A9f-ms-cg2"/>
+                                </connections>
+                            </slider>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="H8e-MD-Hcf" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="19" y="25" width="12" height="12"/>
+                                <rect key="frame" x="19" y="35" width="12" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -215,8 +250,56 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="x2M-u2-mr5"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             </imageView>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="d1i-nw-DOn" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="13" y="-5" width="154" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="yXt-Mz-fJQ" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
+                                        <real key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="-2" name="enabled" keyPath="self.enabled" id="t5j-Ap-mdw"/>
+                                    <binding destination="DKe-Lj-zOO" name="hidden" keyPath="values.mergeBrightnessContrast" previousBinding="t5j-Ap-mdw" id="D4c-4z-71l"/>
+                                    <binding destination="-2" name="value" keyPath="self.preciseContrast" id="gd6-GI-ULG"/>
+                                </connections>
+                            </slider>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="cyc-T0-TZn" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="19" y="10" width="12" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <contentFilters>
+                                    <ciFilter name="CIFalseColor">
+                                        <configuration>
+                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="Gdu-C7-rDv"/>
+                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="DKe-Lj-zOO" name="hidden" keyPath="values.mergeBrightnessContrast" id="H6V-zX-1D1"/>
+                                </connections>
+                            </imageView>
                             <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g9u-50-b3N" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="18" y="44" width="144" height="13"/>
+                                <rect key="frame" x="18" y="54" width="144" height="13"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="144" id="XJp-0G-ZpQ"/>
                                     <constraint firstAttribute="height" constant="16" id="Z7L-lL-B6v"/>
@@ -248,10 +331,12 @@
             </subviews>
             <point key="canvasLocation" x="-16" y="71"/>
         </customView>
+        <userDefaultsController representsSharedInstance="YES" id="DKe-Lj-zOO"/>
     </objects>
     <resources>
         <image name="brightness" width="50.5" height="50.5"/>
         <image name="clock" width="14" height="14"/>
+        <image name="contrast" width="24" height="24"/>
         <image name="sun" width="14" height="14.5"/>
         <image name="sunrise" width="14" height="12"/>
         <image name="sunset" width="14" height="12"/>

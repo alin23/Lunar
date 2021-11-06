@@ -1,3 +1,17 @@
+# 5.0.2
+## Fixes
+
+* Fix lag and wrong monitor assignment when DDC was used for two identical monitors
+* Fix crash when getting current resolution for some displays
+* Fix Sync Mode for Ultrafines that report having ambient light adaptive brightness enabled when in fact they don't
+
+## Improvements
+
+* Add all MCCS VCP codes to `lunar ddc`
+* Add **Use current brightness** button in Clock Mode
+* Add **Merge brightness and contrast** checkbox on the Configuration page
+    * Allows for reverting to the previous behaviour of controlling brightness and contrast separately
+
 # 5.0.1
 ## Fixes
 
