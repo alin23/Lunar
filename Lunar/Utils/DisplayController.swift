@@ -397,6 +397,19 @@ class DisplayController {
             }
         }.store(in: &observers)
 
+        showVolumeSliderPublisher.sink { [self] change in
+            mainAsync { [self] in
+                menuPopover?.close()
+                displays.values.forEach {
+                    // #if DEBUG
+                    //     $0.showVolumeSlider = change.newValue
+                    // #else
+                    $0.showVolumeSlider = $0.canChangeVolume && change.newValue
+                    // #endif
+                }
+            }
+        }.store(in: &observers)
+
         showTwoSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 

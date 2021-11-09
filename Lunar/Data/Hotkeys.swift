@@ -782,7 +782,7 @@ enum Hotkey {
         }
     }
 
-    static func showOsd(osdImage: OSDImage, value: UInt32, display: Display, locked: Bool = false) {
+    static func showOsd(osdImage: OSDImage, value: UInt32, display: Display, locked _: Bool = false) {
         guard !display.blackOutEnabled, let manager = OSDManager.sharedManager() as? OSDManager else {
             log.warning("No OSDManager available")
             return
@@ -896,14 +896,14 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .brightnessUp where contrast:
             increaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessUp where allDisplays:
-            increaseBrightness(by: value, builtinDisplay: true)
+            increaseBrightness(by: value, builtinDisplay: builtinDisplay)
             increaseBrightness(by: value)
         case .brightnessUp:
             increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where contrast:
             decreaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where allDisplays:
-            decreaseBrightness(by: value, builtinDisplay: true)
+            decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
             decreaseBrightness(by: value)
         case .brightnessDown:
             decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
@@ -943,20 +943,39 @@ extension AppDelegate: MediaKeyTapDelegate {
         mediaKey: MediaKey,
         by offset: Int? = nil,
         contrast: Bool = false,
-        lidClosed: Bool
-    ) {
+        lidClosed: Bool,
+        event: CGEvent
+    ) -> CGEvent? {
         switch action {
         case .all:
-            adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
+            if !lidClosed, displayController.builtinDisplay?.active ?? false {
+                adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
+                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                return event
+            }
+            adjust(mediaKey, by: offset, contrast: contrast, builtinDisplay: true, allDisplays: true)
         case .external:
             adjust(mediaKey, by: offset, contrast: contrast)
         case .cursor:
+            if let cursor = displayController.cursorDisplay, cursor.isBuiltin {
+                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                return event
+            }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
+            if !lidClosed {
+                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                return event
+            }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: !lidClosed)
         case .source:
+            if let source = displayController.sourceDisplay, source.isBuiltin {
+                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                return event
+            }
             adjust(mediaKey, by: offset, contrast: contrast, sourceDisplay: true)
         }
+        return nil
     }
 
     func handleBrightnessKeys(
@@ -967,47 +986,101 @@ extension AppDelegate: MediaKeyTapDelegate {
     ) -> CGEvent? {
         switch flags {
         case [] where displayController.adaptiveModeKey == .sync:
-            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.brightnessKeysSyncControl],
+                mediaKey: mediaKey,
+                lidClosed: lidClosed,
+                event: event
+            )
         case [.option, .shift] where displayController.adaptiveModeKey == .sync:
-            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysSyncControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.brightnessKeysSyncControl],
+                mediaKey: mediaKey,
+                by: 1,
+                lidClosed: lidClosed,
+                event: event
+            )
 
         case []:
-            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed, event: event)
         case [.option, .shift]:
-            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.brightnessKeysControl],
+                mediaKey: mediaKey,
+                by: 1,
+                lidClosed: lidClosed,
+                event: event
+            )
 
         case [.shift] where displayController.adaptiveModeKey == .sync:
-            handleBrightnessKeyAction(CachedDefaults[.shiftBrightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.shiftBrightnessKeysSyncControl],
+                mediaKey: mediaKey,
+                lidClosed: lidClosed,
+                event: event
+            )
         case [.shift]:
-            handleBrightnessKeyAction(CachedDefaults[.shiftBrightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.shiftBrightnessKeysControl],
+                mediaKey: mediaKey,
+                lidClosed: lidClosed,
+                event: event
+            )
 
         case [.control] where displayController.adaptiveModeKey == .sync:
-            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysSyncControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.ctrlBrightnessKeysSyncControl],
+                mediaKey: mediaKey,
+                lidClosed: lidClosed,
+                event: event
+            )
         case [.control]:
-            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.ctrlBrightnessKeysControl],
+                mediaKey: mediaKey,
+                lidClosed: lidClosed,
+                event: event
+            )
 
         case [.control, .option] where displayController.adaptiveModeKey == .sync:
-            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysSyncControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.ctrlBrightnessKeysSyncControl],
+                mediaKey: mediaKey,
+                by: 1,
+                lidClosed: lidClosed,
+                event: event
+            )
         case [.control, .option]:
-            handleBrightnessKeyAction(CachedDefaults[.ctrlBrightnessKeysControl], mediaKey: mediaKey, by: 1, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.ctrlBrightnessKeysControl],
+                mediaKey: mediaKey,
+                by: 1,
+                lidClosed: lidClosed,
+                event: event
+            )
 
         case [.control, .shift]:
-            handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, contrast: true, lidClosed: lidClosed)
+            return handleBrightnessKeyAction(
+                CachedDefaults[.brightnessKeysControl],
+                mediaKey: mediaKey,
+                contrast: true,
+                lidClosed: lidClosed,
+                event: event
+            )
         case [.control, .shift, .option]:
-            handleBrightnessKeyAction(
+            return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysControl],
                 mediaKey: mediaKey,
                 by: 1,
                 contrast: true,
-                lidClosed: lidClosed
+                lidClosed: lidClosed,
+                event: event
             )
 
         default:
             log.info("Ignoring media key event")
             return event
         }
-
-        return nil
     }
 
     func isVolumeKey(_ mediaKey: MediaKey) -> Bool {
@@ -1031,7 +1104,9 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         guard isVolumeKey(mediaKey) else {
             let lidClosed = displayController.lidClosed || displayController.builtinDisplay == nil
-            return handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
+            let event = handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
+            if event != nil { log.debug("Forwarding brightness key event to the system") }
+            return event
         }
 
         switch mediaKey {

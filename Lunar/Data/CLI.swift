@@ -491,17 +491,29 @@ struct Lunar: ParsableCommand {
                     guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { globalExit(0) }
                     print(table)
                 case .RegisterForBrightnessChangeNotifications:
-                    DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
+                    let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
-                        print("\(displayID): \(value)")
+
+                        if let display = displayController.activeDisplays[displayID] {
+                            print("\(display) => \(value)")
+                        } else {
+                            print("\(displayID) => \(value)")
+                        }
                     }
+                    print("RegisterForBrightnessChangeNotifications result: \(result)")
                 case .RegisterForAmbientLightCompensationNotifications:
-                    DisplayServicesRegisterForAmbientLightCompensationNotifications(id, id) { _, observer, _, _, userInfo in
+                    let result = DisplayServicesRegisterForAmbientLightCompensationNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
-                        print("\(displayID): \(value)")
+
+                        if let display = displayController.activeDisplays[displayID] {
+                            print("\(display) => \(value)")
+                        } else {
+                            print("\(displayID) => \(value)")
+                        }
                     }
+                    print("RegisterForAmbientLightCompensationNotifications result: \(result)")
                 }
             }
             guard method != .RegisterForAmbientLightCompensationNotifications,

@@ -395,7 +395,7 @@
                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="volume-low" id="dSd-Gf-gBD"/>
                                                         <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                         <connections>
-                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.hasDDC" id="f18-6j-PYN">
+                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.showVolumeSlider" id="FSd-at-Vc7">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
@@ -432,12 +432,14 @@
                                                     <constraint firstItem="OaN-2H-RQX" firstAttribute="leading" secondItem="9t9-h6-nGA" secondAttribute="trailing" constant="-16" id="OjG-4c-Epq"/>
                                                     <constraint firstItem="5He-i1-Qvb" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="top" id="Rk2-Ng-fKP"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="HG8-fg-KZ5" secondAttribute="bottom" id="T16-IH-gny"/>
+                                                    <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="5He-i1-Qvb" secondAttribute="bottom" priority="495" constant="4" id="V4f-eI-ZIA"/>
                                                     <constraint firstItem="WXp-hm-NXm" firstAttribute="centerY" secondItem="wbs-Qz-lUz" secondAttribute="centerY" id="a3Z-b7-1Cf"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="wbs-Qz-lUz" secondAttribute="bottom" constant="4" id="ajP-EN-W2A"/>
                                                     <constraint firstAttribute="bottom" secondItem="sy4-S7-iPw" secondAttribute="bottom" priority="499" constant="5" id="b8r-wG-mnM"/>
                                                     <constraint firstItem="5VK-Ej-krq" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="cz4-Ga-Wfo"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="eDV-1v-TWg"/>
                                                     <constraint firstItem="DrO-3E-miA" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="fqp-Qk-Zbq"/>
+                                                    <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="HG8-fg-KZ5" secondAttribute="bottom" priority="496" constant="4" id="gSc-eT-mYZ"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="bottom" priority="499" id="je5-9H-JnM"/>
                                                     <constraint firstAttribute="bottom" secondItem="5VK-Ej-krq" secondAttribute="bottom" constant="5" id="ncJ-Hz-gpd"/>
                                                     <constraint firstItem="OaN-2H-RQX" firstAttribute="top" secondItem="DrO-3E-miA" secondAttribute="bottom" constant="6" id="saP-mI-b7E"/>
@@ -445,6 +447,7 @@
                                                 </constraints>
                                                 <connections>
                                                     <outlet property="orientationControl" destination="5VK-Ej-krq" id="58l-ut-4ch"/>
+                                                    <outlet property="volumeSlider" destination="wbs-Qz-lUz" id="PDd-BJ-Exz"/>
                                                 </connections>
                                             </tableCellView>
                                         </prototypeCellViews>
@@ -972,7 +975,7 @@
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="ean-37-l36"/>
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
-                                        <slider verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OSL-cA-38n" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                        <slider verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OSL-cA-38n" customClass="AutoRemovingSlider" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="66" y="66" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="vZz-v5-zRN"/>
@@ -990,6 +993,11 @@
                                             </sliderCell>
                                             <connections>
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseVolume" id="IjG-iY-7r4"/>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showVolumeSlider" id="lLV-fV-Cr6">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JaP-5h-FMy" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
@@ -1009,6 +1017,13 @@
                                             </contentFilters>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="volume-low" id="Alt-3Z-b1D"/>
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showVolumeSlider" id="XbE-uh-7fn">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
                                         </imageView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="13" y="0.0" width="115" height="13"/>
@@ -1056,6 +1071,8 @@
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="2" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
+                                        <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="pRg-MU-0kr" secondAttribute="bottom" priority="495" constant="4" id="Vfo-pT-RZi"/>
+                                        <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" priority="496" constant="4" id="WPP-K2-90h"/>
                                         <constraint firstItem="D87-Cq-r76" firstAttribute="leading" secondItem="Hup-6D-J0e" secondAttribute="leading" id="c7K-w6-Hov"/>
                                         <constraint firstItem="197-x4-S44" firstAttribute="centerY" secondItem="f0W-zX-TT0" secondAttribute="centerY" id="cp5-Sn-nAZ"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-16" id="cvs-CK-h0B"/>

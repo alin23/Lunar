@@ -520,6 +520,13 @@
                                                             <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOrientationInQuickActions" id="Y99-OV-dBk"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Show volume slider in Quick Actions" state="on" id="HeU-2X-veM">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showVolumeSlider" id="Y98-OV-dBk"/>
+                                                        </connections>
+                                                    </menuItem>
                                                     <menuItem title="Show brightness in menu bar" state="on" id="caW-3Z-SGn">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -6236,13 +6243,13 @@ Lunar will continue to check in the background</string>
         <scene sceneID="GTI-N2-9dZ">
             <objects>
                 <viewController storyboardIdentifier="SettingsPopoverController" id="21a-h6-6He" customClass="SettingsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="646"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="645"/>
                         <subviews>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwA-hL-Un1" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="300" height="191"/>
+                                <rect key="frame" x="0.0" y="0.0" width="300" height="189"/>
                                 <view key="contentView" id="yhm-tF-nP1">
-                                    <rect key="frame" x="1" y="1" width="298" height="189"/>
+                                    <rect key="frame" x="1" y="1" width="298" height="187"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TuO-c2-HDu">
@@ -6273,7 +6280,7 @@ Lunar will continue to check in the background</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
-                                            <rect key="frame" x="28" y="122" width="81" height="17"/>
+                                            <rect key="frame" x="28" y="122" width="81" height="15"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="77" id="X5b-OU-SYw"/>
                                             </constraints>
@@ -6284,7 +6291,7 @@ Lunar will continue to check in the background</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xk2-Yb-kYN">
-                                            <rect key="frame" x="21" y="157" width="153" height="25"/>
+                                            <rect key="frame" x="21" y="155" width="153" height="25"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="149" id="mw9-sl-9kR"/>
                                             </constraints>
@@ -6294,8 +6301,11 @@ Lunar will continue to check in the background</string>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <popUpButton focusRingType="none" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY">
-                                            <rect key="frame" x="127" y="118" width="158" height="26"/>
+                                        <popUpButton focusRingType="none" misplaced="YES" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY">
+                                            <rect key="frame" x="127" y="117" width="158" height="24"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="24" id="Dtu-re-9w0"/>
+                                            </constraints>
                                             <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="aGF-Pm-WQ9" id="Dst-oX-gLo">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystemBold"/>
@@ -6426,7 +6436,7 @@ Lunar will continue to check in the background</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
-                                <rect key="frame" x="22" y="605" width="179" height="25"/>
+                                <rect key="frame" x="22" y="614" width="179" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Enabled Controls" id="Ivu-gs-zlD">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -6434,7 +6444,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kap-E3-AbC">
-                                <rect key="frame" x="27" y="558" width="168" height="18"/>
+                                <rect key="frame" x="27" y="567" width="168" height="18"/>
                                 <buttonCell key="cell" type="check" title="Network (Raspberry Pi)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="zlB-32-Rul">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6444,7 +6454,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gQ1-Jv-FTC">
-                                <rect key="frame" x="27" y="538" width="215" height="18"/>
+                                <rect key="frame" x="27" y="547" width="215" height="18"/>
                                 <buttonCell key="cell" type="check" title="Apple Native (DisplayServices)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="ppm-z5-gWv">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6454,7 +6464,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YSi-X1-Nsf">
-                                <rect key="frame" x="27" y="518" width="126" height="18"/>
+                                <rect key="frame" x="27" y="527" width="126" height="18"/>
                                 <buttonCell key="cell" type="check" title="Hardware (DDC)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="BTR-Jw-BqR">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6464,7 +6474,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Tt-VZ-2bh">
-                                <rect key="frame" x="27" y="498" width="138" height="18"/>
+                                <rect key="frame" x="27" y="507" width="138" height="18"/>
                                 <buttonCell key="cell" type="check" title="Software Dimming" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6474,7 +6484,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rc0-ia-euE">
-                                <rect key="frame" x="22" y="580" width="200" height="26"/>
+                                <rect key="frame" x="22" y="589" width="200" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="196" id="Om7-JU-mwi"/>
                                     <constraint firstAttribute="height" constant="26" id="RN0-8F-zdH"/>
@@ -6488,7 +6498,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwA-hL-Un8" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="349" width="300" height="132"/>
+                                <rect key="frame" x="0.0" y="358" width="300" height="132"/>
                                 <view key="contentView" id="yhm-tF-nP8">
                                     <rect key="frame" x="1" y="1" width="298" height="130"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -6672,13 +6682,13 @@ when FaceLight is activated</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-UY-Ynz" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="200" width="300" height="140"/>
+                                <rect key="frame" x="0.0" y="198" width="300" height="151"/>
                                 <view key="contentView" id="MR1-5D-jfX">
-                                    <rect key="frame" x="1" y="1" width="298" height="138"/>
+                                    <rect key="frame" x="1" y="1" width="298" height="149"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="dLw-UF-aJD" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="50" y="32" width="198" height="38"/>
+                                            <rect key="frame" x="50" y="43" width="198" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="yDn-7c-fZj"/>
                                             </constraints>
@@ -6712,7 +6722,7 @@ when FaceLight is activated</string>
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sDs-j8-6hM">
-                                            <rect key="frame" x="21" y="79" width="240" height="26"/>
+                                            <rect key="frame" x="21" y="90" width="240" height="26"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="26" id="Yne-QO-DE5"/>
                                                 <constraint firstAttribute="width" constant="236" id="oaD-vP-d6L"/>
@@ -6726,7 +6736,7 @@ should rise or fall based on the adaptive input</string>
                                             </textFieldCell>
                                         </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="O8y-8c-iHO" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="56" y="47" width="12" height="12"/>
+                                            <rect key="frame" x="56" y="58" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="AQJ-gn-P2S"/>
                                                 <constraint firstAttribute="width" constant="12" id="ZXk-4b-TZA"/>
@@ -6760,7 +6770,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </imageView>
                                         <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="hJU-3S-kh0" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="50" y="2" width="198" height="38"/>
+                                            <rect key="frame" x="50" y="13" width="198" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="NRo-bd-0YP"/>
                                             </constraints>
@@ -6794,7 +6804,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="XM0-I5-whZ" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="54" y="16" width="14" height="14"/>
+                                            <rect key="frame" x="54" y="27" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="moh-la-Wa8"/>
                                                 <constraint firstAttribute="width" constant="14" id="x9d-Kf-NI5"/>
@@ -6828,17 +6838,43 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </imageView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Bd-iP-EOm">
-                                            <rect key="frame" x="21" y="104" width="128" height="25"/>
+                                            <rect key="frame" x="21" y="115" width="128" height="25"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Curve Slope" id="xzM-Oh-IbZ">
                                                 <font key="font" metaFont="systemHeavy" size="21"/>
                                                 <color key="textColor" name="Caption"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <popUpButton focusRingType="none" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="uMX-Bu-WIv">
+                                            <rect key="frame" x="70" y="-1" width="158" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="158" id="4YZ-Bl-22d"/>
+                                                <constraint firstAttribute="height" constant="20" id="u5K-OW-9H3"/>
+                                            </constraints>
+                                            <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="hq6-1O-WqP" id="VWy-cj-0YV">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <menu key="menu" id="7IN-Cx-Xrq">
+                                                    <items>
+                                                        <menuItem title="Item" state="on" tag="246" enabled="NO" id="hq6-1O-WqP">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <binding destination="21a-h6-6He" name="content" keyPath="self.display.otherDisplays" id="mCv-Xr-tOS">
+                                                    <dictionary key="options">
+                                                        <string key="NSNoSelectionPlaceholder">Copy from display</string>
+                                                        <string key="NSNullPlaceholder">Copy from display</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.copyFromDisplay" previousBinding="mCv-Xr-tOS" id="nWn-qn-5K7"/>
+                                            </connections>
+                                        </popUpButton>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="leading" secondItem="XM0-I5-whZ" secondAttribute="trailing" constant="-16" id="11y-jV-JIu"/>
-                                        <constraint firstAttribute="bottom" secondItem="hJU-3S-kh0" secondAttribute="bottom" constant="8" id="2x0-MY-Oo4"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="top" secondItem="dLw-UF-aJD" secondAttribute="bottom" id="7Fx-tX-ApG"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="centerY" secondItem="O8y-8c-iHO" secondAttribute="centerY" id="94B-dA-eAJ"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="leading" secondItem="MR1-5D-jfX" secondAttribute="leading" constant="52" id="Dk3-Eh-q6n"/>
@@ -6846,14 +6882,19 @@ should rise or fall based on the adaptive input</string>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="centerX" secondItem="dLw-UF-aJD" secondAttribute="centerX" id="LZ7-vc-oVr"/>
                                         <constraint firstItem="dLw-UF-aJD" firstAttribute="leading" secondItem="O8y-8c-iHO" secondAttribute="trailing" constant="-16" id="Pa7-x9-R75"/>
                                         <constraint firstAttribute="trailing" secondItem="dLw-UF-aJD" secondAttribute="trailing" constant="52" id="S4H-Ov-oPf"/>
+                                        <constraint firstItem="uMX-Bu-WIv" firstAttribute="top" secondItem="hJU-3S-kh0" secondAttribute="bottom" id="dj9-c6-g8z"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="width" secondItem="dLw-UF-aJD" secondAttribute="width" id="dvQ-vt-inW"/>
                                         <constraint firstItem="sDs-j8-6hM" firstAttribute="leading" secondItem="7Bd-iP-EOm" secondAttribute="leading" id="f3I-of-pCU"/>
                                         <constraint firstItem="sDs-j8-6hM" firstAttribute="top" secondItem="7Bd-iP-EOm" secondAttribute="bottom" constant="-1" id="fi3-3n-fDx"/>
+                                        <constraint firstItem="uMX-Bu-WIv" firstAttribute="centerX" secondItem="MR1-5D-jfX" secondAttribute="centerX" id="hbW-Fo-pPC"/>
                                         <constraint firstItem="7Bd-iP-EOm" firstAttribute="leading" secondItem="MR1-5D-jfX" secondAttribute="leading" constant="23" id="ih7-4M-UfV"/>
                                         <constraint firstItem="7Bd-iP-EOm" firstAttribute="top" secondItem="MR1-5D-jfX" secondAttribute="top" constant="9" id="lIw-73-Udq"/>
                                         <constraint firstItem="hJU-3S-kh0" firstAttribute="centerY" secondItem="XM0-I5-whZ" secondAttribute="centerY" id="tFA-6f-IGR"/>
                                     </constraints>
                                 </view>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="uMX-Bu-WIv" secondAttribute="bottom" id="Och-C1-hsO"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
                                         <real key="value" value="1"/>
@@ -6864,7 +6905,7 @@ should rise or fall based on the adaptive input</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <button focusRingType="none" verticalHuggingPriority="750" alphaValue="0.90000000000000002" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="de9-AH-qAA" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="172" y="497" width="114" height="20"/>
+                                <rect key="frame" x="172" y="506" width="114" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="TPP-Z2-UPv"/>
                                     <constraint firstAttribute="width" constant="114" id="vBJ-mQ-zoj"/>
@@ -9275,12 +9316,12 @@ to send arbitrary DDC commands to monitors</string>
         <scene sceneID="7ik-2e-ouh">
             <objects>
                 <viewController storyboardIdentifier="DDCPopoverController" id="JzB-v1-VXs" customClass="DDCPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="O4f-dy-3wr">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="477"/>
+                    <view key="view" misplaced="YES" id="O4f-dy-3wr">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="548"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="FfO-ZH-c2f" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="69" y="193" width="220" height="28"/>
+                                <rect key="frame" x="69" y="250" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="LJr-xX-dmx"/>
                                     <constraint firstAttribute="width" constant="216" id="kag-7I-K1i"/>
@@ -9311,7 +9352,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="vk0-hY-IKP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="69" y="158" width="220" height="28"/>
+                                <rect key="frame" x="69" y="215" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="3jE-0L-5SR"/>
                                     <constraint firstAttribute="width" constant="216" id="Oys-zz-Dk3"/>
@@ -9342,7 +9383,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="zMc-kW-K8Z" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="69" y="123" width="220" height="28"/>
+                                <rect key="frame" x="69" y="180" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="216" id="XpA-5J-BOt"/>
                                     <constraint firstAttribute="height" constant="20" id="sL9-5x-ss5"/>
@@ -9373,7 +9414,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E6J-H0-wkE">
-                                <rect key="frame" x="13" y="438" width="130" height="25"/>
+                                <rect key="frame" x="13" y="495" width="130" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Value Range" id="ZHG-Ld-rF6">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9381,7 +9422,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l2v-Yw-wzp">
-                                <rect key="frame" x="13" y="201" width="32" height="17"/>
+                                <rect key="frame" x="13" y="258" width="32" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Red" id="ozc-LV-TXs">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9389,7 +9430,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bJS-rP-OSB">
-                                <rect key="frame" x="13" y="166" width="47" height="17"/>
+                                <rect key="frame" x="13" y="223" width="47" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Green" id="JD1-HI-8zA">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9397,7 +9438,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zlO-DT-D1a">
-                                <rect key="frame" x="13" y="131" width="36" height="17"/>
+                                <rect key="frame" x="13" y="188" width="36" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Blue" id="ySc-3w-PM6">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9405,7 +9446,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BW5-MP-UeP" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="221" y="439" width="66" height="22"/>
+                                <rect key="frame" x="221" y="496" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="GeQ-IP-z7o"/>
                                     <constraint firstAttribute="width" constant="66" id="SV4-QB-Cwn"/>
@@ -9433,7 +9474,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y6b-dB-TTa">
-                                <rect key="frame" x="13" y="258" width="154" height="25"/>
+                                <rect key="frame" x="13" y="315" width="154" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="LED Color Gain" id="rjA-HG-yD0">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9441,7 +9482,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tNH-AR-h2N" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="221" y="259" width="66" height="22"/>
+                                <rect key="frame" x="221" y="316" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Bfe-NJ-1zA"/>
                                     <constraint firstAttribute="height" constant="22" id="LJV-Em-W5k"/>
@@ -9469,7 +9510,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DNx-3H-95T">
-                                <rect key="frame" x="13" y="381" width="83" height="17"/>
+                                <rect key="frame" x="13" y="438" width="83" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness" id="2CF-Pm-IsZ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9477,7 +9518,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cAV-vg-GMw">
-                                <rect key="frame" x="13" y="346" width="67" height="17"/>
+                                <rect key="frame" x="13" y="403" width="67" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Contrast" id="gEc-Hh-2yT">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9485,7 +9526,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y8V-a2-Kyk">
-                                <rect key="frame" x="13" y="313" width="58" height="17"/>
+                                <rect key="frame" x="13" y="370" width="58" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Volume" id="kgf-Se-ewT">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9493,7 +9534,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DZc-3H-qPr" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="340" width="60" height="28"/>
+                                <rect key="frame" x="227" y="397" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="NrR-7U-ilM"/>
                                     <constraint firstAttribute="height" constant="28" id="g0a-Eo-GJK"/>
@@ -9525,7 +9566,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v71-fh-wyY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="307" width="60" height="28"/>
+                                <rect key="frame" x="148" y="364" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="1PP-Dd-tQv"/>
                                     <constraint firstAttribute="width" constant="60" id="TYG-Fv-CHz"/>
@@ -9557,7 +9598,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ck2-cV-HqR" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="307" width="60" height="28"/>
+                                <rect key="frame" x="227" y="364" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="oO2-C4-V4g"/>
                                     <constraint firstAttribute="height" constant="28" id="uX8-l5-GkE"/>
@@ -9589,7 +9630,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbi-XG-kgW" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="340" width="60" height="28"/>
+                                <rect key="frame" x="148" y="397" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="XSi-Ne-5p9"/>
                                     <constraint firstAttribute="height" constant="28" id="zKu-EU-n0p"/>
@@ -9621,7 +9662,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fTD-mn-mNa" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="375" width="60" height="28"/>
+                                <rect key="frame" x="148" y="432" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="Z8T-oR-wWR"/>
                                     <constraint firstAttribute="width" constant="60" id="r5L-UV-6qI"/>
@@ -9653,7 +9694,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t3p-DW-pd4" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="375" width="60" height="28"/>
+                                <rect key="frame" x="227" y="432" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="AAG-ts-vtJ"/>
                                     <constraint firstAttribute="width" constant="60" id="RdU-ao-mtz"/>
@@ -9685,7 +9726,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fFF-ZM-Emx" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="71" y="92" width="216" height="22"/>
+                                <rect key="frame" x="71" y="149" width="216" height="22"/>
                                 <string key="toolTip">Try to fetch color gain values from the monitor using DDC.
 
 Caution! In rare cases it can cause a kernel panic and you might need to restart your device if it happens.</string>
@@ -9710,7 +9751,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHL-jq-7ru">
-                                <rect key="frame" x="211" y="381" width="13" height="17"/>
+                                <rect key="frame" x="211" y="438" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="p67-IV-Ymq">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9718,7 +9759,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SYN-qO-cgY">
-                                <rect key="frame" x="211" y="346" width="13" height="17"/>
+                                <rect key="frame" x="211" y="403" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="xNn-uT-xof">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9726,7 +9767,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iNk-3R-8Rl">
-                                <rect key="frame" x="211" y="313" width="13" height="17"/>
+                                <rect key="frame" x="211" y="370" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="a2A-cT-rIe">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9734,7 +9775,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sye-Nf-IV1">
-                                <rect key="frame" x="13" y="414" width="179" height="26"/>
+                                <rect key="frame" x="13" y="471" width="179" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="175" id="fKp-u4-bpp"/>
                                     <constraint firstAttribute="height" constant="26" id="oh2-5Y-iCl"/>
@@ -9748,7 +9789,7 @@ ranges different than 0 - 100</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QDa-PD-wyQ">
-                                <rect key="frame" x="13" y="234" width="183" height="26"/>
+                                <rect key="frame" x="13" y="291" width="183" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="179" id="TxT-6B-7pn"/>
                                     <constraint firstAttribute="height" constant="26" id="hWu-X3-I0n"/>
@@ -9762,7 +9803,7 @@ the LED backlight of the monitor</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k4C-cA-Pqe">
-                                <rect key="frame" x="173" y="44" width="32" height="16"/>
+                                <rect key="frame" x="173" y="101" width="32" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="ThN-m4-ztK"/>
                                     <constraint firstAttribute="height" constant="16" id="b8t-VQ-oGm"/>
@@ -9774,7 +9815,7 @@ the LED backlight of the monitor</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10M-jG-PSH">
-                                <rect key="frame" x="257" y="44" width="38" height="16"/>
+                                <rect key="frame" x="257" y="101" width="38" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="S5p-UU-HO0"/>
                                     <constraint firstAttribute="width" constant="34" id="k3L-Ja-8qd"/>
@@ -9786,7 +9827,7 @@ the LED backlight of the monitor</string>
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5xI-sa-EcU" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="206" y="39" width="50" height="26"/>
+                                <rect key="frame" x="206" y="96" width="50" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="5Jw-va-D4H"/>
                                 </constraints>
@@ -9803,7 +9844,7 @@ the LED backlight of the monitor</string>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GDr-wf-jzJ">
-                                <rect key="frame" x="13" y="47" width="131" height="25"/>
+                                <rect key="frame" x="13" y="104" width="131" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Volume OSD" id="QIs-5U-LoH">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9811,7 +9852,7 @@ the LED backlight of the monitor</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LUX-64-DtM">
-                                <rect key="frame" x="13" y="23" width="154" height="26"/>
+                                <rect key="frame" x="13" y="80" width="154" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="NDQ-Ta-pHj"/>
                                     <constraint firstAttribute="height" constant="26" id="dV2-xc-AOZ"/>
@@ -9824,8 +9865,72 @@ monitor OSD appears over it</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RPr-NW-Qx6">
+                                <rect key="frame" x="173" y="39" width="32" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="cu8-5N-tIK"/>
+                                    <constraint firstAttribute="height" constant="16" id="ozi-yS-o7L"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Hide" id="74d-cp-L64">
+                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <color key="textColor" name="Caption Secondary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZDJ-FM-LCR">
+                                <rect key="frame" x="257" y="39" width="38" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="34" id="gUl-F1-tZQ"/>
+                                    <constraint firstAttribute="height" constant="16" id="r4h-of-lBK"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Show" id="B1c-mZ-NAU">
+                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <color key="textColor" name="Caption Secondary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="yRy-M9-7Ef" customClass="MacToggle" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="206" y="34" width="50" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="26" id="6sg-iS-dfQ"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                                        <color key="value" red="1" green="0.71891602710000002" blue="0.19021045919999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="outlineWidth">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="outlineColor">
+                                        <color key="value" red="0.50528805269999999" green="0.27399530750000001" blue="0.15303031550000001" alpha="0.1508950745" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YC7-3Y-dfA">
+                                <rect key="frame" x="13" y="42" width="145" height="25"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Volume Slider" id="mdU-l4-Uml">
+                                    <font key="font" metaFont="systemHeavy" size="21"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yKc-wq-QpC">
+                                <rect key="frame" x="13" y="18" width="154" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="HrF-eU-Ehv"/>
+                                    <constraint firstAttribute="height" constant="26" id="Ut1-9Z-Ibj"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="clipping" id="WWL-UE-amq">
+                                    <font key="font" metaFont="systemSemibold" size="10"/>
+                                    <string key="title">Show/hide the volume slider
+in the Quick Actions menu</string>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="yRy-M9-7Ef" firstAttribute="leading" secondItem="RPr-NW-Qx6" secondAttribute="trailing" constant="3" id="3M0-4E-uja"/>
                             <constraint firstItem="E6J-H0-wkE" firstAttribute="leading" secondItem="O4f-dy-3wr" secondAttribute="leading" constant="15" id="3aH-OX-YMm"/>
                             <constraint firstItem="LUX-64-DtM" firstAttribute="top" secondItem="5xI-sa-EcU" secondAttribute="bottom" constant="-10" id="3jB-Ee-PyT"/>
                             <constraint firstItem="fFF-ZM-Emx" firstAttribute="width" secondItem="zMc-kW-K8Z" secondAttribute="width" id="3we-RC-cKM"/>
@@ -9835,10 +9940,13 @@ monitor OSD appears over it</string>
                             <constraint firstItem="SYN-qO-cgY" firstAttribute="centerY" secondItem="Qbi-XG-kgW" secondAttribute="centerY" id="6bz-Rw-v5W"/>
                             <constraint firstItem="fFF-ZM-Emx" firstAttribute="top" secondItem="zMc-kW-K8Z" secondAttribute="bottom" constant="15" id="7Yy-Fs-S46"/>
                             <constraint firstItem="zMc-kW-K8Z" firstAttribute="centerX" secondItem="vk0-hY-IKP" secondAttribute="centerX" id="7uJ-5Z-fV5"/>
+                            <constraint firstItem="yKc-wq-QpC" firstAttribute="leading" secondItem="YC7-3Y-dfA" secondAttribute="leading" id="8MZ-yE-Jjy"/>
                             <constraint firstItem="DZc-3H-qPr" firstAttribute="centerY" secondItem="Qbi-XG-kgW" secondAttribute="centerY" id="8xt-LI-cFh"/>
+                            <constraint firstItem="YC7-3Y-dfA" firstAttribute="leading" secondItem="GDr-wf-jzJ" secondAttribute="leading" id="92t-P5-OqC"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="centerY" secondItem="zMc-kW-K8Z" secondAttribute="centerY" id="9w3-BS-1Qf"/>
                             <constraint firstItem="v71-fh-wyY" firstAttribute="centerY" secondItem="Y8V-a2-Kyk" secondAttribute="centerY" id="CBo-DG-vku"/>
                             <constraint firstItem="sye-Nf-IV1" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="CuV-MP-LaU"/>
+                            <constraint firstAttribute="bottom" secondItem="yKc-wq-QpC" secondAttribute="bottom" constant="18" id="Dei-k0-OfR"/>
                             <constraint firstItem="vk0-hY-IKP" firstAttribute="centerX" secondItem="FfO-ZH-c2f" secondAttribute="centerX" id="DkY-Ww-bIt"/>
                             <constraint firstItem="Y8V-a2-Kyk" firstAttribute="top" secondItem="cAV-vg-GMw" secondAttribute="bottom" constant="16" id="EpC-5R-DoP"/>
                             <constraint firstItem="cAV-vg-GMw" firstAttribute="leading" secondItem="DNx-3H-95T" secondAttribute="leading" id="GKh-GV-wir"/>
@@ -9846,13 +9954,18 @@ monitor OSD appears over it</string>
                             <constraint firstItem="zMc-kW-K8Z" firstAttribute="top" secondItem="vk0-hY-IKP" secondAttribute="bottom" constant="15" id="HJG-Ae-V45"/>
                             <constraint firstItem="uHL-jq-7ru" firstAttribute="centerY" secondItem="fTD-mn-mNa" secondAttribute="centerY" id="IRY-yr-3Ay"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="leading" secondItem="O4f-dy-3wr" secondAttribute="leading" constant="15" id="JFP-3E-e2e"/>
+                            <constraint firstItem="YC7-3Y-dfA" firstAttribute="top" secondItem="LUX-64-DtM" secondAttribute="bottom" constant="13" id="JVo-lN-owC"/>
                             <constraint firstItem="uHL-jq-7ru" firstAttribute="leading" secondItem="fTD-mn-mNa" secondAttribute="trailing" constant="5" id="KQG-16-5zc"/>
                             <constraint firstItem="10M-jG-PSH" firstAttribute="leading" secondItem="5xI-sa-EcU" secondAttribute="trailing" constant="3" id="Kch-6w-ehi"/>
+                            <constraint firstItem="yKc-wq-QpC" firstAttribute="top" secondItem="YC7-3Y-dfA" secondAttribute="bottom" constant="-2" id="Kkp-Zb-Aww"/>
                             <constraint firstItem="DNx-3H-95T" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="Kps-mu-HII"/>
                             <constraint firstItem="bJS-rP-OSB" firstAttribute="centerY" secondItem="vk0-hY-IKP" secondAttribute="centerY" id="LpW-6f-T5k"/>
+                            <constraint firstItem="yKc-wq-QpC" firstAttribute="top" secondItem="yRy-M9-7Ef" secondAttribute="bottom" constant="-10" id="MHj-4o-Njl"/>
+                            <constraint firstItem="ZDJ-FM-LCR" firstAttribute="centerY" secondItem="yRy-M9-7Ef" secondAttribute="centerY" id="MbU-JP-k7s"/>
                             <constraint firstItem="sye-Nf-IV1" firstAttribute="top" secondItem="E6J-H0-wkE" secondAttribute="bottom" constant="-2" id="MrJ-BO-whS"/>
                             <constraint firstItem="k4C-cA-Pqe" firstAttribute="leading" secondItem="GDr-wf-jzJ" secondAttribute="trailing" constant="33" id="Pcj-xg-4JK"/>
                             <constraint firstItem="DZc-3H-qPr" firstAttribute="leading" secondItem="Qbi-XG-kgW" secondAttribute="trailing" constant="19" id="PmH-ju-J63"/>
+                            <constraint firstItem="RPr-NW-Qx6" firstAttribute="leading" secondItem="k4C-cA-Pqe" secondAttribute="leading" id="RDy-RZ-59q"/>
                             <constraint firstItem="t3p-DW-pd4" firstAttribute="leading" secondItem="uHL-jq-7ru" secondAttribute="trailing" constant="5" id="RJx-P7-bsL"/>
                             <constraint firstItem="tNH-AR-h2N" firstAttribute="trailing" secondItem="FfO-ZH-c2f" secondAttribute="trailing" id="Ta6-jv-RxJ"/>
                             <constraint firstItem="ck2-cV-HqR" firstAttribute="leading" secondItem="v71-fh-wyY" secondAttribute="trailing" constant="19" id="UfB-sd-5ou"/>
@@ -9863,6 +9976,7 @@ monitor OSD appears over it</string>
                             <constraint firstItem="tNH-AR-h2N" firstAttribute="centerY" secondItem="Y6b-dB-TTa" secondAttribute="centerY" id="XbM-o2-fvX"/>
                             <constraint firstItem="SYN-qO-cgY" firstAttribute="leading" secondItem="Qbi-XG-kgW" secondAttribute="trailing" constant="5" id="Xvc-8U-rap"/>
                             <constraint firstItem="bJS-rP-OSB" firstAttribute="leading" secondItem="O4f-dy-3wr" secondAttribute="leading" constant="15" id="ZoI-G0-zau"/>
+                            <constraint firstItem="yKc-wq-QpC" firstAttribute="width" secondItem="LUX-64-DtM" secondAttribute="width" id="ZxM-NP-bl1"/>
                             <constraint firstItem="vk0-hY-IKP" firstAttribute="top" secondItem="FfO-ZH-c2f" secondAttribute="bottom" constant="15" id="b7S-IM-O2v"/>
                             <constraint firstItem="E6J-H0-wkE" firstAttribute="top" secondItem="O4f-dy-3wr" secondAttribute="top" constant="14" id="bqw-7X-wkj"/>
                             <constraint firstAttribute="trailing" secondItem="10M-jG-PSH" secondAttribute="trailing" constant="7" id="cPf-fw-RJX"/>
@@ -9876,14 +9990,15 @@ monitor OSD appears over it</string>
                             <constraint firstItem="l2v-Yw-wzp" firstAttribute="top" secondItem="Y6b-dB-TTa" secondAttribute="bottom" constant="40" id="h9W-u1-Sxj"/>
                             <constraint firstItem="10M-jG-PSH" firstAttribute="centerY" secondItem="5xI-sa-EcU" secondAttribute="centerY" id="hJI-dN-tjx"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="leading" secondItem="bJS-rP-OSB" secondAttribute="leading" id="igT-c1-MmT"/>
+                            <constraint firstItem="ZDJ-FM-LCR" firstAttribute="leading" secondItem="yRy-M9-7Ef" secondAttribute="trailing" constant="3" id="k2v-AA-9aZ"/>
                             <constraint firstItem="ck2-cV-HqR" firstAttribute="leading" secondItem="iNk-3R-8Rl" secondAttribute="trailing" constant="5" id="l80-Zv-DSb"/>
                             <constraint firstItem="cAV-vg-GMw" firstAttribute="top" secondItem="DNx-3H-95T" secondAttribute="bottom" constant="18" id="lBa-EU-teb"/>
                             <constraint firstItem="k4C-cA-Pqe" firstAttribute="centerY" secondItem="5xI-sa-EcU" secondAttribute="centerY" id="lU6-eS-h9Z"/>
                             <constraint firstItem="Y6b-dB-TTa" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="laD-Hv-oER"/>
                             <constraint firstItem="iNk-3R-8Rl" firstAttribute="centerY" secondItem="v71-fh-wyY" secondAttribute="centerY" id="mJz-OW-Kgv"/>
                             <constraint firstItem="BW5-MP-UeP" firstAttribute="centerY" secondItem="E6J-H0-wkE" secondAttribute="centerY" id="mPi-ga-Yar"/>
-                            <constraint firstAttribute="bottom" secondItem="LUX-64-DtM" secondAttribute="bottom" constant="23" id="mve-sp-bOU"/>
                             <constraint firstAttribute="trailing" secondItem="ck2-cV-HqR" secondAttribute="trailing" constant="13" id="nSZ-Mn-EW0"/>
+                            <constraint firstItem="ZDJ-FM-LCR" firstAttribute="trailing" secondItem="10M-jG-PSH" secondAttribute="trailing" id="nYc-A7-YIp"/>
                             <constraint firstItem="QDa-PD-wyQ" firstAttribute="leading" secondItem="Y6b-dB-TTa" secondAttribute="leading" id="oEY-mM-YQx"/>
                             <constraint firstItem="t3p-DW-pd4" firstAttribute="leading" secondItem="fTD-mn-mNa" secondAttribute="trailing" constant="19" id="oiG-W8-m8L"/>
                             <constraint firstItem="BW5-MP-UeP" firstAttribute="trailing" secondItem="t3p-DW-pd4" secondAttribute="trailing" id="qIB-jI-XWp"/>
@@ -9893,6 +10008,7 @@ monitor OSD appears over it</string>
                             <constraint firstItem="l2v-Yw-wzp" firstAttribute="centerY" secondItem="FfO-ZH-c2f" secondAttribute="centerY" id="slO-qs-7l9"/>
                             <constraint firstItem="Qbi-XG-kgW" firstAttribute="centerY" secondItem="cAV-vg-GMw" secondAttribute="centerY" id="tLZ-BB-y9N"/>
                             <constraint firstItem="GDr-wf-jzJ" firstAttribute="top" secondItem="fFF-ZM-Emx" secondAttribute="bottom" constant="20" id="vSU-Jz-yuR"/>
+                            <constraint firstItem="RPr-NW-Qx6" firstAttribute="centerY" secondItem="yRy-M9-7Ef" secondAttribute="centerY" id="wvh-iU-0Up"/>
                             <constraint firstItem="ck2-cV-HqR" firstAttribute="centerY" secondItem="v71-fh-wyY" secondAttribute="centerY" id="xuM-ab-VK0"/>
                             <constraint firstItem="Y8V-a2-Kyk" firstAttribute="leading" secondItem="cAV-vg-GMw" secondAttribute="leading" id="yLn-1B-pZE"/>
                         </constraints>
@@ -9905,12 +10021,13 @@ monitor OSD appears over it</string>
                         <outlet property="minDDCContrastField" destination="Qbi-XG-kgW" id="Va0-F9-3cE"/>
                         <outlet property="minDDCVolumeField" destination="v71-fh-wyY" id="Hhg-3k-GMO"/>
                         <outlet property="volumeOSDToggle" destination="5xI-sa-EcU" id="Dx9-ru-Wni"/>
+                        <outlet property="volumeSliderToggle" destination="yRy-M9-7Ef" id="mQy-u9-Ejh"/>
                     </connections>
                 </viewController>
                 <customObject id="1pi-0N-jDy" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="Dbr-0G-VB7"/>
             </objects>
-            <point key="canvasLocation" x="453" y="3541"/>
+            <point key="canvasLocation" x="453" y="3576"/>
         </scene>
         <!--Reset Popover Controller-->
         <scene sceneID="5Jz-Rc-ASq">

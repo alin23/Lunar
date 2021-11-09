@@ -24,6 +24,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .colorScheme,
     .advancedSettingsShown,
     .mergeBrightnessContrast,
+    .showVolumeSlider,
     .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
     .accessibilityPermissionsGranted,
@@ -557,6 +558,7 @@ func initCache() {
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
     cacheKey(.mergeBrightnessContrast)
+    cacheKey(.showVolumeSlider)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
     cacheKey(.showTwoSchedules)
@@ -652,6 +654,7 @@ extension Defaults.Keys {
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
+    static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
@@ -768,6 +771,7 @@ let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientation
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mergeBrightnessContrastPublisher = Defaults.publisher(.mergeBrightnessContrast).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let showVolumeSliderPublisher = Defaults.publisher(.showVolumeSlider).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let lunarProActivePublisher = Defaults.publisher(.lunarProActive).removeDuplicates().filter { $0.oldValue != $0.newValue }
