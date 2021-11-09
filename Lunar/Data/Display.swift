@@ -408,6 +408,7 @@ enum ValueType {
         self.volume = volume
         preciseVolume = volume.doubleValue / 100.0
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
+        canChangeVolume = (try container.decodeIfPresent(Bool.self, forKey: .canChangeVolume)) ?? true
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
@@ -700,6 +701,7 @@ enum ValueType {
         case brightness
         case volume
         case audioMuted
+        case canChangeVolume
         case power
         case active
         case responsiveDDC
@@ -752,6 +754,7 @@ enum ValueType {
             .lockedBrightnessCurve,
             .lockedContrastCurve,
             .audioMuted,
+            .canChangeVolume,
             .power,
             .useOverlay,
             .alwaysUseNetworkControl,
@@ -820,6 +823,7 @@ enum ValueType {
             .brightness,
             .volume,
             .audioMuted,
+            .canChangeVolume,
             .power,
             .input,
             .hotkeyInput1,
@@ -1170,6 +1174,10 @@ enum ValueType {
         @objc dynamic lazy var showOrientation: Bool = canRotate && CachedDefaults[.showOrientationInQuickActions]
     #endif
 
+    // #if DEBUG
+    //     @objc dynamic lazy var showVolumeSlider: Bool = CachedDefaults[.showVolumeSlider]
+    // #else
+    @objc dynamic lazy var showVolumeSlider: Bool = canChangeVolume && CachedDefaults[.showVolumeSlider]
     lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
     lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
 
@@ -1181,6 +1189,17 @@ enum ValueType {
     var preciseBrightnessContrastBeforeAppPreset: Double = 0.5
 
     @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name)
+
+    @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
+
+    // #endif
+
+    @Published @objc dynamic var canChangeVolume: Bool = true {
+        didSet {
+            showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
+            save()
+        }
+    }
 
     var noControls: Bool {
         guard let control = control else { return true }
@@ -1288,7 +1307,7 @@ enum ValueType {
     }
 
     override var description: String {
-        "\(name)[\(serial): \(id)]"
+        "\(name) [ID \(id)]"
     }
 
     override var hash: Int {
@@ -2151,6 +2170,18 @@ enum ValueType {
         }
     }
 
+    @objc dynamic var copyFromDisplay: Display? = nil {
+        didSet {
+            guard let display = copyFromDisplay else { return }
+            defer { mainAsyncAfter(ms: 200) { self.copyFromDisplay = nil }}
+
+            brightnessCurveFactors = display.brightnessCurveFactors
+            contrastCurveFactors = display.contrastCurveFactors
+            sliderBrightnessCurveFactor = display.sliderBrightnessCurveFactor
+            sliderContrastCurveFactor = display.sliderContrastCurveFactor
+        }
+    }
+
     @objc dynamic var noDDCOrMergedBrightnessContrast: Bool { !hasDDC || CachedDefaults[.mergeBrightnessContrast] }
 
     @Published @objc dynamic var hasDDC: Bool = false {
@@ -2474,10 +2505,9 @@ enum ValueType {
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return false }
+        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
-        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] = true }
-        DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
+        let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
             guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
             let id = CGDirectDisplayID(UInt(bitPattern: observer))
             guard let display = displayController.activeDisplays[id] else {
@@ -2492,8 +2522,9 @@ enum ValueType {
                 mainThread { display.brightness = newBrightness.ns }
             }
         }
+        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] = (result == KERN_SUCCESS) }
 
-        return true
+        return result == KERN_SUCCESS
     }
 
     static func getThreadDictValue(_ id: CGDirectDisplayID, type: String) -> Any? {
@@ -3020,8 +3051,7 @@ enum ValueType {
 
         control = getBestControl()
 
-        _ = observeBrightnessChangeDS()
-        guard isSmartBuiltin, !hasBrightnessChangeObserver else { return }
+        guard isSmartBuiltin, !observeBrightnessChangeDS(), !hasBrightnessChangeObserver else { return }
         asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
                 timer.tolerance = 10
@@ -3212,16 +3242,19 @@ enum ValueType {
             resetSoftwareControl()
         }
 
-        withForce {
-            #if DEBUG
-                log.debug("Setting brightness to \(brightness) for \(description)")
-            #endif
-            brightness = brightness.uint8Value.ns
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            self.withForce {
+                #if DEBUG
+                    log.debug("Setting brightness to \(self.brightness) for \(self.description)")
+                #endif
+                self.brightness = self.brightness.uint8Value.ns
 
-            #if DEBUG
-                log.debug("Setting contrast to \(contrast) for \(description)")
-            #endif
-            contrast = contrast.uint8Value.ns
+                #if DEBUG
+                    log.debug("Setting contrast to \(self.contrast) for \(self.description)")
+                #endif
+                self.contrast = self.contrast.uint8Value.ns
+            }
         }
     }
 
@@ -3342,6 +3375,7 @@ enum ValueType {
             try container.encode(active, forKey: .active)
             try container.encode(adaptive, forKey: .adaptive)
             try container.encode(audioMuted, forKey: .audioMuted)
+            try container.encode(canChangeVolume, forKey: .canChangeVolume)
             try container.encode(brightness.uint8Value, forKey: .brightness)
             try container.encode(contrast.uint8Value, forKey: .contrast)
             try container.encode(edidName, forKey: .edidName)

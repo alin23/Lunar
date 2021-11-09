@@ -64,14 +64,23 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
             guard let self = self else { return }
             self.table.intercellSpacing = NSSize(width: 0, height: !self.displays.isEmpty ? 20 : 0)
             let merged = CachedDefaults[.mergeBrightnessContrast]
-            var height = sum(self.displays.map { $0.hasDDC ? ((merged ? 120 : 150) + ($0.showOrientation ? 30 : 0)) : 80 }) +
-                (self.table.intercellSpacing.height * CGFloat(self.displays.count))
+            var height = sum(self.displays.map { display in
+                guard display.hasDDC else { return 80 }
+
+                let orientationHeight: CGFloat = (display.showOrientation ? 40 : 0)
+                let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
+                return (merged ? 60 : 90) + volumeHeight + orientationHeight
+            }) + (self.table.intercellSpacing.height * CGFloat(self.displays.count))
 
             if let display = self.display {
+                let orientationHeight: CGFloat = (display.showOrientation ? 30 : 0)
+                let appPresetHeight: CGFloat = (display.appPreset != nil ? 20 : 0)
                 if display.hasDDC {
-                    height += 114 + (display.showOrientation ? 30 : 0) + (display.appPreset != nil ? 20 : 0) + (merged ? 0 : 30)
+                    let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
+                    let contrastHeight: CGFloat = (merged ? 0 : 30)
+                    height += 90 + volumeHeight + orientationHeight + appPresetHeight + contrastHeight
                 } else {
-                    height += 60 + (display.showOrientation ? 20 : 0) + (display.appPreset != nil ? 20 : 0)
+                    height += 60 + orientationHeight + appPresetHeight
                 }
             }
 
@@ -89,13 +98,17 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 
 class CellWithDDC: NSTableCellView {
     @IBOutlet var orientationControl: NSSegmentedControl?
+    @IBOutlet var volumeSlider: Slider?
 
     override var objectValue: Any? {
         didSet {
-            guard let display = objectValue as? Display, let orientationControl = orientationControl else { return }
+            guard let display = objectValue as? Display else { return }
 
             if !display.showOrientation {
-                orientationControl.removeFromSuperview()
+                orientationControl?.removeFromSuperview()
+            }
+            if !display.showVolumeSlider {
+                volumeSlider?.removeFromSuperview()
             }
         }
     }

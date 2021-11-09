@@ -17,6 +17,7 @@ class DDCPopoverController: NSViewController {
     @IBOutlet var minDDCVolumeField: ScrollableTextField!
 
     @IBOutlet var volumeOSDToggle: MacToggle!
+    @IBOutlet var volumeSliderToggle: MacToggle!
 
     @objc dynamic weak var display: Display? {
         didSet {
@@ -25,6 +26,7 @@ class DDCPopoverController: NSViewController {
             }
 
             volumeOSDToggle.toggleWithoutCallback(value: display.showVolumeOSD)
+            volumeSliderToggle.toggleWithoutCallback(value: display.canChangeVolume)
         }
     }
 
@@ -52,6 +54,15 @@ class DDCPopoverController: NSViewController {
             guard let self = self else { return }
             self.volumeOSDToggle.toggleWithoutCallback(value: value)
         }.store(in: &displayObservers, for: "showVolumeOSD")
+
+        volumeSliderToggle.callback = { [weak self] isOn in
+            guard let self = self, let display = self.display else { return }
+            display.canChangeVolume = isOn
+        }
+        display.$canChangeVolume.sink { [weak self] value in
+            guard let self = self else { return }
+            self.volumeSliderToggle.toggleWithoutCallback(value: value)
+        }.store(in: &displayObservers, for: "canChangeVolume")
 
         mainAsync { [weak self] in
             guard let self = self else { return }
