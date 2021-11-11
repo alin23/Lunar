@@ -204,6 +204,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memoryUsageChecker: Foundation.Thread?
 
+    lazy var needsAccessibilityPermissions = CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] ||
+        !(CachedDefaults[.appExceptions]?.isEmpty ?? true)
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -422,7 +425,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         setKeyEquivalents(hotkeys)
-        startOrRestartMediaKeyTap(checkPermissions: !datastore.shouldOnboard)
+        startOrRestartMediaKeyTap(checkPermissions: !datastore.shouldOnboard && needsAccessibilityPermissions)
     }
 
     func listenForAdaptiveModeChange() {

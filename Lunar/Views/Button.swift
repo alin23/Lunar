@@ -40,6 +40,8 @@ class Button: NSButton {
 
     lazy var highlighterKey: String = "highlighter-\(accessibilityIdentifier())"
 
+    @IBInspectable dynamic var handCursor = true
+
     @IBInspectable var horizontalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
     @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
     @IBInspectable var color: NSColor = .clear { didSet { mainAsync { [self] in bg = color }}}
@@ -84,11 +86,23 @@ class Button: NSButton {
         }
     }
 
+    @IBInspectable dynamic var disabledAlphaOffset: CGFloat = -0.3 {
+        didSet {
+            guard !grayDisabledText else { return }
+            mainAsync { [self] in
+                alphaValue = isEnabled ? alpha : alpha + disabledAlphaOffset
+                if alternateTitleWhenDisabled {
+                    attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                }
+            }
+        }
+    }
+
     override var isEnabled: Bool {
         didSet {
             guard !grayDisabledText else { return }
             mainAsync { [self] in
-                alphaValue = isEnabled ? alpha : alpha - 0.3
+                alphaValue = isEnabled ? alpha : alpha + disabledAlphaOffset
                 if alternateTitleWhenDisabled {
                     attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
                 }
@@ -224,7 +238,7 @@ class Button: NSButton {
     }
 
     override func cursorUpdate(with _: NSEvent) {
-        if isEnabled {
+        if isEnabled, handCursor {
             NSCursor.pointingHand.set()
         }
     }

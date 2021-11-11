@@ -384,6 +384,15 @@ class DisplayController {
                 lowprioQueue.cancel(timer: task)
             }
         }.store(in: &observers)
+
+        showSliderValuesPublisher.sink { [self] _ in
+            mainAsync { menuPopover?.close() }
+        }.store(in: &observers)
+
+        mergeBrightnessContrastPublisher.sink { [self] _ in
+            mainAsync { menuPopover?.close() }
+        }.store(in: &observers)
+
         showOrientationInQuickActionsPublisher.sink { [self] change in
             mainAsync { [self] in
                 menuPopover?.close()

@@ -543,6 +543,9 @@ struct Lunar: ParsableCommand {
         )
         var control: ControlID
 
+        @Flag(name: .long, help: "Parse values as hex")
+        var hex = false
+
         @Argument(
             help: "Value(s) to set for the control. Pass the value 'read' to fetch the current value from the monitor. Pass 'readmax' to fetch the max value for the control."
         )
@@ -586,7 +589,7 @@ struct Lunar: ParsableCommand {
 
             for display in displays {
                 for value in values {
-                    guard let value = value.parseHex() ?? Int(value) else {
+                    guard let value = hex ? value.parseHex() : Int(value) ?? value.parseHex(strict: true) else {
                         print("Can't parse value \(value) as number")
                         continue
                     }
