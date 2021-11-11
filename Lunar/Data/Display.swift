@@ -1186,11 +1186,26 @@ enum ValueType {
 
     @Atomic var initialised = false
 
-    var preciseBrightnessContrastBeforeAppPreset: Double = 0.5
+    var preciseContrastBeforeAppPreset: Double = 0.5
 
     @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name)
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
+
+    var preciseBrightnessContrastBeforeAppPreset: Double = 0.5 {
+        didSet {
+            guard CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+            preciseContrastBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+        }
+    }
+
+    var preciseBrightnessBeforeAppPreset: Double = 0.5 {
+        didSet {
+            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
+        }
+    }
 
     // #endif
 

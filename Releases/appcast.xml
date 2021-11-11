@@ -1123,7 +1123,7 @@
             <sparkle:version>5.0.2</sparkle:version>
             <sparkle:shortVersionString>5.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.0.2.dmg" length="16488108" type="application/octet-stream" sparkle:edSignature="GXwO9qm8i90lnP/2E1o0mlf3N0OzrejQQojjspyqPCseo2mKDd18jteIjUnglqufYBtoJ6VQKnAPLnr/pABBDw==" sparkle:dsaSignature="MEUCIQCYdQ4LrTe2SPIG5WSyANWMyHxE5gPBYB6s+c7WKCUAgAIgPnsfIIOdl0QN0oodr25uR11qWUEpipORiFBd9pCETLs="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.0.2.dmg" length="16488108" type="application/octet-stream" sparkle:edSignature="GXwO9qm8i90lnP/2E1o0mlf3N0OzrejQQojjspyqPCseo2mKDd18jteIjUnglqufYBtoJ6VQKnAPLnr/pABBDw==" sparkle:dsaSignature="MEUCIQCo4MRhPGrSrPZcZl4SFNBmNoP51b7Edj0Ad15irH+IrQIgM6948e0JmrDJzjYXQs6j6TJvYnGGrDjp18Rnd7jQ7fY="/>
             <signature>BHx2LkiqNl8fIYn5jl9Bh6qBK3U=</signature>
             <signature>RNr8Ps9M11AjZRPd+v+2xboEAOQ=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix lag and wrong monitor assignment when DDC was used for two identical monitors</li><li>Fix crash when getting current resolution for some displays</li><li>Fix Sync Mode for Ultrafines that report having ambient light adaptive brightness enabled when in fact they don't</li></ul><h2 id="improvements">Improvements</h2><ul><li>Add all MCCS VCP codes to <code>lunar ddc</code></li><li>Add <strong>Use current brightness</strong> button in Clock Mode</li><li>Add <strong>Merge brightness and contrast</strong> checkbox on the Configuration page<ul><li>Allows for reverting to the previous behaviour of controlling brightness and contrast separately</li></ul></li></ul></div></div>]]></description>
@@ -1144,6 +1144,8 @@
             <signature>iA4giYB1mhHDpadyQSAKYOiHXbw=</signature>
             <signature>oW3FmpnF7quKUBlLH.zOflrz.sU=</signature>
             <signature>oW3FmpnF7quKUBlLH/zOflrz/sU=</signature>
+            <signature>eKrxWWHbHsCYUDiPbGP3k+gC+lg=</signature>
+            <signature>IgST8eDR2zllkcvHNus8DbyN48A=</signature>
         </item>
     </channel>
 </rss>

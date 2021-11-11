@@ -2671,8 +2671,57 @@ visible screen left</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="7Ya-X7-OiB" id="gcm-Z4-KaY">
+                                                                            <dictionary key="options">
+                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                            </dictionary>
+                                                                        </binding>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightnessContrast" id="GVQ-GO-nKq"/>
                                                                         <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="7Ya-X7-OiB"/>
+                                                                    </connections>
+                                                                </slider>
+                                                                <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="SFe-z3-ghT" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                                                    <rect key="frame" x="256" y="56" width="198" height="38"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="194" id="Qfp-He-aC4"/>
+                                                                        <constraint firstAttribute="height" constant="30" id="kha-g0-Xdw"/>
+                                                                    </constraints>
+                                                                    <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="Icb-sA-qUV" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                                                <real key="value" value="20"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                <real key="value" value="10"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                                                <color key="value" red="0.49970281049999998" green="0.46270559770000003" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                                                                <color key="value" red="0.55608703039999996" green="0.51491521839999999" blue="0.56233205779999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                        </userDefinedRuntimeAttributes>
+                                                                    </sliderCell>
+                                                                    <userDefinedRuntimeAttributes>
+                                                                        <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
+                                                                            <real key="value" value="2"/>
+                                                                        </userDefinedRuntimeAttribute>
+                                                                    </userDefinedRuntimeAttributes>
+                                                                    <connections>
+                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="kdh-wY-CyT" id="czd-0X-A53">
+                                                                            <dictionary key="options">
+                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                                                            </dictionary>
+                                                                        </binding>
+                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="kdh-wY-CyT"/>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightness" id="3GP-cS-1aT"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kiv-mk-M5q" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
@@ -2719,6 +2768,75 @@ visible screen left</string>
                                                                     <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     <connections>
                                                                         <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="vbP-I3-NQu"/>
+                                                                    </connections>
+                                                                </imageView>
+                                                                <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="pMQ-7f-6rg" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                                                    <rect key="frame" x="256" y="31" width="198" height="38"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="194" id="Gyj-k2-niJ"/>
+                                                                        <constraint firstAttribute="height" constant="30" id="ghd-6n-SWM"/>
+                                                                    </constraints>
+                                                                    <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="cIV-QC-PDZ" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                                                                <real key="value" value="20"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                <real key="value" value="10"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                                                <color key="value" red="0.49970281049999998" green="0.46270559770000003" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                                                                <color key="value" red="0.55608703039999996" green="0.51491521839999999" blue="0.56233205779999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                        </userDefinedRuntimeAttributes>
+                                                                    </sliderCell>
+                                                                    <userDefinedRuntimeAttributes>
+                                                                        <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
+                                                                            <real key="value" value="2"/>
+                                                                        </userDefinedRuntimeAttribute>
+                                                                    </userDefinedRuntimeAttributes>
+                                                                    <connections>
+                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="p6B-95-Xhy" id="G3R-2S-XPC">
+                                                                            <dictionary key="options">
+                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                                                            </dictionary>
+                                                                        </binding>
+                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="p6B-95-Xhy"/>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualContrast" id="T4t-Bg-wKx"/>
+                                                                    </connections>
+                                                                </slider>
+                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="wPr-Vf-LWH" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                                                    <rect key="frame" x="260" y="45" width="14" height="14"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="14" id="HVp-9J-wBt"/>
+                                                                        <constraint firstAttribute="height" constant="14" id="kNt-o3-NxI"/>
+                                                                    </constraints>
+                                                                    <contentFilters>
+                                                                        <ciFilter name="CIFalseColor">
+                                                                            <configuration>
+                                                                                <ciColor key="inputColor0" red="1" green="1" blue="1" alpha="1"/>
+                                                                                <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                                                                <null key="inputImage"/>
+                                                                            </configuration>
+                                                                        </ciFilter>
+                                                                    </contentFilters>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="950-Bi-UvY"/>
+                                                                    <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                                    <connections>
+                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="36Z-4c-mbo" id="zE7-ZC-YuB">
+                                                                            <dictionary key="options">
+                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                                                            </dictionary>
+                                                                        </binding>
+                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="36Z-4c-mbo"/>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="RSR-3x-myv" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
@@ -2876,23 +2994,29 @@ visible screen left</string>
                                                                 <constraint firstItem="yNh-or-HM8" firstAttribute="top" secondItem="bPk-JH-iHh" secondAttribute="bottom" constant="10" id="8P9-3S-Xli"/>
                                                                 <constraint firstItem="5cd-8Z-v4l" firstAttribute="centerY" secondItem="WQ3-j3-c4C" secondAttribute="centerY" id="A8X-at-FjI"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="width" secondItem="9eQ-mp-6BP" secondAttribute="width" id="CjY-F9-5dr"/>
+                                                                <constraint firstItem="pMQ-7f-6rg" firstAttribute="top" secondItem="b30-Pt-whw" secondAttribute="bottom" constant="-5" id="FNj-eA-oiN"/>
                                                                 <constraint firstItem="9eQ-mp-6BP" firstAttribute="centerY" secondItem="kiv-mk-M5q" secondAttribute="centerY" id="HFb-sY-0cV"/>
                                                                 <constraint firstItem="jZV-WT-Ktg" firstAttribute="leading" secondItem="RB2-V9-vwF" secondAttribute="leading" constant="2" id="HQt-kh-FN5"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="centerY" secondItem="RSR-3x-myv" secondAttribute="centerY" id="JpZ-hr-O9S"/>
                                                                 <constraint firstAttribute="bottom" secondItem="WQ3-j3-c4C" secondAttribute="bottom" id="Kn8-ai-7cP"/>
                                                                 <constraint firstItem="Yfs-eH-oiE" firstAttribute="centerY" secondItem="WQ3-j3-c4C" secondAttribute="centerY" id="MCx-RS-Kw3"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="b0y-87-zYg" secondAttribute="trailing" constant="-16" id="Mff-IU-PL4"/>
+                                                                <constraint firstItem="SFe-z3-ghT" firstAttribute="top" secondItem="b30-Pt-whw" secondAttribute="top" id="Pmo-aN-yeQ"/>
                                                                 <constraint firstItem="4EQ-S2-v6N" firstAttribute="top" secondItem="yNh-or-HM8" secondAttribute="bottom" constant="15" id="RkO-9p-bhg"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="leading" secondItem="RSR-3x-myv" secondAttribute="trailing" constant="-16" id="VHv-ky-ASB"/>
                                                                 <constraint firstItem="38T-rK-uwv" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" id="Y2T-Uc-Onb"/>
+                                                                <constraint firstItem="wPr-Vf-LWH" firstAttribute="centerY" secondItem="pMQ-7f-6rg" secondAttribute="centerY" id="YIT-7Y-zUP"/>
                                                                 <constraint firstItem="4EQ-S2-v6N" firstAttribute="leading" secondItem="yNh-or-HM8" secondAttribute="leading" id="eJj-AS-syi"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="centerX" secondItem="9eQ-mp-6BP" secondAttribute="centerX" id="fbk-W6-f5t"/>
                                                                 <constraint firstItem="38T-rK-uwv" firstAttribute="centerY" secondItem="9eQ-mp-6BP" secondAttribute="centerY" id="ft6-fF-T0O"/>
                                                                 <constraint firstItem="Yfs-eH-oiE" firstAttribute="leading" secondItem="38T-rK-uwv" secondAttribute="leading" id="gt4-Ki-E8r"/>
+                                                                <constraint firstItem="pMQ-7f-6rg" firstAttribute="leading" secondItem="b30-Pt-whw" secondAttribute="leading" id="h62-le-hL2"/>
                                                                 <constraint firstItem="dCR-ep-nRF" firstAttribute="centerY" secondItem="9eQ-mp-6BP" secondAttribute="centerY" id="iwx-y7-zwQ"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="height" secondItem="9eQ-mp-6BP" secondAttribute="height" id="k4X-oa-uh3"/>
+                                                                <constraint firstItem="pMQ-7f-6rg" firstAttribute="leading" secondItem="wPr-Vf-LWH" secondAttribute="trailing" constant="-16" id="nY2-07-120"/>
                                                                 <constraint firstItem="5cd-8Z-v4l" firstAttribute="leading" secondItem="dCR-ep-nRF" secondAttribute="leading" id="odP-rR-uZt"/>
                                                                 <constraint firstItem="yNh-or-HM8" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" constant="-19" id="scM-th-Xop"/>
+                                                                <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="SFe-z3-ghT" secondAttribute="leading" id="ufz-xY-lYw"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="centerY" secondItem="bPk-JH-iHh" secondAttribute="centerY" id="uqM-OX-MeQ"/>
                                                                 <constraint firstItem="9eQ-mp-6BP" firstAttribute="top" secondItem="bPk-JH-iHh" secondAttribute="bottom" constant="4" id="uro-0R-Vlp"/>
                                                                 <constraint firstItem="b0y-87-zYg" firstAttribute="centerY" secondItem="b30-Pt-whw" secondAttribute="centerY" id="wrZ-yX-Rlk"/>
@@ -3039,6 +3163,7 @@ visible screen left</string>
                     </connections>
                 </arrayController>
                 <userDefaultsController id="WQv-ud-wrT"/>
+                <userDefaultsController id="BWa-81-Fof"/>
             </objects>
             <point key="canvasLocation" x="-661.5" y="3817"/>
         </scene>
