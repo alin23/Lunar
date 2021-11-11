@@ -55,9 +55,16 @@ class ManualMode: AdaptiveMode {
 
         if let (br, cr) = displayController.appBrightnessContrastOffset(for: display) {
             (brightness, contrast) = (br, cr)
+
             if lastAppPreset == nil {
-                display.preciseBrightnessContrastBeforeAppPreset = display.preciseBrightnessContrast
+                if CachedDefaults[.mergeBrightnessContrast] {
+                    display.preciseBrightnessContrastBeforeAppPreset = display.preciseBrightnessContrast
+                } else {
+                    display.preciseBrightnessBeforeAppPreset = display.preciseBrightness
+                    display.preciseContrastBeforeAppPreset = display.preciseContrast
+                }
             }
+
             if display.ambientLightAdaptiveBrightnessEnabled {
                 display.ambientLightAdaptiveBrightnessEnabled = false
             }
@@ -66,7 +73,14 @@ class ManualMode: AdaptiveMode {
                 display.ambientLightAdaptiveBrightnessEnabled = true
             }
             if lastAppPreset.reapplyPreviousBrightness {
-                let (br, cr) = display.sliderValueToBrightnessContrast(display.preciseBrightnessContrastBeforeAppPreset)
+                let br: Brightness
+                let cr: Contrast
+                if CachedDefaults[.mergeBrightnessContrast] {
+                    (br, cr) = display.sliderValueToBrightnessContrast(display.preciseBrightnessContrastBeforeAppPreset)
+                } else {
+                    br = display.sliderValueToBrightness(display.preciseBrightnessBeforeAppPreset).uint8Value
+                    cr = display.sliderValueToContrast(display.preciseContrastBeforeAppPreset).uint8Value
+                }
                 (brightness, contrast) = (br.i, cr.i)
             }
         }

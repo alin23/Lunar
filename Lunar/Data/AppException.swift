@@ -36,6 +36,10 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         contrast = try container.decodeIfPresent(Int8.self, forKey: .contrast) ?? APP_MAX_CONTRAST_OFFSET
         manualBrightnessContrast = try container
             .decodeIfPresent(Double.self, forKey: .manualBrightnessContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+        manualBrightness = try container
+            .decodeIfPresent(Double.self, forKey: .manualBrightness) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+        manualContrast = try container
+            .decodeIfPresent(Double.self, forKey: .manualContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
         applyBuiltin = try container.decodeIfPresent(Bool.self, forKey: .applyBuiltin) ?? false
         reapplyPreviousBrightness = try container.decodeIfPresent(Bool.self, forKey: .reapplyPreviousBrightness) ?? true
     }
@@ -48,6 +52,8 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         case brightness
         case contrast
         case manualBrightnessContrast
+        case manualBrightness
+        case manualContrast
         case applyBuiltin
         case reapplyPreviousBrightness
     }
@@ -87,6 +93,23 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
     }
 
     @objc dynamic var manualBrightnessContrast: Double = DEFAULT_APP_BRIGHTNESS_CONTRAST {
+        didSet {
+            save()
+            guard CachedDefaults[.mergeBrightnessContrast] else { return }
+            manualBrightness = manualBrightnessContrast
+            manualContrast = manualBrightnessContrast
+        }
+    }
+
+    @objc dynamic var manualBrightness: Double = DEFAULT_APP_BRIGHTNESS_CONTRAST {
+        didSet {
+            save()
+            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
+            manualBrightnessContrast = manualBrightness
+        }
+    }
+
+    @objc dynamic var manualContrast: Double = DEFAULT_APP_BRIGHTNESS_CONTRAST {
         didSet { save() }
     }
 

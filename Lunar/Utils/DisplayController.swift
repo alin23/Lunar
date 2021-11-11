@@ -945,6 +945,22 @@ class DisplayController {
         }
     }
 
+    func manualAppBrightnessContrast(for display: Display, app: AppException) -> (Brightness, Contrast) {
+        let br: Brightness
+        let cr: Contrast
+
+        if CachedDefaults[.mergeBrightnessContrast] {
+            (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
+            log.debug("App offset: \(app.identifier) \(app.name) \(app.manualBrightnessContrast) \(br) \(cr)")
+        } else {
+            br = display.sliderValueToBrightness(app.manualBrightness).uint8Value
+            cr = display.sliderValueToBrightness(app.manualContrast).uint8Value
+            log.debug("App offset: \(app.identifier) \(app.name) \(app.manualBrightness) \(app.manualContrast) \(br) \(cr)")
+        }
+
+        return (br, cr)
+    }
+
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
         guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
             mainAsync { display.appPreset = nil }
@@ -955,7 +971,8 @@ class DisplayController {
             mainAsync { display.appPreset = app }
             if adaptiveModeKey == .manual {
                 guard !display.isBuiltin || app.applyBuiltin else { return nil }
-                let (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
+                let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
+
                 return (br.i, cr.i)
             }
             return (app.brightness.i, app.contrast.i)
@@ -969,13 +986,6 @@ class DisplayController {
                 }
             }.joined()
         }.joined()
-
-//        let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[Window]]>? in
-//            guard let runningApps = app.runningApps, !runningApps.isEmpty else { return nil }
-//            return runningApps.compactMap { (a: NSRunningApplication) -> [Window]? in
-//                windowList(for: a, opaque: true, levels: [.normal], appException: app)
-//            }.joined()
-//        }.joined()
 
         let windowsOnScreen = windows.filter { w in w.screen?.displayID == screen.displayID }
         guard let focusedWindow = windowsOnScreen.first(where: { $0.focused }) ?? windowsOnScreen.first,
@@ -992,7 +1002,8 @@ class DisplayController {
 
         if adaptiveModeKey == .manual {
             guard !display.isBuiltin || app.applyBuiltin else { return nil }
-            let (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
+            let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
+
             return (br.i, cr.i)
         }
 
