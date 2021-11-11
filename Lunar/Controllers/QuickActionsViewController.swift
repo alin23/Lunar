@@ -11,6 +11,32 @@ import Combine
 import Defaults
 import Surge
 
+// MARK: - SliderValueTextField
+
+class SliderValueTextField: NSTextField {
+    @objc dynamic var _hidden: Bool = false
+
+    override var isHidden: Bool {
+        get { _hidden }
+        set {
+            _hidden = !CachedDefaults[.showSliderValues] ? true : newValue
+        }
+    }
+}
+
+// MARK: - SliderValueButton
+
+class SliderValueButton: Button {
+    var _hidden: Bool = false
+
+    override var isHidden: Bool {
+        get { _hidden }
+        set {
+            _hidden = !CachedDefaults[.showSliderValues] ? true : newValue
+        }
+    }
+}
+
 // MARK: - QuickActionsViewController
 
 class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
@@ -97,6 +123,8 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 // MARK: - CellWithDDC
 
 class CellWithDDC: NSTableCellView {
+    static let SLIDER_VALUE_TAG = 23
+
     @IBOutlet var orientationControl: NSSegmentedControl?
     @IBOutlet var volumeSlider: Slider?
 
@@ -110,6 +138,33 @@ class CellWithDDC: NSTableCellView {
             if !display.showVolumeSlider {
                 volumeSlider?.removeFromSuperview()
             }
+
+            if !CachedDefaults[.showSliderValues] {
+                for view in subviews.filter({ $0.tag == Self.SLIDER_VALUE_TAG }) {
+                    view.isHidden = true
+                }
+            }
+//            for view in subviews {
+//                guard view.tag == Self.SLIDER_VALUE_TAG else { continue }
+//                switch view {
+//                case let v as SliderValueTextField:
+//                    guard let binding = v.infoForBinding(.hidden),
+//                          let obj = binding[.observedObject] as? NSObject,
+//                          let path = binding[.observedKeyPath] as? String,
+//                          let value = obj.value(forKeyPath: path) as? Bool
+//                    else { continue }
+//                    v._hidden = !CachedDefaults[.showSliderValues] ? true : value
+//                case let v as SliderValueButton:
+//                    guard let binding = v.infoForBinding(.hidden),
+//                          let obj = binding[.observedObject] as? NSObject,
+//                          let path = binding[.observedKeyPath] as? String,
+//                          let value = obj.value(forKeyPath: path) as? Bool
+//                    else { continue }
+//                    v._hidden = !CachedDefaults[.showSliderValues] ? true : value
+//                default:
+//                    view.isHidden = !CachedDefaults[.showSliderValues]
+//                }
+//            }
         }
     }
 }

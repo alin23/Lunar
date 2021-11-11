@@ -162,7 +162,9 @@ extension NSColor {
 
 let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
 extension String {
-    func parseHex() -> Int? {
+    func parseHex(strict: Bool = false) -> Int? {
+        guard !strict || starts(with: "0x") || starts(with: "x") || hasSuffix("h") else { return nil }
+
         var sub = self
 
         if sub.starts(with: "0x") {
@@ -171,6 +173,10 @@ extension String {
 
         if sub.starts(with: "x") {
             sub = String(sub.suffix(from: sub.index(after: sub.startIndex)))
+        }
+
+        if sub.hasSuffix("h") {
+            sub = String(sub.prefix(sub.count - 1))
         }
 
         return Int(sub, radix: 16)
