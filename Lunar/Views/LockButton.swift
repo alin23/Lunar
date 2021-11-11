@@ -64,6 +64,7 @@ class LockButton: NSButton {
 
     @IBInspectable dynamic var labelOn: NSColor = lockButtonLabelOn {
         didSet {
+            attributedTitle = attributedTitle.withTextColor(labelOn)
             attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
         }
     }
@@ -71,6 +72,7 @@ class LockButton: NSButton {
     @IBInspectable dynamic var labelOff: NSColor = lockButtonLabelOff {
         didSet {
             attributedTitle = attributedTitle.withTextColor(labelOff)
+            attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOff)
         }
     }
 

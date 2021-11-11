@@ -513,33 +513,54 @@
                                                             <action selector="installCLI:" target="Voe-Tx-rLC" id="KRr-Ng-kxw"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Show orientation switcher in Quick Actions" state="on" id="HeU-1X-veM">
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Quick Actions" id="XBV-bb-1ha">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Quick Actions" id="eJz-YC-XA7">
+                                                <items>
+                                                    <menuItem title="Merge brightness and contrast" state="on" id="4U0-RR-lcD">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOrientationInQuickActions" id="Y99-OV-dBk"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.mergeBrightnessContrast" id="bXp-Au-8DS"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Show volume slider in Quick Actions" state="on" id="HeU-2X-veM">
+                                                    <menuItem title="Show slider values" state="on" id="3U0-RR-lcD">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showVolumeSlider" id="Y98-OV-dBk"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showSliderValues" id="bXp-Au-7DS"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Show brightness in menu bar" state="on" id="caW-3Z-SGn">
+                                                    <menuItem title="Show orientation switcher" state="on" id="XtC-Fi-3Oq">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showBrightnessMenuBar" id="es9-hG-4Kb"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOrientationInQuickActions" id="zgZ-m2-Yhu"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Show only external monitor brightness" state="on" indentationLevel="1" id="0tN-Sj-xi3">
+                                                    <menuItem title="Show volume slider" state="on" id="sJQ-us-2WR">
                                                         <attributedString key="attributedTitle"/>
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.showBrightnessMenuBar" id="58g-OL-EB0"/>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOnlyExternalBrightnessMenuBar" id="730-OG-B9h"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showVolumeSlider" id="HfK-Ix-BlI"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show brightness in menu bar" state="on" id="3hZ-CD-gRP">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showBrightnessMenuBar" id="lJb-Bu-HQz"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show only external monitor brightness" state="on" indentationLevel="1" id="4vm-iP-IGd">
+                                                        <attributedString key="attributedTitle"/>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.showBrightnessMenuBar" id="k2P-N0-A5z"/>
+                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOnlyExternalBrightnessMenuBar" id="1yt-ug-LLJ"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -3279,7 +3300,7 @@ visible screen left</string>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
                                         <connections>
-                                            <action selector="toggleLock:" target="ASQ-wq-GuY" id="lkk-yB-qr8"/>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedBrightness" id="zPC-Bz-1cX"/>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mts-p9-8Zt" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -3374,7 +3395,7 @@ visible screen left</string>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
                                         <connections>
-                                            <action selector="toggleLock:" target="XVS-nO-2Mf" id="e0c-Sp-Ob6"/>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedContrast" id="gzq-gU-1td"/>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0p3-Ip-HPc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -6863,13 +6884,13 @@ should rise or fall based on the adaptive input</string>
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
+                                                <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.copyFromDisplay" previousBinding="mCv-Xr-tOS" id="nWn-qn-5K7"/>
                                                 <binding destination="21a-h6-6He" name="content" keyPath="self.display.otherDisplays" id="mCv-Xr-tOS">
                                                     <dictionary key="options">
                                                         <string key="NSNoSelectionPlaceholder">Copy from display</string>
                                                         <string key="NSNullPlaceholder">Copy from display</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="21a-h6-6He" name="selectedObject" keyPath="self.display.copyFromDisplay" previousBinding="mCv-Xr-tOS" id="nWn-qn-5K7"/>
                                             </connections>
                                         </popUpButton>
                                     </subviews>

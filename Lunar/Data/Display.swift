@@ -1499,6 +1499,7 @@ enum ValueType {
     @Published @objc dynamic var redGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
+            guard DDC.apply else { return }
             if let control = control, !control.setRedGain(redGain.uint8Value) {
                 log.warning(
                     "Error writing RedGain using \(control.str)",
@@ -1511,6 +1512,7 @@ enum ValueType {
     @Published @objc dynamic var greenGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
+            guard DDC.apply else { return }
             if let control = control, !control.setGreenGain(greenGain.uint8Value) {
                 log.warning(
                     "Error writing GreenGain using \(control.str)",
@@ -1523,6 +1525,7 @@ enum ValueType {
     @Published @objc dynamic var blueGain: NSNumber = DEFAULT_COLOR_GAIN.ns {
         didSet {
             save()
+            guard DDC.apply else { return }
             if let control = control, !control.setBlueGain(blueGain.uint8Value) {
                 log.warning(
                     "Error writing BlueGain using \(control.str)",
