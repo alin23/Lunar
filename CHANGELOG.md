@@ -1,3 +1,8 @@
+# 5.0.4
+## Fixes
+
+* Fix issue where adjusting brightness with keys would double the change for external displays 
+
 # 5.0.3
 ## Features
 
