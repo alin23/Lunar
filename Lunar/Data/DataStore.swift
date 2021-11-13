@@ -96,6 +96,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeKeysEnabled,
     .volumeStep,
     .reapplyValuesAfterWake,
+    .jitterAfterWake,
+    .wakeReapplyTries,
     .ddcSleepFactor,
 
     .brightnessKeysSyncControl,
@@ -604,6 +606,8 @@ func initCache() {
     cacheKey(.syncMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
+    cacheKey(.jitterAfterWake)
+    cacheKey(.wakeReapplyTries)
     cacheKey(.sunrise)
     cacheKey(.sunset)
     cacheKey(.solarNoon)
@@ -704,6 +708,8 @@ extension Defaults.Keys {
     static let syncMode = Key<Bool>("syncMode", default: false)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
+    static let jitterAfterWake = Key<Bool>("jitterAfterWake", default: false)
+    static let wakeReapplyTries = Key<Int>("wakeReapplyTries", default: 5)
     static let hotkeys = Key<Set<PersistentHotkey>>("hotkeys", default: Hotkey.defaults)
     static let displays = Key<[Display]?>("displays", default: nil)
     static let appExceptions = Key<[AppException]?>("appExceptions", default: nil)

@@ -6582,7 +6582,7 @@ Lunar will continue to check in the background</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
-                                <rect key="frame" x="22" y="614" width="179" height="25"/>
+                                <rect key="frame" x="22" y="622" width="179" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Enabled Controls" id="Ivu-gs-zlD">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -6590,7 +6590,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kap-E3-AbC">
-                                <rect key="frame" x="27" y="567" width="168" height="18"/>
+                                <rect key="frame" x="27" y="575" width="168" height="18"/>
                                 <buttonCell key="cell" type="check" title="Network (Raspberry Pi)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="zlB-32-Rul">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6600,7 +6600,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gQ1-Jv-FTC">
-                                <rect key="frame" x="27" y="547" width="215" height="18"/>
+                                <rect key="frame" x="27" y="555" width="215" height="18"/>
                                 <buttonCell key="cell" type="check" title="Apple Native (DisplayServices)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="ppm-z5-gWv">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6610,7 +6610,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YSi-X1-Nsf">
-                                <rect key="frame" x="27" y="527" width="126" height="18"/>
+                                <rect key="frame" x="27" y="535" width="126" height="18"/>
                                 <buttonCell key="cell" type="check" title="Hardware (DDC)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="BTR-Jw-BqR">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6620,7 +6620,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Tt-VZ-2bh">
-                                <rect key="frame" x="27" y="507" width="138" height="18"/>
+                                <rect key="frame" x="27" y="515" width="138" height="18"/>
                                 <buttonCell key="cell" type="check" title="Software Dimming" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6630,7 +6630,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rc0-ia-euE">
-                                <rect key="frame" x="22" y="589" width="200" height="26"/>
+                                <rect key="frame" x="22" y="597" width="200" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="196" id="Om7-JU-mwi"/>
                                     <constraint firstAttribute="height" constant="26" id="RN0-8F-zdH"/>
@@ -6644,7 +6644,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwA-hL-Un8" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="358" width="300" height="132"/>
+                                <rect key="frame" x="0.0" y="366" width="300" height="132"/>
                                 <view key="contentView" id="yhm-tF-nP8">
                                     <rect key="frame" x="1" y="1" width="298" height="130"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -6828,13 +6828,13 @@ when FaceLight is activated</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-UY-Ynz" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="198" width="300" height="151"/>
+                                <rect key="frame" x="0.0" y="198" width="300" height="159"/>
                                 <view key="contentView" id="MR1-5D-jfX">
-                                    <rect key="frame" x="1" y="1" width="298" height="149"/>
+                                    <rect key="frame" x="1" y="1" width="298" height="157"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="dLw-UF-aJD" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="50" y="43" width="198" height="38"/>
+                                            <rect key="frame" x="50" y="51" width="198" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="yDn-7c-fZj"/>
                                             </constraints>
@@ -6868,7 +6868,7 @@ when FaceLight is activated</string>
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sDs-j8-6hM">
-                                            <rect key="frame" x="21" y="90" width="240" height="26"/>
+                                            <rect key="frame" x="21" y="98" width="240" height="26"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="26" id="Yne-QO-DE5"/>
                                                 <constraint firstAttribute="width" constant="236" id="oaD-vP-d6L"/>
@@ -6882,7 +6882,7 @@ should rise or fall based on the adaptive input</string>
                                             </textFieldCell>
                                         </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="O8y-8c-iHO" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="56" y="58" width="12" height="12"/>
+                                            <rect key="frame" x="56" y="66" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="AQJ-gn-P2S"/>
                                                 <constraint firstAttribute="width" constant="12" id="ZXk-4b-TZA"/>
@@ -6916,7 +6916,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </imageView>
                                         <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="hJU-3S-kh0" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="50" y="13" width="198" height="38"/>
+                                            <rect key="frame" x="50" y="21" width="198" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="NRo-bd-0YP"/>
                                             </constraints>
@@ -6950,7 +6950,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="XM0-I5-whZ" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="54" y="27" width="14" height="14"/>
+                                            <rect key="frame" x="54" y="35" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="moh-la-Wa8"/>
                                                 <constraint firstAttribute="width" constant="14" id="x9d-Kf-NI5"/>
@@ -6984,7 +6984,7 @@ should rise or fall based on the adaptive input</string>
                                             </connections>
                                         </imageView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Bd-iP-EOm">
-                                            <rect key="frame" x="21" y="115" width="128" height="25"/>
+                                            <rect key="frame" x="21" y="123" width="128" height="25"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Curve Slope" id="xzM-Oh-IbZ">
                                                 <font key="font" metaFont="systemHeavy" size="21"/>
                                                 <color key="textColor" name="Caption"/>
@@ -6992,7 +6992,7 @@ should rise or fall based on the adaptive input</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton focusRingType="none" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="uMX-Bu-WIv">
-                                            <rect key="frame" x="70" y="-1" width="158" height="20"/>
+                                            <rect key="frame" x="70" y="7" width="158" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="158" id="4YZ-Bl-22d"/>
                                                 <constraint firstAttribute="height" constant="20" id="u5K-OW-9H3"/>
@@ -7039,7 +7039,7 @@ should rise or fall based on the adaptive input</string>
                                     </constraints>
                                 </view>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="uMX-Bu-WIv" secondAttribute="bottom" id="Och-C1-hsO"/>
+                                    <constraint firstAttribute="bottom" secondItem="uMX-Bu-WIv" secondAttribute="bottom" constant="8" id="Och-C1-hsO"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
@@ -7051,7 +7051,7 @@ should rise or fall based on the adaptive input</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <button focusRingType="none" verticalHuggingPriority="750" alphaValue="0.90000000000000002" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="de9-AH-qAA" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="172" y="506" width="114" height="20"/>
+                                <rect key="frame" x="172" y="514" width="114" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="TPP-Z2-UPv"/>
                                     <constraint firstAttribute="width" constant="114" id="vBJ-mQ-zoj"/>

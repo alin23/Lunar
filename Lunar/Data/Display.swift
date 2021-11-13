@@ -345,23 +345,15 @@ enum ValueType {
         let brightness = isNative ? (AppleNativeControl.readBrightnessDisplayServices(id: id) * 100)
             .ns : (try container.decode(UInt8.self, forKey: .brightness)).ns
         self.brightness = brightness
-        preciseBrightness = brightness.doubleValue / 100.0
         let contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
         self.contrast = contrast
-        preciseContrast = contrast.doubleValue / 100.0
+
         let minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minBrightness)).ns
         let maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
         self.minBrightness = minBrightness
         self.maxBrightness = maxBrightness
         minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minContrast)).ns
         maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxContrast)).ns
-        preciseBrightnessContrast = mapNumber(
-            cap(brightness.doubleValue, minVal: 0, maxVal: 100),
-            fromLow: minBrightness.doubleValue,
-            fromHigh: maxBrightness.doubleValue,
-            toLow: 0,
-            toHigh: 100
-        ) / 100.0
 
         defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
@@ -505,6 +497,10 @@ enum ValueType {
 
         super.init()
         defer { initialised = true }
+
+        preciseBrightness = brightnessToSliderValue(brightness)
+        preciseContrast = contrastToSliderValue(contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+        preciseBrightnessContrast = brightnessToSliderValue(brightness)
 
         if !supportsGammaByDefault {
             useOverlay = true
@@ -1830,7 +1826,7 @@ enum ValueType {
             save()
 
             applyPreciseValue = false
-            preciseBrightness = brightness.doubleValue / 100
+            preciseBrightness = brightnessToSliderValue(brightness)
             if !lockedBrightness || lockedContrast {
                 preciseBrightnessContrast = brightnessToSliderValue(brightness)
             }
@@ -1892,7 +1888,7 @@ enum ValueType {
             save()
 
             applyPreciseValue = false
-            preciseContrast = contrast.doubleValue / 100
+            preciseContrast = contrastToSliderValue(contrast, merged: CachedDefaults[.mergeBrightnessContrast])
             if lockedBrightness && !lockedContrast {
                 preciseBrightnessContrast = contrastToSliderValue(contrast)
             }
@@ -3069,8 +3065,10 @@ enum ValueType {
 
         control = getBestControl()
 
-        guard isSmartBuiltin, !observeBrightnessChangeDS(), !hasBrightnessChangeObserver else { return }
-        asyncEvery(1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
+        guard isSmartBuiltin else { return }
+        let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
+
+        asyncEvery(listensForBrightnessChange ? 3.seconds : 1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
                 timer.tolerance = 10
                 return

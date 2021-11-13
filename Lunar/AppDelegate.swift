@@ -525,13 +525,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return mode.available
     }
 
-    func showWindow(after ms: Int? = nil, position: NSPoint? = nil) {
+    func showWindow(after ms: Int? = nil, position: NSPoint? = nil, focus: Bool = true) {
         guard let ms = ms else {
-            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse, position: position)
+            createAndShowWindow("windowController", controller: &windowController, focus: focus, screen: NSScreen.withMouse, position: position)
             return
         }
         mainAsyncAfter(ms: ms) { [self] in
-            createAndShowWindow("windowController", controller: &windowController, screen: NSScreen.withMouse, position: position)
+            createAndShowWindow("windowController", controller: &windowController, focus: focus, screen: NSScreen.withMouse, position: position)
         }
     }
 
@@ -981,8 +981,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     }
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
-                            displayController.adaptBrightness(force: true)
+                        asyncEvery(
+                            2.seconds,
+                            uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY,
+                            runs: CachedDefaults[.wakeReapplyTries],
+                            skipIfExists: true
+                        ) { _ in
+                            if displayController.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
+                                for (num, display) in displayController.activeDisplayList.enumerated() {
+                                    let br = display.brightness.uint8Value
+                                    mainAsyncAfter(ms: num * 50) {
+                                        display.withForce { display.brightness = cap(br - 1, minVal: 0, maxVal: 100).ns }
+                                    }
+                                    mainAsyncAfter(ms: 300 + num * 50) {
+                                        display.withForce { display.brightness = cap(br, minVal: 0, maxVal: 100).ns }
+                                    }
+                                    mainAsyncAfter(ms: 600 + num * 50) {
+                                        display.withForce { display.brightness = cap(br + 1, minVal: 0, maxVal: 100).ns }
+                                    }
+                                    mainAsyncAfter(ms: 900 + num * 50) {
+                                        display.withForce { display.brightness = cap(br, minVal: 0, maxVal: 100).ns }
+                                    }
+                                }
+                            } else {
+                                displayController.adaptBrightness(force: true)
+                            }
 
                             for display in displayController.activeDisplays.values.filter(\.blackOutEnabled) {
                                 display.apply(gamma: GammaTable.zero, force: true)
@@ -1114,7 +1137,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 CachedDefaults[.advancedSettingsShown] = advancedSettings
             }
             if shouldShow {
-                showWindow(position: lastPosition)
+                showWindow(position: lastPosition, focus: NSRunningApplication.current.isActive)
             }
         }
     }
