@@ -509,11 +509,12 @@ func createAndShowWindow(
 
             wc.showWindow(nil)
 
-            if let window = wc.window as? ModernWindow {
-                log.debug("Showing window '\(window.title)'")
-                window.orderFrontRegardless()
-            }
             if focus {
+                if let window = wc.window as? ModernWindow {
+                    log.debug("Focusing window '\(window.title)'")
+                    window.orderFrontRegardless()
+                }
+                
                 NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
             }
         }
@@ -1773,7 +1774,7 @@ func notify(identifier: String, title: String, body: String) {
             let enabled = settings.alertSetting == .enabled
             Defaults[.notificationsPermissionsGranted] = enabled
             guard enabled else {
-                nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { granted, _ in
+                nc.requestAuthorization(options: [], completionHandler: { granted, _ in
                     guard granted else { return }
                     sendNotification(nc)
                 })
