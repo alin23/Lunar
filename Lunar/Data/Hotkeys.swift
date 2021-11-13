@@ -896,14 +896,18 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .brightnessUp where contrast:
             increaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessUp where allDisplays:
-            increaseBrightness(by: value, builtinDisplay: builtinDisplay)
+            if builtinDisplay {
+                increaseBrightness(by: value, builtinDisplay: builtinDisplay)
+            }
             increaseBrightness(by: value)
         case .brightnessUp:
             increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where contrast:
             decreaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
         case .brightnessDown where allDisplays:
-            decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
+            if builtinDisplay {
+                decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
+            }
             decreaseBrightness(by: value)
         case .brightnessDown:
             decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
