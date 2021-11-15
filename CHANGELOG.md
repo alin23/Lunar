@@ -1,3 +1,8 @@
+# 5.0.5
+## Fixes
+
+* Fix detection for Samsung U28E850
+
 # 5.0.4
 ## Fixes
 
