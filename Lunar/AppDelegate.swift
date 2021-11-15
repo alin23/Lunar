@@ -1263,7 +1263,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        // print(initStuff)
+        let xsdf = initStuff
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }

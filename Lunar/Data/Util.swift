@@ -10,10 +10,6 @@ import SwiftDate
 import SwiftyMarkdown
 import UserNotifications
 
-let initStuff: Bool = {
-    true
-}()
-
 typealias FilePath = Path
 func p(_ string: String) -> FilePath? {
     FilePath(string)
