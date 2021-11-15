@@ -892,7 +892,7 @@ enum ValueType {
 
     @Atomic static var applySource = true
 
-    static let dummyNamePattern = "dummy|28e850".r!
+    static let dummyNamePattern = "dummy|[^u]28e850|^28e850".r!
 
     @objc dynamic var appPreset: AppException? = nil
 
@@ -1184,7 +1184,7 @@ enum ValueType {
 
     var preciseContrastBeforeAppPreset: Double = 0.5
 
-    @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name)
+    @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name) && vendor != .samsung
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
 
@@ -3068,7 +3068,12 @@ enum ValueType {
         guard isSmartBuiltin else { return }
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
 
-        asyncEvery(listensForBrightnessChange ? 3.seconds : 1.seconds, uniqueTaskKey: "Builtin Brightness Refresher", skipIfExists: true, eager: true) { [weak self] timer in
+        asyncEvery(
+            listensForBrightnessChange ? 3.seconds : 1.seconds,
+            uniqueTaskKey: "Builtin Brightness Refresher",
+            skipIfExists: true,
+            eager: true
+        ) { [weak self] timer in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
                 timer.tolerance = 10
                 return
