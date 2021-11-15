@@ -514,7 +514,7 @@ func createAndShowWindow(
                     log.debug("Focusing window '\(window.title)'")
                     window.orderFrontRegardless()
                 }
-                
+
                 NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
             }
         }

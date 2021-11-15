@@ -527,11 +527,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func showWindow(after ms: Int? = nil, position: NSPoint? = nil, focus: Bool = true) {
         guard let ms = ms else {
-            createAndShowWindow("windowController", controller: &windowController, focus: focus, screen: NSScreen.withMouse, position: position)
+            createAndShowWindow(
+                "windowController",
+                controller: &windowController,
+                focus: focus,
+                screen: NSScreen.withMouse,
+                position: position
+            )
             return
         }
         mainAsyncAfter(ms: ms) { [self] in
-            createAndShowWindow("windowController", controller: &windowController, focus: focus, screen: NSScreen.withMouse, position: position)
+            createAndShowWindow(
+                "windowController",
+                controller: &windowController,
+                focus: focus,
+                screen: NSScreen.withMouse,
+                position: position
+            )
         }
     }
 

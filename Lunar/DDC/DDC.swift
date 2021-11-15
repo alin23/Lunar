@@ -693,7 +693,7 @@ enum DDC {
         }
 
         let realName = (name ?? Display.printableName(id)).lowercased()
-        return realName =~ Display.dummyNamePattern
+        return realName =~ Display.dummyNamePattern && CGDisplayVendorNumber(id) != Display.Vendor.samsung.rawValue.u32
     }
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
