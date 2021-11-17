@@ -50,24 +50,25 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 
     @objc dynamic lazy var showOrientation = CachedDefaults[.showOrientationInQuickActions]
 
-    #if DEBUG
-        @objc dynamic lazy var display: Display? = {
-            guard let display = displayController.externalActiveDisplays.first else { return nil }
-            display.appPreset = CachedDefaults[.appExceptions]?.first
+//    #if DEBUG
+//        @objc dynamic lazy var display: Display? = {
+//            guard let display = displayController.externalActiveDisplays.first else { return nil }
+//            display.appPreset = CachedDefaults[.appExceptions]?.first
+//
+//            return display
+//        }()
+//
+//        @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
+//            didSet { resize() }
+//        }
+//    #else
+    @objc dynamic lazy var display: Display? = displayController.cursorDisplay
 
-            return display
-        }()
+    @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
+        didSet { resize() }
+    }
 
-        @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
-            didSet { resize() }
-        }
-    #else
-        @objc dynamic lazy var display: Display? = displayController.cursorDisplay
-
-        @objc dynamic lazy var displays: [Display] = displayController.activeDisplayList.filter({ $0.serial != display?.serial }) {
-            didSet { resize() }
-        }
-    #endif
+//    #endif
 
     @IBAction func setPercent(_ sender: Button) {
         appDelegate!.setLightPercent(percent: sender.tag.i8)
@@ -91,11 +92,17 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
             self.table.intercellSpacing = NSSize(width: 0, height: !self.displays.isEmpty ? 20 : 0)
             let merged = CachedDefaults[.mergeBrightnessContrast]
             var height = sum(self.displays.map { display in
-                guard display.hasDDC else { return 80 }
+                guard display.hasDDC else { return 60 }
 
                 let orientationHeight: CGFloat = (display.showOrientation ? 40 : 0)
                 let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
-                return (merged ? 60 : 90) + volumeHeight + orientationHeight
+                #if DEBUG
+                    log.info(
+                        "QuickActions Height for \(display)",
+                        context: ["initial": merged ? 90 : 120, "volumeHeight": volumeHeight, "orientationHeight": orientationHeight]
+                    )
+                #endif
+                return (merged ? 90 : 120) + volumeHeight + orientationHeight
             }) + (self.table.intercellSpacing.height * CGFloat(self.displays.count))
 
             if let display = self.display {
@@ -105,8 +112,26 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
                     let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
                     let contrastHeight: CGFloat = (merged ? 0 : 30)
                     height += 90 + volumeHeight + orientationHeight + appPresetHeight + contrastHeight
+                    #if DEBUG
+                        log.info(
+                            "QuickActions Height for \(display)",
+                            context: [
+                                "initial": 90,
+                                "volumeHeight": volumeHeight,
+                                "orientationHeight": orientationHeight,
+                                "appPresetHeight": appPresetHeight,
+                                "contrastHeight": contrastHeight,
+                            ]
+                        )
+                    #endif
                 } else {
                     height += 60 + orientationHeight + appPresetHeight
+                    #if DEBUG
+                        log.info(
+                            "QuickActions Height for \(display)",
+                            context: ["initial": 60, "orientationHeight": orientationHeight, "appPresetHeight": appPresetHeight]
+                        )
+                    #endif
                 }
             }
 
@@ -144,27 +169,6 @@ class CellWithDDC: NSTableCellView {
                     view.isHidden = true
                 }
             }
-//            for view in subviews {
-//                guard view.tag == Self.SLIDER_VALUE_TAG else { continue }
-//                switch view {
-//                case let v as SliderValueTextField:
-//                    guard let binding = v.infoForBinding(.hidden),
-//                          let obj = binding[.observedObject] as? NSObject,
-//                          let path = binding[.observedKeyPath] as? String,
-//                          let value = obj.value(forKeyPath: path) as? Bool
-//                    else { continue }
-//                    v._hidden = !CachedDefaults[.showSliderValues] ? true : value
-//                case let v as SliderValueButton:
-//                    guard let binding = v.infoForBinding(.hidden),
-//                          let obj = binding[.observedObject] as? NSObject,
-//                          let path = binding[.observedKeyPath] as? String,
-//                          let value = obj.value(forKeyPath: path) as? Bool
-//                    else { continue }
-//                    v._hidden = !CachedDefaults[.showSliderValues] ? true : value
-//                default:
-//                    view.isHidden = !CachedDefaults[.showSliderValues]
-//                }
-//            }
         }
     }
 }

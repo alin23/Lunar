@@ -1439,10 +1439,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         appDelegate!.startOrRestartMediaKeyTap()
     }
 
+    @IBAction func openOnboardingProcess(_: Any) {
+        onboard()
+    }
+
     @IBAction func openLunarDiagnostics(_: Any) {
         useOnboardingForDiagnostics = true
         createAndShowWindow("onboardWindowController", controller: &onboardWindowController)
-        // createAndShowWindow("diagnosticsWindowController", controller: &diagnosticsWindowController)
     }
 
     @IBAction func restartApp(_: Any) {

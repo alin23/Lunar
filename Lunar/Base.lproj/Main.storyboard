@@ -714,6 +714,13 @@ and setting its brightness/contrast to 0</string>
                                                 <action selector="checkForUpdates:" target="Voe-Tx-rLC" id="ibT-20-cPp"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Relaunch the onboarding process" id="bK3-be-bgg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openOnboardingProcess:" target="Voe-Tx-rLC" id="6gk-g2-GOe"/>
+                                                <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="EPR-i8-QIz"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Restart Lunar" id="8Oe-Go-Jnc">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -2671,6 +2678,7 @@ visible screen left</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightnessContrast" id="GVQ-GO-nKq"/>
                                                                         <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="7Ya-X7-OiB" id="gcm-Z4-KaY">
                                                                             <dictionary key="options">
                                                                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2680,7 +2688,6 @@ visible screen left</string>
                                                                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                             </dictionary>
                                                                         </binding>
-                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightnessContrast" id="GVQ-GO-nKq"/>
                                                                         <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="7Ya-X7-OiB"/>
                                                                     </connections>
                                                                 </slider>
@@ -2712,6 +2719,7 @@ visible screen left</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightness" id="3GP-cS-1aT"/>
                                                                         <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="kdh-wY-CyT" id="czd-0X-A53">
                                                                             <dictionary key="options">
                                                                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2721,7 +2729,6 @@ visible screen left</string>
                                                                             </dictionary>
                                                                         </binding>
                                                                         <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="kdh-wY-CyT"/>
-                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightness" id="3GP-cS-1aT"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kiv-mk-M5q" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
@@ -2798,6 +2805,7 @@ visible screen left</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualContrast" id="T4t-Bg-wKx"/>
                                                                         <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="p6B-95-Xhy" id="G3R-2S-XPC">
                                                                             <dictionary key="options">
                                                                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2807,7 +2815,6 @@ visible screen left</string>
                                                                             </dictionary>
                                                                         </binding>
                                                                         <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="p6B-95-Xhy"/>
-                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualContrast" id="T4t-Bg-wKx"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="wPr-Vf-LWH" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
