@@ -8447,6 +8447,16 @@ brightness and volume keys</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="g35-ep-EgK">
+                                <rect key="frame" x="262" y="48" width="426" height="26"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="eaf-Lg-Z4Q">
+                                    <font key="font" metaFont="systemMedium" size="10"/>
+                                    <string key="title">You can always relaunch this onboarding process by clicking with two fingers on the 
+menu bar icon and choosing "Relaunch the onboarding process" at the bottom</string>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstItem="92a-we-p3U" firstAttribute="top" secondItem="Y1l-f7-bs2" secondAttribute="bottom" constant="41" id="AfI-su-G1s"/>
@@ -8454,12 +8464,14 @@ brightness and volume keys</string>
                             <constraint firstItem="QGd-6p-9j0" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="Oux-g2-U4F"/>
                             <constraint firstItem="Swc-RH-H6g" firstAttribute="centerX" secondItem="0jr-VS-Ttp" secondAttribute="centerX" id="SPj-tc-3HC"/>
                             <constraint firstItem="92a-we-p3U" firstAttribute="centerX" secondItem="Y1l-f7-bs2" secondAttribute="centerX" id="Ssc-B7-UkV"/>
+                            <constraint firstItem="g35-ep-EgK" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="X1P-rh-sqX"/>
                             <constraint firstItem="E5r-43-pjX" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="XrC-A2-mOZ"/>
                             <constraint firstItem="jF6-Up-eoN" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="Yyr-J7-ydT"/>
                             <constraint firstItem="Hxg-dR-YkI" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="aCb-gz-MeQ"/>
                             <constraint firstItem="yJG-vz-QYi" firstAttribute="top" secondItem="92a-we-p3U" secondAttribute="bottom" constant="57" id="aH0-W2-sN3"/>
                             <constraint firstAttribute="bottom" secondItem="SF7-Ew-SxR" secondAttribute="bottom" constant="20" symbolic="YES" id="aHS-M0-1fh"/>
                             <constraint firstItem="yJG-vz-QYi" firstAttribute="centerX" secondItem="E5r-43-pjX" secondAttribute="centerX" id="aNf-AB-LJw"/>
+                            <constraint firstItem="SF7-Ew-SxR" firstAttribute="top" secondItem="g35-ep-EgK" secondAttribute="bottom" constant="13" id="cgA-Dm-GO3"/>
                             <constraint firstItem="Q0D-9Q-YZ5" firstAttribute="centerX" secondItem="QGd-6p-9j0" secondAttribute="centerX" id="dSd-Q3-uZq"/>
                             <constraint firstItem="SF7-Ew-SxR" firstAttribute="centerX" secondItem="COS-gn-hQs" secondAttribute="centerX" id="feu-PN-fXO"/>
                             <constraint firstItem="Y1l-f7-bs2" firstAttribute="top" secondItem="COS-gn-hQs" secondAttribute="top" constant="65" id="gYq-T9-1L9"/>
