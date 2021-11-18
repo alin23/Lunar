@@ -12,10 +12,10 @@
             <objects>
                 <viewController storyboardIdentifier="QuickActionsViewController" id="XpJ-ho-P7z" customClass="QuickActionsViewController" customModule="Lunar" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vGd-1C-1a0">
-                        <rect key="frame" x="0.0" y="0.0" width="310" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="310" height="630"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="0.0" y="30" width="310" height="20"/>
+                                <rect key="frame" x="0.0" y="60" width="310" height="283"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -121,14 +121,14 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="N7F-wH-cHs">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
                                                             <binding destination="nKX-LM-MgX" name="value" keyPath="objectValue.brightness" id="gIr-Rc-J8d">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="N7F-wH-cHs">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
@@ -335,14 +335,14 @@
                                                             <userDefinedRuntimeAttribute type="boolean" keyPath="grayDisabledText" value="NO"/>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="RbD-RX-SiO">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
                                                             <binding destination="prI-Gh-RKd" name="title" keyPath="objectValue.brightness" id="TxP-IP-1Ok">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="RbD-RX-SiO">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
@@ -377,14 +377,14 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="5Ey-b9-25E">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
                                                             <binding destination="prI-Gh-RKd" name="title" keyPath="objectValue.contrast" id="ans-7p-Wxc">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="5Ey-b9-25E">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
@@ -528,12 +528,12 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="z1X-Yy-SOw"/>
                                                             <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.brightness" id="fc7-9q-hrv">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                                 </dictionary>
                                                             </binding>
+                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="z1X-Yy-SOw"/>
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="9b5-3v-IoN" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
@@ -544,12 +544,12 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.noDDCOrMergedBrightnessContrast" id="kaJ-Hp-uo0"/>
                                                             <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.contrast" id="izV-Io-gyF">
                                                                 <dictionary key="options">
                                                                     <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                                 </dictionary>
                                                             </binding>
+                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.noDDCOrMergedBrightnessContrast" id="kaJ-Hp-uo0"/>
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="Lww-dX-npG" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
@@ -624,14 +624,17 @@
                                 </connections>
                             </tableView>
                             <button verticalHuggingPriority="750" tag="50" translatesAutoresizingMaskIntoConstraints="NO" id="pEd-3X-Kup" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="189" y="10" width="31" height="14"/>
+                                <rect key="frame" x="189" y="33" width="31" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="3YK-QL-f62"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" title="50%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Oi3-QX-pzN">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="AccentColor"/>
+                                        <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="8"/>
@@ -640,7 +643,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" red="0.13231756286179469" green="0.12205065804422853" blue="0.14811862244897958" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -648,14 +651,17 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="25" translatesAutoresizingMaskIntoConstraints="NO" id="SEc-Qb-jN3" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="151" y="10" width="30" height="14"/>
+                                <rect key="frame" x="151" y="33" width="30" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="0VV-bu-V3r"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" title="25%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="fXN-9u-RgP">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="AccentColor"/>
+                                        <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -664,7 +670,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -672,14 +678,17 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ajr-Nz-yJI" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="119" y="10" width="24" height="14"/>
+                                <rect key="frame" x="119" y="33" width="24" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="ogy-bz-2oH"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" title="0%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Kmq-Om-QOG">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="AccentColor"/>
+                                        <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -688,7 +697,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -696,17 +705,20 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="75" translatesAutoresizingMaskIntoConstraints="NO" id="qKp-A7-ckL" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="228" y="10" width="30" height="14"/>
+                                <rect key="frame" x="228" y="33" width="30" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="oSA-fO-LN5"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" title="75%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="krD-md-bcQ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="AccentColor"/>
+                                        <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -720,7 +732,7 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DhA-7Q-tV4">
-                                <rect key="frame" x="13" y="9" width="64" height="17"/>
+                                <rect key="frame" x="13" y="33" width="64" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Presets:" id="5ss-DQ-CYp">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -728,17 +740,20 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="WXW-NR-yy6" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="263" y="10" width="37" height="14"/>
+                                <rect key="frame" x="263" y="33" width="37" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="34B-EP-Kbd"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" title="100%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="0Wm-eA-Yxm">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="AccentColor"/>
+                                        <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" red="0.13231756289999999" green="0.12205065800000001" blue="0.14811862240000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" name="Caption"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -752,7 +767,7 @@
                                 </connections>
                             </button>
                             <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="486" width="316" height="116"/>
+                                <rect key="frame" x="-3" y="516" width="316" height="116"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
                                     <rect key="frame" x="3" y="9" width="310" height="98"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -785,14 +800,14 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="8lF-KI-4cj">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.brightness" id="NvQ-2i-Fcz">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="8lF-KI-4cj">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -935,7 +950,7 @@
                                 </connections>
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="397" width="316" height="205"/>
+                                <rect key="frame" x="-3" y="427" width="316" height="205"/>
                                 <view key="contentView" verticalCompressionResistancePriority="747" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xED-Xy-oTv">
                                     <rect key="frame" x="3" y="9" width="310" height="187"/>
                                     <subviews>
@@ -1107,13 +1122,9 @@
                                                 <userDefinedRuntimeAttribute type="boolean" keyPath="handCursor" value="NO"/>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="z9U-ZM-aSo" id="Hwj-pg-ikZ">
+                                                <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.brightness" id="iDt-Un-GBB">
                                                     <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                     </dictionary>
                                                 </binding>
                                                 <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="z9U-ZM-aSo">
@@ -1121,9 +1132,13 @@
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.brightness" id="iDt-Un-GBB">
+                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="z9U-ZM-aSo" id="Hwj-pg-ikZ">
                                                     <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                        <integer key="NSNullPlaceholder" value="-1"/>
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1158,13 +1173,9 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="1Ij-t6-6Te" id="BId-Cw-Ogd">
+                                                <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.contrast" id="puv-bh-VvY">
                                                     <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                     </dictionary>
                                                 </binding>
                                                 <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="1Ij-t6-6Te">
@@ -1172,9 +1183,13 @@
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="XpJ-ho-P7z" name="title" keyPath="self.display.contrast" id="puv-bh-VvY">
+                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="1Ij-t6-6Te" id="BId-Cw-Ogd">
                                                     <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                        <integer key="NSNullPlaceholder" value="-1"/>
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1208,6 +1223,12 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.brightness" id="jJi-LV-1bm">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="doF-vd-GfJ"/>
                                                 <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="doF-vd-GfJ" id="qd2-DQ-o5f">
                                                     <dictionary key="options">
                                                         <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -1215,12 +1236,6 @@
                                                         <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                                         <integer key="NSNullPlaceholder" value="-1"/>
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="doF-vd-GfJ"/>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.brightness" id="jJi-LV-1bm">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1378,6 +1393,12 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
+                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.contrast" id="a39-hI-zvZ">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.noDDCOrMergedBrightnessContrast" id="yBI-KF-VNQ"/>
                                                 <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="yBI-KF-VNQ" id="fKX-dT-HdL">
                                                     <dictionary key="options">
                                                         <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -1385,12 +1406,6 @@
                                                         <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                                         <integer key="NSNullPlaceholder" value="-1"/>
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.noDDCOrMergedBrightnessContrast" id="yBI-KF-VNQ"/>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.contrast" id="a39-hI-zvZ">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1403,15 +1418,6 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="YgW-fE-mk1" id="lx5-Cy-KW1">
-                                                    <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
                                                 <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showVolumeSlider" id="YgW-fE-mk1">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -1420,6 +1426,15 @@
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.volume" id="acZ-Gi-aGC">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">StringNumberTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="YgW-fE-mk1" id="lx5-Cy-KW1">
+                                                    <dictionary key="options">
+                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                        <integer key="NSNullPlaceholder" value="-1"/>
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1502,7 +1517,7 @@
                                 </connections>
                             </box>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U3O-vh-AKs" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="272" y="563" width="26" height="32"/>
+                                <rect key="frame" x="272" y="593" width="26" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="D7U-0p-uP5"/>
                                     <constraint firstAttribute="width" constant="26" id="pYh-u5-2SG"/>
@@ -1528,6 +1543,90 @@
                                     <action selector="showMenu:" target="XpJ-ho-P7z" id="Vcx-PX-eUZ"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="wrG-as-JXJ" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="263" y="7" width="37" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="TIC-ov-Tq8"/>
+                                    <constraint firstAttribute="width" constant="37" id="s3z-WW-Km4"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Quit" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="a0x-Gx-VUU">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" name="Caption"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="quit:" target="XpJ-ho-P7z" id="dzg-MZ-Eek"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="yMU-YF-Ujt" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="204" y="7" width="53" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="53" id="LP0-2F-ZqU"/>
+                                    <constraint firstAttribute="height" constant="18" id="SuH-WW-KCF"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Restart" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="WRx-s1-fmT">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" name="Caption"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="restart:" target="XpJ-ho-P7z" id="SFU-3L-ebY"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="aDT-qu-eXw" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="15" y="7" width="87" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="JbZ-sS-0Oa"/>
+                                    <constraint firstAttribute="width" constant="87" id="OmZ-ES-IQz"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Preferences" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="YW0-LA-mah">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" name="Caption"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="preferences:" target="XpJ-ho-P7z" id="bDy-2P-BaA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="qKp-A7-ckL" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="5sy-14-JQf"/>
@@ -1537,20 +1636,27 @@
                             <constraint firstItem="WXW-NR-yy6" firstAttribute="leading" secondItem="qKp-A7-ckL" secondAttribute="trailing" constant="5" id="Bxs-xQ-7Vz"/>
                             <constraint firstItem="qbu-vX-wt7" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="Ckt-uA-c3k"/>
                             <constraint firstItem="DhA-7Q-tV4" firstAttribute="leading" secondItem="vGd-1C-1a0" secondAttribute="leading" constant="15" id="Dfx-4m-GWU"/>
+                            <constraint firstItem="yMU-YF-Ujt" firstAttribute="leading" secondItem="aDT-qu-eXw" secondAttribute="trailing" constant="102" id="KBK-nC-Nu9"/>
                             <constraint firstItem="U3O-vh-AKs" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" constant="8" id="KS1-us-Jfl"/>
                             <constraint firstItem="SEc-Qb-jN3" firstAttribute="leading" secondItem="Ajr-Nz-yJI" secondAttribute="trailing" constant="8" symbolic="YES" id="Khi-eX-NE4"/>
                             <constraint firstItem="pEd-3X-Kup" firstAttribute="leading" secondItem="SEc-Qb-jN3" secondAttribute="trailing" constant="8" symbolic="YES" id="LMv-Pm-jnO"/>
                             <constraint firstItem="qbu-vX-wt7" firstAttribute="width" secondItem="vGd-1C-1a0" secondAttribute="width" id="Lon-hh-zBw"/>
+                            <constraint firstItem="wrG-as-JXJ" firstAttribute="leading" secondItem="yMU-YF-Ujt" secondAttribute="trailing" constant="6" id="Ls6-ed-MWP"/>
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="width" secondItem="vGd-1C-1a0" secondAttribute="width" id="MAN-DX-FgL"/>
-                            <constraint firstAttribute="height" constant="600" placeholder="YES" id="MkK-dC-YGb"/>
+                            <constraint firstAttribute="height" constant="630" placeholder="YES" id="MkK-dC-YGb"/>
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="R5S-6t-zAk"/>
+                            <constraint firstItem="aDT-qu-eXw" firstAttribute="leading" secondItem="DhA-7Q-tV4" secondAttribute="leading" id="V8H-Yz-58Z"/>
+                            <constraint firstItem="aDT-qu-eXw" firstAttribute="top" secondItem="DhA-7Q-tV4" secondAttribute="bottom" constant="8" symbolic="YES" id="VNH-5K-BNA"/>
+                            <constraint firstItem="yMU-YF-Ujt" firstAttribute="centerY" secondItem="aDT-qu-eXw" secondAttribute="centerY" id="WQp-zW-ZN8"/>
                             <constraint firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" constant="10" id="afe-I7-aEK"/>
                             <constraint firstItem="SEc-Qb-jN3" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="eHk-bQ-xYF"/>
                             <constraint firstItem="qbu-vX-wt7" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="jZ9-f9-ELe"/>
-                            <constraint firstAttribute="bottom" secondItem="pEd-3X-Kup" secondAttribute="bottom" constant="10" id="nOg-pP-yky"/>
+                            <constraint firstItem="wrG-as-JXJ" firstAttribute="centerY" secondItem="yMU-YF-Ujt" secondAttribute="centerY" id="nSK-so-RfJ"/>
                             <constraint firstItem="WXW-NR-yy6" firstAttribute="centerY" secondItem="qKp-A7-ckL" secondAttribute="centerY" id="v4h-Ea-PGB"/>
                             <constraint firstItem="Ajr-Nz-yJI" firstAttribute="centerY" secondItem="SEc-Qb-jN3" secondAttribute="centerY" id="vOS-yS-DDE"/>
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="xwJ-hC-Omm"/>
+                            <constraint firstAttribute="bottom" secondItem="aDT-qu-eXw" secondAttribute="bottom" constant="7" id="y3K-yc-KsL"/>
+                            <constraint firstItem="wrG-as-JXJ" firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" id="zIO-gE-okg"/>
                         </constraints>
                     </view>
                     <connections>
@@ -1586,17 +1692,20 @@
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>
         <image name="volume-low" width="24" height="24"/>
-        <namedColor name="AccentColor">
-            <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="Caption">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Caption Secondary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Caption Tertiary">
-            <color red="0.063000001010000001" green="0.0120000001" blue="0.20000000300000001" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Field BG">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Lunar Yellow Transparent">
+            <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

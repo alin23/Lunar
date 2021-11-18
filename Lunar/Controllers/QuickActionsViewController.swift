@@ -70,6 +70,18 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 
 //    #endif
 
+    @IBAction func quit(_ sender: Button) {
+        NSApplication.shared.terminate(sender)
+    }
+
+    @IBAction func restart(_ sender: Button) {
+        appDelegate!.restartApp(sender)
+    }
+
+    @IBAction func preferences(_ sender: Button) {
+        appDelegate!.showPreferencesWindow(sender: sender)
+    }
+
     @IBAction func setPercent(_ sender: Button) {
         appDelegate!.setLightPercent(percent: sender.tag.i8)
     }
@@ -135,7 +147,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
                 }
             }
 
-            self.view.setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 50 : 76)))
+            self.view.setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 80 : 106)))
         }
     }
 
