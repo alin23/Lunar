@@ -881,6 +881,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
+            for windowType in ["corner", "gamma", "shade", "faceLight"] {
+                if !NSScreen.onlineDisplayIDs.contains(displayID), let wc = Display.getWindowController(displayID, type: windowType) {
+                    wc.close()
+                    Display.setWindowController(displayID, type: windowType, windowController: nil)
+                }
+            }
+
             debounce(ms: 2000, uniqueTaskKey: "panel-refresh-\(displayID)", mainThread: true, value: displayID) { id in
                 DisplayController.panelManager = MPDisplayMgr()
                 if let display = displayController.activeDisplays[id] {
