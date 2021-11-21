@@ -74,7 +74,7 @@ let GENERIC_DISPLAY = Display(
 )
 #if DEBUG
     var TEST_DISPLAY: Display = {
-        let d = Display(
+        let BWqRBb9WWpPF = Display(
             id: TEST_DISPLAY_ID,
             serial: "TEST_DISPLAY_SERIAL",
             name: "LG Ultra HD",
@@ -85,12 +85,12 @@ let GENERIC_DISPLAY = Display(
             maxContrast: 75,
             adaptive: true
         )
-        d.hasI2C = true
-        return d
+        BWqRBb9WWpPF.hasI2C = true
+        return BWqRBb9WWpPF
     }()
 
     var TEST_DISPLAY_PERSISTENT: Display = {
-        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT_SERIAL"])?.first ?? Display(
+        let BWqRBb9WWpPF = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT_ID,
             serial: "TEST_DISPLAY_PERSISTENT_SERIAL_PERSISTENT",
             name: "DELL U3419W",
@@ -101,12 +101,12 @@ let GENERIC_DISPLAY = Display(
             maxContrast: 100,
             adaptive: true
         )
-        d.hasI2C = true
-        return d
+        BWqRBb9WWpPF.hasI2C = true
+        return BWqRBb9WWpPF
     }()
 
     var TEST_DISPLAY_PERSISTENT2: Display = {
-        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT2_SERIAL"])?.first ?? Display(
+        let BWqRBb9WWpPF = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT2_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT2_ID,
             serial: "TEST_DISPLAY_PERSISTENT2_SERIAL_PERSISTENT_TWO",
             name: "LG Ultrafine",
@@ -117,12 +117,12 @@ let GENERIC_DISPLAY = Display(
             maxContrast: 100,
             adaptive: true
         )
-        d.hasI2C = true
-        return d
+        BWqRBb9WWpPF.hasI2C = true
+        return BWqRBb9WWpPF
     }()
 
     var TEST_DISPLAY_PERSISTENT3: Display = {
-        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT3_SERIAL"])?.first ?? Display(
+        let BWqRBb9WWpPF = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT3_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT3_ID,
             serial: "TEST_DISPLAY_PERSISTENT3_SERIAL_PERSISTENT_THREE",
             name: "Pro Display XDR",
@@ -133,12 +133,12 @@ let GENERIC_DISPLAY = Display(
             maxContrast: 100,
             adaptive: true
         )
-        d.hasI2C = true
-        return d
+        BWqRBb9WWpPF.hasI2C = true
+        return BWqRBb9WWpPF
     }()
 
     var TEST_DISPLAY_PERSISTENT4: Display = {
-        let d = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT4_SERIAL"])?.first ?? Display(
+        let BWqRBb9WWpPF = datastore.displays(serials: ["TEST_DISPLAY_PERSISTENT4_SERIAL"])?.first ?? Display(
             id: TEST_DISPLAY_PERSISTENT4_ID,
             serial: "TEST_DISPLAY_PERSISTENT4_SERIAL_PERSISTENT_FOUR",
             name: "Thunderbolt",
@@ -149,8 +149,8 @@ let GENERIC_DISPLAY = Display(
             maxContrast: 100,
             adaptive: true
         )
-        d.hasI2C = true
-        return d
+        BWqRBb9WWpPF.hasI2C = true
+        return BWqRBb9WWpPF
     }()
 #endif
 
@@ -1242,6 +1242,11 @@ enum ValueType {
         return false
     }
 
+    var testWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "test") }
+        set { Self.setWindowController(id, type: "test", windowController: newValue) }
+    }
+
     var cornerWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "corner") }
         set { Self.setWindowController(id, type: "corner", windowController: newValue) }
@@ -1825,12 +1830,14 @@ enum ValueType {
         didSet {
             save()
 
-            applyPreciseValue = false
-            preciseBrightness = brightnessToSliderValue(brightness)
-            if !lockedBrightness || lockedContrast {
-                preciseBrightnessContrast = brightnessToSliderValue(brightness)
+            mainThread {
+                applyPreciseValue = false
+                preciseBrightness = brightnessToSliderValue(self.brightness)
+                if !lockedBrightness || lockedContrast {
+                    preciseBrightnessContrast = brightnessToSliderValue(self.brightness)
+                }
+                applyPreciseValue = true
             }
-            applyPreciseValue = true
 
             guard DDC.apply, !lockedBrightness, force || brightness != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
@@ -1887,12 +1894,14 @@ enum ValueType {
         didSet {
             save()
 
-            applyPreciseValue = false
-            preciseContrast = contrastToSliderValue(contrast, merged: CachedDefaults[.mergeBrightnessContrast])
-            if lockedBrightness && !lockedContrast {
-                preciseBrightnessContrast = contrastToSliderValue(contrast)
+            mainThread {
+                applyPreciseValue = false
+                preciseContrast = contrastToSliderValue(self.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+                if lockedBrightness, !lockedContrast {
+                    preciseBrightnessContrast = contrastToSliderValue(self.contrast)
+                }
+                applyPreciseValue = true
             }
-            applyPreciseValue = true
 
             guard DDC.apply, !lockedContrast, force || contrast != oldValue else { return }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
@@ -3067,7 +3076,6 @@ enum ValueType {
 
         guard isSmartBuiltin else { return }
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
-
         asyncEvery(
             listensForBrightnessChange ? 3.seconds : 1.seconds,
             uniqueTaskKey: "Builtin Brightness Refresher",
