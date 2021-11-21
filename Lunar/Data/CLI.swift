@@ -431,7 +431,7 @@ struct Lunar: ParsableCommand {
 
             for id in displayIDs {
                 var brightness: Float = value.f
-                var type: UInt32 = value2.u32
+                let type: UInt32 = value2.u32
                 switch method {
                 case .GetLinearBrightness:
                     DisplayServicesGetLinearBrightness(id, &brightness)

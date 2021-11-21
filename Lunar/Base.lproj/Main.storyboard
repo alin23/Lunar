@@ -8921,7 +8921,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                     <window key="window" title="Window" separatorStyle="none" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" id="uhA-i6-v8l">
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="0.0" y="-1" width="800" height="601"/>
-                        <rect key="screenRect" x="-693" y="1050" width="3008" height="1667"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
                         <view key="contentView" id="0Zp-H5-sSP">
                             <rect key="frame" x="0.0" y="0.0" width="800" height="601"/>
                             <autoresizingMask key="autoresizingMask"/>
@@ -8956,17 +8956,20 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gal-Ax-dzk">
-                                <rect key="frame" x="25" y="41" width="320" height="69"/>
+                                <rect key="frame" x="40" y="41" width="649" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <shadow key="shadow" blurRadius="5">
                                     <size key="offset" width="0.0" height="6"/>
                                     <color key="color" white="0.0" alpha="0.17735927152317882" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </shadow>
-                                <textFieldCell key="cell" alignment="center" title="Lunar Test" id="vRg-TE-3wR">
+                                <textFieldCell key="cell" alignment="left" title="Lunar Test" id="vRg-TE-3wR">
                                     <font key="font" metaFont="systemBlack" size="50"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="Ymi-Qf-JCZ" name="value" keyPath="self.lunarTestText" id="dsR-Di-Pgj"/>
+                                </connections>
                             </textField>
                         </subviews>
                     </view>

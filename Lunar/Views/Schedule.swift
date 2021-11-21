@@ -285,10 +285,10 @@ class Schedule: NSView {
             setTempValues(from: schedule)
 
             if CachedDefaults[.mergeBrightnessContrast] {
-                preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+                preciseBrightnessContrast = display.brightnessToSliderValue(schedule.brightness.ns)
             } else {
-                preciseBrightness = display.brightnessToSliderValue(display.brightness)
-                preciseContrast = display.contrastToSliderValue(display.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+                preciseBrightness = display.brightnessToSliderValue(schedule.brightness.ns)
+                preciseContrast = display.contrastToSliderValue(schedule.contrast.ns, merged: CachedDefaults[.mergeBrightnessContrast])
             }
 
             hour.integerValue = schedule.hour.i
@@ -369,10 +369,9 @@ class Schedule: NSView {
     }
 
     @objc func useCurrentBrightness() {
-        guard let display = display, let schedule = schedule else {
+        guard let display = display else {
             return
         }
-        // self.schedule = schedule.with(brightness: display.brightness.uint8Value, contrast: display.contrast.uint8Value)
         if CachedDefaults[.mergeBrightnessContrast] {
             preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
         } else {
