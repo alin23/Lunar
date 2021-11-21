@@ -323,6 +323,14 @@ class DataStore: NSObject {
                 dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
             case let valueKey as Defaults.Key<AdaptiveModeKey>:
                 dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
+            case let valueKey as Defaults.Key<BrightnessKeyAction>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
+            case let valueKey as Defaults.Key<DDCSleepFactor>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
+            case let valueKey as Defaults.Key<ScheduleTransition>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
+            case let valueKey as Defaults.Key<BrightnessTransition>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
             case let valueKey as Defaults.Key<[String]>:
                 dict[key.name] = try! encoder.encode(Defaults[valueKey]).str()
             case let valueKey as Defaults.Key<[Display]>:

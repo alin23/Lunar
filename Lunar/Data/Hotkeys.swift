@@ -924,20 +924,26 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
         }
 
-        if sourceDisplay {
-            guard let display = displayController.sourceDisplay else { return }
-            showOSD(display)
-        } else if builtinDisplay {
-            guard let display = displayController.builtinDisplay else { return }
-            showOSD(display)
-        } else if currentDisplay {
-            guard let display = displayController.cursorDisplay else { return }
-            showOSD(display)
-        } else if allDisplays {
-            displayController.activeDisplays.values.forEach(showOSD)
-        } else {
+        guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays else {
             displayController.activeDisplays.values
                 .filter { !$0.isBuiltin }
+                .forEach(showOSD)
+
+            return
+        }
+
+        if sourceDisplay, let display = displayController.sourceDisplay {
+            showOSD(display)
+        }
+        if builtinDisplay, let display = displayController.builtinDisplay {
+            showOSD(display)
+        }
+        if currentDisplay, let display = displayController.cursorDisplay {
+            showOSD(display)
+        }
+        if allDisplays {
+            displayController.activeDisplays.values
+                .filter { !builtinDisplay || !$0.isBuiltin }
                 .forEach(showOSD)
         }
     }

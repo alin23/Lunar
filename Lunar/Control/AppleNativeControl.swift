@@ -28,6 +28,8 @@ class AppleNativeControl: Control {
 
     // MARK: Internal
 
+    @Atomic static var sliderTracking = false
+
     var displayControl: DisplayControl = .appleNative
 
     weak var display: Display?
@@ -195,7 +197,9 @@ class AppleNativeControl: Control {
         guard let display = display else { return false }
         guard !display.isForTesting else { return false }
 
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue, oldValue != brightness {
+        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
+           oldValue != brightness
+        {
             if display.inSmoothTransition {
                 display.shouldStopBrightnessTransition = true
                 oldValue = display.lastWrittenBrightness

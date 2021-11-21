@@ -385,11 +385,11 @@ class DisplayController {
             }
         }.store(in: &observers)
 
-        showSliderValuesPublisher.sink { [self] _ in
+        showSliderValuesPublisher.sink { _ in
             mainAsync { menuPopover?.close() }
         }.store(in: &observers)
 
-        mergeBrightnessContrastPublisher.sink { [self] _ in
+        mergeBrightnessContrastPublisher.sink { _ in
             mainAsync { menuPopover?.close() }
         }.store(in: &observers)
 

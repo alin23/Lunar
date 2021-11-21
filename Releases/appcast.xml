@@ -1202,7 +1202,7 @@
             <sparkle:version>5.0.5</sparkle:version>
             <sparkle:shortVersionString>5.0.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.0.5.dmg" length="16561518" type="application/octet-stream" sparkle:edSignature="PO+EhNB/MOPG3yz5YsYfSyt4oVw1f02/WFD9rTloKr1Aiay8A7RGUZ0/7EMzTDNR603WNAdLGp5+u3EPJtp6Dg==" sparkle:dsaSignature="MEQCIHXf08nYlsKMVBP+AMpoc8X8Pa1P643K0VfZ42IO2T2tAiB4roT6TgzopneKuXKX60z/0AQPgfNYUhpanur3VLTj7Q=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.0.5.dmg" length="16561518" type="application/octet-stream" sparkle:edSignature="PO+EhNB/MOPG3yz5YsYfSyt4oVw1f02/WFD9rTloKr1Aiay8A7RGUZ0/7EMzTDNR603WNAdLGp5+u3EPJtp6Dg==" sparkle:dsaSignature="MEUCIHRay71FzhIySoRMjNmqIDcWq1m4tiyStKAAQdjRcTLnAiEAnhm+7NNPFytsIxm3TZtuk7gCgEbR5ZmyrUJRFWg/kyc="/>
             <signature>GWwJjGbvlR6O41iw+PkwXx6DP4E=</signature>
             <signature>M0yZoVBwUutOvo7rP2oHAbb26EE=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="fixes">Fixes</h2><ul><li>Fix detection for Samsung U28E850</li></ul></div></div>]]></description>
@@ -1213,6 +1213,28 @@
             <signature>PktTmG8dCkik.6nxdQMuJXHD01s=</signature>
             <signature>PktTmG8dCkik/6nxdQMuJXHD01s=</signature>
             <signature>T3NFD0oGUqi9bnixaSxZQtuN8oo=</signature>
+            <signature>8.nxj57YsRlSmFhahvnr9eFzJM4=</signature>
+            <signature>8/nxj57YsRlSmFhahvnr9eFzJM4=</signature>
+            <signature>NKJqrso6tD6YZMnQYzVA1BIEr7M=</signature>
+            <signature>hRxIz.NoaHYC8wckHbSeFjk8dC0=</signature>
+            <signature>hRxIz/NoaHYC8wckHbSeFjk8dC0=</signature>
+            <signature>ZN7y.vwFGMRXV9mDEPoOB42xBg0=</signature>
+            <signature>ZN7y/vwFGMRXV9mDEPoOB42xBg0=</signature>
+            <signature>jD+JhLt7YsleKRVm2aEyarSyQuU=</signature>
+            <signature>WURNCFLp5Bd5r7NQil.7wwd2saY=</signature>
+            <signature>WURNCFLp5Bd5r7NQil/7wwd2saY=</signature>
+        </item>
+        <item>
+            <title>5.0.6</title>
+            <pubDate>Sun, 21 Nov 2021 16:56:00 +0200</pubDate>
+            <sparkle:version>5.0.6</sparkle:version>
+            <sparkle:shortVersionString>5.0.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.0.6.dmg" length="16598616" type="application/octet-stream" sparkle:edSignature="V4psy+mCwvg0WyvJE+AI4F2okVSfeHPSVV6jHa17cWY1VpnCCAa3NoCJljtr81rLdOwN2BIx+pgmaw99GtMoCw==" sparkle:dsaSignature="MEUCIF7Zt6juGoj+vhjefhY+cqljOUcmNBzLSixozWoYaR5fAiEAgVSbpFdcJmbEvNTJdqMDZIsunwtJBEKwlCsWL6vXHWA="/>
+            <signature>Wmub5YP1wnLaYQDosUYGN5P0EGI=</signature>
+            <signature>.hZNCphP+ySZ6qGQpD99CiF8EyI=</signature>
+            <signature>/hZNCphP+ySZ6qGQpD99CiF8EyI=</signature>
+            <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add more useful buttons at the bottom of the QuickActions menu: <ul><li><strong>Preferences</strong></li><li><strong>Restart</strong></li><li><strong>Quit</strong></li></ul></li></ul><h2 id="improvements">Improvements</h2><ul><li>Add menu item to <strong>Relaunch the onboarding process</strong></li><li>Improve QuickActions menu height formula </li><li>Add notice about how to relaunch onboarding if needed</li><li>Improve brightness slider for built-in display</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix <strong>Sync Source</strong> button text being unreadable</li><li>Fix overlay artifacts appearing when disconnecting iPad Sidecar</li><li>Fix brightness OSD not showing in some cases</li><li>Fix Clock Mode schedules being reverted to the current brightness on some occasions</li></ul></div></div>]]></description>
         </item>
     </channel>
 </rss>

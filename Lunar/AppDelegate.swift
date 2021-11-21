@@ -180,6 +180,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic var faceLightOn = false
 
+    var wakeObserver: Cancellable?
+    var screenObserver: Cancellable?
+
     lazy var updater = SPUUpdater(
         hostBundle: Bundle.main,
         applicationBundle: Bundle.main,
@@ -296,6 +299,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.restartApp(self)
             }
         }
+    }
+
+    func showTestWindow(text: String? = nil) {
+        mainThread {
+            for d in displayController.activeDisplayList {
+                createWindow(
+                    "testWindowController",
+                    controller: &d.testWindowController,
+                    screen: d.screen,
+                    show: true,
+                    backgroundColor: .clear,
+                    level: .screenSaver,
+                    fillScreen: false,
+                    stationary: true
+                )
+                if let text = text, let wc = d.testWindowController, let w = wc.window,
+                   let view = w.contentViewController as? LunarTestViewController
+                {
+                    view.lunarTestText = text
+                    view.taskKey = "lunarTestHighlighter-\(d.serial)"
+                    view.label.textColor = red
+                }
+            }
+        }
+        wakeObserver = wakeObserver ?? NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.screensDidWakeNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [self] _ in
+                showTestWindow()
+            }
+        screenObserver = screenObserver ?? NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [self] _ in
+                showTestWindow()
+            }
     }
 
     func menuWillOpen(_: NSMenu) {
@@ -1270,9 +1309,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        let xsdf = initStuff
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
+            log.verbose("\(initStuff)")
         }
 
         initCache()

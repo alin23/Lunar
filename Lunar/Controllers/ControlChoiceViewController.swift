@@ -43,24 +43,32 @@ class GradientView: NSView {
 
 class LunarTestViewController: NSViewController {
     @IBOutlet var label: NSTextField!
+    @objc dynamic var lunarTestText: String = "Lunar Test"
+    var taskKey = "lunarTestHighlighter"
 
     override func viewDidAppear() {
         asyncEvery(
             2.seconds,
-            uniqueTaskKey: "lunarTestHighlighter",
+            uniqueTaskKey: taskKey,
             onSuccess: {
-                testWindowController?.close()
-                testWindowController = nil
+                mainAsync {
+                    testWindowController?.close()
+                    testWindowController = nil
+                }
             },
             onCancelled: {
-                testWindowController?.close()
-                testWindowController = nil
+                mainAsync {
+                    testWindowController?.close()
+                    testWindowController = nil
+                }
             }
         ) { [weak self] timer in
             guard let self = self else {
                 timer.invalidate()
-                testWindowController?.close()
-                testWindowController = nil
+                mainAsync {
+                    testWindowController?.close()
+                    testWindowController = nil
+                }
                 return
             }
             mainThread {
@@ -883,7 +891,7 @@ class ControlChoiceViewController: NSViewController {
 
                 guard let w = self?.view.window else { return }
 
-                let resp = ask(
+                _ = ask(
                     message: "Display list changed",
                     info: """
                         The list of connected displays has changed
