@@ -963,9 +963,17 @@ class DisplayController {
 
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
         guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
+            #if DEBUG
+                log.debug("!exceptions: \(runningAppExceptions)")
+                log.debug("!screen: \(display.screen)")
+            #endif
             mainAsync { display.appPreset = nil }
             return nil
         }
+        #if DEBUG
+            log.debug("exceptions: \(exceptions)")
+            log.debug("screen: \(screen)")
+        #endif
 
         if let app = activeWindow(on: screen)?.appException {
             mainAsync { display.appPreset = app }

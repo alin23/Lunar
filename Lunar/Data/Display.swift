@@ -2821,7 +2821,7 @@ enum ValueType {
                     screen: screen,
                     show: true,
                     backgroundColor: .clear,
-                    level: .screenSaver,
+                    level: .hud,
                     fillScreen: true,
                     stationary: true
                 )
@@ -2849,9 +2849,12 @@ enum ValueType {
                 toHigh: 0.85
             )
 
-            if amount == 0, smooth {
-                asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) {
-                    w.contentView?.alphaValue = 0
+            if amount <= 0.01, smooth {
+                asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) { [weak self] in
+                    guard let self = self else { return }
+                    log.verbose("Removing shade for \(self.description ?? "")")
+                    self.shadeWindowController?.close()
+                    self.shadeWindowController = nil
                 }
             }
         }

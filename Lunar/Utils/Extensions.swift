@@ -433,6 +433,10 @@ extension NumberFormatter {
 
 extension NSAppearance {
     var isDark: Bool { name == .vibrantDark || name == .darkAqua }
+    static var dark: NSAppearance? { NSAppearance(named: .darkAqua) }
+    static var light: NSAppearance? { NSAppearance(named: .aqua) }
+    static var vibrantDark: NSAppearance? { NSAppearance(named: .vibrantDark) }
+    static var vibrantLight: NSAppearance? { NSAppearance(named: .vibrantLight) }
 }
 
 extension NSAttributedString {
@@ -734,6 +738,10 @@ extension MPDisplayMode {
     }
 }
 
+extension NSWindow.Level {
+    static var hud: NSWindow.Level { .init(rawValue: CGShieldingWindowLevel().i) }
+}
+
 extension NSScreen {
     // override open var description: String {
     //     "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"
@@ -809,6 +817,11 @@ extension NSScreen {
         guard let id = deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
         else { return nil }
         return CGDirectDisplayID(id.uint32Value)
+    }
+
+    var bounds: CGRect? {
+        guard let id = displayID else { return nil }
+        return CGDisplayBounds(id)
     }
 
     var isBuiltin: Bool {
