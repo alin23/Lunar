@@ -767,9 +767,9 @@
                                 </connections>
                             </button>
                             <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="516" width="316" height="116"/>
+                                <rect key="frame" x="-3" y="510" width="316" height="122"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
-                                    <rect key="frame" x="3" y="9" width="310" height="98"/>
+                                    <rect key="frame" x="3" y="9" width="310" height="104"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -813,7 +813,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
-                                            <rect key="frame" x="13" y="75" width="130" height="19"/>
+                                            <rect key="frame" x="13" y="81" width="130" height="19"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="RjJ-T2-HEe">
                                                 <font key="font" size="16" name="Menlo-Bold"/>
                                                 <color key="textColor" name="Caption Secondary"/>
@@ -906,7 +906,7 @@
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="leading" secondItem="GuV-5N-Ajh" secondAttribute="leading" id="LuT-YH-oxK"/>
-                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="2" id="NLt-qN-Af8"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="8" id="NLt-qN-Af8"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="centerY" secondItem="ddL-Y9-B9P" secondAttribute="centerY" id="Oji-Si-pFa"/>
                                         <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" id="TJr-8A-iUn"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
@@ -950,12 +950,12 @@
                                 </connections>
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="427" width="316" height="205"/>
+                                <rect key="frame" x="-3" y="421" width="316" height="211"/>
                                 <view key="contentView" verticalCompressionResistancePriority="747" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xED-Xy-oTv">
-                                    <rect key="frame" x="3" y="9" width="310" height="187"/>
+                                    <rect key="frame" x="3" y="9" width="310" height="193"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
-                                            <rect key="frame" x="13" y="164" width="130" height="19"/>
+                                            <rect key="frame" x="13" y="170" width="130" height="19"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="8it-gt-vwn">
                                                 <font key="font" size="16" name="Menlo-Bold"/>
                                                 <color key="textColor" name="Caption Secondary"/>
@@ -1411,7 +1411,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VFW-kV-UHQ">
-                                            <rect key="frame" x="248" y="79" width="28" height="15"/>
+                                            <rect key="frame" x="248" y="85" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="qG3-cl-vJX">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1459,7 +1459,7 @@
                                         <constraint firstItem="tpp-dP-5eh" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="JU8-bt-1Ll"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" constant="6" id="K61-K6-fOU"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
-                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="2" id="Nnz-oO-qw1"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="8" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="pRg-MU-0kr" secondAttribute="bottom" priority="495" constant="4" id="Vfo-pT-RZi"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" priority="496" constant="4" id="WPP-K2-90h"/>
@@ -1543,6 +1543,47 @@
                                     <action selector="showMenu:" target="XpJ-ho-P7z" id="Vcx-PX-eUZ"/>
                                 </connections>
                             </button>
+                            <popUpButton focusRingType="none" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SkK-ct-Zbj" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="151" y="602" width="118" height="14"/>
+                                <popUpButtonCell key="cell" type="inline" title="Auto Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" focusRingType="none" tag="99" imageScaling="proportionallyDown" inset="2" selectedItem="UB7-ix-aEg" id="sB5-w1-52V" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="fVR-IO-1bT">
+                                        <items>
+                                            <menuItem title="Sensor Mode" image="sensormode" tag="2" id="uUb-J0-SJN">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Sync Mode" image="syncmode" tag="-1" id="Db5-W4-0zG">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Location Mode" image="locationmode" tag="1" id="ywb-83-P7E">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Clock Mode" image="clockmode" tag="3" id="oxN-pM-cDD">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Manual Mode" image="manualmode" id="9TR-Kk-eDN">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="tUU-JD-j6N"/>
+                                            <menuItem title="Auto Mode" state="on" image="automode" tag="99" id="UB7-ix-aEg">
+                                                <attributedString key="attributedTitle"/>
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="originType">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </popUpButton>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="wrG-as-JXJ" customClass="Button" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="263" y="7" width="37" height="18"/>
                                 <constraints>
@@ -1629,6 +1670,7 @@
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="SkK-ct-Zbj" firstAttribute="centerY" secondItem="U3O-vh-AKs" secondAttribute="centerY" id="0jT-J0-VjR"/>
                             <constraint firstItem="qKp-A7-ckL" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="5sy-14-JQf"/>
                             <constraint firstItem="qKp-A7-ckL" firstAttribute="leading" secondItem="pEd-3X-Kup" secondAttribute="trailing" constant="8" symbolic="YES" id="9ZL-x7-ff0"/>
                             <constraint firstAttribute="trailing" secondItem="U3O-vh-AKs" secondAttribute="trailing" constant="12" id="Aqj-ot-0ha"/>
@@ -1645,6 +1687,7 @@
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="width" secondItem="vGd-1C-1a0" secondAttribute="width" id="MAN-DX-FgL"/>
                             <constraint firstAttribute="height" constant="630" placeholder="YES" id="MkK-dC-YGb"/>
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="R5S-6t-zAk"/>
+                            <constraint firstItem="U3O-vh-AKs" firstAttribute="leading" secondItem="SkK-ct-Zbj" secondAttribute="trailing" constant="3" id="RBt-6L-A16"/>
                             <constraint firstItem="aDT-qu-eXw" firstAttribute="leading" secondItem="DhA-7Q-tV4" secondAttribute="leading" id="V8H-Yz-58Z"/>
                             <constraint firstItem="aDT-qu-eXw" firstAttribute="top" secondItem="DhA-7Q-tV4" secondAttribute="bottom" constant="8" symbolic="YES" id="VNH-5K-BNA"/>
                             <constraint firstItem="yMU-YF-Ujt" firstAttribute="centerY" secondItem="aDT-qu-eXw" secondAttribute="centerY" id="WQp-zW-ZN8"/>
@@ -1679,7 +1722,9 @@
     </scenes>
     <resources>
         <image name="NSActionTemplate" width="15" height="15"/>
+        <image name="automode" width="14" height="14"/>
         <image name="brightness" width="50.5" height="50.5"/>
+        <image name="clockmode" width="14" height="14"/>
         <image name="component" width="14" height="14"/>
         <image name="composite" width="14" height="14"/>
         <image name="contrast" width="24" height="24"/>
@@ -1687,7 +1732,11 @@
         <image name="dvi" width="14" height="14"/>
         <image name="hdmi" width="14" height="14"/>
         <image name="input" width="14" height="14"/>
+        <image name="locationmode" width="14" height="14"/>
+        <image name="manualmode" width="14" height="14"/>
+        <image name="sensormode" width="14" height="14"/>
         <image name="svideo" width="14" height="14"/>
+        <image name="syncmode" width="14" height="14"/>
         <image name="tuner" width="14" height="14"/>
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>

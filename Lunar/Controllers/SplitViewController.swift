@@ -297,10 +297,10 @@ class SplitViewController: NSSplitViewController {
 
     func lastPage() {
         setPage(pageController?.selectedIndex)
-        whiteBackground()
+        displayPage()
     }
 
-    func whiteBackground() {
+    func displayPage() {
         uiCrumb("Display Page \(pageController?.selectedIndex ?? 0)")
         setPage(pageController?.selectedIndex)
         view.transition(0.2)
@@ -311,8 +311,8 @@ class SplitViewController: NSSplitViewController {
         }
 
         if darkMode {
-            activeModeButton?.page = .hotkeys
-            activeModeButton?.fade()
+            activeModeButton.bg = lunarYellow.withAlphaComponent(0.2)
+            activeModeButton.appearance = .dark
 
             POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantDark)
@@ -320,8 +320,8 @@ class SplitViewController: NSSplitViewController {
 
             pageControl?.appearance = NSAppearance(named: .vibrantDark)
         } else {
-            activeModeButton?.page = .display
-            activeModeButton?.fade()
+            activeModeButton.bg = white.withAlphaComponent(0.3)
+            activeModeButton.appearance = .light
 
             POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
             POPOVERS["settings"]??.appearance = NSAppearance(named: .vibrantLight)
@@ -331,7 +331,7 @@ class SplitViewController: NSSplitViewController {
         }
     }
 
-    func yellowBackground() {
+    func configurationPage() {
         uiCrumb("Configuration Page")
         setPage(pageController?.selectedIndex)
         if let logo = logo {
@@ -340,14 +340,14 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "SETTINGS"
         }
 
-        activeModeButton?.page = .settings
-        activeModeButton?.fade()
+        activeModeButton.bg = white.withAlphaComponent(darkMode ? 0.3 : 0.6)
+        activeModeButton.appearance = .light
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantLight)
         pageControl?.appearance = NSAppearance(named: .aqua)
     }
 
-    func mauveBackground() {
+    func hotkeysPage() {
         uiCrumb("Hotkeys Page")
 
         setPage(pageController?.selectedIndex)
@@ -357,8 +357,8 @@ class SplitViewController: NSSplitViewController {
             logo.stringValue = "HOTKEYS"
         }
 
-        activeModeButton?.page = .hotkeys
-        activeModeButton?.fade()
+        activeModeButton.bg = lunarYellow.withAlphaComponent(0.2)
+        activeModeButton.appearance = .dark
 
         POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
         pageControl?.appearance = NSAppearance(named: .darkAqua)
@@ -369,7 +369,7 @@ class SplitViewController: NSSplitViewController {
         view.radius = 12.0.ns
         view.bg = white
 
-        whiteBackground()
+        displayPage()
         updateHelpButton()
         listenForAdaptiveModeChange()
 

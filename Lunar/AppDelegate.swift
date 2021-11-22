@@ -702,13 +702,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             pageController.select(index: currentPage)
             switch currentPage {
             case 0:
-                splitViewController.mauveBackground()
+                splitViewController.hotkeysPage()
             case 1:
-                splitViewController.yellowBackground()
+                splitViewController.configurationPage()
             case pageController.arrangedObjects.count - 1:
                 splitViewController.lastPage()
             default:
-                splitViewController.whiteBackground()
+                splitViewController.displayPage()
             }
         }
 

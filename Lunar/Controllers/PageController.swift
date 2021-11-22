@@ -88,13 +88,13 @@ class PageController: NSPageController {
 
             switch selectedIndex {
             case 0:
-                splitViewController.mauveBackground()
+                splitViewController.hotkeysPage()
             case 1:
-                splitViewController.yellowBackground()
+                splitViewController.configurationPage()
             case arrangedObjects.count - 1:
                 splitViewController.lastPage()
             default:
-                splitViewController.whiteBackground()
+                splitViewController.displayPage()
             }
 
             splitViewController.onLeftButtonPress = { [weak self] in
@@ -143,9 +143,9 @@ extension PageController: NSPageControllerDelegate {
 
         switch c.selectedIndex {
         case 0:
-            splitViewController.mauveBackground()
+            splitViewController.hotkeysPage()
         case 1:
-            splitViewController.yellowBackground()
+            splitViewController.configurationPage()
             if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade, !advancedSettingsHintShown,
                let settingsPageController = c.viewControllers[c.settingsPageControllerIdentifier] as? SettingsPageController
             {
@@ -155,7 +155,7 @@ extension PageController: NSPageControllerDelegate {
         case arrangedObjects.count - 1:
             splitViewController.lastPage()
         default:
-            splitViewController.whiteBackground()
+            splitViewController.displayPage()
         }
     }
 

@@ -1005,176 +1005,36 @@ and setting its brightness/contrast to 0</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGE-aF-MVx" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="795" y="650" width="109" height="15"/>
+                                <rect key="frame" x="795" y="654" width="123" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="inline" title="⚫︎  Sensor Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" tag="2" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="7Tn-b9-Cdk" id="Kyh-RR-mh5" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                <popUpButtonCell key="cell" type="inline" title="Location Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="4Pr-nT-3EU" id="Kyh-RR-mh5" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="8hR-Pz-G9R">
                                         <items>
-                                            <menuItem title="⚫︎  Sensor Mode" state="on" tag="2" id="7Tn-b9-Cdk">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.086269999999999999" green="0.48235" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  ">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.086269999999999999" green="0.48235" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="Sensor Mode">
-                                                        <attributes>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Sensor Mode" image="sensormode" tag="2" id="7Tn-b9-Cdk">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="⚫︎  Sync Mode" tag="-1" id="YYQ-6O-Ldf">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.32940999999999998" green="0.82745000000000002" blue="0.50588" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  ">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.32940999999999998" green="0.82745000000000002" blue="0.50588" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="Sync Mode">
-                                                        <attributes>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Sync Mode" image="syncmode" tag="-1" id="YYQ-6O-Ldf">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="⚫︎  Location Mode" tag="1" id="4Pr-nT-3EU">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  ">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="Location Mode">
-                                                        <attributes>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Location Mode" state="on" image="locationmode" tag="1" id="4Pr-nT-3EU">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="⚫︎  Clock Mode" tag="3" id="4gE-Pl-sMD">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.99215686274509807" green="0.58431372549019611" blue="0.34509803921568627" alpha="1" colorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  ">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.99216000000000004" green="0.79215999999999998" blue="0.22745000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="Clock Mode">
-                                                        <attributes>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Clock Mode" image="clockmode" tag="3" id="4gE-Pl-sMD">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="⚫︎  Manual Mode" id="rh0-mE-71Z">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSBackgroundColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <color key="NSColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
-                                                                <tabStops>
-                                                                    <textTab alignment="left" location="27.149999618530273">
-                                                                        <options/>
-                                                                    </textTab>
-                                                                </tabStops>
-                                                            </paragraphStyle>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  ">
-                                                        <attributes>
-                                                            <color key="NSBackgroundColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="0.0" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <color key="NSColor" red="0.94901999999999997" green="0.20000000000000001" blue="0.26274999999999998" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
-                                                                <tabStops>
-                                                                    <textTab alignment="left" location="27.149999618530273">
-                                                                        <options/>
-                                                                    </textTab>
-                                                                </tabStops>
-                                                            </paragraphStyle>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="Manual Mode">
-                                                        <attributes>
-                                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="27.149999999999999" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
-                                                                <tabStops>
-                                                                    <textTab alignment="left" location="27.149999618530273">
-                                                                        <options/>
-                                                                    </textTab>
-                                                                </tabStops>
-                                                            </paragraphStyle>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Manual Mode" image="manualmode" id="rh0-mE-71Z">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem isSeparatorItem="YES" id="Daz-qe-g48"/>
-                                            <menuItem title="⚫︎  Auto Mode" tag="99" id="A93-Hb-19F">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="⚫︎">
-                                                        <attributes>
-                                                            <color key="NSColor" red="0.15791728887452053" green="0.10222347583866889" blue="0.37273628201280512" alpha="1" colorSpace="calibratedRGB"/>
-                                                            <font key="NSFont" metaFont="smallSystem"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                    <fragment content="  Auto Mode">
-                                                        <attributes>
-                                                            <font key="NSFont" metaFont="systemSemibold" size="11"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                            <menuItem title="Auto Mode" image="automode" tag="99" id="A93-Hb-19F">
+                                                <attributedString key="attributedTitle"/>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
@@ -10567,7 +10427,9 @@ settings for this monitor.</string>
         <image name="Trash" width="22" height="22"/>
         <image name="add" width="30" height="30"/>
         <image name="arrow.left.circle.fill" width="48" height="48"/>
+        <image name="automode" width="14" height="14"/>
         <image name="brightness" width="50.5" height="50.5"/>
+        <image name="clockmode" width="14" height="14"/>
         <image name="colors" width="24" height="24"/>
         <image name="component" width="14" height="14"/>
         <image name="composite" width="14" height="14"/>
@@ -10577,10 +10439,14 @@ settings for this monitor.</string>
         <image name="dvi" width="14" height="14"/>
         <image name="hdmi" width="14" height="14"/>
         <image name="input" width="14" height="14"/>
+        <image name="locationmode" width="14" height="14"/>
+        <image name="manualmode" width="14" height="14"/>
         <image name="power" width="96" height="96"/>
         <image name="reset" width="24" height="24"/>
+        <image name="sensormode" width="14" height="14"/>
         <image name="settings" width="24" height="24"/>
         <image name="svideo" width="14" height="14"/>
+        <image name="syncmode" width="14" height="14"/>
         <image name="tuner" width="14" height="14"/>
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>
