@@ -1,3 +1,27 @@
+# 5.1.0
+## Features
+
+* Add back the Adaptive Mode dropdown in the QuickActions menu
+* Add more useful buttons at the bottom of the QuickActions menu: 
+    * **Preferences**
+    * **Restart**
+    * **Quit**
+
+## Improvements
+
+* Add menu item to **Relaunch the onboarding process**
+* Improve QuickActions menu height formula 
+* Add notice about how to relaunch onboarding if needed
+* Improve brightness slider for built-in display
+
+## Fixes
+
+* Fix **Sync Source** button text being unreadable
+* Fix overlay artifacts appearing when disconnecting iPad Sidecar
+* Fix brightness OSD not showing in some cases
+* Fix Clock Mode schedules being reverted to the current brightness on some occasions
+* Fix App Presets window detection by intersecting the window frame with the raw display bounds
+
 # 5.0.5
 ## Fixes
 
