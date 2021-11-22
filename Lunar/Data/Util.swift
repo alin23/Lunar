@@ -1215,7 +1215,7 @@ func createWindow(
                 window.isOpaque = false
                 window.backgroundColor = backgroundColor
                 if stationary {
-                    window.collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling, .fullScreenNone]
+                    window.collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
                     window.sharingType = .none
                     window.ignoresMouseEvents = true
                     window.setAccessibilityRole(.popover)
@@ -1884,8 +1884,20 @@ struct AXWindow {
 
         self.runningApp = runningApp
         self.appException = appException
-        screen = NSScreen.screens.filter { $0.frame.intersects(frame) }.max(by: { s1, s2 in
-            s1.frame.intersectedArea(frame) < s2.frame.intersectedArea(frame)
+        #if DEBUG
+            log.debug("\(appException) \(title) frame: \(frame)")
+            for screen in NSScreen.screens {
+                guard let id = screen.displayID else { continue }
+                log.debug("Screen \(id) frame: \(screen.frame)")
+                log.debug("Screen \(id) bounds: \(CGDisplayBounds(id))")
+            }
+        #endif
+        screen = NSScreen.screens.filter {
+            guard let bounds = $0.bounds else { return false }
+            return bounds.intersects(frame)
+        }.max(by: { s1, s2 in
+            guard let bounds1 = s1.bounds, let bounds2 = s2.bounds else { return false }
+            return bounds1.intersectedArea(frame) < bounds2.intersectedArea(frame)
         })
     }
 

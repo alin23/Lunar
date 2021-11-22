@@ -11,8 +11,22 @@ import Combine
 import Defaults
 import Foundation
 
-class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
-    var defaultAutoModeTitle: NSAttributedString!
+class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    // MARK: Internal
+
+    let defaultAutoModeTitle: String = "Auto Mode"
     var adaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver: Bool = false
 
@@ -27,23 +41,15 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         }
     }
 
-    override func defocus() {
-        super.defocus()
-    }
-
-    override func hover() {
-        super.hover()
-    }
-
     func setAutoModeItemTitle(modeKey: AdaptiveModeKey? = nil) {
         if CachedDefaults[.overrideAdaptiveMode] {
-            if let buttonTitle = defaultAutoModeTitle, let item = lastItem {
-                item.attributedTitle = buttonTitle
+            if let item = lastItem {
+                item.title = defaultAutoModeTitle
             }
         } else {
             let modeKey = modeKey ?? DisplayController.getAdaptiveMode().key
-            if let buttonTitle = defaultAutoModeTitle, let item = lastItem {
-                item.attributedTitle = buttonTitle.string.replacingOccurrences(of: " Mode", with: ": \(modeKey.str) Mode").attributedString
+            if let item = lastItem {
+                item.title = defaultAutoModeTitle.replacingOccurrences(of: "Auto Mode", with: "Auto: \(modeKey.str)")
             }
         }
     }
@@ -55,16 +61,14 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
             selectItem(withTag: AUTO_MODE_TAG)
         }
         setAutoModeItemTitle(modeKey: modeKey)
-        fade(modeKey: modeKey)
+        // fade(modeKey: modeKey)
     }
 
-    override func setup() {
-        super.setup()
-
-        defaultAutoModeTitle = lastItem?.attributedTitle
+    func setup() {
         action = #selector(setAdaptiveMode(sender:))
         target = self
         listenForAdaptiveModeChange()
+        radius = (frame.height / 2).ns
 
         update()
     }
@@ -89,7 +93,7 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
             CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
         button.setAutoModeItemTitle()
-        button.fade(modeKey: AdaptiveModeKey(rawValue: button.selectedTag()))
+        // button.fade(modeKey: AdaptiveModeKey(rawValue: button.selectedTag()))
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -132,14 +136,6 @@ class AdaptiveModeButton: PopUpButton, NSMenuItemValidation {
         }
         menuItem.toolTip = nil
         return true
-    }
-
-    override func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
-        if overrideMode ?? CachedDefaults[.overrideAdaptiveMode] {
-            return buttonDotColor[modeKey ?? displayController.adaptiveModeKey]!
-        } else {
-            return darkMauve
-        }
     }
 
     override func draw(_ dirtyRect: NSRect) {
