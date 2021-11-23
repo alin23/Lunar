@@ -917,14 +917,20 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         let showOSD = { (display: Display) in
             if contrast {
-                guard !display.isBuiltin else { return }
+                guard !display.isBuiltin else {
+                    log.warning("Contrast can't be adjusted on builtin")
+                    return
+                }
+                log.info("Showing OSD for \(display) on contrast=\(display.contrast.uint32Value)")
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
             } else {
+                log.info("Showing OSD for \(display) on brightness=\(display.brightness.uint32Value)")
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
         }
 
         guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays else {
+            log.info("showOSD()")
             displayController.activeDisplays.values
                 .filter { !$0.isBuiltin }
                 .forEach(showOSD)
@@ -933,15 +939,19 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         if sourceDisplay, let display = displayController.sourceDisplay {
+            log.info("showOSD(sourceDisplay)")
             showOSD(display)
         }
         if builtinDisplay, let display = displayController.builtinDisplay {
+            log.info("showOSD(builtinDisplay)")
             showOSD(display)
         }
         if currentDisplay, let display = displayController.cursorDisplay {
+            log.info("showOSD(cursorDisplay)")
             showOSD(display)
         }
         if allDisplays {
+            log.info("showOSD(allDisplays)")
             displayController.activeDisplays.values
                 .filter { !builtinDisplay || !$0.isBuiltin }
                 .forEach(showOSD)
@@ -956,9 +966,14 @@ extension AppDelegate: MediaKeyTapDelegate {
         lidClosed: Bool,
         event: CGEvent
     ) -> CGEvent? {
+        let lidOpened = !lidClosed
+
+        log.info("\(action) (lidClosed: \(lidClosed))")
+
         switch action {
         case .all:
-            if !lidClosed, displayController.builtinDisplay?.active ?? false {
+            if lidOpened, displayController.builtinDisplay?.active ?? false {
+                log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
@@ -968,18 +983,21 @@ extension AppDelegate: MediaKeyTapDelegate {
             adjust(mediaKey, by: offset, contrast: contrast)
         case .cursor:
             if let cursor = displayController.cursorDisplay, cursor.isBuiltin {
+                log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
-            if !lidClosed {
+            if lidOpened {
+                log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
             }
-            adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: !lidClosed)
+            adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
             if let source = displayController.sourceDisplay, source.isBuiltin {
+                log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
             }
@@ -994,8 +1012,10 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
+        let flags = flags.intersection([.command, .option, .control, .shift])
         switch flags {
         case [] where displayController.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [] where displayController.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1003,6 +1023,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
         case [.option, .shift] where displayController.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.option, .shift] where displayController.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1012,8 +1033,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
 
         case []:
+            log.info("\(mediaKey) + []")
             return handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed, event: event)
         case [.option, .shift]:
+            log.info("\(mediaKey) + [.option, .shift]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1023,6 +1046,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
 
         case [.shift] where displayController.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.shift] where displayController.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.shiftBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1030,6 +1054,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
         case [.shift]:
+            log.info("\(mediaKey) + [.shift]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.shiftBrightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1038,6 +1063,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
 
         case [.control] where displayController.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.control] where displayController.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1045,6 +1071,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
         case [.control]:
+            log.info("\(mediaKey) + [.control]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1053,6 +1080,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
 
         case [.control, .option] where displayController.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.control, .option] where displayController.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1061,6 +1089,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
         case [.control, .option]:
+            log.info("\(mediaKey) + [.control, .option]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1070,6 +1099,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
 
         case [.control, .shift]:
+            log.info("\(mediaKey) + [.control, .shift]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1078,6 +1108,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
         case [.control, .shift, .option]:
+            log.info("\(mediaKey) + [.control, .shift, .option]")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysControl],
                 mediaKey: mediaKey,
@@ -1086,9 +1117,12 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         default:
             log.info("Ignoring media key event")
+            log.info("lidClosed: \(lidClosed)")
+            log.info("mediaKey: \(mediaKey)")
+            log.info("flags: \(flags) (\(flags.keyEquivalentStrings())")
+            log.info("event: \(event.type)")
             return event
         }
     }

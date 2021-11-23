@@ -971,7 +971,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
-                let newLidClosed = IsLidClosed()
+                let newLidClosed = isLidClosed()
                 guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
 
                 if newScreenIDs != self.screenIDs {
@@ -1934,4 +1934,10 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
             cancelTask("AXPermissionsChecker")
         }
     }
+}
+
+func isLidClosed() -> Bool {
+    guard !Sysctl.isiMac else { return false }
+    guard Sysctl.isMacBook else { return true }
+    return IsLidClosed()
 }

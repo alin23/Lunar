@@ -56,7 +56,7 @@ class DisplayController {
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
 
     let getDisplaysLock = NSRecursiveLock()
-    @Atomic var lidClosed: Bool = IsLidClosed()
+    @Atomic var lidClosed: Bool = isLidClosed()
     var clamshellMode: Bool = false
 
     var appObserver: NSKeyValueObservation?
@@ -1255,7 +1255,7 @@ class DisplayController {
             } else {
                 scope.setExtra(value: SyncMode.readBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
             }
-            scope.setExtra(value: self?.lidClosed ?? IsLidClosed(), key: "lidClosed")
+            scope.setExtra(value: self?.lidClosed ?? isLidClosed(), key: "lidClosed")
 
             guard let self = self else { return }
             for display in self.displays.values {
@@ -1306,7 +1306,7 @@ class DisplayController {
     }
 
     func manageClamshellMode() {
-        lidClosed = IsLidClosed()
+        lidClosed = isLidClosed()
         SyncMode.refresh()
         log.info("Lid closed: \(lidClosed)")
         SentrySDK.configureScope { [weak self] scope in

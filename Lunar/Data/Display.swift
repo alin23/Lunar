@@ -613,6 +613,10 @@ enum ValueType {
         super.init()
         defer { initialised = true }
 
+        if isLEDCinema() {
+            maxDDCBrightness = 255
+        }
+
         useOverlay = !supportsGammaByDefault
         enabledControls[.gamma] = !isSmartBuiltin
         guard active else { return }
