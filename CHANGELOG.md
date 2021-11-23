@@ -1,3 +1,14 @@
+# 5.1.1
+## Improvements
+
+* Correctly set max DDC brightness to 255 on LED Cinema displays
+
+## Fixes
+
+* Fix clamshell mode detection for some special setups
+* Fix brightness OSD not showing in some cases (missed some stuff)
+* Fix brightness keys not working in previous release
+
 # 5.1.0
 ## Features
 
