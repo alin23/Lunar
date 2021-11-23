@@ -219,7 +219,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            if IsLidClosed() {
+            if isLidClosed() {
                 print("closed")
             } else {
                 print("opened")
