@@ -115,6 +115,10 @@ class Logger: SwiftyBeaver {
                 Logger.addDestination(cloud)
             }
         #endif
+
+        if lunarProActive, let email = lunarProProduct?.activationEmail {
+            Logger.cloud.analyticsUserName = email
+        }
     }
 
     class func disable() {

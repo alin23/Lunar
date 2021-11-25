@@ -447,6 +447,77 @@ extension NSAttributedString {
     }
 }
 
+extension DispatchTimeInterval {
+    var absNS: UInt64 { abs(ns).u64 }
+    var ns: Int {
+        switch self {
+        case let .seconds(int):
+            return int * 1_000_000_000
+        case let .milliseconds(int):
+            return int * 1_000_000
+        case let .microseconds(int):
+            return int * 1000
+        case let .nanoseconds(int):
+            return int
+        case .never:
+            return 0
+        default:
+            return 0
+        }
+    }
+
+    var us: Int {
+        switch self {
+        case let .seconds(int):
+            return int * 1_000_000
+        case let .milliseconds(int):
+            return int * 1000
+        case let .microseconds(int):
+            return int
+        case let .nanoseconds(int):
+            return int / 1000
+        case .never:
+            return 0
+        default:
+            return 0
+        }
+    }
+
+    var ms: Int {
+        switch self {
+        case let .seconds(int):
+            return int * 1000
+        case let .milliseconds(int):
+            return int
+        case let .microseconds(int):
+            return int / 1000
+        case let .nanoseconds(int):
+            return int / 1_000_000
+        case .never:
+            return 0
+        default:
+            return 0
+        }
+    }
+
+    var s: TimeInterval {
+        switch self {
+        case let .seconds(int):
+            return int.d
+        case let .milliseconds(int):
+            return int.d / 1000
+        case let .microseconds(int):
+            return int.d / 1_000_000
+        case let .nanoseconds(int):
+            return int.d / 1_000_000_000
+        case .never:
+            return 0
+        default:
+            return 0
+        }
+    }
+}
+
 extension Dictionary {
     var threadSafe: ThreadSafeDictionary<Key, Value> {
         ThreadSafeDictionary(dict: self)

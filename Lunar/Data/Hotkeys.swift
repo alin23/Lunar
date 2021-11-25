@@ -890,7 +890,9 @@ extension AppDelegate: MediaKeyTapDelegate {
         sourceDisplay: Bool = false,
         allDisplays: Bool = false
     ) {
-        guard !(contrast && builtinDisplay) else { return }
+        if contrast && builtinDisplay && !(allDisplays || currentDisplay || sourceDisplay) {
+            return
+        }
 
         switch mediaKey {
         case .brightnessUp where contrast:
@@ -975,28 +977,30 @@ extension AppDelegate: MediaKeyTapDelegate {
             if lidOpened, displayController.builtinDisplay?.active ?? false {
                 log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
-                event.flags = event.flags.subtracting([.maskShift, .maskControl])
-                return event
+                if !contrast {
+                    event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                    return event
+                }
             }
             adjust(mediaKey, by: offset, contrast: contrast, builtinDisplay: true, allDisplays: true)
         case .external:
             adjust(mediaKey, by: offset, contrast: contrast)
         case .cursor:
-            if let cursor = displayController.cursorDisplay, cursor.isBuiltin {
+            if !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
                 log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
-            if lidOpened {
+            if !contrast, lidOpened {
                 log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
-            if let source = displayController.sourceDisplay, source.isBuiltin {
+            if !contrast, let source = displayController.sourceDisplay, source.isBuiltin {
                 log.info("Forwarding media key to system")
                 event.flags = event.flags.subtracting([.maskShift, .maskControl])
                 return event
