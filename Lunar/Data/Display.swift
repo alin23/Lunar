@@ -1222,7 +1222,7 @@ enum ValueType {
     }
 
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
-        get { Self.ambientLightCompensationEnabled(id) && hasAmbientLightAdaptiveBrightness }
+        get { Self.ambientLightCompensationEnabled(id) }
         set {
             guard ambientLightCompensationEnabledByUser else { return }
             DisplayServicesEnableAmbientLightCompensation(id, newValue)
@@ -1613,12 +1613,14 @@ enum ValueType {
 
     @Published @objc dynamic var lockedBrightness: Bool = false {
         didSet {
+            log.debug("Locked brightness for \(description)")
             save()
         }
     }
 
     @Published @objc dynamic var lockedContrast: Bool = false {
         didSet {
+            log.debug("Locked contrast for \(description)")
             save()
         }
     }
@@ -1843,7 +1845,19 @@ enum ValueType {
                 applyPreciseValue = true
             }
 
-            guard DDC.apply, !lockedBrightness, force || brightness != oldValue else { return }
+            guard DDC.apply, !lockedBrightness, force || brightness != oldValue else {
+                log.verbose(
+                    "Won't apply brightness to \(description)",
+                    context: [
+                        "DDC.apply": DDC.apply,
+                        "lockedBrightness": lockedBrightness,
+                        "brightness != oldValue": brightness != oldValue,
+                        "brightness": brightness,
+                        "oldValue": oldValue,
+                    ]
+                )
+                return
+            }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
@@ -1888,8 +1902,8 @@ enum ValueType {
                 )
             }
 
-            let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
-            checkSlowWrite(elapsedNS: elapsedTime)
+            let elapsedTimeInterval = startTime.distance(to: .now())
+            checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
             NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
@@ -1907,7 +1921,19 @@ enum ValueType {
                 applyPreciseValue = true
             }
 
-            guard DDC.apply, !lockedContrast, force || contrast != oldValue else { return }
+            guard DDC.apply, !lockedContrast, force || contrast != oldValue else {
+                log.verbose(
+                    "Won't apply contrast to \(description)",
+                    context: [
+                        "DDC.apply": DDC.apply,
+                        "lockedContrast": lockedContrast,
+                        "contrast != oldValue": contrast != oldValue,
+                        "contrast": contrast,
+                        "oldValue": oldValue,
+                    ]
+                )
+                return
+            }
             if control is GammaControl, !(enabledControls[.gamma] ?? false) { return }
 
             if !force {
@@ -1952,8 +1978,8 @@ enum ValueType {
                 )
             }
 
-            let elapsedTime: UInt64 = DispatchTime.now().rawValue - startTime.rawValue
-            checkSlowWrite(elapsedNS: elapsedTime)
+            let elapsedTimeInterval = startTime.distance(to: .now())
+            checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
             NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
@@ -2522,6 +2548,8 @@ enum ValueType {
     }
 
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
+        guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
+
         var enabled = false
         DisplayServicesAmbientLightCompensationEnabled(id, &enabled)
         return enabled
@@ -2654,6 +2682,9 @@ enum ValueType {
     // MARK: User Data Points
 
     static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
+        guard displayController.adaptiveModeKey != .manual else {
+            return
+        }
         for (x, y) in values.dictionary {
             if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
                 if logValue {
@@ -3657,19 +3688,15 @@ enum ValueType {
             }
 
             let startTime = DispatchTime.now()
-            var elapsedTime: UInt64
-            var elapsedSeconds: Double
-            var elapsedSecondsStr: String
 
             onStart?()
             adjust((currentValue.i + step).u8)
 
-            elapsedTime = DispatchTime.now().rawValue - startTime.rawValue
-            elapsedSeconds = elapsedTime.d / 1_000_000_000.0
-            elapsedSecondsStr = String(format: "%.3f", elapsedSeconds)
-            log.debug("It took \(elapsedTime)ns (\(elapsedSecondsStr)s) to change brightness by \(step)")
+            var elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
+            var elapsedSecondsStr = String(format: "%.3f", elapsedTimeInterval.s)
+            log.debug("It took \(elapsedTimeInterval) (\(elapsedSecondsStr)s) to change brightness by \(step)")
 
-            self.checkSlowWrite(elapsedNS: elapsedTime)
+            self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
 
             steps = steps - abs(step)
             if steps <= 0 {
@@ -3677,7 +3704,7 @@ enum ValueType {
                 return
             }
 
-            self.smoothStep = cap((elapsedTime / MAX_SMOOTH_STEP_TIME_NS).i, minVal: 1, maxVal: 100)
+            self.smoothStep = cap((elapsedTimeInterval.absNS / MAX_SMOOTH_STEP_TIME_NS).i, minVal: 1, maxVal: 100)
             if value < currentValue {
                 step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
             } else {
@@ -3687,17 +3714,20 @@ enum ValueType {
             for newValue in stride(from: currentValue.i, through: value.i, by: step) {
                 adjust(cap(newValue.u8, minVal: minVal, maxVal: maxVal))
                 if let delay = delay {
+                    print("Sleeping for \(delay * 1000)ms")
                     Thread.sleep(forTimeInterval: delay)
                 }
             }
             adjust(value)
 
-            elapsedTime = DispatchTime.now().rawValue - startTime.rawValue
-            elapsedSeconds = elapsedTime.d / 1_000_000_000.0
-            elapsedSecondsStr = String(format: "%.3f", elapsedSeconds)
-            log.debug("It took \(elapsedTime)ns (\(elapsedSeconds)s) to change brightness from \(currentValue) to \(value) by \(step)")
+            elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
+            elapsedSecondsStr = String(format: "%.3f", elapsedTimeInterval.s)
+            log
+                .debug(
+                    "It took \(elapsedTimeInterval.ns) (\(elapsedSecondsStr)s) to change brightness from \(currentValue) to \(value) by \(step)"
+                )
 
-            self.checkSlowWrite(elapsedNS: elapsedTime)
+            self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
 
             self.inSmoothTransition = false
         }

@@ -120,9 +120,14 @@ class DDCControl: Control {
     }
 
     func setBrightnessDebounced(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
-        guard let display = display else { return false }
+        guard let display = display else {
+            log.warning("No display for DDCControl?", context: ["brightness": brightness, "oldBrightness": oldValue])
+            return false
+        }
 
         let key = display.preciseBrightnessKey
+        let id = display.id
+
         let value = ValueRange(value: brightness, oldValue: oldValue)
 
 //        print("SETTING BRIGHTNESS TO \(brightness)")
@@ -133,7 +138,11 @@ class DDCControl: Control {
             subscriberKey: key
         ) { [weak self] range in
             guard let self = self else {
+//                log.warning("No `self` for DDCControl?", context: ["values": range])
                 cancelTask(key, subscriberKey: key)
+                if let display = displayController.activeDisplays[id], let control = display.control as? DDCControl {
+                    _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue)
+                }
                 return
             }
 //            if let oldValue = range.oldValue {
@@ -151,6 +160,8 @@ class DDCControl: Control {
         guard let display = display else { return false }
 
         let key = display.preciseContrastKey
+        let id = display.id
+
         let value = ValueRange(value: contrast, oldValue: oldValue)
 
         debounce(
@@ -161,6 +172,9 @@ class DDCControl: Control {
         ) { [weak self] range in
             guard let self = self else {
                 cancelTask(key, subscriberKey: key)
+                if let display = displayController.activeDisplays[id], let control = display.control as? DDCControl {
+                    _ = control.setContrastDebounced(range.value, oldValue: range.oldValue)
+                }
                 return
             }
             _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)
@@ -187,7 +201,18 @@ class DDCControl: Control {
                 onStart: { display.shouldStopBrightnessTransition = false }
             ) { [weak self] brightness in
                 guard let self = self, faults <= 5 || self.ignoreFaults, let display = self.display,
-                      !display.shouldStopBrightnessTransition else { return }
+                      !display.shouldStopBrightnessTransition
+                else {
+                    log.debug(
+                        "Stopping smooth transition to brightness=\(brightness) for \(display)",
+                        context: [
+                            "faults": faults,
+                            "ignoreFaults": self?.ignoreFaults ?? false,
+                            "display.shouldStopBrightnessTransition": display.shouldStopBrightnessTransition,
+                        ]
+                    )
+                    return
+                }
 
                 log.debug("Writing brightness=\(brightness) using \(self) for \(display)")
 

@@ -481,6 +481,36 @@
                                                             <action selector="forceUpdateDisplayList:" target="Voe-Tx-rLC" id="yPJ-IE-ydo"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Stream logs to developer" id="WyA-oO-YoM">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="z8z-AR-4ms" name="value" keyPath="values.streamLogs" id="eum-ic-LSA"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Note: only do this if the developer explicitly asks" enabled="NO" indentationLevel="1" id="XB1-yg-J4q">
+                                                        <attributedString key="attributedTitle">
+                                                            <fragment content="Note: only do this if the developer explicitly asks">
+                                                                <attributes>
+                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <font key="NSFont" metaFont="system" size="10"/>
+                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                                </attributes>
+                                                            </fragment>
+                                                        </attributedString>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem title="Will deactivate automatically on next app launch" enabled="NO" indentationLevel="1" id="M1a-Zl-inx">
+                                                        <attributedString key="attributedTitle">
+                                                            <fragment content="Will deactivate automatically on next app launch">
+                                                                <attributes>
+                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <font key="NSFont" metaFont="system" size="10"/>
+                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                                </attributes>
+                                                            </fragment>
+                                                        </attributedString>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -779,6 +809,7 @@ and setting its brightness/contrast to 0</string>
                 <userDefaultsController id="3YV-ka-Eop"/>
                 <userDefaultsController id="u0a-cA-m1f"/>
                 <userDefaultsController id="fCP-p0-Lkm"/>
+                <userDefaultsController id="z8z-AR-4ms"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
         </scene>
@@ -1005,7 +1036,7 @@ and setting its brightness/contrast to 0</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGE-aF-MVx" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="795" y="654" width="123" height="18"/>
+                                <rect key="frame" x="795" y="652" width="123" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Location Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="4Pr-nT-3EU" id="Kyh-RR-mh5" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2434,7 +2465,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </textField>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="WQ3-j3-c4C" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="209" y="-6" width="198" height="38"/>
+                                                                    <rect key="frame" x="187" y="-6" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="30" id="9PQ-4X-LF8"/>
                                                                     </constraints>
@@ -2472,7 +2503,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </slider>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="9eQ-mp-6BP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="209" y="24" width="198" height="38"/>
+                                                                    <rect key="frame" x="187" y="24" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="194" id="trB-Z0-ydo"/>
                                                                         <constraint firstAttribute="height" constant="30" id="zz4-Pc-YDf"/>
@@ -2592,7 +2623,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kiv-mk-M5q" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="215" y="39" width="12" height="12"/>
+                                                                    <rect key="frame" x="193" y="39" width="12" height="12"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="12" id="jo2-iD-Or3"/>
                                                                         <constraint firstAttribute="width" constant="12" id="wRa-ry-f9u"/>
@@ -2707,7 +2738,7 @@ visible screen left</string>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="RSR-3x-myv" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="213" y="8" width="14" height="14"/>
+                                                                    <rect key="frame" x="191" y="8" width="14" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="14" id="IZH-cu-etH"/>
                                                                         <constraint firstAttribute="height" constant="14" id="lZE-LE-oXF"/>
@@ -2759,8 +2790,8 @@ visible screen left</string>
                                                                     </connections>
                                                                 </button>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dCR-ep-nRF">
-                                                                    <rect key="frame" x="419" y="38" width="28" height="15"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="+20" id="4Ix-O1-34z">
+                                                                    <rect key="frame" x="397" y="38" width="28" height="15"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="+20" id="4Ix-O1-34z">
                                                                         <font key="font" size="13" name="Menlo-Regular"/>
                                                                         <color key="textColor" red="0.49875312319999998" green="0.45549487399999999" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2779,8 +2810,8 @@ visible screen left</string>
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5cd-8Z-v4l">
-                                                                    <rect key="frame" x="419" y="8" width="28" height="15"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="+20" id="gN5-cl-Edw">
+                                                                    <rect key="frame" x="397" y="8" width="28" height="15"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="+20" id="gN5-cl-Edw">
                                                                         <font key="font" size="13" name="Menlo-Regular"/>
                                                                         <color key="textColor" red="0.49875312319999998" green="0.45549487399999999" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2857,7 +2888,6 @@ visible screen left</string>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="top" secondItem="9eQ-mp-6BP" secondAttribute="bottom" id="6c3-Tf-TdW"/>
                                                                 <constraint firstItem="dCR-ep-nRF" firstAttribute="leading" secondItem="9eQ-mp-6BP" secondAttribute="trailing" constant="16" id="6vg-pa-as8"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="width" secondItem="9eQ-mp-6BP" secondAttribute="width" id="7td-Pj-gKK"/>
-                                                                <constraint firstAttribute="trailing" secondItem="dCR-ep-nRF" secondAttribute="trailing" constant="7" id="8Ho-t1-xxJ"/>
                                                                 <constraint firstItem="yNh-or-HM8" firstAttribute="top" secondItem="bPk-JH-iHh" secondAttribute="bottom" constant="10" id="8P9-3S-Xli"/>
                                                                 <constraint firstItem="5cd-8Z-v4l" firstAttribute="centerY" secondItem="WQ3-j3-c4C" secondAttribute="centerY" id="A8X-at-FjI"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="width" secondItem="9eQ-mp-6BP" secondAttribute="width" id="CjY-F9-5dr"/>
@@ -2870,6 +2900,7 @@ visible screen left</string>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="b0y-87-zYg" secondAttribute="trailing" constant="-16" id="Mff-IU-PL4"/>
                                                                 <constraint firstItem="SFe-z3-ghT" firstAttribute="top" secondItem="b30-Pt-whw" secondAttribute="top" id="Pmo-aN-yeQ"/>
                                                                 <constraint firstItem="4EQ-S2-v6N" firstAttribute="top" secondItem="yNh-or-HM8" secondAttribute="bottom" constant="15" id="RkO-9p-bhg"/>
+                                                                <constraint firstItem="38T-rK-uwv" firstAttribute="leading" secondItem="RB2-V9-vwF" secondAttribute="leading" constant="25" id="TSy-pT-zjB"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="leading" secondItem="RSR-3x-myv" secondAttribute="trailing" constant="-16" id="VHv-ky-ASB"/>
                                                                 <constraint firstItem="38T-rK-uwv" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" id="Y2T-Uc-Onb"/>
                                                                 <constraint firstItem="wPr-Vf-LWH" firstAttribute="centerY" secondItem="pMQ-7f-6rg" secondAttribute="centerY" id="YIT-7Y-zUP"/>
@@ -2882,6 +2913,7 @@ visible screen left</string>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="height" secondItem="9eQ-mp-6BP" secondAttribute="height" id="k4X-oa-uh3"/>
                                                                 <constraint firstItem="pMQ-7f-6rg" firstAttribute="leading" secondItem="wPr-Vf-LWH" secondAttribute="trailing" constant="-16" id="nY2-07-120"/>
                                                                 <constraint firstItem="5cd-8Z-v4l" firstAttribute="leading" secondItem="dCR-ep-nRF" secondAttribute="leading" id="odP-rR-uZt"/>
+                                                                <constraint firstItem="9eQ-mp-6BP" firstAttribute="leading" secondItem="38T-rK-uwv" secondAttribute="trailing" constant="100" id="p75-Z8-o2U"/>
                                                                 <constraint firstItem="yNh-or-HM8" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" constant="-19" id="scM-th-Xop"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="SFe-z3-ghT" secondAttribute="leading" id="ufz-xY-lYw"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="centerY" secondItem="bPk-JH-iHh" secondAttribute="centerY" id="uqM-OX-MeQ"/>
@@ -3292,7 +3324,11 @@ visible screen left</string>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
                                         <connections>
-                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedBrightness" id="zPC-Bz-1cX"/>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedBrightness" id="hSC-dm-qja">
+                                                <dictionary key="options">
+                                                    <bool key="NSConditionallySetsEnabled" value="NO"/>
+                                                </dictionary>
+                                            </binding>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mts-p9-8Zt" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -3387,7 +3423,11 @@ visible screen left</string>
                                             <font key="font" metaFont="systemBold" size="12"/>
                                         </buttonCell>
                                         <connections>
-                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedContrast" id="gzq-gU-1td"/>
+                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.lockedContrast" id="V8f-bs-HwZ">
+                                                <dictionary key="options">
+                                                    <bool key="NSConditionallySetsEnabled" value="NO"/>
+                                                </dictionary>
+                                            </binding>
                                         </connections>
                                     </button>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0p3-Ip-HPc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
@@ -4185,7 +4225,6 @@ and contrast to their highest values</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="toggleLock:" target="XVS-nO-2Mf" id="KyR-ua-zbU"/>
                                     <binding destination="rew-Tm-BHz" name="value" keyPath="values.showAdvancedDisplaySettings" id="5Ie-4a-I5L"/>
                                 </connections>
                             </button>
@@ -4659,11 +4698,14 @@ and contrast to their highest values</string>
                                     </subviews>
                                 </view>
                             </box>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
-                                <rect key="frame" x="37" y="-26" width="258" height="126"/>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
+                                <rect key="frame" x="22" y="65" width="280" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" selectable="YES" title="Function keys notice" id="aWn-9O-e5g">
-                                    <font key="font" usesAppearanceFont="YES"/>
+                                <textFieldCell key="cell" selectable="YES" id="aWn-9O-e5g">
+                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <string key="title">Adjusting contrast: 
+    • Simple:  Ctrl-Shift Brightness Up/Down
+    • Precise: Ctrl-Shift-Option Brightness Up/Down</string>
                                     <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>

@@ -1230,7 +1230,7 @@
             <sparkle:version>5.1.0</sparkle:version>
             <sparkle:shortVersionString>5.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.0.dmg" length="16601325" type="application/octet-stream" sparkle:edSignature="UC4zUKOBeWfGp62r5Pmgxt+sSLH0flu8izMtkYj3KQ3a4FJlSkm9xiOsmSgz/Jg/q/IVoJNuGvMIJ9DLP01BDQ==" sparkle:dsaSignature="MEUCICjE9ImgJGFhgOSUobZ8yVIbv48CiziJrIrbXsnZS511AiEAmX1pjqsFsipWJxK4Z9aj+kqnulk1yCIp2RYM5o8dH8A="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.0.dmg" length="16601325" type="application/octet-stream" sparkle:edSignature="UC4zUKOBeWfGp62r5Pmgxt+sSLH0flu8izMtkYj3KQ3a4FJlSkm9xiOsmSgz/Jg/q/IVoJNuGvMIJ9DLP01BDQ==" sparkle:dsaSignature="MEQCIHnFnKl/rYxmsWFgulnYZ/rkjrFu1rzAICeIAnRHHjswAiA5/6BPba1K7I1V5+bIK0MtTP/chuCOxWxCXvYlzHC9qw=="/>
             <signature>UytirBUp6j4UNk.l9gILX12NnCE=</signature>
             <signature>UytirBUp6j4UNk/l9gILX12NnCE=</signature>
             <signature>AW1K2ld+5lLCD8Wifplmnl4gRxo=</signature>
@@ -1249,10 +1249,28 @@
             <sparkle:version>5.1.1</sparkle:version>
             <sparkle:shortVersionString>5.1.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.1.dmg" length="16610863" type="application/octet-stream" sparkle:edSignature="pjohJ8fa/yrJrgjrceFvavZTgiISvM5mTijX24U4qhHsWn4sv7BjWaG20LmErhROFgAwvD6H1vvbLG9n3kBVCQ==" sparkle:dsaSignature="MEQCIAed9T0pbeh3KfEpiTAjxQvCGy96LJ7HQHgcx3INsrhHAiBtnPZkUG12v9Ha6AnqMWVjn8we0kCu3G8kzdX3iLcang=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.1.dmg" length="16610863" type="application/octet-stream" sparkle:edSignature="pjohJ8fa/yrJrgjrceFvavZTgiISvM5mTijX24U4qhHsWn4sv7BjWaG20LmErhROFgAwvD6H1vvbLG9n3kBVCQ==" sparkle:dsaSignature="MEQCICMGKl/jzjcubxdjp8sDoZzR1FXMByqBzSUFO3PBvTsyAiBf2YA1n7433vDMN84PqN6axdk9IZNweBkhvXzF1w7D+Q=="/>
             <signature>zkgvNe+tpWhWW1C7PmsSVnykvaY=</signature>
             <signature>+lXdYsDXQWe4HjVJ+c25peraOvI=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Correctly set max DDC brightness to 255 on LED Cinema displays</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix clamshell mode detection for some special setups</li><li>Fix brightness OSD not showing in some cases (missed some stuff)</li><li>Fix brightness keys not working in previous release</li></ul></div></div>]]></description>
+            <sparkle:deltas>
+                <enclosure url="https://lunar.fyi/delta/5.1.1/5.1.0" sparkle:deltaFrom="5.1.0" length="1973944" type="application/octet-stream" sparkle:edSignature="0i+h0wvoeS9TRgh7/U+L9kfPiDi2Ihl6LBd1hDSUdesKucwvrL6yaAzE/JkegrjiNi4VLaSZBjZf2uWCWvmUDw==" sparkle:dsaSignature="MEUCIQCfKSWktY5fMebEz+UyiDckpb5KVl0IV7vweAkqIsR+7gIgED1nzLAz2bKtl7LxQOBUyCgjOKi62zaq6C1+SV/ilHg="/>
+            </sparkle:deltas>
+            <signature>ACrTSg1LksGdHpdyqLuKfKXMLRw=</signature>
+            <signature>lUXs5aW3s7StORy75HP7YKv2YN0=</signature>
+            <signature>1Rj5kvAIDF3uQ.ME.8Fi+MK3bsE=</signature>
+            <signature>1Rj5kvAIDF3uQ/ME/8Fi+MK3bsE=</signature>
+            <signature>esTsDgRVYUQY0K7wGRwGbln29Z0=</signature>
+            <signature>fgcZIOJOXbqWB+flcl75rPKLKwo=</signature>
+            <signature>KL0.86yo08+LiM4.bUZAQvUemGI=</signature>
+            <signature>KL0/86yo08+LiM4/bUZAQvUemGI=</signature>
+            <signature>Ep80L3+mbvunD1uOfh7DjUJp9Vs=</signature>
+            <signature>DsZsOfOfDnMzKV6nTKpySDqLg0o=</signature>
+            <signature>h5Uv1Wtfp82h1iIRfcqrc6KSx4Q=</signature>
+            <signature>sjUPeK.Ca33GfJUSXY.wgStBgpQ=</signature>
+            <signature>sjUPeK/Ca33GfJUSXY/wgStBgpQ=</signature>
+            <signature>8HwuTEcMlVob5Pvh8Ikc3YIMhvI=</signature>
+            <signature>rI4hidARQXt24i5GiTfKozfxIr4=</signature>
         </item>
     </channel>
 </rss>
