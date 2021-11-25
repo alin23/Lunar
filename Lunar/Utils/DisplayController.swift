@@ -963,17 +963,29 @@ class DisplayController {
 
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
         guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
-            #if DEBUG
-                log.debug("!exceptions: \(runningAppExceptions)")
-                log.debug("!screen: \(display.screen)")
-            #endif
+            log.debug("!exceptions: \(runningAppExceptions ?? [])")
+            log.debug("!screen: \(display.screen?.description ?? "")")
             mainAsync { display.appPreset = nil }
             return nil
         }
-        #if DEBUG
-            log.debug("exceptions: \(exceptions)")
-            log.debug("screen: \(screen)")
-        #endif
+        log.debug("exceptions: \(exceptions)")
+        log.debug("screen: \(screen)")
+
+        if displayController.activeDisplays.count == 1, let app = runningAppExceptions.first,
+           app.runningApps?.first?.windows(appException: app) == nil
+        {
+            log.debug("App offset (single monitor): \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
+            mainAsync { display.appPreset = app }
+
+            if adaptiveModeKey == .manual {
+                guard !display.isBuiltin || app.applyBuiltin else { return nil }
+                let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
+
+                return (br.i, cr.i)
+            }
+
+            return (app.brightness.i, app.contrast.i)
+        }
 
         if let app = activeWindow(on: screen)?.appException {
             mainAsync { display.appPreset = app }
@@ -1003,9 +1015,7 @@ class DisplayController {
             return nil
         }
 
-        #if DEBUG
-            log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
-        #endif
+        log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
         mainAsync { display.appPreset = app }
 
         if adaptiveModeKey == .manual {
@@ -1328,27 +1338,23 @@ class DisplayController {
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
-        appObserver = NSWorkspace.shared.observe(\.runningApplications, options: [.old, .new], changeHandler: { [self] _, change in
-            let oldAppIdentifiers = change.oldValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
-            let newAppIdentifiers = change.newValue?.map { app in app.bundleIdentifier }.compactMap { $0 }
+        NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [self] change in
 
-            if let identifiers = newAppIdentifiers, identifiers.contains(FLUX_IDENTIFIER),
-               let app = change.newValue?.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER }),
-               let display = activeDisplays.values.first(where: { d in d.control is GammaControl })
-            {
-                (display.control as! GammaControl).fluxChecker(flux: app)
-            }
+                let identifiers = change.compactMap(\.bundleIdentifier)
 
-            if let identifiers = newAppIdentifiers, let newApps = datastore.appExceptions(identifiers: identifiers) {
-                runningAppExceptions.append(contentsOf: newApps)
-            }
-            if let identifiers = oldAppIdentifiers, let exceptions = datastore.appExceptions(identifiers: identifiers) {
-                for exception in exceptions {
-                    runningAppExceptions.removeAll(where: { $0.identifier == exception.identifier })
+                if identifiers.contains(FLUX_IDENTIFIER),
+                   let app = change.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER }),
+                   let display = activeDisplays.values.first(where: { d in d.control is GammaControl })
+                {
+                    (display.control as! GammaControl).fluxChecker(flux: app)
                 }
+
+                runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
+                adaptBrightness()
             }
-            adaptBrightness()
-        })
+            .store(in: &observers)
     }
 
     func fetchValues(for displays: [Display]? = nil) {
@@ -1373,6 +1379,26 @@ class DisplayController {
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
+            }
+        }
+    }
+
+    @discardableResult
+    func thrice(
+        uniqueTaskKey key: String,
+        _ action: @escaping ((DisplayController) -> Void),
+        onFinish: ((DisplayController) -> Void)? = nil
+    ) -> DispatchWorkItem {
+        asyncAfter(ms: 10, uniqueTaskKey: key) { [self] in
+            guard adaptiveMode.available else { return }
+            adaptiveMode.withForce {
+                guard !isCancelled(key) else { return }
+                for _ in 1 ... 3 {
+                    action(self)
+                    Thread.sleep(forTimeInterval: 1)
+                    guard !isCancelled(key) else { return }
+                }
+                onFinish?(self)
             }
         }
     }

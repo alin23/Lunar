@@ -210,6 +210,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     lazy var needsAccessibilityPermissions = CachedDefaults[.brightnessKeysEnabled] || CachedDefaults[.volumeKeysEnabled] ||
         !(CachedDefaults[.appExceptions]?.isEmpty ?? true)
 
+    var appPresetHandler: DispatchWorkItem?
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -544,6 +546,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
         showDisconnectedDisplaysPublisher.sink { _ in
             displayController.resetDisplayList(configurationPage: true)
+        }.store(in: &observers)
+        streamLogsPublisher.sink { change in
+            if change.newValue {
+                CachedDefaults[.debug] = true
+                Logger.addDestination(Logger.cloud)
+            } else {
+                CachedDefaults[.debug] = false
+                Logger.removeDestination(Logger.cloud)
+            }
         }.store(in: &observers)
         detectResponsivenessPublisher.sink { change in
             let shouldDetect = change.newValue
@@ -955,7 +966,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .eraseToAnyPublisher().map { $0 as Any? }
             .merge(with: NSWorkspace.shared.publisher(for: \.frontmostApplication).map { $0 as Any? }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
-            .sink { [self] _ in
+            .sink { [self] notif in
+                log.debug("\(notif.debugDescription)")
+//                if let appPresetHandler = appPresetHandler {
+//                    appPresetHandler.cancel()
+//                }
+//                appPresetHandler = displayController.thrice(uniqueTaskKey: "appPresetHandler") { d in
+//                    guard let appPresetHandler = appPresetHandler, !appPresetHandler.isCancelled else {return}
+//                    d.adaptBrightness(force: true)
+//                }
                 displayController.adaptBrightness(force: true)
                 updateInfoMenuItem()
             }
@@ -1315,6 +1334,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         initCache()
+        CachedDefaults[.debug] = false
+        CachedDefaults[.streamLogs] = false
+
         brightnessTransition = CachedDefaults[.brightnessTransition]
         brightnessTransitionPublisher.sink { change in
             brightnessTransition = change.newValue
@@ -1506,6 +1528,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.info("Going down")
 
         CachedDefaults[.debug] = false
+        CachedDefaults[.streamLogs] = false
 
         if let task = valuesReaderThread {
             lowprioQueue.cancel(timer: task)
