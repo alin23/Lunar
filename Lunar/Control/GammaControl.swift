@@ -35,6 +35,8 @@ class GammaControl: Control {
 
     // MARK: Internal
 
+    @Atomic static var sliderTracking = false
+
     var displayControl: DisplayControl = .gamma
 
     weak var display: Display?

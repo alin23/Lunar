@@ -629,7 +629,7 @@ enum ValueType {
         refreshGamma()
         if supportsGamma {
             reapplyGamma()
-        } else {
+        } else if !supportsGammaByDefault, control is GammaControl {
             shade(amount: 1.0 - preciseBrightness)
         }
         updateCornerWindow()
@@ -1096,7 +1096,6 @@ enum ValueType {
     lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
     lazy var gammaDistributedLock: NSDistributedLock? = NSDistributedLock(path: gammaLockPath)
 
-    var lastConnectionTime = Date()
     @Atomic var gammaChanged = false
 
     let VALID_ROTATION_VALUES: Set<Int> = [0, 90, 180, 270]
@@ -1167,6 +1166,12 @@ enum ValueType {
     @objc dynamic lazy var preciseMinBrightness: Double = minBrightness.doubleValue / 100.0
     @objc dynamic lazy var preciseMaxContrast: Double = maxContrast.doubleValue / 100.0
     @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
+
+    var lastConnectionTime = Date() {
+        didSet {
+            print("lastConnectionTime")
+        }
+    }
 
     #if DEBUG
         @objc dynamic lazy var showOrientation: Bool = CachedDefaults[.showOrientationInQuickActions]
@@ -2159,7 +2164,7 @@ enum ValueType {
                 refreshGamma()
                 if supportsGamma {
                     reapplyGamma()
-                } else {
+                } else if !supportsGammaByDefault, control is GammaControl {
                     shade(amount: 1.0 - preciseBrightness)
                 }
 
@@ -2251,13 +2256,7 @@ enum ValueType {
 
             save()
             resetSoftwareControl()
-            if ddcEnabled {
-                resetDDC()
-            } else if networkEnabled {
-                resetNetworkController()
-            } else {
-                resetControl()
-            }
+            preciseBrightness = Double(preciseBrightness)
 
             thrice { d in
                 displayController.adaptBrightness(for: d, force: true)
@@ -3111,6 +3110,13 @@ enum ValueType {
         detectI2C()
 
         control = getBestControl()
+        if control is GammaControl {
+            mainAsyncAfter(ms: 5001) { [weak self] in
+                guard let self = self, let control = self.control, control is GammaControl,
+                      self.enabledControls[.gamma] ?? false else { return }
+                self.preciseBrightness = Double(self.preciseBrightness)
+            }
+        }
 
         guard isSmartBuiltin else { return }
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
@@ -4056,7 +4062,7 @@ enum ValueType {
             guard !isForTesting else { return }
         #endif
 
-        guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) > 5 else { return }
+        guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) >= 5 else { return }
         gammaLock()
         settingGamma = true
         defer { settingGamma = false }
@@ -4064,35 +4070,35 @@ enum ValueType {
         let brightness = brightness ?? self.brightness.uint8Value
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness)
-        let gammaSemaphore = DispatchSemaphore(value: 0, name: "gammaSemaphore")
 
-        if let oldBrightness = oldBrightness {
-            asyncNow(runLoopQueue: realtimeQueue) { [weak self] in
-                guard let self = self else {
-                    gammaSemaphore.signal()
-                    return
-                }
-                Thread.sleep(forTimeInterval: 0.002)
+        guard !GammaControl.sliderTracking, let oldBrightness = oldBrightness else {
+            guard !newGammaTable.isZero else { return }
 
-                self.gammaChanged = true
-                for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness) {
-                    self.apply(gamma: gammaTable)
-                    if let onChange = onChange, let brightness = gammaTable.brightness {
-                        onChange(brightness)
-                    }
-                    Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.002)
-                }
-                gammaSemaphore.signal()
+            gammaChanged = true
+            if apply(gamma: newGammaTable) {
+                lastGammaTable = newGammaTable
             }
+            onChange?(brightness)
+            return
         }
-        asyncNow(runLoopQueue: lowprioQueue) { [weak self] in
-            guard let self = self else { return }
-            if oldBrightness != nil { gammaSemaphore.wait(for: 1.8) }
+
+        serialQueue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.gammaChanged = true
+            Thread.sleep(forTimeInterval: 0.002)
 
             self.gammaChanged = true
+            for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness) {
+                self.apply(gamma: gammaTable)
+                if let onChange = onChange, let brightness = gammaTable.brightness {
+                    onChange(brightness)
+                }
+                Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.002)
+            }
 
             guard !newGammaTable.isZero else {
-                gammaSemaphore.signal()
                 return
             }
 
@@ -4100,7 +4106,6 @@ enum ValueType {
                 self.lastGammaTable = newGammaTable
             }
             onChange?(brightness)
-            gammaSemaphore.signal()
         }
     }
 
