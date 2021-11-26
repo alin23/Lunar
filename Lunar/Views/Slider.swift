@@ -32,6 +32,7 @@ class SliderCell: NSSliderCell {
         pressed = true
         mainAsyncAfter(ms: 10) {
             AppleNativeControl.sliderTracking = true
+            GammaControl.sliderTracking = true
         }
         return super.startTracking(at: startPoint, in: controlView)
     }
@@ -39,6 +40,7 @@ class SliderCell: NSSliderCell {
     override func stopTracking(last lastPoint: NSPoint, current stopPoint: NSPoint, in controlView: NSView, mouseIsUp flag: Bool) {
         pressed = false
         AppleNativeControl.sliderTracking = false
+        GammaControl.sliderTracking = false
         super.stopTracking(last: lastPoint, current: stopPoint, in: controlView, mouseIsUp: flag)
     }
 
@@ -238,6 +240,7 @@ class Slider: NSSlider {
 
     override func mouseExited(with _: NSEvent) {
         AppleNativeControl.sliderTracking = false
+        GammaControl.sliderTracking = false
         transition(0.8)
         alphaValue = 0.9
     }
@@ -250,6 +253,7 @@ class Slider: NSSlider {
     override func scrollWheel(with event: NSEvent) {
         guard isEnabled else { return }
         AppleNativeControl.sliderTracking = (event.scrollingDeltaX + event.scrollingDeltaY != 0)
+        GammaControl.sliderTracking = AppleNativeControl.sliderTracking
 
         let range = Float(maxValue - minValue)
         var delta = Float(0)

@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "0510982c2df41baa5a662f4ce5f83488661fdd48",
-          "version": "7.5.2"
+          "revision": "d7f02ac0ebd9f8f3ddb1f9a2176a5399c5021e12",
+          "version": "7.5.3"
         }
       },
       {
@@ -210,10 +210,10 @@
       },
       {
         "package": "LDSwiftEventSource",
-        "repositoryURL": "https://github.com/launchdarkly/swift-eventsource",
+        "repositoryURL": "https://github.com/alin23/swift-eventsource",
         "state": {
           "branch": "master",
-          "revision": "cfff80e24f74a20f135c972cf11e02b419f7589e",
+          "revision": "8b5c55b6fa9706c12a3f6b42ba55ebff46348829",
           "version": null
         }
       },
