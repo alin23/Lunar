@@ -1,3 +1,23 @@
+# 5.1.2
+## Features
+
+* Add possibility to stream logs to the developer in real time for more efficient troubleshooting
+
+## Improvements
+
+* Make Gamma/Overlay changes faster when using sliders
+* Make the Adaptive Mode dropdown easier to click
+* Add note about how to adjust contrast independently on the Hotkeys page
+* Make App Presets more reliable on single monitor setups by not caring about the window visibility
+* Make Ultrafine AmbientLightCompensation detection more strict
+    * It seems there are some models that report that AmbientLightCompensation is enabled while HasAmbientLightCompensation is false
+
+## Fixes
+
+* Fix contrast media keys
+* Fix internal sensor detection
+* Fix contrast locking by itself when showing/hiding advanced settings
+
 # 5.1.1
 ## Improvements
 
