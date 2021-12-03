@@ -494,7 +494,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                                     	* If possible, try connecting the monitor without the hub or using a different cable/connector
                                     * Are you using DisplayLink? **(DisplayLink doesn't provide support for DDC on macOS)**
                                     * Is DDC/CI enabled in your monitor settings?
-                                    * Is this monitor connected to the HDMI output of a Mac Mini?
+                                    * Is this monitor connected to the HDMI output of a Mac Mini or MacBook Pro post-2021?
                                     	* This is a known hardware issue: [https://github.com/alin23/Lunar/issues/125](https://github.com/alin23/Lunar/issues/125)
                                     """)
                                 }
