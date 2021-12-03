@@ -710,15 +710,15 @@ class DisplayController {
 
             log.info("Mac Mini HDMI Ignore: hw.model=\(Sysctl.modelLowercased)")
             log.info("Mac Mini HDMI Ignore: isMacMini=\(Sysctl.isMacMini)")
+            log.info("Mac Mini HDMI Ignore: isMacBook=\(Sysctl.isMacBook)")
             log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
             log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
-            if Sysctl.isMacMini,
-               clcd2Num == 1,
+            if (Sysctl.isMacMini && clcd2Num == 1) || (Sysctl.isMacBook && clcd2Num >= 1),
                let transport = display.transport,
                transport.upstream == "DP",
                transport.downstream == "HDMI"
             {
-                log.warning("Mac Mini HDMI doesn't support DDC, ignoring for display \(display)")
+                log.warning("This HDMI port doesn't support DDC, ignoring for display \(display)")
                 display.macMiniHDMI = true
                 return nil
             }
