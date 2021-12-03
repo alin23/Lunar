@@ -41,6 +41,7 @@ That is the same brightness that you can control with the physical buttons/contr
 ### Disadvantages
 * Not supported by TVs
 * Doesn't work on Mac Mini's HDMI port
+* Doesn't work on the HDMI port of the post-2021 MacBook Pro
 * Can wear out the monitor flash memory
 * Even though DDC is supported by all monitors, **a bad combination of cables/adapters/hubs/GPU can break it**
     - *Aim for using as little adapters as possible between your Mac device and your monitor*
@@ -1286,6 +1287,7 @@ class DisplayViewController: NSViewController {
 
     override func flagsChanged(with event: NSEvent) {
         optionKeyPressed = event.modifierFlags.contains(.option)
+        log.debug("Option key pressed: \(optionKeyPressed)")
     }
 
     @IBAction func delete(_: Any) {

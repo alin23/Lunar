@@ -978,7 +978,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
                 if !contrast {
-                    event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                    event.flags = event.flags.subtracting(offset == 1 ? [.maskShift, .maskControl, .maskAlternate] : [.maskControl])
                     return event
                 }
             }
@@ -988,21 +988,21 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .cursor:
             if !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
                 log.info("Forwarding media key to system")
-                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                event.flags = event.flags.subtracting(offset == 1 ? [.maskShift, .maskControl, .maskAlternate] : [.maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
             if !contrast, lidOpened {
                 log.info("Forwarding media key to system")
-                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                event.flags = event.flags.subtracting(offset == 1 ? [.maskShift, .maskControl, .maskAlternate] : [.maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
             if !contrast, let source = displayController.sourceDisplay, source.isBuiltin {
                 log.info("Forwarding media key to system")
-                event.flags = event.flags.subtracting([.maskShift, .maskControl])
+                event.flags = event.flags.subtracting(offset == 1 ? [.maskShift, .maskControl, .maskAlternate] : [.maskControl])
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, sourceDisplay: true)
