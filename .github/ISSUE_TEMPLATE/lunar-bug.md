@@ -25,9 +25,9 @@ assignees: alin23
 
 - Tried Lunar Diagnostics?
 > 1. Click on **Open Lunar Diagnostics** in the Lunar menu
-> 2. **Make sure to not click anywhere in the window**
-> 3. Press keyboard keys when prompted by the text
-> 4. After finishing the process click on the **Send Diagnostics** button.
+> 2. Follow through the steps when asked
+
+![Lunar Diagnostics menu item](https://files.lunar.fyi/diagnostics-menu-item.png)
 
     *write yes or no here*
 
