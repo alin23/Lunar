@@ -39,10 +39,11 @@ mkdir -p $TMP_DIR || exit 1
 rsync -avzP "$BUILD_DIR" "$TMP_DIR" || exit 1
 find "$APP_TMP" -not -perm 644 -and -not -perm 755 -exec chmod 644 \{\} \;
 
-set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/* \
-    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Updater.app \
-    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Autoupdate \
-    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/A/Sparkle \
+set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app/Contents/MacOS/* \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Sparkle \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/* \
     $APP_TMP/Contents/Frameworks/*.framework \
     $APP_TMP/Contents/Frameworks/*.dylib \
     $APP_TMP/Contents/Resources/ddcctl \
