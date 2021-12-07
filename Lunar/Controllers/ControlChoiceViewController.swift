@@ -915,6 +915,7 @@ class ControlChoiceViewController: NSViewController {
                         w.close()
                         wc.close()
 
+                        testWindowController?.close()
                         testWindowController = nil
 
                         if restart {
