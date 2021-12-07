@@ -38,6 +38,7 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_: Notification) {
+        testWindowController?.close()
         testWindowController = nil
         cancelTask(ONBOARDING_TASK_KEY)
         applyChanges()

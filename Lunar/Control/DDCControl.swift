@@ -250,7 +250,18 @@ class DDCControl: Control {
                 onStart: { display.shouldStopContrastTransition = false }
             ) { [weak self] contrast in
                 guard let self = self, faults <= 5 || self.ignoreFaults, let display = self.display,
-                      !display.shouldStopContrastTransition else { return }
+                      !display.shouldStopContrastTransition
+                else {
+                    log.debug(
+                        "Stopping smooth transition to contrast=\(contrast) for \(display)",
+                        context: [
+                            "faults": faults,
+                            "ignoreFaults": self?.ignoreFaults ?? false,
+                            "display.shouldStopContrastTransition": display.shouldStopContrastTransition,
+                        ]
+                    )
+                    return
+                }
 
                 log.debug("Writing contrast=\(contrast) using \(self) for \(display)")
 

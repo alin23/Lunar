@@ -154,7 +154,7 @@ let GENERIC_DISPLAY = Display(
     }()
 #endif
 
-let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 70 * 1_000_000 // 70ms
+let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 90 * 1_000_000 // 90ms
 
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
@@ -1896,7 +1896,6 @@ enum ValueType {
             }
 
             log.verbose("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
-            let startTime = DispatchTime.now()
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
@@ -1907,8 +1906,6 @@ enum ValueType {
                 )
             }
 
-            let elapsedTimeInterval = startTime.distance(to: .now())
-            checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
             NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
@@ -1972,7 +1969,6 @@ enum ValueType {
             }
 
             log.verbose("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
-            let startTime = DispatchTime.now()
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast)
@@ -1983,8 +1979,6 @@ enum ValueType {
                 )
             }
 
-            let elapsedTimeInterval = startTime.distance(to: .now())
-            checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
             NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
         }
     }
@@ -3679,6 +3673,7 @@ enum ValueType {
             guard let self = self else { return }
 
             var steps = abs(value.distance(to: currentValue))
+            log.debug("Smooth transition STEPS=\(steps) for \(self.description) from \(currentValue) to \(value)")
 
             var step: Int
             let minVal: UInt8
@@ -3711,6 +3706,7 @@ enum ValueType {
             }
 
             self.smoothStep = cap((elapsedTimeInterval.absNS / MAX_SMOOTH_STEP_TIME_NS).i, minVal: 1, maxVal: 100)
+            log.debug("Smooth step \(self.smoothStep) for \(self.description) from \(currentValue) to \(value)")
             if value < currentValue {
                 step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
             } else {
@@ -3733,7 +3729,7 @@ enum ValueType {
                     "It took \(elapsedTimeInterval.ns) (\(elapsedSecondsStr)s) to change brightness from \(currentValue) to \(value) by \(step)"
                 )
 
-            self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
+            self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS / steps.u64)
 
             self.inSmoothTransition = false
         }

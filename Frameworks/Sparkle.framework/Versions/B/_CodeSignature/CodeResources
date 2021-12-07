@@ -30,7 +30,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		zawRe0hd0z88nBbG/l3U9HMUsR8=
+		pNMmIsTMGUdq9FF9prtz5R1Hldc=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -874,10 +874,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			LICwrlyW9ow0Qs/BCGlZPFdfnIs=
+			TByPvpFpNq8L/3jaN50PhGU3BkQ=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"0fc0b947e63b468408b6af0946a84ba92cc184f2" or cdhash H"2c80b0ae5c96f68c3442cfc10869593c575f9c8b" or cdhash H"4c12e9ef6ab65ea68ed84ddce2839ebd8067fc2a" or cdhash H"3dbd3e0d83642eddcb5a476bd02796408feb923a"</string>
+			<string>cdhash H"a02b303f9af76d4c391f2b9e3f3ae3881d482e70" or cdhash H"4c1c8fbe916936af0bff78da379d0f8465370644" or cdhash H"337c1a6c3f7caef78edd42b3e753251d2e21bb3c" or cdhash H"0eb19ace05d1ab50a9015a7fe05bed66d622feaa"</string>
 		</dict>
 		<key>Headers/SPUDownloadData.h</key>
 		<dict>
@@ -960,11 +960,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			XDFhFrjQSVrrOcDt3bLzulVQqA4=
+			/tgfToGWWd5ECNGkZSP3C2YiCGA=
 			</data>
 			<key>hash2</key>
 			<data>
-			MFU8z6uvXxDHnXhFrkiM0ZPKGLYu2LUeTMRqgvhOoQE=
+			+S0Zt1xWlYWGax3TnJQCIFwdTdS6gz756/Q5U7BBAjU=
 			</data>
 		</dict>
 		<key>Headers/SPUUpdaterSettings.h</key>
@@ -1257,11 +1257,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			zawRe0hd0z88nBbG/l3U9HMUsR8=
+			pNMmIsTMGUdq9FF9prtz5R1Hldc=
 			</data>
 			<key>hash2</key>
 			<data>
-			Fvb4uJLnwANFfI0aVWlIeO0hSYnkRfUaKcHRJz47/LM=
+			xIF/2t1q7M4FKCIijCfMHPsWMjWTkz6cKID5cQU5J9I=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -2495,28 +2495,28 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			9q1tmMR9LEBWKS366OVKjGz++5g=
+			OXq6u9vJllh+B3VnuevUMXZho2k=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"d7b2021bba386b6772cdcab84b029f322663037e" or cdhash H"f6ad6d98c47d2c4056292dfae8e54a8c6cfefb98" or cdhash H"9f784601680ba57a1c63473ee8799c7b9a9d21d5" or cdhash H"168a6c06ae14d6a43c73512ab58ab832794df4f9"</string>
+			<string>cdhash H"0ca53516a698fd86f692d882d1f8f0a845d7c586" or cdhash H"397ababbdbc996587e077567b9ebd4317661a369" or cdhash H"8ff3567199fb6375bc7ea94b65f38c32be56ed80" or cdhash H"aa760ec4da08dc17bb5f89fcb427279f3cf13a63"</string>
 		</dict>
 		<key>XPCServices/org.sparkle-project.Downloader.xpc</key>
 		<dict>
 			<key>cdhash</key>
 			<data>
-			7gQ1hUNrPx7oindTRO/I4qktpX0=
+			2BzkmD1E35cv1CBAWTarSIh2LPg=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"e6737ef3bf71a2269d3e56661ae16d3fae38c40a" or cdhash H"ee043585436b3f1ee88a775344efc8e2a92da57d" or cdhash H"632cf08c74eb843afc9278e2503872cf45172c84" or cdhash H"9bc9b8c260f44465e1fb8cd0aef20339f2367b81"</string>
+			<string>cdhash H"d857b81590157f5121690aeb8081c9d76a6d9f67" or cdhash H"d81ce4983d44df972fd420405936ab4888762cf8" or cdhash H"0bdb1498c6d95005c75913630dfc9b97ea7fc98d" or cdhash H"9db65e9cea129022669bf1c7e42c9597e176fe46"</string>
 		</dict>
 		<key>XPCServices/org.sparkle-project.InstallerLauncher.xpc</key>
 		<dict>
 			<key>cdhash</key>
 			<data>
-			VJDkYdRa0kKUR6og9UMZjpGUOAI=
+			UiRHgqv15XkXAKgNFP2PUItFNBE=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"c4d4844ecf465545a785e8c7c1ac054a6772e67d" or cdhash H"5490e461d45ad2429447aa20f543198e91943802" or cdhash H"1d1186d2ef329b339c653de9007f5abe83267889" or cdhash H"5be51df2837a954d10b047860c0ec7c313e10c84"</string>
+			<string>cdhash H"a6e2f96db8481837e4eee7cc2c0d4b6be8dcb2e3" or cdhash H"52244782abf5e5791700a80d14fd8f508b453411" or cdhash H"7e719d09d05c033518afb04896a146cb32e36f71" or cdhash H"dddea46a21e46bde2ab3a22ffa809b68bb3b2ef0"</string>
 		</dict>
 	</dict>
 	<key>rules</key>
