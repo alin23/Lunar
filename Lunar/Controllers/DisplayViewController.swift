@@ -1368,7 +1368,10 @@ class DisplayViewController: NSViewController {
     }
 
     func showAdaptiveNotice() {
-        guard let button = settingsButton else { return }
+        guard let d = display, !d.isBuiltin, let button = settingsButton else {
+            hideAdaptiveNotice()
+            return
+        }
         button.highlight()
     }
 
