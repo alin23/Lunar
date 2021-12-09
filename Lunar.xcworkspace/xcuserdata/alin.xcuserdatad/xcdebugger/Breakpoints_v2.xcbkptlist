@@ -7,32 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5B196DEA-4D25-4972-9A7D-755EEEA58DC2"
+            uuid = "91AB6699-5094-42C4-817C-F174A4F055EB"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Lunar/Controllers/ControlChoiceViewController.swift"
+            filePath = "Lunar/Utils/DisplayController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "505"
-            endingLineNumber = "505"
-            landmarkName = "testControlWrite(_:for:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "AE2E16B8-782A-4B52-9F0F-56B30FEE92B5"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Lunar/Data/Display.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3656"
-            endingLineNumber = "3656"
-            landmarkName = "checkSlowWrite(elapsedNS:)"
+            startingLineNumber = "1121"
+            endingLineNumber = "1121"
+            landmarkName = "resetDisplayList(advancedSettings:configurationPage:autoBlackOut:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

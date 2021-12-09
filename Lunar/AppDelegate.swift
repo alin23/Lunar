@@ -990,6 +990,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
+                let oldScreenIDs = self.screenIDs
                 let newLidClosed = isLidClosed()
                 guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
 
@@ -1014,7 +1015,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 menuPopover?.close()
 
                 displayController.manageClamshellMode()
-                displayController.resetDisplayList()
+                displayController.resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
 
                 displayController.adaptBrightness(force: true)
 
