@@ -1906,7 +1906,7 @@ enum ValueType {
                 )
             }
 
-            NotificationCenter.default.post(name: currentDataPointChanged, object: nil)
+            mainAsync { NotificationCenter.default.post(name: currentDataPointChanged, object: nil) }
         }
     }
 

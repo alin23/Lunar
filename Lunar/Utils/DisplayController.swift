@@ -1093,17 +1093,21 @@ class DisplayController {
         adaptBrightness(force: true)
     }
 
-    func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false) {
+    func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
         asyncNow {
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
                 DDC.reset()
+
+                let activeOldDisplays = self.displays.values.filter(\.active)
                 self.displays = DisplayController.getDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
                     includeProjector: CachedDefaults[.showProjectorDisplays],
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
+                let activeNewDisplays = self.displays.values.filter(\.active)
+
                 let d = self.displays.values
                 if !d.contains(where: \.isSource),
                    let possibleSource = (d.first(where: \.isSmartBuiltin) ?? d.first(where: \.canChangeBrightnessDS))
@@ -1113,6 +1117,14 @@ class DisplayController {
 
                 SyncMode.refresh()
                 self.addSentryData()
+
+                guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
+                if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1 {
+                    displayController.blackOut(display: d.id, state: .on)
+                }
+                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, activeOldDisplays.count > 1 {
+                    displayController.blackOut(display: d.id, state: .off)
+                }
             }
             windowControllerQueue.sync {
                 let idsWithWindows: Set<CGDirectDisplayID> = Set(
