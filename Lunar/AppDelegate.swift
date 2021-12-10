@@ -975,6 +975,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 //                    guard let appPresetHandler = appPresetHandler, !appPresetHandler.isCancelled else {return}
 //                    d.adaptBrightness(force: true)
 //                }
+                guard let apps = CachedDefaults[.appExceptions], !apps.isEmpty else {
+                    updateInfoMenuItem()
+                    return
+                }
+
                 displayController.adaptBrightness(force: true)
                 updateInfoMenuItem()
             }
