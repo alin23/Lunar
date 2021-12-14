@@ -16,7 +16,7 @@ import Defaults
 class SettingsPopoverController: NSViewController {
     var displayObservers = [String: AnyCancellable]()
 
-    @objc dynamic var adaptiveBrightnessNotice: String = ""
+    @objc dynamic var adaptiveBrightnessNotice = ""
     weak var displayViewController: DisplayViewController?
 
     @objc dynamic weak var display: Display? {

@@ -35,7 +35,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     // MARK: Internal
 
-    @IBInspectable dynamic var step: Double = 1.0
+    @IBInspectable dynamic var step = 1.0
     @IBInspectable dynamic var leftPadding: UInt8 = 0
     @IBInspectable dynamic var showPlusSign = false
     @IBInspectable dynamic var decimalPoints: UInt8 = 0
@@ -44,10 +44,10 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     var _floatValue: Float = 0
     var _doubleValue: Double = 0
-    var _integerValue: Int = 0
+    var _integerValue = 0
     let growPointSize: CGFloat = 2
-    var hover: Bool = false
-    var scrolling: Bool = false
+    var hover = false
+    var scrolling = false
     var onValueChanged: ((Int) -> Void)?
     var onValueChangedInstant: ((Int) -> Void)?
     var onValueChangedDouble: ((Double) -> Void)?
@@ -75,11 +75,11 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     @IBInspectable dynamic var backgroundOpacity: CGFloat = 0.05
 
-    @IBInspectable dynamic var lowerLimit: Double = 0.0 {
+    @IBInspectable dynamic var lowerLimit = 0.0 {
         didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
     }
 
-    @IBInspectable dynamic var upperLimit: Double = 100.0 {
+    @IBInspectable dynamic var upperLimit = 100.0 {
         didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
     }
 

@@ -29,7 +29,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
     @IBOutlet var sshKeyCheckbox: NSButton!
     var sshKey: String?
-    @objc dynamic var port: String = "22"
+    @objc dynamic var port = "22"
     @objc dynamic var password: String? = "raspberry"
     @objc dynamic var passphrase: String?
     @objc dynamic var connectionMessage: String?
@@ -43,13 +43,13 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
     var commandChannel: Channel?
     var cancelled = false
 
-    @objc dynamic var sshKeySelected: Bool = false {
+    @objc dynamic var sshKeySelected = false {
         didSet {
             setInstallButtonEnabled()
         }
     }
 
-    @objc dynamic var connecting: Bool = false {
+    @objc dynamic var connecting = false {
         didSet {
             if connecting {
                 connectingIndicator.startAnimation(nil)
@@ -61,7 +61,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
         }
     }
 
-    @objc dynamic var cancellingCommand: Bool = false {
+    @objc dynamic var cancellingCommand = false {
         didSet {
             if cancellingCommand {
                 connectingIndicator.startAnimation(nil)

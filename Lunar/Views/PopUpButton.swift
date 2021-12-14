@@ -20,7 +20,7 @@ let DOT_PREFIX = "⚫︎  "
 class PopUpButtonCell: NSPopUpButtonCell {
     var textColor: NSColor?
     var dotColor: NSColor?
-    @IBInspectable dynamic var prefix: String = ""
+    @IBInspectable dynamic var prefix = ""
 
     override func drawTitle(_ title: NSAttributedString, withFrame frame: NSRect, in controlView: NSView) -> NSRect {
         guard let color = textColor else {
@@ -101,7 +101,7 @@ class PopUpButton: NSPopUpButton {
 
     // MARK: Internal
 
-    @IBInspectable dynamic var dotColorSecondary: Bool = false
+    @IBInspectable dynamic var dotColorSecondary = false
     @IBInspectable dynamic var dotColor: NSColor? = nil
 
     var hoverState = HoverState.noHover

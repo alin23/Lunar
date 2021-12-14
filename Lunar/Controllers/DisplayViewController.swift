@@ -273,7 +273,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var lockContrastCurveButton: LockButton!
     @IBOutlet var lockBrightnessCurveButton: LockButton!
 
-    @objc dynamic var noDisplay: Bool = false
+    @objc dynamic var noDisplay = false
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
         .ambientLightAdaptiveBrightnessEnabled || displayController
         .adaptiveModeKey == .clock
@@ -287,7 +287,7 @@ class DisplayViewController: NSViewController {
     var viewID: String?
     var displayObservers = [String: AnyCancellable]()
 
-    var pausedAdaptiveModeObserver: Bool = false
+    var pausedAdaptiveModeObserver = false
 
     @objc dynamic lazy var deleteEnabled = getDeleteEnabled()
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
@@ -359,14 +359,14 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @objc dynamic var lockedBrightnessCurve: Bool = false {
+    @objc dynamic var lockedBrightnessCurve = false {
         didSet {
             display?.lockedBrightnessCurve = lockedBrightnessCurve
             lockBrightnessCurveButton?.state = lockedBrightnessCurve.state
         }
     }
 
-    @objc dynamic var lockedContrastCurve: Bool = false {
+    @objc dynamic var lockedContrastCurve = false {
         didSet {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state

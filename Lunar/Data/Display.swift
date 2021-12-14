@@ -22,8 +22,8 @@ import Sentry
 import Surge
 import SwiftDate
 
-let MIN_VOLUME: Int = 0
-let MAX_VOLUME: Int = 100
+let MIN_VOLUME = 0
+let MAX_VOLUME = 100
 let MIN_BRIGHTNESS: UInt8 = 0
 let MAX_BRIGHTNESS: UInt8 = 100
 let MIN_CONTRAST: UInt8 = 0
@@ -915,25 +915,23 @@ enum ValueType {
     lazy var canChangeBrightnessDS: Bool = DisplayServicesCanChangeBrightness(id)
 
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
-    lazy var hotkeyPopoverController: HotkeyPopoverController? = {
-        mainThread {
-            guard let popover = _hotkeyPopover else {
-                _hotkeyPopover = NSPopover()
-                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
-                   let controller = stb.instantiateController(
-                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
-                   ) as? HotkeyPopoverController
-                {
-                    POPOVERS[serial] = _hotkeyPopover
-                    popover.contentViewController = controller
-                    popover.contentViewController!.loadView()
-                }
-
-                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
+    lazy var hotkeyPopoverController: HotkeyPopoverController? = mainThread {
+        guard let popover = _hotkeyPopover else {
+            _hotkeyPopover = NSPopover()
+            if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
+               let controller = stb.instantiateController(
+                   withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
+               ) as? HotkeyPopoverController
+            {
+                POPOVERS[serial] = _hotkeyPopover
+                popover.contentViewController = controller
+                popover.contentViewController!.loadView()
             }
-            return popover.contentViewController as? HotkeyPopoverController
+
+            return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
         }
-    }()
+        return popover.contentViewController as? HotkeyPopoverController
+    }
 
     // MARK: Stored Properties
 
@@ -945,7 +943,7 @@ enum ValueType {
     var edidName: String
     lazy var lastVolume: NSNumber = volume
 
-    @Published @objc dynamic var activeAndResponsive: Bool = false
+    @Published @objc dynamic var activeAndResponsive = false
 
     var schedules: [BrightnessSchedule] = Display.DEFAULT_SCHEDULES
     @Published var enabledControls: [DisplayControl: Bool] = [
@@ -1111,7 +1109,7 @@ enum ValueType {
 
     let DEFAULT_GAMMA_PARAMETERS: (Float, Float, Float, Float, Float, Float, Float, Float, Float) = (0, 1, 1, 0, 1, 1, 0, 1, 1)
 
-    @Atomic var settingGamma: Bool = false
+    @Atomic var settingGamma = false
 
     lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: edidName)
     lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: edidName)
@@ -1191,13 +1189,13 @@ enum ValueType {
 
     @Atomic var initialised = false
 
-    var preciseContrastBeforeAppPreset: Double = 0.5
+    var preciseContrastBeforeAppPreset = 0.5
 
     @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name) && vendor != .samsung
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
 
-    var preciseBrightnessContrastBeforeAppPreset: Double = 0.5 {
+    var preciseBrightnessContrastBeforeAppPreset = 0.5 {
         didSet {
             guard CachedDefaults[.mergeBrightnessContrast] else { return }
             preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
@@ -1205,7 +1203,7 @@ enum ValueType {
         }
     }
 
-    var preciseBrightnessBeforeAppPreset: Double = 0.5 {
+    var preciseBrightnessBeforeAppPreset = 0.5 {
         didSet {
             guard !CachedDefaults[.mergeBrightnessContrast] else { return }
             preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
@@ -1214,7 +1212,7 @@ enum ValueType {
 
     // #endif
 
-    @Published @objc dynamic var canChangeVolume: Bool = true {
+    @Published @objc dynamic var canChangeVolume = true {
         didSet {
             showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
             save()
@@ -1230,6 +1228,9 @@ enum ValueType {
         get { Self.ambientLightCompensationEnabled(id) }
         set {
             guard ambientLightCompensationEnabledByUser else { return }
+            if !newValue, isBuiltin {
+                log.warning("Disabling system adaptive brightness")
+            }
             DisplayServicesEnableAmbientLightCompensation(id, newValue)
         }
     }
@@ -1359,7 +1360,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var applyGamma: Bool = false {
+    @Published @objc dynamic var applyGamma = false {
         didSet {
             save()
             if !applyGamma {
@@ -1383,7 +1384,7 @@ enum ValueType {
         }
     }
 
-    @Published var adaptivePaused: Bool = false {
+    @Published var adaptivePaused = false {
         didSet {
             readapt(newValue: adaptivePaused, oldValue: oldValue)
         }
@@ -1469,7 +1470,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var blacks: Double = 0.0 {
+    @objc dynamic var blacks = 0.0 {
         didSet {
             defaultGammaRedMin = blacks.ns
             defaultGammaGreenMin = blacks.ns
@@ -1477,7 +1478,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var whites: Double = 1.0 {
+    @objc dynamic var whites = 1.0 {
         didSet {
             defaultGammaRedMax = whites.ns
             defaultGammaGreenMax = whites.ns
@@ -1485,7 +1486,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var red: Double = 0.5 {
+    @objc dynamic var red = 0.5 {
         didSet {
             if red == 0.5 {
                 defaultGammaRedValue = 1.0
@@ -1497,7 +1498,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var green: Double = 0.5 {
+    @objc dynamic var green = 0.5 {
         didSet {
             if green == 0.5 {
                 defaultGammaGreenValue = 1.0
@@ -1509,7 +1510,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var blue: Double = 0.5 {
+    @objc dynamic var blue = 0.5 {
         didSet {
             if blue == 0.5 {
                 defaultGammaBlueValue = 1.0
@@ -1616,27 +1617,27 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var lockedBrightness: Bool = false {
+    @Published @objc dynamic var lockedBrightness = false {
         didSet {
             log.debug("Locked brightness for \(description)")
             save()
         }
     }
 
-    @Published @objc dynamic var lockedContrast: Bool = false {
+    @Published @objc dynamic var lockedContrast = false {
         didSet {
             log.debug("Locked contrast for \(description)")
             save()
         }
     }
 
-    @Published @objc dynamic var lockedBrightnessCurve: Bool = false {
+    @Published @objc dynamic var lockedBrightnessCurve = false {
         didSet {
             save()
         }
     }
 
-    @Published @objc dynamic var lockedContrastCurve: Bool = false {
+    @Published @objc dynamic var lockedContrastCurve = false {
         didSet {
             save()
         }
@@ -1713,7 +1714,7 @@ enum ValueType {
         ).rounded().u8
     }
 
-    @objc dynamic var preciseBrightnessContrast: Double = 0.5 {
+    @objc dynamic var preciseBrightnessContrast = 0.5 {
         didSet {
             guard applyPreciseValue else { return }
 
@@ -1743,7 +1744,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var preciseBrightness: Double = 0.5 {
+    @objc dynamic var preciseBrightness = 0.5 {
         didSet {
             guard applyPreciseValue else { return }
 
@@ -1805,7 +1806,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var preciseContrast: Double = 0.5 {
+    @objc dynamic var preciseContrast = 0.5 {
         didSet {
             guard applyPreciseValue else { return }
 
@@ -1830,7 +1831,7 @@ enum ValueType {
         }
     }
 
-    @objc dynamic var preciseVolume: Double = 0.5 {
+    @objc dynamic var preciseVolume = 0.5 {
         didSet {
             guard applyPreciseValue else { return }
             volume = (preciseVolume * 100).ns
@@ -2122,11 +2123,11 @@ enum ValueType {
     @Published @objc dynamic var contrastOnInputChange2: NSNumber = 75 { didSet { save() } }
     @Published @objc dynamic var contrastOnInputChange3: NSNumber = 75 { didSet { save() } }
 
-    @Published @objc dynamic var applyBrightnessOnInputChange1: Bool = true { didSet { save() } }
-    @Published @objc dynamic var applyBrightnessOnInputChange2: Bool = false { didSet { save() } }
-    @Published @objc dynamic var applyBrightnessOnInputChange3: Bool = false { didSet { save() } }
+    @Published @objc dynamic var applyBrightnessOnInputChange1 = true { didSet { save() } }
+    @Published @objc dynamic var applyBrightnessOnInputChange2 = false { didSet { save() } }
+    @Published @objc dynamic var applyBrightnessOnInputChange3 = false { didSet { save() } }
 
-    @Published @objc dynamic var audioMuted: Bool = false {
+    @Published @objc dynamic var audioMuted = false {
         didSet {
             save()
 
@@ -2143,7 +2144,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var power: Bool = true {
+    @Published @objc dynamic var power = true {
         didSet {
             save()
         }
@@ -2151,7 +2152,7 @@ enum ValueType {
 
     // MARK: Computed Properties
 
-    @Published @objc dynamic var active: Bool = false {
+    @Published @objc dynamic var active = false {
         didSet {
             if active {
                 startControls()
@@ -2195,7 +2196,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var responsiveDDC: Bool = true {
+    @Published @objc dynamic var responsiveDDC = true {
         didSet {
             context = getContext()
             mainThread {
@@ -2204,7 +2205,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var hasI2C: Bool = false {
+    @Published @objc dynamic var hasI2C = false {
         didSet {
             context = getContext()
             mainThread {
@@ -2213,7 +2214,7 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var hasNetworkControl: Bool = false {
+    @Published @objc dynamic var hasNetworkControl = false {
         didSet {
             context = getContext()
             mainThread {
@@ -2236,13 +2237,13 @@ enum ValueType {
 
     @objc dynamic var noDDCOrMergedBrightnessContrast: Bool { !hasDDC || CachedDefaults[.mergeBrightnessContrast] }
 
-    @Published @objc dynamic var hasDDC: Bool = false {
+    @Published @objc dynamic var hasDDC = false {
         didSet {
             inputTooltip = hasDDC ? nil : "This monitor doesn't support input switching because DDC is not available"
         }
     }
 
-    @Published @objc dynamic var useOverlay: Bool = false {
+    @Published @objc dynamic var useOverlay = false {
         didSet {
             supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector
             supportsGamma = supportsGammaByDefault && !useOverlay
@@ -2294,31 +2295,31 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var alwaysUseNetworkControl: Bool = false {
+    @Published @objc dynamic var alwaysUseNetworkControl = false {
         didSet {
             context = getContext()
         }
     }
 
-    @Published @objc dynamic var neverUseNetworkControl: Bool = false {
+    @Published @objc dynamic var neverUseNetworkControl = false {
         didSet {
             context = getContext()
         }
     }
 
-    @Published @objc dynamic var alwaysFallbackControl: Bool = false {
+    @Published @objc dynamic var alwaysFallbackControl = false {
         didSet {
             context = getContext()
         }
     }
 
-    @Published @objc dynamic var neverFallbackControl: Bool = false {
+    @Published @objc dynamic var neverFallbackControl = false {
         didSet {
             context = getContext()
         }
     }
 
-    @Published @objc dynamic var showVolumeOSD: Bool = true {
+    @Published @objc dynamic var showVolumeOSD = true {
         didSet {
             context = getContext()
             save()
@@ -2401,25 +2402,25 @@ enum ValueType {
         }
     }
 
-    @Published @objc dynamic var sendingBrightness: Bool = false {
+    @Published @objc dynamic var sendingBrightness = false {
         didSet {
             manageSendingValue(.sendingBrightness, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var sendingContrast: Bool = false {
+    @Published @objc dynamic var sendingContrast = false {
         didSet {
             manageSendingValue(.sendingContrast, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var sendingInput: Bool = false {
+    @Published @objc dynamic var sendingInput = false {
         didSet {
             manageSendingValue(.sendingInput, oldValue: oldValue)
         }
     }
 
-    @Published @objc dynamic var sendingVolume: Bool = false {
+    @Published @objc dynamic var sendingVolume = false {
         didSet {
             manageSendingValue(.sendingVolume, oldValue: oldValue)
         }

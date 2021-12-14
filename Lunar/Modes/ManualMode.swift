@@ -17,7 +17,7 @@ class ManualMode: AdaptiveMode {
     @Atomic var force = false
     var brightnessDataPoint = DataPoint(min: 0, max: 100, last: 0)
     var contrastDataPoint = DataPoint(min: 0, max: 100, last: 0)
-    var maxChartDataPoints: Int = 101
+    var maxChartDataPoints = 101
 
     var key = AdaptiveModeKey.manual
 

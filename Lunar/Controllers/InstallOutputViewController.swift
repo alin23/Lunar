@@ -61,7 +61,7 @@ class InstallOutputViewController: NSViewController {
     @IBOutlet var cancellingIndicator: NSProgressIndicator!
     @IBOutlet var cancelButton: PaddedButton!
 
-    @objc dynamic var scrollAutomatically: Bool = true {
+    @objc dynamic var scrollAutomatically = true {
         didSet {
             if scrollAutomatically, let textView = outputScrollView.documentView as? NSTextView {
                 textView.scrollToEndOfDocument(nil)
@@ -69,7 +69,7 @@ class InstallOutputViewController: NSViewController {
         }
     }
 
-    @objc dynamic var waitingForServer: Bool = false {
+    @objc dynamic var waitingForServer = false {
         didSet {
             if waitingForServer {
                 waitingIndicator.startAnimation(nil)
@@ -79,7 +79,7 @@ class InstallOutputViewController: NSViewController {
         }
     }
 
-    @objc dynamic var cancellingCommand: Bool = false {
+    @objc dynamic var cancellingCommand = false {
         didSet {
             if cancellingCommand {
                 cancellingIndicator.startAnimation(nil)

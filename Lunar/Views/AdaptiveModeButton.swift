@@ -26,9 +26,9 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
 
     // MARK: Internal
 
-    let defaultAutoModeTitle: String = "Auto Mode"
+    let defaultAutoModeTitle = "Auto Mode"
     var adaptiveModeObserver: Cancellable?
-    var pausedAdaptiveModeObserver: Bool = false
+    var pausedAdaptiveModeObserver = false
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in

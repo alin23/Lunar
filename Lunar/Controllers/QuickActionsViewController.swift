@@ -14,7 +14,7 @@ import Surge
 // MARK: - SliderValueTextField
 
 class SliderValueTextField: NSTextField {
-    @objc dynamic var _hidden: Bool = false
+    @objc dynamic var _hidden = false
 
     override var isHidden: Bool {
         get { _hidden }
@@ -27,7 +27,7 @@ class SliderValueTextField: NSTextField {
 // MARK: - SliderValueButton
 
 class SliderValueButton: Button {
-    var _hidden: Bool = false
+    var _hidden = false
 
     override var isHidden: Bool {
         get { _hidden }
