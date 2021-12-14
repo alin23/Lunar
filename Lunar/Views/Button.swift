@@ -26,8 +26,8 @@ class Button: NSButton {
 
     // MARK: Internal
 
-    @IBInspectable dynamic var grayDisabledText: Bool = true
-    @IBInspectable dynamic var alternateTitleWhenDisabled: Bool = false
+    @IBInspectable dynamic var grayDisabledText = true
+    @IBInspectable dynamic var alternateTitleWhenDisabled = false
 
     var buttonShadow: NSShadow!
 
@@ -38,7 +38,7 @@ class Button: NSButton {
 
     weak var notice: NSTextField?
 
-    lazy var highlighterKey: String = "highlighter-\(accessibilityIdentifier())"
+    lazy var highlighterKey = "highlighter-\(accessibilityIdentifier())"
 
     @IBInspectable dynamic var handCursor = true
 
@@ -121,7 +121,7 @@ class Button: NSButton {
         didSet { setShape() }
     }
 
-    @IBInspectable var circle: Bool = true {
+    @IBInspectable var circle = true {
         didSet {
             mainAsync { [self] in
                 setShape()

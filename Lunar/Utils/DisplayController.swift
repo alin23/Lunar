@@ -57,7 +57,7 @@ class DisplayController {
 
     let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = isLidClosed()
-    var clamshellMode: Bool = false
+    var clamshellMode = false
 
     var appObserver: NSKeyValueObservation?
     @AtomicLock var runningAppExceptions: [AppException]!
@@ -74,13 +74,13 @@ class DisplayController {
     var controlWatcherTask: CFRunLoopTimer?
     var modeWatcherTask: CFRunLoopTimer?
 
-    var pausedAdaptiveModeObserver: Bool = false
+    var pausedAdaptiveModeObserver = false
     var adaptiveModeObserver: Cancellable?
 
     var fallbackPromptTime = [CGDirectDisplayID: Date]()
 
     var overrideAdaptiveModeObserver: Cancellable?
-    var pausedOverrideAdaptiveModeObserver: Bool = false
+    var pausedOverrideAdaptiveModeObserver = false
 
     var observers: Set<AnyCancellable> = []
 

@@ -55,7 +55,7 @@ class MacToggle: NSView {
 
     //================================================================================
 
-    public var isEnabled: Bool = true {
+    public var isEnabled = true {
         didSet {
             mainThread {
                 if isEnabled {

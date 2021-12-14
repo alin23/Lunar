@@ -88,7 +88,7 @@ class OnboardingHelpButton: HelpButton {
 class HelpButton: PopoverButton<HelpPopoverController> {
     var link: String?
 
-    @IBInspectable var helpText: String = ""
+    @IBInspectable var helpText = ""
 
     override var popoverKey: String {
         "help"

@@ -43,7 +43,7 @@ class GradientView: NSView {
 
 class LunarTestViewController: NSViewController {
     @IBOutlet var label: NSTextField!
-    @objc dynamic var lunarTestText: String = "Lunar Test"
+    @objc dynamic var lunarTestText = "Lunar Test"
     var taskKey = "lunarTestHighlighter"
 
     override func viewDidAppear() {
@@ -164,7 +164,7 @@ class ControlChoiceViewController: NSViewController {
 
     var observers: Set<AnyCancellable> = []
 
-    @objc dynamic var progress: Double = 0.0
+    @objc dynamic var progress = 0.0
     @objc dynamic var volume: Double = 50
 
     var actionLabelColor = white.blended(withFraction: 0.2, of: lunarYellow)
