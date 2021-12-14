@@ -204,9 +204,9 @@ class SplitViewController: NSSplitViewController {
     var onRightButtonPress: (() -> Void)?
 
     var overrideAdaptiveModeObserver: Cancellable?
-    var pausedAdaptiveModeObserver: Bool = false
+    var pausedAdaptiveModeObserver = false
 
-    @objc dynamic var page: Int = 2 {
+    @objc dynamic var page = 2 {
         didSet {
             guard applyPage else { return }
             appDelegate!.currentPage = page

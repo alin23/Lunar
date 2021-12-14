@@ -143,7 +143,7 @@ class ConfigurationViewController: NSViewController {
         _helpButton3 as? HelpButton
     }
 
-    var hotkeyStepVisible: Bool = false {
+    var hotkeyStepVisible = false {
         didSet {
             brightnessStepField?.isHidden = !hotkeyStepVisible
             brightnessStepCaption?.isHidden = !hotkeyStepVisible
@@ -155,7 +155,7 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    var syncPollingIntervalVisible: Bool = false {
+    var syncPollingIntervalVisible = false {
         didSet {
             syncPollingIntervalField?.isHidden = !syncPollingIntervalVisible
             syncPollingIntervalCaption?.isHidden = !syncPollingIntervalVisible
@@ -163,7 +163,7 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    var sensorPollingIntervalVisible: Bool = false {
+    var sensorPollingIntervalVisible = false {
         didSet {
             sensorPollingIntervalField?.isHidden = !sensorPollingIntervalVisible
             sensorPollingIntervalCaption?.isHidden = !sensorPollingIntervalVisible
@@ -171,14 +171,14 @@ class ConfigurationViewController: NSViewController {
         }
     }
 
-    var scheduleTransitionVisible: Bool = false {
+    var scheduleTransitionVisible = false {
         didSet {
             scheduleTransitionLabel?.isHidden = !scheduleTransitionVisible
             scheduleTransitionSelector?.isHidden = !scheduleTransitionVisible
         }
     }
 
-    var locationVisible: Bool = false {
+    var locationVisible = false {
         didSet {
             locationLatField?.isHidden = !locationVisible
             locationLonField?.isHidden = !locationVisible

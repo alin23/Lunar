@@ -22,7 +22,7 @@ struct DDCCTLControl: Control {
 
     weak var display: Display?
 
-    var str: String = "ddcctl"
+    var str = "ddcctl"
 
     var displayControl: DisplayControl = .ddcctl
 

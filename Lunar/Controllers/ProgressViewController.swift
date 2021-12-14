@@ -9,12 +9,12 @@
 import Cocoa
 
 class ProgressViewController: NSViewController {
-    @objc dynamic var operationTitle: String = ""
+    @objc dynamic var operationTitle = ""
     @objc dynamic var operationDescription: NSAttributedString = "".attributedString
     @IBOutlet var progressBar: NSProgressIndicator!
     @IBOutlet var doneButton: Button!
 
-    @objc dynamic var done: Bool = false {
+    @objc dynamic var done = false {
         didSet {
             if done {
                 progressBar.stopAnimation(nil)

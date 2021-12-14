@@ -704,7 +704,7 @@ enum DDC {
 
         if checkName {
             let realName = (name ?? Display.printableName(id)).lowercased()
-            result = realName.contains("virtual") || realName.contains("displaylink")
+            result = realName.contains("virtual") || realName.contains("displaylink") || realName.contains("luna display")
         }
 
         guard let infoDictionary = displayInfoDictionary(id) else {

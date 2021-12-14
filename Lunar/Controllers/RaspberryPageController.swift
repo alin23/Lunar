@@ -61,7 +61,7 @@ extension RaspberryPageController: NSPageControllerDelegate {
             .instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(identifier)) as? SSHConnectionViewController
         {
             c.viewControllers[identifier] = controller
-            controller.onInstall = { [weak self] (ssh: SSH) -> Void in
+            controller.onInstall = { [weak self] (ssh: SSH) in
                 self?.navigateForward(nil)
                 if let installOutputController = c
                     .viewControllers[c.installOutputViewControllerIdentifier] as? InstallOutputViewController

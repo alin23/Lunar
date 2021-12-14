@@ -206,7 +206,7 @@ class DispatchWorkItem {
 
     // MARK: Internal
 
-    var name: String = ""
+    var name = ""
     var workItem: Foundation.DispatchWorkItem
 
     @inline(__always) var isCancelled: Bool {
@@ -264,7 +264,7 @@ class DispatchSemaphore: CustomStringConvertible {
 
     // MARK: Internal
 
-    var name: String = ""
+    var name = ""
     var sem: Foundation.DispatchSemaphore
 
     var description: String {
@@ -2262,6 +2262,6 @@ func memoryFootprintMB() -> Double? {
 }
 
 func formattedMemoryFootprint() -> String {
-    let usedMBAsString: String = "Memory Used by App: \((memoryFootprintMB() ?? 0).str(decimals: 2)) MB"
+    let usedMBAsString = "Memory Used by App: \((memoryFootprintMB() ?? 0).str(decimals: 2)) MB"
     return usedMBAsString
 }

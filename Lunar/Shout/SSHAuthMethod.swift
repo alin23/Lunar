@@ -54,7 +54,7 @@ public struct SSHAgent: SSHAuthMethod {
         try agent.listIdentities()
 
         var last: Agent.PublicKey?
-        var success: Bool = false
+        var success = false
         while let identity = try agent.getIdentity(last: last) {
             if agent.authenticate(username: username, key: identity) {
                 success = true

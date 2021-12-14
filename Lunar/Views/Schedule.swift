@@ -364,7 +364,7 @@ class Schedule: NSView {
         }
     }
 
-    @objc dynamic var isEnabled: Bool = true {
+    @objc dynamic var isEnabled = true {
         didSet { fade() }
     }
 

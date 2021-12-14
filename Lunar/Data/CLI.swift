@@ -290,7 +290,7 @@ struct Lunar: ParsableCommand {
         var display: String
 
         @Argument(help: "Value for the method's second argument")
-        var value: Double = 1.0
+        var value = 1.0
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -392,7 +392,7 @@ struct Lunar: ParsableCommand {
         var display: String
 
         @Argument(help: "Value for the method's second argument")
-        var value: Double = 1.0
+        var value = 1.0
 
         @Argument(help: "Value for the method's third argument")
         var value2: Double = 0
@@ -916,7 +916,7 @@ struct Lunar: ParsableCommand {
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Option(name: .shortAndLong, help: "How many milliseconds to wait for network controls to be ready")
-        var waitms: Int = 1000
+        var waitms = 1000
 
         @Argument(
             help: "Display property to set. One of (\(Display.CodingKeys.settable.map(\.rawValue).joined(separator: ", ")))"
@@ -967,16 +967,16 @@ struct Lunar: ParsableCommand {
             name: .shortAndLong,
             help: "How many seconds to wait until the program exits and the gamma values reset (0 waits indefinitely)"
         )
-        var wait: Int = 0
+        var wait = 0
 
         @Flag(name: .shortAndLong, help: "Force gamma setting.")
         var force = false
 
         @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, best-guess)")
-        var display: String = "best-guess"
+        var display = "best-guess"
 
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
-        var refreshSeconds: Int = 1
+        var refreshSeconds = 1
 
         @Option(name: .long, help: "Minimum red gamma value")
         var redMin: Float = 0.0

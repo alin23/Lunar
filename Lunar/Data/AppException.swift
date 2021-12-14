@@ -13,7 +13,7 @@ import Sentry
 
 let APP_MAX_BRIGHTNESS_OFFSET: Int8 = 30
 let APP_MAX_CONTRAST_OFFSET: Int8 = 20
-let DEFAULT_APP_BRIGHTNESS_CONTRAST: Double = 0.8
+let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
 let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
 // MARK: - AppException
@@ -113,11 +113,11 @@ let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Pla
         didSet { save() }
     }
 
-    @objc dynamic var applyBuiltin: Bool = false {
+    @objc dynamic var applyBuiltin = false {
         didSet { save() }
     }
 
-    @objc dynamic var reapplyPreviousBrightness: Bool = true {
+    @objc dynamic var reapplyPreviousBrightness = true {
         didSet { save() }
     }
 

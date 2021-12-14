@@ -34,7 +34,7 @@ class LockButton: NSButton {
     // MARK: Internal
 
     lazy var frameSize = frame.size
-    @IBInspectable dynamic var grayDisabledText: Bool = true
+    @IBInspectable dynamic var grayDisabledText = true
     // @IBInspectable dynamic var horizontalPadding: CGFloat = 0.2 {
     //     didSet {
     //         adaptSize()

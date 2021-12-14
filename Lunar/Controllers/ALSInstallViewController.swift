@@ -46,7 +46,7 @@ class ALSInstallViewController: NSViewController {
 
     // MARK: Internal
 
-    @objc dynamic var operationTitle: String = "Ambient Light Sensor"
+    @objc dynamic var operationTitle = "Ambient Light Sensor"
     @objc dynamic var operationDescription: NSAttributedString =
         "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
             .attributedString
@@ -106,7 +106,7 @@ class ALSInstallViewController: NSViewController {
         }
     }
 
-    @objc dynamic var done: Bool = false {
+    @objc dynamic var done = false {
         didSet {
             if done {
                 mainThread {

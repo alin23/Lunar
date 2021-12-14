@@ -51,7 +51,7 @@ class ToggleButton: NSButton {
 
     var hoverState = HoverState.noHover
     weak var notice: NSTextField?
-    lazy var highlighterKey: String = "highlighter-\(accessibilityIdentifier())"
+    lazy var highlighterKey = "highlighter-\(accessibilityIdentifier())"
 
     lazy var initialHeight = frame.height
 
@@ -64,7 +64,7 @@ class ToggleButton: NSButton {
         }
     }
 
-    @IBInspectable dynamic var circle: Bool = true {
+    @IBInspectable dynamic var circle = true {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
             radius = circle ? (frame.height / 2).ns : roundedness.ns
