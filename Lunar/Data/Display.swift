@@ -613,7 +613,7 @@ enum ValueType {
         super.init()
         defer { initialised = true }
 
-        if isLEDCinema() {
+        if isLEDCinema() || isThunderbolt() {
             maxDDCBrightness = 255
         }
 
@@ -4107,7 +4107,12 @@ enum ValueType {
     }
 
     func reset(resetControl: Bool = true) {
-        maxDDCBrightness = 100.ns
+        if isLEDCinema() || isThunderbolt() {
+            maxDDCBrightness = 255.ns
+        } else {
+            maxDDCBrightness = 100.ns
+        }
+
         maxDDCContrast = 100.ns
         maxDDCVolume = 100.ns
 
