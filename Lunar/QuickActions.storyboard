@@ -643,7 +643,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -670,7 +670,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -697,7 +697,7 @@
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -718,7 +718,7 @@
                                         <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -753,7 +753,7 @@
                                         <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -1599,7 +1599,7 @@
                                         <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -1627,7 +1627,7 @@
                                         <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -1655,7 +1655,7 @@
                                         <color key="value" name="Lunar Yellow Transparent"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                        <color key="value" name="Caption"/>
+                                        <color key="value" name="Caption Secondary"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -1741,9 +1741,6 @@
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>
         <image name="volume-low" width="24" height="24"/>
-        <namedColor name="Caption">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="Caption Secondary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
