@@ -1415,7 +1415,7 @@ class DisplayController {
         }
     }
 
-    func setBrightnessPercent(value: Int8, for displays: [Display]? = nil) {
+    func setBrightnessPercent(value: Int8, for displays: [Display]? = nil, now: Bool = false) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplays.values.map { $0 }
 
@@ -1424,7 +1424,7 @@ class DisplayController {
                   !display.lockedBrightness
             else { return }
 
-            mainAsyncAfter(ms: 1) {
+            let set = {
                 let minBr = display.minBrightness.intValue
                 display.brightness = manualMode.compute(
                     percent: value,
@@ -1432,22 +1432,32 @@ class DisplayController {
                     maxVal: display.maxBrightness.intValue
                 )
             }
+            if now {
+                set()
+            } else {
+                mainAsyncAfter(ms: 1, set)
+            }
         }
     }
 
-    func setContrastPercent(value: Int8, for displays: [Display]? = nil) {
+    func setContrastPercent(value: Int8, for displays: [Display]? = nil, now: Bool = false) {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplays.values.map { $0 }
 
         displays.forEach { display in
             guard !display.isBuiltin, !display.lockedContrast else { return }
 
-            mainAsyncAfter(ms: 1) {
+            let set = {
                 display.contrast = manualMode.compute(
                     percent: value,
                     minVal: display.minContrast.intValue,
                     maxVal: display.maxContrast.intValue
                 )
+            }
+            if now {
+                set()
+            } else {
+                mainAsyncAfter(ms: 1, set)
             }
         }
     }

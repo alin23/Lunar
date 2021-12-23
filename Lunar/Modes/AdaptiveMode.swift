@@ -7,6 +7,7 @@
 //
 
 import Accelerate
+import ArgumentParser
 import Atomics
 import Cocoa
 import Defaults
@@ -17,7 +18,7 @@ let STRIDE = vDSP_Stride(1)
 
 // MARK: - AdaptiveModeKey
 
-enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
+enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, ExpressibleByArgument {
     case location = 1
     case sync = -1
     case manual = 0
@@ -25,6 +26,16 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable {
     case clock = 3
 
     // MARK: Lifecycle
+
+    init?(argument: String) {
+        guard argument.lowercased().stripped != "auto" else {
+            CachedDefaults[.overrideAdaptiveMode] = false
+            self = DisplayController.autoMode().key
+            return
+        }
+        CachedDefaults[.overrideAdaptiveMode] = true
+        self = AdaptiveModeKey.fromstr(argument)
+    }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

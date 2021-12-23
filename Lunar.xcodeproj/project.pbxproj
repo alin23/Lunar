@@ -1743,7 +1743,7 @@
 			repositoryURL = "https://github.com/apple/swift-argument-parser";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.1;
+				minimumVersion = 1.0.0;
 			};
 		};
 		C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */ = {
