@@ -743,6 +743,59 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct Preset: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Applies Lunar presets."
+        )
+
+        @OptionGroup var globals: GlobalOptions
+
+        @Argument(help: "Number between 0 and 100")
+        var preset: Int8
+
+        func validate() throws {
+            if !(0 ... 100).contains(preset) {
+                throw CommandError
+                    .propertyNotValid("Preset must be a number between 0 and 100")
+            }
+        }
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            displayController.displays = DisplayController.getDisplays()
+            displayController.disable()
+            brightnessTransition = .instant
+
+            displayController.setBrightnessPercent(value: preset, now: true)
+            Thread.sleep(forTimeInterval: 1.0)
+            displayController.setContrastPercent(value: preset, now: true)
+            Thread.sleep(forTimeInterval: 1.0)
+
+            globalExit(0)
+        }
+    }
+
+    struct Mode: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Configures Lunar mode."
+        )
+
+        @OptionGroup var globals: GlobalOptions
+
+        @Argument(help: "Adaptive mode. One of (manual, clock, location, sync, sensor, auto)")
+        var mode: AdaptiveModeKey
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            CachedDefaults[.adaptiveBrightnessMode] = mode
+            sleep(1)
+
+            globalExit(0)
+        }
+    }
+
     struct Displays: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Lists currently active displays and allows for more granular setting/getting of values."
@@ -786,7 +839,7 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
-        @Argument(help: "Display serial or name or one of (first, main)")
+        @Argument(help: "Display serial or name or one of (first, main, all, builtin, source)")
         var display: String?
 
         @Argument(
@@ -972,7 +1025,7 @@ struct Lunar: ParsableCommand {
         @Flag(name: .shortAndLong, help: "Force gamma setting.")
         var force = false
 
-        @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, best-guess)")
+        @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, all, builtin, source)")
         var display = "best-guess"
 
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
@@ -1088,6 +1141,8 @@ struct Lunar: ParsableCommand {
             Set.self,
             Get.self,
             Displays.self,
+            Preset.self,
+            Mode.self,
             Builtin.self,
             Ddc.self,
             Ddcctl.self,
