@@ -35,6 +35,7 @@ var screensSleeping = ManagedAtomic<Bool>(false)
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
+var startTime = Date()
 
 private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 private let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -1337,6 +1338,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        startTime = Date()
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
             log.verbose("\(initStuff)")

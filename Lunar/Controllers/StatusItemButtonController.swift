@@ -17,6 +17,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     func popoverWillShow(_ notification: Notification) {
         if let menuPopover = menuPopover, let view = menuPopover.contentViewController?.view {
             removePopoverBackground(view: view, backgroundView: &backgroundView)
+            fixPopoverView(view)
         }
     }
 

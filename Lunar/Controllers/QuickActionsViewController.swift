@@ -105,7 +105,11 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
     }
 
     @IBAction func showMenu(_: Button) {
-        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: view.frame.width, y: view.frame.height - 4), in: view)
+        appDelegate!.menu.popUp(
+            positioning: nil,
+            at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: view.frame.height - 4),
+            in: view
+        )
     }
 
     func resize() {
@@ -157,7 +161,8 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
                 }
             }
 
-            self.view.setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 124 : 150)))
+            self.view
+                .setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 124 : 150) + POPOVER_PADDING))
         }
     }
 
