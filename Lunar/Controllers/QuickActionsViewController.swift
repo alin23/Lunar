@@ -133,7 +133,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
 
             if let display = self.display {
                 let orientationHeight: CGFloat = (display.showOrientation ? 30 : 0)
-                let appPresetHeight: CGFloat = (display.appPreset != nil ? 20 : 0)
+                let appPresetHeight: CGFloat = (display.appPreset != nil ? 30 : 0)
                 if display.hasDDC {
                     let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
                     let contrastHeight: CGFloat = (merged ? 0 : 30)

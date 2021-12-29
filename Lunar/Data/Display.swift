@@ -1223,7 +1223,9 @@ enum ValueType {
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
         set {
-            guard ambientLightCompensationEnabledByUser else { return }
+            guard ambientLightCompensationEnabledByUser else {
+                return
+            }
             if !newValue, isBuiltin {
                 log.warning("Disabling system adaptive brightness")
             }
