@@ -12,8 +12,18 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     // MARK: Internal
 
     var statusButton: NSStatusBarButton?
+    var backgroundView: PopoverBackgroundView?
+
+    func popoverWillShow(_ notification: Notification) {
+        if let menuPopover = menuPopover, let view = menuPopover.contentViewController?.view {
+            removePopoverBackground(view: view, backgroundView: &backgroundView)
+        }
+    }
 
     func popoverDidClose(_: Notification) {
+        if let window = menuPopover?.contentViewController?.view.window {
+            window.identifier = nil
+        }
         let positioningView = statusButton?.subviews.first {
             $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
         }
@@ -45,7 +55,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
 
         menuPopover.show(relativeTo: positioningView.bounds, of: positioningView, preferredEdge: .maxY)
         positioningView.bounds = positioningView.bounds.offsetBy(dx: 0, dy: positioningView.bounds.height)
-        if let popoverWindow = menuPopover.contentViewController?.view.window {
+        if let view = menuPopover.contentViewController?.view, let popoverWindow = view.window {
             popoverWindow.setFrame(popoverWindow.frame.offsetBy(dx: 0, dy: 12), display: false)
         }
         super.mouseDown(with: event)

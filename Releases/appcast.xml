@@ -1230,7 +1230,7 @@
             <sparkle:version>5.1.0</sparkle:version>
             <sparkle:shortVersionString>5.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.0.dmg" length="16601325" type="application/octet-stream" sparkle:edSignature="UC4zUKOBeWfGp62r5Pmgxt+sSLH0flu8izMtkYj3KQ3a4FJlSkm9xiOsmSgz/Jg/q/IVoJNuGvMIJ9DLP01BDQ==" sparkle:dsaSignature="MEQCIHhH9zcTack2ZuRlbJLfZBPkuvIHIaAa/JKMaJ+DMfqZAiBgdgLWPn7m7VGeNlCbd2hnvS/GOiob9yNlZIEDiACOpw=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.0.dmg" length="16601325" type="application/octet-stream" sparkle:edSignature="UC4zUKOBeWfGp62r5Pmgxt+sSLH0flu8izMtkYj3KQ3a4FJlSkm9xiOsmSgz/Jg/q/IVoJNuGvMIJ9DLP01BDQ==" sparkle:dsaSignature="MEQCIGeTg1cTbzQYK3L1LW6W7Sh9yCS3IJTYccSnZP2Jt8o9AiAaAJIcHMVqGesYS7+wwCfdJwKRvg6d7c180YUrvXC9sA=="/>
             <signature>UytirBUp6j4UNk.l9gILX12NnCE=</signature>
             <signature>UytirBUp6j4UNk/l9gILX12NnCE=</signature>
             <signature>AW1K2ld+5lLCD8Wifplmnl4gRxo=</signature>
@@ -1249,7 +1249,7 @@
             <sparkle:version>5.1.1</sparkle:version>
             <sparkle:shortVersionString>5.1.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.1.dmg" length="16610863" type="application/octet-stream" sparkle:edSignature="pjohJ8fa/yrJrgjrceFvavZTgiISvM5mTijX24U4qhHsWn4sv7BjWaG20LmErhROFgAwvD6H1vvbLG9n3kBVCQ==" sparkle:dsaSignature="MEUCIGGZ4b2M2vvDIuYwcr1hwqv758kc3mxKjDLP+IIpFoZ8AiEAhUnQd8MUo1oIkJ1WwwGE1qUfMDrItcpb0VMOqbptJtw="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.1.dmg" length="16610863" type="application/octet-stream" sparkle:edSignature="pjohJ8fa/yrJrgjrceFvavZTgiISvM5mTijX24U4qhHsWn4sv7BjWaG20LmErhROFgAwvD6H1vvbLG9n3kBVCQ==" sparkle:dsaSignature="MEUCICJiepG7HsT+R7Mm+iNmezXqTwyCWw8rz87WqYUt3n+MAiEAnyJr2j5gNoTIXcTOgaO4+ajabDEA86+6vJA88VjgB5A="/>
             <signature>zkgvNe+tpWhWW1C7PmsSVnykvaY=</signature>
             <signature>+lXdYsDXQWe4HjVJ+c25peraOvI=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Correctly set max DDC brightness to 255 on LED Cinema displays</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix clamshell mode detection for some special setups</li><li>Fix brightness OSD not showing in some cases (missed some stuff)</li><li>Fix brightness keys not working in previous release</li></ul></div></div>]]></description>
@@ -1289,14 +1289,14 @@
             <sparkle:version>5.1.2</sparkle:version>
             <sparkle:shortVersionString>5.1.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.2.dmg" length="16657565" type="application/octet-stream" sparkle:edSignature="0p3hk006SX54kZ76p4j+TxcLn2n10JG3i1dTQRQC//WN1lUnS2Ws+H4yWcRRmbda4IM3D3wgDhWoVjxxA3NfDw==" sparkle:dsaSignature="MEUCIQCR0c49RL/CHowGy+Ll1tAdhibG00ZsiQvOCIbKLWu4PQIgQIviIHqhYVSNpHQBWmRRkqUmMYF6J2LTGnIv/LLr4JU="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.1.2.dmg" length="16657565" type="application/octet-stream" sparkle:edSignature="0p3hk006SX54kZ76p4j+TxcLn2n10JG3i1dTQRQC//WN1lUnS2Ws+H4yWcRRmbda4IM3D3wgDhWoVjxxA3NfDw==" sparkle:dsaSignature="MEUCIQCRmsQ6BtN9uaPdkE8/d30nt/YXpfoREL9cO0jHdUjMDQIgbnVVxarOFPnagZvXq58mm63EAI2VuRywoxNWhtrrHuY="/>
             <signature>RwnngMg13b6CqtBl2JjQdwnTUvU=</signature>
             <signature>v8dv2TJWTCUQw.GW3j2tosrO9nQ=</signature>
             <signature>v8dv2TJWTCUQw/GW3j2tosrO9nQ=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li>Add possibility to stream logs to the developer in real time for more efficient troubleshooting</li></ul><h2 id="improvements">Improvements</h2><ul><li>Make Gamma/Overlay changes faster when using sliders</li><li>Make the Adaptive Mode dropdown easier to click</li><li>Add note about how to adjust contrast independently on the Hotkeys page</li><li>Make App Presets more reliable on single monitor setups by not caring about the window visibility</li><li>Make Ultrafine AmbientLightCompensation detection more strict<ul><li>It seems there are some models that report that AmbientLightCompensation is enabled while HasAmbientLightCompensation is false</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix contrast media keys</li><li>Fix internal sensor detection</li><li>Fix contrast locking by itself when showing/hiding advanced settings</li></ul></div></div>]]></description>
             <sparkle:deltas>
-                <enclosure url="https://lunar.fyi/delta/5.1.2/5.1.1" sparkle:deltaFrom="5.1.1" length="2739236" type="application/octet-stream" sparkle:edSignature="zE+Vg0z8FEb8Qqr2CEUZVXxSggoMcSjB9MY7+vFLsfgoP+HSEHXCHzaBMI6MqkLIx2b1MDqW6fxNp0qrOrx7Cg==" sparkle:dsaSignature="MEQCIGZoHybTJzqabwLtCnEelaNKF1FuSQC7xaVjRtVfXCusAiB59PtReSspUY24XXNoTuYQpOkmBZLkJZ494BPnGfbKPA=="/>
-                <enclosure url="https://lunar.fyi/delta/5.1.2/5.1.0" sparkle:deltaFrom="5.1.0" length="2863984" type="application/octet-stream" sparkle:edSignature="JBQMpRbqiagETKgiBkPI29IdPe6p/ESpYFoLctguQC0Xy5OwWOEIYgnn7JZj8thfiWj+R+fmc9joVSGKcTzcDA==" sparkle:dsaSignature="MEUCIC/F1cDGIqL0kFKDOClgxLXZFy+fIPEdupeVIDwf3L0sAiEAjci1YEUthPhgjQ1hqXnhjVBnlc7epThgUFh8byxZ7kY="/>
+                <enclosure url="https://lunar.fyi/delta/5.1.2/5.1.1" sparkle:deltaFrom="5.1.1" length="2739236" type="application/octet-stream" sparkle:edSignature="zE+Vg0z8FEb8Qqr2CEUZVXxSggoMcSjB9MY7+vFLsfgoP+HSEHXCHzaBMI6MqkLIx2b1MDqW6fxNp0qrOrx7Cg==" sparkle:dsaSignature="MEQCICozAChC+HVGt0AMOCpzWajsbFoEcHJ3NLS24je3scvsAiAHcyQ59gdhL9nkHCipq7b55e5/uTj6wZQJgjL9YJWchg=="/>
+                <enclosure url="https://lunar.fyi/delta/5.1.2/5.1.0" sparkle:deltaFrom="5.1.0" length="2863984" type="application/octet-stream" sparkle:edSignature="JBQMpRbqiagETKgiBkPI29IdPe6p/ESpYFoLctguQC0Xy5OwWOEIYgnn7JZj8thfiWj+R+fmc9joVSGKcTzcDA==" sparkle:dsaSignature="MEUCIAbEtfZqcvQExVycP+NYjOztZav7OskqTtAtKON9KBQOAiEAk6/6AFf0CHRPh5/wuzFocdgbfubMVoT3laStjnWndR8="/>
             </sparkle:deltas>
             <signature>NyotiWduqOx+9cZshIrbP1rNNe4=</signature>
             <signature>sb0U0j8Qv0TMYYjjxjRZtYAlGrg=</signature>
@@ -1327,6 +1327,10 @@
             <signature>7L0QDYAbEqsfAqsNvMTI1k+F1k8=</signature>
             <signature>TeegUFwi0Jsz9+Psjw7r4osA0V0=</signature>
             <signature>hzflRvcIB08shGktiC9yt8cPlYc=</signature>
+            <signature>.e53UtOx+O82n+GkPMvLIb7M80s=</signature>
+            <signature>/e53UtOx+O82n+GkPMvLIb7M80s=</signature>
+            <signature>E9Jc7Mf6STgRqAoT0iLjx.8vigw=</signature>
+            <signature>E9Jc7Mf6STgRqAoT0iLjx/8vigw=</signature>
         </item>
     </channel>
 </rss>

@@ -1002,7 +1002,7 @@ enum ValueType {
 
     var slowRead = false
     var slowWrite = false
-    var macMiniHDMI = false
+    var badHDMI = false
 
     var onControlChange: ((Control) -> Void)? = nil
     @AtomicLock var context: [String: Any]? = nil
@@ -3569,7 +3569,16 @@ enum ValueType {
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self, var dict = self.dictionary else { return }
             if let panel = self.panel,
-               let encoded = try? encoder.encode(ForgivingEncodable(getMonitorPanelDataJSON(panel))),
+               let encoded = try? encoder.encode(
+                   ForgivingEncodable(
+                       getMonitorPanelDataJSON(
+                           panel,
+                           modeFilter: {
+                               mode in mode.width > 1200 && mode.height > 1200 && mode.roundedScanRate > 50
+                           }
+                       )
+                   )
+               ),
                let compressed = encoded.gzip()?.base64EncodedString()
             {
                 dict["panelData"] = compressed
@@ -3606,6 +3615,7 @@ enum ValueType {
             dict["hasDDC"] = self.hasDDC
             dict["activeAndResponsive"] = self.activeAndResponsive
             dict["responsiveDDC"] = self.responsiveDDC
+            dict["control"] = self.control?.displayControl.str ?? "NONE"
             dict["gamma"] = [
                 "redMin": self.redMin,
                 "redMax": self.redMax,

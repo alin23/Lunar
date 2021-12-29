@@ -366,7 +366,7 @@ class SplitViewController: NSSplitViewController {
 
     override func viewDidLoad() {
         view.wantsLayer = true
-        view.radius = 12.0.ns
+        view.radius = 22.0.ns
         view.bg = white
 
         displayPage()

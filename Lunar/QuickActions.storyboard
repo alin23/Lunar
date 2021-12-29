@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,17 +11,17 @@
         <scene sceneID="mBf-QP-0sI">
             <objects>
                 <viewController storyboardIdentifier="QuickActionsViewController" id="XpJ-ho-P7z" customClass="QuickActionsViewController" customModule="Lunar" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vGd-1C-1a0">
-                        <rect key="frame" x="0.0" y="0.0" width="310" height="630"/>
+                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vGd-1C-1a0" customClass="QuickActionsView" customModule="Lunar" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="330" height="630"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="0.0" y="60" width="310" height="283"/>
+                                <rect key="frame" x="0.0" y="70" width="330" height="283"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="gridColor" red="0.90196078430000004" green="0.90196078430000004" blue="0.90196078430000004" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <tableColumns>
-                                    <tableColumn editable="NO" width="278" minWidth="278" maxWidth="278" id="MGA-3S-uM8">
+                                    <tableColumn editable="NO" width="298" minWidth="298" maxWidth="298" id="MGA-3S-uM8">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -34,17 +34,17 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="cellWithoutDDC" wantsLayer="YES" misplaced="YES" id="nKX-LM-MgX" customClass="CellWithoutDDC" customModule="Lunar" customModuleProvider="target">
-                                                <rect key="frame" x="10" y="10" width="290" height="89"/>
+                                                <rect key="frame" x="10" y="10" width="310" height="89"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="DGy-An-71R">
-                                                        <rect key="frame" x="33" y="65" width="224" height="24"/>
+                                                        <rect key="frame" x="43" y="65" width="224" height="24"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="220" id="jrt-4P-PFp"/>
                                                         </constraints>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Second screen" id="Y36-3Y-IWj">
-                                                            <font key="font" size="20" name="Menlo-Bold"/>
-                                                            <color key="textColor" name="Caption Secondary"/>
+                                                            <font key="font" metaFont="systemHeavy" size="20"/>
+                                                            <color key="textColor" name="Caption"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
@@ -52,7 +52,7 @@
                                                         </connections>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PvO-H1-mOH" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="56" y="23" width="178" height="38"/>
+                                                        <rect key="frame" x="66" y="23" width="178" height="38"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="30" id="Pza-RU-mGU"/>
                                                             <constraint firstAttribute="width" constant="174" id="XuC-ho-bki"/>
@@ -72,7 +72,7 @@
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="lzD-m0-SY0" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="62" y="38" width="12" height="12"/>
+                                                        <rect key="frame" x="72" y="38" width="12" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="12" id="aVw-N6-r2Z"/>
                                                             <constraint firstAttribute="width" constant="12" id="xrc-DE-dK1"/>
@@ -90,7 +90,7 @@
                                                         <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                     </imageView>
                                                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ni0-ms-RPU">
-                                                        <rect key="frame" x="61" y="3" width="168" height="23"/>
+                                                        <rect key="frame" x="71" y="3" width="168" height="23"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="166" id="Wdm-TU-eU2"/>
                                                             <constraint firstAttribute="height" constant="20" id="wd2-QM-hTK"/>
@@ -114,7 +114,7 @@
                                                         </connections>
                                                     </segmentedControl>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6n0-9B-ELM">
-                                                        <rect key="frame" x="238" y="37" width="28" height="15"/>
+                                                        <rect key="frame" x="248" y="37" width="28" height="15"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="if2-vK-ItE">
                                                             <font key="font" metaFont="systemHeavy" size="12"/>
                                                             <color key="textColor" name="Caption Tertiary"/>
@@ -154,13 +154,12 @@
                                                 </connections>
                                             </tableCellView>
                                             <tableCellView identifier="cellWithDDC" wantsLayer="YES" misplaced="YES" id="prI-Gh-RKd" customClass="CellWithDDC" customModule="Lunar" customModuleProvider="target">
-                                                <rect key="frame" x="10" y="119" width="290" height="154"/>
+                                                <rect key="frame" x="10" y="119" width="310" height="154"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="sy4-S7-iPw">
-                                                        <rect key="frame" x="78" y="33" width="134" height="22"/>
+                                                        <rect key="frame" x="68" y="33" width="174" height="22"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="134" id="QDP-gl-ce0"/>
                                                             <constraint firstAttribute="height" constant="22" id="bRz-Kk-8Da"/>
                                                         </constraints>
                                                         <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="kbB-9o-xEP" id="TKU-7K-PcJ">
@@ -240,7 +239,7 @@
                                                         </connections>
                                                     </popUpButton>
                                                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5VK-Ej-krq">
-                                                        <rect key="frame" x="61" y="3" width="168" height="23"/>
+                                                        <rect key="frame" x="71" y="3" width="168" height="23"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="20" id="pTM-mQ-0WE"/>
                                                         </constraints>
@@ -263,7 +262,7 @@
                                                         </connections>
                                                     </segmentedControl>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OaN-2H-RQX" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="56" y="113" width="178" height="38"/>
+                                                        <rect key="frame" x="66" y="113" width="178" height="38"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="30" id="fyP-z2-ZO5"/>
                                                             <constraint firstAttribute="width" constant="174" id="quO-P5-pmt"/>
@@ -288,7 +287,7 @@
                                                         </connections>
                                                     </slider>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5He-i1-Qvb" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="56" y="113" width="178" height="38"/>
+                                                        <rect key="frame" x="66" y="113" width="178" height="38"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="30" id="8xW-pC-LXZ"/>
                                                             <constraint firstAttribute="width" constant="174" id="oeY-qF-cD6"/>
@@ -309,7 +308,7 @@
                                                         </connections>
                                                     </slider>
                                                     <button focusRingType="none" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="RpU-Ox-p2h" customClass="SliderValueButton" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="242" y="134" width="29" height="9"/>
+                                                        <rect key="frame" x="252" y="134" width="29" height="9"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="9" id="8RE-ZZ-m4T"/>
                                                             <constraint firstAttribute="width" constant="29" id="Y0s-L0-W1A"/>
@@ -348,7 +347,7 @@
                                                         </connections>
                                                     </button>
                                                     <button focusRingType="none" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="oNw-h4-Uy2" customClass="SliderValueButton" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="242" y="123" width="30" height="12"/>
+                                                        <rect key="frame" x="252" y="123" width="30" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="30" id="WaC-uu-93H"/>
                                                             <constraint firstAttribute="height" constant="12" id="vbI-ca-959"/>
@@ -390,7 +389,7 @@
                                                         </connections>
                                                     </button>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="9t9-h6-nGA" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="62" y="128" width="12" height="12"/>
+                                                        <rect key="frame" x="72" y="128" width="12" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="12" id="Ome-uZ-pSQ"/>
                                                             <constraint firstAttribute="width" constant="12" id="uMg-SE-Vb3"/>
@@ -415,7 +414,7 @@
                                                         </connections>
                                                     </imageView>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HG8-fg-KZ5" customClass="AutoRemovingSlider" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="56" y="83" width="178" height="38"/>
+                                                        <rect key="frame" x="66" y="83" width="178" height="38"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="30" id="jLO-Qj-Ddx"/>
                                                             <constraint firstAttribute="width" constant="174" id="uc8-tB-J7E"/>
@@ -440,7 +439,7 @@
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kwc-dx-9Kx" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="62" y="98" width="12" height="12"/>
+                                                        <rect key="frame" x="72" y="98" width="12" height="12"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="12" id="dcA-18-IEA"/>
                                                             <constraint firstAttribute="width" constant="12" id="pns-hi-nuM"/>
@@ -461,7 +460,7 @@
                                                         </connections>
                                                     </imageView>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wbs-Qz-lUz" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="56" y="53" width="178" height="38"/>
+                                                        <rect key="frame" x="66" y="53" width="178" height="38"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="174" id="I8h-63-JCN"/>
                                                             <constraint firstAttribute="height" constant="30" id="pXE-oc-xNO"/>
@@ -481,7 +480,7 @@
                                                         </connections>
                                                     </slider>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="WXp-hm-NXm" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="61" y="67" width="14" height="14"/>
+                                                        <rect key="frame" x="71" y="67" width="14" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="14" id="evG-YK-lIX"/>
                                                             <constraint firstAttribute="width" constant="14" id="oEC-Yh-E8M"/>
@@ -506,14 +505,14 @@
                                                         </connections>
                                                     </imageView>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="DrO-3E-miA">
-                                                        <rect key="frame" x="33" y="155" width="224" height="24"/>
+                                                        <rect key="frame" x="43" y="155" width="224" height="24"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="220" id="8Wv-tn-44H"/>
                                                             <constraint firstAttribute="height" constant="24" id="k0H-oq-W8q"/>
                                                         </constraints>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="First Screen" id="Xex-3G-aFC">
-                                                            <font key="font" size="20" name="Menlo-Bold"/>
-                                                            <color key="textColor" name="Caption Secondary"/>
+                                                            <font key="font" metaFont="systemHeavy" size="20"/>
+                                                            <color key="textColor" name="Caption"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
@@ -521,7 +520,7 @@
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-Kg-vng" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="240" y="127" width="28" height="15"/>
+                                                        <rect key="frame" x="250" y="127" width="28" height="15"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="78a-tN-akS">
                                                             <font key="font" metaFont="systemHeavy" size="12"/>
                                                             <color key="textColor" name="Caption Tertiary"/>
@@ -537,7 +536,7 @@
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="9b5-3v-IoN" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="240" y="97" width="28" height="15"/>
+                                                        <rect key="frame" x="250" y="97" width="28" height="15"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="FWU-cw-p6S">
                                                             <font key="font" metaFont="systemHeavy" size="12"/>
                                                             <color key="textColor" name="Caption Tertiary"/>
@@ -553,7 +552,7 @@
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="Lww-dX-npG" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="240" y="67" width="28" height="15"/>
+                                                        <rect key="frame" x="250" y="67" width="28" height="15"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="PD5-kt-2aD">
                                                             <font key="font" metaFont="systemHeavy" size="12"/>
                                                             <color key="textColor" name="Caption Tertiary"/>
@@ -601,6 +600,7 @@
                                                     <constraint firstItem="DrO-3E-miA" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="fqp-Qk-Zbq"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="HG8-fg-KZ5" secondAttribute="bottom" priority="496" constant="4" id="gSc-eT-mYZ"/>
                                                     <constraint firstItem="9b5-3v-IoN" firstAttribute="leading" secondItem="rhU-Kg-vng" secondAttribute="leading" id="gsn-27-EYx"/>
+                                                    <constraint firstItem="sy4-S7-iPw" firstAttribute="width" secondItem="OaN-2H-RQX" secondAttribute="width" id="jXN-sJ-opK"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="bottom" priority="499" id="je5-9H-JnM"/>
                                                     <constraint firstAttribute="bottom" secondItem="5VK-Ej-krq" secondAttribute="bottom" constant="5" id="ncJ-Hz-gpd"/>
                                                     <constraint firstItem="rhU-Kg-vng" firstAttribute="centerY" secondItem="OaN-2H-RQX" secondAttribute="centerY" id="obG-Ur-bsL"/>
@@ -624,17 +624,17 @@
                                 </connections>
                             </tableView>
                             <button verticalHuggingPriority="750" tag="50" translatesAutoresizingMaskIntoConstraints="NO" id="pEd-3X-Kup" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="189" y="33" width="31" height="18"/>
+                                <rect key="frame" x="204" y="40" width="29" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="3YK-QL-f62"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="50%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Oi3-QX-pzN">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="8"/>
@@ -651,17 +651,17 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="25" translatesAutoresizingMaskIntoConstraints="NO" id="SEc-Qb-jN3" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="151" y="33" width="30" height="18"/>
+                                <rect key="frame" x="167" y="40" width="29" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="0VV-bu-V3r"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="25%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="fXN-9u-RgP">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -678,17 +678,17 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ajr-Nz-yJI" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="119" y="33" width="24" height="18"/>
+                                <rect key="frame" x="137" y="40" width="22" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="ogy-bz-2oH"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="0%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="Kmq-Om-QOG">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="horizontalPadding">
                                         <real key="value" value="6"/>
@@ -705,17 +705,17 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="75" translatesAutoresizingMaskIntoConstraints="NO" id="qKp-A7-ckL" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="228" y="33" width="30" height="18"/>
+                                <rect key="frame" x="241" y="40" width="29" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="oSA-fO-LN5"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="75%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="krD-md-bcQ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" name="Caption Secondary"/>
@@ -732,7 +732,7 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DhA-7Q-tV4">
-                                <rect key="frame" x="13" y="33" width="64" height="17"/>
+                                <rect key="frame" x="18" y="40" width="64" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Presets:" id="5ss-DQ-CYp">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -740,17 +740,17 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="WXW-NR-yy6" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="263" y="33" width="37" height="18"/>
+                                <rect key="frame" x="275" y="40" width="35" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="34B-EP-Kbd"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="100%" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="0Wm-eA-Yxm">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" name="Caption Secondary"/>
@@ -767,13 +767,13 @@
                                 </connections>
                             </button>
                             <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="510" width="316" height="122"/>
+                                <rect key="frame" x="-3" y="498" width="336" height="134"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
-                                    <rect key="frame" x="3" y="9" width="310" height="104"/>
+                                    <rect key="frame" x="3" y="9" width="330" height="116"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="66" y="37" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="37" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="10o-lf-zvS"/>
                                                 <constraint firstAttribute="height" constant="30" id="a6o-T5-lQV"/>
@@ -793,7 +793,7 @@
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XD7-ys-eeM">
-                                            <rect key="frame" x="248" y="51" width="28" height="15"/>
+                                            <rect key="frame" x="258" y="50" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="QB0-11-WRL">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -813,10 +813,10 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
-                                            <rect key="frame" x="13" y="81" width="130" height="19"/>
-                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="RjJ-T2-HEe">
-                                                <font key="font" size="16" name="Menlo-Bold"/>
-                                                <color key="textColor" name="Caption Secondary"/>
+                                            <rect key="frame" x="16" y="93" width="53" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Built-in" id="RjJ-T2-HEe">
+                                                <font key="font" metaFont="system" size="15"/>
+                                                <color key="textColor" name="Caption"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
@@ -824,7 +824,7 @@
                                             </connections>
                                         </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="SME-Wy-2pc" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="72" y="52" width="12" height="12"/>
+                                            <rect key="frame" x="82" y="52" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="GCB-04-0TS"/>
                                                 <constraint firstAttribute="width" constant="12" id="gsT-ad-FtE"/>
@@ -842,7 +842,7 @@
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pc0-Ic-fRC" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="71" y="17" width="168" height="23"/>
+                                            <rect key="frame" x="81" y="17" width="168" height="23"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="166" id="CGL-Gg-nNl"/>
                                                 <constraint firstAttribute="height" constant="20" id="Kkl-XW-mZu"/>
@@ -866,7 +866,7 @@
                                             </connections>
                                         </segmentedControl>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
+                                            <rect key="frame" x="16" y="0.0" width="115" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="S7N-nf-buj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -881,7 +881,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
+                                            <rect key="frame" x="130" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="6AG-Ma-ayy">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -899,37 +899,37 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="pc0-Ic-fRC" secondAttribute="bottom" constant="6" id="2Ue-HN-qPT"/>
-                                        <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="5" id="6Nr-zy-jPM"/>
+                                        <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="20" id="6Nr-zy-jPM"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
                                         <constraint firstItem="XD7-ys-eeM" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="9WG-Xj-Ln2"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-16" id="Ch7-G0-7uf"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="leading" secondItem="GuV-5N-Ajh" secondAttribute="leading" id="LuT-YH-oxK"/>
-                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="8" id="NLt-qN-Af8"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="20" id="NLt-qN-Af8"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="centerY" secondItem="ddL-Y9-B9P" secondAttribute="centerY" id="Oji-Si-pFa"/>
                                         <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" id="TJr-8A-iUn"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
-                                        <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="10" id="jRl-qM-LaS"/>
+                                        <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="20" id="jRl-qM-LaS"/>
                                         <constraint firstItem="XD7-ys-eeM" firstAttribute="leading" secondItem="Gpr-KG-BtL" secondAttribute="trailing" constant="8" id="m71-ho-ILL"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="leading" secondItem="ddL-Y9-B9P" secondAttribute="trailing" constant="3" id="nEV-fD-L8b"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
-                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="4" id="nZ7-4a-hWM"/>
-                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="leading" secondItem="j9b-qV-Iv1" secondAttribute="leading" constant="15" id="uBe-tO-W71"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="7" id="nZ7-4a-hWM"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="leading" secondItem="j9b-qV-Iv1" secondAttribute="leading" constant="18" id="uBe-tO-W71"/>
                                     </constraints>
                                 </view>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" constant="5" id="1KH-ih-8Te"/>
-                                    <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="10" id="BkH-fB-O2g"/>
+                                    <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="qbu-vX-wt7" secondAttribute="top" constant="11" id="BD0-Ot-WEU"/>
+                                    <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="25" id="BkH-fB-O2g"/>
                                     <constraint firstAttribute="height" priority="250" constant="70" id="HZ8-1c-qVk"/>
-                                    <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="10" id="o8D-5n-7gU"/>
-                                    <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="qbu-vX-wt7" secondAttribute="top" constant="11" id="rQ8-8U-x8d"/>
+                                    <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="25" id="o8D-5n-7gU"/>
                                 </constraints>
                                 <size key="contentViewMargins" width="0.0" height="6"/>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="bg">
-                                        <color key="value" name="Field BG"/>
+                                        <color key="value" name="Field BG no color"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -950,15 +950,15 @@
                                 </connections>
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="-3" y="421" width="316" height="211"/>
+                                <rect key="frame" x="-3" y="408" width="336" height="224"/>
                                 <view key="contentView" verticalCompressionResistancePriority="747" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xED-Xy-oTv">
-                                    <rect key="frame" x="3" y="9" width="310" height="193"/>
+                                    <rect key="frame" x="3" y="9" width="330" height="209"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
-                                            <rect key="frame" x="13" y="170" width="130" height="19"/>
-                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Second screen" id="8it-gt-vwn">
-                                                <font key="font" size="16" name="Menlo-Bold"/>
-                                                <color key="textColor" name="Caption Secondary"/>
+                                            <rect key="frame" x="16" y="182" width="86" height="20"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="LG Ultrafine" id="8it-gt-vwn">
+                                                <font key="font" metaFont="system" size="15"/>
+                                                <color key="textColor" name="Caption"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
@@ -968,7 +968,6 @@
                                         <popUpButton ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Wk-V9-tNW">
                                             <rect key="frame" x="88" y="47" width="134" height="21"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="134" id="HP7-yo-gqM"/>
                                                 <constraint firstAttribute="height" constant="21" id="gJY-U3-Rkv"/>
                                             </constraints>
                                             <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="87o-hG-ch3" id="pxa-JF-08B">
@@ -1355,7 +1354,7 @@
                                             </connections>
                                         </imageView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="13" y="0.0" width="115" height="13"/>
+                                            <rect key="frame" x="16" y="0.0" width="115" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="otl-pY-cnj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1370,7 +1369,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="127" y="0.0" width="98" height="13"/>
+                                            <rect key="frame" x="130" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="V3L-vf-P4Z">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1410,8 +1409,8 @@
                                                 </binding>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VFW-kV-UHQ">
-                                            <rect key="frame" x="248" y="85" width="28" height="15"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VFW-kV-UHQ">
+                                            <rect key="frame" x="248" y="80" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="qG3-cl-vJX">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1444,9 +1443,9 @@
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="leading" secondItem="197-x4-S44" secondAttribute="trailing" constant="-16" id="2EU-H8-RNt"/>
                                         <constraint firstItem="tpp-dP-5eh" firstAttribute="centerY" secondItem="f0W-zX-TT0" secondAttribute="centerY" id="2G7-hJ-zFr"/>
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="4lF-Al-vJ8"/>
-                                        <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="5" id="72b-i6-eYV"/>
+                                        <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="20" id="72b-i6-eYV"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="centerY" secondItem="D87-Cq-r76" secondAttribute="centerY" id="7Xy-mP-5yd"/>
-                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="4" id="8HR-yp-Aw2"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="7" id="8HR-yp-Aw2"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="9nB-wE-pR6"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="leading" secondItem="D87-Cq-r76" secondAttribute="trailing" constant="3" id="BVX-Qt-Cny"/>
                                         <constraint firstItem="VFW-kV-UHQ" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="BfM-Sz-AXA"/>
@@ -1459,7 +1458,7 @@
                                         <constraint firstItem="tpp-dP-5eh" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="JU8-bt-1Ll"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" constant="6" id="K61-K6-fOU"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
-                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="8" id="Nnz-oO-qw1"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="20" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="pRg-MU-0kr" secondAttribute="bottom" priority="495" constant="4" id="Vfo-pT-RZi"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" priority="496" constant="4" id="WPP-K2-90h"/>
@@ -1467,11 +1466,12 @@
                                         <constraint firstItem="197-x4-S44" firstAttribute="centerY" secondItem="f0W-zX-TT0" secondAttribute="centerY" id="cp5-Sn-nAZ"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-16" id="cvs-CK-h0B"/>
                                         <constraint firstItem="MNZ-Jn-RAr" firstAttribute="centerY" secondItem="Tqt-X1-RJG" secondAttribute="centerY" id="dkt-2V-rz0"/>
-                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="leading" secondItem="xED-Xy-oTv" secondAttribute="leading" constant="15" id="eEm-TZ-Vsd"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="leading" secondItem="xED-Xy-oTv" secondAttribute="leading" constant="18" id="eEm-TZ-Vsd"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="eKY-QN-ieL"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" priority="498" id="g17-EW-0gJ"/>
-                                        <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="5" id="gSE-zS-xW1"/>
+                                        <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="20" id="gSE-zS-xW1"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="leading" secondItem="JaP-5h-FMy" secondAttribute="trailing" constant="-17" id="gXX-hV-vrq"/>
+                                        <constraint firstItem="0Wk-V9-tNW" firstAttribute="width" secondItem="Tqt-X1-RJG" secondAttribute="width" id="iPI-xK-KXz"/>
                                         <constraint firstItem="tD3-7X-FGi" firstAttribute="centerY" secondItem="pRg-MU-0kr" secondAttribute="centerY" id="mDi-b2-OaY"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="mxi-wy-m9O"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
@@ -1486,16 +1486,16 @@
                                 </view>
                                 <constraints>
                                     <constraint firstAttribute="height" priority="200" constant="180" id="L6u-Rx-GcI"/>
-                                    <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="J4o-rg-1UD" secondAttribute="top" constant="11" id="Nxw-rr-fKT"/>
+                                    <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="J4o-rg-1UD" secondAttribute="top" constant="11" id="Rre-D8-N6J"/>
                                     <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" constant="5" id="YUZ-ce-gGn"/>
-                                    <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="10" id="bR9-Ng-poH"/>
-                                    <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="10" id="cuo-yy-Pgr"/>
+                                    <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="25" id="bR9-Ng-poH"/>
+                                    <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="25" id="cuo-yy-Pgr"/>
                                 </constraints>
                                 <size key="contentViewMargins" width="0.0" height="6"/>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="bg">
-                                        <color key="value" name="Field BG"/>
+                                        <color key="value" name="Field BG no color"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -1517,7 +1517,7 @@
                                 </connections>
                             </box>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U3O-vh-AKs" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="272" y="593" width="26" height="32"/>
+                                <rect key="frame" x="292" y="593" width="26" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="D7U-0p-uP5"/>
                                     <constraint firstAttribute="width" constant="26" id="pYh-u5-2SG"/>
@@ -1543,8 +1543,8 @@
                                     <action selector="showMenu:" target="XpJ-ho-P7z" id="Vcx-PX-eUZ"/>
                                 </connections>
                             </button>
-                            <popUpButton focusRingType="none" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SkK-ct-Zbj" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="151" y="602" width="118" height="14"/>
+                            <popUpButton focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="SkK-ct-Zbj" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="193" y="602" width="96" height="14"/>
                                 <popUpButtonCell key="cell" type="inline" title="Auto Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" refusesFirstResponder="YES" state="on" focusRingType="none" tag="99" imageScaling="proportionallyDown" inset="2" selectedItem="UB7-ix-aEg" id="sB5-w1-52V" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -1578,25 +1578,20 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="originType">
-                                        <integer key="value" value="3"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
                             </popUpButton>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="wrG-as-JXJ" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="263" y="7" width="37" height="18"/>
+                                <rect key="frame" x="273" y="14" width="37" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="TIC-ov-Tq8"/>
                                     <constraint firstAttribute="width" constant="37" id="s3z-WW-Km4"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="Quit" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="a0x-Gx-VUU">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" name="Caption Secondary"/>
@@ -1613,18 +1608,18 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="yMU-YF-Ujt" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="204" y="7" width="53" height="18"/>
+                                <rect key="frame" x="214" y="14" width="53" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="53" id="LP0-2F-ZqU"/>
                                     <constraint firstAttribute="height" constant="18" id="SuH-WW-KCF"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="Restart" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="WRx-s1-fmT">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" name="Caption Secondary"/>
@@ -1641,18 +1636,18 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="aDT-qu-eXw" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="15" y="7" width="87" height="18"/>
+                                <rect key="frame" x="20" y="14" width="87" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="JbZ-sS-0Oa"/>
                                     <constraint firstAttribute="width" constant="87" id="OmZ-ES-IQz"/>
                                 </constraints>
                                 <buttonCell key="cell" type="inline" title="Preferences" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" inset="2" id="YW0-LA-mah">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                        <color key="value" name="Lunar Yellow Transparent"/>
+                                        <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textColor">
                                         <color key="value" name="Caption Secondary"/>
@@ -1677,8 +1672,8 @@
                             <constraint firstItem="DhA-7Q-tV4" firstAttribute="centerY" secondItem="Ajr-Nz-yJI" secondAttribute="centerY" id="BW4-YF-sA3"/>
                             <constraint firstItem="WXW-NR-yy6" firstAttribute="leading" secondItem="qKp-A7-ckL" secondAttribute="trailing" constant="5" id="Bxs-xQ-7Vz"/>
                             <constraint firstItem="qbu-vX-wt7" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="Ckt-uA-c3k"/>
-                            <constraint firstItem="DhA-7Q-tV4" firstAttribute="leading" secondItem="vGd-1C-1a0" secondAttribute="leading" constant="15" id="Dfx-4m-GWU"/>
-                            <constraint firstItem="yMU-YF-Ujt" firstAttribute="leading" secondItem="aDT-qu-eXw" secondAttribute="trailing" constant="102" id="KBK-nC-Nu9"/>
+                            <constraint firstItem="DhA-7Q-tV4" firstAttribute="leading" secondItem="vGd-1C-1a0" secondAttribute="leading" constant="20" id="Dfx-4m-GWU"/>
+                            <constraint firstItem="yMU-YF-Ujt" firstAttribute="leading" secondItem="aDT-qu-eXw" secondAttribute="trailing" constant="107" id="KBK-nC-Nu9"/>
                             <constraint firstItem="U3O-vh-AKs" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" constant="8" id="KS1-us-Jfl"/>
                             <constraint firstItem="SEc-Qb-jN3" firstAttribute="leading" secondItem="Ajr-Nz-yJI" secondAttribute="trailing" constant="8" symbolic="YES" id="Khi-eX-NE4"/>
                             <constraint firstItem="pEd-3X-Kup" firstAttribute="leading" secondItem="SEc-Qb-jN3" secondAttribute="trailing" constant="8" symbolic="YES" id="LMv-Pm-jnO"/>
@@ -1691,14 +1686,16 @@
                             <constraint firstItem="aDT-qu-eXw" firstAttribute="leading" secondItem="DhA-7Q-tV4" secondAttribute="leading" id="V8H-Yz-58Z"/>
                             <constraint firstItem="aDT-qu-eXw" firstAttribute="top" secondItem="DhA-7Q-tV4" secondAttribute="bottom" constant="8" symbolic="YES" id="VNH-5K-BNA"/>
                             <constraint firstItem="yMU-YF-Ujt" firstAttribute="centerY" secondItem="aDT-qu-eXw" secondAttribute="centerY" id="WQp-zW-ZN8"/>
-                            <constraint firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" constant="10" id="afe-I7-aEK"/>
+                            <constraint firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" constant="20" id="afe-I7-aEK"/>
                             <constraint firstItem="SEc-Qb-jN3" firstAttribute="centerY" secondItem="pEd-3X-Kup" secondAttribute="centerY" id="eHk-bQ-xYF"/>
                             <constraint firstItem="qbu-vX-wt7" firstAttribute="centerX" secondItem="vGd-1C-1a0" secondAttribute="centerX" id="jZ9-f9-ELe"/>
+                            <constraint firstItem="GuV-5N-Ajh" firstAttribute="centerY" secondItem="SkK-ct-Zbj" secondAttribute="centerY" id="kln-fE-zLC"/>
                             <constraint firstItem="wrG-as-JXJ" firstAttribute="centerY" secondItem="yMU-YF-Ujt" secondAttribute="centerY" id="nSK-so-RfJ"/>
+                            <constraint firstItem="Hup-6D-J0e" firstAttribute="centerY" secondItem="SkK-ct-Zbj" secondAttribute="centerY" id="oa0-GI-Bhh"/>
                             <constraint firstItem="WXW-NR-yy6" firstAttribute="centerY" secondItem="qKp-A7-ckL" secondAttribute="centerY" id="v4h-Ea-PGB"/>
                             <constraint firstItem="Ajr-Nz-yJI" firstAttribute="centerY" secondItem="SEc-Qb-jN3" secondAttribute="centerY" id="vOS-yS-DDE"/>
                             <constraint firstItem="J4o-rg-1UD" firstAttribute="top" secondItem="vGd-1C-1a0" secondAttribute="top" id="xwJ-hC-Omm"/>
-                            <constraint firstAttribute="bottom" secondItem="aDT-qu-eXw" secondAttribute="bottom" constant="7" id="y3K-yc-KsL"/>
+                            <constraint firstAttribute="bottom" secondItem="aDT-qu-eXw" secondAttribute="bottom" constant="14" id="y3K-yc-KsL"/>
                             <constraint firstItem="wrG-as-JXJ" firstAttribute="trailing" secondItem="WXW-NR-yy6" secondAttribute="trailing" id="zIO-gE-okg"/>
                         </constraints>
                     </view>
@@ -1741,17 +1738,20 @@
         <image name="usbc" width="14" height="14"/>
         <image name="vga" width="14" height="14"/>
         <image name="volume-low" width="24" height="24"/>
+        <namedColor name="Button BG">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Caption">
+            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="Caption Secondary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Caption Tertiary">
             <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="Field BG">
-            <color red="0.063000001013278961" green="0.012000000104308128" blue="0.20000000298023224" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="Lunar Yellow Transparent">
-            <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="Field BG no color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

@@ -652,7 +652,7 @@ class DisplayController {
 
         func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
-                  !(display?.macMiniHDMI ?? false),
+                  !(display?.badHDMI ?? false),
                   !DDC.isVirtualDisplay(displayID, checkName: false)
             else {
                 log
@@ -687,7 +687,24 @@ class DisplayController {
             while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
                 if IOServiceNameMatches(
                     txIOChild,
-                    names: ["dispext0", "disp0", "dispext1", "disp1", "dispext2", "disp2", "dispext3", "disp3"]
+                    names: [
+                        "disp0",
+                        "dispext0",
+                        "dispext1",
+                        "dispext2",
+                        "dispext3",
+                        "dispext4",
+                        "dispext5",
+                        "dispext6",
+                        "dispext7",
+                        "disp1",
+                        "disp2",
+                        "disp3",
+                        "disp4",
+                        "disp5",
+                        "disp6",
+                        "disp7",
+                    ]
                 ) {
                     clcd2Num += 1
                     guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
@@ -713,26 +730,29 @@ class DisplayController {
             log.info("Mac Mini HDMI Ignore: isMacBook=\(Sysctl.isMacBook)")
             log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
             log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
-            if (Sysctl.isMacMini && clcd2Num == 1) || (Sysctl.isMacBook && clcd2Num >= 1),
+            if (Sysctl.isMacMini && clcd2Num == 1) || (Sysctl.modelLowercased.starts(with: "macbookpro18,") && clcd2Num >= 1),
                let transport = display.transport,
                transport.upstream == "DP",
                transport.downstream == "HDMI"
             {
                 log.warning("This HDMI port doesn't support DDC, ignoring for display \(display)")
-                display.macMiniHDMI = true
+                display.badHDMI = true
                 return nil
             }
 
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard let dcpService = firstServiceMatching(txIOIterator, names: ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3"]),
-                  let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
-                  let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
-                  !CFEqual(ioAvService, 0 as IOAVService),
-                  // Check if DCPAVServiceProxy belongs to an external monitor
-                  IORegistryEntryCreateCFProperties(dcpAvServiceProxy, &dcpAvServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
-                  KERN_SUCCESS,
-                  let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
-                  let avServiceLocation = dcpAvProps["Location"] as? String, avServiceLocation == "External"
+            guard let dcpService = firstServiceMatching(
+                txIOIterator,
+                names: ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3", "dcpext4", "dcpext5", "dcpext6", "dcpext7"]
+            ),
+                let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
+                let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
+                !CFEqual(ioAvService, 0 as IOAVService),
+                // Check if DCPAVServiceProxy belongs to an external monitor
+                IORegistryEntryCreateCFProperties(dcpAvServiceProxy, &dcpAvServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
+                KERN_SUCCESS,
+                let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
+                let avServiceLocation = dcpAvProps["Location"] as? String, avServiceLocation == "External"
             else {
                 log.warning("No AVService for display with ID: \(displayID)")
                 return nil
