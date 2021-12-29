@@ -2118,7 +2118,11 @@ func getModeDetailsJSON(_ mode: MPDisplayMode?) -> [String: Any]? {
     ]
 }
 
-func getMonitorPanelDataJSON(_ display: MPDisplay, includeModes: Bool = false) -> [String: Any] {
+func getMonitorPanelDataJSON(
+    _ display: MPDisplay,
+    includeModes: Bool = false,
+    modeFilter: ((MPDisplayMode) -> Bool)? = nil
+) -> [String: Any] {
     [
         "id": display.displayID,
         "aliasID": display.aliasID,
@@ -2149,6 +2153,7 @@ func getMonitorPanelDataJSON(_ display: MPDisplay, includeModes: Bool = false) -
         "orientation": display.orientation,
         "modes": [String: Any](
             (includeModes ? ((display.allModes() as? [MPDisplayMode]) ?? []) : [])
+                .filter(modeFilter ?? { _ in true })
                 .compactMap { mode in
                     guard let modeJSON = getModeDetailsJSON(mode) else { return nil }
                     return (mode.description.replacingOccurrences(of: "\n", with: ", "), modeJSON)

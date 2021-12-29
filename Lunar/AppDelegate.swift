@@ -800,7 +800,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
         log.debug("Started DisplayController in \(mode.str) mode")
-        displayController.adaptBrightness()
+        mainAsyncAfter(ms: 1000) {
+            displayController.adaptBrightness()
+        }
     }
 
     func startValuesReaderThread() {
@@ -996,13 +998,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
                 let oldScreenIDs = self.screenIDs
+
                 let newLidClosed = isLidClosed()
                 guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
 
-                if newScreenIDs != self.screenIDs {
+                if newScreenIDs != oldScreenIDs {
                     log.info(
                         "New screen IDs after screen configuration change",
-                        context: ["old": self.screenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
+                        context: ["old": oldScreenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
                     )
                     self.screenIDs = newScreenIDs
                 }
@@ -1482,8 +1485,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         startReceivingSignificantLocationChanges()
 
+//        mainAsyncAfter(ms: 5000) {
+//            SentrySDK.capture(message: "Launch New")
+//        }
+
         if !TEST_MODE {
-            SentrySDK.capture(message: "Launch")
+            mainAsyncAfter(ms: 30000) {
+                SentrySDK.capture(message: "Launch New")
+            }
         }
 
         if CachedDefaults[.reapplyValuesAfterWake] {
