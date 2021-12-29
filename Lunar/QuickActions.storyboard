@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="25" y="130" width="330" height="40"/>
+                                <rect key="frame" x="25" y="130" width="330" height="20"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -798,13 +798,13 @@
                                 </connections>
                             </button>
                             <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="22" y="474" width="336" height="158"/>
+                                <rect key="frame" x="22" y="472" width="336" height="160"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
-                                    <rect key="frame" x="3" y="9" width="330" height="140"/>
+                                    <rect key="frame" x="3" y="9" width="330" height="142"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="37" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="39" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="10o-lf-zvS"/>
                                                 <constraint firstAttribute="height" constant="30" id="a6o-T5-lQV"/>
@@ -824,7 +824,7 @@
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XD7-ys-eeM">
-                                            <rect key="frame" x="258" y="51" width="28" height="15"/>
+                                            <rect key="frame" x="258" y="53" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="QB0-11-WRL">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -844,7 +844,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
-                                            <rect key="frame" x="127" y="79" width="76" height="24"/>
+                                            <rect key="frame" x="127" y="81" width="76" height="24"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Built-in" id="RjJ-T2-HEe">
                                                 <font key="font" metaFont="systemHeavy" size="20"/>
                                                 <color key="textColor" name="Caption"/>
@@ -855,7 +855,7 @@
                                             </connections>
                                         </textField>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="SME-Wy-2pc" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="82" y="52" width="12" height="12"/>
+                                            <rect key="frame" x="82" y="54" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="GCB-04-0TS"/>
                                                 <constraint firstAttribute="width" constant="12" id="gsT-ad-FtE"/>
@@ -873,7 +873,7 @@
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pc0-Ic-fRC" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="81" y="17" width="168" height="23"/>
+                                            <rect key="frame" x="81" y="19" width="168" height="23"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="166" id="CGL-Gg-nNl"/>
                                                 <constraint firstAttribute="height" constant="20" id="Kkl-XW-mZu"/>
@@ -896,9 +896,9 @@
                                                 </binding>
                                             </connections>
                                         </segmentedControl>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="16" y="0.0" width="115" height="13"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="S7N-nf-buj">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ddL-Y9-B9P" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="136" y="14" width="59" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App Preset" id="S7N-nf-buj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -911,8 +911,8 @@
                                                 </binding>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="130" y="0.0" width="98" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2X-XK-Eid" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="116" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="6AG-Ma-ayy">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -929,7 +929,7 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="pc0-Ic-fRC" secondAttribute="bottom" constant="6" id="2Ue-HN-qPT"/>
+                                        <constraint firstItem="ddL-Y9-B9P" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="2he-f4-m8M"/>
                                         <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="20" id="6Nr-zy-jPM"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
                                         <constraint firstItem="XD7-ys-eeM" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="9WG-Xj-Ln2"/>
@@ -937,23 +937,24 @@
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
                                         <constraint firstItem="GuV-5N-Ajh" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="HVC-Cw-iyf"/>
+                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="ddL-Y9-B9P" secondAttribute="bottom" constant="1" id="MXy-5f-3fk"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="6" id="NLt-qN-Af8"/>
-                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="centerY" secondItem="ddL-Y9-B9P" secondAttribute="centerY" id="Oji-Si-pFa"/>
-                                        <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" id="TJr-8A-iUn"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
                                         <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="20" id="jRl-qM-LaS"/>
                                         <constraint firstItem="XD7-ys-eeM" firstAttribute="leading" secondItem="Gpr-KG-BtL" secondAttribute="trailing" constant="8" id="m71-ho-ILL"/>
-                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="leading" secondItem="ddL-Y9-B9P" secondAttribute="trailing" constant="3" id="nEV-fD-L8b"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
                                         <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="40" id="nZ7-4a-hWM"/>
+                                        <constraint firstAttribute="bottom" secondItem="C2X-XK-Eid" secondAttribute="bottom" id="nwf-AH-WAK"/>
+                                        <constraint firstItem="pc0-Ic-fRC" firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="top" constant="6" id="shw-Ax-bFM"/>
+                                        <constraint firstItem="C2X-XK-Eid" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="vld-cp-lzJ"/>
                                     </constraints>
                                 </view>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="bottom" constant="5" id="1KH-ih-8Te"/>
                                     <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="qbu-vX-wt7" secondAttribute="top" constant="44" id="BD0-Ot-WEU"/>
                                     <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="25" id="BkH-fB-O2g"/>
                                     <constraint firstAttribute="height" priority="250" constant="70" id="HZ8-1c-qVk"/>
                                     <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="25" id="o8D-5n-7gU"/>
+                                    <constraint firstAttribute="bottom" secondItem="C2X-XK-Eid" secondAttribute="bottom" constant="5" id="tnb-JT-VcM"/>
                                 </constraints>
                                 <size key="contentViewMargins" width="0.0" height="6"/>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
@@ -975,13 +976,13 @@
                                 </connections>
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="22" y="446" width="336" height="186"/>
-                                <view key="contentView" verticalCompressionResistancePriority="747" id="xED-Xy-oTv">
-                                    <rect key="frame" x="3" y="9" width="330" height="168"/>
+                                <rect key="frame" x="22" y="383" width="336" height="249"/>
+                                <view key="contentView" verticalCompressionResistancePriority="747" ambiguous="YES" id="xED-Xy-oTv">
+                                    <rect key="frame" x="3" y="9" width="330" height="231"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
-                                            <rect key="frame" x="105" y="168" width="120" height="24"/>
+                                            <rect key="frame" x="105" y="170" width="120" height="24"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="LG Ultrafine" id="8it-gt-vwn">
                                                 <font key="font" metaFont="systemHeavy" size="20"/>
                                                 <color key="textColor" name="Caption"/>
@@ -992,7 +993,7 @@
                                             </connections>
                                         </textField>
                                         <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="0Wk-V9-tNW">
-                                            <rect key="frame" x="78" y="47" width="174" height="21"/>
+                                            <rect key="frame" x="78" y="49" width="174" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" id="gJY-U3-Rkv"/>
                                             </constraints>
@@ -1073,7 +1074,7 @@
                                             </connections>
                                         </popUpButton>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Z8-Q7-p7U" customClass="AutoRemovingSegmentedControl" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="81" y="17" width="168" height="23"/>
+                                            <rect key="frame" x="81" y="19" width="168" height="23"/>
                                             <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="nHO-9M-9Q7">
                                                 <font key="font" metaFont="systemSemibold" size="13"/>
                                                 <segments>
@@ -1093,7 +1094,7 @@
                                             </connections>
                                         </segmentedControl>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tqt-X1-RJG" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="126" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="128" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="9Wh-Ue-uRn"/>
                                                 <constraint firstAttribute="height" constant="30" id="yS8-20-Mcf"/>
@@ -1118,7 +1119,7 @@
                                             </connections>
                                         </slider>
                                         <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Emv-k8-sA0" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="260" y="147" width="29" height="9"/>
+                                            <rect key="frame" x="260" y="149" width="29" height="9"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="9" id="RZT-3G-pbR"/>
                                                 <constraint firstAttribute="width" constant="29" id="e2i-q1-53H"/>
@@ -1169,7 +1170,7 @@
                                             </connections>
                                         </button>
                                         <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7cg-qs-QAJ" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="260" y="136" width="30" height="12"/>
+                                            <rect key="frame" x="260" y="138" width="30" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="30" id="4n0-62-unO"/>
                                                 <constraint firstAttribute="height" constant="12" id="osl-px-GIZ"/>
@@ -1220,7 +1221,7 @@
                                             </connections>
                                         </button>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pRg-MU-0kr" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="126" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="128" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="174" id="UQa-Zf-Nbl"/>
                                                 <constraint firstAttribute="height" constant="30" id="j6f-9k-Dx0"/>
@@ -1241,7 +1242,7 @@
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tD3-7X-FGi">
-                                            <rect key="frame" x="258" y="140" width="28" height="15"/>
+                                            <rect key="frame" x="258" y="142" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="wRz-jU-HUd">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1266,7 +1267,7 @@
                                             </connections>
                                         </textField>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f0W-zX-TT0" customClass="AutoRemovingSlider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="96" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="98" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="Br3-5X-20k"/>
                                                 <constraint firstAttribute="width" constant="174" id="F57-ue-qBx"/>
@@ -1291,7 +1292,7 @@
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="197-x4-S44" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="82" y="111" width="12" height="12"/>
+                                            <rect key="frame" x="82" y="113" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="12" id="EvQ-U3-xgM"/>
                                                 <constraint firstAttribute="height" constant="12" id="fT4-XQ-0ep"/>
@@ -1312,7 +1313,7 @@
                                             </connections>
                                         </imageView>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="MNZ-Jn-RAr" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="82" y="141" width="12" height="12"/>
+                                            <rect key="frame" x="82" y="143" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="12" id="6CL-ab-eyX"/>
                                                 <constraint firstAttribute="height" constant="12" id="Itw-Vs-hki"/>
@@ -1330,7 +1331,7 @@
                                             <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                         </imageView>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OSL-cA-38n" customClass="AutoRemovingSlider" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="76" y="66" width="178" height="38"/>
+                                            <rect key="frame" x="76" y="68" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="vZz-v5-zRN"/>
                                                 <constraint firstAttribute="width" constant="174" id="xgs-8B-bjh"/>
@@ -1355,7 +1356,7 @@
                                             </connections>
                                         </slider>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JaP-5h-FMy" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="81" y="80" width="14" height="14"/>
+                                            <rect key="frame" x="81" y="82" width="14" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="Hds-gp-QFx"/>
                                                 <constraint firstAttribute="width" constant="14" id="KNW-ro-MYY"/>
@@ -1379,9 +1380,9 @@
                                                 </binding>
                                             </connections>
                                         </imageView>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="16" y="0.0" width="115" height="13"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App preset applied for" id="otl-pY-cnj">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D87-Cq-r76" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="136" y="14" width="59" height="13"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="App Preset" id="otl-pY-cnj">
                                                 <font key="font" metaFont="systemMedium" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1394,8 +1395,8 @@
                                                 </binding>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="130" y="0.0" width="98" height="13"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ntc-81-W0h" customClass="AutoRemovingTextField" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="116" y="0.0" width="98" height="13"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Plex Media Player" id="V3L-vf-P4Z">
                                                 <font key="font" metaFont="systemHeavy" size="10"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1411,7 +1412,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tpp-dP-5eh">
-                                            <rect key="frame" x="258" y="110" width="28" height="15"/>
+                                            <rect key="frame" x="258" y="112" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="2Fu-sp-t23">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1436,7 +1437,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VFW-kV-UHQ">
-                                            <rect key="frame" x="258" y="80" width="28" height="15"/>
+                                            <rect key="frame" x="258" y="82" width="28" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="qG3-cl-vJX">
                                                 <font key="font" metaFont="systemHeavy" size="12"/>
                                                 <color key="textColor" name="Caption Tertiary"/>
@@ -1471,12 +1472,13 @@
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="4lF-Al-vJ8"/>
                                         <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="20" id="72b-i6-eYV"/>
                                         <constraint firstItem="Hup-6D-J0e" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="7Nm-m4-xNM"/>
-                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="centerY" secondItem="D87-Cq-r76" secondAttribute="centerY" id="7Xy-mP-5yd"/>
                                         <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="40" id="8HR-yp-Aw2"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="9nB-wE-pR6"/>
-                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="leading" secondItem="D87-Cq-r76" secondAttribute="trailing" constant="3" id="BVX-Qt-Cny"/>
                                         <constraint firstItem="VFW-kV-UHQ" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="BfM-Sz-AXA"/>
+                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="DGe-qg-n2g"/>
                                         <constraint firstItem="VFW-kV-UHQ" firstAttribute="leading" secondItem="tpp-dP-5eh" secondAttribute="leading" id="DOc-U3-Vcv"/>
+                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="D87-Cq-r76" secondAttribute="bottom" constant="1" id="ERP-q3-aTb"/>
+                                        <constraint firstAttribute="bottom" secondItem="Ntc-81-W0h" secondAttribute="bottom" id="FOZ-uo-PyK"/>
                                         <constraint firstItem="D87-Cq-r76" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="499" constant="6" id="FOi-Ro-2A2"/>
                                         <constraint firstItem="pRg-MU-0kr" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" id="FYz-pR-MhE"/>
                                         <constraint firstItem="pRg-MU-0kr" firstAttribute="leading" secondItem="Tqt-X1-RJG" secondAttribute="leading" id="G1e-lr-1dR"/>
@@ -1484,7 +1486,7 @@
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="I8P-g4-hIO"/>
                                         <constraint firstItem="tpp-dP-5eh" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="JU8-bt-1Ll"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" constant="6" id="K61-K6-fOU"/>
-                                        <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" constant="6" id="NTh-u2-HIx"/>
+                                        <constraint firstItem="D87-Cq-r76" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="LEa-dD-8vR"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="6" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="pRg-MU-0kr" secondAttribute="bottom" priority="495" constant="4" id="Vfo-pT-RZi"/>
@@ -1502,7 +1504,7 @@
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
                                         <constraint firstItem="7cg-qs-QAJ" firstAttribute="bottom" secondItem="Tqt-X1-RJG" secondAttribute="bottom" constant="-4" id="qNt-Xh-QFr"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="qW5-xo-Qe0"/>
-                                        <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" id="sNb-T1-tu5"/>
+                                        <constraint firstItem="5Z8-Q7-p7U" firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="top" constant="6" id="sJi-Og-IwV"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" id="sOI-9Y-bEC"/>
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="uoD-7p-cZO"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" constant="8" id="wr5-uK-0dY"/>
@@ -1511,8 +1513,8 @@
                                 </view>
                                 <constraints>
                                     <constraint firstAttribute="height" priority="200" constant="180" id="L6u-Rx-GcI"/>
+                                    <constraint firstAttribute="bottom" secondItem="Ntc-81-W0h" secondAttribute="bottom" constant="5" id="M1E-Pn-wLg"/>
                                     <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="J4o-rg-1UD" secondAttribute="top" constant="44" id="Rre-D8-N6J"/>
-                                    <constraint firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="bottom" constant="5" id="YUZ-ce-gGn"/>
                                     <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="25" id="bR9-Ng-poH"/>
                                     <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="25" id="cuo-yy-Pgr"/>
                                 </constraints>
