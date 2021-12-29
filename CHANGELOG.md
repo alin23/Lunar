@@ -1,3 +1,23 @@
+# 5.2.0
+## Features
+
+* **Auto BlackOut**: turn off the built-in display automatically when an external monitor is connected
+* Simpler visual design for **Quick Actions**
+
+## Improvements
+
+* Automatically switch to Gamma on the HDMI port of the M1 Pro/Max MacBook
+* Don't re-apply brightness if App Presets is empty (avoids jittery brightness on some displays)
+* Make sure we don't accidentally disable "Automatically adjust brightness"
+
+## Fixes
+
+* Fix option key being wrongly taken into account when pressing brightness keys
+* Update Sparkle auto-updating framework to fix some GUI bugs
+* Update diagnostics text to include the MacBook HDMI limitation
+* Fix `checkSlowWrite` for DDC which could wrongly mark smooth transitions as unsupported
+* Make sure to remove the **Lunar Test** marker when closing diagnostics/onboarding
+
 # 5.1.2
 ## Features
 
