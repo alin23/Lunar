@@ -37,6 +37,16 @@ class SliderValueButton: Button {
     }
 }
 
+// MARK: - QuickActionsView
+
+class QuickActionsView: NSView {
+    override var wantsDefaultClipping: Bool { false }
+
+    override func makeBackingLayer() -> CALayer {
+        NoClippingLayer()
+    }
+}
+
 // MARK: - QuickActionsViewController
 
 class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
@@ -147,7 +157,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
                 }
             }
 
-            self.view.setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 80 : 106)))
+            self.view.setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 124 : 150)))
         }
     }
 

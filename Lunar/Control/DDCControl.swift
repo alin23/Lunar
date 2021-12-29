@@ -23,6 +23,8 @@ class DDCControl: Control {
         let oldValue: UInt8?
     }
 
+    static var sliderTracking = false
+
     var displayControl: DisplayControl = .ddc
 
     weak var display: Display?
@@ -184,7 +186,7 @@ class DDCControl: Control {
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
+        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
            oldValue != brightness
         {
             if display.inSmoothTransition {
@@ -233,7 +235,7 @@ class DDCControl: Control {
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
 
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), var oldValue = oldValue,
+        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST), var oldValue = oldValue,
            oldValue != contrast
         {
             if display.inSmoothTransition {

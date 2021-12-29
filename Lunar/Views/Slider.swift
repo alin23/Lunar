@@ -33,6 +33,7 @@ class SliderCell: NSSliderCell {
         mainAsyncAfter(ms: 10) {
             AppleNativeControl.sliderTracking = true
             GammaControl.sliderTracking = true
+            DDCControl.sliderTracking = true
         }
         return super.startTracking(at: startPoint, in: controlView)
     }
@@ -41,6 +42,7 @@ class SliderCell: NSSliderCell {
         pressed = false
         AppleNativeControl.sliderTracking = false
         GammaControl.sliderTracking = false
+        DDCControl.sliderTracking = false
         super.stopTracking(last: lastPoint, current: stopPoint, in: controlView, mouseIsUp: flag)
     }
 
