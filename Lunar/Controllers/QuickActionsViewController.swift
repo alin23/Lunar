@@ -120,7 +120,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
             var height = sum(self.displays.map { display in
                 guard display.hasDDC else { return 60 }
 
-                let orientationHeight: CGFloat = (display.showOrientation ? 40 : 0)
+                let orientationHeight: CGFloat = (display.showOrientation ? 30 : 0)
                 let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
                 #if DEBUG
                     log.info(
@@ -162,7 +162,7 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
             }
 
             self.view
-                .setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 124 : 150) + POPOVER_PADDING))
+                .setFrameSize(NSSize(width: self.view.frame.width, height: height + (self.displays.isEmpty ? 144 : 170) + POPOVER_PADDING))
         }
     }
 
