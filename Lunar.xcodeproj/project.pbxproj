@@ -55,12 +55,11 @@
 		C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* DisplayController.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
-		C753799A26A5E6AD0017B784 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C753799826A5D8820017B784 /* Sparkle.framework */; };
-		C753799B26A5E6AD0017B784 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C753799826A5D8820017B784 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
 		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
 		C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */; };
 		C7656C56277BBAAD00F4922A /* Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7656C55277BBAAD00F4922A /* Swizzle.swift */; };
+		C7656C5A277CD66400F4922A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7656C59277CD66400F4922A /* Sparkle */; };
 		C765E4FB26FF9F3500FD6463 /* CryptorECC in Frameworks */ = {isa = PBXBuildFile; productRef = C765E4FA26FF9F3500FD6463 /* CryptorECC */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
@@ -185,20 +184,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		C72CFB882586AE6B005F0340 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 736850AD1CA40F1C00E2FEA0;
-			remoteInfo = NSPageControl;
-		};
-		C72CFB8A2586AE6B005F0340 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 7368513A1CA5582900E2FEA0;
-			remoteInfo = NSPageControlTests;
-		};
 		C72CFB902586AE7E005F0340 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */;
@@ -216,7 +201,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
-				C753799B26A5E6AD0017B784 /* Sparkle.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
 				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
 			);
@@ -240,7 +224,6 @@
 		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
 		C72BB4B32727E03400941708 /* Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Extensions.h; sourceTree = "<group>"; };
 		C72BB4B52727E03400941708 /* Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Extensions.m; sourceTree = "<group>"; };
-		C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = NSPageControl.xcodeproj; path = NSPageControl/NSPageControl.xcodeproj; sourceTree = "<group>"; };
 		C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = WAYWindow.xcodeproj; path = WAYWindow/WAYWindow.xcodeproj; sourceTree = "<group>"; };
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
@@ -261,7 +244,6 @@
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* DisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayController.swift; sourceTree = "<group>"; };
 		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC/DDC.c; sourceTree = SOURCE_ROOT; };
-		C753799826A5D8820017B784 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
 		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = gencode.sh; path = bin/gencode.sh; sourceTree = "<group>"; };
@@ -407,6 +389,7 @@
 				C73CC69F24615E9D003B2658 /* Sentry in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
+				C7656C5A277CD66400F4922A /* Sparkle in Frameworks */,
 				C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
@@ -415,7 +398,6 @@
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
-				C753799A26A5E6AD0017B784 /* Sparkle.framework in Frameworks */,
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
@@ -450,15 +432,6 @@
 				C7151944224E34BA0024C6F6 /* DDC.swift */,
 			);
 			path = DDC;
-			sourceTree = "<group>";
-		};
-		C72CFB7F2586AE6B005F0340 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				C72CFB892586AE6B005F0340 /* NSPageControl.framework */,
-				C72CFB8B2586AE6B005F0340 /* NSPageControlTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		C72CFB8D2586AE7E005F0340 /* Products */ = {
@@ -693,13 +666,11 @@
 			isa = PBXGroup;
 			children = (
 				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
-				C753799826A5D8820017B784 /* Sparkle.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,
 				C7138D952634B02900406EE3 /* Paddle.framework */,
 				C74F8DBE25EB94660077DF27 /* DisplayServices.framework */,
 				C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */,
-				C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */,
 				C730421E2407E92C0016E591 /* Headers */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
@@ -841,6 +812,7 @@
 				C765E4FA26FF9F3500FD6463 /* CryptorECC */,
 				C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */,
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
+				C7656C59277CD66400F4922A /* Sparkle */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -904,14 +876,11 @@
 				C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */,
 				C7F99AC527175E0C00FBF192 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
+				C7656C58277CD66400F4922A /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
-				{
-					ProductGroup = C72CFB7F2586AE6B005F0340 /* Products */;
-					ProjectRef = C72CFB7E2586AE6B005F0340 /* NSPageControl.xcodeproj */;
-				},
 				{
 					ProductGroup = C72CFB8D2586AE7E005F0340 /* Products */;
 					ProjectRef = C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */;
@@ -925,20 +894,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		C72CFB892586AE6B005F0340 /* NSPageControl.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = NSPageControl.framework;
-			remoteRef = C72CFB882586AE6B005F0340 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		C72CFB8B2586AE6B005F0340 /* NSPageControlTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = NSPageControlTests.xctest;
-			remoteRef = C72CFB8A2586AE6B005F0340 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		C72CFB912586AE7E005F0340 /* WAYWindow.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -1766,6 +1721,14 @@
 				kind = branch;
 			};
 		};
+		C7656C58277CD66400F4922A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Kitura/BlueECC.git";
@@ -1942,6 +1905,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */;
 			productName = Burritos;
+		};
+		C7656C59277CD66400F4922A /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7656C58277CD66400F4922A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		C765E4FA26FF9F3500FD6463 /* CryptorECC */ = {
 			isa = XCSwiftPackageProductDependency;
