@@ -11,6 +11,7 @@ import Foundation
 
 let MAIN_MENU_ID = NSUserInterfaceItemIdentifier("MainMenuWindow")
 let POPOVER_CORNER_RADIUS: CGFloat = 18
+let POPOVER_PADDING: CGFloat = 50
 
 // MARK: - PopoverBackgroundView
 
@@ -47,9 +48,9 @@ extension NSVisualEffectView {
 let POPOVER_SHADOW: NSShadow = {
     let s = NSShadow()
 
-    s.shadowColor = .black.withAlphaComponent(0.2)
-    s.shadowOffset = .init(width: 0, height: 1)
-    s.shadowBlurRadius = 2
+    s.shadowColor = NSColor.shadowColor.withAlphaComponent(0.2)
+    s.shadowOffset = .init(width: 0, height: -4)
+    s.shadowBlurRadius = 10
     return s
 }()
 
@@ -61,12 +62,23 @@ func fixPopoverWindow(_ window: NSWindow) {
     window.styleMask = [.fullSizeContentView, .titled]
     window.hasShadow = false
     window.identifier = MAIN_MENU_ID
+}
 
-    if let view = window.contentView {
-        view.radius = POPOVER_CORNER_RADIUS.ns
-        view.bg = darkMode ? darkMauve : white
-        view.layer?.borderColor = NSColor.shadowColor.withAlphaComponent(0.1).cgColor
-        view.layer?.borderWidth = 2
+func fixPopoverView(_ view: NSView?) {
+    if let view = view {
+        let backView = QuickActionsView(frame: NSRect(
+            x: POPOVER_PADDING / 2,
+            y: POPOVER_PADDING,
+            width: view.frame.width - POPOVER_PADDING,
+            height: view.frame.height - POPOVER_PADDING
+        ))
+        backView.wantsLayer = true
+        if let l = backView.layer {
+            l.backgroundColor = (darkMode ? darkMauve : white).cgColor
+            l.cornerRadius = POPOVER_CORNER_RADIUS
+        }
+        backView.shadow = POPOVER_SHADOW
+        view.addSubview(backView, positioned: .below, relativeTo: view.subviews.first)
     }
 }
 

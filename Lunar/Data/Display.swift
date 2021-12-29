@@ -1165,11 +1165,7 @@ enum ValueType {
     @objc dynamic lazy var preciseMaxContrast: Double = maxContrast.doubleValue / 100.0
     @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
 
-    var lastConnectionTime = Date() {
-        didSet {
-            print("lastConnectionTime")
-        }
-    }
+    var lastConnectionTime = Date()
 
     #if DEBUG
         @objc dynamic lazy var showOrientation: Bool = CachedDefaults[.showOrientationInQuickActions]
