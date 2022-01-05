@@ -524,7 +524,8 @@ enum ValueType {
         }
 
         mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
-        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy
+        blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
+            (isNative ? (brightness.uint8Value <= 1) : true)
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
             brightnessBeforeBlackout = value
         }
@@ -915,23 +916,7 @@ enum ValueType {
     lazy var canChangeBrightnessDS: Bool = DisplayServicesCanChangeBrightness(id)
 
     lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
-    lazy var hotkeyPopoverController: HotkeyPopoverController? = mainThread {
-        guard let popover = _hotkeyPopover else {
-            _hotkeyPopover = NSPopover()
-            if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
-               let controller = stb.instantiateController(
-                   withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
-               ) as? HotkeyPopoverController
-            {
-                POPOVERS[serial] = _hotkeyPopover
-                popover.contentViewController = controller
-                popover.contentViewController!.loadView()
-            }
-
-            return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
-        }
-        return popover.contentViewController as? HotkeyPopoverController
-    }
+    lazy var hotkeyPopoverController: HotkeyPopoverController? = initHotkeyPopoverController()
 
     // MARK: Stored Properties
 
@@ -1167,6 +1152,26 @@ enum ValueType {
 
     var lastConnectionTime = Date()
 
+    func initHotkeyPopoverController() -> HotkeyPopoverController? {
+        mainThread {
+            guard let popover = _hotkeyPopover else {
+                _hotkeyPopover = NSPopover()
+                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
+                   let controller = stb.instantiateController(
+                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
+                   ) as? HotkeyPopoverController
+                {
+                    POPOVERS[serial] = _hotkeyPopover
+                    popover.contentViewController = controller
+                    popover.contentViewController!.loadView()
+                }
+
+                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
+            }
+            return popover.contentViewController as? HotkeyPopoverController
+        }
+    }
+
     #if DEBUG
         @objc dynamic lazy var showOrientation: Bool = CachedDefaults[.showOrientationInQuickActions]
     #else
@@ -1190,6 +1195,8 @@ enum ValueType {
     @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name) && vendor != .samsung
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
+
+    @Atomic var userAdjusting = false
 
     var preciseBrightnessContrastBeforeAppPreset = 0.5 {
         didSet {
@@ -1839,6 +1846,10 @@ enum ValueType {
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()
+            userAdjusting = true
+            defer {
+                userAdjusting = false
+            }
 
             mainThread {
                 applyPreciseValue = false
@@ -1912,6 +1923,10 @@ enum ValueType {
     @Published @objc dynamic var contrast: NSNumber = 50 {
         didSet {
             save()
+            userAdjusting = true
+            defer {
+                userAdjusting = false
+            }
 
             mainThread {
                 applyPreciseValue = false
@@ -2552,12 +2567,13 @@ enum ValueType {
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
+        return false
         guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
             guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
             let id = CGDirectDisplayID(UInt(bitPattern: observer))
-            guard let display = displayController.activeDisplays[id] else {
+            guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
                 return
             }
             let newBrightness = (value * 100).u8
@@ -2565,6 +2581,7 @@ enum ValueType {
                 return
             }
 
+            log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
             display.withoutDDC {
                 mainThread { display.brightness = newBrightness.ns }
             }
@@ -4345,6 +4362,6 @@ enum ValueType {
     }
 
     func isUserAdjusting() -> Bool {
-        brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil
+        userAdjusting || brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil
     }
 }

@@ -867,18 +867,22 @@ struct Lunar: ParsableCommand {
             if let displayFilter = display {
                 let filters = displayFilter != "all" ? [displayFilter] : displays.map(\.serial)
                 for filter in filters {
-                    try handleDisplay(
-                        filter,
-                        displays: displays,
-                        property: property,
-                        value: value,
-                        json: json,
-                        controls: controls,
-                        read: read,
-                        systemInfo: systemInfo,
-                        panelData: panelData,
-                        edid: edid
-                    )
+                    do {
+                        try handleDisplay(
+                            filter,
+                            displays: displays,
+                            property: property,
+                            value: value,
+                            json: json,
+                            controls: controls,
+                            read: read,
+                            systemInfo: systemInfo,
+                            panelData: panelData,
+                            edid: edid
+                        )
+                    } catch {
+                        print("\(filter): \(error)")
+                    }
                 }
                 globalExit(0)
             }

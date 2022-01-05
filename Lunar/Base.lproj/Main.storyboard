@@ -1155,9 +1155,9 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2vT-Re-R5O">
-                                <rect key="frame" x="43" y="450" width="300" height="30"/>
+                                <rect key="frame" x="43" y="450" width="321" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable menu bar popup" id="gaa-wL-zrP">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Use workaround for built-in display" id="gaa-wL-zrP">
                                     <font key="font" size="15" name="Menlo-Bold"/>
                                     <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -1172,11 +1172,11 @@ and setting its brightness/contrast to 0</string>
                                 </buttonCell>
                                 <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
                                 <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.showQuickActions" id="V23-av-W1X"/>
+                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.workaroundBuiltinDisplay" id="NHC-gj-OAS"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PKh-fF-D5v">
-                                <rect key="frame" x="43" y="400" width="300" height="30"/>
+                                <rect key="frame" x="43" y="390" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show more graph data" id="vhs-Fm-qk5">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1185,7 +1185,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="ZZ9-IW-Mmi">
-                                <rect key="frame" x="407" y="411" width="20" height="20"/>
+                                <rect key="frame" x="407" y="401" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="WFy-UK-HDk">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1197,7 +1197,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="64a-QL-7wH">
-                                <rect key="frame" x="43" y="382" width="360" height="26"/>
+                                <rect key="frame" x="43" y="372" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Renders values and data lines on the bottom graph" id="3mV-KD-y63">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1208,8 +1208,10 @@ and setting its brightness/contrast to 0</string>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IUj-7E-OhQ">
                                 <rect key="frame" x="43" y="432" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Hover over the menu bar icon for quick actions" id="2FD-df-bTF">
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2FD-df-bTF">
                                     <font key="font" size="11" name="Menlo-Regular"/>
+                                    <string key="title">Forward brightness keys to the system for built-in 
+Disables "Hotkey Step" but persists brightness better</string>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
@@ -1224,7 +1226,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fsd-Hh-QgP">
-                                <rect key="frame" x="43" y="350" width="300" height="30"/>
+                                <rect key="frame" x="43" y="340" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Clamshell mode detection" id="sqt-c7-YEn">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1233,7 +1235,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="P37-NS-W2U">
-                                <rect key="frame" x="407" y="361" width="20" height="20"/>
+                                <rect key="frame" x="407" y="351" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="vMd-qp-hWx">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1245,7 +1247,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ix-Wb-DfR">
-                                <rect key="frame" x="43" y="332" width="360" height="26"/>
+                                <rect key="frame" x="43" y="322" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Toggle Sync mode when the lid is closed/opened" id="C6l-GQ-byR">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1254,7 +1256,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pkT-AK-4hq">
-                                <rect key="frame" x="43" y="300" width="330" height="30"/>
+                                <rect key="frame" x="43" y="290" width="330" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Refresh values from monitor settings" id="BL6-Mw-OOe">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1263,7 +1265,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="tNN-lC-Mzw">
-                                <rect key="frame" x="407" y="311" width="20" height="20"/>
+                                <rect key="frame" x="407" y="301" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="Zls-zU-K3n">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1275,7 +1277,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ts7-Be-cIj">
-                                <rect key="frame" x="43" y="282" width="360" height="26"/>
+                                <rect key="frame" x="43" y="272" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Keep Lunar state in sync by reading monitor settings " id="miz-5F-j8r">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1284,7 +1286,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x4d-gH-awU">
-                                <rect key="frame" x="43" y="264" width="389" height="26"/>
+                                <rect key="frame" x="43" y="254" width="389" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="This can freeze the system if a monitor doesn't support reading" id="OS3-ly-FMI">
                                     <font key="font" size="10" name="Menlo-Regular"/>
@@ -1293,7 +1295,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xda-XJ-76X">
-                                <rect key="frame" x="43" y="238" width="300" height="30"/>
+                                <rect key="frame" x="43" y="228" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Start at login" id="Kaw-nM-BSb">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1302,7 +1304,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JK5-mA-0oY">
-                                <rect key="frame" x="407" y="249" width="20" height="20"/>
+                                <rect key="frame" x="407" y="239" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="Vrl-SH-cxY">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1314,7 +1316,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ifj-60-t4w">
-                                <rect key="frame" x="43" y="220" width="360" height="26"/>
+                                <rect key="frame" x="43" y="210" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Might not always work.. no idea why" id="RoB-pD-VKU">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1334,7 +1336,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SNO-lg-Xmp">
-                                <rect key="frame" x="43" y="188" width="300" height="30"/>
+                                <rect key="frame" x="43" y="178" width="300" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Disable Network Controller video" id="FFO-Oz-8C8">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1343,7 +1345,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="7eF-EV-nI5">
-                                <rect key="frame" x="407" y="199" width="20" height="20"/>
+                                <rect key="frame" x="407" y="189" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="8kT-OD-5ft">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1355,7 +1357,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SDB-oc-gZI">
-                                <rect key="frame" x="43" y="170" width="360" height="26"/>
+                                <rect key="frame" x="43" y="160" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Useful if you don't need to see the Pi desktop" id="aWH-8W-LbD">
                                     <font key="font" size="11" name="Menlo-Regular"/>
@@ -1406,7 +1408,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFM-4J-v5n">
-                                <rect key="frame" x="43" y="138" width="312" height="30"/>
+                                <rect key="frame" x="43" y="128" width="312" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Re-apply brightness on screen wake" id="7uj-K0-XAY">
                                     <font key="font" size="15" name="Menlo-Bold"/>
@@ -1415,7 +1417,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="V3C-Ul-SK6">
-                                <rect key="frame" x="407" y="149" width="20" height="20"/>
+                                <rect key="frame" x="407" y="139" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="9sX-hd-6L1">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1427,7 +1429,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R2H-bi-Sa9">
-                                <rect key="frame" x="43" y="120" width="360" height="26"/>
+                                <rect key="frame" x="43" y="110" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable if system gets slow on screen wake" id="MSe-cp-R6h">
                                     <font key="font" size="11" name="Menlo-Regular"/>

@@ -26,9 +26,9 @@ echo \n(set_color yellow)"Generating AppCast ($APPCAST)"(set_color normal)
 "$WORK_DIR/bin/generate_appcast" -f "$DSA_PRIV_KEY" -s (cat $ED_PRIV_KEY) -o "$APPCAST" "$RELEASE_DIR"
 
 echo \n(set_color yellow)"Fixing appcast"(set_color normal)
-if test "$DSA" != 1
-    "$WORK_DIR/bin/update_appcast.py" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
-else
-    "$WORK_DIR/bin/update_appcast.py" --dsa-key-path "$DSA_PRIV_KEY" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
-end
+# if test "$DSA" != 1
+#     "$WORK_DIR/bin/update_appcast.py" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
+# else
+"$WORK_DIR/bin/update_appcast.py" --dsa-key-path "$DSA_PRIV_KEY" --eddsa-key-path "$ED_PRIV_KEY" --app-signatures="['$ARM_APP_SIGNATURE', '$INTEL_APP_SIGNATURE']" --app-version "$APP_VERSION" --app-configuration (string lower -- $CONFIGURATION) $argv || exit 1
+# end
 subl "$APPCAST"

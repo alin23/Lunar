@@ -1204,6 +1204,14 @@ class DisplayViewController: NSViewController {
                 }
             }
         }
+        DistributedNotificationCenter.default()
+            .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.display?._hotkeyPopover = nil
+                self?.display?.hotkeyPopoverController = self?.display?.initHotkeyPopoverController()
+                self?.initHotkeys()
+            }.store(in: &observers)
     }
 
     func initGraph(mode: AdaptiveMode? = nil) {

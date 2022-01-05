@@ -1318,3 +1318,22 @@ extension FileManager {
         return isExecutableFile(atPath: path)
     }
 }
+
+extension Publisher {
+    func retryWithDelay<T, E>(
+        _ retries: Int,
+        interval: ImmediateScheduler.SchedulerTimeType.Stride,
+        tolerance: ImmediateScheduler.SchedulerTimeType.Stride
+    )
+        -> Publishers.Catch<Self, AnyPublisher<T, E>> where T == Self.Output, E == Self.Failure
+    {
+        self.catch { error -> AnyPublisher<T, E> in
+            Publishers.Delay(
+                upstream: self,
+                interval: interval,
+                tolerance: tolerance,
+                scheduler: ImmediateScheduler.shared
+            ).retry(retries).eraseToAnyPublisher()
+        }
+    }
+}

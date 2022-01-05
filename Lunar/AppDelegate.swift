@@ -37,9 +37,9 @@ let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
 var startTime = Date()
 
-private let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
-private let kAppleInterfaceStyle = "AppleInterfaceStyle"
-private let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
+let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
+let kAppleInterfaceStyle = "AppleInterfaceStyle"
+let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .utility)
 let mediaKeyStarterQueue = RunloopQueue(named: "fyi.lunar.mediaKeyStarter.queue")
@@ -905,6 +905,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     for (key, popover) in POPOVERS {
                         guard let popover = popover else { continue }
                         popover.close()
+                        popover.contentViewController = nil
                         POPOVERS[key] = nil
                     }
                     recreateWindow()
