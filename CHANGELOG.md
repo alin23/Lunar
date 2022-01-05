@@ -1,3 +1,18 @@
+# 5.2.1
+## Improvements
+
+* Make brightness key forwarding optional in Advanced settings
+    * If the built-in display brightness is not persisting properly, try enabling this setting
+
+![workaround builtin setting](https://files.lunar.fyi/workaround-builtin.png)
+
+## Fixes
+
+* Reset BlackOut state if brightness is greater than 1
+* Don't show OSD for built-in brightness when forwarding media keys to the system
+* Fix crash because of wrong datapoints for the Location Mode chart
+* Fix Input Hotkey dropdown in Dark Mode
+
 # 5.2.0
 ## Features
 
