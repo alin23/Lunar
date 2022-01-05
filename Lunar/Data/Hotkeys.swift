@@ -933,9 +933,11 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays else {
             log.info("showOSD()")
-            displayController.activeDisplays.values
-                .filter { !$0.isBuiltin }
-                .forEach(showOSD)
+            if CachedDefaults[.workaroundBuiltinDisplay] {
+                displayController.externalActiveDisplays.forEach(showOSD)
+            } else {
+                displayController.activeDisplayList.forEach(showOSD)
+            }
 
             return
         }
@@ -954,9 +956,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
         if allDisplays {
             log.info("showOSD(allDisplays)")
-            displayController.activeDisplays.values
-                .filter { !builtinDisplay || !$0.isBuiltin }
-                .forEach(showOSD)
+            displayController.externalActiveDisplays.forEach(showOSD)
         }
     }
 
@@ -974,36 +974,53 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch action {
         case .all:
-            if lidOpened, let builtin = displayController.builtinDisplay, builtin.active {
+            if CachedDefaults[.workaroundBuiltinDisplay], lidOpened, let builtin = displayController.builtinDisplay, builtin.active {
                 log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
                 if !contrast, !builtin.blackOutEnabled {
-                    event.flags = (offset == 1 ? [.maskShift, .maskAlternate] : [])
+                    event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
+                    if offset == 1 {
+                        event.flags = event.flags.union([.maskShift, .maskAlternate])
+                    }
+                    log.info("Forwarding media key to system using flags=\(offset == 1 ? "[.maskShift, .maskAlternate]" : "[]")")
                     return event
                 }
+                log
+                    .info(
+                        "Not forwarding media key to system because of contrast=\(contrast) builtin.blackOutEnabled=\(builtin.blackOutEnabled)"
+                    )
                 return nil
             }
             adjust(mediaKey, by: offset, contrast: contrast, builtinDisplay: true, allDisplays: true)
         case .external:
-            adjust(mediaKey, by: offset, contrast: contrast)
+            adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
         case .cursor:
-            if !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
-                log.info("Forwarding media key to system")
-                event.flags = (offset == 1 ? [.maskShift, .maskAlternate] : [])
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
+                event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
+                if offset == 1 {
+                    event.flags = event.flags.union([.maskShift, .maskAlternate])
+                }
+                log.info("Forwarding media key to system using flags=\(offset == 1 ? "[.maskShift, .maskAlternate]" : "[]")")
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
-            if !contrast, lidOpened {
-                log.info("Forwarding media key to system")
-                event.flags = (offset == 1 ? [.maskShift, .maskAlternate] : [])
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, lidOpened {
+                event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
+                if offset == 1 {
+                    event.flags = event.flags.union([.maskShift, .maskAlternate])
+                }
+                log.info("Forwarding media key to system using flags=\(offset == 1 ? "[.maskShift, .maskAlternate]" : "[]")")
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
-            if !contrast, let source = displayController.sourceDisplay, source.isBuiltin {
-                log.info("Forwarding media key to system")
-                event.flags = (offset == 1 ? [.maskShift, .maskAlternate] : [])
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let source = displayController.sourceDisplay, source.isBuiltin {
+                event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
+                if offset == 1 {
+                    event.flags = event.flags.union([.maskShift, .maskAlternate])
+                }
+                log.info("Forwarding media key to system using flags=\(offset == 1 ? "[.maskShift, .maskAlternate]" : "[]")")
                 return event
             }
             adjust(mediaKey, by: offset, contrast: contrast, sourceDisplay: true)

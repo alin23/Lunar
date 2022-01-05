@@ -1338,10 +1338,36 @@
             <sparkle:version>5.2.0</sparkle:version>
             <sparkle:shortVersionString>5.2.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.0.dmg" length="16648045" type="application/octet-stream" sparkle:edSignature="eWXO+dkRi0W/sviBHiP4txiyfLT7ZFPvF1neTBHS3dr/1cT6QApA+dyQpTxhWnUCXoLZ75BNPXNBxaCkmfXlCQ==" sparkle:dsaSignature="MEUCIDh9AaaQQJTX2sUTAow2eN0cViR7O8UF+/F8BJUFKzUIAiEAoRgVgq1HMUJwI6cr2rlZuVU7Ey/PJz6nIjtokqCZg94="/>
             <signature>ASINUgLc0iU0huswCu3ExmaaMJc=</signature>
             <signature>21107zuzEFdGks3uVqWFLryfmeY=</signature>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li><strong>Auto BlackOut</strong>: turn off the built-in display automatically when an external monitor is connected</li><li>Simpler visual design for <strong>Quick Actions</strong></li></ul><h2 id="improvements">Improvements</h2><ul><li>Automatically switch to Gamma on the HDMI port of the M1 Pro/Max MacBook</li><li>Don't re-apply brightness if App Presets is empty (avoids jittery brightness on some displays)</li><li>Make sure we don't accidentally disable "Automatically adjust brightness"</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix option key being wrongly taken into account when pressing brightness keys</li><li>Update Sparkle auto-updating framework to fix some GUI bugs</li><li>Update diagnostics text to include the MacBook HDMI limitation</li><li>Fix <code>checkSlowWrite</code> for DDC which could wrongly mark smooth transitions as unsupported</li><li>Make sure to remove the <strong>Lunar Test</strong> marker when closing diagnostics/onboarding</li></ul></div></div>]]></description>
+            <signature>OBeb1OCekdaWD35Le5tFDga005Y=</signature>
+            <signature>EkgQNl.s0I++WXl3z9nI7F92SVM=</signature>
+            <signature>EkgQNl/s0I++WXl3z9nI7F92SVM=</signature>
+            <signature>c1GIINA4g6d0Sp5VUqd6LthoCOk=</signature>
+            <signature>Cd4SnFSlNJOin03M9T0OHH8jP3Q=</signature>
+            <signature>q6AuX7xzRy32a8TaemiOEaKkIPE=</signature>
+            <signature>13ekUkX.SQ7EOsDad8wtdDxnEF4=</signature>
+            <signature>13ekUkX/SQ7EOsDad8wtdDxnEF4=</signature>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.0.dmg" length="16648045" type="application/octet-stream" sparkle:edSignature="eWXO+dkRi0W/sviBHiP4txiyfLT7ZFPvF1neTBHS3dr/1cT6QApA+dyQpTxhWnUCXoLZ75BNPXNBxaCkmfXlCQ==" sparkle:dsaSignature="MEUCIQCOggwk7gkTNCUXs6Fq9pNC+cznrOhLUhj+xsF65R4U5gIgZI7DYyAbWZANBXKole3RwjbPfNQNRJTMEO5RgWUw6FE="/>
+            <signature>eavS8o08c8xjuBEnToCUaFBT30c=</signature>
+            <signature>3BsvnkCW8Dc0NCEVq24Am2eIk3E=</signature>
+            <signature>RKKXXIye6uKxXGkeIWgLG2kcC54=</signature>
+            <signature>xI42mxJMi6mYaa9GA3QZsM.UL.E=</signature>
+            <signature>xI42mxJMi6mYaa9GA3QZsM/UL/E=</signature>
+            <signature>96cBg3bNnf9SVLb91DLuZZ7DN2k=</signature>
+            <signature>HZmi4Z+t63MHts2+K2zjOMudlxI=</signature>
+        </item>
+        <item>
+            <title>5.2.1</title>
+            <pubDate>Wed, 05 Jan 2022 12:46:17 +0200</pubDate>
+            <sparkle:version>5.2.1</sparkle:version>
+            <sparkle:shortVersionString>5.2.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.1.dmg" length="16658018" type="application/octet-stream" sparkle:edSignature="Ln0qlkhfQiYGlrBx4o5CQ26TAa0xXJzxJNhEuQjPqBbxlBWbqBgLguBvC/Yr6zwLFUmZFIWzKrvK4NcKOA2bBQ==" sparkle:dsaSignature="MEQCIHY/LFXer1np+QDI8AexCXJXQIMClGz9SMaCkV6vaC9SAiAexXZOoyXXbHTh8JpGn+sqdJZGAxWhLN9YU6hZevIXEw=="/>
+            <signature>U8FYfsgDOk6kCGgUKPPEJRegLPg=</signature>
+            <signature>OPAkqFoqj3rd8nGbPRPvEHzAUl8=</signature>
+            <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: 1rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Make brightness key forwarding optional in Advanced settings<ul><li>If the built-in display brightness is not persisting properly, try enabling this setting</li></ul></li></ul><p><img src="https://files.lunar.fyi/workaround-builtin.png" alt="workaround builtin setting"></p><h2 id="fixes">Fixes</h2><ul><li>Reset BlackOut state if brightness is greater than 1</li><li>Don't show OSD for built-in brightness when forwarding media keys to the system</li><li>Fix crash because of wrong datapoints for the Location Mode chart</li><li>Fix Input Hotkey dropdown in Dark Mode</li></ul></div></div>]]></description>
         </item>
     </channel>
 </rss>
