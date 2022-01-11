@@ -27,7 +27,7 @@ CHANGELOG_STYLE = H.style(
     """
     * {
         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 1rem;
+        font-size: .9rem;
     }
 
     img {
@@ -128,6 +128,7 @@ def get_eddsa_signature(file):
     )
     return EDDSA_SIGNER_PATTERN.match(output).groups()
 
+
 def get_item_for_version(app_version, appcast):
     for item in appcast.iter("item"):
         enclosure = item.find("enclosure")
@@ -138,6 +139,7 @@ def get_item_for_version(app_version, appcast):
         if app_version == version or re.sub(r"-beta\d+", "", app_version) == version:
             return item
     return item
+
 
 # pylint: disable=too-many-locals,too-many-branches
 def main(
@@ -168,7 +170,6 @@ def main(
             if "/" in signature:
                 item.append(E.signature(signature.replace("/", ".")))
             item.append(E.signature(signature))
-
 
     for item in appcast.iter("item"):
         enclosure = item.find("enclosure")
