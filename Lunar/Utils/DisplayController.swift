@@ -730,15 +730,16 @@ class DisplayController {
             log.info("Mac Mini HDMI Ignore: isMacBook=\(Sysctl.isMacBook)")
             log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
             log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
-            if (Sysctl.isMacMini && clcd2Num == 1) || (Sysctl.modelLowercased.starts(with: "macbookpro18,") && clcd2Num >= 1),
-               let transport = display.transport,
-               transport.upstream == "DP",
-               transport.downstream == "HDMI"
+            if Sysctl.isMacMini, clcd2Num == 1
+            // || (Sysctl.modelLowercased.starts(with: "macbookpro18,") && clcd2Num >= 1),
+            let transport = display.transport,
+                transport.upstream == "DP",
+                transport.downstream == "HDMI"
             {
-                log.warning("This HDMI port doesn't support DDC, ignoring for display \(display)")
-                display.badHDMI = true
-                return nil
-            }
+                    log.warning("This HDMI port doesn't support DDC, ignoring for display \(display)")
+                    display.badHDMI = true
+                    return nil
+                }
 
             var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
             guard let dcpService = firstServiceMatching(
