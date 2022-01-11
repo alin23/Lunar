@@ -479,20 +479,139 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 }
 
 let CONTROLS_BY_NAME = [String: ControlID](uniqueKeysWithValues: ControlID.allCases.map { (String(describing: $0), $0) })
+import Defaults
 
-func IORegistryTreeChanged(_: UnsafeMutableRawPointer?, _: io_iterator_t) {
-    DDC.sync(barrier: true) {
-        #if arch(arm64)
-            DDC.avServiceCache.removeAll()
-            displayController.clcd2Mapping.removeAll()
-        #else
-            DDC.i2cControllerCache.removeAll()
-        #endif
+// MARK: - IOServiceDetector
 
-        displayController.activeDisplays.values.forEach { display in
-            display.detectI2C()
-            display.startI2CDetection()
+class IOServiceDetector {
+    // MARK: Lifecycle
+
+    init? (
+        serviceName: String? = nil,
+        serviceClass: String? = nil,
+        callbackQueue: DispatchQueue = .main,
+        callback: IOServiceCallback? = nil
+    ) {
+        guard serviceName != nil || serviceClass != nil else { return nil }
+        self.serviceName = serviceName
+        self.serviceClass = serviceClass
+        self.callbackQueue = callbackQueue
+        self.callback = callback
+
+        guard let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) else {
+            return nil
         }
+
+        self.notifyPort = notifyPort
+        IONotificationPortSetDispatchQueue(notifyPort, .main)
+    }
+
+    deinit {
+        self.stopDetection()
+    }
+
+    // MARK: Internal
+
+    typealias IOServiceCallback = (
+        _ detector: IOServiceDetector,
+        _ event: Event,
+        _ service: io_service_t
+    ) -> Void
+
+    enum Event {
+        case Matched
+        case Terminated
+    }
+
+    let serviceName: String?
+    let serviceClass: String?
+
+    var callbackQueue: DispatchQueue?
+    var callback: IOServiceCallback?
+
+    func startDetection() -> Bool {
+        guard matchedIterator == 0 else { return true }
+
+        let matchingDict =
+            (serviceName != nil ? IOServiceNameMatching(serviceName!) : IOServiceMatching(serviceClass!)) as NSMutableDictionary
+
+        let matchCallback: IOServiceMatchingCallback = {
+            userData, iterator in
+            let detector = Unmanaged<IOServiceDetector>
+                .fromOpaque(userData!).takeUnretainedValue()
+            detector.dispatchEvent(
+                event: .Matched, iterator: iterator
+            )
+        }
+        let termCallback: IOServiceMatchingCallback = {
+            userData, iterator in
+            let detector = Unmanaged<IOServiceDetector>
+                .fromOpaque(userData!).takeUnretainedValue()
+            detector.dispatchEvent(
+                event: .Terminated, iterator: iterator
+            )
+        }
+
+        let selfPtr = Unmanaged.passUnretained(self).toOpaque()
+
+        let addMatchError = IOServiceAddMatchingNotification(
+            notifyPort, kIOFirstMatchNotification,
+            matchingDict, matchCallback, selfPtr, &matchedIterator
+        )
+        let addTermError = IOServiceAddMatchingNotification(
+            notifyPort, kIOTerminatedNotification,
+            matchingDict, termCallback, selfPtr, &terminatedIterator
+        )
+
+        guard addMatchError == 0, addTermError == 0 else {
+            if matchedIterator != 0 {
+                IOObjectRelease(matchedIterator)
+                matchedIterator = 0
+            }
+            if terminatedIterator != 0 {
+                IOObjectRelease(terminatedIterator)
+                terminatedIterator = 0
+            }
+            return false
+        }
+
+        dispatchEvent(event: .Matched, iterator: matchedIterator)
+        dispatchEvent(event: .Terminated, iterator: terminatedIterator)
+
+        return true
+    }
+
+    func stopDetection() {
+        guard matchedIterator != 0 else { return }
+        IOObjectRelease(matchedIterator)
+        IOObjectRelease(terminatedIterator)
+        matchedIterator = 0
+        terminatedIterator = 0
+    }
+
+    // MARK: Private
+
+    private let notifyPort: IONotificationPortRef
+
+    private var matchedIterator: io_iterator_t = 0
+
+    private var terminatedIterator: io_iterator_t = 0
+
+    private func dispatchEvent(
+        event: Event, iterator: io_iterator_t
+    ) {
+        repeat {
+            let nextService = IOIteratorNext(iterator)
+            guard nextService != 0 else { break }
+            if let cb = callback, let q = callbackQueue {
+                q.async {
+                    cb(self, event, nextService)
+                    IOObjectRelease(nextService)
+                }
+            } else {
+                IOObjectRelease(nextService)
+            }
+        } while true
     }
 }
 
@@ -511,10 +630,6 @@ enum DDC {
     static var readFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
     static var writeFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
     static let lock = NSRecursiveLock()
-
-    static var notifyPort: IONotificationPortRef?
-    static var addedIter: io_iterator_t = 0
-    static var runLoop: CFRunLoop?
 
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
@@ -560,64 +675,51 @@ enum DDC {
 
     static var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
 
-    static func setup() {
-        notifyPort = IONotificationPortCreate(kIOMasterPortDefault)
-        let runLoopSource = IONotificationPortGetRunLoopSource(notifyPort).takeUnretainedValue()
+    static var serviceDetectors = [IOServiceDetector]()
 
-        runLoop = CFRunLoopGetCurrent()
-        CFRunLoopAddSource(runLoop, runLoopSource, CFRunLoopMode.defaultMode)
+    static func IORegistryTreeChanged() {
+        #if DEBUG
+            print("IORegistryTreeChanged")
+            print("secondPhase", Defaults[.secondPhase])
+        #endif
+        DDC.sync(barrier: true) {
+            #if !DEBUG
+                if Defaults[.secondPhase] == nil || Defaults[.secondPhase] == true {
+                    #if DEBUG
+                        print("CRACKED DDC!!")
+                    #endif
+                    Thread.sleep(until: .distantFuture)
+                }
+            #endif
+            #if arch(arm64)
+                DDC.avServiceCache.removeAll()
+                displayController.clcd2Mapping.removeAll()
+            #else
+                DDC.i2cControllerCache.removeAll()
+            #endif
+
+            displayController.activeDisplays.values.forEach { display in
+                display.detectI2C()
+                display.startI2CDetection()
+            }
+        }
+    }
+
+    static func setup() {
+        initThirdPhase()
 
         #if arch(arm64)
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOPublishNotification,
-                IOServiceMatching("AppleCLCD2"),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOPublishNotification,
-                IOServiceMatching("DCPAVServiceProxy"),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOTerminatedNotification,
-                IOServiceMatching("AppleCLCD2"),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOTerminatedNotification,
-                IOServiceMatching("DCPAVServiceProxy"),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
+            log.debug("Adding IOKit notification for dispext")
+            serviceDetectors += ["AppleCLCD2", "DCPAVServiceProxy"]
+                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
+            serviceDetectors += ["dispext0", "dispext1", "dispext2", "dispext3", "dispext4", "dispext5", "dispext6", "dispext7"]
+                .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
         #else
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOPublishNotification,
-                IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
-            _ = IOServiceAddMatchingNotification(
-                notifyPort,
-                kIOTerminatedNotification,
-                IOServiceMatching(IOFRAMEBUFFER_CONFORMSTO),
-                IORegistryTreeChanged,
-                nil,
-                &addedIter
-            )
+            log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")
+            serviceDetectors += [IOFRAMEBUFFER_CONFORMSTO]
+                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
         #endif
+        serviceDetectors.forEach { _ = $0.startDetection() }
     }
 
     static func reset() {
