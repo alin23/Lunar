@@ -43,7 +43,6 @@ dev: install-deps install-hooks codegen
 
 .PHONY: release upload build sentry-release pkg dmg pack appcast
 upload:
-	rsync -avzP Releases/*.delta darkwoods:/static/Lunar/deltas/ || exit 0
 	rsync -avzP Releases/*.dmg darkwoods:/static/Lunar/releases/
 	fish -c 'upload -d Lunar Releases/appcast.xml'
 	cfcli -d lunar.fyi purge
