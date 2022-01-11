@@ -1,3 +1,14 @@
+# 5.2.2
+## Improvements
+
+* Add an IOService event detector to re-create the I2C service port cache when the IOKit tree changes
+    * This should help with cases when the monitor is not responding to Lunar's brightness/volume/input changes until app restart
+
+## Fixes
+
+* Fix fetching script dir in Lunar sensor install script
+* Remove HDMI port detection logic for M1 Pro/Max because it causes false positives
+    * Will resume work on this when my MacBook arrives
 # 5.2.1
 ## Improvements
 
