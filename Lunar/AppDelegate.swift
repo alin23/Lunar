@@ -1340,9 +1340,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         startTime = Date()
+        initFirstPhase()
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
-            log.verbose("\(initStuff)")
         }
 
         initCache()
@@ -1410,6 +1410,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
             scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
+            if let secondPhase = Defaults[.secondPhase] {
+                scope.setTag(value: secondPhase ? "false" : "true", key: "secondPhase")
+            } else {
+                scope.setTag(value: "null", key: "secondPhase")
+            }
         }
 
         let runningApp = NSWorkspace.shared.runningApplications
@@ -1494,6 +1499,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if !TEST_MODE {
             mainAsyncAfter(ms: 30000) {
+                let user = User(userId: getSerialNumberHash() ?? "NOID")
+                user.email = lunarProProduct?.activationEmail
+                user.username = lunarProProduct?.activationID
+                SentrySDK.configureScope { scope in
+                    scope.setUser(user)
+                    scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
+                    scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+                    scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
+                    if let secondPhase = Defaults[.secondPhase] {
+                        scope.setTag(value: secondPhase ? "false" : "true", key: "secondPhase")
+                    } else {
+                        scope.setTag(value: "null", key: "secondPhase")
+                    }
+                }
                 SentrySDK.capture(message: "Launch New")
             }
         }

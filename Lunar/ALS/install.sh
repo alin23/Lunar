@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/zsh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+DIR="${0:a:h}"
 
 mkdir -p "/tmp/lunarsensor/$BOARD"
 cd "/tmp/lunarsensor/$BOARD"
