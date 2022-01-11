@@ -542,6 +542,9 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
         CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
     }
     CachedDefaults.locks[key.name] = NSRecursiveLock()
+    if key == .secondPhase {
+        initSecondPhase()
+    }
     Defaults.publisher(key).sink { change in
         log.debug("Caching \(key.name) = \(change.newValue)")
         CachedDefaults.cache[key.name] = AnyCodable(change.newValue)
@@ -627,6 +630,7 @@ func initCache() {
     cacheKey(.solarNoon)
     cacheKey(.civilTwilightBegin)
     cacheKey(.civilTwilightEnd)
+    cacheKey(.secondPhase)
     cacheKey(.nauticalTwilightBegin)
     cacheKey(.nauticalTwilightEnd)
     cacheKey(.astronomicalTwilightBegin)
@@ -649,6 +653,7 @@ func initCache() {
 
 extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
+    static let secondPhase = Key<Bool?>("secondPhase", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterBuiltinUpgrade = Key<Bool?>("firstRunAfterBuiltinUpgrade", default: nil)
