@@ -184,7 +184,7 @@ def main(
         print("Processing", version)
 
         minimumAutoupdateVersion = item.findall(sparkle("minimumAutoupdateVersion"))
-        if version[0] == "4" and not minimumAutoupdateVersion:
+        if version[0] in ["4", "5", "6"] and not minimumAutoupdateVersion:
             el = etree.Element(
                 sparkle("minimumAutoupdateVersion"), nsmap={"sparkle": SPARKLE}
             )
