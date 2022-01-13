@@ -1081,6 +1081,7 @@
         <item>
             <title>5.0.0</title>
             <pubDate>Wed, 03 Nov 2021 17:17:51 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.0</sparkle:version>
             <sparkle:shortVersionString>5.0.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1095,6 +1096,7 @@
         <item>
             <title>5.0.1</title>
             <pubDate>Thu, 04 Nov 2021 10:35:09 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.1</sparkle:version>
             <sparkle:shortVersionString>5.0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1120,6 +1122,7 @@
         <item>
             <title>5.0.2</title>
             <pubDate>Sat, 06 Nov 2021 22:38:05 +0100</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.2</sparkle:version>
             <sparkle:shortVersionString>5.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1160,6 +1163,7 @@
         <item>
             <title>5.0.3</title>
             <pubDate>Sat, 13 Nov 2021 20:14:53 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.3</sparkle:version>
             <sparkle:shortVersionString>5.0.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1177,6 +1181,7 @@
         <item>
             <title>5.0.4</title>
             <pubDate>Sat, 13 Nov 2021 22:05:46 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.4</sparkle:version>
             <sparkle:shortVersionString>5.0.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1199,6 +1204,7 @@
         <item>
             <title>5.0.5</title>
             <pubDate>Mon, 15 Nov 2021 12:49:25 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.0.5</sparkle:version>
             <sparkle:shortVersionString>5.0.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1227,6 +1233,7 @@
         <item>
             <title>5.1.0</title>
             <pubDate>Mon, 22 Nov 2021 12:11:03 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.1.0</sparkle:version>
             <sparkle:shortVersionString>5.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1246,6 +1253,7 @@
         <item>
             <title>5.1.1</title>
             <pubDate>Tue, 23 Nov 2021 09:59:35 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.1.1</sparkle:version>
             <sparkle:shortVersionString>5.1.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1286,6 +1294,7 @@
         <item>
             <title>5.1.2</title>
             <pubDate>Mon, 29 Nov 2021 21:43:35 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.1.2</sparkle:version>
             <sparkle:shortVersionString>5.1.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1335,6 +1344,7 @@
         <item>
             <title>5.2.0</title>
             <pubDate>Wed, 29 Dec 2021 20:40:55 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.2.0</sparkle:version>
             <sparkle:shortVersionString>5.2.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1361,6 +1371,7 @@
         <item>
             <title>5.2.1</title>
             <pubDate>Wed, 05 Jan 2022 12:46:17 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.2.1</sparkle:version>
             <sparkle:shortVersionString>5.2.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
@@ -1377,6 +1388,7 @@
         <item>
             <title>5.2.2</title>
             <pubDate>Tue, 11 Jan 2022 20:59:49 +0200</pubDate>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <sparkle:version>5.2.2</sparkle:version>
             <sparkle:shortVersionString>5.2.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>

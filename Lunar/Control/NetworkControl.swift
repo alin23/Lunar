@@ -261,7 +261,8 @@ class NetworkControl: Control {
 
             guard let display = displayController.getMatchingDisplay(
                 name: name, serial: serial, productID: productID,
-                manufactureYear: year, manufacturer: manufacturer
+                manufactureYear: year, manufacturer: manufacturer,
+                displays: displayController.externalActiveDisplays.filter { $0.networkEnabled }
             ),
                 shouldPromptForNetworkControl(display)
             else {
