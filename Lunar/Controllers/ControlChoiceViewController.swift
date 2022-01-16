@@ -43,7 +43,7 @@ class GradientView: NSView {
 
 class LunarTestViewController: NSViewController {
     @IBOutlet var label: NSTextField!
-    @objc dynamic var lunarTestText = "Lunar Test"
+    @objc dynamic var lunarTestText = "Checking Monitor"
     var taskKey = "lunarTestHighlighter"
 
     override func viewDidAppear() {
@@ -52,22 +52,28 @@ class LunarTestViewController: NSViewController {
             uniqueTaskKey: taskKey,
             onSuccess: {
                 mainAsync {
-                    testWindowController?.close()
-                    testWindowController = nil
+                    displayController.displays.values.forEach { d in
+                        d.testWindowController?.close()
+                        d.testWindowController = nil
+                    }
                 }
             },
             onCancelled: {
                 mainAsync {
-                    testWindowController?.close()
-                    testWindowController = nil
+                    displayController.displays.values.forEach { d in
+                        d.testWindowController?.close()
+                        d.testWindowController = nil
+                    }
                 }
             }
         ) { [weak self] timer in
             guard let self = self else {
                 timer.invalidate()
                 mainAsync {
-                    testWindowController?.close()
-                    testWindowController = nil
+                    displayController.displays.values.forEach { d in
+                        d.testWindowController?.close()
+                        d.testWindowController = nil
+                    }
                 }
                 return
             }
@@ -128,8 +134,6 @@ struct ControlResult {
 
     var all: Bool { read.all && write.all }
 }
-
-var testWindowController: NSWindowController?
 
 // MARK: - ControlChoiceViewController
 
@@ -794,7 +798,7 @@ class ControlChoiceViewController: NSViewController {
         mainThread {
             createWindow(
                 "testWindowController",
-                controller: &testWindowController,
+                controller: &d.testWindowController,
                 screen: d.screen,
                 show: true,
                 backgroundColor: .clear,
@@ -915,8 +919,10 @@ class ControlChoiceViewController: NSViewController {
                         w.close()
                         wc.close()
 
-                        testWindowController?.close()
-                        testWindowController = nil
+                        displayController.displays.values.forEach { d in
+                            d.testWindowController?.close()
+                            d.testWindowController = nil
+                        }
 
                         if restart {
                             mainAsyncAfter(ms: 1000) { appDelegate!.onboard() }
@@ -943,8 +949,17 @@ class ControlChoiceViewController: NSViewController {
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
                 self?.cancelled = true
-                testWindowController?.close()
-                testWindowController = nil
+                displayController.displays.values.forEach { d in
+                    d.testWindowController?.close()
+                    d.testWindowController = nil
+                }
+
+                self?.wakeObserver?.cancel()
+                self?.wakeObserver = nil
+
+                self?.screenObserver?.cancel()
+                self?.screenObserver = nil
+
                 self?.semaphore.signal()
 
                 guard useOnboardingForDiagnostics else { return }
@@ -985,8 +1000,10 @@ class ControlChoiceViewController: NSViewController {
             }
 
             mainThread {
-                testWindowController?.close()
-                testWindowController = nil
+                displayController.displays.values.forEach { d in
+                    d.testWindowController?.close()
+                    d.testWindowController = nil
+                }
                 if useOnboardingForDiagnostics, self.cancelled { return }
                 self.next()
             }
@@ -994,6 +1011,11 @@ class ControlChoiceViewController: NSViewController {
     }
 
     func testDisplay(_ d: Display, index: Int) {
+        displayController.displays.values.forEach { d in
+            d.testWindowController?.close()
+            d.testWindowController = nil
+        }
+
         guard !cancelled else { return }
         progressForLastDisplay = displayProgressStep * index.d
         setDisplayProgress(0, controlStep: 0.25)

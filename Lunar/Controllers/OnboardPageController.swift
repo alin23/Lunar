@@ -38,11 +38,17 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_: Notification) {
-        testWindowController?.close()
-        testWindowController = nil
+        displayController.displays.values.forEach { d in
+            d.testWindowController?.close()
+            d.testWindowController = nil
+        }
         cancelTask(ONBOARDING_TASK_KEY)
         applyChanges()
         appDelegate!.onboardWindowController = nil
+        appDelegate!.wakeObserver?.cancel()
+        appDelegate!.wakeObserver = nil
+        appDelegate!.screenObserver?.cancel()
+        appDelegate!.screenObserver = nil
 
         guard !clickedSkipButton else { return }
         skip?()
