@@ -2896,7 +2896,7 @@ enum ValueType {
             if amount <= 0.01, smooth {
                 asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) { [weak self] in
                     guard let self = self else { return }
-                    log.verbose("Removing shade for \(self.description ?? "")")
+                    log.verbose("Removing shade for \(self.description)")
                     self.shadeWindowController?.close()
                     self.shadeWindowController = nil
                 }
