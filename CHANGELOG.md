@@ -1,4 +1,18 @@
+# 5.2.3
+**Note: if you have a monitor connected to the HDMI port of the 2021 MacBook, disable DDC manually for that monitor**
+
+![disabling DDC for HDMI port on M1](https://files.lunar.fyi/disable-ddc-m1-hdmi.png)
+
+## Fixes
+
+* Make sure that monitors with Network Control disabled don't get matched with a Pi controller
+* Remove the **Lunar Test** flashing text properly after onboarding
+
 # 5.2.2
+**Note: if you have a monitor connected to the HDMI port of the 2021 MacBook, disable DDC manually for that monitor**
+
+![disabling DDC for HDMI port on M1](https://files.lunar.fyi/disable-ddc-m1-hdmi.png)
+
 ## Improvements
 
 * Add an IOService event detector to re-create the I2C service port cache when the IOKit tree changes
@@ -9,6 +23,7 @@
 * Fix fetching script dir in Lunar sensor install script
 * Remove HDMI port detection logic for M1 Pro/Max because it causes false positives
     * Will resume work on this when my MacBook arrives
+
 # 5.2.1
 ## Improvements
 
