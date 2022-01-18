@@ -1477,27 +1477,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
         }
 
-        if TEST_MODE, !datastore.shouldOnboard {
-            showWindow()
-            // onboard()
-        }
+        startReceivingSignificantLocationChanges()
 
-        if TEST_MODE {
+        #if TEST_MODE
+            if !datastore.shouldOnboard {
+                showWindow()
+            }
+
             fm.createFile(
                 atPath: "/usr/local/bin/lunar",
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
                 attributes: [.posixPermissions: 0o755]
             )
-            // createAndShowWindow("diagnosticsWindowController", controller: &diagnosticsWindowController)
-        }
-
-        startReceivingSignificantLocationChanges()
-
-//        mainAsyncAfter(ms: 5000) {
-//            SentrySDK.capture(message: "Launch New")
-//        }
-
-        if !TEST_MODE {
+        #else
             mainAsyncAfter(ms: 30000) {
                 let user = User(userId: getSerialNumberHash() ?? "NOID")
                 user.email = lunarProProduct?.activationEmail
@@ -1515,7 +1507,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
                 SentrySDK.capture(message: "Launch New")
             }
-        }
+        #endif
 
         if CachedDefaults[.reapplyValuesAfterWake] {
             asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in

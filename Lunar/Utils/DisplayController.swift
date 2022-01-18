@@ -179,10 +179,8 @@ class DisplayController {
         if !displays.isEmpty {
             return displays.values.first(where: { d in d.active }) ?? displays.values.first!
         } else {
-            #if DEBUG
-                if TEST_MODE {
-                    return TEST_DISPLAY
-                }
+            #if TEST_MODE
+                return TEST_DISPLAY
             #endif
             return GENERIC_DISPLAY
         }
