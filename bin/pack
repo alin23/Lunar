@@ -50,7 +50,7 @@ set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/
     $APP_TMP
 
 for file in $filesToSign
-    codesign -fs "$CODESIGN_CERT" -o runtime --timestamp "$file" || exit 1
+    codesign -fs "$CODESIGN_CERT" -o runtime --entitlements "$WORK_DIR/Lunar/LunarRelease.entitlements" --timestamp "$file" || exit 1
 end
 
 
