@@ -1340,7 +1340,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func applicationDidFinishLaunching(_: Notification) {
         startTime = Date()
-        initFirstPhase()
+        Defaults[.secondPhase] = initFirstPhase()
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }
@@ -1411,7 +1411,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             if let secondPhase = Defaults[.secondPhase] {
-                scope.setTag(value: secondPhase ? "false" : "true", key: "secondPhase")
+                scope.setTag(value: secondPhase ? "true" : "false", key: "secondPhase")
             } else {
                 scope.setTag(value: "null", key: "secondPhase")
             }
