@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="25" y="130" width="330" height="20"/>
+                                <rect key="frame" x="25" y="130" width="330" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -943,7 +943,7 @@
                                         <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="20" id="jRl-qM-LaS"/>
                                         <constraint firstItem="XD7-ys-eeM" firstAttribute="leading" secondItem="Gpr-KG-BtL" secondAttribute="trailing" constant="8" id="m71-ho-ILL"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
-                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" constant="40" id="nZ7-4a-hWM"/>
+                                        <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" priority="499" constant="40" id="nZ7-4a-hWM"/>
                                         <constraint firstAttribute="bottom" secondItem="C2X-XK-Eid" secondAttribute="bottom" id="nwf-AH-WAK"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="bottom" secondItem="ddL-Y9-B9P" secondAttribute="top" constant="6" id="shw-Ax-bFM"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="vld-cp-lzJ"/>
@@ -977,7 +977,7 @@
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="22" y="383" width="336" height="249"/>
-                                <view key="contentView" verticalCompressionResistancePriority="747" ambiguous="YES" id="xED-Xy-oTv">
+                                <view key="contentView" verticalCompressionResistancePriority="747" id="xED-Xy-oTv">
                                     <rect key="frame" x="3" y="9" width="330" height="231"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1472,7 +1472,7 @@
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="4lF-Al-vJ8"/>
                                         <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="20" id="72b-i6-eYV"/>
                                         <constraint firstItem="Hup-6D-J0e" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="7Nm-m4-xNM"/>
-                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" constant="40" id="8HR-yp-Aw2"/>
+                                        <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" priority="499" constant="40" id="8HR-yp-Aw2"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="9nB-wE-pR6"/>
                                         <constraint firstItem="VFW-kV-UHQ" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="BfM-Sz-AXA"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="DGe-qg-n2g"/>

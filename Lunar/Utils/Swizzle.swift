@@ -39,6 +39,9 @@ extension NSVisualEffectView {
         CATransaction.disableActions()
 
         layer.isOpaque = false
+        if let sublayer = layer.sublayers?.first, sublayer.name == "_NSPopoverFrameAXBackgroundView" {
+            sublayer.opacity = 0
+        }
         fixPopoverWindow(window)
 
         CATransaction.commit()
@@ -56,16 +59,15 @@ let POPOVER_SHADOW: NSShadow = {
 
 func fixPopoverWindow(_ window: NSWindow) {
     window.backgroundColor = .clear
-    window.titleVisibility = .hidden
-    window.titlebarAppearsTransparent = true
     window.isOpaque = false
-    window.styleMask = [.fullSizeContentView, .titled]
+    window.styleMask = [.borderless]
     window.hasShadow = false
     window.identifier = MAIN_MENU_ID
 }
 
 func fixPopoverView(_ view: NSView?) {
     if let view = view {
+        view.layer = nil
         let backView = QuickActionsView(frame: NSRect(
             x: POPOVER_PADDING / 2,
             y: POPOVER_PADDING,
