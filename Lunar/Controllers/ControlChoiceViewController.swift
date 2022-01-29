@@ -1022,7 +1022,7 @@ class ControlChoiceViewController: NSViewController {
         defer { self.progress = self.displayProgressStep * (index + 1).d }
 
         currentDisplay = d
-        showTestWindow()
+        // showTestWindow()
         mainThread {
             self.displayName.transition(0.5, easing: .easeOutExpo)
             self.displayName.alphaValue = 1.0
