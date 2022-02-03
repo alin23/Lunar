@@ -2471,7 +2471,7 @@ visible screen left</string>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="30" id="9PQ-4X-LF8"/>
                                                                     </constraints>
-                                                                    <sliderCell key="cell" continuous="YES" alignment="left" minValue="-100" maxValue="100" tickMarkPosition="above" sliderType="linear" id="UQb-U2-WwN" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-100" maxValue="100" doubleValue="63.555136494252878" tickMarkPosition="above" sliderType="linear" id="UQb-U2-WwN" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                                         <userDefinedRuntimeAttributes>
                                                                             <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                                 <real key="value" value="20"/>
@@ -2488,6 +2488,7 @@ visible screen left</string>
                                                                             <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
                                                                                 <real key="value" value="0.5"/>
                                                                             </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
                                                                         </userDefinedRuntimeAttributes>
                                                                     </sliderCell>
                                                                     <userDefinedRuntimeAttributes>
@@ -2527,6 +2528,7 @@ visible screen left</string>
                                                                             <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
                                                                                 <real key="value" value="0.5"/>
                                                                             </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
                                                                         </userDefinedRuntimeAttributes>
                                                                     </sliderCell>
                                                                     <userDefinedRuntimeAttributes>
@@ -6856,6 +6858,7 @@ when FaceLight is activated</string>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
                                                         <real key="value" value="0.5"/>
                                                     </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
                                             <userDefinedRuntimeAttributes>
@@ -6938,6 +6941,7 @@ should rise or fall based on the adaptive input</string>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
                                                         <real key="value" value="0.5"/>
                                                     </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
                                             <userDefinedRuntimeAttributes>

@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="25" y="130" width="330" height="40"/>
+                                <rect key="frame" x="25" y="130" width="330" height="20"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -58,13 +58,16 @@
                                                             <constraint firstAttribute="height" constant="30" id="Pza-RU-mGU"/>
                                                             <constraint firstAttribute="width" constant="174" id="XuC-ho-bki"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="aGQ-Uy-5CI" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                        <sliderCell key="cell" continuous="YES" alignment="left" tag="26" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="aGQ-Uy-5CI" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                             <userDefinedRuntimeAttributes>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                     <real key="value" value="20"/>
                                                                 </userDefinedRuntimeAttribute>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                                    <real key="value" value="0.45000000000000001"/>
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </sliderCell>
@@ -114,38 +117,16 @@
                                                             </binding>
                                                         </connections>
                                                     </segmentedControl>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6n0-9B-ELM">
-                                                        <rect key="frame" x="248" y="37" width="28" height="15"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="if2-vK-ItE">
-                                                            <font key="font" metaFont="systemHeavy" size="12"/>
-                                                            <color key="textColor" name="Caption Tertiary"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="nKX-LM-MgX" name="value" keyPath="objectValue.brightness" id="gIr-Rc-J8d">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="N7F-wH-cHs">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                        </connections>
-                                                    </textField>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="Ni0-ms-RPU" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="0nn-LJ-MSm"/>
                                                     <constraint firstItem="PvO-H1-mOH" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="6GO-oH-hQb"/>
-                                                    <constraint firstItem="6n0-9B-ELM" firstAttribute="centerY" secondItem="PvO-H1-mOH" secondAttribute="centerY" id="78R-qT-oON"/>
                                                     <constraint firstItem="Ni0-ms-RPU" firstAttribute="top" secondItem="PvO-H1-mOH" secondAttribute="bottom" constant="4" id="DDO-BS-pyq"/>
                                                     <constraint firstItem="PvO-H1-mOH" firstAttribute="leading" secondItem="lzD-m0-SY0" secondAttribute="trailing" constant="-16" id="Uxl-uC-cIz"/>
                                                     <constraint firstItem="DGy-An-71R" firstAttribute="top" secondItem="nKX-LM-MgX" secondAttribute="top" constant="5" id="VDr-UM-ehe"/>
                                                     <constraint firstAttribute="bottom" secondItem="Ni0-ms-RPU" secondAttribute="bottom" constant="5" id="YQE-Qs-Sh9"/>
                                                     <constraint firstItem="PvO-H1-mOH" firstAttribute="top" secondItem="DGy-An-71R" secondAttribute="bottom" constant="6" id="ceo-Nn-c3V"/>
                                                     <constraint firstAttribute="bottom" secondItem="PvO-H1-mOH" secondAttribute="bottom" priority="499" constant="5" id="fe7-8j-t8r"/>
-                                                    <constraint firstItem="6n0-9B-ELM" firstAttribute="leading" secondItem="PvO-H1-mOH" secondAttribute="trailing" constant="8" symbolic="YES" id="jcv-zj-94z"/>
                                                     <constraint firstItem="DGy-An-71R" firstAttribute="centerX" secondItem="nKX-LM-MgX" secondAttribute="centerX" id="uYV-XV-CNE"/>
                                                     <constraint firstItem="lzD-m0-SY0" firstAttribute="centerY" secondItem="PvO-H1-mOH" secondAttribute="centerY" id="xpq-TQ-wFz"/>
                                                 </constraints>
@@ -268,13 +249,16 @@
                                                             <constraint firstAttribute="height" constant="30" id="fyP-z2-ZO5"/>
                                                             <constraint firstAttribute="width" constant="174" id="quO-P5-pmt"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="yag-dO-RNx" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="yag-dO-RNx" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                             <userDefinedRuntimeAttributes>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                     <real key="value" value="20"/>
                                                                 </userDefinedRuntimeAttribute>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                                    <real key="value" value="0.45000000000000001"/>
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </sliderCell>
@@ -293,13 +277,16 @@
                                                             <constraint firstAttribute="height" constant="30" id="8xW-pC-LXZ"/>
                                                             <constraint firstAttribute="width" constant="174" id="oeY-qF-cD6"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="u9C-Li-R70" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="u9C-Li-R70" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                             <userDefinedRuntimeAttributes>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                     <real key="value" value="20"/>
                                                                 </userDefinedRuntimeAttribute>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                                    <real key="value" value="0.45000000000000001"/>
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </sliderCell>
@@ -314,7 +301,7 @@
                                                             <constraint firstAttribute="height" constant="9" id="8RE-ZZ-m4T"/>
                                                             <constraint firstAttribute="width" constant="29" id="Y0s-L0-W1A"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="brightness" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="AH4-ug-clU">
+                                                        <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="brightness-dynamic" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="AH4-ug-clU">
                                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="miniSystemBold"/>
                                                         </buttonCell>
@@ -353,7 +340,7 @@
                                                             <constraint firstAttribute="width" constant="30" id="WaC-uu-93H"/>
                                                             <constraint firstAttribute="height" constant="12" id="vbI-ca-959"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="contrast" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Dg1-8e-nd5">
+                                                        <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="contrast-dynamic" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Dg1-8e-nd5">
                                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="miniSystemBold"/>
                                                         </buttonCell>
@@ -420,13 +407,16 @@
                                                             <constraint firstAttribute="height" constant="30" id="jLO-Qj-Ddx"/>
                                                             <constraint firstAttribute="width" constant="174" id="uc8-tB-J7E"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="EC6-tN-dFo" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="EC6-tN-dFo" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                             <userDefinedRuntimeAttributes>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                     <real key="value" value="20"/>
                                                                 </userDefinedRuntimeAttribute>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                                    <real key="value" value="0.45000000000000001"/>
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </sliderCell>
@@ -466,13 +456,16 @@
                                                             <constraint firstAttribute="width" constant="174" id="I8h-63-JCN"/>
                                                             <constraint firstAttribute="height" constant="30" id="pXE-oc-xNO"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.53107244318181823" tickMarkPosition="above" sliderType="linear" id="HsP-9N-heG" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="0.53107244318181823" tickMarkPosition="above" sliderType="linear" id="HsP-9N-heG" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                             <userDefinedRuntimeAttributes>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                                     <real key="value" value="20"/>
                                                                 </userDefinedRuntimeAttribute>
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="10"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                                    <real key="value" value="0.45000000000000001"/>
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </sliderCell>
@@ -520,58 +513,6 @@
                                                             <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.name" id="xdR-Tl-qGA"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-Kg-vng" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="250" y="127" width="28" height="15"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="78a-tN-akS">
-                                                            <font key="font" metaFont="systemHeavy" size="12"/>
-                                                            <color key="textColor" name="Caption Tertiary"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.brightness" id="fc7-9q-hrv">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                            <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="z1X-Yy-SOw"/>
-                                                        </connections>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="9b5-3v-IoN" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="250" y="97" width="28" height="15"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="FWU-cw-p6S">
-                                                            <font key="font" metaFont="systemHeavy" size="12"/>
-                                                            <color key="textColor" name="Caption Tertiary"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.contrast" id="izV-Io-gyF">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.noDDCOrMergedBrightnessContrast" id="kaJ-Hp-uo0"/>
-                                                        </connections>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="Lww-dX-npG" customClass="SliderValueTextField" customModule="Lunar" customModuleProvider="target">
-                                                        <rect key="frame" x="250" y="67" width="28" height="15"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="PD5-kt-2aD">
-                                                            <font key="font" metaFont="systemHeavy" size="12"/>
-                                                            <color key="textColor" name="Caption Tertiary"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="prI-Gh-RKd" name="hidden" keyPath="objectValue.showVolumeSlider" id="kty-XA-D70">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                            <binding destination="prI-Gh-RKd" name="value" keyPath="objectValue.volume" id="blx-RQ-vTQ">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                        </connections>
-                                                    </textField>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="1jl-w5-Kxx"/>
@@ -591,25 +532,19 @@
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="HG8-fg-KZ5" secondAttribute="bottom" id="T16-IH-gny"/>
                                                     <constraint firstItem="RpU-Ox-p2h" firstAttribute="leading" secondItem="oNw-h4-Uy2" secondAttribute="leading" id="Tni-K2-KiC"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="5He-i1-Qvb" secondAttribute="bottom" priority="495" constant="4" id="V4f-eI-ZIA"/>
-                                                    <constraint firstItem="Lww-dX-npG" firstAttribute="leading" secondItem="9b5-3v-IoN" secondAttribute="leading" id="Vy6-Hh-eP4"/>
-                                                    <constraint firstItem="9b5-3v-IoN" firstAttribute="centerY" secondItem="HG8-fg-KZ5" secondAttribute="centerY" id="ZBe-qF-7BG"/>
                                                     <constraint firstItem="WXp-hm-NXm" firstAttribute="centerY" secondItem="wbs-Qz-lUz" secondAttribute="centerY" id="a3Z-b7-1Cf"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="wbs-Qz-lUz" secondAttribute="bottom" constant="4" id="ajP-EN-W2A"/>
                                                     <constraint firstAttribute="bottom" secondItem="sy4-S7-iPw" secondAttribute="bottom" priority="499" constant="5" id="b8r-wG-mnM"/>
                                                     <constraint firstItem="5VK-Ej-krq" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="cz4-Ga-Wfo"/>
+                                                    <constraint firstItem="RpU-Ox-p2h" firstAttribute="leading" secondItem="OaN-2H-RQX" secondAttribute="trailing" constant="10" id="dda-Fc-HDm"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="eDV-1v-TWg"/>
                                                     <constraint firstItem="DrO-3E-miA" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="fqp-Qk-Zbq"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="top" secondItem="HG8-fg-KZ5" secondAttribute="bottom" priority="496" constant="4" id="gSc-eT-mYZ"/>
-                                                    <constraint firstItem="9b5-3v-IoN" firstAttribute="leading" secondItem="rhU-Kg-vng" secondAttribute="leading" id="gsn-27-EYx"/>
                                                     <constraint firstItem="sy4-S7-iPw" firstAttribute="width" secondItem="OaN-2H-RQX" secondAttribute="width" id="jXN-sJ-opK"/>
                                                     <constraint firstItem="wbs-Qz-lUz" firstAttribute="top" secondItem="OaN-2H-RQX" secondAttribute="bottom" priority="499" id="je5-9H-JnM"/>
                                                     <constraint firstAttribute="bottom" secondItem="5VK-Ej-krq" secondAttribute="bottom" constant="5" id="ncJ-Hz-gpd"/>
-                                                    <constraint firstItem="rhU-Kg-vng" firstAttribute="centerY" secondItem="OaN-2H-RQX" secondAttribute="centerY" id="obG-Ur-bsL"/>
-                                                    <constraint firstItem="RpU-Ox-p2h" firstAttribute="leading" secondItem="rhU-Kg-vng" secondAttribute="leading" id="qsA-cP-keW"/>
                                                     <constraint firstItem="OaN-2H-RQX" firstAttribute="top" secondItem="DrO-3E-miA" secondAttribute="bottom" constant="6" id="saP-mI-b7E"/>
                                                     <constraint firstItem="OaN-2H-RQX" firstAttribute="centerX" secondItem="prI-Gh-RKd" secondAttribute="centerX" id="t3w-56-h0M"/>
-                                                    <constraint firstItem="Lww-dX-npG" firstAttribute="centerY" secondItem="wbs-Qz-lUz" secondAttribute="centerY" id="vBk-pl-AMQ"/>
-                                                    <constraint firstItem="rhU-Kg-vng" firstAttribute="leading" secondItem="OaN-2H-RQX" secondAttribute="trailing" constant="10" id="wW8-te-8JN"/>
                                                 </constraints>
                                                 <connections>
                                                     <outlet property="orientationControl" destination="5VK-Ej-krq" id="58l-ut-4ch"/>
@@ -809,7 +744,7 @@
                                                 <constraint firstAttribute="width" constant="174" id="10o-lf-zvS"/>
                                                 <constraint firstAttribute="height" constant="30" id="a6o-T5-lQV"/>
                                             </constraints>
-                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="QVY-Qg-p73" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" alignment="left" tag="26" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="QVY-Qg-p73" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                         <real key="value" value="20"/>
@@ -817,32 +752,15 @@
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="10"/>
                                                     </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                        <real key="value" value="0.45000000000000001"/>
+                                                    </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
                                             <connections>
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.preciseBrightness" id="rTV-Sp-akj"/>
                                             </connections>
                                         </slider>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XD7-ys-eeM">
-                                            <rect key="frame" x="258" y="53" width="28" height="15"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="QB0-11-WRL">
-                                                <font key="font" metaFont="systemHeavy" size="12"/>
-                                                <color key="textColor" name="Caption Tertiary"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.brightness" id="NvQ-2i-Fcz">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.showSliderValues" id="8lF-KI-4cj">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
                                             <rect key="frame" x="127" y="81" width="76" height="24"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Built-in" id="RjJ-T2-HEe">
@@ -932,7 +850,6 @@
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="2he-f4-m8M"/>
                                         <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="20" id="6Nr-zy-jPM"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
-                                        <constraint firstItem="XD7-ys-eeM" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="9WG-Xj-Ln2"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-16" id="Ch7-G0-7uf"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
@@ -941,7 +858,6 @@
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="6" id="NLt-qN-Af8"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
                                         <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="20" id="jRl-qM-LaS"/>
-                                        <constraint firstItem="XD7-ys-eeM" firstAttribute="leading" secondItem="Gpr-KG-BtL" secondAttribute="trailing" constant="8" id="m71-ho-ILL"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
                                         <constraint firstItem="GuV-5N-Ajh" firstAttribute="top" secondItem="j9b-qV-Iv1" secondAttribute="top" priority="499" constant="40" id="nZ7-4a-hWM"/>
                                         <constraint firstAttribute="bottom" secondItem="C2X-XK-Eid" secondAttribute="bottom" id="nwf-AH-WAK"/>
@@ -1099,13 +1015,16 @@
                                                 <constraint firstAttribute="width" constant="174" id="9Wh-Ue-uRn"/>
                                                 <constraint firstAttribute="height" constant="30" id="yS8-20-Mcf"/>
                                             </constraints>
-                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="6Na-m9-LnM" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="6Na-m9-LnM" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                         <real key="value" value="20"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                        <real key="value" value="0.45000000000000001"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
@@ -1124,7 +1043,7 @@
                                                 <constraint firstAttribute="height" constant="9" id="RZT-3G-pbR"/>
                                                 <constraint firstAttribute="width" constant="29" id="e2i-q1-53H"/>
                                             </constraints>
-                                            <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="brightness" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="K6q-zX-8i1">
+                                            <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="brightness-dynamic" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="K6q-zX-8i1">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="miniSystemBold"/>
                                             </buttonCell>
@@ -1175,7 +1094,7 @@
                                                 <constraint firstAttribute="width" constant="30" id="4n0-62-unO"/>
                                                 <constraint firstAttribute="height" constant="12" id="osl-px-GIZ"/>
                                             </constraints>
-                                            <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="contrast" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ZsI-oF-IV2">
+                                            <buttonCell key="cell" type="inline" title="100" bezelStyle="inline" image="contrast-dynamic" imagePosition="trailing" alignment="left" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="ZsI-oF-IV2">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="miniSystemBold"/>
                                             </buttonCell>
@@ -1226,13 +1145,16 @@
                                                 <constraint firstAttribute="width" constant="174" id="UQa-Zf-Nbl"/>
                                                 <constraint firstAttribute="height" constant="30" id="j6f-9k-Dx0"/>
                                             </constraints>
-                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="0kA-9m-XNL" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                            <sliderCell key="cell" continuous="YES" refusesFirstResponder="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="0kA-9m-XNL" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                         <real key="value" value="20"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                        <real key="value" value="0.45000000000000001"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
@@ -1241,44 +1163,22 @@
                                                 <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="dVc-hK-hos"/>
                                             </connections>
                                         </slider>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tD3-7X-FGi">
-                                            <rect key="frame" x="258" y="142" width="28" height="15"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="wRz-jU-HUd">
-                                                <font key="font" metaFont="systemHeavy" size="12"/>
-                                                <color key="textColor" name="Caption Tertiary"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.brightness" id="jJi-LV-1bm">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="PYN-1K-q54" name="hidden" keyPath="values.mergeBrightnessContrast" id="doF-vd-GfJ"/>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="doF-vd-GfJ" id="qd2-DQ-o5f">
-                                                    <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </textField>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f0W-zX-TT0" customClass="AutoRemovingSlider" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="76" y="98" width="178" height="38"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="Br3-5X-20k"/>
                                                 <constraint firstAttribute="width" constant="174" id="F57-ue-qBx"/>
                                             </constraints>
-                                            <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="B1H-4a-75Q" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                            <sliderCell key="cell" continuous="YES" state="on" alignment="left" tag="26" maxValue="1" doubleValue="1" tickMarkPosition="below" sliderType="linear" id="B1H-4a-75Q" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                                         <real key="value" value="20"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                        <real key="value" value="0.45000000000000001"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
@@ -1343,6 +1243,9 @@
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="bgOpacity">
+                                                        <real key="value" value="0.45000000000000001"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </sliderCell>
@@ -1411,80 +1314,20 @@
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.appPreset.name" id="jWw-k0-tro"/>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tpp-dP-5eh">
-                                            <rect key="frame" x="258" y="112" width="28" height="15"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="2Fu-sp-t23">
-                                                <font key="font" metaFont="systemHeavy" size="12"/>
-                                                <color key="textColor" name="Caption Tertiary"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.contrast" id="a39-hI-zvZ">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.noDDCOrMergedBrightnessContrast" id="yBI-KF-VNQ"/>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="yBI-KF-VNQ" id="fKX-dT-HdL">
-                                                    <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VFW-kV-UHQ">
-                                            <rect key="frame" x="258" y="82" width="28" height="15"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="100" id="qG3-cl-vJX">
-                                                <font key="font" metaFont="systemHeavy" size="12"/>
-                                                <color key="textColor" name="Caption Tertiary"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.showVolumeSlider" id="YgW-fE-mk1">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.volume" id="acZ-Gi-aGC">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">StringNumberTransformer</string>
-                                                    </dictionary>
-                                                </binding>
-                                                <binding destination="PYN-1K-q54" name="hidden2" keyPath="values.showSliderValues" previousBinding="YgW-fE-mk1" id="lx5-Cy-KW1">
-                                                    <dictionary key="options">
-                                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                        <integer key="NSNullPlaceholder" value="-1"/>
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </textField>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="leading" secondItem="197-x4-S44" secondAttribute="trailing" constant="-16" id="2EU-H8-RNt"/>
-                                        <constraint firstItem="tpp-dP-5eh" firstAttribute="centerY" secondItem="f0W-zX-TT0" secondAttribute="centerY" id="2G7-hJ-zFr"/>
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="bottom" id="4lF-Al-vJ8"/>
                                         <constraint firstAttribute="bottom" secondItem="5Z8-Q7-p7U" secondAttribute="bottom" priority="498" constant="20" id="72b-i6-eYV"/>
                                         <constraint firstItem="Hup-6D-J0e" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="7Nm-m4-xNM"/>
                                         <constraint firstItem="Hup-6D-J0e" firstAttribute="top" secondItem="xED-Xy-oTv" secondAttribute="top" priority="499" constant="40" id="8HR-yp-Aw2"/>
-                                        <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="9nB-wE-pR6"/>
-                                        <constraint firstItem="VFW-kV-UHQ" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="BfM-Sz-AXA"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="DGe-qg-n2g"/>
-                                        <constraint firstItem="VFW-kV-UHQ" firstAttribute="leading" secondItem="tpp-dP-5eh" secondAttribute="leading" id="DOc-U3-Vcv"/>
                                         <constraint firstItem="Ntc-81-W0h" firstAttribute="top" secondItem="D87-Cq-r76" secondAttribute="bottom" constant="1" id="ERP-q3-aTb"/>
                                         <constraint firstAttribute="bottom" secondItem="Ntc-81-W0h" secondAttribute="bottom" id="FOZ-uo-PyK"/>
                                         <constraint firstItem="D87-Cq-r76" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="499" constant="6" id="FOi-Ro-2A2"/>
                                         <constraint firstItem="pRg-MU-0kr" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" id="FYz-pR-MhE"/>
                                         <constraint firstItem="pRg-MU-0kr" firstAttribute="leading" secondItem="Tqt-X1-RJG" secondAttribute="leading" id="G1e-lr-1dR"/>
-                                        <constraint firstItem="tD3-7X-FGi" firstAttribute="leading" secondItem="pRg-MU-0kr" secondAttribute="trailing" constant="8" symbolic="YES" id="GUS-x3-KPu"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="I8P-g4-hIO"/>
-                                        <constraint firstItem="tpp-dP-5eh" firstAttribute="leading" secondItem="tD3-7X-FGi" secondAttribute="leading" id="JU8-bt-1Ll"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" constant="6" id="K61-K6-fOU"/>
                                         <constraint firstItem="D87-Cq-r76" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="LEa-dD-8vR"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="6" id="Nnz-oO-qw1"/>
@@ -1499,9 +1342,9 @@
                                         <constraint firstAttribute="bottom" secondItem="0Wk-V9-tNW" secondAttribute="bottom" priority="220" constant="20" id="gSE-zS-xW1"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="leading" secondItem="JaP-5h-FMy" secondAttribute="trailing" constant="-17" id="gXX-hV-vrq"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="width" secondItem="Tqt-X1-RJG" secondAttribute="width" id="iPI-xK-KXz"/>
-                                        <constraint firstItem="tD3-7X-FGi" firstAttribute="centerY" secondItem="pRg-MU-0kr" secondAttribute="centerY" id="mDi-b2-OaY"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="mxi-wy-m9O"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
+                                        <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="Tqt-X1-RJG" secondAttribute="trailing" constant="8" symbolic="YES" id="oig-r5-72D"/>
                                         <constraint firstItem="7cg-qs-QAJ" firstAttribute="bottom" secondItem="Tqt-X1-RJG" secondAttribute="bottom" constant="-4" id="qNt-Xh-QFr"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="qW5-xo-Qe0"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="top" constant="6" id="sJi-Og-IwV"/>
@@ -1759,10 +1602,12 @@
         <image name="NSActionTemplate" width="15" height="15"/>
         <image name="automode" width="14" height="14"/>
         <image name="brightness" width="50.5" height="50.5"/>
+        <image name="brightness-dynamic" width="50.5" height="50.5"/>
         <image name="clockmode" width="14" height="14"/>
         <image name="component" width="14" height="14"/>
         <image name="composite" width="14" height="14"/>
         <image name="contrast" width="24" height="24"/>
+        <image name="contrast-dynamic" width="24" height="24"/>
         <image name="displayport" width="14" height="14"/>
         <image name="dvi" width="14" height="14"/>
         <image name="hdmi" width="14" height="14"/>

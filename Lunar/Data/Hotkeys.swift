@@ -1177,7 +1177,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .volumeUp:
-            guard let display = displayController.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
@@ -1192,7 +1192,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
         case .volumeDown:
-            guard let display = displayController.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
@@ -1207,7 +1207,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
         case .mute:
-            guard let display = displayController.currentAudioDisplay else {
+            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
