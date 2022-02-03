@@ -29,6 +29,7 @@ let faceLightColor = white.blended(withFraction: 0.15, of: orange) ?? white
 let bgColor = white
 var hotkeysBgColor: NSColor { darkMode ? blackMauve : darkMauve }
 var settingsBgColor: NSColor { darkMode ? peach : lunarYellow }
+var sliderBorderColor: NSColor { darkMode ? white : mauve }
 let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 

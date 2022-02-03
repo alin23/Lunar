@@ -564,6 +564,7 @@ class DisplayController {
 
             log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
             display.transport = transport
+            display.audioIdentifier = edidUUID
             return display
         }
 
@@ -745,6 +746,7 @@ class DisplayController {
                 names: ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3", "dcpext4", "dcpext5", "dcpext6", "dcpext7"]
             ),
                 let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
+                firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) == nil,
                 let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
                 !CFEqual(ioAvService, 0 as IOAVService),
                 // Check if DCPAVServiceProxy belongs to an external monitor
@@ -941,6 +943,18 @@ class DisplayController {
         guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) else {
             return nil
         }
+
+        if let audioDeviceUid = audioDevice.uid,
+           let display = activeDisplayList.filter({ $0.audioIdentifier != nil })
+           .first(where: { audioDeviceUid.contains($0.audioIdentifier!) })
+        {
+            log.info("Matched Audio Device UID \(audioDeviceUid) with Display UID \(display.audioIdentifier ?? "")")
+            return display
+        } else {
+            log.info("Audio Device UID \(audioDevice.uid ?? "")")
+            log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
+        }
+
         let alignments = fuzzyFind(queries: [audioDevice.name], inputs: activeDisplays.values.map(\.name))
         guard let name = alignments.first?.result.asString else { return mainExternalOrCGMainDisplay }
 
@@ -1061,10 +1075,13 @@ class DisplayController {
     }
 
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            adaptiveCrumb("Changed mode from \(change.oldValue) to \(change.newValue)")
-            mainAsync {
-                guard let self = self, !self.pausedAdaptiveModeObserver else {
+        adaptiveModeObserver = adaptiveBrightnessModePublisher
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] change in
+                adaptiveCrumb("Changed mode from \(change.oldValue) to \(change.newValue)")
+                guard let self = self else { return }
+
+                guard !self.pausedAdaptiveModeObserver else {
                     return
                 }
 
@@ -1074,7 +1091,6 @@ class DisplayController {
                     self.pausedAdaptiveModeObserver = false
                 }
             }
-        }
     }
 
     func toggle() {

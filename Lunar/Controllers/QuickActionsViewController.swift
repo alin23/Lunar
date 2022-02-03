@@ -11,6 +11,8 @@ import Combine
 import Defaults
 import Surge
 
+let QUICK_ACTIONS_SLIDER_CELL_TAG = 26
+
 // MARK: - SliderValueTextField
 
 class SliderValueTextField: NSTextField {
@@ -45,6 +47,7 @@ class QuickActionsView: NSView {
     override func makeBackingLayer() -> CALayer {
         NoClippingLayer()
     }
+
 }
 
 // MARK: - QuickActionsViewController

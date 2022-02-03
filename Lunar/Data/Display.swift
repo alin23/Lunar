@@ -315,6 +315,8 @@ enum ValueType {
     case contrast
 }
 
+let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0-9a-f]+$".r!
+
 // MARK: - Display
 
 @objc class Display: NSObject, Codable, Defaults.Serializable, ObservableObject {
@@ -563,6 +565,7 @@ enum ValueType {
 
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
+            setAudioIdentifier(from: infoDictionary)
         }
     }
 
@@ -623,6 +626,7 @@ enum ValueType {
         guard active else { return }
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
+            setAudioIdentifier(from: infoDictionary)
         }
 
         startControls()
@@ -924,7 +928,6 @@ enum ValueType {
     var _id: CGDirectDisplayID
 
     var transport: Transport? = nil
-
     var edidName: String
     lazy var lastVolume: NSNumber = volume
 
@@ -958,10 +961,6 @@ enum ValueType {
     @objc dynamic var sentContrastCondition = NSCondition()
     @objc dynamic var sentInputCondition = NSCondition()
     @objc dynamic var sentVolumeCondition = NSCondition()
-
-    // MARK: Gamma and User values
-
-    var infoDictionary: NSDictionary = [:]
 
     var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
     var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
@@ -1151,6 +1150,41 @@ enum ValueType {
     @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
 
     var lastConnectionTime = Date()
+
+    var audioIdentifier: String? = nil {
+        didSet {
+            guard audioIdentifier != nil else { return }
+            mainAsync {
+                displayController.currentAudioDisplay = displayController.getCurrentAudioDisplay()
+            }
+        }
+    }
+
+    // MARK: Gamma and User values
+
+    var infoDictionary: NSDictionary = [:] {
+        didSet {
+            setAudioIdentifier(from: infoDictionary)
+        }
+    }
+
+    var supportsVolumeControl: Bool {
+        guard let control = control, !(control is GammaControl) else { return false }
+        if control is AppleNativeControl, let alternativeControl = alternativeControlForAppleNative {
+            return alternativeControl is DDCControl || alternativeControl is NetworkControl
+        }
+        return control is DDCControl || control is NetworkControl
+    }
+
+    func setAudioIdentifier(from dict: NSDictionary) {
+        #if !arch(arm64)
+            guard let prefsKey = infoDictionary["IODisplayPrefsKey"] as? String,
+                  let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
+                  let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
+            else { return }
+            audioIdentifier = "\(g2)\(g1)-\(g3)".uppercased()
+        #endif
+    }
 
     func initHotkeyPopoverController() -> HotkeyPopoverController? {
         mainThread {

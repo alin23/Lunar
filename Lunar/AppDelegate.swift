@@ -485,6 +485,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             let modeKey = change.newValue
             mainAsync {
+                if change.oldValue == .manual, change.newValue != .manual {
+                    for d in displayController.activeDisplayList {
+                        guard d.hasAmbientLightAdaptiveBrightness, let lastAppPreset = d.appPreset
+                        else { continue }
+
+                        if !d.ambientLightAdaptiveBrightnessEnabled {
+                            d.ambientLightAdaptiveBrightnessEnabled = true
+                        }
+                        if lastAppPreset.reapplyPreviousBrightness {
+                            if CachedDefaults[.mergeBrightnessContrast] {
+                                let (br, _) = d.sliderValueToBrightnessContrast(d.preciseBrightnessContrastBeforeAppPreset)
+                                d.brightness = br.ns
+                            } else {
+                                d.brightness = d.sliderValueToBrightness(d.preciseBrightnessBeforeAppPreset)
+                            }
+                        }
+                    }
+                }
+
                 CachedDefaults[.nonManualMode] = modeKey != .manual
                 CachedDefaults[.clockMode] = modeKey == .clock
                 CachedDefaults[.syncMode] = modeKey == .sync
