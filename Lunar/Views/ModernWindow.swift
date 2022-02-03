@@ -30,6 +30,7 @@ extension NSView {
 
         wantsLayer = true
         layer?.mask = maskLayer
+        layer?.cornerCurve = .continuous
     }
 }
 

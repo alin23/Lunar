@@ -19,6 +19,16 @@ class SliderCell: NSSliderCell {
     @IBInspectable dynamic var imageOpacity: CGFloat = 1.0
     @IBInspectable dynamic var verticalPadding: CGFloat = 10
     @IBInspectable dynamic var cornerRadius: CGFloat = 4
+    @IBInspectable dynamic var drawText = true
+    @IBInspectable dynamic var borderOpacity: CGFloat = 0.02
+    @IBInspectable dynamic var bgOpacity: CGFloat = 0.3
+
+    var shouldDrawText: Bool {
+        guard tag != QUICK_ACTIONS_SLIDER_CELL_TAG else {
+            return CachedDefaults[.showSliderValues]
+        }
+        return drawText
+    }
 
     @IBInspectable dynamic var color = NSColor(named: "Slider")! {
         didSet { controlView?.needsDisplay = true }
@@ -86,6 +96,20 @@ class SliderCell: NSSliderCell {
 //        color.blended(withFraction: 0.2, of: .gray)!.setStroke()
 //        knob.stroke()
 
+        if shouldDrawText {
+            let centered = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
+            centered.alignment = .center
+
+            let font = NSFont.systemFont(ofSize: 9, weight: .semibold)
+            let textHeight = font.boundingRectForFont.height
+            let textRect = NSRect(x: rect.minX, y: rect.midY - (textHeight / 2), width: rect.width, height: textHeight)
+            (value * 100).str(decimals: 0)
+                .withFont(font)
+                .withTextColor(knobColor.hsb.2 > 70 ? .black : .white)
+                .withParagraphStyle(centered)
+                .draw(in: textRect)
+        }
+
         guard let knobImage = knobImage else {
             return
         }
@@ -120,9 +144,9 @@ class SliderCell: NSSliderCell {
 
         let bg = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
         let color = isEnabled ? color : (color.blended(withFraction: 0.5, of: .gray) ?? .gray)
-        color.withAlphaComponent(0.3).setFill()
+        color.withAlphaComponent(bgOpacity).setFill()
         bg.fill()
-        color.withAlphaComponent(0.02).setStroke()
+        sliderBorderColor.withAlphaComponent(borderOpacity).setStroke()
         bg.stroke()
 
         let value = (minValue == 0 && maxValue == 1) ? CGFloat(floatValue) : CGFloat(mapNumber(

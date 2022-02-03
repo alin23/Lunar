@@ -1414,7 +1414,7 @@
             <sparkle:version>5.2.3</sparkle:version>
             <sparkle:shortVersionString>5.2.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.3.dmg" length="16785409" type="application/octet-stream" sparkle:edSignature="pR7bZ+ObGLxtxkBcN+hmE/3qF4eHyfaAXM2CSrEJPH13cjOybYRBCYhaC6OVsTauf2iNPVQuBdDdlUTUmIRYCA==" sparkle:dsaSignature="MEQCIBk/QO+YI5xv28iY1KLDa9uJsWpGcPvbaz72h5xAJfyZAiA1mTzaLWQsCSKC8x0aCc4BUOe0KARgj8fBa5iJoeBPkw=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.3.dmg" length="16787458" type="application/octet-stream" sparkle:edSignature="BviA0Y352MwzyYp27N6qgf/Kkw+maH7klP0nuD+B/IXtbOPAG/jkrDanbD9iqccOiwAoHi9lj2wd8fBsOSNRCw==" sparkle:dsaSignature="MEUCIFhltZ/CfeD7PQQz2Xf4a6IrFAeISUM1r95W+l74L8ciAiEAiAfyBnTMdrxbMw2sDRBY5pzvCbZf8Fvo5Iny0CFVGjU="/>
             <signature>Dd8cFTLkuaFksCQohmP9OBK6hwE=</signature>
             <signature>Xl0ukSFEx0kp+FQLqRXc+b42LbI=</signature>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
@@ -1422,6 +1422,17 @@
             <signature>06dgG3pISrKz7XUWJ3Tubjeg0ng=</signature>
             <signature>coIwKsi4I2.PLG4IGKqAfNfiB0E=</signature>
             <signature>coIwKsi4I2/PLG4IGKqAfNfiB0E=</signature>
+            <signature>DS6Jm62o9Gh8aXFOKhie.KE6jOU=</signature>
+            <signature>DS6Jm62o9Gh8aXFOKhie/KE6jOU=</signature>
+            <signature>.ECk7p01MszyTW2BaM8P4lxZmbc=</signature>
+            <signature>/ECk7p01MszyTW2BaM8P4lxZmbc=</signature>
+            <signature>9uAlQBdvSC.wX.THczLDNxorhwU=</signature>
+            <signature>9uAlQBdvSC/wX/THczLDNxorhwU=</signature>
+            <signature>jPizdTSkcM94wkUcKz9Jt0pAmsw=</signature>
+            <signature>S3DOvThd2uTliBdoMcxJgqmbpMo=</signature>
+            <signature>tqcdzb+iCq7cAUBK8745XQQVLz4=</signature>
+            <signature>M0Oi6Vdoa7I2Vmkr+47OPkf0QRE=</signature>
+            <signature>plnGmtTQbJg4yVQ2WuwIDFlnFk4=</signature>
         </item>
     </channel>
 </rss>
