@@ -47,7 +47,6 @@ class QuickActionsView: NSView {
     override func makeBackingLayer() -> CALayer {
         NoClippingLayer()
     }
-
 }
 
 // MARK: - QuickActionsViewController

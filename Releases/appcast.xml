@@ -1414,7 +1414,7 @@
             <sparkle:version>5.2.3</sparkle:version>
             <sparkle:shortVersionString>5.2.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.3.dmg" length="16787458" type="application/octet-stream" sparkle:edSignature="BviA0Y352MwzyYp27N6qgf/Kkw+maH7klP0nuD+B/IXtbOPAG/jkrDanbD9iqccOiwAoHi9lj2wd8fBsOSNRCw==" sparkle:dsaSignature="MEUCIFhltZ/CfeD7PQQz2Xf4a6IrFAeISUM1r95W+l74L8ciAiEAiAfyBnTMdrxbMw2sDRBY5pzvCbZf8Fvo5Iny0CFVGjU="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.2.3.dmg" length="16787458" type="application/octet-stream" sparkle:edSignature="BviA0Y352MwzyYp27N6qgf/Kkw+maH7klP0nuD+B/IXtbOPAG/jkrDanbD9iqccOiwAoHi9lj2wd8fBsOSNRCw==" sparkle:dsaSignature="MEQCIAn2s+dbgYQ3VkaNah6VJkzysRQTDX/fyOMG02V2A1i/AiBb8gYoV7QRiJI8FbPddSZMUbogIaDTZJ8O4cp7dyQ6xQ=="/>
             <signature>Dd8cFTLkuaFksCQohmP9OBK6hwE=</signature>
             <signature>Xl0ukSFEx0kp+FQLqRXc+b42LbI=</signature>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
@@ -1433,6 +1433,8 @@
             <signature>tqcdzb+iCq7cAUBK8745XQQVLz4=</signature>
             <signature>M0Oi6Vdoa7I2Vmkr+47OPkf0QRE=</signature>
             <signature>plnGmtTQbJg4yVQ2WuwIDFlnFk4=</signature>
+            <signature>SiQd0qw4+EY0e9NieJwGyEaXrb0=</signature>
+            <signature>K+5X7g9mAvYmTeZdkJgbgKuzkl0=</signature>
         </item>
     </channel>
 </rss>

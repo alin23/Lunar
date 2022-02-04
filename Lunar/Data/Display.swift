@@ -1178,7 +1178,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func setAudioIdentifier(from dict: NSDictionary) {
         #if !arch(arm64)
-            guard let prefsKey = infoDictionary["IODisplayPrefsKey"] as? String,
+            guard let prefsKey = dict["IODisplayPrefsKey"] as? String,
                   let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
                   let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
             else { return }
@@ -3137,6 +3137,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func startControls() {
         guard !isGeneric(id) else { return }
+        ensureAudioIdentifier()
 
         if CachedDefaults[.refreshValues] {
             serialQueue.async { [weak self] in
@@ -3234,7 +3235,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         ]
     }
 
+    func ensureAudioIdentifier() {
+        #if !arch(arm64)
+            if (infoDictionary["IODisplayPrefsKey"] as? String) == nil, let dict = displayInfoDictionary(id) {
+                infoDictionary = dict
+                setAudioIdentifier(from: infoDictionary)
+            }
+        #endif
+    }
+
     func detectI2C() {
+        ensureAudioIdentifier()
         guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault, !isDummy
         else {
             if isSmartBuiltin {
