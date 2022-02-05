@@ -1442,12 +1442,15 @@
             <sparkle:version>5.3.0</sparkle:version>
             <sparkle:shortVersionString>5.3.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.0.dmg" length="16803604" type="application/octet-stream" sparkle:edSignature="U/ciVWjJjsgDnFiWumPwF2OxZR0hP2mVLR9Gwrm3N5Hv6iqGhwEDZs2RFj0XN6jyI78vmpmgjf+T1OMabCb3AQ==" sparkle:dsaSignature="MEUCIQCOk5qGrVbHXwTxjFdjVYQBPt0acnI/FqWaUwt5Mu7LoAIgdltV41onmzkA2AAZW9reOkCNKkp1hdqlmT7JiepDtgg="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.0.dmg" length="16803604" type="application/octet-stream" sparkle:edSignature="U/ciVWjJjsgDnFiWumPwF2OxZR0hP2mVLR9Gwrm3N5Hv6iqGhwEDZs2RFj0XN6jyI78vmpmgjf+T1OMabCb3AQ==" sparkle:dsaSignature="MEUCIFLH95NZGUxwWPBtP6m7/tGyaS+KbLMa1YLh0+/8NZ2CAiEApa/LzHX0F4zEXG1ogHZRNR4pJ+AjooJrkXx5xVSQvIk="/>
             <signature>hwxlICsFnehP4Y.m8jovk8dSzUc=</signature>
             <signature>hwxlICsFnehP4Y/m8jovk8dSzUc=</signature>
             <signature>MV4LLEcakGoWdJrwKIoIzH+f5dY=</signature>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: .9rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Show slider values on the knob</li><li>Improve slider contrast</li><li>Add glass material to QuickActions</li><li>Detect HDMI port properly on the M1 Pro and M1 Max<ul><li>This will disable DDC automatically for that port as there's still no way to send DDC commands through it</li></ul></li></ul><h2 id="fixes">Fixes</h2><ul><li>Hide second background of QuickActions when Reduce Transparency is active</li><li>Make sure to re-enable adaptive brightness on built-in after switching from Manual to other modes while in an App Preset</li></ul></div></div>]]></description>
+            <signature>gBQ29RkGL2sdh1d06wY1aC7ec.8=</signature>
+            <signature>gBQ29RkGL2sdh1d06wY1aC7ec/8=</signature>
+            <signature>uHnn1+glxYYVYNhXo2JnJLDKzR8=</signature>
         </item>
     </channel>
 </rss>

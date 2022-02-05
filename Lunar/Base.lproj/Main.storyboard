@@ -1006,7 +1006,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="389" y="656" width="171" height="29"/>
+                                <rect key="frame" x="388" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -2951,7 +2951,7 @@ visible screen left</string>
                                 </scroller>
                             </scrollView>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s2w-VK-m8s" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="182" y="526" width="112" height="18"/>
+                                <rect key="frame" x="181" y="526" width="112" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Needs Lunar Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="9Tq-dz-jUi">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3869,7 +3869,7 @@ disabled</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WET-aM-MU7" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="30" y="5" width="180" height="146"/>
+                                            <rect key="frame" x="29" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
@@ -3919,7 +3919,7 @@ disabled</string>
                                             </connections>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c7W-w3-0q6" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="747" y="5" width="180" height="146"/>
+                                            <rect key="frame" x="746" y="5" width="180" height="146"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
@@ -3997,7 +3997,7 @@ disabled</string>
                                 </connections>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi">
-                                <rect key="frame" x="378" y="253" width="193" height="22"/>
+                                <rect key="frame" x="377" y="253" width="193" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4208,7 +4208,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="396" y="40" width="157" height="14"/>
+                                <rect key="frame" x="395" y="40" width="157" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Show advanced settings" alternateTitle="Hide advanced settings" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -9483,7 +9483,7 @@ to send arbitrary DDC commands to monitors</string>
         <scene sceneID="7ik-2e-ouh">
             <objects>
                 <viewController storyboardIdentifier="DDCPopoverController" id="JzB-v1-VXs" customClass="DDCPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="O4f-dy-3wr">
+                    <view key="view" id="O4f-dy-3wr">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="548"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -9515,7 +9515,8 @@ to send arbitrary DDC commands to monitors</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.redGain" id="q1Q-VF-hRt"/>
+                                    <binding destination="JzB-v1-VXs" name="maxValue" keyPath="self.display.maxColorGain" id="GwN-1y-PSl"/>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.redGain" previousBinding="GwN-1y-PSl" id="3qM-y0-nPu"/>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="vk0-hY-IKP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -9546,7 +9547,8 @@ to send arbitrary DDC commands to monitors</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.greenGain" id="h3D-Wc-EfE"/>
+                                    <binding destination="JzB-v1-VXs" name="maxValue" keyPath="self.display.maxColorGain" id="jEO-bh-GcD"/>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.greenGain" previousBinding="jEO-bh-GcD" id="1Lz-rg-qjc"/>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="zMc-kW-K8Z" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -9577,11 +9579,12 @@ to send arbitrary DDC commands to monitors</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.blueGain" id="b2X-tf-JYe"/>
+                                    <binding destination="JzB-v1-VXs" name="maxValue" keyPath="self.display.maxColorGain" id="YYH-eo-l4C"/>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.blueGain" previousBinding="YYH-eo-l4C" id="PWK-8m-BPR"/>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E6J-H0-wkE">
-                                <rect key="frame" x="13" y="495" width="130" height="25"/>
+                                <rect key="frame" x="13" y="509" width="130" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Value Range" id="ZHG-Ld-rF6">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9613,7 +9616,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BW5-MP-UeP" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="221" y="496" width="66" height="22"/>
+                                <rect key="frame" x="221" y="510" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="GeQ-IP-z7o"/>
                                     <constraint firstAttribute="width" constant="66" id="SV4-QB-Cwn"/>
@@ -9641,7 +9644,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y6b-dB-TTa">
-                                <rect key="frame" x="13" y="315" width="154" height="25"/>
+                                <rect key="frame" x="13" y="329" width="154" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="LED Color Gain" id="rjA-HG-yD0">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9649,12 +9652,12 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tNH-AR-h2N" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="221" y="316" width="66" height="22"/>
+                                <rect key="frame" x="221" y="330" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Bfe-NJ-1zA"/>
                                     <constraint firstAttribute="height" constant="22" id="LJV-Em-W5k"/>
                                 </constraints>
-                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="end-dR-9iF">
+                                <buttonCell key="cell" type="inline" title="Reset" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="end-dR-9iF">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
@@ -9668,7 +9671,6 @@ to send arbitrary DDC commands to monitors</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="resetGamma:" target="21a-h6-6He" id="475-il-xcC"/>
                                     <binding destination="JzB-v1-VXs" name="target" keyPath="self.display" id="GLn-qk-4Wf">
                                         <dictionary key="options">
                                             <string key="NSSelectorName">resetColors</string>
@@ -9677,7 +9679,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DNx-3H-95T">
-                                <rect key="frame" x="13" y="438" width="83" height="17"/>
+                                <rect key="frame" x="13" y="452" width="83" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness" id="2CF-Pm-IsZ">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9685,7 +9687,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cAV-vg-GMw">
-                                <rect key="frame" x="13" y="403" width="67" height="17"/>
+                                <rect key="frame" x="13" y="417" width="67" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Contrast" id="gEc-Hh-2yT">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9693,7 +9695,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y8V-a2-Kyk">
-                                <rect key="frame" x="13" y="370" width="58" height="17"/>
+                                <rect key="frame" x="13" y="384" width="58" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Volume" id="kgf-Se-ewT">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9701,7 +9703,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DZc-3H-qPr" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="397" width="60" height="28"/>
+                                <rect key="frame" x="227" y="411" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="NrR-7U-ilM"/>
                                     <constraint firstAttribute="height" constant="28" id="g0a-Eo-GJK"/>
@@ -9733,7 +9735,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v71-fh-wyY" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="364" width="60" height="28"/>
+                                <rect key="frame" x="148" y="378" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="1PP-Dd-tQv"/>
                                     <constraint firstAttribute="width" constant="60" id="TYG-Fv-CHz"/>
@@ -9765,7 +9767,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ck2-cV-HqR" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="364" width="60" height="28"/>
+                                <rect key="frame" x="227" y="378" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="oO2-C4-V4g"/>
                                     <constraint firstAttribute="height" constant="28" id="uX8-l5-GkE"/>
@@ -9797,7 +9799,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qbi-XG-kgW" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="397" width="60" height="28"/>
+                                <rect key="frame" x="148" y="411" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="XSi-Ne-5p9"/>
                                     <constraint firstAttribute="height" constant="28" id="zKu-EU-n0p"/>
@@ -9829,7 +9831,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fTD-mn-mNa" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="432" width="60" height="28"/>
+                                <rect key="frame" x="148" y="446" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="Z8T-oR-wWR"/>
                                     <constraint firstAttribute="width" constant="60" id="r5L-UV-6qI"/>
@@ -9861,7 +9863,7 @@ to send arbitrary DDC commands to monitors</string>
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t3p-DW-pd4" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="227" y="432" width="60" height="28"/>
+                                <rect key="frame" x="227" y="446" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="AAG-ts-vtJ"/>
                                     <constraint firstAttribute="width" constant="60" id="RdU-ao-mtz"/>
@@ -9918,7 +9920,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHL-jq-7ru">
-                                <rect key="frame" x="211" y="438" width="13" height="17"/>
+                                <rect key="frame" x="211" y="452" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="p67-IV-Ymq">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9926,7 +9928,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SYN-qO-cgY">
-                                <rect key="frame" x="211" y="403" width="13" height="17"/>
+                                <rect key="frame" x="211" y="417" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="xNn-uT-xof">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9934,7 +9936,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iNk-3R-8Rl">
-                                <rect key="frame" x="211" y="370" width="13" height="17"/>
+                                <rect key="frame" x="211" y="384" width="13" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="–" id="a2A-cT-rIe">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9942,7 +9944,7 @@ Caution! In rare cases it can cause a kernel panic and you might need to restart
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sye-Nf-IV1">
-                                <rect key="frame" x="13" y="471" width="179" height="26"/>
+                                <rect key="frame" x="13" y="485" width="179" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="175" id="fKp-u4-bpp"/>
                                     <constraint firstAttribute="height" constant="26" id="oh2-5Y-iCl"/>
@@ -9956,7 +9958,7 @@ ranges different than 0 - 100</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QDa-PD-wyQ">
-                                <rect key="frame" x="13" y="291" width="183" height="26"/>
+                                <rect key="frame" x="13" y="305" width="183" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="179" id="TxT-6B-7pn"/>
                                     <constraint firstAttribute="height" constant="26" id="hWu-X3-I0n"/>
@@ -9969,6 +9971,16 @@ the LED backlight of the monitor</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" ambiguous="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="2qr-N3-cfw">
+                                <rect key="frame" x="13" y="284" width="134" height="18"/>
+                                <buttonCell key="cell" type="check" title="Re-apply on wake" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yij-Le-csY">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.reapplyColorGain" id="veJ-au-mnd"/>
+                                </connections>
+                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k4C-cA-Pqe">
                                 <rect key="frame" x="173" y="101" width="32" height="16"/>
                                 <constraints>
@@ -10095,6 +10107,33 @@ in the Quick Actions menu</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="esR-sk-lwD" customClass="Button" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="221" y="306" width="66" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="ar9-sL-MaE"/>
+                                    <constraint firstAttribute="height" constant="22" id="v68-L9-HSZ"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Extend" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="sF8-7l-wcK">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="roundedness">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="pageType">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                        <color key="value" name="Button BG"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="resetGamma:" target="21a-h6-6He" id="zGf-BF-hAw"/>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.extendedColorGain" id="tTP-dH-12w"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="yRy-M9-7Ef" firstAttribute="leading" secondItem="RPr-NW-Qx6" secondAttribute="trailing" constant="3" id="3M0-4E-uja"/>
@@ -10102,6 +10141,7 @@ in the Quick Actions menu</string>
                             <constraint firstItem="LUX-64-DtM" firstAttribute="top" secondItem="5xI-sa-EcU" secondAttribute="bottom" constant="-10" id="3jB-Ee-PyT"/>
                             <constraint firstItem="fFF-ZM-Emx" firstAttribute="width" secondItem="zMc-kW-K8Z" secondAttribute="width" id="3we-RC-cKM"/>
                             <constraint firstItem="fFF-ZM-Emx" firstAttribute="centerX" secondItem="zMc-kW-K8Z" secondAttribute="centerX" id="4xz-Kh-EXu"/>
+                            <constraint firstItem="l2v-Yw-wzp" firstAttribute="top" secondItem="2qr-N3-cfw" secondAttribute="bottom" constant="10" id="5Fm-Pl-MP1"/>
                             <constraint firstItem="GDr-wf-jzJ" firstAttribute="leading" secondItem="Y6b-dB-TTa" secondAttribute="leading" id="5S4-Pb-PSP"/>
                             <constraint firstAttribute="trailing" secondItem="t3p-DW-pd4" secondAttribute="trailing" constant="13" id="6Yl-bh-c4H"/>
                             <constraint firstItem="SYN-qO-cgY" firstAttribute="centerY" secondItem="Qbi-XG-kgW" secondAttribute="centerY" id="6bz-Rw-v5W"/>
@@ -10154,7 +10194,6 @@ in the Quick Actions menu</string>
                             <constraint firstAttribute="trailing" secondItem="DZc-3H-qPr" secondAttribute="trailing" constant="13" id="fzp-HL-s9v"/>
                             <constraint firstItem="iNk-3R-8Rl" firstAttribute="leading" secondItem="v71-fh-wyY" secondAttribute="trailing" constant="5" id="gf0-mb-szM"/>
                             <constraint firstItem="fTD-mn-mNa" firstAttribute="centerY" secondItem="DNx-3H-95T" secondAttribute="centerY" id="giZ-AY-Uoz"/>
-                            <constraint firstItem="l2v-Yw-wzp" firstAttribute="top" secondItem="Y6b-dB-TTa" secondAttribute="bottom" constant="40" id="h9W-u1-Sxj"/>
                             <constraint firstItem="10M-jG-PSH" firstAttribute="centerY" secondItem="5xI-sa-EcU" secondAttribute="centerY" id="hJI-dN-tjx"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="leading" secondItem="bJS-rP-OSB" secondAttribute="leading" id="igT-c1-MmT"/>
                             <constraint firstItem="ZDJ-FM-LCR" firstAttribute="leading" secondItem="yRy-M9-7Ef" secondAttribute="trailing" constant="3" id="k2v-AA-9aZ"/>
@@ -10162,6 +10201,7 @@ in the Quick Actions menu</string>
                             <constraint firstItem="cAV-vg-GMw" firstAttribute="top" secondItem="DNx-3H-95T" secondAttribute="bottom" constant="18" id="lBa-EU-teb"/>
                             <constraint firstItem="k4C-cA-Pqe" firstAttribute="centerY" secondItem="5xI-sa-EcU" secondAttribute="centerY" id="lU6-eS-h9Z"/>
                             <constraint firstItem="Y6b-dB-TTa" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="laD-Hv-oER"/>
+                            <constraint firstItem="esR-sk-lwD" firstAttribute="top" secondItem="tNH-AR-h2N" secondAttribute="bottom" constant="2" id="lya-0x-LUK"/>
                             <constraint firstItem="iNk-3R-8Rl" firstAttribute="centerY" secondItem="v71-fh-wyY" secondAttribute="centerY" id="mJz-OW-Kgv"/>
                             <constraint firstItem="BW5-MP-UeP" firstAttribute="centerY" secondItem="E6J-H0-wkE" secondAttribute="centerY" id="mPi-ga-Yar"/>
                             <constraint firstAttribute="trailing" secondItem="ck2-cV-HqR" secondAttribute="trailing" constant="13" id="nSZ-Mn-EW0"/>
@@ -10174,7 +10214,9 @@ in the Quick Actions menu</string>
                             <constraint firstItem="bJS-rP-OSB" firstAttribute="leading" secondItem="l2v-Yw-wzp" secondAttribute="leading" id="sg4-Ge-10V"/>
                             <constraint firstItem="l2v-Yw-wzp" firstAttribute="centerY" secondItem="FfO-ZH-c2f" secondAttribute="centerY" id="slO-qs-7l9"/>
                             <constraint firstItem="Qbi-XG-kgW" firstAttribute="centerY" secondItem="cAV-vg-GMw" secondAttribute="centerY" id="tLZ-BB-y9N"/>
+                            <constraint firstItem="2qr-N3-cfw" firstAttribute="top" secondItem="QDa-PD-wyQ" secondAttribute="bottom" constant="4" id="tQn-aO-DpA"/>
                             <constraint firstItem="GDr-wf-jzJ" firstAttribute="top" secondItem="fFF-ZM-Emx" secondAttribute="bottom" constant="20" id="vSU-Jz-yuR"/>
+                            <constraint firstItem="esR-sk-lwD" firstAttribute="centerX" secondItem="tNH-AR-h2N" secondAttribute="centerX" id="vuD-d0-RuK"/>
                             <constraint firstItem="RPr-NW-Qx6" firstAttribute="centerY" secondItem="yRy-M9-7Ef" secondAttribute="centerY" id="wvh-iU-0Up"/>
                             <constraint firstItem="ck2-cV-HqR" firstAttribute="centerY" secondItem="v71-fh-wyY" secondAttribute="centerY" id="xuM-ab-VK0"/>
                             <constraint firstItem="Y8V-a2-Kyk" firstAttribute="leading" secondItem="cAV-vg-GMw" secondAttribute="leading" id="yLn-1B-pZE"/>
