@@ -383,6 +383,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         cornerRadius = (try container.decodeIfPresent(Int.self, forKey: .cornerRadius)?.ns) ?? 0
 
+        reapplyColorGain = (try container.decodeIfPresent(Bool.self, forKey: .reapplyColorGain)) ?? false
+        extendedColorGain = (try container.decodeIfPresent(Bool.self, forKey: .extendedColorGain)) ?? false
         redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
         greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
         blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
@@ -691,6 +693,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         case cornerRadius
 
+        case reapplyColorGain
+        case extendedColorGain
         case redGain
         case greenGain
         case blueGain
@@ -813,6 +817,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .faceLightBrightness,
             .faceLightContrast,
             .cornerRadius,
+            .reapplyColorGain,
+            .extendedColorGain,
             .redGain,
             .greenGain,
             .blueGain,
@@ -1231,6 +1237,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
 
     @Atomic var userAdjusting = false
+
+    @objc dynamic var reapplyColorGain = false
+    @objc dynamic lazy var maxColorGain = extendedColorGain ? 255 : 100
 
     var preciseBrightnessContrastBeforeAppPreset = 0.5 {
         didSet {
@@ -2588,6 +2597,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         isDummy && !isInMirrorSet
     }
 
+    @objc dynamic var extendedColorGain = false {
+        didSet {
+            maxColorGain = extendedColorGain ? 255 : 100
+        }
+    }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
@@ -3544,6 +3559,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             try container.encode(cornerRadius.intValue, forKey: .cornerRadius)
 
+            try container.encode(reapplyColorGain, forKey: .reapplyColorGain)
+            try container.encode(extendedColorGain, forKey: .extendedColorGain)
             try container.encode(redGain.uint8Value, forKey: .redGain)
             try container.encode(greenGain.uint8Value, forKey: .greenGain)
             try container.encode(blueGain.uint8Value, forKey: .blueGain)
