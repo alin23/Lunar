@@ -1126,16 +1126,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                                 }
                             }
 
-                            for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled }) {
-                                if display.redGain.uint8Value != DEFAULT_COLOR_GAIN {
-                                    _ = display.control?.setRedGain(display.redGain.uint8Value)
-                                }
-                                if display.greenGain.uint8Value != DEFAULT_COLOR_GAIN {
-                                    _ = display.control?.setGreenGain(display.greenGain.uint8Value)
-                                }
-                                if display.blueGain.uint8Value != DEFAULT_COLOR_GAIN {
-                                    _ = display.control?.setBlueGain(display.blueGain.uint8Value)
-                                }
+                            for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
+                                _ = display.control?.setRedGain(display.redGain.uint8Value)
+                                _ = display.control?.setGreenGain(display.greenGain.uint8Value)
+                                _ = display.control?.setBlueGain(display.blueGain.uint8Value)
                             }
                         }
                     }
@@ -1531,16 +1525,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if CachedDefaults[.reapplyValuesAfterWake] {
             asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
-                for display in displayController.activeDisplays.values {
-                    if display.redGain.uint8Value != DEFAULT_COLOR_GAIN {
-                        _ = display.control?.setRedGain(display.redGain.uint8Value)
-                    }
-                    if display.greenGain.uint8Value != DEFAULT_COLOR_GAIN {
-                        _ = display.control?.setGreenGain(display.greenGain.uint8Value)
-                    }
-                    if display.blueGain.uint8Value != DEFAULT_COLOR_GAIN {
-                        _ = display.control?.setBlueGain(display.blueGain.uint8Value)
-                    }
+                for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
+                    _ = display.control?.setRedGain(display.redGain.uint8Value)
+                    _ = display.control?.setGreenGain(display.greenGain.uint8Value)
+                    _ = display.control?.setBlueGain(display.blueGain.uint8Value)
                 }
             }
         }
