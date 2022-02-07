@@ -105,7 +105,7 @@
         "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
           "branch": "dev",
-          "revision": "5ceb849fdd52833670fb897bf8428c9a5fb0a068",
+          "revision": "856f2708108ab9e3018405e9bf273318c28d7b32",
           "version": null
         }
       },
@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "5dcd5c245545a03a27988dcdb1a53f78fbee12a1",
-          "version": "7.8.0"
+          "revision": "967f04b3cd6989df3f9ced3060481a21646c146d",
+          "version": "7.9.0"
         }
       },
       {
@@ -159,7 +159,7 @@
         "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "75970285e2470f12a569cdff68ef5a75498a4646",
+          "revision": "0269196ce22d17155b4ce1f11bb118eda62cdf49",
           "version": null
         }
       },
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "e1465042f195f374b94f915ba8ca49de24300a0d",
-          "version": "1.0.2"
+          "revision": "e394bf350e38cb100b6bc4172834770ede1b7232",
+          "version": "1.0.3"
         }
       },
       {
