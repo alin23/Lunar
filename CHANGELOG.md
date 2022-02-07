@@ -1,3 +1,14 @@
+# 5.3.1
+## Improvements
+
+* Add a way to **extend the range** of Color Gain for professional displays like the **Wacom Cintiq Pro**
+* Add a way to **disable re-apply on wake** for Color Gain
+* Security updates to dependencies
+
+## Fixes
+
+* Fix colors being washed out because the Color Gain value of the monitor didn't match what Lunar had stored
+
 # 5.3.0
 ## Improvements
 
