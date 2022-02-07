@@ -9,6 +9,8 @@
 
 * Fix colors being washed out because the Color Gain value of the monitor didn't match what Lunar had stored
 
+![new color gain settings](https://files.lunar.fyi/color-gain-settings.png)
+
 # 5.3.0
 ## Improvements
 
