@@ -306,6 +306,8 @@ class DisplayViewController: NSViewController {
 
     var observers: Set<AnyCancellable> = []
 
+    var openedBlackoutPage = false
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainAsync { [weak self] in
@@ -1302,6 +1304,16 @@ class DisplayViewController: NSViewController {
         guard let serial = display?.serial else { return }
         CachedDefaults[.displays] = CachedDefaults[.displays]?.filter { $0.serial != serial }
         displayController.resetDisplayList()
+    }
+
+    @IBAction func autoBlackout(_: Any) {
+        guard lunarProOnTrial || lunarProActive || openedBlackoutPage else {
+            openedBlackoutPage = true
+            if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
     }
 
     @IBAction func powerOff(_: Any) {

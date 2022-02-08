@@ -156,10 +156,10 @@
       },
       {
         "package": "SimplyCoreAudio",
-        "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
+        "repositoryURL": "https://github.com/alin23/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "0269196ce22d17155b4ce1f11bb118eda62cdf49",
+          "revision": "8207a464541ade7b060827721d90cec6d225f1c2",
           "version": null
         }
       },
