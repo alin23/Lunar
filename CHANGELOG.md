@@ -1,3 +1,12 @@
+# 5.3.2
+## Improvements
+
+* Move the **Auto Blackout** setting to the main preferences screen
+
+## Fixes
+
+* Fix crash caused by SimplyCoreAudio deadlock
+
 # 5.3.1
 ## Improvements
 
