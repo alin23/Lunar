@@ -78,6 +78,7 @@
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C780CF98269F241A007FFB58 /* tsl2591.h in Resources */ = {isa = PBXBuildFile; fileRef = C780CF96269F2370007FFB58 /* tsl2591.h */; };
+		C789D9A927B288F8001EBCFE /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C789D9A827B288F8001EBCFE /* SimplyCoreAudio */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
 		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
@@ -132,7 +133,6 @@
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
-		C7CA0D4C26C1144B00E12CE5 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFF492271FF280002CB549 /* DDCPopoverController.swift */; };
@@ -401,10 +401,10 @@
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
+				C789D9A927B288F8001EBCFE /* SimplyCoreAudio in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
-				C7CA0D4C26C1144B00E12CE5 /* SimplyCoreAudio in Frameworks */,
 				C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C7E80E4626370780004718A4 /* Socket in Frameworks */,
@@ -807,12 +807,12 @@
 				C75FFA09266D24AA0034DDD6 /* Burritos */,
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
 				C77AB65B269A032E0046BA78 /* Magnet */,
-				C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */,
 				C748210326DFA44400556EA8 /* FuzzyFind */,
 				C765E4FA26FF9F3500FD6463 /* CryptorECC */,
 				C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */,
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
 				C7656C59277CD66400F4922A /* Sparkle */,
+				C789D9A827B288F8001EBCFE /* SimplyCoreAudio */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -871,12 +871,12 @@
 				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
-				C7CA0D4A26C1144B00E12CE5 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */,
 				C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */,
 				C7F99AC527175E0C00FBF192 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 				C7656C58277CD66400F4922A /* XCRemoteSwiftPackageReference "Sparkle" */,
+				C789D9A727B288F8001EBCFE /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1173,7 +1173,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.3.1;
+				CURRENT_PROJECT_VERSION = 5.3.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1199,7 +1199,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.3.1;
+				MARKETING_VERSION = 5.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1293,7 +1293,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.3.1;
+				CURRENT_PROJECT_VERSION = 5.3.2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1319,7 +1319,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.3.1;
+				MARKETING_VERSION = 5.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1474,7 +1474,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.3.1;
+				CURRENT_PROJECT_VERSION = 5.3.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1500,7 +1500,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.3.1;
+				MARKETING_VERSION = 5.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1539,7 +1539,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.3.1;
+				CURRENT_PROJECT_VERSION = 5.3.2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1565,7 +1565,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.3.1;
+				MARKETING_VERSION = 5.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1751,6 +1751,14 @@
 				kind = branch;
 			};
 		};
+		C789D9A727B288F8001EBCFE /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/SimplyCoreAudio";
+			requirement = {
+				branch = develop;
+				kind = branch;
+			};
+		};
 		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mxcl/Path.swift";
@@ -1781,14 +1789,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.2.0;
-			};
-		};
-		C7CA0D4A26C1144B00E12CE5 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rnine/SimplyCoreAudio";
-			requirement = {
-				branch = develop;
-				kind = branch;
 			};
 		};
 		C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */ = {
@@ -1927,6 +1927,11 @@
 			package = C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */;
 			productName = Magnet;
 		};
+		C789D9A827B288F8001EBCFE /* SimplyCoreAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C789D9A727B288F8001EBCFE /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
+			productName = SimplyCoreAudio;
+		};
 		C78BD049259B33D500FC823F /* Path */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */;
@@ -1946,11 +1951,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */;
 			productName = SwiftyAttributes;
-		};
-		C7CA0D4B26C1144B00E12CE5 /* SimplyCoreAudio */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7CA0D4A26C1144B00E12CE5 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
-			productName = SimplyCoreAudio;
 		};
 		C7DA10F6259B8979006DD876 /* Regex */ = {
 			isa = XCSwiftPackageProductDependency;
