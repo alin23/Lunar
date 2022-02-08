@@ -44,6 +44,12 @@ class LockButton: NSButton {
     @IBInspectable dynamic var bgOn: NSColor = lockButtonBgOn
     @IBInspectable dynamic var bgOff: NSColor = lockButtonBgOff
 
+    @IBOutlet var notice: NSTextField? {
+        didSet {
+            notice?.alphaValue = 0.0
+        }
+    }
+
     @IBInspectable dynamic var verticalPadding: CGFloat = 0.7 {
         didSet {
             adaptSize()
@@ -133,6 +139,7 @@ class LockButton: NSButton {
             bg = bgOff
         }
         trackHover(cursor: true)
+        notice?.alphaValue = 0.0
     }
 
     override func mouseEntered(with _: NSEvent) {
@@ -144,6 +151,8 @@ class LockButton: NSButton {
         } else {
             bg = bgOffHover
         }
+        notice?.transition(0.4)
+        notice?.alphaValue = 1.0
     }
 
     override func mouseExited(with _: NSEvent) {
@@ -155,6 +164,8 @@ class LockButton: NSButton {
         } else {
             bg = bgOff
         }
+        notice?.transition(0.4)
+        notice?.alphaValue = 0.0
     }
 
     override func draw(_ dirtyRect: NSRect) {
