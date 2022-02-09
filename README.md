@@ -28,7 +28,7 @@
 ## Features ##
 - **[Native keyboard control](https://lunar.fyi/#keys)** and hotkeys for setting brightness, volume and contrast that respect the min/max values per monitor
 - **[Sensor-based Adaptive Brightness](https://lunar.fyi/#sensor)** (and contrast) based on [an external light sensor](https://lunar.fyi/sensor)
-- **[Sync-based Adaptive Brightness](https://lunar.fyi/#sync)** (and contrast) based on the built-in light sensor of the Macbook or iMac
+- **[Sync-based Adaptive Brightness](https://lunar.fyi/#sync)** (and contrast) based on the built-in light sensor of the MacBook or iMac
 - **[Location-based Adaptive Brightness](https://lunar.fyi/#location)** (and contrast) based on the sunrise/sunset times in your location
 - **[App Exception](https://lunar.fyi/#configuration-page)** list if you need more brightness for specific activities (watching movies, design work)
 - **[Input switching](#input-hotkeys)** from a convenient dropdown or using up to 3 input-specific hotkeys
