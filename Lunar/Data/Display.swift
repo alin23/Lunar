@@ -3184,13 +3184,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             listensForBrightnessChange ? 3.seconds : 1.seconds,
             uniqueTaskKey: "Builtin Brightness Refresher",
             skipIfExists: true,
-            eager: true
-        ) { [weak self] timer in
+            eager: true,
+            queue: .main
+        ) { [weak self] in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
-                timer.tolerance = 10
                 return
             }
-            if timer.tolerance != 1 { timer.tolerance = 1 }
             self.refreshBrightness()
         }
         asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true) { [weak self] timer in
