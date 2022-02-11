@@ -84,6 +84,10 @@ class HotkeyPopoverController: NSViewController {
 
                 _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
                 _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
+                mainAsyncAfter(ms: 1000) {
+                    display.input = display.hotkeyInput1
+                }
+                return
             }
             display.input = display.hotkeyInput1
         }
@@ -112,6 +116,10 @@ class HotkeyPopoverController: NSViewController {
 
                 _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
                 _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
+                mainAsyncAfter(ms: 1000) {
+                    display.input = display.hotkeyInput2
+                }
+                return
             }
             display.input = display.hotkeyInput2
         }
@@ -140,6 +148,10 @@ class HotkeyPopoverController: NSViewController {
 
                 _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
                 _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
+                mainAsyncAfter(ms: 1000) {
+                    display.input = display.hotkeyInput3
+                }
+                return
             }
             display.input = display.hotkeyInput3
         }
