@@ -4633,7 +4633,7 @@ and contrast to their highest values</string>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="upY-F0-APc" name="value" keyPath="values.mediaKeysControlAllMonitors" id="oqj-cx-3kc"/>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeHotkeysControlAllMonitors" id="oqj-cx-3kc"/>
                                             </connections>
                                         </button>
                                     </subviews>
