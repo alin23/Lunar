@@ -60,6 +60,7 @@ class HotkeyViewController: NSViewController {
         CachedDefaults.reset(.volumeKeysEnabled)
         CachedDefaults.reset(.useAlternateBrightnessKeys)
         CachedDefaults.reset(.mediaKeysControlAllMonitors)
+        CachedDefaults.reset(.volumeHotkeysControlAllMonitors)
 
         CachedDefaults.reset(.brightnessKeysSyncControl)
         CachedDefaults.reset(.brightnessKeysControl)
