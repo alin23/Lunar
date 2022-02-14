@@ -1377,7 +1377,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func volumeUpAction(offset: Int? = nil) {
-        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+        let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
         increaseVolume(by: offset, currentAudioDisplay: !allMonitors)
 
@@ -1395,7 +1395,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func volumeDownAction(offset: Int? = nil) {
-        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+        let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
         decreaseVolume(by: offset, currentAudioDisplay: !allMonitors)
 
@@ -1413,7 +1413,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func muteAudioHotkeyHandler() {
-        let allMonitors = CachedDefaults[.mediaKeysControlAllMonitors]
+        let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
         toggleAudioMuted(currentAudioDisplay: !allMonitors)
 

@@ -1210,7 +1210,7 @@ and setting its brightness/contrast to 0</string>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2FD-df-bTF">
                                     <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Forward brightness keys to the system for built-in 
+                                    <string key="title">Forward brightness keys to the system for built-in
 Disables "Hotkey Step" but persists brightness better</string>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -4378,7 +4378,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3e4-2T-uSq">
-                                            <rect key="frame" x="13" y="332" width="78" height="19"/>
+                                            <rect key="frame" x="13" y="362" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="jT7-rI-1rC">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4387,7 +4387,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
-                                            <rect key="frame" x="0.0" y="396" width="247" height="51"/>
+                                            <rect key="frame" x="0.0" y="429" width="247" height="51"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable to free up F14/F15 keys. Might not work on all keyboards" id="kPG-QJ-rNC">
                                                 <font key="font" size="11" name="Menlo-Regular"/>
@@ -4416,7 +4416,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RZN-qo-Knd" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="306" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="336" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="62m-O0-ejM" id="Wj4-48-ddQ" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4454,7 +4454,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IFX-Lv-Too">
-                                            <rect key="frame" x="0.0" y="358" width="305" height="25"/>
+                                            <rect key="frame" x="0.0" y="388" width="305" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Brightness keys adjust" id="Hen-8a-cpa">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4463,7 +4463,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9SN-bX-ipB">
-                                            <rect key="frame" x="5" y="305" width="86" height="19"/>
+                                            <rect key="frame" x="5" y="335" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Anu-4Q-8pe">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4472,7 +4472,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ske-w4-cem" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="334" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="364" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="GrK-so-l5A" id="fgz-OR-aj6" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4516,7 +4516,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="64T-5y-0v5">
-                                            <rect key="frame" x="13" y="237" width="78" height="19"/>
+                                            <rect key="frame" x="13" y="267" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="nMr-wY-hZu">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4525,7 +4525,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L5R-Jf-CYq" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="211" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="241" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="CRe-nn-c6r" id="pxu-I3-TJW" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4563,7 +4563,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iiF-bT-vMa">
-                                            <rect key="frame" x="0.0" y="263" width="305" height="25"/>
+                                            <rect key="frame" x="0.0" y="293" width="305" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Ctrl+Brightness keys adjust" id="bu9-l5-Uan">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4572,7 +4572,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FhM-JW-maE">
-                                            <rect key="frame" x="5" y="210" width="86" height="19"/>
+                                            <rect key="frame" x="5" y="240" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Edw-yU-lJa">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4581,7 +4581,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xvH-4n-Tdb" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="239" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="269" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="K6k-uA-bhA" id="gYb-Qy-LM6" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4625,7 +4625,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wc5-nt-nOZ">
-                                            <rect key="frame" x="11" y="142" width="78" height="19"/>
+                                            <rect key="frame" x="11" y="172" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="k0I-L6-w90">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4634,7 +4634,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="whW-nP-Sm4" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="113" y="116" width="73" height="12"/>
+                                            <rect key="frame" x="113" y="146" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="fRv-Fr-fuC" id="qg7-MK-IF7" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4672,7 +4672,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ebb-yB-Fsv">
-                                            <rect key="frame" x="-2" y="168" width="305" height="25"/>
+                                            <rect key="frame" x="-2" y="198" width="305" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Shift+Brightness keys adjust" id="L8p-e6-fZh">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4681,7 +4681,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8U-UN-0gm">
-                                            <rect key="frame" x="3" y="115" width="86" height="19"/>
+                                            <rect key="frame" x="3" y="145" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Oja-ib-XhU">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4690,7 +4690,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sQt-gS-ue8" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="113" y="144" width="73" height="12"/>
+                                            <rect key="frame" x="113" y="174" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="fyN-kS-fMs" id="xeS-zp-kJh" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4745,7 +4745,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ese-6H-Ch6">
-                                            <rect key="frame" x="2" y="448" width="305" height="20"/>
+                                            <rect key="frame" x="2" y="481" width="305" height="20"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <buttonCell key="cell" type="check" title="F14/F15 as brightness keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="MFI-Wk-4bg">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -4753,17 +4753,6 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="upY-F0-APc" name="value" keyPath="values.useAlternateBrightnessKeys" id="UcE-vx-PVW"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iDs-n5-cCa">
-                                            <rect key="frame" x="1" y="481" width="305" height="20"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="check" title="Volume keys control all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="YI2-0t-Q6Z">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" size="14" name="Menlo-Bold"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="upY-F0-APc" name="value" keyPath="values.mediaKeysControlAllMonitors" id="oqj-cx-3kc"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -4876,14 +4865,14 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
                             </box>
                             <box fixedFrame="YES" title="Volume" translatesAutoresizingMaskIntoConstraints="NO" id="kwR-HX-YdF">
-                                <rect key="frame" x="341" y="93" width="289" height="176"/>
+                                <rect key="frame" x="341" y="48" width="289" height="221"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="7HP-u7-kKJ">
-                                    <rect key="frame" x="3" y="3" width="283" height="155"/>
+                                    <rect key="frame" x="3" y="3" width="283" height="200"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y4u-jp-6fx">
-                                            <rect key="frame" x="0.0" y="67" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="112" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Down" id="vfr-RN-7ui">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4892,7 +4881,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YXN-jH-AYQ">
-                                            <rect key="frame" x="0.0" y="109" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="154" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Up" id="WqD-Ml-vhu">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4901,7 +4890,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXp-UA-sml" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="60" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="105" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4910,7 +4899,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dVT-T8-W1q" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="102" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="147" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4919,7 +4908,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d1c-vq-bzf">
-                                            <rect key="frame" x="0.0" y="25" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="70" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Mute" id="aka-pF-4Op">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4928,7 +4917,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SUd-lg-U7d" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="18" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="63" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4936,6 +4925,17 @@ Turns the display back on when the last monitor is disconnected</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iDs-n5-cCa">
+                                            <rect key="frame" x="53" y="23" width="222" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="check" title="Control all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="YI2-0t-Q6Z">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeHotkeysControlAllMonitors" id="oqj-cx-3kc"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
