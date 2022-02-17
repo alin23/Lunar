@@ -113,7 +113,10 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     override func mouseDown(with event: NSEvent) {
         onClick?()
 
-        guard let popover = display?._hotkeyPopover, isEnabled else { return }
+        guard let display = display, let popover = display._hotkeyPopover, isEnabled else { return }
+        if popover.contentViewController == nil {
+            setup(from: display)
+        }
         handlePopoverClick(popover, with: event)
         window?.makeFirstResponder(popoverController?.dropdown1)
     }
