@@ -1331,9 +1331,9 @@ class DisplayViewController: NSViewController {
             if !display.blackOutEnabled {
                 displayController.blackOut(display: display.id, state: .on)
             } else {
-                let mirrored = CGDisplayMirrorsDisplay(display.id)
+//                let mirrored = CGDisplayMirrorsDisplay(display.id)
                 displayController.blackOut(
-                    display: (mirrored != kCGNullDirectDisplay) ? mirrored : display.id,
+                    display: display.id,
                     state: .off
                 )
             }

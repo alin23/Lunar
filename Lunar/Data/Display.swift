@@ -527,7 +527,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             enabledControls[.gamma] = !DDC.isSmartBuiltinDisplay(_id)
         }
 
-        mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
+        if !isInMirrorSet {
+            mirroredBeforeBlackOut = false
+        } else {
+            mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
+        }
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
             (isNative ? (brightness.uint8Value <= 1) : true)
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
@@ -1008,7 +1012,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
-                asyncEvery(2.seconds, uniqueTaskKey: "primaryMirrorScreen-\(self.serial)", runs: 5, skipIfExists: false) { [weak self] _ in
+                asyncEvery(
+                    2.seconds,
+                    uniqueTaskKey: "primaryMirrorScreen-\(self.serial)",
+                    runs: 5,
+                    skipIfExists: false,
+                    queue: mainQueue
+                ) { [weak self] _ in
                     guard let self = self else { return }
                     self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
                 }
@@ -1029,7 +1039,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     2.seconds,
                     uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
                     runs: 5,
-                    skipIfExists: false
+                    skipIfExists: false,
+                    queue: mainQueue
                 ) { [weak self] _ in
                     guard let self = self else { return }
                     self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
@@ -1047,7 +1058,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.screen = self.getScreen()
-                asyncEvery(2.seconds, uniqueTaskKey: "screen-\(self.serial)", runs: 5, skipIfExists: false) { [weak self] _ in
+                asyncEvery(
+                    2.seconds,
+                    uniqueTaskKey: "screen-\(self.serial)",
+                    runs: 5,
+                    skipIfExists: false,
+                    queue: mainQueue
+                ) { [weak self] _ in
                     guard let self = self else { return }
                     self.screen = self.getScreen()
                 }
