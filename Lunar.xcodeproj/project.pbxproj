@@ -74,6 +74,7 @@
 		C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C776416E272139A100C7C308 /* ResetPopoverController.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
 		C77AB65C269A032E0046BA78 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C77AB65B269A032E0046BA78 /* Magnet */; };
+		C77B176927BE430200B957D1 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C77B176827BE430200B957D1 /* SimplyCoreAudio */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
@@ -400,6 +401,7 @@
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
 				C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */,
+				C77B176927BE430200B957D1 /* SimplyCoreAudio in Frameworks */,
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
@@ -810,6 +812,7 @@
 				C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */,
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
 				C7656C59277CD66400F4922A /* Sparkle */,
+				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -873,6 +876,7 @@
 				C7F99AC527175E0C00FBF192 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 				C7656C58277CD66400F4922A /* XCRemoteSwiftPackageReference "Sparkle" */,
+				C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1747,6 +1751,14 @@
 				kind = branch;
 			};
 		};
+		C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rnine/SimplyCoreAudio";
+			requirement = {
+				branch = develop;
+				kind = branch;
+			};
+		};
 		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mxcl/Path.swift";
@@ -1914,6 +1926,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */;
 			productName = Magnet;
+		};
+		C77B176827BE430200B957D1 /* SimplyCoreAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
+			productName = SimplyCoreAudio;
 		};
 		C78BD049259B33D500FC823F /* Path */ = {
 			isa = XCSwiftPackageProductDependency;
