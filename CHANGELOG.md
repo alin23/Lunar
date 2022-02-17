@@ -1,3 +1,12 @@
+# 5.3.3
+## Improvements
+
+* Move the *Volume keys control all monitors* setting to make its effect clearer
+
+## Fixes
+
+* Fix crash caused by reading built-in brightness on a different thread
+* Add 1 second delay between switching input and applying defined brightness on Input Hotkeys
 # 5.3.2
 ## Improvements
 

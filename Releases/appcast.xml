@@ -1471,7 +1471,7 @@
             <sparkle:version>5.3.2</sparkle:version>
             <sparkle:shortVersionString>5.3.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.2.dmg" length="16828765" type="application/octet-stream" sparkle:edSignature="5gNOrb6cBdTGH8xM8+mN6lF3s9VpdwzgBwUfaKsq36cnYhwUknAu/ZG63hMt4vDTLW+2rsRiLwXEwQLRdviCBw==" sparkle:dsaSignature="MEQCIFPkHJRTNoCFAV8s4UH71ES+c6PmEqwcHgE7bj5jRaGoAiAk65ZIIh/yz5qCXQGYTop8H/gyPLvJngWthF/h74/Qow=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.2.dmg" length="16828765" type="application/octet-stream" sparkle:edSignature="5gNOrb6cBdTGH8xM8+mN6lF3s9VpdwzgBwUfaKsq36cnYhwUknAu/ZG63hMt4vDTLW+2rsRiLwXEwQLRdviCBw==" sparkle:dsaSignature="MEUCIQCYRkBbEPo3snGkcW836HV/ZU4qWjq7x9Cm4QFzX4ZxrAIgLodJpc5M1yWU4lB3PaHevaoaOZWGgFvhQAUZDrRc2/E="/>
             <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
             <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: .9rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Move the <strong>Auto Blackout</strong> setting to the main preferences screen</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix crash caused by SimplyCoreAudio deadlock</li></ul></div></div>]]></description>
             <signature>PO9IxPc7UG6HdVlX2Ntch4LIBb0=</signature>
@@ -1480,6 +1480,18 @@
             <signature>P.CcKuuHDmp5D0tJy0qUYcIis5Q=</signature>
             <signature>P/CcKuuHDmp5D0tJy0qUYcIis5Q=</signature>
             <signature>KivpU0+Tz4w2Lj5RVXTPtYk5hdw=</signature>
+        </item>
+        <item>
+            <title>5.3.3</title>
+            <pubDate>Thu, 17 Feb 2022 10:35:48 +0200</pubDate>
+            <sparkle:version>5.3.3</sparkle:version>
+            <sparkle:shortVersionString>5.3.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.3.dmg" length="16830858" type="application/octet-stream" sparkle:edSignature="SAZ07toow23bg8NSWsImfRzPPE5icgpqj8yT9zgfwE7aMbrWrh/5r+jLKFrY5JxxqF2SHzYOBaCr6Hk4yMe3Ag==" sparkle:dsaSignature="MEUCIQCQrFEXuGeE/cywyXbD6YalR16mbXRKRrB+KyfS4R+ExQIgaJeDAnAYvxITIvsOAvj29td6DLPAbt+SLSeNlWpoZiE="/>
+            <signature>ZgIhIRNGF2hfJZP2+vKcwQ+3vYw=</signature>
+            <signature>IC6UvqmUt5V5r5gZfE8QZucSaYc=</signature>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: .9rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1 {        font-size: 2rem;    }    h2 {        font-size: 1.5rem;    }    h3 {        font-size: 1.25rem;    }    h4 {        font-size: 1.125rem;    }    h5 {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="improvements">Improvements</h2><ul><li>Move the <em>Volume keys control all monitors</em> setting to make its effect clearer</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix crash caused by reading built-in brightness on a different thread</li><li>Add 1 second delay between switching input and applying defined brightness on Input Hotkeys</li></ul></div></div>]]></description>
         </item>
     </channel>
 </rss>
