@@ -265,7 +265,7 @@ bool EDIDTestM1(IOAVServiceRef avService, struct EDID *edid, uint8_t edidData[25
 bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand *write);
 bool DDCRead(io_service_t framebuffer, struct DDCReadCommand *read);
 bool EDIDTest(io_service_t framebuffer, struct EDID *edid, uint8_t edidData[256]);
-IOAVServiceRef AVServiceFromDCPAVServiceProxy(io_service_t service);
+IOAVServiceRef AVServiceCreateFromDCPAVServiceProxy(io_service_t service);
 io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMutableDictionaryRef displayUUIDByEDID);
 io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID);
 io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID);

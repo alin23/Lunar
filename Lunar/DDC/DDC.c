@@ -146,7 +146,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     return NULL;
 }
 
-IOAVServiceRef AVServiceFromDCPAVServiceProxy(io_service_t service)
+IOAVServiceRef AVServiceCreateFromDCPAVServiceProxy(io_service_t service)
 {
     IOAVServiceRef avService = 0;
     if (&IOAVServiceCreateWithService != NULL) {
@@ -538,8 +538,10 @@ long DDCDelay(io_service_t framebuffer)
 
     CFStringRef ioRegPath = IORegistryEntryCopyPath(framebuffer, kIOServicePlane);
     if (CFStringFind(ioRegPath, CFSTR("/AMD"), kCFCompareCaseInsensitive).location != kCFNotFound) {
+        CFRelease(ioRegPath);
         return DDCDelayBase + 30000000; // Team Red needs more time, as usual!
     }
+    CFRelease(ioRegPath);
     return DDCDelayBase;
 }
 
