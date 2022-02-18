@@ -1,3 +1,9 @@
+# 5.3.4
+## Fixes
+
+* Fix BlackOut getting stuck in some rare cases
+* Release leaking memory on Intel DDC implementation with AMD GPU
+
 # 5.3.3
 ## Improvements
 
