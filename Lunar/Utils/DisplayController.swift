@@ -747,7 +747,7 @@ class DisplayController {
             ),
                 let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
                 firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) == nil,
-                let ioAvService = AVServiceFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
+                let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
                 !CFEqual(ioAvService, 0 as IOAVService),
                 // Check if DCPAVServiceProxy belongs to an external monitor
                 IORegistryEntryCreateCFProperties(dcpAvServiceProxy, &dcpAvServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
