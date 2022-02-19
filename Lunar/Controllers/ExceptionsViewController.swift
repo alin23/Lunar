@@ -119,8 +119,8 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
     @IBAction func proButtonClick(_: Any) {
         if lunarProActive, !lunarProOnTrial {
             NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
-        } else if lunarProBadSignature {
-            NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
+            // } else if lunarProBadSignature {
+            // NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
         } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
             if lunarProProduct.licenseCode != nil {
                 deactivateLicense {
