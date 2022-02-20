@@ -4226,6 +4226,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightBrightness = 100.ns
         faceLightContrast = 90.ns
 
+        blackOutEnabled = false
+        mirroredBeforeBlackOut = false
+
         userContrast[displayController.adaptiveModeKey]?.removeAll()
         userBrightness[displayController.adaptiveModeKey]?.removeAll()
 
@@ -4257,6 +4260,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
             .clock: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
         ]
+
+        adaptive = !Self.ambientLightCompensationEnabled(id)
+        adaptivePaused = false
 
         save()
 
