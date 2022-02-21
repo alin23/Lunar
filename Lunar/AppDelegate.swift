@@ -135,6 +135,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case advancedSettingsButton
     }
 
+    @Atomic static var optionKeyPressed = false
+    @Atomic static var shiftKeyPressed = false
+
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
@@ -175,6 +178,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var activateLicenseMenuItem: NSMenuItem!
     @IBOutlet var faceLightMenuItem: NSMenuItem!
     @IBOutlet var blackOutMenuItem: NSMenuItem!
+    @IBOutlet var blackOutNoMirroringMenuItem: NSMenuItem!
+    @IBOutlet var blackOutPowerOffMenuItem: NSMenuItem!
     @IBOutlet var faceLightExplanationMenuItem: NSMenuItem!
     @IBOutlet var blackOutExplanationMenuItem: NSMenuItem!
     @IBOutlet var infoMenuItem: NSMenuItem!
@@ -302,6 +307,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.restartApp(self)
             }
         }
+    }
+
+    @IBAction func blackOutPowerOff(_: Any) {
+        guard let display = displayController.mainExternalDisplay else { return }
+        _ = display.control?.setPower(.off)
     }
 
     func showTestWindow(text: String? = nil) {
@@ -453,6 +463,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
         for hotkey in hotkeys {
             hotkey.handleRegistration(persist: false)
+            guard let alternates = alternateHotkeysMapping[hotkey.identifier] else { continue }
+            for (flags, altIdentifier) in alternates {
+                guard let altHotkey = hotkeys.first(where: { $0.identifier == altIdentifier }) else {
+                    continue
+                }
+                altHotkey.isEnabled = hotkey.isEnabled && !NSEvent.ModifierFlags(carbonModifiers: hotkey.modifiers).contains(flags)
+                altHotkey.handleRegistration(persist: false)
+            }
         }
         CachedDefaults[.hotkeys] = hotkeys
 
@@ -1312,6 +1330,54 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
     }
 
+    func setKeyEquivalent(_ hotkeyIdentifier: HotkeyIdentifier) {
+        guard let menuItem = menuItem(hotkeyIdentifier) else { return }
+        Hotkey.setKeyEquivalent(hotkeyIdentifier.rawValue, menuItem: menuItem, hotkeys: CachedDefaults[.hotkeys])
+    }
+
+    func menuItem(_ hotkeyIdentifier: HotkeyIdentifier) -> NSMenuItem? {
+        switch hotkeyIdentifier {
+        case .lunar:
+            return preferencesMenuItem
+        case .restart:
+            return restartMenuItem
+        case .percent0:
+            return percent0MenuItem
+        case .percent25:
+            return percent25MenuItem
+        case .percent50:
+            return percent50MenuItem
+        case .percent75:
+            return percent75MenuItem
+        case .percent100:
+            return percent100MenuItem
+        case .faceLight:
+            return faceLightMenuItem
+        case .blackOut:
+            return blackOutMenuItem
+        case .blackOutNoMirroring:
+            return blackOutNoMirroringMenuItem
+        case .blackOutPowerOff:
+            return blackOutPowerOffMenuItem
+        case .brightnessUp:
+            return brightnessUpMenuItem
+        case .brightnessDown:
+            return brightnessDownMenuItem
+        case .contrastUp:
+            return contrastUpMenuItem
+        case .contrastDown:
+            return contrastDownMenuItem
+        case .volumeDown:
+            return volumeDownMenuItem
+        case .volumeUp:
+            return volumeUpMenuItem
+        case .muteAudio:
+            return muteAudioMenuItem
+        default:
+            return nil
+        }
+    }
+
     func setKeyEquivalents(_ hotkeys: Set<PersistentHotkey>) {
         Hotkey.setKeyEquivalent(HotkeyIdentifier.lunar.rawValue, menuItem: preferencesMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.restart.rawValue, menuItem: restartMenuItem, hotkeys: hotkeys)
@@ -1323,6 +1389,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         Hotkey.setKeyEquivalent(HotkeyIdentifier.percent100.rawValue, menuItem: percent100MenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.faceLight.rawValue, menuItem: faceLightMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOut.rawValue, menuItem: blackOutMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOutNoMirroring.rawValue, menuItem: blackOutNoMirroringMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOutPowerOff.rawValue, menuItem: blackOutPowerOffMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessUp.rawValue, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessDown.rawValue, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
