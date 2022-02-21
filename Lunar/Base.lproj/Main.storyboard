@@ -676,6 +676,22 @@ and setting its brightness/contrast to 0</string>
                                             </attributedString>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
+                                        <menuItem title="BlackOut without mirroring" alternate="YES" keyEquivalent="6" id="tot-Gy-BcJ">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" control="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="blackOutNoMirroring:" target="Voe-Tx-rLC" id="X9b-9t-zzd"/>
+                                                <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="4Ev-yr-2rC"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="DDC Power Off" alternate="YES" keyEquivalent="6" id="zTc-mS-stH">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="blackOutPowerOff:" target="Voe-Tx-rLC" id="PWe-ad-x0Y"/>
+                                                <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="iz3-YQ-E0I"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="oR7-ui-EOU"/>
                                         <menuItem title="Info (click to show/hide)" enabled="NO" id="Jo8-0Y-lO0">
                                             <attributedString key="attributedTitle">
@@ -779,6 +795,8 @@ and setting its brightness/contrast to 0</string>
                         <outlet property="activateLicenseMenuItem" destination="xUM-y5-dTw" id="jhW-HM-fs1"/>
                         <outlet property="blackOutExplanationMenuItem" destination="eAl-H3-Qg3" id="zg5-s2-gCh"/>
                         <outlet property="blackOutMenuItem" destination="yNB-Oq-RZ1" id="wQD-dU-hX3"/>
+                        <outlet property="blackOutNoMirroringMenuItem" destination="tot-Gy-BcJ" id="mDw-i7-Nrs"/>
+                        <outlet property="blackOutPowerOffMenuItem" destination="zTc-mS-stH" id="KZh-Mb-BuH"/>
                         <outlet property="brightnessDownMenuItem" destination="7w6-Ut-dgH" id="57z-2k-Qyb"/>
                         <outlet property="brightnessUpMenuItem" destination="901-kH-Bky" id="Dia-9T-gdF"/>
                         <outlet property="contrastDownMenuItem" destination="FDC-pE-gF0" id="hxa-UG-1ry"/>

@@ -42,7 +42,11 @@ class AppleNativeControl: Control {
     static func isAvailable(for display: Display) -> Bool {
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[.appleNative], enabledForDisplay else { return false }
-        return display.canChangeBrightnessDS
+        #if TEST_MODE
+            return display.isForTesting || display.canChangeBrightnessDS
+        #else
+            return display.canChangeBrightnessDS
+        #endif
         // return (
         //     display.isAppleDisplay() ||
         //         (display.isBuiltin && (DisplayController.panel(with: display.id)?.isSmartDisplay ?? false)) ||

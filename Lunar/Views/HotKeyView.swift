@@ -94,7 +94,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
         guard let hotkey = hotkey else { return }
         guard let keyCombo = keyCombo else {
             hotkey.isEnabled = false
-
+            for altHotkey in hotkey.alternates() {
+                altHotkey.isEnabled = false
+            }
             return
         }
 
@@ -129,6 +131,34 @@ class HotkeyView: RecordView, RecordViewDelegate {
                     hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main)
                 } else if let handler = hotkey.handler {
                     hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, actionQueue: .main, handler: handler)
+                }
+                hotkey.isEnabled = true
+                hotkey.register()
+            }
+        }
+
+        if let alternates = alternateHotkeysMapping[hotkey.identifier] {
+            for (flags, altIdentifier) in alternates {
+                guard !NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(flags) else {
+                    guard let altHotkey = CachedDefaults[.hotkeys].first(where: { $0.identifier == altIdentifier }),
+                          let altID = altIdentifier.hk
+                    else { continue }
+                    altHotkey.unregister()
+                    altHotkey.isEnabled = false
+                    appDelegate?.setKeyEquivalent(altID)
+                    continue
+                }
+                guard let hotkey = CachedDefaults[.hotkeys].first(where: { $0.identifier == altIdentifier }),
+                      let kc = KeyCombo(
+                          QWERTYKeyCode: keyCombo.QWERTYKeyCode,
+                          cocoaModifiers: keyCombo.keyEquivalentModifierMask.union(flags)
+                      ) else { continue }
+
+                hotkey.unregister()
+                if let target = hotkey.target, let action = hotkey.action {
+                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main)
+                } else if let handler = hotkey.handler {
+                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, actionQueue: .main, handler: handler)
                 }
                 hotkey.isEnabled = true
                 hotkey.register()

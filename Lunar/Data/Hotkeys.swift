@@ -37,6 +37,7 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          faceLight,
          blackOut,
          blackOutPowerOff,
+         blackOutNoMirroring,
          preciseBrightnessUp,
          preciseBrightnessDown,
          preciseContrastUp,
@@ -56,6 +57,14 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          orientation270
 }
 
+// MARK: - NSEvent.ModifierFlags + Hashable
+
+extension NSEvent.ModifierFlags: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(rawValue)
+    }
+}
+
 let preciseHotkeys: Set<String> = [
     HotkeyIdentifier.preciseBrightnessUp.rawValue,
     HotkeyIdentifier.preciseBrightnessDown.rawValue,
@@ -72,6 +81,12 @@ let coarseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.preciseVolumeUp.rawValue: HotkeyIdentifier.volumeUp.rawValue,
     HotkeyIdentifier.preciseVolumeDown.rawValue: HotkeyIdentifier.volumeDown.rawValue,
 ]
+let alternateHotkeysMapping: [String: [NSEvent.ModifierFlags: String]] = [
+    HotkeyIdentifier.blackOut.rawValue: [
+        .option: HotkeyIdentifier.blackOutPowerOff.rawValue,
+        .shift: HotkeyIdentifier.blackOutNoMirroring.rawValue,
+    ],
+]
 let preciseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.brightnessUp.rawValue: HotkeyIdentifier.preciseBrightnessUp.rawValue,
     HotkeyIdentifier.brightnessDown.rawValue: HotkeyIdentifier.preciseBrightnessDown.rawValue,
@@ -79,7 +94,6 @@ let preciseHotkeysMapping: [String: String] = [
     HotkeyIdentifier.contrastDown.rawValue: HotkeyIdentifier.preciseContrastDown.rawValue,
     HotkeyIdentifier.volumeUp.rawValue: HotkeyIdentifier.preciseVolumeUp.rawValue,
     HotkeyIdentifier.volumeDown.rawValue: HotkeyIdentifier.preciseVolumeDown.rawValue,
-    HotkeyIdentifier.blackOut.rawValue: HotkeyIdentifier.blackOutPowerOff.rawValue,
 ]
 
 // MARK: - HotkeyPart
@@ -256,8 +270,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         didSet {
             HotKeyCenter.shared.unregisterHotKey(with: oldValue.identifier)
             handleRegistration(persist: true)
-            if HotkeyIdentifier(rawValue: identifier) != nil {
-                appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
+            if let hkID = identifier.hk {
+                appDelegate!.setKeyEquivalent(hkID)
             }
         }
     }
@@ -270,8 +284,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 log.debug("Disabled hotkey \(identifier)")
             }
             handleRegistration()
-            if HotkeyIdentifier(rawValue: identifier) != nil {
-                appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
+            if let hkID = identifier.hk {
+                appDelegate!.setKeyEquivalent(hkID)
             }
         }
     }
@@ -321,6 +335,11 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     static func == (lhs: PersistentHotkey, rhs: PersistentHotkey) -> Bool {
         lhs.identifier == rhs.identifier
+    }
+
+    func alternates(in hotkeys: Set<PersistentHotkey>? = nil) -> [PersistentHotkey] {
+        guard let alternates = alternateHotkeysMapping[hotkey.identifier] else { return [] }
+        return alternates.values.compactMap { altID in (hotkeys ?? CachedDefaults[.hotkeys]).first(where: { $0.identifier == altID }) }
     }
 
     func disabled() -> PersistentHotkey {
@@ -565,6 +584,17 @@ enum Hotkey {
             detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.blackOutNoMirroring.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_6,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .shift])
+            )!,
+            target: appDelegate!,
+            action: handler(identifier: .blackOutNoMirroring),
+            actionQueue: .main,
+            detectKeyHold: false
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
             target: appDelegate!,
@@ -731,6 +761,8 @@ enum Hotkey {
             return #selector(AppDelegate.blackOutHotkeyHandler)
         case .blackOutPowerOff:
             return #selector(AppDelegate.blackOutPowerOffHotkeyHandler)
+        case .blackOutNoMirroring:
+            return #selector(AppDelegate.blackOutNoMirroringHotkeyHandler)
         case .preciseBrightnessUp:
             return #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
         case .preciseBrightnessDown:
@@ -771,6 +803,10 @@ enum Hotkey {
     static func setKeyEquivalent(_ identifier: String, menuItem: NSMenuItem?, hotkeys: Set<PersistentHotkey>) {
         guard let menuItem = menuItem, let hotkey = hotkeys.first(where: { $0.identifier == identifier }) else { return }
         if hotkey.isEnabled {
+            if menuItem.isAlternate {
+                menuItem.isHidden = false
+                menuItem.isEnabled = true
+            }
             if let keyEquivalent = Hotkey.functionKeyMapping[hotkey.keyCode] {
                 menuItem.keyEquivalent = keyEquivalent
             } else {
@@ -779,6 +815,10 @@ enum Hotkey {
             menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(carbonModifiers: hotkey.modifiers)
         } else {
             menuItem.keyEquivalent = ""
+            if menuItem.isAlternate {
+                menuItem.isHidden = true
+                menuItem.isEnabled = false
+            }
         }
     }
 
@@ -1281,9 +1321,16 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func blackOutPowerOffHotkeyHandler() {
-        guard lunarProActive, let display = displayController.mainExternalDisplay else { return }
+        guard let display = displayController.mainExternalDisplay else { return }
         _ = display.control?.setPower(.off)
         log.debug("BlackOut Power Off Hotkey pressed")
+    }
+
+    @objc func blackOutNoMirroringHotkeyHandler() {
+        guard lunarProActive else { return }
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        blackOutNoMirroring(self)
+        log.debug("BlackOut No Mirroring Hotkey pressed")
     }
 
     @objc func orientation0Handler() {
