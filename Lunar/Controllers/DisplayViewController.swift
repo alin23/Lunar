@@ -293,8 +293,6 @@ class DisplayViewController: NSViewController {
     @objc dynamic lazy var powerOffEnabled = getPowerOffEnabled()
     @objc dynamic lazy var powerOffTooltip = getPowerOffTooltip()
 
-    @Atomic var optionKeyPressed = false
-
     @IBOutlet var scheduleBox: NSBox!
     @IBOutlet var schedule1: Schedule!
     @IBOutlet var schedule2: Schedule!
@@ -1272,8 +1270,11 @@ class DisplayViewController: NSViewController {
 
             Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
+            Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
+
             Hold the Option key while clicking the button (or while pressing the hotkey) if you want to power off the monitor completely using DDC.
-            Caveats:
+
+            Caveats for DDC power offf:
               • works only if the monitor can be controlled through DDC
               • can't be used to power on the monitor
               • when a monitor is turned off or in standby, it does not accept commands from a connected device
@@ -1292,12 +1293,9 @@ class DisplayViewController: NSViewController {
         BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
 
         Can also be toggled with the keyboard using Ctrl-Cmd-6.
-        """
-    }
 
-    override func flagsChanged(with event: NSEvent) {
-        optionKeyPressed = event.modifierFlags.contains(.option)
-        log.debug("Option key pressed: \(optionKeyPressed)")
+        Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
+        """
     }
 
     @IBAction func delete(_: Any) {
@@ -1320,26 +1318,23 @@ class DisplayViewController: NSViewController {
         guard let display = display,
               displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
 
-        guard display.hasDDC, optionKeyPressed else {
-            guard lunarProOnTrial || lunarProActive else {
-                if let url = URL(string: "https://lunar.fyi/#blackout") {
-                    NSWorkspace.shared.open(url)
-                }
-                return
-            }
+        if display.hasDDC, AppDelegate.optionKeyPressed {
+            _ = display.control?.setPower(.off)
+            return
+        }
 
-            if !display.blackOutEnabled {
-                displayController.blackOut(display: display.id, state: .on)
-            } else {
-//                let mirrored = CGDisplayMirrorsDisplay(display.id)
-                displayController.blackOut(
-                    display: display.id,
-                    state: .off
-                )
+        guard lunarProOnTrial || lunarProActive else {
+            if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
             }
             return
         }
-        _ = display.control?.setPower(.off)
+
+        displayController.blackOut(
+            display: display.id,
+            state: display.blackOutEnabled ? .off : .on,
+            mirroringAllowed: !AppDelegate.shiftKeyPressed && display.blackOutMirroringAllowed
+        )
     }
 
     func showGammaNotice() {

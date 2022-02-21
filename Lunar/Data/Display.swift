@@ -532,6 +532,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else {
             mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
         }
+
+        blackOutMirroringAllowed = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? true)
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
             (isNative ? (brightness.uint8Value <= 1) : true)
         if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
@@ -684,6 +686,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         case mirroredBeforeBlackOut
         case blackOutEnabled
+        case blackOutMirroringAllowed
         case brightnessBeforeBlackout
         case contrastBeforeBlackout
         case minBrightnessBeforeBlackout
@@ -779,6 +782,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .applyGamma,
             .faceLightEnabled,
             .blackOutEnabled,
+            .blackOutMirroringAllowed,
             .mirroredBeforeBlackOut,
         ]
 
@@ -1085,6 +1089,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var mirroredBeforeBlackOut = false
     @Atomic @objc dynamic var blackOutEnabled = false
+    @Atomic @objc dynamic var blackOutMirroringAllowed = true
     lazy var brightnessBeforeBlackout = brightness
     lazy var contrastBeforeBlackout = contrast
     lazy var minBrightnessBeforeBlackout = minBrightness
@@ -3562,6 +3567,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             try container.encode(mirroredBeforeBlackOut, forKey: .mirroredBeforeBlackOut)
             try container.encode(blackOutEnabled, forKey: .blackOutEnabled)
+            try container.encode(blackOutMirroringAllowed, forKey: .blackOutMirroringAllowed)
             try container.encode(brightnessBeforeBlackout.uint8Value, forKey: .brightnessBeforeBlackout)
             try container.encode(contrastBeforeBlackout.uint8Value, forKey: .contrastBeforeBlackout)
             try container.encode(minBrightnessBeforeBlackout.uint8Value, forKey: .minBrightnessBeforeBlackout)
@@ -4227,6 +4233,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightContrast = 90.ns
 
         blackOutEnabled = false
+        blackOutMirroringAllowed = false
         mirroredBeforeBlackOut = false
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()

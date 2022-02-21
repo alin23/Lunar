@@ -203,6 +203,11 @@ class ModernWindow: WAYWindow {
             log.verbose("Normal scroll threshold")
             scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
         }
+
+        AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
+        AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
+        log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
+        log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
     }
 
     func setup() {
