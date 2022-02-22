@@ -94,8 +94,8 @@ class Logger: SwiftyBeaver {
         }
 
         setMinLevel(
-            debug: debugMode(cli ? debug : Defaults[.debug]),
-            verbose: verbose || TEST_MODE || Defaults[.debug],
+            debug: !cli && debugMode(cli ? debug : Defaults[.debug]),
+            verbose: !cli && (verbose || TEST_MODE || Defaults[.debug]),
             cloud: !cli && AppSettings.beta,
             cli: cli
         )

@@ -959,7 +959,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\n#exit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    if [[ $CONFIGURATION == \"Release\" ]]; then\n        ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    else\n        export DISABLE_PACKING=1\n        export DISABLE_NOTARIZATION=1\n    fi\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\n#exit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    if [[ $CONFIGURATION == \"Release\" ]]; then\n        ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    else\n        export DISABLE_PACKING=1\n        export DISABLE_NOTARIZATION=1\n    fi\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nelse\n    echo Running sign\n    ./bin/sign\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

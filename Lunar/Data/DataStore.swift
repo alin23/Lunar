@@ -79,6 +79,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeHotkeysControlAllMonitors,
     .useAlternateBrightnessKeys,
     .neverAskAboutFlux,
+    .apiKey,
+    .listenForRemoteCommands,
     .nonManualMode,
     .clockMode,
     .syncMode,
@@ -644,6 +646,8 @@ func initCache() {
     cacheKey(.neverAskAboutFlux)
     cacheKey(.hasActiveDisplays)
     cacheKey(.ignoredVolumes)
+    cacheKey(.listenForRemoteCommands)
+    cacheKey(.apiKey)
 
     cacheKey(.location)
     cacheKey(.secure)
@@ -766,6 +770,8 @@ extension Defaults.Keys {
 
     static let silentUpdate = Key<Bool>("SUAutomaticallyUpdate", default: false)
     static let checkForUpdate = Key<Bool>("SUEnableAutomaticChecks", default: true)
+    static let apiKey = Key<String>("apiKey", default: "")
+    static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
 }
 
 let datastore = DataStore()

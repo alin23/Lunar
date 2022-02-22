@@ -2536,7 +2536,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     "Display got \(control.str)",
                     context: context
                 )
-                mainAsyncAfter(ms: 1) { [weak self] in
+                mainAsync { [weak self] in
                     guard let self = self else { return }
                     self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
                     self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl

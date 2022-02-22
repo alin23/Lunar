@@ -1,0 +1,32 @@
+#!/usr/bin/env fish
+
+set DIR (cd (dirname (status -f)); and pwd)
+if test -f "$DIR/.env.sh"
+    . $DIR/.env.sh
+end
+
+if not set -q PROJECT_DIR
+    set PROJECT_DIR (dirname $DIR)
+end
+
+set CODESIGN_CERT "Developer ID Application: Alin Panaitiu (RDDXV84A73)"
+set CODESIGN_CERT_INSTALLER "Developer ID Installer: Alin Panaitiu (RDDXV84A73)"
+set WORK_DIR "$PROJECT_DIR"
+set SCRIPTS_DIR "$PROJECT_DIR/scripts"
+set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
+set APP_TMP "$BUILD_DIR"
+find "$APP_TMP" -not -perm 644 -and -not -perm 755 -exec chmod 644 \{\} \;
+
+set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app/Contents/MacOS/* \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Sparkle \
+    $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/* \
+    $APP_TMP/Contents/Frameworks/*.framework \
+    $APP_TMP/Contents/Frameworks/*.dylib \
+    $APP_TMP/Contents/Resources/ddcctl \
+    $APP_TMP
+
+for file in $filesToSign
+    codesign -fs "$CODESIGN_CERT" -o runtime --entitlements "$WORK_DIR/Lunar/Lunar.entitlements" --timestamp "$file" || exit 1
+end

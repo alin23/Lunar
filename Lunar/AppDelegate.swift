@@ -21,6 +21,7 @@ import Regex
 import Sauce
 import Sentry
 import SimplyCoreAudio
+import Socket
 import Sparkle
 import SwiftDate
 import SwiftyMarkdown
@@ -1419,9 +1420,67 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    func otherLunar() -> NSRunningApplication? {
+        NSWorkspace.shared.runningApplications
+            .filter { item in item.bundleIdentifier == Bundle.main.bundleIdentifier }
+            .first { item in item.processIdentifier != getpid() }
+    }
+
+    func handleCLI() -> Bool {
+        signal(SIGINT) { _ in
+            for display in displayController.displays.values {
+                if display.gammaChanged {
+                    display.resetGamma()
+                }
+
+                display.gammaUnlock()
+                refreshScreen()
+            }
+
+            cliExit(0)
+        }
+
+        guard let idx = CommandLine.arguments.firstIndex(of: "@") else { return false }
+
+        asyncNow { [self] in
+            log.initLogger(cli: true)
+            let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
+
+            guard !argList.contains("--new-instance"), otherLunar() != nil,
+                  let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
+            else {
+                if !argList.contains("--remote") {
+                    Lunar.main(argList)
+                }
+                return
+            }
+
+            let argString = argList.joined(separator: CLI_ARG_SEPARATOR)
+            let key = opts.key.isEmpty ? Defaults[.apiKey] : opts.key
+
+            do {
+                try socket.connect(to: opts.host, port: LUNAR_CLI_PORT)
+                try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
+
+                if let response = try socket.readString(), !response.isEmpty {
+                    print(response, terminator: "")
+                }
+                cliExit(0)
+            } catch {
+                print(error.localizedDescription)
+                cliExit(1)
+            }
+        }
+
+        return true
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         startTime = Date()
         Defaults[.secondPhase] = initFirstPhase()
+        if Defaults[.apiKey].isEmpty {
+            Defaults[.apiKey] = SERIAL_NUMBER_HASH
+        }
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }
@@ -1435,26 +1494,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             brightnessTransition = change.newValue
         }.store(in: &observers)
 
-        signal(SIGINT) { _ in
-            for display in displayController.displays.values {
-                if display.gammaChanged {
-                    display.resetGamma()
-                }
-
-                display.gammaUnlock()
-                refreshScreen()
-            }
-
-            globalExit(0)
-        }
-
-        if let idx = CommandLine.arguments.firstIndex(of: "@") {
-            asyncNow {
-                log.initLogger(cli: true)
-                Lunar.main(Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count]))
-            }
-            return
-        }
+        if handleCLI() { return }
+        try? serve()
 
         Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
         Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()
@@ -1483,7 +1524,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             options.environment = "production"
         }
 
-        let user = User(userId: getSerialNumberHash() ?? "NOID")
+        let user = User(userId: SERIAL_NUMBER_HASH)
         user.email = lunarProProduct?.activationEmail
         user.username = lunarProProduct?.activationID
         SentrySDK.configureScope { scope in
@@ -1498,11 +1539,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
 
-        let runningApp = NSWorkspace.shared.runningApplications
-            .filter { item in item.bundleIdentifier == Bundle.main.bundleIdentifier }
-            .first { item in item.processIdentifier != getpid() }
-
-        if let app = runningApp, app.forceTerminate() {
+        if let app = otherLunar(), app.forceTerminate() {
             notify(
                 identifier: "lunar-single-instance",
                 title: "Lunar was already running",
@@ -1572,7 +1609,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
         #else
             mainAsyncAfter(ms: 30000) {
-                let user = User(userId: getSerialNumberHash() ?? "NOID")
+                let user = User(userId: SERIAL_NUMBER_HASH)
                 user.email = lunarProProduct?.activationEmail
                 user.username = lunarProProduct?.activationID
                 SentrySDK.configureScope { scope in
