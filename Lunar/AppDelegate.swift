@@ -1455,7 +1455,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 return
             }
 
-            let argString = argList.joined(separator: CLI_ARG_SEPARATOR)
+            let argString = argList.without("--remote").joined(separator: CLI_ARG_SEPARATOR)
             let key = opts.key.isEmpty ? Defaults[.apiKey] : opts.key
 
             do {
@@ -1495,7 +1495,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         if handleCLI() { return }
-        try? serve()
+        listenForRemoteCommandsPublisher
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .sink { change in
+                server.stop()
+                serve(host: change.newValue ? "0.0.0.0" : "127.0.0.1")
+            }.store(in: &observers)
+        serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
 
         Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
         Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()

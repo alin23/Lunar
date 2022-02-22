@@ -870,3 +870,5 @@ let detectResponsivenessPublisher = Defaults.publisher(.detectResponsiveness).dr
     .filter { $0.oldValue != $0.newValue }
 let nonManualModePublisher = Defaults.publisher(.nonManualMode).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
+let listenForRemoteCommandsPublisher = Defaults.publisher(.listenForRemoteCommands).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }

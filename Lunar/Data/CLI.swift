@@ -1170,6 +1170,7 @@ struct Lunar: ParsableCommand {
                 "Setting gamma for \(display):\n\tRed: \(red)\n\tGreen: \(green)\n\tBlue: \(blue)"
             )
 
+            display.applyGamma = true
             guard !isServer else {
                 display.gammaLock()
 
@@ -1637,7 +1638,7 @@ class LunarServer {
     var connectedSockets = [Int32: Socket]()
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
-    func run() {
+    func run(host: String = "127.0.0.1") {
         DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
             do {
                 self.listenSocket = try Socket.create(family: .inet)
@@ -1646,7 +1647,7 @@ class LunarServer {
                     return
                 }
 
-                try socket.listen(on: LUNAR_CLI_PORT.i, node: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
+                try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
                 log.info("Listening on port: \(socket.listeningPort)")
 
                 repeat {
@@ -1673,7 +1674,7 @@ class LunarServer {
 
     func onResponse(_ response: String, socket: Socket) throws {
         do {
-            var args = response.split(separator: CLI_ARG_SEPARATOR.first!).map { String($0) }
+            var args = response.split(separator: CLI_ARG_SEPARATOR.first!).map { String($0) }.without("--remote")
             let key = args.removeFirst()
 
             guard key == CachedDefaults[.apiKey] else {
@@ -1806,7 +1807,7 @@ func cliGetDisplays(
 let LUNAR_CLI_PORT: Int32 = 23803
 let server = LunarServer()
 
-func serve() throws {
+func serve(host: String) {
     isServer = true
-    server.run()
+    server.run(host: host)
 }
