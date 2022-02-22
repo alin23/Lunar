@@ -42,13 +42,8 @@ class DisplayController {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        if let task = controlWatcherTask {
-            lowprioQueue.cancel(timer: task)
-        }
-
-        if let task = modeWatcherTask {
-            lowprioQueue.cancel(timer: task)
-        }
+        cancelTask(CONTROL_WATCHER_TASK_KEY)
+        cancelTask(MODE_WATCHER_TASK_KEY)
     }
 
     // MARK: Internal
@@ -71,9 +66,6 @@ class DisplayController {
 
     var onAdapt: ((Any) -> Void)?
 
-    var controlWatcherTask: CFRunLoopTimer?
-    var modeWatcherTask: CFRunLoopTimer?
-
     var pausedAdaptiveModeObserver = false
     var adaptiveModeObserver: Cancellable?
 
@@ -85,6 +77,9 @@ class DisplayController {
     var observers: Set<AnyCancellable> = []
 
     lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay()
+
+    let MODE_WATCHER_TASK_KEY = "modeWatcherTask"
+    let CONTROL_WATCHER_TASK_KEY = "controlWatcherTask"
 
     var activeDisplayList: [Display] {
         activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
@@ -344,18 +339,16 @@ class DisplayController {
     }
 
     func watchModeAvailability() {
-        guard modeWatcherTask == nil || !lowprioQueue.isValid(timer: modeWatcherTask!) else {
+        guard !taskIsRunning(MODE_WATCHER_TASK_KEY) else {
             return
         }
 
         guard !pausedOverrideAdaptiveModeObserver else { return }
 
         pausedOverrideAdaptiveModeObserver = true
-        Defaults.withoutPropagation {
-            self.modeWatcherTask = asyncEvery(5.seconds, queue: lowprioQueue) { [weak self] _ in
-                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-                self.autoAdaptMode()
-            }
+        asyncEvery(5.seconds, uniqueTaskKey: MODE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
+            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+            self.autoAdaptMode()
         }
         pausedOverrideAdaptiveModeObserver = false
     }
@@ -375,12 +368,8 @@ class DisplayController {
         NSWorkspace.shared.notificationCenter.publisher(
             for: NSWorkspace.screensDidSleepNotification, object: nil
         ).sink { _ in
-            if let task = self.controlWatcherTask {
-                lowprioQueue.cancel(timer: task)
-            }
-            if let task = self.modeWatcherTask {
-                lowprioQueue.cancel(timer: task)
-            }
+            cancelTask(self.CONTROL_WATCHER_TASK_KEY)
+            cancelTask(self.MODE_WATCHER_TASK_KEY)
         }.store(in: &observers)
 
         showSliderValuesPublisher.sink { _ in
@@ -1211,71 +1200,75 @@ class DisplayController {
         return false
     }
 
-    func watchControlAvailability() {
-        guard controlWatcherTask == nil || !lowprioQueue.isValid(timer: controlWatcherTask!) else {
+    func promptAboutFallback(_ display: Display) {
+        log.warning("Non-responsive display", context: display.context)
+        fallbackPromptTime[display.id] = Date()
+        let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
+        let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
+            if fallbackToGamma == .alertFirstButtonReturn {
+                if let control = display.control?.displayControl {
+                    display.enabledControls[control] = false
+                }
+                display.control = GammaControl(display: display)
+                display.setGamma()
+            }
+            if fallbackToGamma == .alertThirdButtonReturn {
+                display.neverFallbackControl = true
+            }
+            semaphore.signal()
+        }
+
+        if display.alwaysFallbackControl {
+            completionHandler(.alertFirstButtonReturn)
             return
         }
 
-        controlWatcherTask = asyncEvery(15.seconds, queue: lowprioQueue) { [weak self] _ in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-            for display in self.activeDisplays.values {
+        let window = mainThread { appDelegate!.windowController?.window }
+
+        let resp = ask(
+            message: "Non-responsive display \"\(display.name)\"",
+            info: """
+                This display is not responding to commands in
+                \(display.control!.str) mode.
+
+                Do you want to fallback to adjusting brightness in software?
+
+                Note: adjust the monitor to [BRIGHTNESS: 100%, CONTRAST: 70%] manually
+                using its physical buttons to allow for a full range in software.
+            """,
+            okButton: "Yes",
+            cancelButton: "Not now",
+            thirdButton: "No, never ask again",
+            screen: display.screen ?? display.primaryMirrorScreen,
+            window: window,
+            suppressionText: "Always fallback to software controls for this display when needed",
+            onSuppression: { fallback in
+                display.alwaysFallbackControl = fallback
+                display.save()
+            },
+            onCompletion: completionHandler,
+            unique: true,
+            waitTimeout: 60.seconds,
+            wide: true
+        )
+        if window == nil {
+            completionHandler(resp)
+        } else {
+            semaphore.wait(for: nil)
+        }
+    }
+
+    func watchControlAvailability() {
+        guard !taskIsRunning(CONTROL_WATCHER_TASK_KEY) else {
+            return
+        }
+
+        asyncEvery(15.seconds, uniqueTaskKey: CONTROL_WATCHER_TASK_KEY, queue: .main) { [self] in
+            guard !screensSleeping.load(ordering: .relaxed) else { return }
+            for display in activeDisplays.values {
                 display.control = display.getBestControl()
-                if self.shouldPromptAboutFallback(display) {
-                    log.warning("Non-responsive display", context: display.context)
-                    self.fallbackPromptTime[display.id] = Date()
-                    let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
-                    let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
-                        if fallbackToGamma == .alertFirstButtonReturn {
-                            if let control = display.control?.displayControl {
-                                display.enabledControls[control] = false
-                            }
-                            display.control = GammaControl(display: display)
-                            display.setGamma()
-                        }
-                        if fallbackToGamma == .alertThirdButtonReturn {
-                            display.neverFallbackControl = true
-                        }
-                        semaphore.signal()
-                    }
-
-                    if display.alwaysFallbackControl {
-                        completionHandler(.alertFirstButtonReturn)
-                        return
-                    }
-
-                    let window = mainThread { appDelegate!.windowController?.window }
-
-                    let resp = ask(
-                        message: "Non-responsive display \"\(display.name)\"",
-                        info: """
-                            This display is not responding to commands in
-                            \(display.control!.str) mode.
-
-                            Do you want to fallback to adjusting brightness in software?
-
-                            Note: adjust the monitor to [BRIGHTNESS: 100%, CONTRAST: 70%] manually
-                            using its physical buttons to allow for a full range in software.
-                        """,
-                        okButton: "Yes",
-                        cancelButton: "Not now",
-                        thirdButton: "No, never ask again",
-                        screen: display.screen ?? display.primaryMirrorScreen,
-                        window: window,
-                        suppressionText: "Always fallback to software controls for this display when needed",
-                        onSuppression: { fallback in
-                            display.alwaysFallbackControl = fallback
-                            display.save()
-                        },
-                        onCompletion: completionHandler,
-                        unique: true,
-                        waitTimeout: 60.seconds,
-                        wide: true
-                    )
-                    if window == nil {
-                        completionHandler(resp)
-                    } else {
-                        semaphore.wait(for: nil)
-                    }
+                if shouldPromptAboutFallback(display) {
+                    asyncNow { promptAboutFallback(display) }
                 }
             }
         }

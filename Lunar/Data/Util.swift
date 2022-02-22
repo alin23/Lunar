@@ -3,6 +3,7 @@ import Atomics
 import AXSwift
 import Cocoa
 import Combine
+import Defaults
 import Foundation
 import Path
 import Surge
@@ -539,6 +540,20 @@ func shortHash(string: String, length: Int = 8) -> String {
     return String(sha256(data: data).str(hex: true, separator: "").prefix(length))
 }
 
+func generateAPIKey() -> String {
+    var r = SystemRandomNumberGenerator()
+    let serialNumberData = Data(r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array())
+    let hash = sha256(data: serialNumberData).prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
+        switch c {
+        case "/": return Character(".")
+        case "+": return Character(".")
+        default: return c
+        }
+    }.str()
+    log.info("APIKey: \(hash)")
+    return hash
+}
+
 func getSerialNumberHash() -> String? {
     let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
@@ -570,10 +585,20 @@ func getSerialNumberHash() -> String? {
             default: return c
             }
         }.str()
-        log.info(hash)
+        log.info("SerialNumberHash: \(hash)")
         return hash
     }
     return nil
+}
+
+let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()
+
+@discardableResult
+@inline(__always) func mainThreadThrows<T>(_ action: () throws -> T) throws -> T {
+    guard !Thread.isMainThread else {
+        return try action()
+    }
+    return try DispatchQueue.main.sync { return try action() }
 }
 
 @discardableResult
@@ -2210,8 +2235,7 @@ func contactURL() -> URL {
     guard var urlBuilder = URLComponents(url: CONTACT_URL, resolvingAgainstBaseURL: false) else {
         return CONTACT_URL
     }
-    let serialhash = getSerialNumberHash()
-    urlBuilder.queryItems = [URLQueryItem(name: "userid", value: serialhash)]
+    urlBuilder.queryItems = [URLQueryItem(name: "userid", value: SERIAL_NUMBER_HASH)]
 
     if let licenseCode = lunarProProduct?.licenseCode {
         urlBuilder.queryItems?.append(URLQueryItem(name: "code", value: licenseCode))

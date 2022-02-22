@@ -139,6 +139,12 @@ extension Bool {
     }
 }
 
+extension Array where Element == CGGammaValue {
+    func str(decimals: UInt8) -> String {
+        map { $0.str(decimals: decimals) }.joined(separator: ", ")
+    }
+}
+
 extension NSColor {
     var hsb: (Int, Int, Int) {
         let c = usingColorSpace(.extendedSRGB) ?? self
