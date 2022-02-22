@@ -1343,3 +1343,43 @@ extension Publisher {
         }
     }
 }
+
+extension Set {
+    var arr: [Element] { Array(self) }
+}
+
+extension Array where Element: Equatable & Hashable {
+    var uniqued: Self { Set(self).arr }
+    func uniqued(by uniqueMethod: (Element, Element) -> Element) -> Self {
+        [Element]([Element: Element](map { ($0, $0) }, uniquingKeysWith: uniqueMethod).keys)
+    }
+
+    func replacing(at index: Index, with element: Element) -> Self {
+        enumerated().map { $0.offset == index ? element : $0.element }
+    }
+
+    func replacing(_ element: Element, with newElement: Element) -> Self {
+        map { $0 == element ? newElement : $0 }
+    }
+
+    func without(index: Index) -> Self {
+        enumerated().filter { $0.offset != index }.map(\.element)
+    }
+
+    func without(indices: [Index]) -> Self {
+        enumerated().filter { !indices.contains($0.offset) }.map(\.element)
+    }
+
+    func without(_ element: Element) -> Self {
+        filter { $0 != element }
+    }
+
+    func without(_ elements: [Element]) -> Self {
+        filter { !elements.contains($0) }
+    }
+
+    func after(_ element: Element) -> Element? {
+        guard let idx = firstIndex(of: element) else { return nil }
+        return self[safe: index(after: idx)]
+    }
+}

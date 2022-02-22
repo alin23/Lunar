@@ -543,6 +543,12 @@
                                                             <action selector="installCLI:" target="Voe-Tx-rLC" id="KRr-Ng-kxw"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Listen for remote CLI commands" id="2r7-5F-T8N">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <binding destination="Ftc-y8-9wL" name="value" keyPath="values.listenForRemoteCommands" id="e8I-l7-Qvf"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -828,6 +834,7 @@ and setting its brightness/contrast to 0</string>
                 <userDefaultsController id="u0a-cA-m1f"/>
                 <userDefaultsController id="fCP-p0-Lkm"/>
                 <userDefaultsController id="z8z-AR-4ms"/>
+                <userDefaultsController id="Ftc-y8-9wL"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
         </scene>
@@ -1024,7 +1031,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="388" y="656" width="171" height="29"/>
+                                <rect key="frame" x="387" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
