@@ -1463,7 +1463,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
 
                 if let response = try socket.readString(), !response.isEmpty {
-                    print(response, terminator: "")
+                    print(response.trimmed, terminator: "")
                 }
                 cliExit(0)
             } catch {
