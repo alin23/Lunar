@@ -15,8 +15,6 @@ import FuzzyFind
 import Regex
 import SwiftyJSON
 
-let globalExit = exit
-
 private let UPPERCASE_LETTER_NAMES = #"e\s?d\s?i\s?d|id|d\s?d\s?c"#.r!
 var encoder: JSONEncoder = {
     var encoder = JSONEncoder()
@@ -32,9 +30,9 @@ private var prettyEncoder: JSONEncoder = {
     return encoder
 }()
 
-// MARK: - CommandError
+// MARK: - LunarCommandError
 
-private enum CommandError: Error, CustomStringConvertible {
+private enum LunarCommandError: Error, CustomStringConvertible {
     case displayNotFound(String)
     case propertyNotValid(String)
     case cantReadProperty(String)
@@ -80,7 +78,7 @@ private func printArray(_ array: [Any], level: Int = 0, longestKeySize: Int = 0)
         case let nestedArray as [Any]:
             printArray(nestedArray, level: level + 1, longestKeySize: longestKeySize)
         default:
-            print("\(indentation)\(String(describing: value).replacingOccurrences(of: "\n", with: "\n\(indentation)"))")
+            cliPrint("\(indentation)\(String(describing: value).replacingOccurrences(of: "\n", with: "\n\(indentation)"))")
         }
     }
 }
@@ -93,12 +91,14 @@ private func printDictionary(_ dict: [String: Any], level: Int = 0, longestKeySi
     for (key, value) in dict {
         switch value {
         case let nestedDict as [String: Any]:
-            print("\(indentation)\(spaced(key, longestKeySize))")
+            cliPrint("\(indentation)\(spaced(key, longestKeySize))")
             printDictionary(nestedDict, level: level + 1, longestKeySize: longestKeySize)
         case let nestedArray as [Any]:
             printArray(nestedArray, level: level + 1, longestKeySize: longestKeySize)
         default:
-            print("\(indentation)\(spaced(key, longestKeySize))\(String(describing: value).replacingOccurrences(of: "\n", with: "\n\t"))")
+            cliPrint(
+                "\(indentation)\(spaced(key, longestKeySize))\(String(describing: value).replacingOccurrences(of: "\n", with: "\n\t"))"
+            )
         }
     }
 }
@@ -134,7 +134,7 @@ struct ForgivingEncodable: Encodable {
         case let data as Data:
             try container.encode(data.str(base64: true))
         case let array as [PersistentHotkey]:
-            print(array)
+            cliPrint(array)
             try container.encode(array)
         case let array as [Any?]:
             try container.encode(array.map { ForgivingEncodable($0) })
@@ -186,6 +186,37 @@ struct Lunar: ParsableCommand {
 
         @Flag(name: .shortAndLong, help: "Enable verbose logging.")
         var verbose = false
+
+        @Flag(name: .long, help: "Send the command to an already running instance of Lunar.")
+        var remote = false
+
+        @Flag(name: .long, help: "Spawn a new command-line only instance even if the Lunar app is already running.")
+        var newInstance = false
+
+        @Option(name: .long, help: "Hostname or IP of the device where to send the command.")
+        var host = "localhost"
+
+        @Option(
+            name: .long,
+            help: "API key of the device where to send the command. The key can be viewed by running `lunar key` on that device. It can be omitted if you want to control the current device."
+        )
+        var key = ""
+    }
+
+    struct Key: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Prints API Key for controlling Lunar remotely using `lunar --remote`."
+        )
+
+        func run() throws {
+            guard !CachedDefaults[.apiKey].isEmpty else {
+                CachedDefaults[.apiKey] = SERIAL_NUMBER_HASH
+                cliPrint(CachedDefaults[.apiKey])
+                return cliExit(0)
+            }
+            cliPrint(CachedDefaults[.apiKey])
+            return cliExit(0)
+        }
     }
 
     struct Signature: ParsableCommand {
@@ -202,10 +233,10 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             guard let sig = getCodeSignature(hex: hex) else {
-                globalExit(1)
+                return cliExit(1)
             }
-            print(sig)
-            globalExit(0)
+            cliPrint(sig)
+            return cliExit(0)
         }
     }
 
@@ -220,11 +251,11 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             if isLidClosed() {
-                print("closed")
+                cliPrint("closed")
             } else {
-                print("opened")
+                cliPrint("opened")
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -237,8 +268,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            print(SensorMode.getInternalSensorLux() ?? -1)
-            globalExit(0)
+            cliPrint(SensorMode.getInternalSensorLux() ?? -1)
+            return cliExit(0)
         }
     }
 
@@ -250,7 +281,7 @@ struct Lunar: ParsableCommand {
         @Argument var args: [String] = []
 
         func run() throws {
-            globalExit(0)
+            cliExit(0)
         }
     }
 
@@ -262,7 +293,7 @@ struct Lunar: ParsableCommand {
         @Argument var args: [String] = []
 
         func run() throws {
-            globalExit(0)
+            cliExit(0)
         }
     }
 
@@ -295,7 +326,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
                 includeProjector: false,
@@ -309,17 +340,17 @@ struct Lunar: ParsableCommand {
                 displayIDs = displays.map(\.id)
             case "builtin":
                 guard let id = displayController.builtinDisplay?.id else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             case "source":
                 guard let id = displayController.sourceDisplay?.id else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             default:
                 guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [display.id]
             }
@@ -327,26 +358,26 @@ struct Lunar: ParsableCommand {
             for id in displayIDs {
                 switch method {
                 case .GetUserBrightness:
-                    print(CoreDisplay_Display_GetUserBrightness(id))
+                    cliPrint(CoreDisplay_Display_GetUserBrightness(id))
                 case .GetLinearBrightness:
-                    print(CoreDisplay_Display_GetLinearBrightness(id))
+                    cliPrint(CoreDisplay_Display_GetLinearBrightness(id))
                 case .GetDynamicLinearBrightness:
-                    print(CoreDisplay_Display_GetDynamicLinearBrightness(id))
+                    cliPrint(CoreDisplay_Display_GetDynamicLinearBrightness(id))
                 case .SetUserBrightness:
-                    print("Setting UserBrightness to \(value) for ID: \(id)")
+                    cliPrint("Setting UserBrightness to \(value) for ID: \(id)")
                     CoreDisplay_Display_SetUserBrightness(id, value)
                 case .SetLinearBrightness:
-                    print("Setting LinearBrightness to \(value) for ID: \(id)")
+                    cliPrint("Setting LinearBrightness to \(value) for ID: \(id)")
                     CoreDisplay_Display_SetLinearBrightness(id, value)
                 case .SetDynamicLinearBrightness:
-                    print("Setting DynamicLinearBrightness to \(value) for ID: \(id)")
+                    cliPrint("Setting DynamicLinearBrightness to \(value) for ID: \(id)")
                     CoreDisplay_Display_SetDynamicLinearBrightness(id, value)
                 case .SetAutoBrightnessIsEnabled:
-                    print("Setting AutoBrightnessIsEnabled to \(value > 0) for ID: \(id)")
+                    cliPrint("Setting AutoBrightnessIsEnabled to \(value > 0) for ID: \(id)")
                     CoreDisplay_Display_SetAutoBrightnessIsEnabled(id, value > 0)
                 }
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -400,7 +431,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
                 includeProjector: false,
@@ -414,17 +445,17 @@ struct Lunar: ParsableCommand {
                 displayIDs = displays.map(\.id)
             case "builtin":
                 guard let id = displayController.builtinDisplay?.id else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             case "source":
                 guard let id = displayController.sourceDisplay?.id else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [id]
             default:
                 guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displayIDs = [display.id]
             }
@@ -435,85 +466,85 @@ struct Lunar: ParsableCommand {
                 switch method {
                 case .GetLinearBrightness:
                     DisplayServicesGetLinearBrightness(id, &brightness)
-                    print(value)
+                    cliPrint(value)
                 case .SetLinearBrightness:
-                    print("Setting LinearBrightness to \(brightness) for ID: \(id)")
+                    cliPrint("Setting LinearBrightness to \(brightness) for ID: \(id)")
                     DisplayServicesSetLinearBrightness(id, brightness)
                 case .GetBrightness:
                     DisplayServicesGetBrightness(id, &brightness)
-                    print(brightness)
+                    cliPrint(brightness)
                 case .SetBrightness:
-                    print("Setting Brightness to \(brightness) for ID: \(id)")
+                    cliPrint("Setting Brightness to \(brightness) for ID: \(id)")
                     DisplayServicesSetBrightness(id, brightness)
                 case .SetBrightnessSmooth:
-                    print("Setting BrightnessSmooth to \(brightness) for ID: \(id)")
+                    cliPrint("Setting BrightnessSmooth to \(brightness) for ID: \(id)")
                     DisplayServicesSetBrightnessSmooth(id, brightness)
                 case .SetBrightnessWithType:
-                    print("Setting BrightnessWithType to \(brightness) with type \(type) for ID: \(id)")
+                    cliPrint("Setting BrightnessWithType to \(brightness) with type \(type) for ID: \(id)")
                     DisplayServicesSetBrightnessWithType(id, type, brightness)
                 case .CanChangeBrightness:
-                    print(DisplayServicesCanChangeBrightness(id))
+                    cliPrint(DisplayServicesCanChangeBrightness(id))
                 case .IsSmartDisplay:
-                    print(DisplayServicesIsSmartDisplay(id))
+                    cliPrint(DisplayServicesIsSmartDisplay(id))
                 case .BrightnessChanged:
-                    print("Sending brightness change notification")
+                    cliPrint("Sending brightness change notification")
                     DisplayServicesBrightnessChanged(id, value)
 
                 case .GetPowerMode:
-                    print(DisplayServicesGetPowerMode(id))
+                    cliPrint(DisplayServicesGetPowerMode(id))
                 case .SetPowerMode:
-                    print(DisplayServicesSetPowerMode(id, value.u8))
+                    cliPrint(DisplayServicesSetPowerMode(id, value.u8))
 
                 case .GetBrightnessIncrement:
-                    print(DisplayServicesGetBrightnessIncrement(id))
+                    cliPrint(DisplayServicesGetBrightnessIncrement(id))
                 case .NeedsBrightnessSmoothing:
-                    print(DisplayServicesNeedsBrightnessSmoothing(id))
+                    cliPrint(DisplayServicesNeedsBrightnessSmoothing(id))
                 case .EnableAmbientLightCompensation:
-                    print(DisplayServicesEnableAmbientLightCompensation(id, value == 1))
+                    cliPrint(DisplayServicesEnableAmbientLightCompensation(id, value == 1))
                 case .AmbientLightCompensationEnabled:
                     var enabled = false
-                    print(DisplayServicesAmbientLightCompensationEnabled(id, &enabled))
-                    print(enabled)
+                    cliPrint(DisplayServicesAmbientLightCompensationEnabled(id, &enabled))
+                    cliPrint(enabled)
                 case .HasAmbientLightCompensation:
-                    print(DisplayServicesHasAmbientLightCompensation(id))
+                    cliPrint(DisplayServicesHasAmbientLightCompensation(id))
                 case .ResetAmbientLight:
-                    print(DisplayServicesResetAmbientLight(id, id))
+                    cliPrint(DisplayServicesResetAmbientLight(id, id))
                 case .ResetAmbientLightAll:
-                    print(DisplayServicesResetAmbientLightAll())
+                    cliPrint(DisplayServicesResetAmbientLightAll())
                 case .CanResetAmbientLight:
-                    print(DisplayServicesCanResetAmbientLight(id, 1))
+                    cliPrint(DisplayServicesCanResetAmbientLight(id, 1))
                 case .GetLinearBrightnessUsableRange:
                     var min: Int32 = 0
                     var max: Int32 = 0
-                    print(DisplayServicesGetLinearBrightnessUsableRange(id, &min, &max))
-                    print("\(min) - \(max)")
+                    cliPrint(DisplayServicesGetLinearBrightnessUsableRange(id, &min, &max))
+                    cliPrint("\(min) - \(max)")
                 case .CreateBrightnessTable:
-                    guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { globalExit(0) }
-                    print(table)
+                    guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { return cliExit(0) }
+                    cliPrint(table)
                 case .RegisterForBrightnessChangeNotifications:
                     let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
 
                         if let display = displayController.activeDisplays[displayID] {
-                            print("\(display) => \(value)")
+                            cliPrint("\(display) => \(value)")
                         } else {
-                            print("\(displayID) => \(value)")
+                            cliPrint("\(displayID) => \(value)")
                         }
                     }
-                    print("RegisterForBrightnessChangeNotifications result: \(result)")
+                    cliPrint("RegisterForBrightnessChangeNotifications result: \(result)")
                 case .RegisterForAmbientLightCompensationNotifications:
                     let result = DisplayServicesRegisterForAmbientLightCompensationNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
 
                         if let display = displayController.activeDisplays[displayID] {
-                            print("\(display) => \(value)")
+                            cliPrint("\(display) => \(value)")
                         } else {
-                            print("\(displayID) => \(value)")
+                            cliPrint("\(displayID) => \(value)")
                         }
                     }
-                    print("RegisterForAmbientLightCompensationNotifications result: \(result)")
+                    cliPrint("RegisterForAmbientLightCompensationNotifications result: \(result)")
                 }
             }
             guard method != .RegisterForAmbientLightCompensationNotifications,
@@ -521,7 +552,7 @@ struct Lunar: ParsableCommand {
             else {
                 return
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -554,7 +585,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
                 includeProjector: false,
@@ -563,7 +594,7 @@ struct Lunar: ParsableCommand {
             var displays = displayController.activeDisplays.values.map { $0 }
             if display != "all" {
                 guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw CommandError.displayNotFound(display)
+                    throw LunarCommandError.displayNotFound(display)
                 }
                 displays = [display]
             }
@@ -573,36 +604,36 @@ struct Lunar: ParsableCommand {
                 for display in displays {
                     if let result = DDC.read(displayID: display.id, controlID: control) {
                         if displays.count == 1 {
-                            print(max ? result.maxValue : result.currentValue)
+                            cliPrint(max ? result.maxValue : result.currentValue)
                         } else {
-                            print("\(display): \(max ? result.maxValue : result.currentValue)")
+                            cliPrint("\(display): \(max ? result.maxValue : result.currentValue)")
                         }
                     } else {
                         if displays.count == 1 {
-                            throw CommandError.ddcError("Can't read \(control) for display \(display)")
+                            throw LunarCommandError.ddcError("Can't read \(control) for display \(display)")
                         }
-                        print("\(display): Can't read \(control)")
+                        cliPrint("\(display): Can't read \(control)")
                     }
                 }
-                globalExit(0)
+                return cliExit(0)
             }
 
             for display in displays {
                 for value in values {
                     guard let value = hex ? value.parseHex() : Int(value) ?? value.parseHex(strict: true) else {
-                        print("Can't parse value \(value) as number")
+                        cliPrint("Can't parse value \(value) as number")
                         continue
                     }
-                    print("\(display): Writing \(value) for \(control)", terminator: ": ")
+                    cliPrint("\(display): Writing \(value) for \(control)", terminator: ": ")
                     if DDC.write(displayID: display.id, controlID: control, newValue: value.u8) {
-                        print("Ok")
+                        cliPrint("Ok")
                     } else {
-                        print("Error")
-//                        print("\(display): Error writing \(value) for \(control)")
+                        cliPrint("Error")
+//                        cliPrint("\(display): Error writing \(value) for \(control)")
                     }
                 }
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -620,15 +651,15 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             guard !json else {
-                print((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
-                globalExit(0)
+                cliPrint((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
+                return cliExit(0)
             }
 
             let hotkeys = [String: String](CachedDefaults[.hotkeys].map { hotkey in
                 (hotkey.identifier, hotkey.hotkeyString)
             }, uniquingKeysWith: first(this:other:))
             printDictionary(hotkeys)
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -660,51 +691,51 @@ struct Lunar: ParsableCommand {
 
             if raw {
                 guard let props = SyncMode.getArmBuiltinDisplayProperties() else {
-                    throw CommandError.displayNotFound("builtin")
+                    throw LunarCommandError.displayNotFound("builtin")
                 }
 
                 switch property {
                 case .id:
-                    print(displayController.builtinDisplay?.id.s ?? "None")
+                    cliPrint(displayController.builtinDisplay?.id.s ?? "None")
                 case .brightness:
-                    print(props["property"] ?? "nil")
+                    cliPrint(props["property"] ?? "nil")
                 case .contrast:
-                    print(props["IOMFBContrastEnhancerStrength"] ?? "nil")
+                    cliPrint(props["IOMFBContrastEnhancerStrength"] ?? "nil")
                 case .all:
                     if json {
                         let encodableProps = ForgivingEncodable(props)
-                        print((try! prettyEncoder.encode(encodableProps)).str())
+                        cliPrint((try! prettyEncoder.encode(encodableProps)).str())
                     } else {
                         printDictionary(props)
                     }
                 }
-                globalExit(0)
+                return cliExit(0)
             }
 
             guard let (brightness, contrast) = SyncMode.getSourceBrightnessContrast() else {
-                throw CommandError.displayNotFound("builtin")
+                throw LunarCommandError.displayNotFound("builtin")
             }
             switch property {
             case .id:
-                print(displayController.builtinDisplay?.id.s ?? "None")
+                cliPrint(displayController.builtinDisplay?.id.s ?? "None")
             case .brightness:
-                print(brightness.str(decimals: 2))
+                cliPrint(brightness.str(decimals: 2))
             case .contrast:
-                print(contrast.str(decimals: 2))
+                cliPrint(contrast.str(decimals: 2))
             case .all:
                 if json {
-                    print((try! prettyEncoder.encode([
+                    cliPrint((try! prettyEncoder.encode([
                         "id": displayController.builtinDisplay?.id.d ?? 0,
                         "brightness": brightness,
                         "contrast": contrast,
                     ])).str())
                 } else {
-                    print("ID: \(displayController.builtinDisplay?.id.s ?? "None")")
-                    print("Brightness: \(brightness.str(decimals: 2))")
-                    print("Contrast: \(contrast.str(decimals: 2))")
+                    cliPrint("ID: \(displayController.builtinDisplay?.id.s ?? "None")")
+                    cliPrint("Brightness: \(brightness.str(decimals: 2))")
+                    cliPrint("Contrast: \(contrast.str(decimals: 2))")
                 }
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -728,18 +759,18 @@ struct Lunar: ParsableCommand {
                 let uuidValue = uuid.takeRetainedValue()
                 let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
                 if !uuidString.isEmpty {
-                    print(uuidString)
-                    globalExit(0)
+                    cliPrint(uuidString)
+                    return cliExit(0)
                 }
             }
 
             if fallback {
                 if let edid = Display.edid(id: id), let uuid = UUID(namespace: .oid, name: edid) {
-                    print(uuid)
-                    globalExit(0)
+                    cliPrint(uuid)
+                    return cliExit(0)
                 }
             }
-            throw CommandError.noUUID(id)
+            throw LunarCommandError.noUUID(id)
         }
     }
 
@@ -755,7 +786,7 @@ struct Lunar: ParsableCommand {
 
         func validate() throws {
             if !(0 ... 100).contains(preset) {
-                throw CommandError
+                throw LunarCommandError
                     .propertyNotValid("Preset must be a number between 0 and 100")
             }
         }
@@ -763,16 +794,23 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays()
+            cliGetDisplays()
             displayController.disable()
-            brightnessTransition = .instant
+            if !isServer {
+                brightnessTransition = .instant
+            }
 
             displayController.setBrightnessPercent(value: preset, now: true)
-            Thread.sleep(forTimeInterval: 1.0)
+            cliSleep(1.0)
             displayController.setContrastPercent(value: preset, now: true)
-            Thread.sleep(forTimeInterval: 1.0)
+            cliSleep(1.0)
 
-            globalExit(0)
+            for display in displayController.activeDisplays.values {
+                cliPrint(display.name)
+                cliPrint("\tBrightness: \(display.brightness)")
+                cliPrint("\tContrast: \(display.contrast)\n")
+            }
+            return cliExit(0)
         }
     }
 
@@ -790,9 +828,9 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             CachedDefaults[.adaptiveBrightnessMode] = mode
-            sleep(1)
+            cliSleep(1)
 
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -853,7 +891,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: virtual || all,
                 includeAirplay: airplay || all,
                 includeProjector: projector || all,
@@ -881,14 +919,14 @@ struct Lunar: ParsableCommand {
                             edid: edid
                         )
                     } catch {
-                        print("\(filter): \(error)")
+                        cliPrint("\(filter): \(error)")
                     }
                 }
-                globalExit(0)
+                return cliExit(0)
             }
 
             if json {
-                print("{")
+                cliPrint("{")
             }
 
             for (i, display) in displays.enumerated() {
@@ -903,16 +941,16 @@ struct Lunar: ParsableCommand {
                         edid: edid
                     )
                 } else {
-                    print("\(i): \(display.name)")
+                    cliPrint("\(i): \(display.name)")
                     try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, panelData: panelData, edid: edid)
-                    print("")
+                    cliPrint("")
                 }
             }
 
             if json {
-                print("}")
+                cliPrint("}")
             }
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -940,7 +978,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
                 includeProjector: CachedDefaults[.showProjectorDisplays],
@@ -952,7 +990,7 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             try handleDisplay("first", displays: displays, property: property, controls: controls, read: read)
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -985,7 +1023,7 @@ struct Lunar: ParsableCommand {
 
         func validate() throws {
             if !Display.CodingKeys.settable.contains(property) {
-                throw CommandError
+                throw LunarCommandError
                     .propertyNotValid("Property must be one of (\(Display.CodingKeys.settable.map(\.rawValue).joined(separator: ", ")))")
             }
         }
@@ -993,7 +1031,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
                 includeProjector: CachedDefaults[.showProjectorDisplays],
@@ -1004,12 +1042,12 @@ struct Lunar: ParsableCommand {
                 d1.key <= d2.key
             }).map(\.value)
 
-            if controls.contains(.network) {
+            if !isServer, controls.contains(.network) {
                 setupNetworkControls(displays: displays, waitms: waitms)
             }
 
             try handleDisplay("first", displays: displays, property: property, value: value, controls: controls, read: read)
-            globalExit(0)
+            return cliExit(0)
         }
     }
 
@@ -1035,32 +1073,32 @@ struct Lunar: ParsableCommand {
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
         var refreshSeconds = 1
 
-        @Option(name: .long, help: "Minimum red gamma value")
-        var redMin: Float = 0.0
-        @Option(name: .long, help: "Maximum red gamma value")
-        var redMax: Float = 1.0
+        @Flag(name: .long, help: "Read Gamma values (the default unless `--write` is passed)")
+        var read = true
+
+        @Flag(name: .long, help: "Read the system gamma table instead of Lunar's internal values")
+        var readFullTable = false
+
+        @Flag(name: .long, help: "Write Gamma values")
+        var write = false
+
+        @Flag(name: .long, help: "Reset Gamma values")
+        var reset = false
+
         @Option(name: .shortAndLong, help: "Red gamma value")
-        var red: Float = 1.0
-
-        @Option(name: .long, help: "Minimum green gamma value")
-        var greenMin: Float = 0.0
-        @Option(name: .long, help: "Maximum green gamma value")
-        var greenMax: Float = 1.0
+        var red = 0.5
         @Option(name: .shortAndLong, help: "Green gamma value")
-        var green: Float = 1.0
-
-        @Option(name: .long, help: "Minimum blue gamma value")
-        var blueMin: Float = 0.0
-        @Option(name: .long, help: "Maximum blue gamma value")
-        var blueMax: Float = 1.0
+        var green = 0.5
         @Option(name: .shortAndLong, help: "Blue gamma value")
-        var blue: Float = 1.0
+        var blue = 0.5
 
         var foundDisplay: Display!
 
         mutating func validate() throws {
+            guard !globals.remote else { return }
+
             Lunar.configureLogging(options: globals)
-            displayController.displays = DisplayController.getDisplays(
+            cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
                 includeProjector: CachedDefaults[.showProjectorDisplays],
@@ -1072,12 +1110,12 @@ struct Lunar: ParsableCommand {
             }).map(\.value)
 
             guard let display = getDisplay(displays: displays, filter: display) else {
-                throw CommandError.displayNotFound(display)
+                throw LunarCommandError.displayNotFound(display)
             }
 
             let alreadyLocked = !display.gammaLock()
-            if alreadyLocked, !force {
-                throw CommandError
+            if !isServer, alreadyLocked, !force {
+                throw LunarCommandError
                     .gammaError(
                         "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete \(display.gammaLockPath) if you think this is incorrect)."
                     )
@@ -1090,42 +1128,65 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             guard let display = foundDisplay else {
-                globalExit(0)
+                return cliExit(0)
             }
 
-            guard redMin != 0 || redMax != 1 || red != 1 ||
-                greenMin != 0 || greenMax != 1 || green != 1 ||
-                blueMin != 0 || blueMax != 1 || blue != 1
-            else {
-                print("""
+            let printTable = {
+                if readFullTable {
+                    let table = GammaTable(for: display.id)
+                    cliPrint("""
                     Gamma table for \(display):
-                        Red: \(display.defaultGammaTable.red)
-                        Green: \(display.defaultGammaTable.green)
-                        Blue: \(display.defaultGammaTable.blue)
-                """)
+                        Red: \(table.red.str(decimals: 3))
+                        Green: \(table.green.str(decimals: 3))
+                        Blue: \(table.blue.str(decimals: 3))
+                    """)
+                } else {
+                    cliPrint("""
+                    Gamma table for \(display):
+                        Red: \(display.red.str(decimals: 3))
+                        Green: \(display.green.str(decimals: 3))
+                        Blue: \(display.blue.str(decimals: 3))
+                    """)
+                }
+            }
+
+            guard write || reset else {
+                printTable()
                 return
             }
 
-            print(
-                "Setting gamma for '\(display.name)':\n\tredMin: \(redMin)\n\tred: \(red)\n\tredMax: \(redMax)\n\tgreenMin: \(greenMin)\n\tgreen: \(green)\n\tgreenMax: \(greenMax)\n\tblueMin: \(blueMin)\n\tblue: \(blue)\n\tblueMax: \(blueMax)"
+            if reset {
+                if isServer {
+                    display.resetDefaultGamma()
+                } else {
+                    CGDisplayRestoreColorSyncSettings()
+                }
+                cliPrint("Resetting gamma table for \(display)\n")
+                printTable()
+                return
+            }
+
+            cliPrint(
+                "Setting gamma for \(display):\n\tRed: \(red)\n\tGreen: \(green)\n\tBlue: \(blue)"
             )
+
+            guard !isServer else {
+                display.gammaLock()
+
+                display.red = red
+                display.green = green
+                display.blue = blue
+
+                return
+            }
 
             var stepsDone = 0
             _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
                 display.gammaLock()
 
-                let table = GammaTable(
-                    redMin: redMin,
-                    redMax: redMax,
-                    redValue: red,
-                    greenMin: greenMin,
-                    greenMax: greenMax,
-                    greenValue: green,
-                    blueMin: blueMin,
-                    blueMax: blueMax,
-                    blueValue: blue
-                )
-                display.apply(gamma: table, force: true)
+                display.red = red
+                display.green = green
+                display.blue = blue
 
                 stepsDone += 1
                 if stepsDone == wait {
@@ -1133,7 +1194,7 @@ struct Lunar: ParsableCommand {
                     if let timer = timer {
                         realtimeQueue.cancel(timer: timer)
                     }
-                    globalExit(0)
+                    return cliExit(0)
                 }
             }
         }
@@ -1153,6 +1214,7 @@ struct Lunar: ParsableCommand {
             Lid.self,
             Lux.self,
             Signature.self,
+            Key.self,
             Launch.self,
             Gamma.self,
             CoreDisplay.self,
@@ -1183,6 +1245,62 @@ struct Lunar: ParsableCommand {
             using: { $0.matched.uppercased().replacingOccurrences(of: " ", with: "") }
         )
     }
+
+    static func globalOptions(args: [String]) -> GlobalOptions? {
+        var args = args
+        if !args.contains("--remote") {
+            args = ["--remote"] + args
+        }
+        let command: ParsableCommand
+        do {
+            command = try Lunar.parseAsRoot(args)
+        } catch {
+            print(Lunar.fullMessage(for: error))
+            cliExit(1)
+            return nil
+        }
+
+        switch command {
+        case let cmd as Set:
+            return cmd.globals
+        case let cmd as Get:
+            return cmd.globals
+        case let cmd as Displays:
+            return cmd.globals
+        case let cmd as Preset:
+            return cmd.globals
+        case let cmd as Mode:
+            return cmd.globals
+        case let cmd as Builtin:
+            return cmd.globals
+        case let cmd as Ddc:
+            return cmd.globals
+        case is Ddcctl:
+            return nil
+        case let cmd as Lid:
+            return cmd.globals
+        case let cmd as Lux:
+            return cmd.globals
+        case let cmd as Signature:
+            return cmd.globals
+        case is Key:
+            return nil
+        case is Launch:
+            return nil
+        case let cmd as Gamma:
+            return cmd.globals
+        case let cmd as CoreDisplay:
+            return cmd.globals
+        case let cmd as DisplayServices:
+            return cmd.globals
+        case let cmd as Hotkeys:
+            return cmd.globals
+        case let cmd as DisplayUuid:
+            return cmd.globals
+        default:
+            return nil
+        }
+    }
 }
 
 private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
@@ -1194,7 +1312,7 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
         NetworkControl.browser = CiaoBrowser()
         NetworkControl.listenForDDCUtilControllers()
     }
-    Thread.sleep(forTimeInterval: waitms.d / 1000)
+    cliSleep(waitms.d / 1000)
 
     for display in displays {
         display.control = display.getBestControl()
@@ -1222,7 +1340,7 @@ private func printDisplay(
 
     if json {
         guard var dict = display.dictionary else {
-            throw CommandError.serializationError("Can't serialize display \(display.name)")
+            throw LunarCommandError.serializationError("Can't serialize display \(display.name)")
         }
         if systemInfo {
             dict["systemInfo"] = display.infoDictionary
@@ -1235,14 +1353,14 @@ private func printDisplay(
             dict["edidUUIDPatterns"] = display.possibleEDIDUUIDs()
         }
         let encodableDisplay = ForgivingEncodable(dict)
-        print("\(prefix)\((try! encoder.encode(encodableDisplay)).str())", terminator: terminator)
+        cliPrint("\(prefix)\((try! encoder.encode(encodableDisplay)).str())", terminator: terminator)
         return
     }
 
     guard let displayDict = display.dictionary?.sorted(by: { $0.key <= $1.key })
         .map({ ($0.key, Lunar.prettyKey($0.key), $0.value) })
     else {
-        print("\(prefix)Serialization error!")
+        cliPrint("\(prefix)Serialization error!")
         return
     }
 
@@ -1250,46 +1368,46 @@ private func printDisplay(
 
     for (originalKey, key, value) in displayDict {
         guard let displayKey = Display.CodingKeys(rawValue: originalKey) else { continue }
-        print("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value))")
+        cliPrint("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value))")
     }
     let s = { (k: String) in spaced(k, longestKeySize) }
-    print("\(prefix)\(s("Has I2C"))\(display.hasI2C)")
-    print("\(prefix)\(s("Has Network Control"))\(display.hasNetworkControl)")
-    print("\(prefix)\(s("Has DDC"))\(display.hasDDC)")
+    cliPrint("\(prefix)\(s("Has I2C"))\(display.hasI2C)")
+    cliPrint("\(prefix)\(s("Has Network Control"))\(display.hasNetworkControl)")
+    cliPrint("\(prefix)\(s("Has DDC"))\(display.hasDDC)")
     if systemInfo {
         if let dict = display.infoDictionary as? [String: Any], dict.count != 0 {
-            print("\(prefix)\(s("Info Dictionary"))")
+            cliPrint("\(prefix)\(s("Info Dictionary"))")
             printDictionary(dict, level: 6, longestKeySize: longestKeySize)
         } else {
-            print("\(prefix)\(s("Info Dictionary")){}")
+            cliPrint("\(prefix)\(s("Info Dictionary")){}")
         }
     }
 
     if panelData, let panel = display.panel {
         let dict = getMonitorPanelDataJSON(panel)
         if dict.count != 0 {
-            print("\(prefix)\(s("Panel Data"))")
+            cliPrint("\(prefix)\(s("Panel Data"))")
             printDictionary(dict, level: 6, longestKeySize: longestKeySize)
         } else {
-            print("\(prefix)\(s("Panel Data")){}")
+            cliPrint("\(prefix)\(s("Panel Data")){}")
         }
     }
 
-    print("\(prefix)\(s("Red Gamma"))\(display.redMin) - \(display.redGamma) - \(display.redMax)")
-    print("\(prefix)\(s("Green Gamma"))\(display.greenMin) - \(display.greenGamma) - \(display.greenMax)")
-    print("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
+    cliPrint("\(prefix)\(s("Red Gamma"))\(display.redMin) - \(display.redGamma) - \(display.redMax)")
+    cliPrint("\(prefix)\(s("Green Gamma"))\(display.greenMin) - \(display.greenGamma) - \(display.greenMax)")
+    cliPrint("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
 
     #if arch(arm64)
         let avService = DDC.AVService(displayID: display.id, ignoreCache: true)
-        print("\(prefix)\(s("AVService"))\(avService == nil ? "NONE" : CFCopyDescription(avService!) as String)")
+        cliPrint("\(prefix)\(s("AVService"))\(avService == nil ? "NONE" : CFCopyDescription(avService!) as String)")
     #else
         let i2c = DDC.I2CController(displayID: display.id, ignoreCache: true)
-        print("\(prefix)\(s("I2C Controller"))\(i2c == nil ? "NONE" : i2c!.s)")
+        cliPrint("\(prefix)\(s("I2C Controller"))\(i2c == nil ? "NONE" : i2c!.s)")
     #endif
 
     if edid {
-        print("\(prefix)\(s("EDID"))\(edidStr)")
-        print("\(prefix)\(s("EDID UUID Patterns"))\(display.possibleEDIDUUIDs())")
+        cliPrint("\(prefix)\(s("EDID"))\(edidStr)")
+        cliPrint("\(prefix)\(s("EDID UUID Patterns"))\(display.possibleEDIDUUIDs())")
     }
 }
 
@@ -1308,7 +1426,7 @@ private func handleDisplay(
     // MARK: - Apply display filter to get single display
 
     guard let display = getDisplay(displays: displays, filter: displayFilter) else {
-        throw CommandError.displayNotFound(displayFilter)
+        throw LunarCommandError.displayNotFound(displayFilter)
     }
 
     guard let property = property else {
@@ -1326,11 +1444,11 @@ private func handleDisplay(
     ]
     display.control = display.getBestControl()
     if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!, display.control is GammaControl {
-        throw CommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
+        throw LunarCommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
     }
 
     guard let propertyValue = display.dictionary?[property.rawValue] else {
-        throw CommandError.propertyNotValid(property.rawValue)
+        throw LunarCommandError.propertyNotValid(property.rawValue)
     }
 
     guard var value = value else {
@@ -1338,7 +1456,7 @@ private func handleDisplay(
 
         if !read {
             log.debug("Fetching value for \(property.rawValue)")
-            print(encodedValue(key: property, value: propertyValue))
+            cliPrint(encodedValue(key: property, value: propertyValue))
             return
         }
 
@@ -1346,10 +1464,10 @@ private func handleDisplay(
 
         log.debug("Reading value for \(property.rawValue)")
         guard let readValue = display.control?.read(property) else {
-            throw CommandError.cantReadProperty(property.rawValue)
+            throw LunarCommandError.cantReadProperty(property.rawValue)
         }
 
-        print(encodedValue(key: property, value: readValue))
+        cliPrint(encodedValue(key: property, value: readValue))
         return
     }
 
@@ -1362,7 +1480,7 @@ private func handleDisplay(
         display.save(now: true)
     case is NSNumber where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
         guard let input = InputSource(stringValue: value) else {
-            throw CommandError.invalidValue("Unknown input \(value)")
+            throw LunarCommandError.invalidValue("Unknown input \(value)")
         }
         display.setValue(input.rawValue.ns, forKey: property.rawValue)
         display.save(now: true)
@@ -1377,7 +1495,7 @@ private func handleDisplay(
         case "toggle", "switch":
             newValue = !currentValue
         default:
-            throw CommandError.invalidValue("\(value) is not a boolean")
+            throw LunarCommandError.invalidValue("\(value) is not a boolean")
         }
         display.setValue(newValue, forKey: property.rawValue)
         display.save(now: true)
@@ -1393,7 +1511,7 @@ private func handleDisplay(
             value = String(value.dropFirst())
         }
 
-        guard var value = value.d?.ns else { throw CommandError.invalidValue("\(value) is not a number") }
+        guard var value = value.d?.ns else { throw LunarCommandError.invalidValue("\(value) is not a number") }
 
         switch operation {
         case "+":
@@ -1403,7 +1521,7 @@ private func handleDisplay(
         case "":
             break
         default:
-            throw CommandError.invalidValue("Unknown operation \(operation) for value \(value)")
+            throw LunarCommandError.invalidValue("Unknown operation \(operation) for value \(value)")
         }
 
         switch property {
@@ -1426,9 +1544,9 @@ private func handleDisplay(
     }
 
     if display.control is NetworkControl {
-        Thread.sleep(forTimeInterval: 1)
+        cliSleep(1)
     }
-    print(encodedValue(key: property, value: display.dictionary![property.rawValue]!))
+    cliPrint(encodedValue(key: property, value: display.dictionary![property.rawValue]!))
 }
 
 private func spacing(longestKeySize: Int, key: String) -> String {
@@ -1494,3 +1612,201 @@ let LUNAR_CLI_SCRIPT =
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ $@
     fi
     """
+
+import Socket
+
+// MARK: - LunarServer
+
+class LunarServer {
+    // MARK: Lifecycle
+
+    deinit {
+        for socket in connectedSockets.values {
+            socket.close()
+        }
+        self.listenSocket?.close()
+    }
+
+    // MARK: Internal
+
+    static let bufferSize = 4096
+
+    @Atomic var continueRunning = true
+
+    var listenSocket: Socket?
+    var connectedSockets = [Int32: Socket]()
+    let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
+
+    func run() {
+        DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+            do {
+                self.listenSocket = try Socket.create(family: .inet)
+                guard let socket = self.listenSocket else {
+                    log.error("Unable to unwrap socket...")
+                    return
+                }
+
+                try socket.listen(on: LUNAR_CLI_PORT.i, node: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
+                log.info("Listening on port: \(socket.listeningPort)")
+
+                repeat {
+                    let newSocket = try socket.acceptClientConnection()
+
+                    log.debug("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                    log.debug("Socket Signature: \(String(describing: newSocket.signature?.description))")
+
+                    self.addNewConnection(socket: newSocket)
+
+                } while self.continueRunning
+            } catch {
+                guard let socketError = error as? Socket.Error else {
+                    log.error("Unexpected error: \(error)")
+                    return
+                }
+
+                if self.continueRunning {
+                    log.error("Error reported:\n \(socketError.description)")
+                }
+            }
+        }
+    }
+
+    func onResponse(_ response: String, socket: Socket) throws {
+        do {
+            var args = response.split(separator: CLI_ARG_SEPARATOR.first!).map { String($0) }
+            let key = args.removeFirst()
+
+            guard key == CachedDefaults[.apiKey] else {
+                try socket.write(from: "Unauthorized\n")
+                return
+            }
+
+            var command = try Lunar.parseAsRoot(args)
+            try mainThreadThrows {
+                try command.run()
+            }
+            if !serverOutput.isEmpty {
+                try socket.write(from: serverOutput)
+                serverOutput = ""
+            }
+        } catch {
+            try socket.write(from: Lunar.fullMessage(for: error) + "\n")
+        }
+    }
+
+    func addNewConnection(socket: Socket) {
+        socketLockQueue.sync { [unowned self, socket] in
+            self.connectedSockets[socket.socketfd] = socket
+        }
+
+        DispatchQueue.global(qos: .default).async { [unowned self, socket] in
+            var shouldKeepRunning = true
+            var readData = Data(capacity: Self.bufferSize)
+
+            do {
+                readLoop: repeat {
+                    switch try socket.read(into: &readData) {
+                    case 1 ... Self.bufferSize:
+                        guard let response = String(data: readData, encoding: .utf8)?.trimmed else {
+                            log.error("Error decoding response...")
+                            readData.removeAll(keepingCapacity: true)
+                            break readLoop
+                        }
+
+                        log.debug("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                        try onResponse(response, socket: socket)
+                    case 0:
+                        log.debug("Read 0 bytes, closing socket")
+                        shouldKeepRunning = false
+                        break readLoop
+                    default:
+                        log.warning("Read too many bytes!")
+                        readData.removeAll(keepingCapacity: true)
+                        break readLoop
+                    }
+
+                    readData.removeAll(keepingCapacity: true)
+                } while shouldKeepRunning
+
+                log.debug("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                socket.close()
+
+                self.socketLockQueue.sync { [unowned self, socket] in
+                    self.connectedSockets[socket.socketfd] = nil
+                }
+            } catch {
+                guard let socketError = error as? Socket.Error else {
+                    log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
+                    return
+                }
+                if self.continueRunning {
+                    log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
+                }
+            }
+        }
+    }
+
+    func stop() {
+        log.info("Shutdown in progress...")
+        continueRunning = false
+
+        for socket in connectedSockets.values {
+            socketLockQueue.sync { [unowned self, socket] in
+                self.connectedSockets[socket.socketfd] = nil
+                socket.close()
+            }
+        }
+    }
+}
+
+let CLI_ARG_SEPARATOR = "\u{01}"
+
+var isServer = false
+var serverOutput = ""
+func cliSleep(_ time: TimeInterval) {
+    guard !isServer else { return }
+    Thread.sleep(forTimeInterval: time)
+}
+
+func cliExit(_ code: Int32) {
+    guard !isServer else {
+        if serverOutput.isEmpty {
+            serverOutput = "\n"
+        }
+        return
+    }
+    exit(code)
+}
+
+func cliPrint(_ s: Any, terminator: String = "\n") {
+    guard !isServer else {
+        serverOutput += "\(s)\(terminator)"
+        return
+    }
+    print(s, terminator: terminator)
+}
+
+func cliGetDisplays(
+    includeVirtual: Bool = true,
+    includeAirplay: Bool = false,
+    includeProjector: Bool = false,
+    includeDummy: Bool = false
+) {
+    guard !isServer else {
+        return
+    }
+    displayController.displays = DisplayController.getDisplays(
+        includeVirtual: includeVirtual,
+        includeAirplay: includeAirplay,
+        includeProjector: includeProjector,
+        includeDummy: includeDummy
+    )
+}
+
+let LUNAR_CLI_PORT: Int32 = 23803
+let server = LunarServer()
+
+func serve() throws {
+    isServer = true
+    server.run()
+}
