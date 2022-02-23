@@ -105,7 +105,7 @@
         "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
           "branch": "dev",
-          "revision": "856f2708108ab9e3018405e9bf273318c28d7b32",
+          "revision": "fda73dc564372e98b5e5e6f5452a19f6b92a0382",
           "version": null
         }
       },
@@ -159,7 +159,7 @@
         "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "d0f5cce4dca669df7947054560de9ccfbe4a6498",
+          "revision": "343d463cffef1f30458d02ce2dc441138e9e0134",
           "version": null
         }
       },
@@ -170,15 +170,6 @@
           "branch": null,
           "revision": "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
           "version": "3.1.1"
-        }
-      },
-      {
-        "package": "Sparkle",
-        "repositoryURL": "https://github.com/sparkle-project/Sparkle",
-        "state": {
-          "branch": null,
-          "revision": "85d3fa2e0e2b7871866eb1a92231847cff4162fd",
-          "version": "2.0.0"
         }
       },
       {

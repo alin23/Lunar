@@ -1,6 +1,0 @@
-framework module LetsMove {
-	umbrella header "LetsMove.h"
-	
-	export *
-	module * { export * }
-}
