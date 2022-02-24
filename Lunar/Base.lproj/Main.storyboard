@@ -4021,10 +4021,10 @@ disabled</string>
                                     </binding>
                                 </connections>
                             </box>
-                            <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi">
+                            <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi" customClass="ModePopupButton" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="377" y="253" width="193" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
+                                <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="tWl-6K-XFy">
@@ -4036,7 +4036,8 @@ disabled</string>
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <action selector="selectItem:" target="VkT-77-mId" id="kUc-hp-8Kk"/>
+                                    <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="YCF-76-hSY"/>
+                                    <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="YCF-76-hSY" id="jqB-8b-S6Y"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="qyp-NH-cxV" id="yjV-vz-r45">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -4046,8 +4047,6 @@ disabled</string>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="EzW-Wq-S4N" id="Ev3-mN-3Nu"/>
-                                    <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="EzW-Wq-S4N"/>
                                     <binding destination="wZs-lo-pp8" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="qyp-NH-cxV">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -4371,6 +4370,7 @@ Turns the display back on when the last monitor is disconnected</string>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
                         <outlet property="lockBrightnessCurveButton" destination="Z5X-YG-FjQ" id="pOc-V1-hxI"/>
                         <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
+                        <outlet property="resolutionsDropdown" destination="rrg-Kp-lBi" id="IVH-3Y-mNe"/>
                         <outlet property="schedule1" destination="WET-aM-MU7" id="txT-Qj-ffP"/>
                         <outlet property="schedule2" destination="Qx8-vD-Roe" id="ody-x1-U9V"/>
                         <outlet property="schedule3" destination="6NV-4N-tbR" id="dBy-Nt-p9d"/>
@@ -6452,12 +6452,12 @@ Lunar will continue to check in the background</string>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <popUpButton focusRingType="none" misplaced="YES" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY">
+                                        <popUpButton focusRingType="none" misplaced="YES" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY" customClass="ModePopupButton" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="127" y="117" width="158" height="24"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="24" id="Dtu-re-9w0"/>
                                             </constraints>
-                                            <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="aGF-Pm-WQ9" id="Dst-oX-gLo">
+                                            <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="aGF-Pm-WQ9" id="Dst-oX-gLo">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <menu key="menu" id="Y4J-Ke-N0J">
@@ -7133,6 +7133,9 @@ should rise or fall based on the adaptive input</string>
                             <constraint firstItem="1Tt-VZ-2bh" firstAttribute="leading" secondItem="YSi-X1-Nsf" secondAttribute="leading" id="zfY-vE-yyw"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="resolutionsDropdown" destination="r0W-Kk-VpY" id="7ds-xw-U52"/>
+                    </connections>
                 </viewController>
                 <customObject id="gdS-SJ-DKe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <arrayController id="Hw6-bB-9z0">

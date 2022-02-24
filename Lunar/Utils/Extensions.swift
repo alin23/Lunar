@@ -774,6 +774,17 @@ extension ArraySlice {
     }
 }
 
+extension Collection where Element == NSAttributedString {
+    func joined(separator: String) -> NSAttributedString {
+        interspersed(with: separator.attributedString).reduce("".attributedString) { $0 + $1 }
+    }
+}
+
+let MODE_NATIVE_TAG_COLOR = #colorLiteral(red: 0.712478668, green: 0.4330835298, blue: 0.3457791855, alpha: 1)
+let MODE_HIDPI_TAG_COLOR = #colorLiteral(red: 0.4922937925, green: 0.273587038, blue: 0.3272711812, alpha: 1)
+let MODE_RETINA_TAG_COLOR = #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)
+let MODE_UNSAFE_TAG_COLOR = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
+
 extension MPDisplayMode {
     enum Tag: String {
         case retina
@@ -803,15 +814,101 @@ extension MPDisplayMode {
             isSimulscan ? Tag.simulscan : nil,
             isInterlaced ? Tag.interlaced : nil,
         ].compactMap { $0?.rawValue }
-        return tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+        return tags.isEmpty ? "" : "   (\(tags.joined(separator: ", ")))"
+    }
+
+    var tagsAttributedString: NSAttributedString {
+        let tags: [NSAttributedString] = [
+            isNativeMode ? Tag.native.rawValue.withTextColor(MODE_NATIVE_TAG_COLOR) : nil,
+            isDefaultMode ? Tag.defaultMode.rawValue.withTextColor(.secondaryLabelColor) : nil,
+            isRetina ? Tag.retina.rawValue.withTextColor(MODE_RETINA_TAG_COLOR) : nil,
+            isHiDPI ? Tag.hidpi.rawValue.withTextColor(MODE_HIDPI_TAG_COLOR) : nil,
+            (isTVMode && tvMode != 0) ? Tag.tv.rawValue.withTextColor(.tertiaryLabelColor) : nil,
+            isSafeMode ? nil : Tag.unsafe.rawValue.withTextColor(MODE_UNSAFE_TAG_COLOR),
+            isSimulscan ? Tag.simulscan.rawValue.withTextColor(.quaternaryLabelColor) : nil,
+            isInterlaced ? Tag.interlaced.rawValue.withTextColor(.quaternaryLabelColor) : nil,
+        ].compactMap { $0 }
+        return tags.isEmpty ? "".attributedString : "   ".attributedString + tags.joined(separator: ", ")
+    }
+
+    open var attributedString: NSAttributedString {
+        let res = (resolutionString?.isEmpty ?? true) ? "\(pixelsWide)x\(pixelsHigh)" : resolutionString!
+        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
+        let dpi = "\(dotsPerInch)DPI"
+
+        let rightAligned = NSMutableParagraphStyle()
+        rightAligned.alignment = .right
+        rightAligned.tabStops = [NSTextTab(textAlignment: NSTextAlignment.left, location: 200, options: [:])]
+
+        return "\(res)".withFont(.systemFont(ofSize: 12, weight: .medium))
+            + " @ ".withFont(.monospacedSystemFont(ofSize: 12, weight: .regular)).withTextColor(.gray)
+            + "\(refresh)".withFont(.systemFont(ofSize: 12, weight: .medium))
+            + "\t[\(dpi)] [\(depth)bit]"
+            .withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
+            .withTextColor(.gray)
+            .withParagraphStyle(rightAligned)
+            + tagsAttributedString.withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
     }
 
     override open var description: String {
-        let res = "\(pixelsWide)x\(pixelsHigh)"
-        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
+        let res = "\(width) x \(height)"
+        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
         let dpi = "\(dotsPerInch)DPI"
 
         return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
+    }
+}
+
+// MARK: - ModePopupButton
+
+class ModePopupButton: NSPopUpButton {
+    // MARK: Lifecycle
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+
+        setItemStyles()
+        selectedItemPublisher
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { item in
+                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
+                    return
+                }
+                defer { mgr.unlockAccess() }
+
+                guard let item = item, let mode = item.representedObject as? MPDisplayMode else { return }
+                item.attributedTitle = mode.attributedString
+            }.store(in: &observers)
+    }
+
+    // MARK: Internal
+
+    var observers: Set<AnyCancellable> = []
+
+    override var menu: NSMenu? {
+        didSet {
+            setItemStyles()
+        }
+    }
+
+    override func addItems(withTitles itemTitles: [String]) {
+        super.addItems(withTitles: itemTitles)
+
+        setItemStyles()
+    }
+
+    func setItemStyles() {
+        guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+            mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
+            return
+        }
+
+        defer { mgr.unlockAccess() }
+        for item in itemArray {
+            guard let mode = item.representedObject as? MPDisplayMode else { continue }
+            item.attributedTitle = mode.attributedString
+        }
     }
 }
 
@@ -1250,6 +1347,13 @@ extension NSPopUpButton {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
             .map { _ in self.selectedTag() }
+            .eraseToAnyPublisher()
+    }
+
+    var selectedItemPublisher: AnyPublisher<NSMenuItem?, Never> {
+        NotificationCenter.default
+            .publisher(for: NSMenu.didSendActionNotification, object: menu)
+            .map { _ in self.selectedItem }
             .eraseToAnyPublisher()
     }
 }
