@@ -223,7 +223,7 @@ def main(
         releaseNotesFile = RELEASE_NOTES / f"{version}.md"
         if description is None and releaseNotesFile.exists():
             changelog = html.fromstring(
-                markdown_path(str(releaseNotesFile), extras=["header-ids"])
+                markdown_path(str(releaseNotesFile), extras=["header-ids", "fenced-code-blocks"])
             )
             description = E.description(
                 etree.CDATA(
