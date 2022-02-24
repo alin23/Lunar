@@ -1,3 +1,4 @@
 fire
 lxml
 markdown2
+pygments
