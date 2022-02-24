@@ -256,6 +256,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var brightnessSlider: Slider?
     @IBOutlet var brightnessContrastSlider: Slider?
+    @IBOutlet var resolutionsDropdown: ModePopupButton?
 
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
@@ -613,6 +614,10 @@ class DisplayViewController: NSViewController {
 
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
+
+        if let resolutionsDropdown = resolutionsDropdown {
+            resolutionsDropdown.setItemStyles()
+        }
 
         display.withoutDDC { display.panelMode = display.panel?.currentMode }
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
