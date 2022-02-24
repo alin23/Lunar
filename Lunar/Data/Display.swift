@@ -1131,6 +1131,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var supportsGamma: Bool = supportsGammaByDefault && !useOverlay
     @objc dynamic lazy var supportsGammaByDefault: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector
 
+    @objc dynamic lazy var panelModeTitles: [NSAttributedString] = panelModes.map(\.attributedString)
+
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
         let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
             (panel?.isTV ?? false) || !($0.isTVMode && $0.tvMode != 0)
