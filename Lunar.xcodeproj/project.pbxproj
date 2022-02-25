@@ -100,7 +100,6 @@
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A517A02593C11C00F6CC83 /* PopoverButon.swift */; };
 		C7A63205238C04C10005D792 /* QuickActionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* QuickActionsViewController.swift */; };
-		C7A6A08827BF8F57008E52E0 /* QuickActions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7DDAEA32736A31A00996715 /* QuickActions.storyboard */; };
 		C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */ = {isa = PBXBuildFile; fileRef = C7AF321C26F62F5C00AC14AF /* Schedule.xib */; };
 		C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C247259391C200745637 /* HotkeyPopoverController.swift */; };
 		C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C2492593B5EA00745637 /* HotkeyButton.swift */; };
@@ -129,6 +128,7 @@
 		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
 		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
 		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
+		C7C2EE9427C81B5200A1285E /* QuickActions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7C2EE9627C81B5200A1285E /* QuickActions.storyboard */; };
 		C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */; };
 		C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = C7C43190269DD9AE00DCD0F5 /* install.sh */; };
 		C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C7C43191269DD9AE00DCD0F5 /* lunar.yaml */; };
@@ -315,6 +315,7 @@
 		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
 		C7C1F7061FD6354C0039507C /* Geolocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geolocation.swift; sourceTree = "<group>"; };
 		C7C1F7081FD639970039507C /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		C7C2EE9527C81B5200A1285E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/QuickActions.storyboard; sourceTree = "<group>"; };
 		C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALSInstallViewController.swift; sourceTree = "<group>"; };
 		C7C43190269DD9AE00DCD0F5 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		C7C43191269DD9AE00DCD0F5 /* lunar.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = lunar.yaml; sourceTree = "<group>"; };
@@ -330,7 +331,6 @@
 		C7DD62282612331700B07B31 /* PaddedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedTextField.swift; sourceTree = "<group>"; };
 		C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHConnectionViewController.swift; sourceTree = "<group>"; };
 		C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedButton.swift; sourceTree = "<group>"; };
-		C7DDAEA32736A31A00996715 /* QuickActions.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = QuickActions.storyboard; sourceTree = "<group>"; };
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7DED367267A0639002E0188 /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		C7DED368267A0663002E0188 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
@@ -630,7 +630,7 @@
 				C79B5A252434905900D62E52 /* Lunar.entitlements */,
 				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
-				C7DDAEA32736A31A00996715 /* QuickActions.storyboard */,
+				C7C2EE9627C81B5200A1285E /* QuickActions.storyboard */,
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AF321C26F62F5C00AC14AF /* Schedule.xib */,
 				C7AEC7F81FD0B4350039B562 /* AppDelegate.swift */,
@@ -911,7 +911,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */,
-				C7A6A08827BF8F57008E52E0 /* QuickActions.storyboard in Resources */,
+				C7C2EE9427C81B5200A1285E /* QuickActions.storyboard in Resources */,
 				C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
@@ -1093,6 +1093,14 @@
 				C7AEC7FF1FD0B4350039B562 /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		C7C2EE9627C81B5200A1285E /* QuickActions.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C7C2EE9527C81B5200A1285E /* Base */,
+			);
+			name = QuickActions.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

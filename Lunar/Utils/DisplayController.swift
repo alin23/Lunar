@@ -886,6 +886,7 @@ class DisplayController {
                 log.debug("STORED NEW DISPLAYS \(storedDisplays.map(\.serial))")
             #endif
 
+            printMirrors(displays)
             return Dictionary(
                 storedDisplays.map { d in (d.id, d) },
                 uniquingKeysWith: first(this:other:)
@@ -925,7 +926,20 @@ class DisplayController {
             log.debug("STORED UPDATED DISPLAYS \(storedDisplays.map(\.serial))")
         #endif
 
+        printMirrors(storedDisplays)
         return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
+    }
+
+    static func printMirrors(_ displays: [Display]) {
+        for d in displays {
+            d.primaryMirrorScreen = d.getPrimaryMirrorScreen()
+//            d.secondaryMirrorScreenID = d.getSecondaryMirrorScreenID()
+            let primary = d.primaryMirrorScreen
+            let secondary = d.secondaryMirrorScreenID
+
+            log.debug("Primary mirror for \(d): \(String(describing: primary))")
+            log.debug("Secondary mirror for \(d): \(String(describing: secondary))")
+        }
     }
 
     func getCurrentAudioDisplay() -> Display? {
@@ -1131,6 +1145,7 @@ class DisplayController {
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
                 let activeNewDisplays = self.displays.values.filter(\.active)
+                let activeNewDisplayIDs = activeNewDisplays.map(\.id)
 
                 let d = self.displays.values
                 if !d.contains(where: \.isSource),
@@ -1142,38 +1157,28 @@ class DisplayController {
                 SyncMode.refresh()
                 self.addSentryData()
 
+                log.debug("Disabling BlackOut where the mirror does not exist anymore")
+                for d in activeNewDisplays {
+                    let mirror = d.primaryMirrorScreen?.displayID ?? 0
+                    log
+                        .debug(
+                            "\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(activeNewDisplayIDs.contains(mirror))"
+                        )
+                    guard d.blackOutEnabled, mirror == 0 || !activeNewDisplayIDs.contains(mirror) else { continue }
+                    mainAsync { displayController.blackOut(display: d.id, state: .off) }
+                }
+
+                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, activeOldDisplays.count > 1 {
+                    log.debug("Disabling BlackOut if we're left with only 1 screen")
+                    mainAsync { displayController.blackOut(display: d.id, state: .off) }
+                }
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1 {
-                    displayController.blackOut(display: d.id, state: .on)
-                }
-                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, activeOldDisplays.count > 1 {
-                    displayController.blackOut(display: d.id, state: .off)
+                    mainAsync { displayController.blackOut(display: d.id, state: .on) }
                 }
             }
-            windowControllerQueue.sync {
-                let idsWithWindows: Set<CGDirectDisplayID> = Set(
-                    Thread.current.threadDictionary.allKeys
-                        .compactMap { $0 as? String }
-                        .filter { $0.starts(with: "window-") }
-                        .compactMap { $0.split(separator: "-").last?.u32 }
-                )
-                let currentIDs: Set<CGDirectDisplayID> = Set(self.displays.keys)
 
-                let idsToRemove = idsWithWindows.subtracting(currentIDs)
-                Thread.current.threadDictionary.allKeys
-                    .compactMap { $0 as? String }
-                    .filter {
-                        guard $0.starts(with: "window-"), let id = $0.split(separator: "-").last?.u32 else { return false }
-                        return idsToRemove.contains(id)
-                    }.forEach { key in
-                        guard let wc = Thread.current.threadDictionary[key] as? NSWindowController else {
-                            return
-                        }
-                        wc.close()
-                        Thread.current.threadDictionary.removeObject(forKey: key)
-                    }
-            }
-
+            self.reconfigure()
             mainAsync {
                 appDelegate!.recreateWindow(
                     page: (advancedSettings || configurationPage) ? Page.settings.rawValue : nil,
@@ -1182,6 +1187,48 @@ class DisplayController {
                 NotificationCenter.default.post(name: displayListChanged, object: nil)
             }
         }
+    }
+
+    func reconfigure() {
+        thrice(uniqueTaskKey: "display-controller-reconfiguration") { dc in
+            log.info("Resetting software dimming")
+            dc.activeDisplays.values.forEach { d in
+                d.updateCornerWindow()
+                d.resetSoftwareControl()
+            }
+
+            log.info("Removing old overlays")
+            windowControllerQueue.sync {
+                dc.removeOldOverlays()
+            }
+
+            log.info("Re-adapting brightness after reconfiguration")
+            dc.adaptBrightness(force: true)
+        }
+    }
+
+    func removeOldOverlays() {
+        let idsWithWindows: Set<CGDirectDisplayID> = Set(
+            Thread.current.threadDictionary.allKeys
+                .compactMap { $0 as? String }
+                .filter { $0.starts(with: "window-") }
+                .compactMap { $0.split(separator: "-").last?.u32 }
+        )
+        let currentIDs: Set<CGDirectDisplayID> = Set(displays.keys)
+
+        let idsToRemove = idsWithWindows.subtracting(currentIDs)
+        Thread.current.threadDictionary.allKeys
+            .compactMap { $0 as? String }
+            .filter {
+                guard $0.starts(with: "window-"), let id = $0.split(separator: "-").last?.u32 else { return false }
+                return idsToRemove.contains(id)
+            }.forEach { key in
+                guard let wc = Thread.current.threadDictionary[key] as? NSWindowController else {
+                    return
+                }
+                wc.close()
+                Thread.current.threadDictionary.removeObject(forKey: key)
+            }
     }
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
