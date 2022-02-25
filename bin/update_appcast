@@ -18,8 +18,8 @@ end
 set TMP_DIR /tmp/Lunar
 set APP_TMP "$TMP_DIR/Lunar.app"
 set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
-set ARM_APP_SIGNATURE ("$APP_TMP"/Contents/MacOS/Lunar @ signature || exit 1)
-set INTEL_APP_SIGNATURE (arch -x86_64 "$APP_TMP"/Contents/MacOS/Lunar @ signature || exit 1)
+set ARM_APP_SIGNATURE ("$APP_TMP"/Contents/MacOS/Lunar @ --new-instance signature || exit 1)
+set INTEL_APP_SIGNATURE (arch -x86_64 "$APP_TMP"/Contents/MacOS/Lunar @ --new-instance signature || exit 1)
 echo Lunar $APP_VERSION \n\tARM signature: "$ARM_APP_SIGNATURE"\n\tINTEL signature: "$INTEL_APP_SIGNATURE"
 
 echo \n(set_color yellow)"Generating AppCast ($APPCAST)"(set_color normal)
