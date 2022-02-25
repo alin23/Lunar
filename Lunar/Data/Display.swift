@@ -1032,28 +1032,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return getPrimaryMirrorScreen()
     }()
 
-    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
-        NotificationCenter.default
-            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-                asyncEvery(
-                    2.seconds,
-                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
-                    runs: 5,
-                    skipIfExists: false,
-                    queue: mainQueue
-                ) { [weak self] _ in
-                    guard let self = self else { return }
-                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-                }
-            }
-            .store(in: &observers)
-
-        return getSecondaryMirrorScreenID()
-    }()
+//    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
+//        NotificationCenter.default
+//            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+//            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+//            .sink { [weak self] _ in
+//                guard let self = self else { return }
+//                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
+//                asyncEvery(
+//                    2.seconds,
+//                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
+//                    runs: 5,
+//                    skipIfExists: false,
+//                    queue: mainQueue
+//                ) { [weak self] _ in
+//                    guard let self = self else { return }
+//                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
+//                }
+//            }
+//            .store(in: &observers)
+//
+//        return getSecondaryMirrorScreenID()
+//    }()
 
     lazy var screen: NSScreen? = {
         NotificationCenter.default
@@ -1180,6 +1180,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var preciseMinContrast: Double = minContrast.doubleValue / 100.0
 
     var lastConnectionTime = Date()
+
+    var secondaryMirrorScreenID: CGDirectDisplayID? {
+        getSecondaryMirrorScreenID()
+    }
 
     var audioIdentifier: String? = nil {
         didSet {

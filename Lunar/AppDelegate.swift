@@ -1029,7 +1029,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { _ in
+                displayController.reconfigure()
+            }.store(in: &observers)
+
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
                 log.debug("Screen configuration changed")
                 displayController.activeDisplays.values.forEach { d in
@@ -1040,7 +1047,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 let oldScreenIDs = self.screenIDs
 
                 let newLidClosed = isLidClosed()
-                guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else { return }
+                guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else {
+                    return
+                }
 
                 if newScreenIDs != oldScreenIDs {
                     log.info(
