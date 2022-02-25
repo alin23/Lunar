@@ -89,11 +89,12 @@ clean:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
 
 build: BEAUTIFY=1
+build: ONLY_ACTIVE_ARCH=NO
 build: setversion
 ifneq ($(BEAUTIFY),0)
-	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
 else
-	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO | tee /tmp/lunar-$(ENV)-build.log
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | tee /tmp/lunar-$(ENV)-build.log
 endif
 
 build-version: BEAUTIFY=1
