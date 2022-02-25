@@ -832,7 +832,7 @@ extension MPDisplayMode {
     }
 
     open var attributedString: NSAttributedString {
-        let res = (resolutionString?.isEmpty ?? true) ? "\(pixelsWide)x\(pixelsHigh)" : resolutionString!
+        let res = "\(width) x \(height)"
         let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
         let dpi = "\(dotsPerInch)DPI"
 
