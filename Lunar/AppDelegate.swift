@@ -1490,6 +1490,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if Defaults[.apiKey].isEmpty {
             Defaults[.apiKey] = SERIAL_NUMBER_HASH
         }
+
+        if CommandLine.arguments.contains("install-cli") || CommandLine.arguments
+            .contains("installcli") || (CommandLine.arguments.contains("install") && CommandLine.arguments.contains("cli"))
+        {
+            log.setMinLevel(debug: false, verbose: false, cloud: false, cli: false)
+            log.disable()
+            do {
+                try installCLIBinary()
+                print("Lunar CLI installed")
+            } catch let error as InstallCLIError {
+                print(error.message)
+                print(error.info)
+            } catch {
+                print("Error installing Lunar CLI")
+                print(error.localizedDescription)
+            }
+            exit(0)
+        }
+
         if !CommandLine.arguments.contains("@") {
             log.initLogger()
         }
@@ -2008,6 +2027,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         createAndShowWindow("sshWindowController", controller: &sshWindowController)
     }
 
+    func installCLIAndShowDialog() {
+        do {
+            try installCLIBinary()
+            dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
+        } catch let error as InstallCLIError {
+            dialog(message: error.message, info: error.info, cancelButton: nil).runModal()
+        } catch {
+            dialog(message: "Error installing Lunar CLI", info: "\(error)", cancelButton: nil).runModal()
+        }
+    }
+
     @IBAction func installCLI(_: Any) {
         let shouldInstall: Bool = ask(
             message: "Lunar CLI",
@@ -2017,14 +2047,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             unique: true
         )
         if shouldInstall {
-            do {
-                try installCLIBinary()
-                dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
-            } catch let error as InstallCLIError {
-                dialog(message: error.message, info: error.info, cancelButton: nil).runModal()
-            } catch {
-                dialog(message: "Error installing Lunar CLI", info: "\(error)", cancelButton: nil).runModal()
-            }
+            installCLIAndShowDialog()
         }
     }
 
