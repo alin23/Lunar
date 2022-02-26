@@ -1502,9 +1502,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             } catch let error as InstallCLIError {
                 print(error.message)
                 print(error.info)
+                exit(1)
             } catch {
                 print("Error installing Lunar CLI")
                 print(error.localizedDescription)
+                exit(2)
             }
             exit(0)
         }
