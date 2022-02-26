@@ -84,14 +84,50 @@ Lunar has to fallback to mimicking a brightness change through gamma table alter
 * No support for changing volume or input
 * Low brightness values can wash out colors
 * Quitting Lunar resets the brightness to default
-* Contrast is approximated by adjusting the gamma factor and can look very bad on some monitors
+
 """
+
+let SOFTWARE_OVERLAY_FORCED_HELP_TEXT = """
+## Software Overlay
+
+This monitor's brightness will be dimmed by placing a dark overlay on top.
+
+### Advantages
+* It works on any monitor no matter what type of connections is used
+
+### Disadvantages
+* **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+* No support for changing volume, contrast or input
+* Low brightness values can wash out colors
+* Quitting Lunar resets the brightness to default
+
+#### Notes
+
+An **overlay** is a black, always-on-top, semi-transparent window that adjusts its opacity based on the brightness set in Lunar.
+
+"""
+let SOFTWARE_CONTROLS_FORCED_HELP_TEXT = """
+## Gamma tables
+
+This monitor's brightness will be dimmed by altering its RGB Gamma table to make the colors look less bright.
+
+### Advantages
+* It works on any monitor no matter what cable/adapter/connector you use
+
+### Disadvantages
+* **Needs the hardware brightness/contrast to be set manually to high values like 100/70 first**
+* No support for changing volume or input
+* Low brightness values can wash out colors
+* Quitting Lunar resets the brightness to default
+
+"""
+
 let NO_CONTROLS_HELP_TEXT = """
 ## No controls available
 
 Looks like all available controls for this monitor have been disabled manually.
 
-Click on the **Display Settings** button near the `RESET` dropdown to enable a control.
+Click on the `Controls` button near the `Reset` button to enable a control.
 """
 let NETWORK_CONTROLS_HELP_TEXT = """
 ## Network control
@@ -264,6 +300,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var cornerRadiusFieldCaption: ScrollableTextFieldCaption?
 
     @IBOutlet var _controlsButton: NSButton!
+    @IBOutlet var _softwareDimmingButton: NSButton!
     @IBOutlet var _proButton: NSButton!
     @IBOutlet var _lockContrastHelpButton: NSButton?
     @IBOutlet var _lockBrightnessHelpButton: NSButton?
@@ -321,6 +358,10 @@ class DisplayViewController: NSViewController {
 
     var controlsButton: HelpButton? {
         _controlsButton as? HelpButton
+    }
+
+    var softwareDimmingButton: HelpButton? {
+        _softwareDimmingButton as? HelpButton
     }
 
     var proButton: Button? {
@@ -771,7 +812,9 @@ class DisplayViewController: NSViewController {
     func updateControlsButton(control: Control? = nil) {
         mainAsync { [weak self] in
             guard let self = self else { return }
-            guard let button = self.controlsButton, let display = self.display else {
+            guard let button = self.controlsButton, let softwareDimmingButton = self.softwareDimmingButton,
+                  let display = self.display
+            else {
                 return
             }
 
@@ -787,33 +830,93 @@ class DisplayViewController: NSViewController {
             button.alpha = 0.85
             button.hoverAlpha = 1.0
             button.circle = false
+            button.shadowAlpha = 0.0
+            button.identifier = NSUserInterfaceItemIdentifier("ControlsButton")
+            button.onClick = nil
+
+            softwareDimmingButton.alpha = 0.85
+            softwareDimmingButton.hoverAlpha = 1.0
+            softwareDimmingButton.shadowAlpha = 0.0
+            softwareDimmingButton.identifier = NSUserInterfaceItemIdentifier("SoftwareDimmingButton")
+            softwareDimmingButton.onClick = nil
+            softwareDimmingButton.attributedTitle = "".attributedString
+            softwareDimmingButton.isHidden = true
+            softwareDimmingButton.isEnabled = false
 
             switch control {
             case is AppleNativeControl:
                 button.bg = green
                 button.attributedTitle = "Apple Native".withAttribute(.textColor(mauve))
                 button.helpText = NATIVE_CONTROLS_HELP_TEXT
+                button.showPopover = true
             case is DDCControl:
                 button.bg = darkMode ? peach : lunarYellow
                 button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
-            case is GammaControl where display.enabledControls[.gamma] ?? false:
-                button.bg = darkMode ? peach.blended(withFraction: 0.5, of: red) : red.withAlphaComponent(0.9)
-                if display.supportsGamma {
-                    button.attributedTitle = "Software Gamma".withAttribute(.textColor(.black))
-                    button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
-                } else {
-                    button.attributedTitle = "Software Overlay".withAttribute(.textColor(.black))
-                    button.helpText = SOFTWARE_OVERLAY_HELP_TEXT
+                button.alpha = 1.0
+                button.shadowAlpha = 1.0
+                button.showPopover = true
+
+                softwareDimmingButton.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red.withAlphaComponent(0.9)
+                softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(.white.withAlphaComponent(0.5)))
+                softwareDimmingButton.alpha = 0.7
+                softwareDimmingButton.shadowAlpha = 0.0
+                softwareDimmingButton.isHidden = false
+                softwareDimmingButton.isEnabled = true
+                softwareDimmingButton.showPopover = false
+                softwareDimmingButton.onClick = { [weak self] in
+                    guard let display = self?.display else { return }
+                    display.gammaEnabled = true
+                    display.ddcEnabled = false
+                    display.control = display.getBestControl(reapply: true)
                 }
+                self.view.bringSubviewToFront(button)
+            case is GammaControl where display.enabledControls[.gamma] ?? false:
+                if DDCControl.isAvailable(for: display) {
+                    button.bg = darkMode ? peach : lunarYellow
+                    button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
+                    button.helpText = HARDWARE_CONTROLS_HELP_TEXT
+                    button.shadowAlpha = 0.0
+                    button.alpha = 0.6
+                    button.showPopover = false
+                    button.onClick = { [weak self] in
+                        guard let display = self?.display else { return }
+                        display.ddcEnabled = true
+                        display.control = display.getBestControl(reapply: true)
+                    }
+
+                    softwareDimmingButton.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red
+                    softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(darkMauve))
+                    softwareDimmingButton.alpha = 1.0
+                    softwareDimmingButton.shadowAlpha = 1.0
+                    softwareDimmingButton.isHidden = false
+                    softwareDimmingButton.isEnabled = true
+                    softwareDimmingButton.showPopover = true
+                    softwareDimmingButton.helpText = display
+                        .supportsGamma ? SOFTWARE_CONTROLS_FORCED_HELP_TEXT : SOFTWARE_OVERLAY_FORCED_HELP_TEXT
+                    self.view.bringSubviewToFront(softwareDimmingButton)
+                } else {
+                    button.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red.withAlphaComponent(0.9)
+                    if display.supportsGamma {
+                        button.attributedTitle = "Software Gamma".withAttribute(.textColor(.black))
+                        button.helpText = SOFTWARE_CONTROLS_HELP_TEXT
+                    } else {
+                        button.attributedTitle = "Software Overlay".withAttribute(.textColor(.black))
+                        button.helpText = SOFTWARE_OVERLAY_HELP_TEXT
+                    }
+                    button.showPopover = true
+                }
+
             case is NetworkControl:
                 button.bg = darkMode ? blue.highlight(withLevel: 0.2) : blue.withAlphaComponent(0.9)
                 button.attributedTitle = "Network Pi".withAttribute(.textColor(.black))
                 button.helpText = NETWORK_CONTROLS_HELP_TEXT
+                button.showPopover = true
             default:
                 button.bg = darkMode ? gray.withAlphaComponent(0.6) : gray.withAlphaComponent(0.9)
                 button.attributedTitle = "No Controls".withAttribute(.textColor(.darkGray))
                 button.helpText = NO_CONTROLS_HELP_TEXT
+                button.showPopover = true
             }
             self.brightnessSlider?.color = button.bg!
             self.brightnessContrastSlider?.color = button.bg!

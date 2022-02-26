@@ -17,6 +17,24 @@ public extension String {
     }
 }
 
+extension NSView {
+    func bringSubviewToFront(_ view: NSView) {
+        var theView = view
+        sortSubviews({ viewA, viewB, rawPointer in
+            let view = rawPointer?.load(as: NSView.self)
+
+            switch view {
+            case viewA:
+                return ComparisonResult.orderedDescending
+            case viewB:
+                return ComparisonResult.orderedAscending
+            default:
+                return ComparisonResult.orderedSame
+            }
+        }, context: &theView)
+    }
+}
+
 // MARK: private functionality
 
 extension DispatchQueue {
@@ -1437,7 +1455,7 @@ extension Publisher {
     )
         -> Publishers.Catch<Self, AnyPublisher<T, E>> where T == Self.Output, E == Self.Failure
     {
-        self.catch { error -> AnyPublisher<T, E> in
+        self.catch { _ -> AnyPublisher<T, E> in
             Publishers.Delay(
                 upstream: self,
                 interval: interval,
