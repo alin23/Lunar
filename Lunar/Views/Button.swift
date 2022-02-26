@@ -28,8 +28,8 @@ class Button: NSButton {
 
     @IBInspectable dynamic var grayDisabledText = true
     @IBInspectable dynamic var alternateTitleWhenDisabled = false
-
     var buttonShadow: NSShadow!
+    var buttonShadowHover: NSShadow!
 
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
@@ -41,6 +41,18 @@ class Button: NSButton {
     lazy var highlighterKey = "highlighter-\(accessibilityIdentifier())"
 
     @IBInspectable dynamic var handCursor = true
+
+    @IBInspectable dynamic var shadowAlpha: CGFloat = 0 {
+        didSet {
+            if let shadow = shadow?.copy() as? NSShadow {
+                buttonShadow = shadow
+                buttonShadow.shadowColor = buttonShadowHover.shadowColor?.withAlphaComponent(shadowAlpha)
+            } else {
+                buttonShadow = NO_SHADOW
+            }
+            shadow = (hover || shadowAlpha == 1) ? buttonShadowHover : shadowAlpha > 0 ? buttonShadow : NO_SHADOW
+        }
+    }
 
     @IBInspectable var horizontalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
     @IBInspectable var verticalPadding: CGFloat = 0 { didSet { mainAsync { [self] in invalidateIntrinsicContentSize() }}}
@@ -231,8 +243,14 @@ class Button: NSButton {
         attributedTitle = title.withTextColor(textColor)
         alphaValue = alpha
 
-        buttonShadow = shadow
-        shadow = NO_SHADOW
+        buttonShadowHover = shadow
+        if let shadow = shadow?.copy() as? NSShadow {
+            buttonShadow = shadow
+            buttonShadow.shadowColor = buttonShadowHover.shadowColor?.withAlphaComponent(shadowAlpha)
+        } else {
+            buttonShadow = NO_SHADOW
+        }
+        shadow = shadowAlpha == 1 ? buttonShadowHover : (shadowAlpha > 0 ? buttonShadow : NO_SHADOW)
         isBordered = false
         trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
     }
@@ -253,7 +271,7 @@ class Button: NSButton {
 
         transition(fadeDuration)
         alphaValue = alpha
-        shadow = NO_SHADOW
+        shadow = shadowAlpha == 1 ? buttonShadowHover : (shadowAlpha > 0 ? buttonShadow : NO_SHADOW)
     }
 
     func hover(fadeDuration: TimeInterval = 0.3) {
@@ -261,7 +279,7 @@ class Button: NSButton {
 
         transition(fadeDuration)
         alphaValue = hoverAlpha
-        shadow = buttonShadow
+        shadow = buttonShadowHover
     }
 
     override func mouseEntered(with _: NSEvent) {
