@@ -3578,9 +3578,37 @@ visible screen left</string>
                                     <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.input" id="55S-07-HOK"/>
                                 </connections>
                             </popUpButton>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="410" y="413" width="130" height="18"/>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0dW-qZ-glS" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="410" y="400" width="130" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
+                                <shadow key="shadow" blurRadius="6">
+                                    <size key="offset" width="0.0" height="-2"/>
+                                    <color key="color" red="0.17814691534381044" green="0.13160808944013672" blue="0.18593218537414966" alpha="0.70431498344370858" colorSpace="calibratedRGB"/>
+                                </shadow>
+                                <buttonCell key="cell" type="inline" title="Software Dimming" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="28G-xN-agv">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="alpha">
+                                        <real key="value" value="0.5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowAlpha">
+                                        <real key="value" value="0.80000000000000004"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="zNX-mv-Pc0"/>
+                                </connections>
+                            </button>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="410" y="414" width="130" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <shadow key="shadow" blurRadius="6">
+                                    <size key="offset" width="0.0" height="2"/>
+                                    <color key="color" red="0.17814691534381044" green="0.13160808944013672" blue="0.18593218537414966" alpha="0.703125" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                </shadow>
                                 <buttonCell key="cell" type="inline" title="Hardware Control" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ie5-OW-ycd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -3589,6 +3617,9 @@ visible screen left</string>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
                                     <userDefinedRuntimeAttribute type="number" keyPath="alpha">
                                         <real key="value" value="0.5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowAlpha">
+                                        <real key="value" value="0.80000000000000004"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -4036,8 +4067,6 @@ disabled</string>
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="YCF-76-hSY"/>
-                                    <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="YCF-76-hSY" id="jqB-8b-S6Y"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="qyp-NH-cxV" id="yjV-vz-r45">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -4047,6 +4076,8 @@ disabled</string>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="YCF-76-hSY" id="jqB-8b-S6Y"/>
+                                    <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="YCF-76-hSY"/>
                                     <binding destination="wZs-lo-pp8" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="qyp-NH-cxV">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -4358,6 +4389,7 @@ Turns the display back on when the last monitor is disconnected</string>
                         <outlet property="_proButton" destination="OZD-Gw-TTp" id="GdC-vI-6lp"/>
                         <outlet property="_resetButton" destination="TJO-8a-xfO" id="x3I-L4-3qx"/>
                         <outlet property="_settingsButton" destination="5Zc-wW-De5" id="vMa-qZ-kKc"/>
+                        <outlet property="_softwareDimmingButton" destination="0dW-qZ-glS" id="iqi-eZ-JMs"/>
                         <outlet property="adaptiveNotice" destination="ZlW-Lv-Oa8" id="e5o-8i-RIo"/>
                         <outlet property="addScheduleButton" destination="8G3-fq-bS8" id="XHZ-uR-fu4"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>

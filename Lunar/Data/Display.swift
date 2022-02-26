@@ -1087,7 +1087,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var maxBrightnessBeforeFacelight = maxBrightness
     lazy var maxContrastBeforeFacelight = maxContrast
 
-    @Atomic var mirroredBeforeBlackOut = false
+    @Atomic @objc dynamic var mirroredBeforeBlackOut = false
     @Atomic @objc dynamic var blackOutEnabled = false
     @Atomic @objc dynamic var blackOutMirroringAllowed = true
     lazy var brightnessBeforeBlackout = brightness
