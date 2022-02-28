@@ -743,7 +743,7 @@ class DisplayViewController: NSViewController {
                   displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedBrightnessCurve
             else {
-                self?.updateDataset(currentBrightness: brightness.u8)
+                self?.updateDataset(currentBrightness: brightness.u16)
                 return
             }
             cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
@@ -752,14 +752,14 @@ class DisplayViewController: NSViewController {
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
 
             let userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
-            self.updateDataset(currentBrightness: brightness.u8, userBrightness: userValues.dictionary)
+            self.updateDataset(currentBrightness: brightness.u16, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
             guard let self = self, let display = self.display,
                   displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedContrastCurve
             else {
-                self?.updateDataset(currentContrast: contrast.u8)
+                self?.updateDataset(currentContrast: contrast.u16)
                 return
             }
 
@@ -767,7 +767,7 @@ class DisplayViewController: NSViewController {
             display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
 
             let userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
-            self.updateDataset(currentContrast: contrast.u8, userContrast: userValues.dictionary)
+            self.updateDataset(currentContrast: contrast.u16, userContrast: userValues.dictionary)
         }
 
         display.onControlChange = { [weak self] control in
@@ -924,12 +924,12 @@ class DisplayViewController: NSViewController {
     }
 
     func updateDataset(
-        minBrightness: UInt8? = nil,
-        maxBrightness: UInt8? = nil,
-        minContrast: UInt8? = nil,
-        maxContrast: UInt8? = nil,
-        currentBrightness: UInt8? = nil,
-        currentContrast: UInt8? = nil,
+        minBrightness: UInt16? = nil,
+        maxBrightness: UInt16? = nil,
+        minContrast: UInt16? = nil,
+        maxContrast: UInt16? = nil,
+        currentBrightness: UInt16? = nil,
+        currentContrast: UInt16? = nil,
         brightnessFactor: Double? = nil,
         contrastFactor: Double? = nil,
         userBrightness: [Int: Int]? = nil,
@@ -1516,10 +1516,10 @@ class DisplayViewController: NSViewController {
             scrollableBrightness?.label.textColor = scrollableViewLabelColor
             scrollableContrast?.label.textColor = scrollableViewLabelColor
 
-            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u8) }
-            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u8) }
-            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u8) }
-            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u8) }
+            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u16) }
+            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u16) }
+            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u16) }
+            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u16) }
 
             initGraph()
         }

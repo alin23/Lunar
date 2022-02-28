@@ -120,12 +120,12 @@ class GammaControl: Control {
 
     func resetState() {}
 
-    func setRedGain(_ gain: UInt8) -> Bool { true }
-    func setGreenGain(_ gain: UInt8) -> Bool { true }
-    func setBlueGain(_ gain: UInt8) -> Bool { true }
-    func getRedGain() -> UInt8? { nil }
-    func getGreenGain() -> UInt8? { nil }
-    func getBlueGain() -> UInt8? { nil }
+    func setRedGain(_ gain: UInt16) -> Bool { true }
+    func setGreenGain(_ gain: UInt16) -> Bool { true }
+    func setBlueGain(_ gain: UInt16) -> Bool { true }
+    func getRedGain() -> UInt16? { nil }
+    func getGreenGain() -> UInt16? { nil }
+    func getBlueGain() -> UInt16? { nil }
     func resetColors() -> Bool { true }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
@@ -182,7 +182,7 @@ class GammaControl: Control {
         false
     }
 
-    func setVolume(_: UInt8) -> Bool {
+    func setVolume(_: UInt16) -> Bool {
         false
     }
 
@@ -210,11 +210,11 @@ class GammaControl: Control {
         MAX_CONTRAST
     }
 
-    func getMaxVolume() -> UInt8? {
+    func getMaxVolume() -> UInt16? {
         nil
     }
 
-    func getVolume() -> UInt8? {
+    func getVolume() -> UInt16? {
         nil
     }
 

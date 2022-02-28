@@ -625,7 +625,7 @@ struct Lunar: ParsableCommand {
                         continue
                     }
                     cliPrint("\(display): Writing \(value) for \(control)", terminator: ": ")
-                    if DDC.write(displayID: display.id, controlID: control, newValue: value.u8) {
+                    if DDC.write(displayID: display.id, controlID: control, newValue: value.u16) {
                         cliPrint("Ok")
                     } else {
                         cliPrint("Error")
@@ -1516,9 +1516,9 @@ private func handleDisplay(
 
         switch operation {
         case "+":
-            value = (currentValue.uint8Value + min(value.uint8Value, UINT8_MAX.u8 - currentValue.uint8Value)).ns
+            value = (currentValue.uint16Value + min(value.uint16Value, UINT16_MAX.u16 - currentValue.uint16Value)).ns
         case "-":
-            value = (currentValue.uint8Value - min(value.uint8Value, currentValue.uint8Value)).ns
+            value = (currentValue.uint16Value - min(value.uint16Value, currentValue.uint16Value)).ns
         case "":
             break
         default:
@@ -1537,7 +1537,7 @@ private func handleDisplay(
             display.control?.write(property, display.limitedVolume)
         default:
             display.setValue(value, forKey: property.rawValue)
-            display.control?.write(property, value.uint8Value)
+            display.control?.write(property, value.uint16Value)
         }
         display.save(now: true)
     default:
@@ -1571,7 +1571,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
     case .brightnessCurveFactors, .contrastCurveFactors:
         return (try! encoder.encode(value as! [String: Double])).str()
     case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:
-        return (InputSource(rawValue: value as! UInt8) ?? .unknown).str
+        return (InputSource(rawValue: value as! UInt16) ?? .unknown).str
     case .power:
         return (value as! Bool) ? "on" : "off"
     case .schedules:

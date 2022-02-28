@@ -155,37 +155,37 @@ class AppleNativeControl: Control {
         return control.setPower(power)
     }
 
-    func setRedGain(_ gain: UInt8) -> Bool {
+    func setRedGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setRedGain(gain)
     }
 
-    func setGreenGain(_ gain: UInt8) -> Bool {
+    func setGreenGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setGreenGain(gain)
     }
 
-    func setBlueGain(_ gain: UInt8) -> Bool {
+    func setBlueGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setBlueGain(gain)
     }
 
-    func getRedGain() -> UInt8? {
+    func getRedGain() -> UInt16? {
         guard let display = display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getRedGain()
     }
 
-    func getGreenGain() -> UInt8? {
+    func getGreenGain() -> UInt16? {
         guard let display = display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getGreenGain()
     }
 
-    func getBlueGain() -> UInt8? {
+    func getBlueGain() -> UInt16? {
         guard let display = display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getBlueGain()
@@ -261,7 +261,7 @@ class AppleNativeControl: Control {
 
                     // log.debug("Writing brightness=\(brightness) using \(self) to \(display)")
                     _ = self.writeBrightness(0, preciseBrightness: brightness)
-                    let br = (brightness * 100).intround.u8
+                    let br = (brightness * 100).intround.u16
                     display.lastWrittenBrightness = br
                     onChange?(br)
                     Thread.sleep(forTimeInterval: interval)
@@ -286,7 +286,7 @@ class AppleNativeControl: Control {
         return control.setContrast(contrast, oldValue: oldValue, onChange: onChange)
     }
 
-    func setVolume(_ volume: UInt8) -> Bool {
+    func setVolume(_ volume: UInt16) -> Bool {
         guard let display = display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setVolume(volume)
@@ -308,11 +308,11 @@ class AppleNativeControl: Control {
         guard let display = display else { return nil }
         switch method {
         case .coreDisplay:
-            return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u8
+            return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u16
         case .displayServices:
             var br = display.brightness.floatValue
             DisplayServicesGetBrightness(display.id, &br)
-            return (br * 100.0).u8
+            return (br * 100.0).u16
         }
     }
 
@@ -334,13 +334,13 @@ class AppleNativeControl: Control {
         return control.getMaxContrast()
     }
 
-    func getMaxVolume() -> UInt8? {
+    func getMaxVolume() -> UInt16? {
         guard let display = display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxVolume()
     }
 
-    func getVolume() -> UInt8? {
+    func getVolume() -> UInt16? {
         guard let display = display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getVolume()

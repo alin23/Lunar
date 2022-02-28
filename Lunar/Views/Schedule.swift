@@ -58,8 +58,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
             type: ScheduleType(rawValue: dict["type"] as! Int) ?? .time,
             hour: dict["hour"] as! UInt8,
             minute: dict["minute"] as! UInt8,
-            brightness: dict["brightness"] as! UInt8,
-            contrast: dict["contrast"] as! UInt8,
+            brightness: dict["brightness"] as! UInt16,
+            contrast: dict["contrast"] as! UInt16,
             negative: dict["negative"] as! Bool
         )
     }
@@ -96,8 +96,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
         type: ScheduleType? = nil,
         hour: UInt8? = nil,
         minute: UInt8? = nil,
-        brightness: UInt8? = nil,
-        contrast: UInt8? = nil,
+        brightness: UInt16? = nil,
+        contrast: UInt16? = nil,
         negative: Bool? = nil
     ) -> Self {
         BrightnessSchedule(
@@ -195,7 +195,7 @@ class Schedule: NSView {
                 return
             }
             let brightness = display.sliderValueToBrightness(newValue)
-            self.schedule = schedule.with(brightness: brightness.uint8Value)
+            self.schedule = schedule.with(brightness: brightness.uint16Value)
             display.save()
         }
     }
@@ -214,7 +214,7 @@ class Schedule: NSView {
             }
 
             let contrast = display.sliderValueToContrast(newValue)
-            self.schedule = schedule.with(contrast: contrast.uint8Value)
+            self.schedule = schedule.with(contrast: contrast.uint16Value)
             display.save()
         }
     }

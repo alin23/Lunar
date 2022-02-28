@@ -87,28 +87,28 @@ protocol Control {
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness?, onChange: ((Brightness) -> Void)?) -> Bool
     func setContrast(_ contrast: Contrast, oldValue: Contrast?, onChange: ((Contrast) -> Void)?) -> Bool
-    func setVolume(_ volume: UInt8) -> Bool
+    func setVolume(_ volume: UInt16) -> Bool
     func setInput(_ input: InputSource) -> Bool
     func setMute(_ muted: Bool) -> Bool
     func setPower(_ power: PowerState) -> Bool
 
-    func setRedGain(_ gain: UInt8) -> Bool
-    func setGreenGain(_ gain: UInt8) -> Bool
-    func setBlueGain(_ gain: UInt8) -> Bool
+    func setRedGain(_ gain: UInt16) -> Bool
+    func setGreenGain(_ gain: UInt16) -> Bool
+    func setBlueGain(_ gain: UInt16) -> Bool
 
-    func getRedGain() -> UInt8?
-    func getGreenGain() -> UInt8?
-    func getBlueGain() -> UInt8?
+    func getRedGain() -> UInt16?
+    func getGreenGain() -> UInt16?
+    func getBlueGain() -> UInt16?
 
     func getBrightness() -> Brightness?
     func getContrast() -> Contrast?
-    func getVolume() -> UInt8?
+    func getVolume() -> UInt16?
     func getMute() -> Bool?
     func getInput() -> InputSource?
 
     func getMaxBrightness() -> Brightness?
     func getMaxContrast() -> Contrast?
-    func getMaxVolume() -> UInt8?
+    func getMaxVolume() -> UInt16?
 
     func reset() -> Bool
     func resetState()
@@ -163,7 +163,7 @@ extension Control {
         case .contrast:
             return setContrast(value as! Contrast, oldValue: nil, onChange: nil)
         case .volume:
-            return setVolume(value as! UInt8)
+            return setVolume(value as! UInt16)
         case .input:
             return setInput(value as! InputSource)
         case .audioMuted:
