@@ -494,8 +494,7 @@ enum CachedDefaults {
         set {
             mainAsync {
                 cache[key.name] = AnyCodable(newValue)
-                if key == .displays, let displays = newValue as? [Display] {
-                    displaysPublisher.send(displays)
+                if key == .displays {
                     Defaults.withoutPropagation {
                         key.suite[key] = newValue
                     }
@@ -517,7 +516,6 @@ enum CachedDefaults {
 
     // MARK: Internal
 
-    static var displaysPublisher = PassthroughSubject<[Display], Never>()
     static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
     static var locks: [String: NSRecursiveLock] = [:]
     static var observers = Set<AnyCancellable>()
@@ -551,9 +549,6 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
     Defaults.publisher(key).sink { change in
         log.debug("Caching \(key.name) = \(change.newValue)")
         CachedDefaults.cache[key.name] = AnyCodable(change.newValue)
-        if key == .displays, let displays = change.newValue as? [Display] {
-            asyncNow { CachedDefaults.displaysPublisher.send(displays) }
-        }
     }.store(in: &CachedDefaults.observers)
 }
 
@@ -832,7 +827,6 @@ let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHot
     .filter { $0.oldValue != $0.newValue }
 let detectKeyHoldPublisher = Defaults.publisher(.detectKeyHold).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
-// let hotkeysPublisher = Defaults.publisher(.hotkeys).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showDockIconPublisher = Defaults.publisher(.showDockIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let disableControllerVideoPublisher = Defaults.publisher(.disableControllerVideo).removeDuplicates().filter { $0.oldValue != $0.newValue }
@@ -844,7 +838,6 @@ let contrastStepPublisher = Defaults.publisher(.contrastStep).removeDuplicates()
 let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let appExceptionsPublisher = Defaults.publisher(.appExceptions).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let securePublisher = Defaults.publisher(.secure).removeDuplicates().filter { $0.oldValue != $0.newValue }
-// let displaysPublisher = Defaults.publisher(.displays).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let debugPublisher = Defaults.publisher(.debug).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
