@@ -19,8 +19,8 @@ class DDCControl: Control {
     // MARK: Internal
 
     struct ValueRange: Equatable {
-        let value: UInt8
-        let oldValue: UInt8?
+        let value: UInt16
+        let oldValue: UInt16?
     }
 
     static var sliderTracking = false
@@ -87,35 +87,35 @@ class DDCControl: Control {
         return DDC.setPower(for: display.id, power: power == .on)
     }
 
-    func setRedGain(_ gain: UInt8) -> Bool {
+    func setRedGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
 
         return DDC.setRedGain(for: display.id, redGain: gain)
     }
 
-    func setGreenGain(_ gain: UInt8) -> Bool {
+    func setGreenGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
 
         return DDC.setGreenGain(for: display.id, greenGain: gain)
     }
 
-    func setBlueGain(_ gain: UInt8) -> Bool {
+    func setBlueGain(_ gain: UInt16) -> Bool {
         guard let display = display else { return false }
 
         return DDC.setBlueGain(for: display.id, blueGain: gain)
     }
 
-    func getRedGain() -> UInt8? {
+    func getRedGain() -> UInt16? {
         guard let display = display else { return nil }
         return DDC.getRedGain(for: display.id)
     }
 
-    func getGreenGain() -> UInt8? {
+    func getGreenGain() -> UInt16? {
         guard let display = display else { return nil }
         return DDC.getGreenGain(for: display.id)
     }
 
-    func getBlueGain() -> UInt8? {
+    func getBlueGain() -> UInt16? {
         guard let display = display else { return nil }
         return DDC.getBlueGain(for: display.id)
     }
@@ -284,7 +284,7 @@ class DDCControl: Control {
         return DDC.setContrast(for: display.id, contrast: contrast)
     }
 
-    func setVolume(_ volume: UInt8) -> Bool {
+    func setVolume(_ volume: UInt16) -> Bool {
         guard let display = display else { return false }
 
         return DDC.setAudioSpeakerVolume(for: display.id, audioSpeakerVolume: volume)
@@ -322,12 +322,12 @@ class DDCControl: Control {
         return DDC.getMaxValue(for: display.id, controlID: .CONTRAST)
     }
 
-    func getMaxVolume() -> UInt8? {
+    func getMaxVolume() -> UInt16? {
         guard let display = display else { return nil }
         return DDC.getMaxValue(for: display.id, controlID: .AUDIO_SPEAKER_VOLUME)
     }
 
-    func getVolume() -> UInt8? {
+    func getVolume() -> UInt16? {
         guard let display = display else { return nil }
         return DDC.getAudioSpeakerVolume(for: display.id)
     }

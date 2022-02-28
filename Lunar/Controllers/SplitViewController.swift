@@ -206,6 +206,8 @@ class SplitViewController: NSSplitViewController {
     var overrideAdaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver = false
 
+    var nameObservers: Set<AnyCancellable> = []
+
     @objc dynamic var page = 2 {
         didSet {
             guard applyPage else { return }
@@ -216,16 +218,33 @@ class SplitViewController: NSSplitViewController {
 
     weak var pageController: PageController? {
         didSet {
+            nameObservers = []
             guard let pageController = pageController else { return }
+            var tabIndex = 0
             pages = pageController.arrangedObjects.compactMap { obj in
+                defer { tabIndex += 1 }
                 switch obj {
                 case let page as NSPageController.ObjectIdentifier:
                     let tab = NSTabViewItem(identifier: page.stripped)
                     tab.label = page.stripped
                     return tab
                 case let display as Display:
-                    let tab = NSTabViewItem(identifier: display.serial)
+                    let serial = display.serial
+                    let tab = NSTabViewItem(identifier: serial)
                     tab.label = display.name.stripped
+                    display.$name
+                        .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+                        .sink { [weak self] name in
+                            guard let self = self else { return }
+
+                            self.pages = self.pages.map { tab in
+                                guard (tab.identifier as? String) == serial else { return tab }
+
+                                let newTab = NSTabViewItem(identifier: tab.identifier)
+                                newTab.label = name.stripped
+                                return newTab
+                            }
+                        }.store(in: &nameObservers)
                     return tab
                 default:
                     return nil

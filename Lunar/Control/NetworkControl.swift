@@ -135,7 +135,7 @@ class NetworkControl: Control {
         var url: URL
         var controlID: ControlID
         var timeout: DateComponents
-        var value: UInt8
+        var value: UInt16
     }
 
     static var browser = CiaoBrowser()
@@ -428,7 +428,7 @@ class NetworkControl: Control {
         }
     }
 
-    func set(_ value: UInt8, for controlID: ControlID, smooth: Bool = false, oldValue: UInt8? = nil) -> Bool {
+    func set(_ value: UInt16, for controlID: ControlID, smooth: Bool = false, oldValue: UInt16? = nil) -> Bool {
         guard let display = display else { return false }
 
         guard let service = NetworkControl.controllersForDisplay[display.serial],
@@ -458,7 +458,7 @@ class NetworkControl: Control {
         return true
     }
 
-    func get(_ controlID: ControlID, max: Bool = false) -> UInt8? {
+    func get(_ controlID: ControlID, max: Bool = false) -> UInt16? {
         guard let display = display else { return nil }
 
         guard !screensSleeping.load(ordering: .relaxed) else { return nil }
@@ -472,13 +472,13 @@ class NetworkControl: Control {
             return nil
         }
 
-        var value: UInt8?
+        var value: UInt16?
         guard let resp = waitForResponse(from: url / controlID, timeoutPerTry: 1500.milliseconds) else {
             log.error("Error reading \(controlID) for \(display)")
             return nil
         }
         log.debug("Read \(controlID), received response `\(resp)` for \(display)")
-        value = UInt8(resp)
+        value = UInt16(resp)
 
         return value
     }
@@ -487,27 +487,27 @@ class NetworkControl: Control {
         set(power == .on ? 1 : 5, for: .DPMS)
     }
 
-    func setRedGain(_ gain: UInt8) -> Bool {
+    func setRedGain(_ gain: UInt16) -> Bool {
         set(gain, for: .RED_GAIN)
     }
 
-    func setGreenGain(_ gain: UInt8) -> Bool {
+    func setGreenGain(_ gain: UInt16) -> Bool {
         set(gain, for: .GREEN_GAIN)
     }
 
-    func setBlueGain(_ gain: UInt8) -> Bool {
+    func setBlueGain(_ gain: UInt16) -> Bool {
         set(gain, for: .BLUE_GAIN)
     }
 
-    func getRedGain() -> UInt8? {
+    func getRedGain() -> UInt16? {
         get(.RED_GAIN)
     }
 
-    func getGreenGain() -> UInt8? {
+    func getGreenGain() -> UInt16? {
         get(.GREEN_GAIN)
     }
 
-    func getBlueGain() -> UInt8? {
+    func getBlueGain() -> UInt16? {
         get(.BLUE_GAIN)
     }
 
@@ -535,7 +535,7 @@ class NetworkControl: Control {
         return set(contrast, for: .CONTRAST)
     }
 
-    func setVolume(_ volume: UInt8) -> Bool {
+    func setVolume(_ volume: UInt16) -> Bool {
         set(volume, for: .AUDIO_SPEAKER_VOLUME)
     }
 
@@ -563,11 +563,11 @@ class NetworkControl: Control {
         get(.CONTRAST, max: true)
     }
 
-    func getMaxVolume() -> UInt8? {
+    func getMaxVolume() -> UInt16? {
         get(.AUDIO_SPEAKER_VOLUME, max: true)
     }
 
-    func getVolume() -> UInt8? {
+    func getVolume() -> UInt16? {
         get(.AUDIO_SPEAKER_VOLUME)
     }
 

@@ -829,7 +829,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineHeightMultiple = 0.6
-            statusItem.button?.attributedTitle = " B: \(display.brightness.uint8Value)\n C: \(display.contrast.uint8Value)"
+            statusItem.button?.attributedTitle = " B: \(display.brightness.uint16Value)\n C: \(display.contrast.uint16Value)"
                 .withFont(.systemFont(ofSize: 10, weight: .medium)).withBaselineOffset(-5).withParagraphStyle(paragraphStyle)
         }
         infoMenuItem.attributedTitle = markdown.attributedString(from: "\(externalLux)\(internalLux)\(sun)".trimmed)
@@ -1124,7 +1124,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         ) { _ in
                             if displayController.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
                                 for (num, display) in displayController.activeDisplayList.enumerated() {
-                                    let br = display.brightness.uint8Value
+                                    let br = display.brightness.uint16Value
                                     mainAsyncAfter(ms: num * 50) {
                                         display.withForce { display.brightness = cap(br - 1, minVal: 0, maxVal: 100).ns }
                                     }
@@ -1155,9 +1155,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             }
 
                             for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
-                                _ = display.control?.setRedGain(display.redGain.uint8Value)
-                                _ = display.control?.setGreenGain(display.greenGain.uint8Value)
-                                _ = display.control?.setBlueGain(display.blueGain.uint8Value)
+                                _ = display.control?.setRedGain(display.redGain.uint16Value)
+                                _ = display.control?.setGreenGain(display.greenGain.uint16Value)
+                                _ = display.control?.setBlueGain(display.blueGain.uint16Value)
                             }
                         }
                     }
@@ -1667,9 +1667,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
                 displayController.adaptBrightness(force: true)
                 for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
-                    _ = display.control?.setRedGain(display.redGain.uint8Value)
-                    _ = display.control?.setGreenGain(display.greenGain.uint8Value)
-                    _ = display.control?.setBlueGain(display.blueGain.uint8Value)
+                    _ = display.control?.setRedGain(display.redGain.uint16Value)
+                    _ = display.control?.setGreenGain(display.greenGain.uint16Value)
+                    _ = display.control?.setBlueGain(display.blueGain.uint16Value)
                 }
             }
         }

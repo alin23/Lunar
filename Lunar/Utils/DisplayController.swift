@@ -989,8 +989,8 @@ class DisplayController {
             (br, cr) = display.sliderValueToBrightnessContrast(app.manualBrightnessContrast)
             log.debug("App offset: \(app.identifier) \(app.name) \(app.manualBrightnessContrast) \(br) \(cr)")
         } else {
-            br = display.sliderValueToBrightness(app.manualBrightness).uint8Value
-            cr = display.sliderValueToBrightness(app.manualContrast).uint8Value
+            br = display.sliderValueToBrightness(app.manualBrightness).uint16Value
+            cr = display.sliderValueToBrightness(app.manualContrast).uint16Value
             log.debug("App offset: \(app.identifier) \(app.name) \(app.manualBrightness) \(app.manualContrast) \(br) \(cr)")
         }
 

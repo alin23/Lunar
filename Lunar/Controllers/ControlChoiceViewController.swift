@@ -418,7 +418,7 @@ class ControlChoiceViewController: NSViewController {
         }
     }
 
-    func setVolume(_ volume: UInt8) {
+    func setVolume(_ volume: UInt16) {
         mainThread {
             if volumeSlider.alphaValue == 0 {
                 volumeSlider.isEnabled = true
@@ -476,9 +476,9 @@ class ControlChoiceViewController: NSViewController {
         //     return .noneWorked
         // #endif
 
-        let currentBrightness = brightnessField.integerValue.u8
-        let currentContrast = contrastField.integerValue.u8
-        let currentVolume = volume.u8
+        let currentBrightness = brightnessField.integerValue.u16
+        let currentContrast = contrastField.integerValue.u16
+        let currentVolume = volume.u16
         var brightnessWriteWorked = false
         var contrastWriteWorked = false
         var volumeWriteWorked = false
