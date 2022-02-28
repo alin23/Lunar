@@ -250,7 +250,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             "#### Testing \(control.str):\(control is DDCCTLControl ? "  [https://github.com/kfix/ddcctl](https://github.com/kfix/ddcctl)" : "")"
                         )
 
-                    let brightnessBeforeTest = display.brightness.uint8Value
+                    let brightnessBeforeTest = display.brightness.uint16Value
                     switch control {
                     case is AppleNativeControl:
                         self.render("\n##### Reading brightness...")
@@ -289,7 +289,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                             if let br = control.getBrightness() {
                                 self
                                     .renderSeparated(
-                                        "Received brightness value: `\(br)` *(\(br.asPercentage(of: display.maxDDCBrightness.uint8Value)))*"
+                                        "Received brightness value: `\(br)` *(\(br.asPercentage(of: display.maxDDCBrightness.uint16Value)))*"
                                     )
                                 switch control {
                                 case is DDCControl:
@@ -665,7 +665,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         printBrightness()
                         Thread.sleep(forTimeInterval: 0.5)
 
-                        let trySync = { (brightness: UInt8, method: AppleNativeMethod) in
+                        let trySync = { (brightness: UInt16, method: AppleNativeMethod) in
                             guard !self.stopped else { return }
                             self.render("\n\n##### Setting source brightness to `\(brightness)`")
                             display.brightness = brightness.ns
@@ -679,7 +679,7 @@ class DiagnosticsViewController: NSViewController, NSTextViewDelegate {
                         trySync(10, .displayServices)
                         trySync(1, .displayServices)
                         if let oldBrightness = sourceBrightness {
-                            trySync(oldBrightness.u8, .displayServices)
+                            trySync(oldBrightness.u16, .displayServices)
                         }
                     }
                 }

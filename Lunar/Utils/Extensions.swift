@@ -1213,8 +1213,8 @@ extension Matrix {
 typealias NSBrightness = NSNumber
 typealias NSContrast = NSNumber
 
-typealias Brightness = UInt8
-typealias Contrast = UInt8
+typealias Brightness = UInt16
+typealias Contrast = UInt16
 
 typealias PreciseBrightness = Double
 typealias PreciseContrast = Double

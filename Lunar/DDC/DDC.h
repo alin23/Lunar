@@ -71,15 +71,15 @@ char *logPath = "/tmp/lunar.log";
 struct DDCWriteCommand
 {
     UInt8 control_id;
-    UInt8 new_value;
+    UInt16 new_value;
 };
 
 struct DDCReadCommand
 {
     UInt8 control_id;
     bool success;
-    UInt8 max_value;
-    UInt8 current_value;
+    UInt16 max_value;
+    UInt16 current_value;
 };
 
 struct EDID {

@@ -60,7 +60,7 @@ struct DDCCTLControl: Control {
         }
     }
 
-    func ddcctlSet(_ property: ControlID, value: UInt8) -> Bool {
+    func ddcctlSet(_ property: ControlID, value: UInt16) -> Bool {
         guard let index = displayIndex else { return false }
         let ddcctlSemaphore = DispatchSemaphore(value: 0, name: "ddcctlSemaphore")
         var command = "ddcctl "
@@ -94,15 +94,15 @@ struct DDCCTLControl: Control {
         return process.terminationStatus == 0
     }
 
-    func setRedGain(_ gain: UInt8) -> Bool {
+    func setRedGain(_ gain: UInt16) -> Bool {
         ddcctlSet(.RED_GAIN, value: gain)
     }
 
-    func setGreenGain(_ gain: UInt8) -> Bool {
+    func setGreenGain(_ gain: UInt16) -> Bool {
         ddcctlSet(.GREEN_GAIN, value: gain)
     }
 
-    func setBlueGain(_ gain: UInt8) -> Bool {
+    func setBlueGain(_ gain: UInt16) -> Bool {
         ddcctlSet(.BLUE_GAIN, value: gain)
     }
 
@@ -118,7 +118,7 @@ struct DDCCTLControl: Control {
         ddcctlSet(.CONTRAST, value: value)
     }
 
-    func setVolume(_ value: UInt8) -> Bool {
+    func setVolume(_ value: UInt16) -> Bool {
         ddcctlSet(.AUDIO_SPEAKER_VOLUME, value: value)
     }
 
@@ -134,9 +134,9 @@ struct DDCCTLControl: Control {
         ddcctlSet(.DPMS, value: value == .on ? 1 : 5)
     }
 
-    func getRedGain() -> UInt8? { nil }
-    func getGreenGain() -> UInt8? { nil }
-    func getBlueGain() -> UInt8? { nil }
+    func getRedGain() -> UInt16? { nil }
+    func getGreenGain() -> UInt16? { nil }
+    func getBlueGain() -> UInt16? { nil }
 
     func getBrightness() -> Brightness? {
         nil
@@ -146,7 +146,7 @@ struct DDCCTLControl: Control {
         nil
     }
 
-    func getVolume() -> UInt8? {
+    func getVolume() -> UInt16? {
         nil
     }
 
@@ -166,7 +166,7 @@ struct DDCCTLControl: Control {
         nil
     }
 
-    func getMaxVolume() -> UInt8? {
+    func getMaxVolume() -> UInt16? {
         nil
     }
 

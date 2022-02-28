@@ -107,10 +107,10 @@ class ScrollableContrast: NSView {
     func addObserver(_ display: Display) {
         display.$contrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
             guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
-            let minContrast = display.minContrast.uint8Value
-            let maxContrast = display.maxContrast.uint8Value
+            let minContrast = display.minContrast.uint16Value
+            let maxContrast = display.maxContrast.uint16Value
 
-            let newContrast = cap(newContrast.uint8Value, minVal: minContrast, maxVal: maxContrast)
+            let newContrast = cap(newContrast.uint16Value, minVal: minContrast, maxVal: maxContrast)
             mainThread {
                 self?.currentValue?.stringValue = String(newContrast)
             }

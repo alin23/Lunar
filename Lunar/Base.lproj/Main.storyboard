@@ -9761,7 +9761,7 @@ to send arbitrary DDC commands to monitors</string>
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <integer key="value" value="255"/>
+                                        <integer key="value" value="999"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
                                         <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -9825,7 +9825,7 @@ to send arbitrary DDC commands to monitors</string>
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <integer key="value" value="255"/>
+                                        <integer key="value" value="999"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
                                         <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -9921,7 +9921,7 @@ to send arbitrary DDC commands to monitors</string>
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="upperLimit">
-                                        <real key="value" value="255"/>
+                                        <integer key="value" value="999"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="textFieldColor">
                                         <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
