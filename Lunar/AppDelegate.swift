@@ -1456,7 +1456,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 refreshScreen()
             }
 
-            cliExit(0)
+            exit(0)
         }
 
         guard let idx = CommandLine.arguments.firstIndex(of: "@") else { return false }
