@@ -854,7 +854,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func initDisplayControllerActivity() {
+    func initDisplayController() {
+        displayController.displays = displayController.getDisplaysLock.around {
+            DisplayController.getDisplays(
+                includeVirtual: CachedDefaults[.showVirtualDisplays],
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
+            )
+        }
+        displayController.addSentryData()
+
         if CachedDefaults[.refreshValues] {
             startValuesReaderThread()
         }
@@ -1451,32 +1461,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         guard let idx = CommandLine.arguments.firstIndex(of: "@") else { return false }
 
+        configureSentry()
         asyncNow { [self] in
             log.initLogger(cli: true)
             let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
 
-            guard !argList.contains("--new-instance"), otherLunar() != nil,
-                  let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
-            else {
-                if !argList.contains("--remote") {
-                    Lunar.main(argList)
+            let exc = tryBlock {
+                guard !argList.contains("--new-instance"), otherLunar() != nil,
+                      let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
+                else {
+                    if !argList.contains("--remote") {
+                        initCacheTransitionLogging()
+                        Lunar.main(argList)
+                    } else {
+                        print("Can't use `--remote` and `--new-instance` at the same time.")
+                        cliExit(1)
+                    }
+                    return
                 }
-                return
+
+                let argString = argList.without("--remote").joined(separator: CLI_ARG_SEPARATOR)
+                let key = opts.key.isEmpty ? Defaults[.apiKey] : opts.key
+
+                do {
+                    try socket.connect(to: opts.host, port: LUNAR_CLI_PORT)
+                    try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
+
+                    if let response = (try socket.readString())?.trimmed, !response.isEmpty {
+                        print(response)
+                    }
+                    cliExit(0)
+                } catch {
+                    print(error.localizedDescription)
+                    cliExit(1)
+                }
             }
 
-            let argString = argList.without("--remote").joined(separator: CLI_ARG_SEPARATOR)
-            let key = opts.key.isEmpty ? Defaults[.apiKey] : opts.key
-
-            do {
-                try socket.connect(to: opts.host, port: LUNAR_CLI_PORT)
-                try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
-
-                if let response = try socket.readString(), !response.isEmpty {
-                    print(response.trimmed, terminator: "")
-                }
-                cliExit(0)
-            } catch {
-                print(error.localizedDescription)
+            if let exc = exc {
+                log.error(exc)
                 cliExit(1)
             }
         }
@@ -1484,73 +1506,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return true
     }
 
-    func applicationDidFinishLaunching(_: Notification) {
-        startTime = Date()
-        Defaults[.secondPhase] = initFirstPhase()
-        if Defaults[.apiKey].isEmpty {
-            Defaults[.apiKey] = SERIAL_NUMBER_HASH
-        }
-
-        if CommandLine.arguments.contains("install-cli") || CommandLine.arguments
-            .contains("installcli") || (CommandLine.arguments.contains("install") && CommandLine.arguments.contains("cli"))
-        {
-            log.setMinLevel(debug: false, verbose: false, cloud: false, cli: false)
-            log.disable()
-            do {
-                try installCLIBinary()
-                print("Lunar CLI installed")
-            } catch let error as InstallCLIError {
-                print(error.message)
-                print(error.info)
-                exit(1)
-            } catch {
-                print("Error installing Lunar CLI")
-                print(error.localizedDescription)
-                exit(2)
-            }
-            exit(0)
-        }
-
-        if !CommandLine.arguments.contains("@") {
-            log.initLogger()
-        }
-
-        initCache()
-        CachedDefaults[.debug] = false
-        CachedDefaults[.streamLogs] = false
-
-        brightnessTransition = CachedDefaults[.brightnessTransition]
-        brightnessTransitionPublisher.sink { change in
-            brightnessTransition = change.newValue
-        }.store(in: &observers)
-
-        if handleCLI() { return }
-        listenForRemoteCommandsPublisher
-            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
-            .sink { change in
-                server.stop()
-                serve(host: change.newValue ? "0.0.0.0" : "127.0.0.1")
-            }.store(in: &observers)
-        serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
-
-        Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
-        Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()
-        let nc = UNUserNotificationCenter.current()
-        nc.getNotificationSettings { settings in
-            mainAsync {
-                let enabled = settings.alertSetting == .enabled
-                Defaults[.notificationsPermissionsGranted] = enabled
-                // if !enabled, !datastore.shouldOnboard {
-                //     nc.requestAuthorization(options: [.alert, .provisional], completionHandler: { _, _ in })
-                // }
-            }
-        }
-
+    func configureSentry() {
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-        ValueTransformer.setValueTransformer(StringNumberTransformer(), forName: .stringNumberTransformerName)
-        ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
-        ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
-        ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
         SentrySDK.start { options in
@@ -1574,7 +1531,54 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 scope.setTag(value: "null", key: "secondPhase")
             }
         }
+    }
 
+    func initCacheTransitionLogging() {
+        if !CommandLine.arguments.contains("@") {
+            log.initLogger()
+        }
+
+        initCache()
+        CachedDefaults[.debug] = false
+        CachedDefaults[.streamLogs] = false
+
+        brightnessTransition = CachedDefaults[.brightnessTransition]
+        brightnessTransitionPublisher.sink { change in
+            brightnessTransition = change.newValue
+        }.store(in: &observers)
+    }
+
+    func handleCLIInstall() {
+        guard CommandLine.arguments.contains("install-cli") || CommandLine.arguments
+            .contains("installcli") || (CommandLine.arguments.contains("install") && CommandLine.arguments.contains("cli"))
+        else { return }
+
+        log.setMinLevel(debug: false, verbose: false, cloud: false, cli: false)
+        log.disable()
+
+        do {
+            try installCLIBinary()
+            print("Lunar CLI installed")
+        } catch let error as InstallCLIError {
+            print(error.message)
+            print(error.info)
+            exit(1)
+        } catch {
+            print("Error installing Lunar CLI")
+            print(error.localizedDescription)
+            exit(2)
+        }
+        exit(0)
+    }
+
+    func setupValueTransformers() {
+        ValueTransformer.setValueTransformer(StringNumberTransformer(), forName: .stringNumberTransformerName)
+        ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
+        ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
+        ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
+    }
+
+    func terminateOtherLunarInstances() {
         if let app = otherLunar(), app.forceTerminate() {
             notify(
                 identifier: "lunar-single-instance",
@@ -1582,18 +1586,47 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 body: "The other instance was terminated and this instance will now continue to run normally."
             )
         }
+    }
 
-        DDC.setup()
-
-        displayController.displays = displayController.getDisplaysLock.around {
-            DisplayController.getDisplays(
-                includeVirtual: CachedDefaults[.showVirtualDisplays],
-                includeAirplay: CachedDefaults[.showAirplayDisplays],
-                includeProjector: CachedDefaults[.showProjectorDisplays],
-                includeDummy: CachedDefaults[.showDummyDisplays]
-            )
+    func checkPermissions() {
+        Defaults[.accessibilityPermissionsGranted] = AXIsProcessTrusted()
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            mainAsync {
+                let enabled = settings.alertSetting == .enabled
+                Defaults[.notificationsPermissionsGranted] = enabled
+            }
         }
-        displayController.addSentryData()
+    }
+
+    func applicationDidFinishLaunching(_: Notification) {
+        if Defaults[.apiKey].isEmpty {
+            Defaults[.apiKey] = SERIAL_NUMBER_HASH
+        }
+
+        handleCLIInstall()
+        if handleCLI() {
+            return
+        }
+
+        initCacheTransitionLogging()
+
+        startTime = Date()
+        Defaults[.secondPhase] = initFirstPhase()
+
+        listenForRemoteCommandsPublisher
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .sink { change in
+                server.stop()
+                serve(host: change.newValue ? "0.0.0.0" : "127.0.0.1")
+            }.store(in: &observers)
+        serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
+
+        Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
+        checkPermissions()
+        setupValueTransformers()
+        configureSentry()
+        terminateOtherLunarInstances()
+        DDC.setup()
 
         if let logPath = LOG_URL?.path.cString(using: .utf8) {
             log.info("Setting log path to \(LOG_URL?.path ?? "")")
@@ -1603,7 +1636,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         try? updater.start()
         handleDaemon()
 
-        initDisplayControllerActivity()
+        initDisplayController()
         initMenubarIcon()
 
         addGlobalMouseDownMonitor()
